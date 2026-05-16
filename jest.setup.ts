@@ -73,6 +73,7 @@ jest.mock('mapbox-gl', () => ({
 }));
 
 // Mock framer-motion to skip animations
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, react/display-name */
 jest.mock('framer-motion', () => {
   const React = require('react');
   return {
@@ -94,8 +95,10 @@ jest.mock('framer-motion', () => {
     useAnimation: () => ({ start: jest.fn(), stop: jest.fn() }),
   };
 });
+/* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, react/display-name */
 
 // Mock react-firebase-hooks
+/* eslint-disable @typescript-eslint/no-explicit-any */
 jest.mock('react-firebase-hooks/auth', () => ({
   useAuthState: jest.fn(() => [mockState.currentUser, false, null]),
 }), { virtual: true });
@@ -111,6 +114,7 @@ jest.mock('react-firebase-hooks/firestore', () => ({
     return [mockState.firestoreDocs[path] || null, false, null];
   }),
 }), { virtual: true });
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // Mock Firebase standard SDK
 jest.mock('firebase/app', () => ({
@@ -264,14 +268,15 @@ jest.mock('firebase/firestore', () => ({
   getDocFromCache: jest.fn(() => Promise.reject(new Error('no cache'))),
   getDocs: jest.fn((query) => {
     const path = query?._path || 'default';
-    const docs = (mockState.firestoreData[path] || []).map(d => ({
+    const rows = (mockState.firestoreData[path] || []) as Array<{ id?: string }>;
+    const docs = rows.map((d) => ({
       data: () => d,
       id: d.id || 'mock-id'
     }));
     return Promise.resolve({
       docs,
       empty: docs.length === 0,
-      forEach: (cb: any) => docs.forEach(cb),
+      forEach: (cb: (doc: { data: () => unknown; id: string }) => void) => docs.forEach(cb),
     });
   }),
   setDoc: jest.fn(() => Promise.resolve()),
@@ -290,14 +295,15 @@ jest.mock('firebase/firestore', () => ({
   onSnapshot: jest.fn((refOrQuery, callback) => {
     const path = refOrQuery?._path || 'default';
     const data = mockState.firestoreDocs[path];
-    const docs = mockState.firestoreData[path] || [];
+    const rows = (mockState.firestoreData[path] || []) as Array<{ id?: string }>;
     
     if (typeof callback === 'function') {
       callback({
         exists: () => !!data,
         data: () => data,
-        docs: docs.map(d => ({ data: () => d, id: d.id || 'mock-id' })),
-        forEach: (cb: any) => docs.forEach(d => cb({ data: () => d, id: d.id || 'mock-id' })),
+        docs: rows.map((d) => ({ data: () => d, id: d.id || 'mock-id' })),
+        forEach: (cb: (doc: { data: () => unknown; id: string }) => void) =>
+          rows.forEach((d) => cb({ data: () => d, id: d.id || 'mock-id' })),
       });
     }
     return jest.fn();

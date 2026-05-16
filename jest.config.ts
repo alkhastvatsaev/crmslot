@@ -52,6 +52,18 @@ const config: Config = {
       functions: 50,
       lines: 48,
     },
+    './src/features/interventions/technicianAssignmentsFilter.ts': {
+      statements: 85,
+      branches: 70,
+      functions: 100,
+      lines: 85,
+    },
+    './src/features/interventions/mapTechnicianMissions.ts': {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
     './src/core/ui/dashboardDesktopLayout.ts': {
       statements: 100,
       branches: 100,

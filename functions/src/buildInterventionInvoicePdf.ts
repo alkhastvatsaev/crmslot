@@ -89,7 +89,7 @@ export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput):
 
   const tableBottom =
     (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y + 40;
-  let finalY = tableBottom + 14;
+  const finalY = tableBottom + 14;
 
   const labelX = 120;
   const valX = 190;

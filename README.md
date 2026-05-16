@@ -2,49 +2,60 @@
 
 Ce projet est une application Next.js premium dédiée à la gestion d'interventions techniques (serrurerie, etc.) à Bruxelles. Elle propose une interface fluide sous forme de carrousel permettant de basculer entre la vue cartographique, le hub société et le hub technicien.
 
-## 🚀 Fonctionnalités Clés
+## Fonctionnalités clés
 
-- **Carte Interactive (Mapbox)** : Visualisation en temps réel des interventions, filtrage par date et accès rapide aux dossiers.
-- **Hub Société** : Formulaire intelligent avec dictée vocale, géocodage inverse et portail client pour le suivi en direct.
-- **Hub Technicien** : Gestion des missions assignées, capture de photos avant/après et signature électronique.
-- **Mode Hors-ligne (PWA)** : Synchronisation automatique des données lors du retour de la connexion.
-- **Multilingue** : Support complet du Français, Néerlandais et Anglais.
+- **Carte interactive (Mapbox)** : visualisation en temps réel des interventions, filtrage par date et accès rapide aux dossiers.
+- **Hub société** : formulaire intelligent avec dictée vocale, géocodage inverse et portail client pour le suivi en direct.
+- **Hub technicien** : gestion des missions assignées, capture de photos avant/après et signature électronique.
+- **Mode hors-ligne (PWA)** : synchronisation automatique des données lors du retour de la connexion.
+- **Multilingue** : français, néerlandais et anglais.
 
-## 🛠 Tech Stack
+## Tech stack
 
-- **Framework** : Next.js 14+ (App Router)
-- **Langage** : TypeScript
-- **Backend** : Firebase (Firestore, Auth, Storage, Functions)
-- **Styling** : Tailwind CSS & Framer Motion (Animations Premium)
+- **Framework** : Next.js 16 (App Router, webpack)
+- **UI** : React 19, Tailwind CSS v4, Framer Motion, shadcn (base-nova)
+- **Backend** : Firebase (Firestore, Auth, Storage)
 - **Cartographie** : Mapbox GL JS
-- **State Management** : React Context & TanStack Query
+- **Data** : React Context et TanStack Query (persistance offline technicien)
 
-## 📦 Installation
+## Installation
 
 1. Cloner le dépôt.
-2. Installer les dépendances :
-   ```bash
-   npm install
-   ```
-3. Configurer les variables d'environnement dans un fichier `.env.local` (voir `.env.example`).
-4. Lancer le serveur de développement :
-   ```bash
-   npm run dev
-   ```
+2. Installer les dépendances : `npm install`
+3. Copier `.env.example` vers `.env.local` et renseigner les variables.
+4. Lancer le dev : `npm run dev` (PWA en dev : `npm run dev:pwa`)
 
-## 🧪 Tests
+## Tests
 
-Le projet suit une architecture de tests stricte (Jest + RTL) :
 ```bash
-npm run test
+npm run ci                # lint + typecheck + tests + build (recommandé avant merge)
+npm run ci:all            # ci + Playwright E2E
+npm run lint:ci           # ESLint (erreurs bloquantes sur src/)
+npm run test:ci           # typecheck + coverage
+npm run test:e2e          # Playwright (carte + navigation carrousel)
+npx playwright install    # une fois, avant les E2E en local
+npm run lint              # rapport complet (avertissements inclus)
 ```
 
-## 🏗 Structure du Projet
+Voir `AGENTS.md` pour les règles de tests (colocation, `data-testid`, modules P0).
 
-- `src/features` : Modules fonctionnels isolés (map, backoffice, interventions, auth).
-- `src/core` : Configuration de base, i18n, services partagés.
-- `src/context` : Fournisseurs d'états globaux.
-- `src/utils` : Utilitaires et helpers transverses.
+## Sécurité API
 
----
-Projet optimisé et nettoyé pour la production.
+Les routes `/api/*` sensibles exigent un jeton Firebase (`Authorization: Bearer`). Exceptions documentées :
+
+- `GET /api/health` — sonde publique
+- `GET|POST /api/ai/audio-dispatch` — MacroDroid (secret `AUDIO_DISPATCH_SECRET` en production)
+- `POST /api/ai/process-uploads` — secret, jeton ou IP bureau
+- `/api/webhooks/twilio/*` — callbacks Twilio
+- `/api/demo/*` — désactivé en production
+
+## Structure
+
+- `src/features` — modules métier (map, interventions, auth, backoffice…)
+- `src/core` — config Firebase, i18n, helpers API (`src/core/api/routeAuth.ts`)
+- `src/app` — pages et routes API Next
+- `tests/e2e` — Playwright
+
+## Page prototype
+
+`/technician` est un laboratoire UI (AR, paiement) distinct du hub technicien du carrousel principal (`/`).
