@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
+<div
+  class="flex items-center gap-2 px-4 py-2"
+>
+  <span
+    class="rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1.5 bg-amber-50 text-amber-600 border border-amber-200"
+    data-testid="kpi-pending"
+  >
+    <span
+      aria-hidden="true"
+      class="w-1.5 h-1.5 rounded-full bg-amber-500"
+    />
+    En attente
+    <span>
+      3
+    </span>
+  </span>
+  <span
+    class="rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-200"
+    data-testid="kpi-in-progress"
+  >
+    <span
+      aria-hidden="true"
+      class="w-1.5 h-1.5 rounded-full bg-blue-500"
+    />
+    En cours
+    <span>
+      2
+    </span>
+  </span>
+  <span
+    class="rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200"
+    data-testid="kpi-done"
+  >
+    <span
+      aria-hidden="true"
+      class="w-1.5 h-1.5 rounded-full bg-emerald-500"
+    />
+    Terminées
+    <span>
+      7
+    </span>
+  </span>
+</div>
+`;
