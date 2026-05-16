@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe } from 'lucide-react';
+import { X, Globe, Search, Map, Building2, Wrench } from 'lucide-react';
+import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DASHBOARD_PANEL_CHROME_BLUR,
@@ -23,6 +24,12 @@ const languages: { code: Language; label: string }[] = [
 export default function SpotlightSearch() {
   const [open, setOpen] = useState(false);
   const { language, setLanguage, t } = useTranslation();
+  const pager = useDashboardPagerOptional();
+  const navPages = [
+    { index: 0, label: t('spotlight.nav_map'),        Icon: Map },
+    { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
+    { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
+  ];
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -38,16 +45,21 @@ export default function SpotlightSearch() {
 
   return (
     <>
-      <button 
+      <button
         id="spotlight-search"
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ouvrir la recherche"
-        className={`${dashboardHeaderPanelShellClass} items-center justify-end bg-white/95 px-8 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`}
+        className={`${dashboardHeaderPanelShellClass} items-center justify-between bg-white/95 px-6 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`}
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
-
-
+        <span className="flex items-center gap-2 text-sm text-gray-400">
+          <Search className="w-4 h-4" />
+          <span>{t('spotlight.search_placeholder')}</span>
+        </span>
+        <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-black/10 bg-black/5 px-2 py-0.5 text-xs font-medium text-gray-400">
+          ⌘K
+        </kbd>
       </button>
 
       <AnimatePresence>
@@ -119,6 +131,26 @@ export default function SpotlightSearch() {
                   <Command.Empty className="px-6 py-8 text-center text-gray-500/60 font-medium">
                     {t('spotlight.no_results')}
                   </Command.Empty>
+                  <Command.Group heading="Navigation" className="px-2 py-2">
+                    {navPages.map((page) => {
+                      const isActive = pager?.pageIndex === page.index;
+                      return (
+                        <Command.Item
+                          key={page.index}
+                          value={page.label}
+                          onSelect={() => {
+                            pager?.setPageIndex(page.index);
+                            setOpen(false);
+                          }}
+                          className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-black/5 aria-selected:bg-black/5 ${isActive ? 'font-semibold text-gray-900' : 'text-gray-600'}`}
+                        >
+                          <page.Icon className="w-4 h-4 shrink-0 opacity-60" />
+                          <span className="flex-1">{page.label}</span>
+                          {isActive && <span className="text-xs text-blue-500 font-medium">Actif</span>}
+                        </Command.Item>
+                      );
+                    })}
+                  </Command.Group>
                 </Command.List>
               </Command>
             </motion.div>

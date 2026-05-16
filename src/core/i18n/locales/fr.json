@@ -30,7 +30,11 @@
     "map_action_title": "Carte",
     "map_action_desc": "Ouvrir la carte des interventions",
     "tech_action_title": "Techniciens",
-    "tech_action_desc": "Voir les techniciens disponibles"
+    "tech_action_desc": "Voir les techniciens disponibles",
+    "no_results": "Aucun résultat",
+    "nav_map": "Carte",
+    "nav_company": "Espace société",
+    "nav_technician": "Technicien"
   },
   "auth": {
     "email_required": "Saisissez une adresse e-mail",
