@@ -34,7 +34,10 @@
     "no_results": "No results",
     "nav_map": "Map",
     "nav_company": "Company Hub",
-    "nav_technician": "Technician"
+    "nav_technician": "Technician",
+    "open_aria": "Open search",
+    "active_label": "Active",
+    "nav_group_heading": "Navigation"
   },
   "auth": {
     "email_required": "Enter an email address",
