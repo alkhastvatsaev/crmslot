@@ -74,11 +74,13 @@ export default function InterventionCalendarPanel() {
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (workspace?.activeCompanyId) setCompanyFilterId(workspace.activeCompanyId);
   }, [workspace?.activeCompanyId]);
 
   useEffect(() => {
     const d = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedDayKey(localDayKeyFromParts(d.getFullYear(), d.getMonth(), d.getDate()));
   }, []);
 
@@ -171,7 +173,7 @@ export default function InterventionCalendarPanel() {
         <p className="sr-only">Dossier {iv.id}</p>
       </li>
     );
-  }, []);
+  }, [t]);
 
   if (!workspace || !workspace.isTenantUser || !workspace.memberships.length) {
     return (

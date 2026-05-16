@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
@@ -100,9 +101,11 @@ export default function TechnicianDashboardImagesPanel({
                 }}
                 className="group relative overflow-hidden rounded-[20px] bg-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.12)]"
               >
-                <img
+                <Image
                   src={url}
                   alt={`${t("technician_hub.dashboard.images.photo_alt")} ${idx + 1}`}
+                  width={400}
+                  height={300}
                   className="w-full object-cover"
                 />
               </motion.div>

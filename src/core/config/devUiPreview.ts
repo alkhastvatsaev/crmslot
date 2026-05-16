@@ -1,24 +1,33 @@
 /**
- * Prévisualisation UI sans Firebase ni tenant réel (développement uniquement).
+ * Prévisualisation UI avec données démo (missions du jour, Demandes, Rapports mock, etc.).
  *
- * Activé si `NODE_ENV === "development"` SAUF si vous définissez
- * `NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW=true`.
+ * | Contexte | Activé ? |
+ * |----------|----------|
+ * | `npm run dev` | Oui |
+ * | Vercel sans variable staging | **Non** → listes vides sans tenant / dossiers Firestore |
+ * | Vercel + `NEXT_PUBLIC_STAGING_PREVIEW=true` | Oui (même ressenti que le local) |
  *
- * Production : toujours désactivé.
+ * Désactiver : `NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW=true`.
+ *
+ * **Profils** : pas basé sur l’IP. Firebase Auth anonyme = un UID **par navigateur**.
+ * Les missions démo sont **partagées** entre testeurs ; seuls les vrais dossiers Firestore sont isolés par projet / règles.
  */
+export const stagingPreviewEnabled =
+  process.env.NEXT_PUBLIC_STAGING_PREVIEW === "true";
+
 export const devUiPreviewEnabled =
+  (process.env.NODE_ENV === "development" ||
+    stagingPreviewEnabled ||
+    process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW === "true") &&
   process.env.NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW !== "true";
 
-const inDevOrPreview = true;
+const inDevOrPreview = devUiPreviewEnabled;
 
 /**
  * Masque missions / grilles générées (carte, technicien démo, etc.) et fichiers locaux `.intervention.json`.
  *
- * - **Développement / Preview** : Les démos sont visibles par défaut. Pour les cacher : `NEXT_PUBLIC_HIDE_DEMO_MISSIONS=true`.
- * - **Production / test** : `false` sauf si `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY=true`.
- *
- * Les dossiers Firestore aux ids seed (`1`, `2`, `3`, `mock-day-*`, …) sont **toujours** filtrés à l’affichage
- * via `stripKnownSyntheticInterventions` — ils peuvent rester dans la base tant qu’ils ne sont pas supprimés manuellement.
+ * - **Développement / staging preview** : démos visibles par défaut (`NEXT_PUBLIC_HIDE_DEMO_MISSIONS=true` pour les cacher).
+ * - **Production réelle** : `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY=true`.
  */
 export const realInterventionsOnly =
   process.env.NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY === "true" ||

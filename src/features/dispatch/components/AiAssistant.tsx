@@ -13,7 +13,7 @@ import {
   DASHBOARD_DESKTOP_GALAXY_STRIP_INNER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
 import { useAiStripInsetRect } from "@/features/dispatch/useAiStripInsetRect";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
 const LS_UPLOAD_LAST_SEEN = "ai_upload_last_seen_mtime";
 
@@ -144,7 +144,7 @@ async function resolveClipPublicUrl(clipUrl: string): Promise<string> {
 
   for (const name of uploadPathCandidatesFromUrl(clipUrl, window.location.origin)) {
     try {
-      const r = await fetch(`/api/ai/resolve-audio-url?name=${encodeURIComponent(name)}`, {
+      const r = await fetchWithAuth(`/api/ai/resolve-audio-url?name=${encodeURIComponent(name)}`, {
         cache: "no-store",
       });
       if (!r.ok) continue;
@@ -190,7 +190,6 @@ export default function AiAssistant({
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [queue, setQueue] = useState<QueuedClip[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const pager = useDashboardPagerOptional();
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -271,8 +270,11 @@ export default function AiAssistant({
   const flushPlaybackSyncRef = useRef(flushPlaybackSync);
   const cancelPlaybackSyncRafRef = useRef(cancelPlaybackSyncRaf);
   const schedulePlaybackSyncRafRef = useRef(schedulePlaybackSyncRaf);
+  // eslint-disable-next-line react-hooks/refs
   flushPlaybackSyncRef.current = flushPlaybackSync;
+  // eslint-disable-next-line react-hooks/refs
   cancelPlaybackSyncRafRef.current = cancelPlaybackSyncRaf;
+  // eslint-disable-next-line react-hooks/refs
   schedulePlaybackSyncRafRef.current = schedulePlaybackSyncRaf;
 
   useEffect(() => {
@@ -408,6 +410,7 @@ export default function AiAssistant({
       stopBufferPlayback();
       if (!pausedByUserRef.current) {
         requestAnimationFrame(() => {
+          // eslint-disable-next-line react-hooks/immutability
           void playHead();
         });
       } else {
@@ -527,7 +530,7 @@ export default function AiAssistant({
         let ab = await tryDownload(absResolved);
         if (!ab && typeof window !== "undefined") {
           for (const name of uploadPathCandidatesFromUrl(clip.url, window.location.origin)) {
-            const res = await fetch(`/api/ai/resolve-audio-url?name=${encodeURIComponent(name)}`, {
+            const res = await fetchWithAuth(`/api/ai/resolve-audio-url?name=${encodeURIComponent(name)}`, {
               cache: "no-store",
             });
             if (!res.ok) continue;
@@ -671,7 +674,7 @@ export default function AiAssistant({
 
     const poll = async () => {
       try {
-        const res = await fetch("/api/ai/audios");
+        const res = await fetchWithAuth("/api/ai/audios");
         if (!res.ok || cancelled) return;
         const { audios } = (await res.json()) as AudiosPayload;
         const clips = audios

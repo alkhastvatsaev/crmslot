@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { writeAudioDecisionToDisk } from "@/core/services/audio/audio-decision-store";
 import { isSafeUploadsRelativePath } from "@/core/services/audio/intervention-json-path";
@@ -12,6 +13,9 @@ function decisionDocIdForUploadFileName(uploadFileName: string): string {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const body = (await request.json().catch(() => null)) as
       | { fileName?: unknown; status?: unknown }

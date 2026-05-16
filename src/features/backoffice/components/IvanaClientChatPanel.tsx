@@ -89,6 +89,7 @@ export default function IvanaClientChatPanel({
   const seenPortalIdsRef = useRef<Set<string>>(new Set());
   const fsHydratedRef = useRef(false);
   const seenFsIdsRef = useRef<Set<string>>(new Set());
+  // eslint-disable-next-line react-hooks/purity
   const sessionStartTimeRef = useRef<number>(Date.now());
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
@@ -102,6 +103,7 @@ export default function IvanaClientChatPanel({
 
   useEffect(() => {
     if (!auth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser(null);
       return;
     }
@@ -120,6 +122,7 @@ export default function IvanaClientChatPanel({
 
     if (!CHAT_PERSISTENCE_ENABLED) {
       if (!cancelled) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMessages([welcomeMessage()]);
         hydratedRef.current = true;
       }
@@ -213,7 +216,7 @@ export default function IvanaClientChatPanel({
       },
     );
     return unsub;
-  }, [firestoreSyncEnabled, companyIdTrimmed, firestore, onRemoteClientMessage]);
+  }, [firestoreSyncEnabled, companyIdTrimmed, onRemoteClientMessage]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -359,13 +362,10 @@ export default function IvanaClientChatPanel({
   }, [
     draft,
     ivanaTyping,
-    pendingImages.length,
+    pendingImages,
     publishAsPortal,
     firestoreSyncEnabled,
-    firestore,
     companyIdTrimmed,
-    auth?.currentUser,
-    storage,
   ]);
 
   const bubbleTestId = (m: IvanaChatMessage) => {

@@ -27,6 +27,7 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
     if (skipFirestoreDemo) {
       const cid = (companyId ?? "").trim() || DEMO_COMPANY_ID;
       if (realInterventionsOnly || cid !== DEMO_COMPANY_ID) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRows([]);
       } else {
         const similarInterventionId = `mock-day-${new Date().toLocaleDateString("en-CA")}-0`;
@@ -83,7 +84,7 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
     );
 
     return () => unsub();
-  }, [companyId, skipFirestoreDemo, realInterventionsOnly]);
+  }, [companyId, skipFirestoreDemo]);
 
   const openAlerts = useMemo(() => rows.filter((r) => r.status === "open"), [rows]);
 

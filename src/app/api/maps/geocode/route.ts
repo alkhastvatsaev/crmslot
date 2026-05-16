@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import {
   mapboxReverseGeocodeAttemptUrls,
   pickPlaceLabelFromFeatures,
@@ -81,6 +82,9 @@ function parseCoords(searchParams: URLSearchParams): { lat: number; lng: number 
  * - `?lat=&lng=` — géocodage inverse (coordonnées → adresse lisible).
  */
 export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   const { searchParams } = new URL(request.url);
   const coords = parseCoords(searchParams);
 

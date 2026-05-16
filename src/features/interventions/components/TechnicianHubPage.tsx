@@ -64,6 +64,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   useEffect(() => {
     if (pendingCaseId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedCaseId(pendingCaseId);
       setPendingCaseId(null);
       return;

@@ -27,10 +27,11 @@ export default function UserProfile() {
   useEffect(() => {
     if (pager) {
       if (pager.pageIndex >= 0 && pager.pageIndex < 4) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentIndex(pager.pageIndex);
       }
     }
-  }, [pager?.pageIndex]);
+  }, [pager, pager?.pageIndex]);
 
   const currentProfile = profiles[currentIndex];
 

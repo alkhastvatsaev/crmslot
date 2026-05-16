@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -23,16 +24,13 @@ import {
   MapPin,
   Mic,
   Calendar,
-  Clock,
   SendHorizontal,
   Trash2,
   UserRound,
   X,
-  Zap,
   Play,
   Pause,
   Download,
-  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
@@ -42,7 +40,6 @@ import { compressImageToDataUrl } from "@/features/interventions/compressImageTo
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import {
   REQUESTER_GEOLOC_ADDRESS_PENDING,
-  SMART_FORM_TEMPLATES,
   SMART_INTERVENTION_DRAFT_STORAGE_KEY,
   smartFormAddressEligibleForStep2,
 } from "@/features/interventions/smartInterventionConstants";
@@ -56,7 +53,6 @@ import { useAudioRecorder } from "@/features/interventions/useAudioRecorder";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -359,7 +355,7 @@ export default function SmartInterventionRequestForm() {
 
   const stored = typeof window !== "undefined" ? loadStorageDraft() : null;
   const initialPayload = stored ? { ...emptyDraft(), ...stored.payload } : emptyDraft();
-  const { language, t } = useTranslation();
+  const { language } = useTranslation();
   const [address, setAddress] = useState(initialPayload.address);
   const [description, setDescription] = useState(initialPayload.description ?? "");
   const [urgency, setUrgency] = useState(initialPayload.urgency);
@@ -378,26 +374,21 @@ export default function SmartInterventionRequestForm() {
   );
   const [demoAudioUrl, setDemoAudioUrl] = useState<string | null>(null);
   const [demoAudioSaving, setDemoAudioSaving] = useState(false);
-  
   const [pregeneratedDocId, setPregeneratedDocId] = useState<string>("");
-  const [uploadedAudioInfo, setUploadedAudioInfo] = useState<{
-    url: string | null;
-    storagePath: string | null;
-    mimeType: string | null;
-  } | null>(null);
-  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
 
   useEffect(() => {
     if (firestore && !pregeneratedDocId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPregeneratedDocId(doc(collection(firestore, "interventions")).id);
     }
-  }, [firestore, pregeneratedDocId]);
+  }, [pregeneratedDocId]);
   
   const audioRecorder = useAudioRecorder({ language });
 
   // Sync the audio recorder's state into our form's state
   useEffect(() => {
     if (audioRecorder.audioBlob !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAudioBlob(audioRecorder.audioBlob);
     }
     if (audioRecorder.transcription !== "") {
@@ -414,6 +405,7 @@ export default function SmartInterventionRequestForm() {
     let cancelled = false;
     const controller = new AbortController();
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDemoAudioSaving(true);
     (async () => {
       try {
@@ -421,7 +413,7 @@ export default function SmartInterventionRequestForm() {
         const mime = audioBlob.type || "audio/webm";
         const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : mime.includes("wav") ? "wav" : "webm";
         formData.append("audio", audioBlob, `message.${ext}`);
-        const res = await fetch("/api/demo/client-audio", { method: "POST", body: formData, signal: controller.signal });
+        const res = await fetchWithAuth("/api/demo/client-audio", { method: "POST", body: formData, signal: controller.signal });
         if (!res.ok) {
           const txt = await res.text().catch(() => "");
           console.error("Demo local audio save failed:", res.status, txt);
@@ -431,7 +423,7 @@ export default function SmartInterventionRequestForm() {
         const json = (await res.json()) as { url?: string };
         if (!cancelled) setDemoAudioUrl(json.url ?? null);
         // Sanity check: ensure file is visible on disk via GET listing.
-        const list = await fetch("/api/demo/client-audio", { signal: controller.signal })
+        const list = await fetchWithAuth("/api/demo/client-audio", { signal: controller.signal })
           .then((r) => (r.ok ? r.json() : null))
           .catch(() => null);
         if (!cancelled && json.url && list?.files && Array.isArray(list.files)) {
@@ -468,6 +460,7 @@ export default function SmartInterventionRequestForm() {
   const addressInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (step !== 5) setRecapPhotosOpen(false);
   }, [step]);
 
@@ -562,10 +555,11 @@ export default function SmartInterventionRequestForm() {
     }, 850);
 
     return () => window.clearTimeout(timer);
-  }, [address, urgency, photoDataUrls, placeLatLng, firstName, lastName, phone, scheduledDate, scheduledTime, audioTranscription]);
+  }, [address, description, urgency, photoDataUrls, placeLatLng, firstName, lastName, phone, scheduledDate, scheduledTime, audioTranscription]);
 
   /** Cohérence : sans adresse, revenir à l’étape adresse (1) */
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (step > 1 && !address.trim()) setStep(1);
   }, [address, step]);
 
@@ -671,7 +665,7 @@ export default function SmartInterventionRequestForm() {
     let finalAudioBlob = audioRecorder.audioBlob || audioBlob;
     const promiseFunc = audioRecorder.transcriptionPromise;
     const tPromise = promiseFunc ? promiseFunc() : null;
-    let finalTranscription = audioTranscription || audioRecorder.transcription;
+    const finalTranscription = audioTranscription || audioRecorder.transcription;
 
     if (address === REQUESTER_GEOLOC_ADDRESS_PENDING) {
       toast.error("Adresse encore en cours de recherche");
@@ -700,7 +694,7 @@ export default function SmartInterventionRequestForm() {
       let lng = placeLatLng?.lng;
       if (lat === undefined || lng === undefined) {
         try {
-          const geo = await fetch(`/api/maps/geocode?q=${encodeURIComponent(address.trim())}`);
+          const geo = await fetchWithAuth(`/api/maps/geocode?q=${encodeURIComponent(address.trim())}`);
           const gj = (await geo.json()) as { location?: { lat: number; lng: number } };
           lat = gj.location?.lat ?? 50.8466;
           lng = gj.location?.lng ?? 4.3522;
@@ -734,7 +728,7 @@ export default function SmartInterventionRequestForm() {
           const mime = finalAudioBlob.type || "audio/webm";
           const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : "webm";
           formData.append("audio", finalAudioBlob, `message.${ext}`);
-          const res = await fetch("/api/demo/client-audio", { method: "POST", body: formData });
+          const res = await fetchWithAuth("/api/demo/client-audio", { method: "POST", body: formData });
           if (!res.ok) {
             const txt = await res.text().catch(() => "");
             console.error("Demo local audio save failed:", res.status, txt);
@@ -1034,9 +1028,12 @@ export default function SmartInterventionRequestForm() {
             <div className="flex flex-col items-center justify-center gap-4 py-6">
               <button
                 type="button"
+                data-testid="smart-form-mic-button"
+                disabled={demoAudioSaving}
                 onClick={audioRecorder.isRecording ? audioRecorder.stopRecording : audioRecorder.startRecording}
                 className={cn(
                   "flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30",
+                  demoAudioSaving && "cursor-wait opacity-60",
                   audioRecorder.isRecording 
                     ? "bg-red-500 text-white animate-pulse shadow-red-500/40" 
                     : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-105"
@@ -1048,8 +1045,12 @@ export default function SmartInterventionRequestForm() {
                   <Mic className="h-6 w-6" />
                 )}
               </button>
-              <p className="text-sm font-medium text-slate-500">
-                {audioRecorder.isRecording ? "Enregistrement en cours..." : "Appuyez pour parler"}
+              <p className="text-sm font-medium text-slate-500" data-testid="smart-form-mic-hint">
+                {demoAudioSaving
+                  ? "Sauvegarde de l’audio démo…"
+                  : audioRecorder.isRecording
+                    ? "Enregistrement en cours..."
+                    : "Appuyez pour parler"}
               </p>
             </div>
           ) : (
@@ -1405,7 +1406,7 @@ export default function SmartInterventionRequestForm() {
                         className="line-clamp-2 whitespace-pre-wrap break-words text-[11px] font-medium italic leading-tight text-slate-700"
                         title={audioTranscription}
                       >
-                        "{audioTranscription}"
+                        &quot;{audioTranscription}&quot;
                       </p>
                     ) : audioBlob ? (
                       <p className="text-xs font-medium text-slate-700">Audio enregistré</p>
@@ -1475,7 +1476,7 @@ export default function SmartInterventionRequestForm() {
                         )}
                       >
                         {filled ? (
-                          <img src={src} alt="" className="h-full w-full object-cover" />
+                          <Image src={src} alt="" width={40} height={40} className="h-full w-full object-cover" />
                         ) : (
                           <ImagePlus className="h-4 w-4 text-slate-400/85" strokeWidth={1.75} aria-hidden />
                         )}
@@ -1525,7 +1526,7 @@ export default function SmartInterventionRequestForm() {
                           key={`recap-modal-${i}-${src.slice(0, 24)}`}
                           className="aspect-square overflow-hidden rounded-[18px] border border-white/90 bg-slate-200 shadow-[0_12px_28px_-10px_rgba(15,23,42,0.22),0_0_0_1px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04]"
                         >
-                          <img src={src} alt="" className="h-full w-full object-cover" />
+                          <Image src={src} alt="" width={400} height={400} className="h-full w-full object-cover" />
                         </li>
                       ))}
                     </ul>

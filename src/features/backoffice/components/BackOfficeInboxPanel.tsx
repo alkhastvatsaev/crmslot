@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
 import type { Intervention } from "@/features/interventions/types";
+import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
@@ -38,10 +39,7 @@ import {
 } from "@/features/backoffice/mergeReportCompletionMedia";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
-import {
-  coerceFirestoreLikeDate,
-  scheduledFieldsWhenReleasingToTechnician,
-} from "@/features/interventions/technicianSchedule";
+import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
@@ -185,7 +183,7 @@ export default function BackOfficeInboxPanel() {
   const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
   const { interventions, loading } = useBackOfficeInterventions(cid);
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
-  const bridgedTerrainReports = terrainBridge?.reports ?? [];
+  const bridgedTerrainReports = useMemo(() => terrainBridge?.reports ?? [], [terrainBridge?.reports]);
   const pager = useDashboardPagerOptional();
   const { setPendingCaseId } = useTechnicianCaseIntent();
 
@@ -285,7 +283,7 @@ export default function BackOfficeInboxPanel() {
       await deleteDoc(doc(firestore, "interventions", id));
       toast.success(t("backoffice.toasts.request_deleted"));
       setSelectedItemId(null);
-    } catch (e) {
+    } catch {
       toast.error(t("common.error"), { description: t("backoffice.toasts.delete_failed") });
     }
   };
@@ -294,19 +292,16 @@ export default function BackOfficeInboxPanel() {
     if (!firestore) return;
     try {
       const row = interventions.find((x) => x.id === id);
-      const schedule = scheduledFieldsWhenReleasingToTechnician(row ?? {}, new Date());
       const targetUid = auth?.currentUser?.uid || getDefaultAssignedTechnicianUid();
-      await updateDoc(doc(firestore, "interventions", id), {
-        status: "assigned",
-        assignedTechnicianUid: targetUid,
-        scheduledDate: schedule.scheduledDate,
-        scheduledTime: schedule.scheduledTime,
-      });
+      await updateDoc(
+        doc(firestore, "interventions", id),
+        buildAssignInterventionToTechnicianUpdate(row, targetUid),
+      );
       toast.success(t("backoffice.toasts.request_assigned"));
       setSelectedItemId(null);
       setPendingCaseId(id);
       navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-    } catch (e) {
+    } catch {
       toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
     }
   };
@@ -351,7 +346,7 @@ export default function BackOfficeInboxPanel() {
       });
       toast.success(t("backoffice.toasts.datetime_updated"));
       setIsEditingDateTime(false);
-    } catch (error) {
+    } catch {
       toast.error(t("common.error"), { description: t("backoffice.toasts.update_failed") });
     }
   };
@@ -359,6 +354,7 @@ export default function BackOfficeInboxPanel() {
   const isTenant = !!workspace?.isTenantUser;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (activeTab !== "reports") setReportsArchiveExpanded(false);
   }, [activeTab]);
 
@@ -826,7 +822,7 @@ export default function BackOfficeInboxPanel() {
                   )}
                   {readTranscription(selectedItem) ? (
                     <div className="rounded-[20px] border border-blue-100 bg-blue-50/50 p-4 text-sm italic text-blue-900">
-                      "{readTranscription(selectedItem)}"
+                      &quot;{readTranscription(selectedItem)}&quot;
                     </div>
                   ) : null}
                 </div>
@@ -1004,7 +1000,7 @@ export default function BackOfficeInboxPanel() {
                       )}
                       {iv && readTranscription(iv) ? (
                         <div className="rounded-[20px] border border-blue-100 bg-blue-50/50 p-4 text-sm italic text-blue-900">
-                          "{readTranscription(iv)}"
+                          &quot;{readTranscription(iv)}&quot;
                         </div>
                       ) : null}
                     </div>

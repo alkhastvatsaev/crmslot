@@ -96,6 +96,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         if (parsed.profile) {
           const p = parsed.profile;
           if ((p.type as string) === "societe") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setProfile({ ...p, type: "login" });
           } else {
             setProfile(p);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 
 export function useAvailableSlots(companyId: string | null | undefined, date: string | null = null) {
   const [bookedSlotsByDate, setBookedSlotsByDate] = useState<Record<string, string[]>>({});
@@ -45,10 +45,10 @@ export function useAvailableSlots(companyId: string | null | undefined, date: st
         if (isMounted) {
           setBookedSlotsByDate(booked);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching available slots:", err);
         if (isMounted) {
-          setError(err.message || "Failed to fetch slots");
+          setError(err instanceof Error ? err.message : "Failed to fetch slots");
           setBookedSlotsByDate({});
         }
       } finally {

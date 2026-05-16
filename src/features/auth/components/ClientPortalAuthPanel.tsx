@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
-  getMultiFactorResolver,
   sendSignInLinkToEmail,
   signOut,
   type MultiFactorResolver,
@@ -34,7 +34,6 @@ import {
   completeTotpMfa,
   createInvisibleRecaptcha,
   mfaHintKind,
-  pickDefaultMfaHintIndex,
   sendPhoneMfaSms,
 } from "@/features/auth/clientPortalPasswordMfa";
 
@@ -115,10 +114,9 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
   
   // Login State
   const [email, setEmail] = useState("");
-  const [signingIn, setSigningIn] = useState(false);
   const [sending, setSending] = useState(false);
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
-  const [mfaHintIndex, setMfaHintIndex] = useState(0);
+  const [mfaHintIndex] = useState(0);
   const [phoneVerificationId, setPhoneVerificationId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaBusy, setMfaBusy] = useState(false);
@@ -156,7 +154,6 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
   };
 
   const sendMagicLink = async () => {
-    console.log("[sendMagicLink] Triggered with email:", email, "authRailMode:", authRailMode);
     if (!auth || !email.trim()) {
       toast.error(t('auth.email_required'));
       return;
@@ -167,7 +164,6 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
       
       if (authRailMode) {
         const demoLink = `${origin}/?demo_login=${encodeURIComponent(email.trim())}`;
-        console.log("[sendMagicLink] Generating demo link:", demoLink);
         try {
           if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(demoLink);
@@ -354,7 +350,7 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
       {/* 1. SECTION SUIVI (Tracking) */}
       <div className="flex flex-col rounded-[24px] border border-black/[0.06] bg-gradient-to-b from-white/96 via-white/90 to-slate-50/85 p-6 shadow-[0_12px_40px_-16px_rgba(15,23,42,0.12)] backdrop-blur-xl">
         <h3 className="text-[18px] font-extrabold text-slate-800 mb-1">Suivi de demande</h3>
-        <p className="text-[13px] font-medium text-slate-500 mb-4">Entrez votre nom de famille pour voir l'état de votre intervention en temps réel.</p>
+        <p className="text-[13px] font-medium text-slate-500 mb-4">Entrez votre nom de famille pour voir l&apos;état de votre intervention en temps réel.</p>
         
         <form onSubmit={handleSearch} className="flex w-full gap-2 mb-2">
           <div className="relative flex-1">
@@ -383,7 +379,7 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
               <div className="flex items-center gap-3 rounded-[16px] border border-amber-200/60 bg-amber-50/80 p-4">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
                 <p className="text-[13px] font-medium text-amber-800 leading-tight">
-                  Aucune demande trouvée pour "<strong>{searchName}</strong>". Vérifiez l'orthographe ou connectez-vous.
+                  Aucune demande trouvée pour &quot;<strong>{searchName}</strong>&quot;. Vérifiez l&apos;orthographe ou connectez-vous.
                 </p>
               </div>
             ) : (
@@ -540,7 +536,7 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
           className="flex flex-col items-center gap-4 rounded-[24px] border border-black/[0.06] bg-gradient-to-b from-white/95 to-white/82 px-5 py-8 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.16)] backdrop-blur-xl"
         >
           {LOGO_URL ? (
-            <img src={LOGO_URL} alt="" className="h-14 w-auto max-w-[200px] object-contain" />
+            <Image src={LOGO_URL} alt="" width={200} height={56} className="h-14 w-auto max-w-[200px] object-contain" />
           ) : (
             <Building2 className="h-11 w-11 text-slate-400" aria-hidden />
           )}

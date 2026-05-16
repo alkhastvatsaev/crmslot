@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import {
   DEMO_TECHNICIAN_UID,
@@ -63,7 +63,7 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
       queryClient.getQueryData<Intervention[]>(assignmentsQueryKey as readonly unknown[]) ?? [],
   });
 
-  const firestoreInterventions = assignmentsQuery.data ?? [];
+  const firestoreInterventions = useMemo(() => assignmentsQuery.data ?? [], [assignmentsQuery.data]);
 
   const interventions = useMemo(() => {
     const filterReleased = (rows: Intervention[]) => {
@@ -102,6 +102,7 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
   useEffect(() => {
     if (!isConfigured || !firestore || !auth) {
       if (devUiPreviewEnabled) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFirebaseUid(getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID));
         setSnapshotReady(true);
         setError(null);
@@ -144,9 +145,15 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
 
       const db = firestore!;
       
-      // Requête ultra-simple : on écoute toute la collection. 
-      // Les règles Firestore se chargeront de filtrer ce que l'utilisateur a le droit de voir.
-      const q = query(collection(db, "interventions"));
+      const queryUid = devUiPreviewEnabled && technicianUid === DEMO_TECHNICIAN_UID
+        ? getDefaultAssignedTechnicianUid()
+        : technicianUid;
+
+      // Requête optimisée : on filtre sur les interventions assignées au technicien
+      const q = query(
+        collection(db, "interventions"),
+        where("assignedTechnicianUid", "==", queryUid)
+      );
 
       unsubSnap = onSnapshot(
         q,
@@ -158,7 +165,6 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
         },
         (e) => {
           console.error("[useTechnicianAssignments]", e);
-          // Si erreur de permission, on peut essayer de filtrer plus agressivement
           setError(e.message || "Erreur Firestore");
           setSnapshotReady(true);
         }

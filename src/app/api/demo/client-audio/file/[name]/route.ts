@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { blockIfProduction, requireAuthenticatedUser } from "@/core/api/routeAuth";
 
 export const runtime = "nodejs";
 
@@ -21,9 +22,14 @@ function inferContentType(filename: string) {
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ name: string }> },
 ) {
+  const blocked = blockIfProduction();
+  if (blocked) return blocked;
+  const auth = await requireAuthenticatedUser(req);
+  if ("response" in auth) return auth.response;
+
   try {
     const { name } = await params;
     // prevent path traversal

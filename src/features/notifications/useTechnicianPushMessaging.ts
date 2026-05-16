@@ -100,7 +100,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       const id = typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
       openCaseFromPayload(id);
     });
-  }, [app, openCaseFromPayload]);
+  }, [openCaseFromPayload]);
 
   const syncTokenForUser = useCallback(
     async (uid: string): Promise<void> => {
@@ -120,7 +120,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       setLastError(null);
       attachForegroundListener();
     },
-    [app, firestore, vapidKey, attachForegroundListener],
+    [vapidKey, attachForegroundListener],
   );
 
   useEffect(() => {
@@ -128,6 +128,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
     unsubForegroundRef.current = undefined;
 
     if (!enabled || !isConfigured || !app || !firestore || !auth || !isFirebasePublicConfigured()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("unsupported");
       return () => {};
     }
@@ -188,7 +189,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       unsubForegroundRef.current?.();
       unsubForegroundRef.current = undefined;
     };
-  }, [enabled, vapidKey, app, firestore, auth, syncTokenForUser]);
+  }, [enabled, vapidKey, syncTokenForUser]);
 
   const registerPush = useCallback(async () => {
     const uid = auth?.currentUser?.uid;
@@ -220,7 +221,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       setStatus("error");
       setLastError(e instanceof Error ? e.message : String(e));
     }
-  }, [app, firestore, vapidKey, syncTokenForUser, auth]);
+  }, [vapidKey, syncTokenForUser]);
 
   return useMemo(
     () => ({ status, lastError, registerPush }),

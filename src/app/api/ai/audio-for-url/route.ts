@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { readAudioUploadSidecarIfPresent, readTranscriptSidecarIfPresent } from "@/core/services/audio/transcript-sidecar";
 import { isSafeUploadsRelativePath } from "@/core/services/audio/intervention-json-path";
 import { findUploadedAudioRelativePath } from "@/core/services/audio/resolve-upload-by-basename";
@@ -23,6 +24,9 @@ function publicParamToSafeRelative(urlParam: string): string | null {
 }
 
 export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const urlParam = new URL(request.url).searchParams.get("url")?.trim() ?? "";
     if (!urlParam) {

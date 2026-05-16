@@ -19,6 +19,7 @@ export default function DesktopOnlyGate({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (devUiPreviewEnabled) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDesktopOk(!isPhoneClassDevice());
   }, []);
 

@@ -1,9 +1,13 @@
+import type { Intervention } from "@/features/interventions/types";
+
 export interface Mission {
   id: number;
   clientName: string;
   coordinates: [number, number];
   time: string;
   status: string;
+  /** Code métier Firestore (carte / cartes journalières). */
+  statusCode?: Intervention["status"];
   source?: 'mock' | 'live';
   /** YYYY-MM-DD (utilisé pour filtrer les missions créées) */
   date?: string;
@@ -40,7 +44,6 @@ const LAST_NAMES = [
   "Dubois", "Peeters", "Janssens", "Maes", "Mertens", "Willems", "Lambert", "Dupont", 
   "Claes", "Goossens", "Wouters", "De Smet", "Jacobs", "Vandenberghe", "Desmedt"
 ];
-const STATUSES = ["Terminé", "En cours", "À venir"];
 
 export function generateDailyMissions(date: Date): Mission[] {
   // Use local date string YYYY-MM-DD for stable generation

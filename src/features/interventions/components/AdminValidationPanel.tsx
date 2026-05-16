@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, onSnapshot, updateDoc, doc, and } from "firebase/firestore";
+import Image from "next/image";
+import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, FileText, MapPin, Search, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Check, MapPin, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
 import type { Intervention } from "@/features/interventions/types";
 import { capitalizeName } from "@/utils/stringUtils";
 
-const springTransition = { type: "spring", bounce: 0, duration: 0.5 };
 export default function AdminValidationPanel() {
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +20,7 @@ export default function AdminValidationPanel() {
   
   useEffect(() => {
     if (!firestore || !activeCompanyId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -40,8 +40,8 @@ export default function AdminValidationPanel() {
         const data = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
           // Sort in memory by createdAt descending
           data.sort((a, b) => {
-            const tA = typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : (a.createdAt as any)?.toMillis?.() || 0;
-            const tB = typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : (b.createdAt as any)?.toMillis?.() || 0;
+            const tA = typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : (a.createdAt as { toMillis?: () => number } | null | undefined)?.toMillis?.() || 0;
+            const tB = typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : (b.createdAt as { toMillis?: () => number } | null | undefined)?.toMillis?.() || 0;
             return tB - tA;
           });
         setInterventions(data);
@@ -56,7 +56,7 @@ export default function AdminValidationPanel() {
     return () => unsub();
   }, [activeCompanyId]);
 
-  const handleVerify = async (id: string, currentStatus: string) => {
+  const handleVerify = async (id: string) => {
     if (!firestore) return;
     try {
       // Just a visual confirmation or setting a custom flag if needed.
@@ -96,7 +96,6 @@ export default function AdminValidationPanel() {
           <div className="flex flex-col gap-4">
             {interventions.map((iv) => {
               const isExpanded = expandedId === iv.id;
-              // @ts-ignore : ivanaVerified custom flag
               const isVerified = iv.ivanaVerified;
 
               const getDisplayName = () => {
@@ -168,9 +167,11 @@ export default function AdminValidationPanel() {
                               <div className="flex gap-2 overflow-x-auto pb-2">
                                 {iv.completionPhotoUrls.map((url, idx) => (
                                   <a key={idx} href={url} target="_blank" rel="noreferrer" className="shrink-0">
-                                    <img
+                                    <Image
                                       src={url}
                                       alt={`Photo ${idx + 1}`}
+                                      width={80}
+                                      height={80}
                                       className="h-20 w-20 object-cover rounded-xl border border-black/5 shadow-sm"
                                     />
                                   </a>
@@ -183,9 +184,11 @@ export default function AdminValidationPanel() {
                             <div>
                               <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Signature Client</h4>
                               <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 flex justify-center">
-                                <img
+                                <Image
                                   src={iv.completionSignatureUrl}
                                   alt="Signature"
+                                  width={200}
+                                  height={64}
                                   className="h-16 object-contain"
                                 />
                               </div>
@@ -196,7 +199,7 @@ export default function AdminValidationPanel() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleVerify(iv.id, iv.status);
+                                handleVerify(iv.id);
                               }}
                               className="mt-2 w-full py-3 bg-black text-white text-sm font-bold rounded-xl hover:bg-black/80 transition-colors flex items-center justify-center gap-2"
                             >

@@ -34,6 +34,7 @@ export function useResolvedInterventionAudio(inv: Intervention | null | undefine
   const [audioStorageResolveFailed, setAudioStorageResolveFailed] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResolvedAudioUrl(null);
     setIsResolvingAudio(false);
     setAudioStorageResolveFailed(false);

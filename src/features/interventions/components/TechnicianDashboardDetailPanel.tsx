@@ -4,23 +4,18 @@ import { useState } from "react";
 import { Camera, MapPin, Play, Navigation, CheckCircle2, Pause } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { SlideAction } from "@/components/ui/slide-action";
-import { Badge } from "@/components/ui/badge";
 import { doc, updateDoc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import { toast } from "sonner";
-import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import type { Intervention } from "@/features/interventions/types";
 
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
-import { cn } from "@/lib/utils";
 
 import {
   formatScheduledTimeOnly,
-  interventionClientLabel,
 } from "@/features/interventions/technicianSchedule";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
@@ -159,7 +154,6 @@ export default function TechnicianDashboardDetailPanel({
     );
   }
 
-  const client = interventionClientLabel(liveIv);
   const cardClass = "flex flex-col items-center text-center py-1.5";
   const mainContainerClass = "rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] border border-white/40 backdrop-blur-sm";
 
@@ -256,7 +250,7 @@ export default function TechnicianDashboardDetailPanel({
 
         {liveIv.transcription && (
           <div className="mt-1 text-[15px] font-bold text-black italic bg-blue-50/30 p-4 rounded-2xl border border-blue-100/50 w-full text-left leading-relaxed">
-            "{liveIv.transcription}"
+            &quot;{liveIv.transcription}&quot;
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import * as admin from "firebase-admin";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { readAudioUploadSidecarIfPresent } from "@/core/services/audio/transcript-sidecar";
 import { writeAudioDecisionToDisk } from "@/core/services/audio/audio-decision-store";
@@ -48,6 +49,9 @@ async function verifyTenantCompany(uid: string, companyId: string): Promise<bool
 }
 
 export async function POST(request: Request) {
+  const authGuard = await requireAuthenticatedUser(request);
+  if ("response" in authGuard) return authGuard.response;
+
   try {
     const body = (await request.json().catch(() => null)) as
       | {

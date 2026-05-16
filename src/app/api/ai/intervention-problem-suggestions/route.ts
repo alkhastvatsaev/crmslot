@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,9 @@ function heuristicSuggestions(seed: string): string[] {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   const body = (await request.json().catch(() => null)) as { seed?: unknown } | null;
   const seed = typeof body?.seed === "string" ? body.seed.trim().slice(0, 600) : "";
 

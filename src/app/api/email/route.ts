@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 
 export async function POST(req: Request) {
+  const auth = await requireAuthenticatedUser(req);
+  if ('response' in auth) return auth.response;
+
   try {
     const { clientName, message, pdfBase64 } = await req.json();
 
@@ -45,12 +49,12 @@ export async function POST(req: Request) {
 
     // Envoi de l'e-mail
     const info = await transporter.sendMail(mailOptions);
-    console.log(`Email envoyé via Gmail à testbelgiqueserrure@gmail.com pour ${clientName} (ID: ${info.messageId})`);
 
     return NextResponse.json({ success: true, messageId: info.messageId }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de l'envoi de l'e-mail avec Gmail :", error);
-    return NextResponse.json({ success: false, error: error.message || "Échec de l'envoi de l'e-mail." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Échec de l'envoi de l'e-mail.";
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
 

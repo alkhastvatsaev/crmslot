@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,10 @@ function normalizeTime(v?: string | null): string {
   return /^\d{2}:\d{2}$/.test(last) ? last : t;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadsDir)) return NextResponse.json({ interventions: [] });

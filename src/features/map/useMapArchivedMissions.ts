@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const STORAGE_KEY = "belgmap_map_archived_missions_v1";
 
@@ -27,11 +27,7 @@ function persistKeys(next: Set<string>) {
 
 /** Missions masquées sur la carte (page 1) — persistance locale par navigateur. */
 export function useMapArchivedMissions() {
-  const [archivedKeys, setArchivedKeys] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    setArchivedKeys(loadKeys());
-  }, []);
+  const [archivedKeys, setArchivedKeys] = useState<Set<string>>(loadKeys);
 
   const archiveKey = useCallback((key: string) => {
     setArchivedKeys((prev) => {

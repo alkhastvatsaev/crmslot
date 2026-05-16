@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { AiPlaybackSync } from '@/features/dispatch/components/AiAssistant';
+import { fetchWithAuth } from '@/core/api/fetchWithAuth';
 
 export const TRANSCRIPT_REVEAL_MS_PER_CHAR = 18;
 /** Pas d’animation pour la révélation timer : un mot (ou un chunk de caractères si un seul token) à chaque pas. */
@@ -140,6 +141,7 @@ function MapTranscriptionOverlayInner({
     const nearStart =
       playbackSync.currentTime < playbackSync.duration * 0.06 &&
       playbackSync.currentTime < playbackSync.duration - 0.2;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (playbackSync.playing || nearStart) setAudioRevealBlocked(false);
   }, [playbackSync, transcriptSourceUrl]);
 
@@ -189,6 +191,7 @@ function MapTranscriptionOverlayInner({
   useEffect(() => {
     if (!armed) return;
     if (!playOpenSignal && !forceVisible && !fullText) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
     closedForSessionRef.current = null;
   }, [armed, playOpenSignal, forceVisible, fullText]);
@@ -249,6 +252,7 @@ function MapTranscriptionOverlayInner({
     if (s) return;
     currentSessionKeyRef.current = "";
     lastTranscriptInSessionRef.current = "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFullText("");
     setTranscriptSourceUrl("");
     setAudioRevealBlocked(true);
@@ -265,6 +269,7 @@ function MapTranscriptionOverlayInner({
     if (!armed) {
       currentSessionKeyRef.current = '';
       lastTranscriptInSessionRef.current = '';
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(false);
       setFullText('');
       setTranscriptSourceUrl('');
@@ -292,7 +297,7 @@ function MapTranscriptionOverlayInner({
           ? `/api/ai/audio-for-url?url=${encodeURIComponent(scoped)}`
           : "/api/ai/latest-audio";
 
-        const res = await fetch(endpoint);
+        const res = await fetchWithAuth(endpoint);
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as AudiosResponse;
         if (data?.decision?.status === "refused" || data?.decision?.status === "created") {

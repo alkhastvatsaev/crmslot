@@ -43,6 +43,7 @@ export function useInterventions() {
 
   useEffect(() => {
     if (!isConfigured || !firestore || !auth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return () => {};
     }

@@ -66,7 +66,7 @@ describe("TechnicianAssignmentOfferCard", () => {
     fireEvent.click(screen.getByTestId("technician-assignment-accept"));
 
     await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
-    const [, patch] = mockUpdateDoc.mock.calls[0] as [unknown, Record<string, unknown>];
+    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
     expect(patch.status).toBe("en_route");
     expect(typeof patch.technicianAcceptedAt).toBe("string");
   });
@@ -85,7 +85,7 @@ describe("TechnicianAssignmentOfferCard", () => {
     fireEvent.click(screen.getByTestId("technician-assignment-decline"));
 
     await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
-    const [, patch] = mockUpdateDoc.mock.calls[0] as [unknown, Record<string, unknown>];
+    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
     expect(patch.status).toBe("pending");
     expect(patch.assignedTechnicianUid).toBeNull();
     expect(patch.technicianDeclinedByUid).toBe("demo-tech-local");

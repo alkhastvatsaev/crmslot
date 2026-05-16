@@ -70,6 +70,7 @@ export function CompanyWorkspaceProvider({
 
   useEffect(() => {
     if (!firestore || !firebaseUid || !isConfigured) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMemberships([]);
       setActiveCompanyIdState("");
       return () => {};

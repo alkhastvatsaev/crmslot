@@ -23,7 +23,7 @@ export interface AudioUploadSidecar {
   receivedAt: string;
   /** Fin du traitement OpenAI (ISO 8601) */
   processedAt: string;
-  source: "audio-dispatch" | "api-transcribe" | "upload-auto";
+  source: "audio-dispatch" | "api-transcribe" | "upload-auto" | "twilio-recording";
   openai?: {
     transcriptionModel: string;
     dispatchModel: string;

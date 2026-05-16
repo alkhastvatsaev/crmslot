@@ -1,23 +1,20 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import { auth, firestore, isConfigured } from '@/core/config/firebase';
+import { auth } from '@/core/config/firebase';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-
-import { toast } from 'sonner';
 
 import { syncClientPortalProfile } from '@/features/auth/clientPortalProfile';
 import { devUiPreviewEnabled } from '@/core/config/devUiPreview';
 
 export default function LoginOverlay({ children }: { children: React.ReactNode }) {
   const [loadingState, setLoadingState] = useState<'checking' | 'ready'>('checking');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [, setIsAuthenticated] = useState(false);
 
 
   useEffect(() => {
-    console.log("[LoginOverlay] Auto-access mode enabled");
-
     if (devUiPreviewEnabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuthenticated(true);
       setLoadingState('ready');
       return;
@@ -25,7 +22,6 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
 
     const unsubscribe = onAuthStateChanged(auth!, async (user) => {
       if (user) {
-        console.log("[LoginOverlay] User detected:", user.uid);
         try {
           await syncClientPortalProfile(user);
         } catch (e) {
@@ -34,7 +30,6 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
         setIsAuthenticated(true);
         setLoadingState('ready');
       } else {
-        console.log("[LoginOverlay] No user, signing in anonymously...");
         try {
           const cred = await signInAnonymously(auth!);
           await syncClientPortalProfile(cred.user);

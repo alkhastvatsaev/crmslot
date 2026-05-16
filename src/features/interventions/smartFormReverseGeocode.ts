@@ -1,5 +1,6 @@
 /** Géocodage inverse pour le formulaire : API Next d’abord, puis Mapbox public (NEXT_PUBLIC_MAPBOX_TOKEN) pour la PWA hors token serveur */
 
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import {
   mapboxReverseGeocodeAttemptUrls,
   pickPlaceLabelFromFeatures,
@@ -38,7 +39,7 @@ export async function resolveInterventionAddressFromCoords(
   let location: { lat: number; lng: number } = { lat, lng };
 
   try {
-    const res = await fetch(
+    const res = await fetchWithAuth(
       `/api/maps/geocode?lat=${encodeURIComponent(String(lat))}&lng=${encodeURIComponent(String(lng))}`,
     );
     if (res.ok) {
