@@ -2,7 +2,9 @@
 
 exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
 <div
-  class="flex items-center gap-2 px-4 py-2"
+  aria-label="Résumé des interventions du jour"
+  class="flex flex-wrap items-center gap-2 px-4 py-2"
+  role="status"
 >
   <span
     class="rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1.5 bg-amber-50 text-amber-600 border border-amber-200"
