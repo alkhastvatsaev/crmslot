@@ -8,7 +8,11 @@ interface DashboardKpiStripProps {
 
 export default function DashboardKpiStrip({ pending, inProgress, done }: DashboardKpiStripProps) {
   return (
-    <div className="flex items-center gap-2 px-4 py-2">
+    <div
+      role="status"
+      aria-label="Résumé des interventions du jour"
+      className="flex flex-wrap items-center gap-2 px-4 py-2"
+    >
       <span
         data-testid="kpi-pending"
         className="rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1.5 bg-amber-50 text-amber-600 border border-amber-200"
