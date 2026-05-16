@@ -378,7 +378,11 @@
       "client_folder": "Client / folder",
       "assigned_technician": "Assigned technician",
       "planned_slot": "Planned slot",
-      "intervention_address": "Intervention address"
+      "intervention_address": "Intervention address",
+      "kpi_strip_aria": "Today's intervention summary",
+      "kpi_pending": "Pending",
+      "kpi_in_progress": "In progress",
+      "kpi_done": "Done"
     },
     "incoming_requests": {
       "company_required": "Company required to see requests.",
@@ -563,6 +567,20 @@
       "client": "CLIENT",
       "technician": "TECHNICIAN",
       "admin": "ADMIN"
+    }
+  },
+  "dispatch": {
+    "assign_picker": {
+      "title": "Choose a technician",
+      "cancel": "Cancel",
+      "confirm": "Confirm assignment",
+      "loading": "Loading technicians…",
+      "no_technicians": "No technicians available",
+      "recommended": "Recommended",
+      "eta_loading": "Calculating ETA",
+      "status_available": "Available",
+      "status_en_route": "En route",
+      "status_on_site": "On site"
     }
   }
 }

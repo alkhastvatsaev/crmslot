@@ -2,7 +2,7 @@
 
 exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
 <div
-  aria-label="Résumé des interventions du jour"
+  aria-label="dashboard.kpi_strip_aria"
   class="flex flex-wrap items-center gap-2 px-4 py-2"
   role="status"
 >
@@ -14,7 +14,7 @@ exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
       aria-hidden="true"
       class="w-1.5 h-1.5 rounded-full bg-amber-500"
     />
-    En attente
+    dashboard.kpi_pending
     <span>
       3
     </span>
@@ -27,7 +27,7 @@ exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
       aria-hidden="true"
       class="w-1.5 h-1.5 rounded-full bg-blue-500"
     />
-    En cours
+    dashboard.kpi_in_progress
     <span>
       2
     </span>
@@ -40,7 +40,7 @@ exports[`DashboardKpiStrip matches snapshot for basic structure 1`] = `
       aria-hidden="true"
       class="w-1.5 h-1.5 rounded-full bg-emerald-500"
     />
-    Terminées
+    dashboard.kpi_done
     <span>
       7
     </span>

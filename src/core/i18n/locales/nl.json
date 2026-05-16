@@ -369,7 +369,11 @@
       "client_folder": "Klant / map",
       "assigned_technician": "Toegewezen technicus",
       "planned_slot": "Gepland slot",
-      "intervention_address": "Interventieadres"
+      "intervention_address": "Interventieadres",
+      "kpi_strip_aria": "Samenvatting van vandaag",
+      "kpi_pending": "In afwachting",
+      "kpi_in_progress": "Bezig",
+      "kpi_done": "Klaar"
     },
     "incoming_requests": {
       "company_required": "Bedrijf vereist om aanvragen te zien.",
