@@ -382,7 +382,11 @@
       "client_folder": "Client / dossier",
       "assigned_technician": "Technicien assigné",
       "planned_slot": "Créneau planifié",
-      "intervention_address": "Adresse d’intervention"
+      "intervention_address": "Adresse d’intervention",
+      "kpi_strip_aria": "Résumé des interventions du jour",
+      "kpi_pending": "En attente",
+      "kpi_in_progress": "En cours",
+      "kpi_done": "Terminées"
     },
     "incoming_requests": {
       "company_required": "Société requise pour voir les demandes.",
@@ -567,6 +571,20 @@
       "client": "CLIENT",
       "technician": "TECHNICIEN",
       "admin": "ADMIN"
+    }
+  },
+  "dispatch": {
+    "assign_picker": {
+      "title": "Choisir un technicien",
+      "cancel": "Annuler",
+      "confirm": "Confirmer l'assignation",
+      "loading": "Chargement des techniciens…",
+      "no_technicians": "Aucun technicien disponible",
+      "recommended": "Recommandé",
+      "eta_loading": "Calcul de l'ETA en cours",
+      "status_available": "Disponible",
+      "status_en_route": "En route",
+      "status_on_site": "Sur place"
     }
   }
 }
