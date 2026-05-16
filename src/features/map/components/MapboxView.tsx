@@ -7,6 +7,7 @@ import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/core/config/firebase';
 import { toast } from "sonner";
 import DailyMissions from '@/features/dashboard/components/DailyMissions';
+import DashboardKpiStrip from '@/features/dashboard/components/DashboardKpiStrip';
 import BackOfficeInboxPanel from '@/features/backoffice/components/BackOfficeInboxPanel';
 import RequesterTrackingPanel from '@/features/interventions/components/RequesterTrackingPanel';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -128,6 +129,12 @@ export default function MapboxView() {
     () => allMissions.filter((m) => !archivedKeys.has(missionStableKey(m))),
     [allMissions, archivedKeys],
   );
+
+  const kpiCounts = useMemo(() => ({
+    pending:    visibleMissions.filter(m => ['pending','assigned','pending_needs_address'].includes(m.statusCode ?? '')).length,
+    inProgress: visibleMissions.filter(m => ['en_route','in_progress'].includes(m.statusCode ?? '')).length,
+    done:       visibleMissions.filter(m => ['done','invoiced'].includes(m.statusCode ?? '')).length,
+  }), [visibleMissions]);
 
   const handleArchiveMission = React.useCallback(
     (mission: Mission) => {
@@ -440,6 +447,7 @@ export default function MapboxView() {
           shellClassName={dashboardTripleSideShellClass}
           innerClassName={`${GLASS_PANEL_BODY_SCROLL} flex min-h-0 flex-col`}
         >
+          <DashboardKpiStrip {...kpiCounts} />
           <DailyMissions
             missions={visibleMissions}
             onMissionClick={handleMissionClick}
