@@ -10,11 +10,12 @@ export default function ClockCalendar() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarDate, setCalendarDate] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
-  const { language, t } = useTranslation();
+  const { language, tValue } = useTranslation();
 
   const locale = language === "nl" ? "nl-NL" : language === "en" ? "en-GB" : "fr-FR";
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTime(new Date());
     setCalendarDate(selectedDate);
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -145,7 +146,7 @@ export default function ClockCalendar() {
           </div>
           <div className="calendar-grid">
             {(() => {
-              const v = t("calendar.weekdays_initials");
+              const v = tValue("calendar.weekdays_initials");
               const arr = Array.isArray(v) ? v : null;
               const fallback = ["M", "T", "W", "T", "F", "S", "S"];
               const days = arr && arr.length === 7 ? arr : fallback;

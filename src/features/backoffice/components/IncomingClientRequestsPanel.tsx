@@ -46,7 +46,7 @@ export default function IncomingClientRequestsPanel() {
       await deleteDoc(doc(firestore, "interventions", id));
       toast.success(String(t("backoffice.toasts.request_deleted")));
       setSelectedRequest(null);
-    } catch (e) {
+    } catch {
       toast.error(String(t("backoffice.toasts.delete_failed")));
     }
   };
@@ -61,7 +61,7 @@ export default function IncomingClientRequestsPanel() {
       );
       toast.success(String(t("backoffice.toasts.request_assigned")));
       setSelectedRequest(null);
-    } catch (e) {
+    } catch {
       toast.error(String(t("backoffice.toasts.assign_failed")));
     }
   };
@@ -80,7 +80,7 @@ export default function IncomingClientRequestsPanel() {
         requestedTime: editTime,
       });
       setIsEditingDateTime(false);
-    } catch (error) {
+    } catch {
       toast.error(String(t("backoffice.toasts.update_failed")));
     }
   };
@@ -230,7 +230,7 @@ export default function IncomingClientRequestsPanel() {
                   )}
                   {selectedRequest.transcription && (
                     <div className="mt-2 rounded-[12px] bg-slate-50 p-3 border border-slate-100">
-                      <p className="text-[14px] text-slate-700 italic">"{selectedRequest.transcription}"</p>
+                      <p className="text-[14px] text-slate-700 italic">&quot;{selectedRequest.transcription}&quot;</p>
                     </div>
                   )}
                 </div>

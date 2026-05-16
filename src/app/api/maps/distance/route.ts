@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
-import { Client } from '@googlemaps/google-maps-services-js';
+import { Client, TrafficModel } from '@googlemaps/google-maps-services-js';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ('response' in auth) return auth.response;
+
   try {
     const { originLat, originLng, destLat, destLng } = await request.json();
 
@@ -21,8 +25,8 @@ export async function POST(request: Request) {
         origins: [{ lat: originLat, lng: originLng }],
         destinations: [{ lat: destLat, lng: destLng }],
         key: apiKey,
-        departure_time: 'now' as any, // Pour activer le trafic en temps réel (Bouchons)
-        traffic_model: 'best_guess' as any
+        departure_time: 'now' as unknown as number,
+        traffic_model: TrafficModel.best_guess,
       }
     });
 
@@ -42,8 +46,9 @@ export async function POST(request: Request) {
       distanceMeters: element.distance.value 
     }, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Erreur Google Maps:', error);
-    return NextResponse.json({ error: error.message || 'Échec du calcul de trafic' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Échec du calcul de trafic';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

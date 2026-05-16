@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
-import { Search, X, Globe } from 'lucide-react';
+import { X, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DASHBOARD_PANEL_CHROME_BLUR,

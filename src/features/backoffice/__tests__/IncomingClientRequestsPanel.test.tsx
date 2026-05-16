@@ -44,7 +44,11 @@ function mockTenantWorkspace() {
     isTenantUser: true,
     activeCompanyId: "co-1",
     memberships: [{ companyId: "co-1", role: "owner" }],
-  } as ReturnType<typeof useCompanyWorkspaceOptional>);
+    firebaseUid: "ivana-uid",
+    setActiveCompanyId: jest.fn(),
+    activeRole: "owner",
+    refreshClaimsSilent: jest.fn(async () => true),
+  } as unknown as NonNullable<ReturnType<typeof useCompanyWorkspaceOptional>>);
 }
 
 describe("IncomingClientRequestsPanel", () => {
@@ -55,15 +59,21 @@ describe("IncomingClientRequestsPanel", () => {
     mockUseBackOffice.mockReturnValue({
       interventions: [pendingRequest],
       loading: false,
+      error: null,
+      firebaseUid: "ivana-uid",
     });
   });
 
   it("shows gate when workspace is not a tenant", () => {
     mockWorkspace.mockReturnValue({
       isTenantUser: false,
-      activeCompanyId: null,
+      activeCompanyId: "",
       memberships: [],
-    } as ReturnType<typeof useCompanyWorkspaceOptional>);
+      firebaseUid: null,
+      setActiveCompanyId: jest.fn(),
+      activeRole: null,
+      refreshClaimsSilent: jest.fn(async () => false),
+    } as unknown as NonNullable<ReturnType<typeof useCompanyWorkspaceOptional>>);
 
     render(<IncomingClientRequestsPanel />);
 
@@ -78,7 +88,7 @@ describe("IncomingClientRequestsPanel", () => {
     fireEvent.click(screen.getByTestId("incoming-request-assign"));
 
     await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
-    const [, patch] = mockUpdateDoc.mock.calls[0] as [unknown, Record<string, unknown>];
+    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
     expect(patch.status).toBe("assigned");
     expect(patch.assignedTechnicianUid).toBe(getDefaultAssignedTechnicianUid());
     expect(patch.scheduledDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);

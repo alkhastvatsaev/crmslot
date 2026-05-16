@@ -28,8 +28,7 @@ export const viewport: Viewport = {
   themeColor: "#f8fafc",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
 };
 
 import { Toaster } from 'sonner';

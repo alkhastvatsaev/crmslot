@@ -13,7 +13,7 @@ interface RightPanelProps {
   selectedMission: Mission | null;
 }
 
-export default function RightPanel({ selectedMission }: RightPanelProps) {
+export default function RightPanel({ selectedMission: _selectedMission }: RightPanelProps) {
   return (
     <div className="w-[450px] h-full bg-white border-l border-slate-200 flex flex-col p-8">
       

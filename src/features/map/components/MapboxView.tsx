@@ -17,12 +17,13 @@ import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerCo
 import { useGalaxyLayerBridgeOptional } from '@/features/map/GalaxyLayerBridgeContext';
 import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
 import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
+import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
 import {
   interventionClientLabel,
   statusLabelKey,
   formatScheduledTimeOnly,
-  interventionMatchesTab,
   dailyMissionCardToneFromStatus,
+  interventionMatchesTab,
   isInterventionReleasedToTechnicianField,
 } from '@/features/interventions/technicianSchedule';
 import { cn } from '@/lib/utils';
@@ -55,7 +56,15 @@ export default function MapboxView() {
   
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
-  const { interventions: firestoreInterventions } = useBackOfficeInterventions(workspace?.activeCompanyId ?? null);
+  
+  // Phase 2: Filtre Carte.
+  // Si l'utilisateur est un locataire (BackOffice), on charge toutes les missions de la compagnie.
+  // Sinon (Technicien), on ne charge que les missions assignées.
+  const isBackOffice = workspace?.isTenantUser ?? false;
+  const { interventions: boInterventions } = useBackOfficeInterventions(isBackOffice ? workspace?.activeCompanyId ?? null : null);
+  const { interventions: techInterventions } = useTechnicianAssignments();
+  
+  const firestoreInterventions = isBackOffice ? boInterventions : techInterventions;
 
   const missions = useMemo(
     () => (!devUiPreviewEnabled || realInterventionsOnly ? [] : generateDailyMissions(selectedDate)),
@@ -70,8 +79,7 @@ export default function MapboxView() {
     
     const realMissions: Mission[] = firestoreInterventions
       .filter((iv) => isInterventionReleasedToTechnicianField(iv))
-      .filter(iv => interventionMatchesTab(iv, "today", selectedDate))
-      .filter(iv => iv.location && typeof iv.location.lat === "number" && typeof iv.location.lng === "number")
+      .filter((iv) => interventionMatchesTab(iv, "today", selectedDate))
       .map(iv => {
         let numericId = 0;
         for (let i = 0; i < iv.id.length; i++) {
@@ -141,7 +149,7 @@ export default function MapboxView() {
           await deleteDoc(doc(firestore!, "interventions", mission.key));
           toast.success(String(t("map.daily_missions.deleted_toast")));
           setSelectedMission(null);
-        } catch (e) {
+        } catch {
           toast.error("Erreur de suppression");
         }
       } else {
@@ -172,7 +180,8 @@ export default function MapboxView() {
     let cancelled = false;
     const loadLocal = async () => {
       try {
-        const res = await fetch("/api/interventions/local");
+        const { fetchWithAuth } = await import("@/core/api/fetchWithAuth");
+        const res = await fetchWithAuth("/api/interventions/local");
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as {
           interventions: Array<{
@@ -216,17 +225,18 @@ export default function MapboxView() {
     return () => {
       cancelled = true;
     };
-  }, [selectedDateStr, realInterventionsOnly]);
+  }, [selectedDateStr, t]);
 
   useEffect(() => {
     if (!realInterventionsOnly) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLiveMissions((prev) =>
       prev.filter((m) => {
         const k = m.key;
         return typeof k !== "string" || !k.endsWith(".intervention.json");
       }),
     );
-  }, [realInterventionsOnly]);
+  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -287,8 +297,8 @@ export default function MapboxView() {
 
       const isLive = mission.source === "live";
       const tone =
-        (mission as any).statusCode
-          ? dailyMissionCardToneFromStatus((mission as any).statusCode)
+        mission.statusCode
+          ? dailyMissionCardToneFromStatus(mission.statusCode)
           : "upcoming";
       const isDone = tone === "done";
       const inProgress = tone === "active";

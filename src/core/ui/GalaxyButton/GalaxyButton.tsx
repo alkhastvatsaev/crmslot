@@ -41,7 +41,8 @@ const GalaxyButton: React.FC<GalaxyButtonProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        let width: number, height: number, stars: any[] = [];
+        type Star = { radius: number; angle: number; angularVelocity: number; size: number; opacity: number; twinkleSpeed: number; z: number; color: { r: number; g: number; b: number } };
+        let width: number, height: number, stars: Star[] = [];
         const STAR_COUNT = 6000; // Augmentation pour un effet de galaxie dense et riche
         let speedMultiplier = 1;
         let targetSpeed = 1;
@@ -118,17 +119,17 @@ const GalaxyButton: React.FC<GalaxyButtonProps> = ({
                 star.angle += star.angularVelocity * speedMultiplier;
 
                 // Calcul des positions en respectant l'aspect ratio
-                let x = Math.cos(star.angle) * star.radius;
-                let y = Math.sin(star.angle) * star.radius;
-                let z = star.z;
+                const x = Math.cos(star.angle) * star.radius;
+                const y = Math.sin(star.angle) * star.radius;
+                const z = star.z;
 
                 // Application de l'inclinaison (Tilt)
-                let y1 = y * Math.cos(GALAXY_TILT) - z * Math.sin(GALAXY_TILT);
-                let z1 = y * Math.sin(GALAXY_TILT) + z * Math.cos(GALAXY_TILT);
+                const y1 = y * Math.cos(GALAXY_TILT) - z * Math.sin(GALAXY_TILT);
+                const z1 = y * Math.sin(GALAXY_TILT) + z * Math.cos(GALAXY_TILT);
 
                 // Application de l'angle de vue
-                let x2 = x * Math.cos(GALAXY_ANGLE) - y1 * Math.sin(GALAXY_ANGLE);
-                let y2 = x * Math.sin(GALAXY_ANGLE) + y1 * Math.cos(GALAXY_ANGLE);
+                const x2 = x * Math.cos(GALAXY_ANGLE) - y1 * Math.sin(GALAXY_ANGLE);
+                const y2 = x * Math.sin(GALAXY_ANGLE) + y1 * Math.cos(GALAXY_ANGLE);
 
                 const finalX = currentX + x2;
                 const finalY = currentY + y2;

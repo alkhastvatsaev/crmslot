@@ -3,20 +3,13 @@
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/core/config/firebase";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
 /** Sauvegarde manuelle / autres clients : relève les fichiers sans sidecar. Après MacroDroid, le traitement part surtout depuis `audio-dispatch`. */
 const INTERVAL_MS = Number(process.env.NEXT_PUBLIC_PROCESS_UPLOADS_INTERVAL_MS) || 15_000;
 
 async function postProcessUploads(): Promise<void> {
-  const headers: Record<string, string> = {};
-  if (auth?.currentUser) {
-    try {
-      headers.Authorization = `Bearer ${await auth.currentUser.getIdToken()}`;
-    } catch {
-      /* ignore */
-    }
-  }
-  const res = await fetch("/api/ai/process-uploads", { method: "POST", headers, credentials: "same-origin" });
+  const res = await fetchWithAuth("/api/ai/process-uploads", { method: "POST" });
   if (!res.ok && process.env.NODE_ENV === "development") {
     const text = await res.text().catch(() => "");
     console.warn("[AutoProcessUploads]", res.status, text);

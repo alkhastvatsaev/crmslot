@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { readAudioUploadSidecarIfPresent, readTranscriptSidecarIfPresent } from "@/core/services/audio/transcript-sidecar";
 import { readAudioDecisionForUpload } from "@/core/services/audio/audio-route-helpers";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadsDir)) {

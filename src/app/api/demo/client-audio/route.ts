@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { blockIfProduction, requireAuthenticatedUser } from "@/core/api/routeAuth";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,12 @@ function getDemoAudioAbsDir() {
     : path.join(process.cwd(), "public", "client-audios");
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const blocked = blockIfProduction();
+  if (blocked) return blocked;
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const absDir = getDemoAudioAbsDir();
     const entries = await readdir(absDir).catch(() => []);
@@ -41,6 +47,11 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const blocked = blockIfProduction();
+  if (blocked) return blocked;
+  const auth = await requireAuthenticatedUser(req);
+  if ("response" in auth) return auth.response;
+
   try {
     if (process.env.VERCEL === "1" && process.env.NODE_ENV === "production") {
       return NextResponse.json(

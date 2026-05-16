@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import * as admin from 'firebase-admin';
 import '@/core/config/firebase-admin';
+import { authorizeProcessUploads } from '@/core/api/routeAuth';
 import { findPendingUploadJobs } from '@/core/services/audio/process-upload-jobs';
 import { runProcessUploadJob } from '@/core/services/audio/run-process-upload-job';
 
@@ -10,40 +10,6 @@ export const runtime = 'nodejs';
 
 /** Limite serveur (Vercel Pro+) — ajuste si besoin */
 export const maxDuration = 120;
-
-function clientIp(request: Request): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const realIp = request.headers.get('x-real-ip');
-  return forwardedFor?.split(',')[0]?.trim() || realIp?.trim() || '';
-}
-
-async function authorizeProcessUploads(request: Request): Promise<boolean> {
-  const secret = process.env.UPLOAD_AUTO_PROCESS_SECRET?.trim();
-  const hdr = request.headers.get('x-upload-auto-secret')?.trim();
-  if (secret && hdr === secret) return true;
-
-  // Sans secret serveur : on autorise (bureau / dév). Sinon l'endpoint restait en 403 en prod sans Admin Firebase.
-  if (!secret) {
-    return true;
-  }
-
-  const authz = request.headers.get('authorization');
-  if (authz?.startsWith('Bearer ') && admin.apps.length) {
-    try {
-      await admin.auth().verifyIdToken(authz.slice(7));
-      return true;
-    } catch {
-      /* jeton invalide */
-    }
-  }
-
-  const officeIp = process.env.NEXT_PUBLIC_OFFICE_IP?.trim();
-  if (officeIp && process.env.OFFICE_ALLOW_UPLOAD_AUTO_PROCESS === 'true') {
-    if (clientIp(request) === officeIp) return true;
-  }
-
-  return process.env.NODE_ENV !== 'production';
-}
 
 /**
  * Traite au plus un fichier audio dans `public/uploads` sans `.audio.json` à jour.

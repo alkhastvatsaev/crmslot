@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getDatabase, type Database } from 'firebase/database';
-import { getFirestore, enableMultiTabIndexedDbPersistence, initializeFirestore } from 'firebase/firestore';
+import { enableMultiTabIndexedDbPersistence, initializeFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 

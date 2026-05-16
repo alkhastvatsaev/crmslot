@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 import { transcrireAppelSerrurier } from '@/core/services/audio/transcription';
 import { writeAudioUploadSidecar } from '@/core/services/audio/transcript-sidecar';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ('response' in auth) return auth.response;
+
   try {
     const body = await request.json().catch(() => ({}));
     const audioUrl = typeof body.audioUrl === 'string' ? body.audioUrl : '';

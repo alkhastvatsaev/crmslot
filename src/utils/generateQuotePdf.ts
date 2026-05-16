@@ -117,7 +117,7 @@ export const generateLocksmithQuote = (clientName: string, returnBase64: boolean
   });
 
   // --- TOTALS ---
-  let finalY = (doc as any).lastAutoTable.finalY + 15;
+  let finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15;
   const pageHeight = doc.internal.pageSize.height;
   
   // Vérification de l'espace disponible pour les totaux (besoin d'environ 50mm)

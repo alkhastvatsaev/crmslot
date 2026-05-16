@@ -23,6 +23,7 @@ export default function SmartFormAddressMiniMap({ address, placeLatLng, classNam
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   const latestRef = useRef({ address, placeLatLng });
+  // eslint-disable-next-line react-hooks/refs
   latestRef.current = { address, placeLatLng };
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() ?? "";
 
@@ -96,7 +97,8 @@ export default function SmartFormAddressMiniMap({ address, placeLatLng, classNam
     const timer = window.setTimeout(() => {
       void (async () => {
         try {
-          const res = await fetch(`/api/maps/geocode?q=${encodeURIComponent(q)}`);
+          const { fetchWithAuth } = await import("@/core/api/fetchWithAuth");
+          const res = await fetchWithAuth(`/api/maps/geocode?q=${encodeURIComponent(q)}`);
           if (!res.ok) return;
           const data = (await res.json()) as {
             location?: { lat: number; lng: number };

@@ -11,6 +11,7 @@ import {
   moveItemToEndById,
   type QuoteRequestRow,
 } from '@/features/dashboard/quoteRequestsOrder';
+import { fetchWithAuth } from '@/core/api/fetchWithAuth';
 
 const baseRequests: QuoteRequestRow[] = [
   {
@@ -99,6 +100,7 @@ export default function QuoteRequests() {
       const savedOrder = localStorage.getItem(QUOTE_REQUEST_ORDER_KEY);
 
       if (savedGenerated) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setGeneratedStates(JSON.parse(savedGenerated) as Record<number, boolean>);
       }
 
@@ -156,7 +158,7 @@ export default function QuoteRequests() {
       // Générer le PDF en base64 juste avant l'envoi
       const pdfBase64 = generateLocksmithQuote(clientName, true);
 
-      const response = await fetch('/api/email', {
+      const response = await fetchWithAuth('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -11,6 +11,7 @@ export function useInterventionLive(interventionId: string | null, enabled = tru
 
   useEffect(() => {
     if (!enabled || !interventionId?.trim() || !isConfigured || !firestore) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setData(null);
       return () => {};
     }

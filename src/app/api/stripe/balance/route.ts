@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ('response' in auth) return auth.response;
+
   try {
     const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
@@ -35,8 +39,9 @@ export async function GET() {
       pending: pending
     }, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Erreur Stripe:', error);
-    return NextResponse.json({ error: error.message || 'Impossible de récupérer le solde' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Impossible de récupérer le solde';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

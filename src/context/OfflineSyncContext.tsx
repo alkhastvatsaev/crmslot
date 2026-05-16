@@ -27,7 +27,9 @@ export type OfflineSyncContextValue = {
 const OfflineSyncContext = createContext<OfflineSyncContextValue | null>(null);
 
 export function OfflineSyncProvider({ children }: { children: ReactNode }) {
-  const [navigatorOnline, setNavigatorOnline] = useState(true);
+  const [navigatorOnline, setNavigatorOnline] = useState(
+    () => typeof navigator !== "undefined" ? navigator.onLine : true,
+  );
   const [pendingCompletionCount, setPendingCompletionCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -77,6 +79,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
   }, [runFlushWithToasts]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshPendingCount();
   }, [refreshPendingCount]);
 
@@ -93,7 +96,6 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
     };
     const syncOffline = () => setNavigatorOnline(false);
 
-    setNavigatorOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
     if (typeof window === "undefined") return () => {};
 
     window.addEventListener("online", syncOnline);

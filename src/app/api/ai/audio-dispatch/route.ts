@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
-import * as admin from 'firebase-admin';
 import '@/core/config/firebase-admin';
+import { authorizeAudioDispatch } from '@/core/api/routeAuth';
 import { readAudioUploadBody } from '@/core/services/audio/read-audio-upload-body';
-import type { PendingUploadJob } from '@/core/services/audio/process-upload-jobs';
-import { runProcessUploadJob } from '@/core/services/audio/run-process-upload-job';
+import { ingestCallAudioBuffer } from '@/core/services/audio/ingestCallAudioBuffer';
 
 export const runtime = 'nodejs';
 
@@ -41,6 +39,14 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const allowed = await authorizeAudioDispatch(request);
+  if (!allowed) {
+    return NextResponse.json(
+      { success: false, error: 'Non autorisé' },
+      { status: 403, headers: { 'Access-Control-Allow-Origin': '*' } },
+    );
+  }
+
   try {
     const url = new URL(request.url);
     const phone = url.searchParams.get('phone');
@@ -51,9 +57,6 @@ export async function POST(request: Request) {
 
     const ct = request.headers.get('content-type') || '';
     const contentLength = request.headers.get('content-length');
-    console.log(
-      `[audio-dispatch] POST phone=${phone || 'inconnu'} content-length=${contentLength ?? 'n/a'} content-type=${ct.slice(0, 120) || '(vide)'}`
-    );
 
     const parsed = await readAudioUploadBody(request);
     if (!parsed.ok) {
@@ -72,56 +75,19 @@ export async function POST(request: Request) {
     }
 
     const { buffer, fileName } = parsed;
-    console.log(`[audio-dispatch] Réception audio ${phone || 'inconnu'}, taille: ${buffer.length} octets`);
+
+    const ext = path.extname(fileName) || '.m4a';
+    const phoneSegment = phone ? phone.replace(/[^a-zA-Z0-9]/g, '') : 'unknown';
+    const { publicUrl } = await ingestCallAudioBuffer({
+      buffer,
+      ext,
+      phone,
+      source: 'audio-dispatch',
+      fileBase: `call-${phoneSegment}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+    });
 
     const receivedAt = new Date().toISOString();
-
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    fs.mkdirSync(uploadsDir, { recursive: true });
-
-    let ext = path.extname(fileName) || '.m4a';
-    const phoneSegment = phone ? phone.replace(/[^a-zA-Z0-9]/g, '') : 'unknown';
-    const safeBase = `call-${phoneSegment}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    let rootRel = `${safeBase}${ext}`;
-    let savedPath = path.join(uploadsDir, rootRel);
-    fs.writeFileSync(savedPath, buffer);
-
-    let publicUrl = `/uploads/${rootRel}`;
-
-    try {
-      if (admin.apps.length) {
-        const db = admin.firestore();
-        const dispPhone = phone?.trim() ? phone.trim() : null;
-        await db.collection('ai_status').doc('macrodroid').set(
-          {
-            status: 'processing',
-            transcript: '',
-            phone: dispPhone,
-            audioUrl: publicUrl,
-            updatedAt: receivedAt,
-          },
-          { merge: true }
-        );
-      }
-    } catch (e) {
-      console.warn('[audio-dispatch] Firestore (processing):', e);
-    }
-
-    const stem = path.basename(rootRel, path.extname(rootRel));
-    const job: PendingUploadJob = {
-      stem,
-      canonical: rootRel,
-      mtimeMs: fs.statSync(savedPath).mtimeMs,
-    };
-
-    void runProcessUploadJob({
-      uploadsDir,
-      job,
-      source: 'audio-dispatch',
-      dispatchPhone: phone,
-    }).catch((err) => console.error('[audio-dispatch] Traitement async:', err));
-
-    const processedAt = new Date().toISOString();
+    const processedAt = receivedAt;
 
     return NextResponse.json(
       {

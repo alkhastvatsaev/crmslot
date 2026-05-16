@@ -95,7 +95,7 @@ function formatEuro(n: number): string {
 function BackOfficeDetailDrawer({
   intervention,
   technicians,
-  isAdmin,
+  isAdmin: _isAdmin,
   onClose,
   onDelete,
   onArchive,
@@ -244,6 +244,7 @@ export default function BackOfficeDashboardPanel() {
   const [detail, setDetail] = useState<Intervention | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (workspace?.activeCompanyId) setCompanyFilterId(workspace.activeCompanyId);
   }, [workspace?.activeCompanyId]);
 

@@ -81,7 +81,8 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
             formData.append("audio", generatedBlob, `audio.${ext}`);
             formData.append("language", String(opts?.language ?? "fr"));
             
-            const res = await fetch("/api/ai/transcribe-blob", {
+            const { fetchWithAuth } = await import("@/core/api/fetchWithAuth");
+            const res = await fetchWithAuth("/api/ai/transcribe-blob", {
               method: "POST",
               body: formData,
             });

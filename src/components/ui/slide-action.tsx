@@ -36,7 +36,7 @@ export function SlideAction({
     }
   }, []);
 
-  const handleDragEnd = async (event: any, info: any) => {
+  const handleDragEnd = async (_event: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number } }) => {
     if (!containerRef.current || !knobRef.current) return;
     
     const maxDrag = bounds.right;

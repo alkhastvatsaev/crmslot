@@ -20,6 +20,7 @@ const MAP_TRANSCRIPTION_PANEL_SHELL =
   `pointer-events-auto absolute top-1/2 z-[9999] flex h-[min(70dvh,720px)] min-h-0 -translate-y-1/2 flex-col ${DASHBOARD_PANEL_CHROME_ROUNDED} ${DASHBOARD_PANEL_CHROME_BORDER} bg-white/85 ${DASHBOARD_PANEL_SHADOW_CLASS} ${DASHBOARD_PANEL_CHROME_BLUR}`;
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
 type DecisionStatus = "none" | "refused" | "created";
 
@@ -73,6 +74,7 @@ export default function MapTranscriptionActionsPanel({
 
   useLayoutEffect(() => {
     if (!editOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRailScreenRect(null);
       return;
     }
@@ -121,11 +123,13 @@ export default function MapTranscriptionActionsPanel({
   useEffect(() => {
     const s = scopedClipPublicUrl?.trim() ?? "";
     if (s) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLatest(null);
   }, [armed, scopedClipPublicUrl]);
 
   useEffect(() => {
     if (!armed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLatest(null);
       setBusy(null);
       lastHandledOpenSignalRef.current = 0;
@@ -143,7 +147,7 @@ export default function MapTranscriptionActionsPanel({
         const endpoint = useScoped
           ? `/api/ai/audio-for-url?url=${encodeURIComponent(scoped)}`
           : "/api/ai/latest-audio";
-        const res = await fetch(endpoint);
+        const res = await fetchWithAuth(endpoint);
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as LatestAudioResponse;
         if (!cancelled) setLatest(data);
@@ -194,6 +198,7 @@ export default function MapTranscriptionActionsPanel({
     if (!openEditSignal || openEditSignal <= lastHandledOpenSignalRef.current) return;
     if (!canShow) return;
     lastHandledOpenSignalRef.current = openEditSignal;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     openEdit();
   }, [armed, openEditSignal, canShow, openEdit]);
 
@@ -232,7 +237,7 @@ export default function MapTranscriptionActionsPanel({
     }
     setBusy("refuse");
     try {
-      await fetch("/api/ai/audio-decision", {
+      await fetchWithAuth("/api/ai/audio-decision", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ fileName, status: "refused" }),
@@ -254,13 +259,9 @@ export default function MapTranscriptionActionsPanel({
     try {
       const tenantCompanyId =
         workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : undefined;
-      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
-      const headers: Record<string, string> = { "content-type": "application/json" };
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      const res = await fetch("/api/interventions/from-audio", {
+      const res = await fetchWithAuth("/api/interventions/from-audio", {
         method: "POST",
-        headers,
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           fileName,
           override: form,
@@ -366,7 +367,7 @@ export default function MapTranscriptionActionsPanel({
           date: form.date.trim(),
         });
         // Enregistrer la décision (Firestore admin si dispo, sinon disque côté serveur)
-        await fetch("/api/ai/audio-decision", {
+        await fetchWithAuth("/api/ai/audio-decision", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ fileName, status: "created" }),

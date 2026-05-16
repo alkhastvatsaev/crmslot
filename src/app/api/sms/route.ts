@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import twilio from 'twilio';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ('response' in auth) return auth.response;
+
   try {
     // Récupération des données envoyées depuis le frontend
     const { to, message } = await request.json();
@@ -30,11 +34,11 @@ export async function POST(request: Request) {
       to: to
     });
 
-    console.log(`✅ SMS envoyé avec succès! SID: ${twilioResponse.sid}`);
     return NextResponse.json({ success: true, messageId: twilioResponse.sid }, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Erreur Twilio:', error);
-    return NextResponse.json({ error: error.message || 'Échec de l\'envoi du SMS' }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Échec de l'envoi du SMS";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

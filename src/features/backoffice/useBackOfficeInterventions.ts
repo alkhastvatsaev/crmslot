@@ -18,16 +18,20 @@ export function useBackOfficeInterventions(companyId: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const skipFirestoreDemo =
+  const cidForEffect = (companyId ?? "").trim();
+  /** Société démo : données en mémoire même si Firebase est configuré (cas typique Vercel + auth anonyme). */
+  const useInMemoryDemo =
     devUiPreviewEnabled &&
     (!isConfigured ||
       !firestore ||
       !auth ||
-      !auth.currentUser);
+      !auth.currentUser ||
+      cidForEffect === DEMO_COMPANY_ID);
 
   useEffect(() => {
-    if (skipFirestoreDemo) {
-      const cid = (companyId ?? "").trim() || DEMO_COMPANY_ID;
+    if (useInMemoryDemo) {
+      const cid = cidForEffect || DEMO_COMPANY_ID;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInterventions(realInterventionsOnly ? [] : demoInterventionsForCompany(cid));
       setLoading(false);
       setError(null);
@@ -71,7 +75,7 @@ export function useBackOfficeInterventions(companyId: string | null) {
     );
 
     return () => unsub();
-  }, [companyId, skipFirestoreDemo]);
+  }, [companyId, useInMemoryDemo, cidForEffect]);
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
 

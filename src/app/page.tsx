@@ -1,6 +1,6 @@
 "use client";
 import React, { Suspense, useMemo } from "react";
-import MapboxView from "@/features/map/components/MapboxView";
+import dynamic from "next/dynamic";
 import SpotlightSearch from "@/features/dashboard/components/SpotlightSearch";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import UserProfile from "@/features/dashboard/components/UserProfile";
@@ -9,8 +9,6 @@ import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndic
 import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
-import DashboardSecondaryPlaceholder from "@/features/dashboard/components/DashboardSecondaryPlaceholder";
-import TechnicianHubPage from "@/features/interventions/components/TechnicianHubPage";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
@@ -25,10 +23,33 @@ import TechnicianConnectivityBar from "@/features/offline/components/TechnicianC
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import TechnicianNotificationBootstrap from "@/features/notifications/components/TechnicianNotificationBootstrap";
 import DevPreviewAnonymousAuth from "@/features/dev/DevPreviewAnonymousAuth";
+import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
+
+const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
+  ssr: false,
+  loading: () => (
+    <main
+      id="map-container"
+      data-testid="map-container-loading"
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center min-h-[320px] animate-pulse bg-slate-100`}
+      aria-busy="true"
+    />
+  ),
+});
+
+const DashboardSecondaryPlaceholder = dynamic(
+  () => import("@/features/dashboard/components/DashboardSecondaryPlaceholder"),
+  { ssr: false, loading: () => null },
+);
+
+const TechnicianHubPage = dynamic(
+  () => import("@/features/interventions/components/TechnicianHubPage"),
+  { ssr: false, loading: () => null },
+);
 
 /** Écran d’accueil — **3 pages** : carte · hub société · hub technicien (back-office via inbox sur la carte). */
 export default function Dashboard() {
@@ -73,8 +94,9 @@ export default function Dashboard() {
                                     <ClockCalendar />
                                   </aside>
                                   <div
-                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto`}
+                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
                                   >
+                                    <StagingPreviewBanner />
                                     <SpotlightSearch />
                                   </div>
                                   <aside

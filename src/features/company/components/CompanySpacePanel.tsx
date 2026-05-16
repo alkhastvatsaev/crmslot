@@ -103,6 +103,7 @@ export default function CompanySpacePanel() {
 
   useEffect(() => {
     if (!firestore || !firebaseUid || !activeCompanyId || !isAdmin) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInvitesCount(0);
       return () => {};
     }
@@ -116,7 +117,7 @@ export default function CompanySpacePanel() {
       },
       () => setInvitesCount(0),
     );
-  }, [firestore, firebaseUid, activeCompanyId, isAdmin]);
+  }, [firebaseUid, activeCompanyId, isAdmin]);
 
   const createCompany = async () => {
     const name = companyName.trim();

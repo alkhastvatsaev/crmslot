@@ -1,4 +1,5 @@
 import { Technician } from '@/features/technicians/types';
+import { fetchWithAuth } from '@/core/api/fetchWithAuth';
 
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -39,7 +40,7 @@ export async function findBestTechnician(
 
   for (const tech of top3) {
     try {
-      const response = await fetch('/api/maps/distance', {
+      const response = await fetchWithAuth('/api/maps/distance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

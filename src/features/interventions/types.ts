@@ -62,4 +62,6 @@ export interface Intervention {
   invoicedAt?: unknown;
   completedAt?: unknown;
   completedByUid?: string | null;
+  /** Validation Ivana (back-office). */
+  ivanaVerified?: boolean;
 }

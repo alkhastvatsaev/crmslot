@@ -12,6 +12,7 @@ const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 /** Page 12 — centre sur les alertes (actions admin + même bandeau que le back-office). */
 export default function DuplicateAlertsPanel() {
   const workspace = useCompanyWorkspaceOptional();
+  const { openAlerts, loading } = useOpenDuplicateAlerts(workspace?.activeCompanyId ?? null);
 
   if (!workspace || !workspace.isTenantUser || !workspace.memberships.length) {
     return (
@@ -34,7 +35,6 @@ export default function DuplicateAlertsPanel() {
   }
 
   const ws = workspace;
-  const { openAlerts, loading } = useOpenDuplicateAlerts(ws.activeCompanyId);
   const isAdmin = ws.activeRole === "admin";
 
   return (

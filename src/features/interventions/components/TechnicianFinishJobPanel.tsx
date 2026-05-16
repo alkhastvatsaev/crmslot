@@ -90,7 +90,7 @@ export default function TechnicianFinishJobPanel() {
       cancelled = true;
       stopCamera();
     };
-  }, [interventionId, step, stopCamera]);
+  }, [interventionId, step, stopCamera, t]);
 
   const captureShot = () => {
     const v = videoRef.current;
@@ -255,7 +255,7 @@ export default function TechnicianFinishJobPanel() {
 
 
             <div className="relative mt-2 overflow-hidden rounded-[24px] bg-slate-900 shadow-xl ring-1 ring-black/5">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              { }
               <video
                 ref={videoRef}
                 className={cn(

@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import path from "path";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { findUploadedAudioRelativePath } from "@/core/services/audio/resolve-upload-by-basename";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ("response" in auth) return auth.response;
+
   try {
     const url = new URL(request.url);
     const name = url.searchParams.get("name")?.trim();

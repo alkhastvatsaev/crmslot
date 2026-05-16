@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
+import { requireAuthenticatedUser } from '@/core/api/routeAuth';
 import { getClient, transcribeAudioToText } from '@/core/services/audio/transcription';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser(request);
+  if ('response' in auth) return auth.response;
+
   try {
     const formData = await request.formData();
     const audioFile = formData.get('audio') as File | null;

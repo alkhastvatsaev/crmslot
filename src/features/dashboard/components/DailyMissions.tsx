@@ -39,10 +39,9 @@ export default function DailyMissions({
       {/* Aligning the mission items to the top */}
       <div className="grid grid-cols-3 gap-3 px-3 pb-8 pt-4 [grid-template-columns:repeat(3,minmax(0,1fr))]">
           {missions.map((mission, index) => {
-            const tone =
-              (mission as any).statusCode
-                ? dailyMissionCardToneFromStatus((mission as any).statusCode)
-                : "upcoming";
+            const tone = mission.statusCode
+              ? dailyMissionCardToneFromStatus(mission.statusCode)
+              : "upcoming";
             const isDone = tone === "done";
             const inProgress = tone === "active";
             

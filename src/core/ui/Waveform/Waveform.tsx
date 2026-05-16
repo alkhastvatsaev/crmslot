@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import './Waveform.css';
 
 interface WaveformProps {
@@ -9,6 +9,11 @@ interface WaveformProps {
 
 const Waveform: React.FC<WaveformProps> = ({ color = 'white', barCount = 12, analyser }) => {
     const barsRef = useRef<(HTMLDivElement | null)[]>([]);
+    const animDurations = useMemo(
+        // eslint-disable-next-line react-hooks/purity
+        () => Array.from({ length: barCount }, () => 2.0 + Math.random() * 1.5),
+        [barCount],
+    );
 
     useEffect(() => {
         if (!analyser) return;
@@ -36,10 +41,10 @@ const Waveform: React.FC<WaveformProps> = ({ color = 'white', barCount = 12, ana
 
         update();
 
+        const bars = barsRef.current;
         return () => {
             cancelAnimationFrame(animationId);
-            // reset heights
-            barsRef.current.forEach(bar => {
+            bars.forEach(bar => {
                 if (bar) bar.style.height = '45%';
             });
         };
@@ -54,7 +59,7 @@ const Waveform: React.FC<WaveformProps> = ({ color = 'white', barCount = 12, ana
                     className={`waveform-bar ${!analyser ? 'animate-waveform' : ''}`} 
                     style={{ 
                         backgroundColor: color,
-                        animation: analyser ? 'none' : `bounce ${2.0 + Math.random() * 1.5}s ease-in-out ${i * 0.05}s infinite alternate`,
+                        animation: analyser ? 'none' : `bounce ${animDurations[i]}s ease-in-out ${i * 0.05}s infinite alternate`,
                         height: '45%',
                         width: '4px',
                         borderRadius: '2px',

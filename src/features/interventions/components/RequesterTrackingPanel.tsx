@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 import { Check, Clock, MapPin, User, Navigation, CheckCircle2, FileText, Search, X, ArrowRight } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, onSnapshot, or, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ function useMyLatestIntervention(searchLastName: string, profileLastName: string
 
   useEffect(() => {
     if (!isConfigured || !auth || !firestore) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -46,7 +47,6 @@ function useMyLatestIntervention(searchLastName: string, profileLastName: string
 
       const db = firestore;
       if (!db) return;
-      let q;
 
       if (!user) {
         setIntervention(null);
@@ -54,7 +54,7 @@ function useMyLatestIntervention(searchLastName: string, profileLastName: string
         return;
       }
 
-      q = query(
+      const q = query(
         collection(db, "interventions"), 
         where("createdByUid", "==", user.uid)
       );
@@ -86,7 +86,7 @@ function useMyLatestIntervention(searchLastName: string, profileLastName: string
       if (unsubSnap) unsubSnap();
       unsubAuth();
     };
-  }, [searchLastName]);
+  }, [searchLastName, profileLastName]);
 
   return { intervention, loading };
 }
@@ -99,7 +99,7 @@ export default function RequesterTrackingPanel() {
   const [syncOnNextLoad, setSyncOnNextLoad] = useState(false);
   
   const { intervention: latestIntervention, loading: interventionLoading } = useMyLatestIntervention(searchQuery, profile.lastName);
-  const [user, setUser] = useState(auth?.currentUser ?? null);
+  const [, setUser] = useState(auth?.currentUser ?? null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -131,9 +131,10 @@ export default function RequesterTrackingPanel() {
           toast.success(`${String(t("requester.tracking.switched_to_case_prefix"))} ${who}`);
         });
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSyncOnNextLoad(false);
     }
-  }, [syncOnNextLoad, interventionLoading, latestIntervention, setProfile, resetRequestOnly]);
+  }, [syncOnNextLoad, interventionLoading, latestIntervention, setProfile, resetRequestOnly, t]);
 
   const draftTitle = requestData.problemLabel.trim() || requestData.description.trim();
   const hasDraft = Boolean(draftTitle || requestData.interventionAddress.trim());

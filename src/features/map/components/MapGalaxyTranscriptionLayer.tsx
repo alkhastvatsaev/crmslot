@@ -2,11 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
 import AiAssistant, { type AiPlaybackSync, type QueuedClip } from "@/features/dispatch/components/AiAssistant";
 import MapTranscriptionOverlay from "@/features/map/components/MapTranscriptionOverlay";
 import MapTranscriptionActionsPanel from "@/features/map/components/MapTranscriptionActionsPanel";
 import { DASHBOARD_DESKTOP_GALAXY_RAIL_CLASS } from "@/core/ui/dashboardDesktopLayout";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
 const OVERLAY_ROOT_ID = "dashboard-overlay-root";
 
@@ -32,6 +32,7 @@ export default function MapGalaxyTranscriptionLayer({ transcriptionArmed, onUser
   const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!transcriptionArmed) setActiveClipPublicUrl(null);
   }, [transcriptionArmed]);
 
@@ -104,19 +105,20 @@ export default function MapGalaxyTranscriptionLayer({ transcriptionArmed, onUser
   );
 }
 
-function HistoryPanel({ queue, onClose }: { queue: QueuedClip[]; onClose: () => void }) {
+function HistoryPanel({ queue, onClose: _onClose }: { queue: QueuedClip[]; onClose: () => void }) {
   const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!selectedUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTranscript(null);
       return;
     }
     let active = true;
     setLoading(true);
-    fetch(`/api/ai/latest-audio?url=${encodeURIComponent(selectedUrl)}`)
+    void fetchWithAuth(`/api/ai/latest-audio?url=${encodeURIComponent(selectedUrl)}`)
       .then((res) => res.json())
       .then((data) => {
         if (active) {

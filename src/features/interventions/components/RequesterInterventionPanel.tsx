@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRequesterHub } from "../context/RequesterHubContext";
-import { ImagePlus, Loader2, MapPin, Mic, SendHorizontal, Trash2, Check, Calendar, Clock, Square, Play, Pause, Download } from "lucide-react";
+import { ImagePlus, Loader2, MapPin, Mic, SendHorizontal, Trash2, Square, Play, Pause, Download } from "lucide-react";
 import { SmartTimeSlotPicker } from "./SmartTimeSlotPicker";
 import { toast } from "sonner";
-import { addDoc, collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -280,7 +282,7 @@ export default function RequesterInterventionPanel() {
       const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : mime.includes("wav") ? "wav" : "webm";
       formData.append("audio", blob, `message.${ext}`);
 
-      const res = await fetch("/api/demo/client-audio", { method: "POST", body: formData });
+      const res = await fetchWithAuth("/api/demo/client-audio", { method: "POST", body: formData });
       if (!res.ok) throw new Error(String(t("requester.toasts.server_error")));
 
       const json = (await res.json().catch(() => null)) as { url?: string; storagePath?: string } | null;
@@ -460,7 +462,7 @@ export default function RequesterInterventionPanel() {
             const mime = blobForAudio.type || "audio/webm";
             const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : mime.includes("wav") ? "wav" : "webm";
             formData.append("audio", blobForAudio, `message.${ext}`);
-            const res = await fetch("/api/demo/client-audio", { method: "POST", body: formData });
+            const res = await fetchWithAuth("/api/demo/client-audio", { method: "POST", body: formData });
             if (res.ok) {
               const json = (await res.json()) as { url?: string };
               demoAudioUrlForDoc = (json.url ?? "").trim() || null;
@@ -489,11 +491,11 @@ export default function RequesterInterventionPanel() {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
-              const geo = await fetch(`/api/maps/geocode?q=${encodeURIComponent(interventionAddress.trim())}`, { signal: controller.signal });
+              const geo = await fetchWithAuth(`/api/maps/geocode?q=${encodeURIComponent(interventionAddress.trim())}`, { signal: controller.signal });
               const gj = (await geo.json()) as { location?: { lat: number; lng: number } };
               lat = gj.location?.lat ?? 50.8466;
               lng = gj.location?.lng ?? 4.3522;
-            } catch (err) {
+            } catch {
               lat = 50.8466;
               lng = 4.3522;
             } finally {
@@ -547,7 +549,7 @@ export default function RequesterInterventionPanel() {
               try {
                 const formData = new FormData();
                 formData.append("audio", audioBlob, `message.${ext}`);
-                const res = await fetch("/api/demo/client-audio", { method: "POST", body: formData });
+                const res = await fetchWithAuth("/api/demo/client-audio", { method: "POST", body: formData });
                 if (!res.ok) return;
                 const json = (await res.json()) as { url?: string; mimeType?: string };
                 if (json.url) {
@@ -876,7 +878,7 @@ export default function RequesterInterventionPanel() {
                       <div key={i} className="aspect-square relative group">
                         {filled ? (
                           <div className="relative h-full w-full overflow-hidden rounded-[24px] shadow-sm border border-black/5">
-                            <img src={src} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <Image src={src} alt="" width={400} height={400} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             <button
                               type="button"
