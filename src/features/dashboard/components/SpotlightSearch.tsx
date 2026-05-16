@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
 import { X, Globe, Search, Map, Building2, Wrench } from 'lucide-react';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
@@ -25,11 +25,11 @@ export default function SpotlightSearch() {
   const [open, setOpen] = useState(false);
   const { language, setLanguage, t } = useTranslation();
   const pager = useDashboardPagerOptional();
-  const navPages = [
+  const navPages = useMemo(() => [
     { index: 0, label: t('spotlight.nav_map'),        Icon: Map },
     { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
-  ];
+  ], [t]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -47,9 +47,10 @@ export default function SpotlightSearch() {
     <>
       <button
         id="spotlight-search"
+        data-testid="spotlight-trigger"
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Ouvrir la recherche"
+        aria-label={t('spotlight.open_aria')}
         className={`${dashboardHeaderPanelShellClass} items-center justify-between bg-white/95 px-6 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`}
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
@@ -131,12 +132,13 @@ export default function SpotlightSearch() {
                   <Command.Empty className="px-6 py-8 text-center text-gray-500/60 font-medium">
                     {t('spotlight.no_results')}
                   </Command.Empty>
-                  <Command.Group heading="Navigation" className="px-2 py-2">
+                  <Command.Group heading={t('spotlight.nav_group_heading')} className="px-2 py-2">
                     {navPages.map((page) => {
                       const isActive = pager?.pageIndex === page.index;
                       return (
                         <Command.Item
                           key={page.index}
+                          data-testid={`nav-item-${page.index}`}
                           value={page.label}
                           onSelect={() => {
                             pager?.setPageIndex(page.index);
@@ -146,7 +148,7 @@ export default function SpotlightSearch() {
                         >
                           <page.Icon className="w-4 h-4 shrink-0 opacity-60" />
                           <span className="flex-1">{page.label}</span>
-                          {isActive && <span className="text-xs text-blue-500 font-medium">Actif</span>}
+                          {isActive && <span className="text-xs text-blue-500 font-medium">{t('spotlight.active_label')}</span>}
                         </Command.Item>
                       );
                     })}

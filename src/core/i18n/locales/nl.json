@@ -34,7 +34,10 @@
     "no_results": "Geen resultaten",
     "nav_map": "Kaart",
     "nav_company": "Bedrijfshub",
-    "nav_technician": "Technieker"
+    "nav_technician": "Technieker",
+    "open_aria": "Zoek openen",
+    "active_label": "Actief",
+    "nav_group_heading": "Navigatie"
   },
   "auth": {
     "email_required": "Voer een e-mailadres in",

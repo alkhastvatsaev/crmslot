@@ -34,7 +34,10 @@
     "no_results": "Aucun résultat",
     "nav_map": "Carte",
     "nav_company": "Espace société",
-    "nav_technician": "Technicien"
+    "nav_technician": "Technicien",
+    "open_aria": "Ouvrir la recherche",
+    "active_label": "Actif",
+    "nav_group_heading": "Navigation"
   },
   "auth": {
     "email_required": "Saisissez une adresse e-mail",
