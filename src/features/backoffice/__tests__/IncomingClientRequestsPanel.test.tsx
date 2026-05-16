@@ -27,6 +27,27 @@ jest.mock("@/features/backoffice/useResolvedInterventionAudio", () => ({
   useResolvedInterventionAudio: jest.fn(() => ({ resolvedAudioUrl: null })),
 }));
 
+jest.mock("@/features/technicians/hooks", () => ({
+  useTechnicians: jest.fn(() => ({
+    technicians: [
+      {
+        id: "2",
+        name: "Thomas L.",
+        initial: "T",
+        vehicle: "Van",
+        status: "available",
+        authUid: getDefaultAssignedTechnicianUid(),
+        location: { lat: 50.848, lng: 4.352 },
+      },
+    ],
+    loading: false,
+  })),
+}));
+
+jest.mock("@/features/dispatch/algorithm", () => ({
+  findBestTechnician: jest.fn(async () => null),
+}));
+
 const pendingRequest: Intervention = {
   id: "req-1",
   title: "Fuite cuisine",
@@ -86,6 +107,16 @@ describe("IncomingClientRequestsPanel", () => {
 
     fireEvent.click(screen.getByTestId("incoming-request-card-req-1"));
     fireEvent.click(screen.getByTestId("incoming-request-assign"));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId("technician-assign-option-2")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByTestId("technician-assign-option-2"));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId("technician-assign-confirm")).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByTestId("technician-assign-confirm"));
 
     await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
     const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
