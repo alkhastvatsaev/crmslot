@@ -30,7 +30,11 @@
     "map_action_title": "Map",
     "map_action_desc": "Open interventions map",
     "tech_action_title": "Technicians",
-    "tech_action_desc": "View available technicians"
+    "tech_action_desc": "View available technicians",
+    "no_results": "No results",
+    "nav_map": "Map",
+    "nav_company": "Company Hub",
+    "nav_technician": "Technician"
   },
   "auth": {
     "email_required": "Enter an email address",

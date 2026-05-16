@@ -30,7 +30,11 @@
     "map_action_title": "Kaart",
     "map_action_desc": "Open interventie kaart",
     "tech_action_title": "Technici",
-    "tech_action_desc": "Bekijk beschikbare technici"
+    "tech_action_desc": "Bekijk beschikbare technici",
+    "no_results": "Geen resultaten",
+    "nav_map": "Kaart",
+    "nav_company": "Bedrijfshub",
+    "nav_technician": "Technieker"
   },
   "auth": {
     "email_required": "Voer een e-mailadres in",
