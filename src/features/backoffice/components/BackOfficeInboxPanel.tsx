@@ -62,6 +62,9 @@ import {
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
 import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
+import InterventionCommissionPanel from "@/features/commissions/components/InterventionCommissionPanel";
+import InterventionInvoiceAmountField from "@/features/commissions/components/InterventionInvoiceAmountField";
+import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -812,6 +815,10 @@ export default function BackOfficeInboxPanel() {
                 allowCreate={Boolean(selectedItem.assignedTechnicianUid?.trim())}
                 allowStatusUpdate
               />
+
+              <InterventionInvoiceAmountField intervention={selectedItem} />
+              <InvoiceBillingPanel intervention={selectedItem} />
+              <InterventionCommissionPanel intervention={selectedItem} />
 
               {/* Date & Time management for requests */}
               {isInterventionPendingBackOfficeIntake(selectedItem) && (

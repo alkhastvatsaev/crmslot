@@ -9,6 +9,13 @@
       ]
     },
     {
+      "collectionGroup": "interventions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "scheduledDate", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "portal_ivana_chat_messages",
       "queryScope": "COLLECTION",
       "fields": [
@@ -22,6 +29,23 @@
       "fields": [
         { "fieldPath": "interventionId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "commission_rules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "commission_audit",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "interventionId", "order": "ASCENDING" },
+        { "fieldPath": "at", "order": "ASCENDING" }
       ]
     },
     {

@@ -1,5 +1,7 @@
 {
   "tracking": {
+    "waiting_material_banner": "Wachten op materiaal. We nemen contact op zodra het binnen is.",
+    "cancelled_banner": "Deze interventie is geannuleerd.",
     "step0": "Formulier",
     "step1": "Aanvraag ontvangen",
     "step2": "Zoeken naar een technicus",
@@ -60,8 +62,64 @@
       "urgency_normal": "Normaal",
       "urgency_high": "Hoog",
       "submit": "Bestellen en wachten",
-      "submitting": "Verzenden…"
+      "submitting": "Verzenden…",
+      "template_label": "Snel sjabloon laden",
+      "template_placeholder": "-- Selecteer een sjabloon --",
+      "lecot_title": "Controleren op Lecot.be"
     }
+  },
+  "commissions": {
+    "dashboard": {
+      "title": "Commissiemotor",
+      "subtitle": "Regels per bedrijf, technicus of dossier (prioriteit: dossier > technicus > groep).",
+      "add_rule": "+ Nieuwe regel",
+      "form_title": "Regel aanmaken",
+      "level_label": "Niveau",
+      "level": {
+        "group": "Groep",
+        "technician": "Technicus",
+        "intervention": "Dossier"
+      },
+      "target_label": "Doel-ID",
+      "target_group": "Bedrijfs-ID (companyId)",
+      "target_technician": "Technicus-UID",
+      "target_intervention": "Interventie-ID",
+      "value_type_label": "Type",
+      "value_percentage": "Percentage (%)",
+      "value_fixed": "Vast bedrag (€)",
+      "value_label": "Waarde",
+      "saving": "Opslaan…",
+      "save_rule": "Opslaan",
+      "empty": "Geen actieve regels.",
+      "col_level": "Niveau",
+      "col_target": "Doel",
+      "col_value": "Commissie",
+      "col_actions": "Acties"
+    },
+    "panel_title": "Technicuscommissie",
+    "not_calculated": "Niet berekend",
+    "manual_override": "Handmatig",
+    "recalculate": "Herberekenen",
+    "override": "Bedrag forceren",
+    "recalculated": "Commissie herberekend",
+    "override_saved": "Override opgeslagen",
+    "override_invalid": "Ongeldig bedrag",
+    "override_reason_required": "Motief verplicht",
+    "override_amount_placeholder": "Bedrag in €",
+    "override_reason_placeholder": "Reden van aanpassing",
+    "invoice_amount_label": "Factuurbedrag (€)",
+    "invoice_amount_invalid": "Ongeldig bedrag",
+    "invoice_amount_saved": "Bedrag en commissie bijgewerkt"
+  },
+  "payment": {
+    "pay_now": "Online betalen",
+    "loading": "Voorbereiden…",
+    "amount_due": "Te betalen",
+    "status_paid": "Betaling ontvangen — bedankt",
+    "pending_hint": "Betaling wordt verwerkt",
+    "error": "Betaling niet mogelijk",
+    "download_invoice": "Factuur downloaden",
+    "return_success": "Betaling geregistreerd — bedankt!"
   },
   "emails": {
     "panel_title": "E-mails",
@@ -321,7 +379,11 @@
     "urgent": "Dringend",
     "dash": "—",
     "back": "Terug",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "call": "Bellen",
+    "navigate": "Navigeren",
+    "materials": "Materialen",
+    "finish": "Afronden"
   },
   "map": {
     "transcription": {
@@ -562,7 +624,10 @@
       "back": "Vorige stap"
     },
     "templates": {
-      "blocked": { "label": "Deur geblokkeerd", "seed": "Mijn deur zit vast." },
+      "blocked": {
+        "label": "Deur geblokkeerd",
+        "seed": "Mijn deur zit vast."
+      },
       "armored": {
         "label": "Veiligheidsdeur",
         "line1": "Veiligheids",
@@ -575,7 +640,10 @@
         "line2": "gebroken",
         "seed": "Mijn sleutel is in het slot afgebroken."
       },
-      "cylinder": { "label": "Cilinder", "seed": "Probleem met de cilinder / het slot." },
+      "cylinder": {
+        "label": "Cilinder",
+        "seed": "Probleem met de cilinder / het slot."
+      },
       "locked_out": {
         "label": "Buitengesloten",
         "line1": "Buiten",
@@ -588,8 +656,14 @@
         "line2": "openen",
         "seed": "Probleem met het openen van een kluis."
       },
-      "roller_shutter": { "label": "Rolluik", "seed": "Mijn rolluik zit vast." },
-      "digicode": { "label": "Codeklavier", "seed": "Probleem met toegang via codeklavier." },
+      "roller_shutter": {
+        "label": "Rolluik",
+        "seed": "Mijn rolluik zit vast."
+      },
+      "digicode": {
+        "label": "Codeklavier",
+        "seed": "Probleem met toegang via codeklavier."
+      },
       "key_copy": {
         "label": "Sleutel bijmaken",
         "line1": "Sleutel",
@@ -647,5 +721,25 @@
       "technician": "TECHNICUS",
       "admin": "ADMIN"
     }
+  },
+  "billing": {
+    "panel_title": "Facturatie",
+    "invoice_amount": "Factuurbedrag",
+    "commission": "Techniciencommissie",
+    "invoiced_at": "Factuurdatum",
+    "paid_at": "Betalingsdatum",
+    "payment_status": "Betalingsstatus",
+    "status_paid": "Betaald",
+    "status_pending": "In behandeling",
+    "status_unpaid": "Onbetaald",
+    "status_refunded": "Terugbetaald",
+    "view_invoice_pdf": "Factuur PDF bekijken",
+    "stripe_link": "Stripe-betalingslink",
+    "toast_status_updated": "Status bijgewerkt",
+    "toast_amount_saved": "Bedrag opgeslagen",
+    "toast_invalid_amount": "Ongeldig bedrag",
+    "toast_error": "Fout bij opslaan",
+    "template_label": "Facturatiesjabloon",
+    "template_placeholder": "— Sjabloon laden —"
   }
 }

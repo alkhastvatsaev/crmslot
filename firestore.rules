@@ -215,6 +215,21 @@ service cloud.firestore {
         || userBelongsToCompany(data.companyId);
     }
 
+    /** Facturation / commissions : réservés admin tenant ou membership (webhook Stripe = Admin SDK). */
+    function interventionSensitiveBillingUnchanged() {
+      return !request.resource.data.diff(resource.data).changedKeys().hasAny([
+        'paymentStatus',
+        'stripePaymentLinkUrl',
+        'stripePaymentIntentId',
+        'paidAt',
+        'invoiceAmountCents',
+        'commissionAmountCents',
+        'commissionRuleId',
+        'invoicePdfUrl',
+        'invoicedAt',
+      ]);
+    }
+
     function canUpdateInterventionAsTenantStaff() {
       return isCompanyPortalUser()
         && interventionHasTenantScope(resource.data)
@@ -225,6 +240,7 @@ service cloud.firestore {
             request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
             && resource.data.keys().hasAny(['createdByUid'])
             && resource.data.createdByUid == request.auth.uid
+            && interventionSensitiveBillingUnchanged()
           )
           || tenantCollaborateurCanValidateReport()
         );
@@ -239,6 +255,7 @@ service cloud.firestore {
             userRoleInCompany(resource.data.companyId) == 'collaborateur'
             && resource.data.keys().hasAny(['createdByUid'])
             && resource.data.createdByUid == request.auth.uid
+            && interventionSensitiveBillingUnchanged()
           )
         );
     }
@@ -247,13 +264,15 @@ service cloud.firestore {
       return resource.data.keys().hasAny(['assignedTechnicianUid'])
         && resource.data.assignedTechnicianUid is string
         && resource.data.assignedTechnicianUid.size() > 0
-        && resource.data.assignedTechnicianUid == request.auth.uid;
+        && resource.data.assignedTechnicianUid == request.auth.uid
+        && interventionSensitiveBillingUnchanged();
     }
 
     /** Staging : technicien démo (assignations `demo-tech-local`). */
     function canUpdateInterventionDemoAssignee() {
       return resource.data.keys().hasAny(['assignedTechnicianUid'])
-        && resource.data.assignedTechnicianUid == 'demo-tech-local';
+        && resource.data.assignedTechnicianUid == 'demo-tech-local'
+        && interventionSensitiveBillingUnchanged();
     }
 
     function canDeleteInterventionAsAdmin() {
@@ -452,6 +471,65 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /commission_rules/{ruleId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && request.resource.data.createdByUid == request.auth.uid
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+
+      allow update: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        )
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['isActive', 'updatedAt']);
+
+      allow delete: if false;
+    }
+
+    match /commission_overrides/{interventionId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow create, update: if isAuthed()
+        && request.resource.data.companyId is string
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow delete: if false;
+    }
+
+    match /commission_audit/{auditId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow update, delete: if false;
+    }
+
     match /material_orders/{orderId} {
       allow read: if isAuthed()
         && (
@@ -515,40 +593,6 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['readAt']);
 
       allow delete: if false;
-    }
-
-    match /commission_rules/{ruleId} {
-      allow read: if userBelongsToCompany(resource.data.companyId)
-        || tenantClaimsIncludeCompany(resource.data.companyId);
-      allow create: if isAuthed()
-        && request.resource.data.companyId is string
-        && request.resource.data.companyId.size() > 0
-        && (userBelongsToCompany(request.resource.data.companyId)
-            || tenantClaimsIncludeCompany(request.resource.data.companyId));
-      allow update: if (userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId))
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['isActive', 'updatedAt']);
-      allow delete: if false;
-    }
-
-    match /commission_overrides/{overrideId} {
-      allow read: if userBelongsToCompany(resource.data.companyId)
-        || tenantClaimsIncludeCompany(resource.data.companyId);
-      allow create, update: if isAuthed()
-        && request.resource.data.companyId is string
-        && (userBelongsToCompany(request.resource.data.companyId)
-            || tenantClaimsIncludeCompany(request.resource.data.companyId));
-      allow delete: if false;
-    }
-
-    match /commission_audit/{auditId} {
-      allow read: if userBelongsToCompany(resource.data.companyId)
-        || tenantClaimsIncludeCompany(resource.data.companyId);
-      allow create: if isAuthed()
-        && request.resource.data.companyId is string
-        && (userBelongsToCompany(request.resource.data.companyId)
-            || tenantClaimsIncludeCompany(request.resource.data.companyId));
-      allow update, delete: if false;
     }
 
     match /{document=**} {
