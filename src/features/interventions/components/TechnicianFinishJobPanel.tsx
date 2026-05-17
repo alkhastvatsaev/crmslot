@@ -29,10 +29,11 @@ import TechnicianSignaturePad, {
 } from "@/features/interventions/components/TechnicianSignaturePad";
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import TechnicianBillingLinesForm, { type BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
-type WizardStep = "photos" | "signature";
+type WizardStep = "photos" | "billing" | "signature";
 
 export default function TechnicianFinishJobPanel() {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export default function TechnicianFinishJobPanel() {
   const [step, setStep] = useState<WizardStep>("photos");
   const [photos, setPhotos] = useState<{url: string; category: 'panne' | 'materiel' | 'preuve' | 'autre'}[]>([]);
   const [currentCategory, setCurrentCategory] = useState<'panne' | 'materiel' | 'preuve' | 'autre'>('preuve');
+  const [billingLines, setBillingLines] = useState<BillingLine[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
@@ -114,6 +116,7 @@ export default function TechnicianFinishJobPanel() {
   const resetWizard = () => {
     stopCamera();
     setPhotos([]);
+    setBillingLines([]);
     sigRef.current?.clear();
     setStep("photos");
   };
@@ -353,7 +356,7 @@ export default function TechnicianFinishJobPanel() {
               disabled={photos.length < FINISH_JOB_MIN_PHOTOS}
               onClick={() => {
                 stopCamera();
-                setStep("signature");
+                setStep("billing");
               }}
               aria-label={String(t("technician_hub.finish.continue_signature"))}
               className="mt-6 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[20px] bg-slate-900 px-4 text-white shadow-lg transition-all hover:bg-slate-800 disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:scale-100 active:scale-[0.98]"
@@ -362,6 +365,20 @@ export default function TechnicianFinishJobPanel() {
               <ArrowRight className="h-5 w-5" aria-hidden />
             </button>
           </>
+        ) : null}
+
+        {step === "billing" ? (
+          <TechnicianBillingLinesForm
+            initialLines={billingLines}
+            onConfirm={(confirmed) => {
+              setBillingLines(confirmed);
+              setStep("signature");
+            }}
+            onSkip={() => {
+              setBillingLines([]);
+              setStep("signature");
+            }}
+          />
         ) : null}
 
         {step === "signature" ? (
