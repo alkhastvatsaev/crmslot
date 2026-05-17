@@ -32,6 +32,7 @@ import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/company/companyHubNavigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -382,6 +383,7 @@ export default function CompanySpacePanel() {
       ) : null}
 
       {isAdmin ? (
+        <>
         <div
           data-testid="company-billing-strip"
           className={`${glassRow} border-amber-200/40 bg-amber-50/50`}
@@ -391,10 +393,14 @@ export default function CompanySpacePanel() {
             <CreditCard className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0 flex-1 text-[12px] font-medium text-amber-950/90">
-            Facturation / abonnement — réservé admin — Stripe à brancher.
+            Facturation / abonnement — paiements clients via Stripe (portail + webhook).
           </div>
           <Lock className="h-4 w-4 shrink-0 text-amber-800/50" aria-hidden />
         </div>
+        <div data-testid="company-commission-dashboard" className="min-h-0 shrink-0">
+          <CommissionDashboard />
+        </div>
+        </>
       ) : null}
 
       <div className="mt-auto flex shrink-0 justify-end pt-1">

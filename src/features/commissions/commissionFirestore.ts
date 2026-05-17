@@ -111,6 +111,10 @@ export async function saveCommissionOverride(
     { merge: true },
   );
 
+  await updateDoc(doc(db, "interventions", override.interventionId), {
+    commissionAmountCents: Math.round(override.finalCommissionAmount * 100),
+  }).catch(() => {});
+
   await addDoc(collection(db, COMMISSION_AUDIT_COLLECTION), {
     companyId,
     interventionId: override.interventionId,

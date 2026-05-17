@@ -81,7 +81,7 @@ export interface Intervention {
   invoicePdfUrl?: string | null;
   /** Chemin objet Storage relatif au bucket (ex. invoices/{id}.pdf). */
   invoicePdfStoragePath?: string | null;
-  invoicedAt?: unknown;
+  invoicedAt?: string | null;
   /** Montant facturé en centimes (base commission + paiement client). */
   invoiceAmountCents?: number | null;
   /** Lignes facturables saisies par le technicien avant clôture. */
@@ -92,7 +92,7 @@ export interface Intervention {
   stripePaymentLinkUrl?: string | null;
   stripePaymentIntentId?: string | null;
   paidAt?: string | null;
-  completedAt?: unknown;
+  completedAt?: string | null;
   completedByUid?: string | null;
   /** Validation Ivana (back-office). */
   ivanaVerified?: boolean;

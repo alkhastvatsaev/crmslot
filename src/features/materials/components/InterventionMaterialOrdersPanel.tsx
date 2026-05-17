@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Package, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { auth, firestore } from "@/core/config/firebase";
@@ -26,6 +26,7 @@ type Props = {
   technicianUid: string;
   allowCreate?: boolean;
   allowStatusUpdate?: boolean;
+  forceOpen?: boolean;
 };
 
 const STATUS_KEYS: MaterialOrder["status"][] = ["pending", "ordered", "received", "cancelled"];
@@ -35,11 +36,16 @@ export default function InterventionMaterialOrdersPanel({
   technicianUid,
   allowCreate = true,
   allowStatusUpdate = false,
+  forceOpen,
 }: Props) {
   const { t } = useTranslation();
   const { orders, loading } = useMaterialOrders(intervention.id);
   const [expanded, setExpanded] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (forceOpen) setExpanded(true);
+  }, [forceOpen]);
 
   const handleSubmit = useCallback(
     async (parts: MaterialOrderPart[], urgency: MaterialOrder["urgency"]) => {
@@ -73,7 +79,7 @@ export default function InterventionMaterialOrdersPanel({
   };
 
   return (
-    <div style={outfit} data-testid="intervention-material-orders-panel" className="space-y-2">
+    <div id="technician-material-orders" style={outfit} data-testid="intervention-material-orders-panel" className="space-y-2">
       <button
         type="button"
         data-testid="material-orders-toggle"

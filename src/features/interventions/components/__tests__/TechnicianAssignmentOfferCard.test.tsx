@@ -1,10 +1,20 @@
 import { fireEvent, waitFor } from "@testing-library/react";
-import { updateDoc } from "firebase/firestore";
 import { render, screen } from "@/test-utils/render";
 import type { Intervention } from "@/features/interventions/types";
 import TechnicianAssignmentOfferCard from "@/features/interventions/components/TechnicianAssignmentOfferCard";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 
-const mockUpdateDoc = updateDoc as jest.MockedFunction<typeof updateDoc>;
+jest.mock("@/features/interventions/workflow/transitionInterventionStatus", () => ({
+  transitionInterventionStatus: jest.fn(),
+}));
+
+jest.mock("@/features/interventions/workflow/workflowActor", () => ({
+  requireAuthTransitionActor: jest.fn(() => ({ uid: "demo-tech-local", role: "technician" })),
+}));
+
+const mockTransition = transitionInterventionStatus as jest.MockedFunction<
+  typeof transitionInterventionStatus
+>;
 
 jest.mock("sonner", () => ({
   toast: {
@@ -32,8 +42,8 @@ function assignmentIv(partial: Partial<Intervention> = {}): Intervention {
 
 describe("TechnicianAssignmentOfferCard", () => {
   beforeEach(() => {
-    mockUpdateDoc.mockClear();
-    mockUpdateDoc.mockResolvedValue(undefined);
+    mockTransition.mockClear();
+    mockTransition.mockResolvedValue({ id: "evt-1" } as any);
   });
 
   it("renders offer actions for assigned mission", () => {
@@ -52,7 +62,7 @@ describe("TechnicianAssignmentOfferCard", () => {
     expect(screen.getByTestId("technician-assignment-decline")).toBeInTheDocument();
   });
 
-  it("accept writes en_route patch to Firestore", async () => {
+  it("accept transitions to en_route via workflow", async () => {
     render(
       <TechnicianAssignmentOfferCard
         iv={assignmentIv()}
@@ -65,13 +75,16 @@ describe("TechnicianAssignmentOfferCard", () => {
 
     fireEvent.click(screen.getByTestId("technician-assignment-accept"));
 
-    await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
-    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
-    expect(patch.status).toBe("en_route");
-    expect(typeof patch.technicianAcceptedAt).toBe("string");
+    await waitFor(() => expect(mockTransition).toHaveBeenCalledTimes(1));
+    expect(mockTransition.mock.calls[0]?.[0]).toMatchObject({
+      interventionId: "iv-offer-1",
+      toStatus: "en_route",
+    });
+    const extra = mockTransition.mock.calls[0]?.[0].extraPatch as Record<string, unknown>;
+    expect(typeof extra.technicianAcceptedAt).toBe("string");
   });
 
-  it("decline resets dossier to pending", async () => {
+  it("decline transitions to pending with decline patch", async () => {
     render(
       <TechnicianAssignmentOfferCard
         iv={assignmentIv()}
@@ -84,11 +97,14 @@ describe("TechnicianAssignmentOfferCard", () => {
 
     fireEvent.click(screen.getByTestId("technician-assignment-decline"));
 
-    await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
-    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
-    expect(patch.status).toBe("pending");
-    expect(patch.assignedTechnicianUid).toBeNull();
-    expect(patch.technicianDeclinedByUid).toBe("demo-tech-local");
-    expect(typeof patch.technicianDeclinedAt).toBe("string");
+    await waitFor(() => expect(mockTransition).toHaveBeenCalledTimes(1));
+    expect(mockTransition.mock.calls[0]?.[0]).toMatchObject({
+      interventionId: "iv-offer-1",
+      toStatus: "pending",
+    });
+    const extra = mockTransition.mock.calls[0]?.[0].extraPatch as Record<string, unknown>;
+    expect(extra.assignedTechnicianUid).toBeNull();
+    expect(extra.technicianDeclinedByUid).toBe("demo-tech-local");
+    expect(typeof extra.technicianDeclinedAt).toBe("string");
   });
 });
