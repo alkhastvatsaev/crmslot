@@ -1,22 +1,28 @@
-import { devUiPreviewEnabled, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
+import {
+  devUiPreviewEnabled,
+  DEMO_TECHNICIAN_UID,
+  realInterventionsOnly,
+} from "@/core/config/devUiPreview";
 import type { Intervention } from "@/features/interventions/types";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 
 /**
  * UID utilisé pour filtrer / accepter les missions sur la page technicien.
- * En dev, le hub MANSOUR suit toujours le technicien par défaut back-office (pas l’UID IVANA).
+ * Démo anonyme → UID par défaut back-office ; compte Auth réel → son `uid`.
  */
 export function getTechnicianAssignmentUid(
   authUid: string | null | undefined,
 ): string | null {
-  if (devUiPreviewEnabled) {
-    return getDefaultAssignedTechnicianUid();
-  }
   const uid = (authUid ?? "").trim();
+  if (realInterventionsOnly) return uid || null;
+  if (devUiPreviewEnabled) {
+    if (!uid || uid === DEMO_TECHNICIAN_UID) return getDefaultAssignedTechnicianUid();
+    return uid;
+  }
   return uid || null;
 }
 
-/** L’intervention cible ce technicien (UID direct ou technicien par défaut back-office). */
+/** L’intervention cible ce technicien (`assignedTechnicianUid` = UID Auth effectif). */
 export function matchesAssignedTechnician(
   iv: Pick<Intervention, "assignedTechnicianUid">,
   technicianUid: string | null | undefined,
@@ -25,13 +31,11 @@ export function matchesAssignedTechnician(
   const assigned = (iv.assignedTechnicianUid ?? "").trim();
   if (!uid || !assigned) return false;
   if (assigned === uid) return true;
-  if (devUiPreviewEnabled && assigned === getDefaultAssignedTechnicianUid()) {
-    return true;
-  }
+  if (realInterventionsOnly || !devUiPreviewEnabled) return false;
   const defaultUid = getDefaultAssignedTechnicianUid();
   return (
     assigned === defaultUid &&
-    (uid === DEMO_TECHNICIAN_UID || uid === defaultUid)
+    (uid === defaultUid || uid === DEMO_TECHNICIAN_UID)
   );
 }
 

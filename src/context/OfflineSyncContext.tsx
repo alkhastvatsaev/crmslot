@@ -14,12 +14,15 @@ import {
   flushCompletionQueue,
   getCompletionQueueLength,
   subscribeCompletionQueueChanged,
+  type FlushCompletionReport,
 } from "@/features/offline/completionSync";
 
 export type OfflineSyncContextValue = {
   navigatorOnline: boolean;
   pendingCompletionCount: number;
   isSyncing: boolean;
+  /** Dernier rapport de sync (conflits ignorés, échecs, succès). */
+  lastFlushReport: FlushCompletionReport | null;
   flushNow: () => Promise<void>;
   refreshPendingCount: () => Promise<void>;
 };
@@ -32,6 +35,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
   );
   const [pendingCompletionCount, setPendingCompletionCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [lastFlushReport, setLastFlushReport] = useState<FlushCompletionReport | null>(null);
 
   const refreshPendingCount = useCallback(async () => {
     const n = await getCompletionQueueLength();
@@ -44,6 +48,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
     setIsSyncing(true);
     try {
       const report = await flushCompletionQueue();
+      setLastFlushReport(report);
       if (report.skippedConflict > 0) {
         toast.message("Conflit résolu", {
           description:
@@ -127,10 +132,11 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
       navigatorOnline,
       pendingCompletionCount,
       isSyncing,
+      lastFlushReport,
       flushNow,
       refreshPendingCount,
     }),
-    [navigatorOnline, pendingCompletionCount, isSyncing, flushNow, refreshPendingCount],
+    [navigatorOnline, pendingCompletionCount, isSyncing, lastFlushReport, flushNow, refreshPendingCount],
   );
 
   return <OfflineSyncContext.Provider value={value}>{children}</OfflineSyncContext.Provider>;

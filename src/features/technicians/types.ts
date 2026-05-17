@@ -8,5 +8,7 @@ export interface Technician {
     lat: number;
     lng: number;
   };
+  /** UID Firebase Auth pour `assignedTechnicianUid` (sinon repli back-office). */
+  authUid?: string;
   realEta?: string;
 }

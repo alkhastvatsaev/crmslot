@@ -6,7 +6,11 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
 import { rankTechniciansForIntervention } from "@/features/dispatch/rankTechniciansForIntervention";
-import { resolveTechnicianAssignUid } from "@/features/dispatch/technicianAssignUid";
+import {
+  canResolveTechnicianAssignUid,
+  resolveTechnicianAssignUid,
+} from "@/features/dispatch/technicianAssignUid";
+import { toast } from "sonner";
 import { findBestTechnician } from "@/features/dispatch/algorithm";
 import { useTechnicians } from "@/features/technicians/hooks";
 import type { Technician } from "@/features/technicians/types";
@@ -92,6 +96,10 @@ export default function TechnicianAssignPicker({
   const handleConfirm = () => {
     const row = ranked.find((r) => r.technician.id === selectedId);
     if (!row || isAssigning) return;
+    if (!canResolveTechnicianAssignUid(row.technician)) {
+      toast.error(String(t("dispatch.assign_picker.missing_auth_uid")));
+      return;
+    }
     void onAssign(resolveTechnicianAssignUid(row.technician));
   };
 

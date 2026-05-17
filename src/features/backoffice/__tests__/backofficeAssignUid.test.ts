@@ -1,7 +1,6 @@
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
 import { resolveTechnicianAssignUid } from "@/features/dispatch/technicianAssignUid";
 import { matchesAssignedTechnician } from "@/features/interventions/technicianAssignmentActions";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Technician } from "@/features/technicians/types";
 
 const technician: Technician = {
@@ -33,15 +32,4 @@ describe("back-office assign → technicien hub parity", () => {
     ).toBe(true);
   });
 
-  it("default technician without authUid uses env fallback", () => {
-    const fallback: Technician = {
-      id: "1",
-      name: "Demo",
-      initial: "D",
-      vehicle: "Van",
-      status: "available",
-      location: { lat: 50.85, lng: 4.35 },
-    };
-    expect(resolveTechnicianAssignUid(fallback)).toBe(getDefaultAssignedTechnicianUid());
-  });
 });

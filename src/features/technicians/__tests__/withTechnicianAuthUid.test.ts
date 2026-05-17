@@ -1,3 +1,8 @@
+jest.mock("@/core/config/devUiPreview", () => ({
+  devUiPreviewEnabled: true,
+  realInterventionsOnly: false,
+}));
+
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Technician } from "@/features/technicians/types";
@@ -16,7 +21,7 @@ describe("withTechnicianAuthUid", () => {
     expect(withTechnicianAuthUid({ ...base, authUid: "firebase-abc" }).authUid).toBe("firebase-abc");
   });
 
-  it("fills default when missing", () => {
+  it("fills default when missing in dev preview", () => {
     expect(withTechnicianAuthUid(base).authUid).toBe(getDefaultAssignedTechnicianUid());
   });
 });

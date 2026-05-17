@@ -35,15 +35,25 @@ export function rankTechniciansForIntervention(
   const pool = available.length > 0 ? available : [...technicians];
 
   return pool
-    .map((technician) => ({
-      technician,
-      distanceKm: haversineDistanceKm(
-        interventionLat,
-        interventionLng,
-        technician.location.lat,
-        technician.location.lng,
-      ),
-    }))
+    .map((technician) => {
+      const tLat = technician.location?.lat;
+      const tLng = technician.location?.lng;
+      let distanceKm = Number.MAX_VALUE;
+
+      if (
+        typeof interventionLat === "number" && !Number.isNaN(interventionLat) &&
+        typeof interventionLng === "number" && !Number.isNaN(interventionLng) &&
+        typeof tLat === "number" && !Number.isNaN(tLat) &&
+        typeof tLng === "number" && !Number.isNaN(tLng)
+      ) {
+        distanceKm = haversineDistanceKm(interventionLat, interventionLng, tLat, tLng);
+      }
+
+      return {
+        technician,
+        distanceKm: Number.isNaN(distanceKm) ? Number.MAX_VALUE : distanceKm,
+      };
+    })
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .map((row, index) => ({ ...row, rank: index + 1 }));
 }

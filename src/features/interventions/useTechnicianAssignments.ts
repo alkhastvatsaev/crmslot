@@ -10,7 +10,6 @@ import {
   stripKnownSyntheticInterventions,
 } from "@/core/config/devUiPreview";
 import { useDashboardSelectedDate } from "@/context/DateContext";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import type { Intervention } from "@/features/interventions/types";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
 import { generateDailyAssignmentsAsInterventions } from "@/utils/dailyMockAssignments";
@@ -28,21 +27,20 @@ export type UseTechnicianAssignmentsResult = {
   firebaseUid: string | null;
 };
 
+type Options = {
+  /** Désactiver l’écoute Firestore (ex. carte dispatch qui utilise le back-office). */
+  enabled?: boolean;
+};
+
 /**
  * Temps réel — interventions visibles par le technicien **après** le goulot IVANA
  * (les dossiers `pending` / `pending_needs_address` restent dans « Demandes » uniquement).
  * Sources : assignées au technicien, repli démo, pool société une fois libérées du statut intake.
  */
-export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
+export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
+  const hookEnabled = options.enabled !== false;
   const queryClient = useQueryClient();
   const dashboardDate = useDashboardSelectedDate();
-  const workspace = useCompanyWorkspaceOptional();
-  const tenantCompanyId = useMemo(() => {
-    const id = workspace?.activeCompanyId?.trim();
-    if (!workspace?.isTenantUser || !id) return null;
-    return id;
-  }, [workspace?.isTenantUser, workspace?.activeCompanyId]);
-
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(false);
@@ -100,6 +98,13 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
   );
 
   useEffect(() => {
+    if (!hookEnabled) {
+      setFirebaseUid(null);
+      setSnapshotReady(true);
+      setError(null);
+      return () => {};
+    }
+
     if (!isConfigured || !firestore || !auth) {
       if (devUiPreviewEnabled) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -119,11 +124,11 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
       unsubSnap?.();
       unsubSnap = undefined;
 
-      const authUid =
+      const rawAuthUid =
         devUiPreviewEnabled && (!user || user.isAnonymous)
           ? DEMO_TECHNICIAN_UID
           : user?.uid ?? null;
-      const technicianUid = getTechnicianAssignmentUid(authUid);
+      const technicianUid = getTechnicianAssignmentUid(rawAuthUid);
 
       queryClient.removeQueries({
         predicate: (q) =>
@@ -144,15 +149,10 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
       setError(null);
 
       const db = firestore!;
-      
-      const queryUid = devUiPreviewEnabled && technicianUid === DEMO_TECHNICIAN_UID
-        ? getDefaultAssignedTechnicianUid()
-        : technicianUid;
 
-      // Requête optimisée : on filtre sur les interventions assignées au technicien
       const q = query(
         collection(db, "interventions"),
-        where("assignedTechnicianUid", "==", queryUid)
+        where("assignedTechnicianUid", "==", technicianUid),
       );
 
       unsubSnap = onSnapshot(
@@ -167,7 +167,7 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
           console.error("[useTechnicianAssignments]", e);
           setError(e.message || "Erreur Firestore");
           setSnapshotReady(true);
-        }
+        },
       );
     });
 
@@ -175,7 +175,7 @@ export function useTechnicianAssignments(): UseTechnicianAssignmentsResult {
       unsubSnap?.();
       unsubAuth();
     };
-  }, [queryClient, tenantCompanyId]);
+  }, [queryClient, hookEnabled]);
 
   return { interventions, loading, error, firebaseUid };
 }

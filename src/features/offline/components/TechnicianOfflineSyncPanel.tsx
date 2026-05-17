@@ -8,7 +8,10 @@ const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 /** Page dédiée : rappels hors ligne + actions de synchro (carousel). */
 export default function TechnicianOfflineSyncPanel() {
-  const { navigatorOnline, pendingCompletionCount, isSyncing, flushNow } = useOfflineSync();
+  const { navigatorOnline, pendingCompletionCount, isSyncing, lastFlushReport, flushNow } =
+    useOfflineSync();
+
+  const hadConflictSkip = (lastFlushReport?.skippedConflict ?? 0) > 0;
 
   return (
     <div data-testid="technician-offline-sync-panel" style={outfit} className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-3`}>
@@ -16,6 +19,20 @@ export default function TechnicianOfflineSyncPanel() {
       <p className="sr-only">
         Données et fins d&apos;intervention peuvent être mises en attente localement ; envoi vers Firestore au retour réseau. En cas de conflit avec le serveur, la version serveur l&apos;emporte.
       </p>
+
+      {hadConflictSkip ? (
+        <div
+          data-testid="offline-sync-conflict-notice"
+          className="rounded-[14px] border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 text-[12px] font-medium leading-snug text-amber-900"
+          role="status"
+        >
+          Dernière synchro : le serveur avait déjà clôturé{" "}
+          {lastFlushReport!.skippedConflict === 1
+            ? "une intervention"
+            : `${lastFlushReport!.skippedConflict} interventions`}
+          . La copie locale n&apos;a pas été réappliquée.
+        </div>
+      ) : null}
 
       <div className="rounded-[16px] border border-black/[0.06] bg-white/90 px-3 py-3 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]">
         <ul className="space-y-3 text-[13px] font-semibold text-slate-800">

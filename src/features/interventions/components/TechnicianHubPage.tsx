@@ -12,7 +12,9 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
   TECHNICIAN_HUB_ANCHOR_FINISH,
+  TECHNICIAN_HUB_ANCHOR_OFFLINE,
 } from "@/features/interventions/technicianHubNavigation";
+import TechnicianOfflineSyncPanel from "@/features/offline/components/TechnicianOfflineSyncPanel";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechnicianMissionDayAnchor";
 import {
@@ -94,8 +96,16 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       centerAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.center")}`}
       rightAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`}
       left={
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
-          <TechnicianDashboardListPanel selectedCaseId={selectedCaseId} onSelect={setSelectedCaseId} />
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden pb-4">
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <TechnicianDashboardListPanel selectedCaseId={selectedCaseId} onSelect={setSelectedCaseId} />
+          </div>
+          <section
+            id={TECHNICIAN_HUB_ANCHOR_OFFLINE}
+            className="shrink-0 scroll-mt-2 border-t border-black/[0.06] pt-2"
+          >
+            <TechnicianOfflineSyncPanel />
+          </section>
         </div>
       }
       centerPadding={false}
