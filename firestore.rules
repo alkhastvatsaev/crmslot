@@ -103,7 +103,8 @@ service cloud.firestore {
       return request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
         && resource.data.status == 'done'
         && request.resource.data.status == 'invoiced'
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status'])
+        && request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly(['status', 'currentOwnerUid', 'currentOwnerRole', 'statusUpdatedAt'])
         && request.resource.data.companyId == resource.data.companyId;
     }
 
@@ -351,6 +352,33 @@ service cloud.firestore {
       );
 
       allow delete: if isAuthed() && canDeleteInterventionAsAdmin();
+
+      match /status_events/{eventId} {
+        allow read: if isAuthed();
+        allow create: if isAuthed()
+          && request.resource.data.interventionId == docId
+          && request.resource.data.actorUid == request.auth.uid;
+        allow update, delete: if false;
+      }
+
+      match /timeline_events/{eventId} {
+        allow read: if isAuthed();
+        allow create: if isAuthed()
+          && request.resource.data.interventionId == docId
+          && request.resource.data.createdByUid == request.auth.uid
+          && request.resource.data.type == 'comment'
+          && request.resource.data.content is string
+          && request.resource.data.content.size() > 0
+          && request.resource.data.content.size() <= 8000;
+        allow update, delete: if false;
+      }
+    }
+
+    match /users/{userId}/intervention_alerts/{alertId} {
+      allow read, update: if isAuthed() && request.auth.uid == userId;
+      allow create: if isAuthed()
+        && request.resource.data.actorUid == request.auth.uid;
+      allow delete: if false;
     }
 
     /** Brouillon formulaire demande d’intervention — une entrée par utilisateur authentifié (doc id = uid). */
@@ -422,6 +450,33 @@ service cloud.firestore {
         );
 
       allow update, delete: if false;
+    }
+
+    match /intervention_emails/{emailId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && request.resource.data.companyId.size() > 0
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+
+      allow update: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        )
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['readAt']);
+
+      allow delete: if false;
     }
 
     match /{document=**} {

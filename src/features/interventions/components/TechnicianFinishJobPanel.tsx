@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Camera, ClipboardList, FileSignature, Loader2, SendHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import type { Intervention } from "@/features/interventions/types";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useOfflineSyncOptional } from "@/context/OfflineSyncContext";
@@ -39,7 +42,8 @@ export default function TechnicianFinishJobPanel() {
   const backofficeBridge = useTechnicianBackofficeReportBridgeOptional();
 
   const [step, setStep] = useState<WizardStep>("photos");
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<{url: string; category: 'panne' | 'materiel' | 'preuve' | 'autre'}[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<'panne' | 'materiel' | 'preuve' | 'autre'>('preuve');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
@@ -97,7 +101,7 @@ export default function TechnicianFinishJobPanel() {
     if (!v || photos.length >= FINISH_JOB_MAX_PHOTOS) return;
     try {
       const url = capturePhotoFromVideo(v);
-      setPhotos((p) => [...p, url]);
+      setPhotos((p) => [...p, {url, category: currentCategory}]);
     } catch {
       toast.error(String(t("technician_hub.finish.toasts.photo_impossible")));
     }
@@ -136,7 +140,8 @@ export default function TechnicianFinishJobPanel() {
     setSubmitBusy(true);
 
     try {
-      const photoDataUrls = [...photos];
+      // Legacy compatibility: bridge expects array of strings, we'll map the URLs for now
+      const photoDataUrls = photos.map(p => p.url);
       const signaturePngDataUrl = sig;
 
       backofficeBridge?.pushReport({
@@ -149,10 +154,23 @@ export default function TechnicianFinishJobPanel() {
 
       if (PRESENTATION_PRIVACY_MODE) {
         if (firestore && auth.currentUser) {
-          await updateDoc(doc(firestore, "interventions", interventionId), {
-            status: "done",
-            completedAt: serverTimestamp(),
-            completedByUid: auth.currentUser.uid,
+          const snap = await getDoc(doc(firestore, "interventions", interventionId));
+          const data = snap.data() as Intervention | undefined;
+          await transitionInterventionStatus({
+            db: firestore,
+            interventionId,
+            iv: {
+              status: data?.status ?? "in_progress",
+              assignedTechnicianUid: data?.assignedTechnicianUid ?? auth.currentUser.uid,
+              createdByUid: data?.createdByUid ?? null,
+              companyId: data?.companyId ?? null,
+            },
+            toStatus: "done",
+            actor: technicianTransitionActor(auth.currentUser.uid),
+            extraPatch: {
+              completedAt: serverTimestamp(),
+              completedByUid: auth.currentUser.uid,
+            },
           });
         }
       } else {
@@ -275,24 +293,44 @@ export default function TechnicianFinishJobPanel() {
               ) : null}
             </div>
 
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-2 px-1 scrollbar-hide">
+              {(['panne', 'materiel', 'preuve', 'autre'] as const).map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setCurrentCategory(cat)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-[13px] font-semibold capitalize whitespace-nowrap transition-colors border",
+                    currentCategory === cat
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
             <button
               type="button"
               data-testid="finish-job-capture-btn"
               disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
               onClick={captureShot}
               aria-label={String(t("technician_hub.finish.capture_photo"))}
-              className="mt-4 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[24px] bg-slate-900 text-white shadow-[0_8px_20px_-8px_rgba(15,23,42,0.5)] transition-all hover:bg-slate-800 hover:shadow-[0_12px_24px_-8px_rgba(15,23,42,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:scale-100"
+              className="mt-2 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[24px] bg-slate-900 text-white shadow-[0_8px_20px_-8px_rgba(15,23,42,0.5)] transition-all hover:bg-slate-800 hover:shadow-[0_12px_24px_-8px_rgba(15,23,42,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:scale-100"
             >
               <Camera className="h-7 w-7" aria-hidden />
               <span className="font-semibold tracking-wide">{String(t("technician_hub.finish.capture"))}</span>
             </button>
 
             <div data-testid="finish-job-photo-strip" className="flex flex-wrap gap-3 mt-2">
-              {photos.map((src, i) => (
-                <div key={`${i}-${src.slice(0, 24)}`} className="relative h-20 w-20 overflow-hidden rounded-[16px] border border-black/5 bg-slate-100 shadow-sm transition-transform hover:scale-105">
+              {photos.map((photo, i) => (
+                <div key={`${i}-${photo.url ? photo.url.slice(0, 24) : ''}`} className="relative h-20 w-20 overflow-hidden rounded-[16px] border border-black/5 bg-slate-100 shadow-sm transition-transform hover:scale-105">
+                  <div className="absolute top-0 left-0 w-full bg-black/60 text-white text-[10px] font-bold text-center py-0.5 capitalize z-10 backdrop-blur-sm">
+                    {photo.category}
+                  </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={src}
+                    src={photo.url}
                     alt=""
                     className={cn("h-full w-full object-cover", PRESENTATION_PRIVACY_MODE ? "blur-lg" : null)}
                   />
@@ -301,7 +339,7 @@ export default function TechnicianFinishJobPanel() {
                     data-testid={`finish-job-photo-remove-${i}`}
                     aria-label={String(t("technician_hub.finish.delete_photo"))}
                     onClick={() => removePhoto(i)}
-                    className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-red-500/90"
+                    className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-red-500/90 z-20"
                   >
                     <Trash2 className="h-3 w-3" aria-hidden />
                   </button>

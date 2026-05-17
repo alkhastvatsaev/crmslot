@@ -39,6 +39,9 @@ interface RequesterHubContextValue {
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
   lastSubmittedRequest: InterventionRequestData | null;
   setLastSubmittedRequest: (request: InterventionRequestData | null) => void;
+  /** Dernier dossier Firestore créé (hub société — historique). */
+  lastSubmittedInterventionId: string | null;
+  setLastSubmittedInterventionId: (id: string | null) => void;
   isSubmitting: boolean;
   setIsSubmitting: (val: boolean) => void;
   validationFailedCount: number;
@@ -79,6 +82,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   const [requestData, setRequestData] = useState<InterventionRequestData>(defaultRequestData);
   const [currentStep, setCurrentStep] = useState(0);
   const [lastSubmittedRequest, setLastSubmittedRequest] = useState<InterventionRequestData | null>(null);
+  const [lastSubmittedInterventionId, setLastSubmittedInterventionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationFailedCount, setValidationFailedCount] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -92,6 +96,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
           profile?: RequesterProfile;
           requestData?: InterventionRequestData;
           lastSubmittedRequest?: InterventionRequestData | null;
+          lastSubmittedInterventionId?: string | null;
         };
         if (parsed.profile) {
           const p = parsed.profile;
@@ -105,6 +110,9 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         if (parsed.requestData) setRequestData({ ...defaultRequestData, ...parsed.requestData });
         if (parsed.lastSubmittedRequest)
           setLastSubmittedRequest({ ...defaultRequestData, ...parsed.lastSubmittedRequest });
+        if (typeof parsed.lastSubmittedInterventionId === "string") {
+          setLastSubmittedInterventionId(parsed.lastSubmittedInterventionId);
+        }
       }
     } catch {
       // ignore
@@ -116,11 +124,14 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isHydrated) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ profile, requestData, lastSubmittedRequest }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ profile, requestData, lastSubmittedRequest, lastSubmittedInterventionId }),
+      );
     } catch {
       // ignore
     }
-  }, [profile, requestData, lastSubmittedRequest, isHydrated]);
+  }, [profile, requestData, lastSubmittedRequest, lastSubmittedInterventionId, isHydrated]);
 
   const triggerValidation = () => setValidationFailedCount((v) => v + 1);
 
@@ -135,6 +146,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
     setRequestData(defaultRequestData);
     setCurrentStep(0);
     setLastSubmittedRequest(null);
+    setLastSubmittedInterventionId(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -149,6 +161,8 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         setCurrentStep,
         lastSubmittedRequest,
         setLastSubmittedRequest,
+        lastSubmittedInterventionId,
+        setLastSubmittedInterventionId,
         isSubmitting,
         setIsSubmitting,
         validationFailedCount,

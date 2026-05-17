@@ -19,13 +19,17 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 /** Même pas que la grille desktop (`DASHBOARD_DESKTOP_PANEL_GAP_CLASS`) — rythme équidistant. */
 const railGap = `flex min-h-0 flex-1 flex-col ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
 
-type CompanyHubRightCategory = "tracking" | "chat";
+import { CompanyHubTimelineTab } from "@/features/company/components/CompanyHubTimelineTab";
+import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+
+type CompanyHubRightCategory = "tracking" | "chat" | "timeline";
 
 /** Interface Demandeur (Page 2) — Qui demande, Que faut-il réparer, Où en est ma demande. */
 export default function CompanyHubPage() {
-  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("tracking");
+  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("timeline");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
+  const { lastSubmittedInterventionId } = useRequesterHub();
 
   const ivanaChatCompanyId = useMemo(() => {
     if (workspace?.isTenantUser && workspace.activeCompanyId) return workspace.activeCompanyId;
@@ -100,15 +104,35 @@ export default function CompanyHubPage() {
             >
               {t("company_hub.right_tabs.chat")}
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={rightCategory === "timeline"}
+              data-testid="company-hub-right-tab-timeline"
+              onClick={() => setRightCategory("timeline")}
+              className={cn(
+                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
+                rightCategory === "timeline"
+                  ? "bg-white text-emerald-600 shadow-sm"
+                  : "text-slate-500 hover:bg-slate-300/30",
+              )}
+            >
+              Historique
+            </button>
           </div>
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden" role="tabpanel">
             {rightCategory === "tracking" ? (
               <RequesterTrackingPanel />
-            ) : (
+            ) : rightCategory === "chat" ? (
               <IvanaClientChatPanel
                 className="min-h-0 flex-1"
                 publishAsPortal
                 chatCompanyId={ivanaChatCompanyId}
+              />
+            ) : (
+              <CompanyHubTimelineTab
+                interventionId={lastSubmittedInterventionId}
+                companyId={ivanaChatCompanyId}
               />
             )}
           </div>

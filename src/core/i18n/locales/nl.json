@@ -23,7 +23,41 @@
     "on_site": "Ter plaatse",
     "in_progress": "Bezig",
     "done": "Klaar",
-    "invoiced": "Gefactureerd"
+    "invoiced": "Gefactureerd",
+    "waiting_material": "Wacht op materiaal",
+    "cancelled": "Geannuleerd"
+  },
+  "scheduling": {
+    "conflict": {
+      "title": "Planningsconflict",
+      "block_assign": "Deze technicus heeft al een opdracht in dit tijdvak.",
+      "block_save": "Dit tijdvak overlapt een andere opdracht van de technicus."
+    }
+  },
+  "timeline": {
+    "title": "Geschiedenis & communicatie",
+    "empty": "Nog geen gebeurtenissen op dit dossier.",
+    "comment_placeholder": "Interne notitie toevoegen…",
+    "send": "Verzenden",
+    "sending": "Bezig…",
+    "type": {
+      "status_change": "Statuswijziging",
+      "comment": "Interne notitie",
+      "email": "E-mail",
+      "material_order": "Materiaalbestelling"
+    }
+  },
+  "workflow": {
+    "timeline": {
+      "title": "Statusgeschiedenis",
+      "empty": "Nog geen statuswijzigingen geregistreerd."
+    },
+    "owner": {
+      "dispatcher": "Dispatch",
+      "technician": "Technicus",
+      "client": "Klant",
+      "system": "Systeem"
+    }
   },
   "spotlight": {
     "search_placeholder": "Naam",
@@ -141,6 +175,9 @@
         "updating": "Bijwerken...",
         "start_intervention": "Interventie starten",
         "on_site": "Ik ben ter plaatse",
+        "waiting_material": "Wacht op materiaal",
+        "resume_work": "Interventie hervatten",
+        "waiting_material_banner": "Interventie gepauzeerd — wacht op materiaal.",
         "no_address": "Geen adres",
         "not_provided": "Niet opgegeven"
       },
@@ -313,6 +350,8 @@
       "request_deleted": "Aanvraag verwijderd",
       "delete_failed": "Verwijderen mislukt",
       "request_assigned": "Aanvraag toegewezen",
+      "request_cancelled": "Dossier geannuleerd",
+      "cancel_failed": "Annuleren mislukt",
       "assign_failed": "Toewijzen mislukt",
       "firestore_unavailable": "Firestore niet beschikbaar",
       "report_verified": "Rapport geverifieerd",

@@ -23,7 +23,41 @@
     "on_site": "Sur place",
     "in_progress": "En cours",
     "done": "Terminé",
-    "invoiced": "Facturé"
+    "invoiced": "Facturé",
+    "waiting_material": "En attente matériel",
+    "cancelled": "Annulé"
+  },
+  "scheduling": {
+    "conflict": {
+      "title": "Conflit de planning",
+      "block_assign": "Ce technicien a déjà une mission sur ce créneau.",
+      "block_save": "Ce créneau chevauche une autre mission du technicien."
+    }
+  },
+  "timeline": {
+    "title": "Historique & communications",
+    "empty": "Aucun événement sur ce dossier.",
+    "comment_placeholder": "Ajouter une note interne…",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "type": {
+      "status_change": "Changement de statut",
+      "comment": "Note interne",
+      "email": "E-mail",
+      "material_order": "Commande matériel"
+    }
+  },
+  "workflow": {
+    "timeline": {
+      "title": "Historique des statuts",
+      "empty": "Aucun changement de statut enregistré."
+    },
+    "owner": {
+      "dispatcher": "Dispatch",
+      "technician": "Technicien",
+      "client": "Client",
+      "system": "Système"
+    }
   },
   "spotlight": {
     "search_placeholder": "Nom",
@@ -141,6 +175,9 @@
         "updating": "Mise à jour...",
         "start_intervention": "Démarrer l'intervention",
         "on_site": "Je suis sur place",
+        "waiting_material": "En attente matériel",
+        "resume_work": "Reprendre l'intervention",
+        "waiting_material_banner": "Intervention en pause — en attente de matériel.",
         "no_address": "Pas d'adresse",
         "not_provided": "Non renseigné",
         "new_assignment": "Nouvelle assignation",
@@ -326,6 +363,8 @@
       "request_deleted": "Demande supprimée",
       "delete_failed": "Erreur lors de la suppression",
       "request_assigned": "Demande assignée",
+      "request_cancelled": "Dossier annulé",
+      "cancel_failed": "Impossible d'annuler le dossier",
       "assign_failed": "Erreur lors de l'assignation",
       "firestore_unavailable": "Firestore indisponible",
       "report_verified": "Rapport validé",

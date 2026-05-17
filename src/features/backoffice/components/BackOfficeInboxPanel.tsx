@@ -16,7 +16,10 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import InterventionCaseTimeline from "@/features/interventions/components/InterventionCaseTimeline";
 
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -25,6 +28,13 @@ import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeI
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
 import type { Intervention } from "@/features/interventions/types";
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
+import { canTransitionInterventionStatus } from "@/features/interventions/workflow/interventionWorkflow";
+import { updateInterventionSchedule } from "@/features/scheduling/updateInterventionSchedule";
+import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
+import {
+  candidateRangeFromScheduleFields,
+  findTechnicianScheduleConflicts,
+} from "@/features/scheduling/scheduleConflicts";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
@@ -50,6 +60,7 @@ import {
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
+import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -215,7 +226,19 @@ export default function BackOfficeInboxPanel() {
   const [isEditingDateTime, setIsEditingDateTime] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
-  
+  const editScheduleConflicts = useMemo(() => {
+    if (!selectedItem || !isEditingDateTime) return [];
+    const tech = (selectedItem.assignedTechnicianUid ?? "").trim();
+    const range = candidateRangeFromScheduleFields(editDate, editTime);
+    if (!tech || !range) return [];
+    return findTechnicianScheduleConflicts({
+      interventions,
+      technicianUid: tech,
+      candidateRange: range,
+      excludeInterventionId: selectedItem.id,
+    });
+  }, [selectedItem, isEditingDateTime, editDate, editTime, interventions]);
+
   const [reportsArchiveExpanded, setReportsArchiveExpanded] = useState(false);
   const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
   if (prevActiveTab !== activeTab) {
@@ -321,10 +344,20 @@ export default function BackOfficeInboxPanel() {
         toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
         return;
       }
-      await updateDoc(
-        doc(firestore, "interventions", id),
-        buildAssignInterventionToTechnicianUpdate(row, technicianUid)
-      );
+      const assignPatch = buildAssignInterventionToTechnicianUpdate(row, technicianUid);
+      const actorUid = auth?.currentUser?.uid?.trim();
+      if (!actorUid) {
+        toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
+        return;
+      }
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: id,
+        iv: row,
+        toStatus: "assigned",
+        actor: dispatcherTransitionActor(actorUid),
+        extraPatch: assignPatch,
+      });
       toast.success(t("backoffice.toasts.request_assigned"));
       setAssignPickerOpen(false);
       setSelectedItemId(null);
@@ -337,14 +370,44 @@ export default function BackOfficeInboxPanel() {
     }
   };
 
+  const handleCancelIntervention = async (id: string) => {
+    if (!firestore) return;
+    const row = interventions.find((x) => x.id === id);
+    if (!row) return;
+    const actorUid = auth?.currentUser?.uid?.trim();
+    if (!actorUid) return;
+    try {
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: id,
+        iv: row,
+        toStatus: "cancelled",
+        actor: dispatcherTransitionActor(actorUid),
+        note: "Annulé depuis le back-office",
+      });
+      toast.success(t("backoffice.toasts.request_cancelled"));
+      setSelectedItemId(null);
+    } catch {
+      toast.error(t("common.error"), { description: t("backoffice.toasts.cancel_failed") });
+    }
+  };
+
   const handleVerify = async (id: string) => {
     if (!firestore) {
       toast.error(t("common.error"), { description: t("backoffice.toasts.firestore_unavailable") });
       return;
     }
     try {
-      await updateDoc(doc(firestore, "interventions", id), {
-        status: "invoiced",
+      const row = interventions.find((x) => x.id === id);
+      if (!row) return;
+      const actorUid = auth?.currentUser?.uid?.trim();
+      if (!actorUid) return;
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: id,
+        iv: row,
+        toStatus: "invoiced",
+        actor: dispatcherTransitionActor(actorUid),
       });
       toast.success(t("backoffice.toasts.report_verified"));
       setSelectedItemId(null);
@@ -371,10 +434,21 @@ export default function BackOfficeInboxPanel() {
   const handleUpdateDateTime = async () => {
     if (!selectedItem || !firestore) return;
     try {
-      await updateDoc(doc(firestore, "interventions", selectedItem.id), {
+      const result = await updateInterventionSchedule({
+        db: firestore,
+        intervention: selectedItem,
+        allInterventions: interventions,
         requestedDate: editDate,
         requestedTime: editTime,
       });
+      if (!result.ok) {
+        if (result.reason === "conflict") {
+          toast.error(t("scheduling.conflict.block_save"));
+        } else {
+          toast.error(t("common.error"), { description: t("backoffice.toasts.update_failed") });
+        }
+        return;
+      }
       toast.success(t("backoffice.toasts.datetime_updated"));
       setIsEditingDateTime(false);
     } catch {
@@ -701,6 +775,12 @@ export default function BackOfficeInboxPanel() {
                 <p className="text-[15px] font-semibold text-slate-800">{formatAddress(selectedItem.address)}</p>
               </div>
 
+              <InterventionCaseTimeline
+                interventionId={selectedItem.id}
+                companyId={selectedItem.companyId ?? null}
+                className="mt-2 min-h-[280px]"
+              />
+
               {/* Problem / Report Description */}
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -714,6 +794,12 @@ export default function BackOfficeInboxPanel() {
                   </p>
                 </div>
               </div>
+
+              {/* Emails par dossier */}
+              <InterventionEmailPanel
+                interventionId={selectedItem.id}
+                companyId={selectedItem.companyId ?? null}
+              />
 
               {/* Date & Time management for requests */}
               {isInterventionPendingBackOfficeIntake(selectedItem) && (
@@ -737,6 +823,8 @@ export default function BackOfficeInboxPanel() {
                   </div>
                   
                   {isEditingDateTime ? (
+                    <div className="space-y-2">
+                      <ScheduleConflictBanner conflicts={editScheduleConflicts} />
                     <div className="grid grid-cols-2 gap-2">
                       <input 
                         type="date" 
@@ -754,10 +842,16 @@ export default function BackOfficeInboxPanel() {
                         <button onClick={() => setIsEditingDateTime(false)} className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-100">
                           {t("common.cancel")}
                         </button>
-                        <button onClick={handleUpdateDateTime} className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-900 text-white">
+                        <button
+                          type="button"
+                          onClick={() => void handleUpdateDateTime()}
+                          disabled={editScheduleConflicts.length > 0}
+                          className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-900 text-white disabled:opacity-50"
+                        >
                           {t("common.save")}
                         </button>
                       </div>
+                    </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-blue-900 font-bold">
@@ -880,6 +974,7 @@ export default function BackOfficeInboxPanel() {
                 assignPickerOpen ? (
                   <TechnicianAssignPicker
                     intervention={selectedItem}
+                    peerInterventions={interventions}
                     isAssigning={isAssigning}
                     onCancel={() => setAssignPickerOpen(false)}
                     onAssign={(technicianUid) =>
@@ -888,6 +983,17 @@ export default function BackOfficeInboxPanel() {
                   />
                 ) : (
                 <div className="flex gap-3">
+                  {canTransitionInterventionStatus(selectedItem.status, "cancelled") ? (
+                    <button
+                      type="button"
+                      data-testid="backoffice-inbox-cancel"
+                      onClick={() => void handleCancelIntervention(selectedItem.id)}
+                      className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-slate-200 bg-slate-50 text-slate-700 font-bold text-[14px] hover:bg-slate-100 active:scale-95 transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                      {t("status.cancelled")}
+                    </button>
+                  ) : null}
                   <button
                     onClick={() => handleDelete(selectedItem.id)}
                     className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-red-100 bg-red-50 text-red-600 font-bold text-[14px] hover:bg-red-100 active:scale-95 transition-all"

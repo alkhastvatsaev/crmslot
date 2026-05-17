@@ -211,9 +211,20 @@ export function isInterventionVisibleOnTechnicianMap(
   iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
 ): boolean {
   if (isInterventionPendingBackOfficeIntake(iv)) return false;
+  if (iv.status === "cancelled") return false;
   if (iv.status === "assigned") return false;
   if (iv.status === "in_progress" && !(iv.technicianAcceptedAt ?? "").trim()) return false;
   return true;
+}
+
+export function isInterventionActiveOnTechnicianHub(
+  iv: Pick<Intervention, "status">,
+): boolean {
+  return (
+    iv.status !== "done" &&
+    iv.status !== "invoiced" &&
+    iv.status !== "cancelled"
+  );
 }
 
 export function formatScheduledLabel(iv: Intervention): string {
@@ -271,6 +282,10 @@ export function statusLabelKey(status: Intervention["status"]): string {
       return "status.done";
     case "invoiced":
       return "status.invoiced";
+    case "waiting_material":
+      return "status.waiting_material";
+    case "cancelled":
+      return "status.cancelled";
     default:
       return String(status);
   }
@@ -285,7 +300,14 @@ export type DailyMissionCardTone = "done" | "active" | "upcoming";
  */
 export function dailyMissionCardToneFromStatus(status: Intervention["status"] | null | undefined): DailyMissionCardTone {
   if (!status) return "upcoming";
-  if (status === "done" || status === "invoiced") return "done";
-  if (status === "assigned" || status === "en_route" || status === "in_progress") return "active";
+  if (status === "done" || status === "invoiced" || status === "cancelled") return "done";
+  if (
+    status === "assigned" ||
+    status === "en_route" ||
+    status === "in_progress" ||
+    status === "waiting_material"
+  ) {
+    return "active";
+  }
   return "upcoming";
 }

@@ -1,3 +1,17 @@
+export interface InterventionEvent {
+  id: string;
+  interventionId: string;
+  type: 'status_change' | 'comment' | 'email' | 'material_order';
+  createdAt: string;
+  createdByUid: string;
+  content?: string;
+  oldStatus?: string;
+  newStatus?: string;
+  /** Notes internes vs visibles client (portail). */
+  visibility?: 'internal' | 'client';
+  actorRole?: string;
+}
+
 export interface Intervention {
   id: string;
   title: string;
@@ -10,7 +24,9 @@ export interface Intervention {
     | 'in_progress'
     | 'done'
     | 'pending_needs_address'
-    | 'invoiced';
+    | 'invoiced'
+    | 'waiting_material'
+    | 'cancelled';
   location: {
     lat: number;
     lng: number;
@@ -38,6 +54,10 @@ export interface Intervention {
   companyId?: string | null;
   /** Créateur de la demande (Firebase Auth uid). */
   createdByUid?: string | null;
+  /** Responsable actuel du dossier (dénormalisé à chaque transition). */
+  currentOwnerUid?: string | null;
+  currentOwnerRole?: 'dispatcher' | 'technician' | 'client' | 'system' | null;
+  statusUpdatedAt?: string | null;
   /** Technicien désigné — filtre sécurité + dashboard Prompt 4. */
   assignedTechnicianUid?: string | null;
   /** Horodatage acceptation terrain (passage `assigned` → `en_route`). */
@@ -52,7 +72,9 @@ export interface Intervention {
   requestedTime?: string | null;
   /** Miniatures JPEG compressées (data URLs), usage interne / prévisualisation. */
   attachmentThumbnails?: string[];
-  /** Fin d’intervention — URLs Storage (JPEG). */
+  /** Fin d’intervention — URLs Storage (JPEG) avec catégorisation par type. */
+  completionPhotos?: { url: string; category: 'panne' | 'materiel' | 'preuve' | 'autre' }[];
+  /** Legacy field, conservé pour la rétrocompatibilité (temporaire) */
   completionPhotoUrls?: string[];
   completionSignatureUrl?: string | null;
   /** URL HTTPS Firebase Storage (PDF), renseignée par Cloud Function après facturation auto. */

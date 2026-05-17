@@ -31,9 +31,11 @@ describe("technicianSchedule intake gate", () => {
     expect(isInterventionReleasedToTechnicianField(iv("en_route"))).toBe(true);
   });
 
-  it("hides assigned from technician map until accept", () => {
+  it("hides assigned and cancelled from technician map", () => {
     expect(isInterventionVisibleOnTechnicianMap(iv("assigned"))).toBe(false);
+    expect(isInterventionVisibleOnTechnicianMap(iv("cancelled"))).toBe(false);
     expect(isInterventionVisibleOnTechnicianMap(iv("en_route"))).toBe(true);
+    expect(isInterventionVisibleOnTechnicianMap(iv("waiting_material"))).toBe(true);
     expect(
       isInterventionVisibleOnTechnicianMap({
         ...iv("in_progress"),
