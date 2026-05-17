@@ -12,6 +12,7 @@ import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -192,6 +193,8 @@ export default function RequesterInterventionPanel() {
   } = useRequesterHub();
   const workspace = useCompanyWorkspaceOptional();
   const tenantCompanyId = workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
+  const interventionCompanyId =
+    tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
   const { t, language } = useTranslation();
   const locale = language === "nl" ? "nl-BE" : language === "en" ? "en-GB" : "fr-BE";
   const [locatingAddress, setLocatingAddress] = useState(false);
@@ -528,7 +531,7 @@ export default function RequesterInterventionPanel() {
             createdAt: nowIso,
             createdByUid: user.uid,
             assignedTechnicianUid: null,
-            ...(tenantCompanyId ? { companyId: tenantCompanyId } : {}),
+            ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
             ...(photoDataUrls.length ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) } : {}),
             ...(clientFirstRaw ? { clientFirstName: capitalizeName(clientFirstRaw) } : {}),
             ...(clientLastRaw ? { clientLastName: capitalizeName(clientLastRaw) } : {}),
@@ -595,7 +598,7 @@ export default function RequesterInterventionPanel() {
           recordDuplicateAlertIfNeeded({
             db,
             newInterventionId: newDocRef.id,
-            companyId: tenantCompanyId,
+            companyId: interventionCompanyId,
             address: interventionAddress.trim(),
             problem: problemForDedupe,
             createdByUid: user.uid,

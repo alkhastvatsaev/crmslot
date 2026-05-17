@@ -271,19 +271,22 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
     setIsSearching(true);
     setSearchResult(null);
     try {
-      if (firestore) {
-        // We try to search in firestore (if rules allow it)
+      if (firestore && auth?.currentUser) {
         const q = query(
-          collection(firestore, "interventions"), 
-          where("clientLastName", ">=", searchName.trim()),
-          where("clientLastName", "<=", searchName.trim() + '\uf8ff')
+          collection(firestore, "interventions"),
+          where("createdByUid", "==", auth.currentUser.uid),
         );
         const snap = await getDocs(q);
-        
-        if (!snap.empty) {
-          // Just take the first match for now
-          const data = snap.docs[0].data() as Intervention;
-          setSearchResult(data);
+        const needle = searchName.trim().toLowerCase();
+        const hit = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as Intervention))
+          .find((row) => {
+            const last = (row.clientLastName ?? "").toLowerCase();
+            const first = (row.clientFirstName ?? "").toLowerCase();
+            return last.includes(needle) || first.includes(needle);
+          });
+        if (hit) {
+          setSearchResult(hit);
           setIsSearching(false);
           return;
         }

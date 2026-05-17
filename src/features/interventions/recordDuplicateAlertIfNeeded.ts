@@ -29,6 +29,7 @@ export async function recordDuplicateAlertIfNeeded(params: RecordDuplicateAlertP
   const { db, newInterventionId, companyId, address, problem, createdByUid } = params;
   const cid = (companyId ?? "").trim();
   if (!cid || !newInterventionId.trim()) return;
+  if (newInterventionId.startsWith("demo-")) return;
 
   const alertRef = doc(db, "intervention_duplicate_alerts", newInterventionId.trim());
   const existing = await getDoc(alertRef);

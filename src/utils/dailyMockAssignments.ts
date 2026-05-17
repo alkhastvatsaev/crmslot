@@ -1,5 +1,6 @@
 import type { Intervention } from "@/features/interventions/types";
-import { DEMO_COMPANY_ID, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
+import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
+import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import { generateDailyMissions } from "@/utils/mockMissions";
 
 function missionUiStatusToInterventionStatus(ui: string): Intervention["status"] {
@@ -11,7 +12,7 @@ function missionUiStatusToInterventionStatus(ui: string): Intervention["status"]
 
 /**
  * Transforme les « missions du jour » mock (`generateDailyMissions`) en dossiers Firestore-shaped,
- * tous assignés au technicien démo (`DEMO_TECHNICIAN_UID`).
+ * tous assignés au technicien démo (`getDefaultAssignedTechnicianUid()`).
  * Même entrée que la grille carte / DailyMissions pour une date donnée (`DateContext.selectedDate`).
  */
 export function generateDailyAssignmentsAsInterventions(date: Date): Intervention[] {
@@ -33,7 +34,7 @@ export function generateDailyAssignmentsAsInterventions(date: Date): Interventio
       category: "serrurerie",
       problem: `Mission générée (${dateStr} · même jeu que la page carte).`,
       companyId: DEMO_COMPANY_ID,
-      assignedTechnicianUid: DEMO_TECHNICIAN_UID,
+      assignedTechnicianUid: getDefaultAssignedTechnicianUid(),
       scheduledDate: dateStr,
       scheduledTime: m.time,
       createdAt: isoStamp,

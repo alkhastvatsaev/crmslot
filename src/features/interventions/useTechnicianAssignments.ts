@@ -18,8 +18,6 @@ import {
   getTechnicianAssignmentUid,
   matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
-
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
   loading: boolean;
@@ -90,12 +88,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       });
     };
 
-    const defaultTechUid = getDefaultAssignedTechnicianUid();
-    if (
-      devUiPreviewEnabled &&
-      firebaseUid === defaultTechUid &&
-      !realInterventionsOnly
-    ) {
+    if (devUiPreviewEnabled && !realInterventionsOnly) {
       const mockRows = generateDailyAssignmentsAsInterventions(dashboardDate);
       const map = new Map(mockRows.map((r) => [r.id, r]));
       firestoreInterventions.forEach((r) => map.set(r.id, r));

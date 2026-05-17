@@ -16,6 +16,7 @@ import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 
 import {
   formatScheduledTimeOnly,
+  isInterventionPendingBackOfficeIntake,
 } from "@/features/interventions/technicianSchedule";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
@@ -416,7 +417,7 @@ export default function TechnicianDashboardDetailPanel({
     if (liveIv.status === "assigned") {
       return renderAwaitingAssignmentHint();
     }
-    if (liveIv.status === "pending" || liveIv.status === "pending_needs_address") return renderPending();
+    if (isInterventionPendingBackOfficeIntake(liveIv)) return renderPending();
     if (liveIv.status === "en_route") return renderEnRoute();
     if (liveIv.status === "in_progress") return renderInProgress();
     return renderDone();

@@ -7,6 +7,7 @@ import type { AudioUploadSidecar } from "@/core/services/audio/transcription.typ
 import { addDoc, collection } from "firebase/firestore";
 import { extractClientNameFromText, extractDateTimeFromText } from "./transcriptionFormInference";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import {
   DASHBOARD_PANEL_CHROME_BLUR,
   DASHBOARD_PANEL_CHROME_BORDER,
@@ -259,13 +260,15 @@ export default function MapTranscriptionActionsPanel({
     try {
       const tenantCompanyId =
         workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : undefined;
+      const interventionCompanyId =
+        tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : undefined);
       const res = await fetchWithAuth("/api/interventions/from-audio", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           fileName,
           override: form,
-          ...(tenantCompanyId ? { companyId: tenantCompanyId } : {}),
+          ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
         }),
       });
       if (res.ok) {
@@ -312,8 +315,7 @@ export default function MapTranscriptionActionsPanel({
         const address = form.address.trim() || analysis.adresse?.trim() || null;
         const nowIso = new Date().toISOString();
         const uid = auth?.currentUser?.uid ?? null;
-        const fallbackTenantCompanyId =
-          workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : undefined;
+        const fallbackTenantCompanyId = interventionCompanyId;
         const dStr = form.date.trim();
         const tStr = form.time.trim();
         const scheduleFromForm =
@@ -339,6 +341,7 @@ export default function MapTranscriptionActionsPanel({
           transcription: analysis.transcription?.trim() || "",
           audioUrl: sidecar.publicUrl,
           createdAt: nowIso,
+          createdByUid: uid,
           assignedTechnicianUid: null,
           ...scheduleFromForm,
           ...(fallbackTenantCompanyId ? { companyId: fallbackTenantCompanyId } : {}),

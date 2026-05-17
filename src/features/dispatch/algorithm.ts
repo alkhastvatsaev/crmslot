@@ -11,7 +11,12 @@ export async function findBestTechnician(
 ): Promise<Technician | null> {
   
 
-  const availableTechs = technicians.filter(t => t.status === 'available' && canResolveTechnicianAssignUid(t));
+  const availableTechs = technicians.filter(t => 
+    t.status === 'available' && 
+    canResolveTechnicianAssignUid(t) &&
+    typeof t.location?.lat === 'number' && !Number.isNaN(t.location?.lat) &&
+    typeof t.location?.lng === 'number' && !Number.isNaN(t.location?.lng)
+  );
   
   if (availableTechs.length === 0) return null;
 

@@ -16,17 +16,15 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
   const [rows, setRows] = useState<DuplicateAlertRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const skipFirestoreDemo =
-    devUiPreviewEnabled &&
-    (!isConfigured ||
-      !firestore ||
-      !auth ||
-      !auth.currentUser);
-
   useEffect(() => {
-    if (skipFirestoreDemo) {
-      const cid = (companyId ?? "").trim() || DEMO_COMPANY_ID;
-      if (realInterventionsOnly || cid !== DEMO_COMPANY_ID) {
+    const cid = (companyId ?? "").trim();
+    const demoAlertMode =
+      devUiPreviewEnabled &&
+      !realInterventionsOnly &&
+      (cid === DEMO_COMPANY_ID || !cid);
+
+    if (demoAlertMode) {
+      if (cid && cid !== DEMO_COMPANY_ID) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setRows([]);
       } else {
@@ -55,7 +53,6 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
       return () => {};
     }
 
-    const cid = (companyId ?? "").trim();
     if (!cid) {
       setRows([]);
       setLoading(false);
@@ -84,7 +81,7 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
     );
 
     return () => unsub();
-  }, [companyId, skipFirestoreDemo]);
+  }, [companyId]);
 
   const openAlerts = useMemo(() => rows.filter((r) => r.status === "open"), [rows]);
 

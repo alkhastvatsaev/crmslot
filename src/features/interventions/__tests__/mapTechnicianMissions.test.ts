@@ -17,6 +17,18 @@ function iv(
 describe("filterInterventionsForMapTechnicianMissions", () => {
   const anchor = new Date("2026-05-16T12:00:00");
 
+  it("excludes assigned awaiting accept", () => {
+    const rows = [
+      iv({
+        id: "awaiting",
+        status: "assigned",
+        scheduledDate: "2026-05-16",
+        scheduledTime: "10:00",
+      }),
+    ];
+    expect(filterInterventionsForMapTechnicianMissions(rows, "today", anchor)).toEqual([]);
+  });
+
   it("excludes pending intake and missions without coordinates", () => {
     const rows = [
       iv({ id: "pending", status: "pending" }),
