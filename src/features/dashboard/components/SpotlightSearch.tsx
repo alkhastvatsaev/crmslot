@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench } from 'lucide-react';
+import { X, Globe, Search, Map, Building2, Wrench, FileText, Phone, Navigation, ExternalLink } from 'lucide-react';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -30,6 +30,41 @@ export default function SpotlightSearch() {
     { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
   ], [t]);
+
+  const quickActions = useMemo(() => [
+    {
+      id: 'new-intervention',
+      label: 'Nouvelle intervention',
+      searchTerms: 'nouvelle intervention créer demande client',
+      Icon: FileText,
+      badge: 'Créer',
+      onSelect: () => pager?.setPageIndex(1),
+    },
+    {
+      id: 'call-client',
+      label: 'Appeler le client',
+      searchTerms: 'appeler téléphone client contact',
+      Icon: Phone,
+      badge: 'Appel',
+      onSelect: () => { /* handled by intervention context */ },
+    },
+    {
+      id: 'navigate-waze',
+      label: 'Naviguer vers le client',
+      searchTerms: 'navigation waze google maps itinéraire route',
+      Icon: Navigation,
+      badge: 'GPS',
+      onSelect: () => { /* handled by intervention context */ },
+    },
+    {
+      id: 'open-technician',
+      label: 'Espace technicien',
+      searchTerms: 'technicien terrain missions planning',
+      Icon: Wrench,
+      badge: 'Tech',
+      onSelect: () => pager?.setPageIndex(2),
+    },
+  ], [pager]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -132,6 +167,8 @@ export default function SpotlightSearch() {
                   <Command.Empty className="px-6 py-8 text-center text-gray-500/60 font-medium">
                     {t('spotlight.no_results')}
                   </Command.Empty>
+
+                  {/* Navigation */}
                   <Command.Group heading={t('spotlight.nav_group_heading')} className="px-2 py-2">
                     {navPages.map((page) => {
                       const isActive = pager?.pageIndex === page.index;
@@ -152,6 +189,42 @@ export default function SpotlightSearch() {
                         </Command.Item>
                       );
                     })}
+                  </Command.Group>
+
+                  {/* Quick Actions */}
+                  <Command.Group heading="Actions rapides" className="px-2 py-2">
+                    {quickActions.map((action) => (
+                      <Command.Item
+                        key={action.id}
+                        data-testid={`quick-action-${action.id}`}
+                        value={action.searchTerms}
+                        onSelect={() => {
+                          action.onSelect();
+                          setOpen(false);
+                        }}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-black/5 aria-selected:bg-black/5"
+                      >
+                        <action.Icon className="w-4 h-4 shrink-0 opacity-60" />
+                        <span className="flex-1">{action.label}</span>
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">{action.badge}</span>
+                      </Command.Item>
+                    ))}
+                  </Command.Group>
+
+                  {/* Supplier Links */}
+                  <Command.Group heading="Fournisseurs" className="px-2 py-2">
+                    <Command.Item
+                      value="lecot fournisseur matériel pièces recherche"
+                      onSelect={() => {
+                        window.open('https://lecot.be/fr-be', '_blank', 'noopener');
+                        setOpen(false);
+                      }}
+                      className="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-black/5 aria-selected:bg-black/5"
+                    >
+                      <ExternalLink className="w-4 h-4 shrink-0 opacity-60" />
+                      <span className="flex-1">Ouvrir Lecot.be</span>
+                      <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-white">Lecot</span>
+                    </Command.Item>
                   </Command.Group>
                 </Command.List>
               </Command>
