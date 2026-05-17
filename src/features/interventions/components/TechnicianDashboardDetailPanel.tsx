@@ -5,8 +5,9 @@ import { Camera, MapPin, Play, Navigation, CheckCircle2, Pause } from "lucide-re
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlideAction } from "@/components/ui/slide-action";
-import { doc, updateDoc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { requireAuthTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { toast } from "sonner";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import type { Intervention } from "@/features/interventions/types";
@@ -158,12 +159,18 @@ export default function TechnicianDashboardDetailPanel({
   const cardClass = "flex flex-col items-center text-center py-1.5";
   const mainContainerClass = "rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] border border-white/40 backdrop-blur-sm";
 
-  const handleUpdateStatus = async (newStatus: Intervention["status"]) => {
+  const handleUpdateStatus = async (newStatus: Intervention["status"], note?: string) => {
     if (!liveIv || isUpdating || !firestore) return;
     setIsUpdating(true);
     try {
-      const ref = doc(firestore, "interventions", liveIv.id);
-      await updateDoc(ref, { status: newStatus });
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: liveIv.id,
+        iv: liveIv,
+        toStatus: newStatus,
+        actor: requireAuthTransitionActor("technician"),
+        note,
+      });
     } catch (err) {
       console.error("Failed to update status", err);
       toast.error(String(t("technician_hub.dashboard.detail.update_failed")));
@@ -387,12 +394,52 @@ export default function TechnicianDashboardDetailPanel({
       </div>
 
 
-      <SlideAction
-        onAction={onStartFinishJob}
-        label={t("technician_hub.dashboard.detail.finish_job")}
-        icon={Camera}
-        className="shrink-0"
-      />
+      <motion.div className="flex flex-col gap-2 shrink-0">
+        <button
+          type="button"
+          data-testid="technician-waiting-material-btn"
+          onClick={() => void handleUpdateStatus("waiting_material")}
+          disabled={isUpdating}
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[20px] border border-amber-200 bg-amber-50 px-4 text-[15px] font-bold text-amber-950 transition hover:bg-amber-100 disabled:opacity-70"
+        >
+          <Pause className="h-4 w-4 shrink-0" />
+          {t("technician_hub.dashboard.detail.waiting_material")}
+        </button>
+        <SlideAction
+          onAction={onStartFinishJob}
+          label={t("technician_hub.dashboard.detail.finish_job")}
+          icon={Camera}
+          className="shrink-0"
+        />
+      </motion.div>
+    </motion.div>
+  );
+
+  const renderWaitingMaterial = () => (
+    <motion.div
+      key="waiting_material"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="flex flex-col gap-4 h-full justify-between pb-2"
+      data-testid="technician-detail-waiting-material"
+    >
+      <motion.div className={mainContainerClass}>
+        <p className="rounded-[16px] border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-center text-[14px] font-semibold text-amber-950">
+          {t("technician_hub.dashboard.detail.waiting_material_banner")}
+        </p>
+        <div className="mt-4 flex flex-col gap-4">{renderContactClient()}</div>
+      </motion.div>
+      <button
+        type="button"
+        data-testid="technician-resume-work-btn"
+        onClick={() => void handleUpdateStatus("in_progress")}
+        disabled={isUpdating}
+        className="flex min-h-[54px] shrink-0 w-full items-center justify-center gap-2 rounded-[22px] bg-blue-600 px-4 text-[17px] font-bold text-white shadow-[0_14px_40px_-14px_rgba(37,99,235,0.55)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
+      >
+        <Play className="h-5 w-5 shrink-0" />
+        {isUpdating ? t("technician_hub.dashboard.detail.updating") : t("technician_hub.dashboard.detail.resume_work")}
+      </button>
     </motion.div>
   );
 
@@ -419,8 +466,12 @@ export default function TechnicianDashboardDetailPanel({
     }
     if (isInterventionPendingBackOfficeIntake(liveIv)) return renderPending();
     if (liveIv.status === "en_route") return renderEnRoute();
+    if (liveIv.status === "waiting_material") return renderWaitingMaterial();
     if (liveIv.status === "in_progress") return renderInProgress();
-    return renderDone();
+    if (liveIv.status === "done" || liveIv.status === "invoiced" || liveIv.status === "cancelled") {
+      return renderDone();
+    }
+    return renderPending();
   }
 
   return (

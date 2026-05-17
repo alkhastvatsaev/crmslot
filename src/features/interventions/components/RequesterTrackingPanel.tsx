@@ -24,6 +24,7 @@ type TrackedIntervention = {
   clientLastName?: string;
   clientCompanyName?: string;
   clientPhone?: string;
+  invoicePdfUrl?: string;
 };
 
 function useMyLatestIntervention(searchLastName: string, profileLastName: string) {
@@ -279,6 +280,28 @@ export default function RequesterTrackingPanel() {
               <h2 className="text-[22px] font-extrabold text-black tracking-tight">
                 {getDisplayName()}
               </h2>
+
+              {status === 'en_attente_materiel' && (
+                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm font-medium">
+                  Intervention en attente de matériel. Nous vous contacterons dès réception.
+                </div>
+              )}
+              {status === 'cancelled' && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
+                  Cette intervention a été annulée.
+                </div>
+              )}
+              {latestIntervention?.invoicePdfUrl && (
+                <a 
+                  href={latestIntervention.invoicePdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded-xl text-sm font-bold transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Télécharger la facture
+                </a>
+              )}
             </div>
             <div className="relative flex flex-col gap-10 my-auto">
               {/* Ligne verticale subtile (fond) avec la ligne active à l'intérieur pour de vrais pourcentages */}

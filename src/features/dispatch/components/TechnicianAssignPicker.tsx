@@ -5,7 +5,13 @@ import { Loader2, MapPin, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
+import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
 import { rankTechniciansForIntervention } from "@/features/dispatch/rankTechniciansForIntervention";
+import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
+import {
+  candidateRangeFromScheduleFields,
+  findTechnicianScheduleConflicts,
+} from "@/features/scheduling/scheduleConflicts";
 import {
   canResolveTechnicianAssignUid,
   resolveTechnicianAssignUid,
@@ -16,7 +22,17 @@ import { useTechnicians } from "@/features/technicians/hooks";
 import type { Technician } from "@/features/technicians/types";
 
 type Props = {
-  intervention: Pick<Intervention, "id" | "location" | "address">;
+  intervention: Pick<
+    Intervention,
+    | "id"
+    | "location"
+    | "address"
+    | "requestedDate"
+    | "requestedTime"
+    | "scheduledDate"
+    | "scheduledTime"
+  >;
+  peerInterventions?: Intervention[];
   onAssign: (technicianUid: string) => void | Promise<void>;
   onCancel: () => void;
   isAssigning?: boolean;
@@ -35,6 +51,7 @@ const statusLabelKey: Record<Technician["status"], string> = {
 
 export default function TechnicianAssignPicker({
   intervention,
+  peerInterventions = [],
   onAssign,
   onCancel,
   isAssigning = false,
@@ -93,11 +110,31 @@ export default function TechnicianAssignPicker({
     };
   }, [intervention.location.lat, intervention.location.lng, technicians, ranked.length]);
 
+  const selectedConflicts = useMemo(() => {
+    if (!selectedId) return [];
+    const tech = ranked.find((r) => r.technician.id === selectedId);
+    if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
+    const uid = resolveTechnicianAssignUid(tech.technician);
+    const patch = buildAssignInterventionToTechnicianUpdate(intervention, uid);
+    const range = candidateRangeFromScheduleFields(patch.scheduledDate, patch.scheduledTime);
+    if (!range) return [];
+    return findTechnicianScheduleConflicts({
+      interventions: peerInterventions,
+      technicianUid: uid,
+      candidateRange: range,
+      excludeInterventionId: intervention.id,
+    });
+  }, [selectedId, ranked, intervention, peerInterventions]);
+
   const handleConfirm = () => {
     const row = ranked.find((r) => r.technician.id === selectedId);
     if (!row || isAssigning) return;
     if (!canResolveTechnicianAssignUid(row.technician)) {
       toast.error(String(t("dispatch.assign_picker.missing_auth_uid")));
+      return;
+    }
+    if (selectedConflicts.length > 0) {
+      toast.error(String(t("scheduling.conflict.block_assign")));
       return;
     }
     void onAssign(resolveTechnicianAssignUid(row.technician));
@@ -141,6 +178,8 @@ export default function TechnicianAssignPicker({
           {String(t("dispatch.assign_picker.no_technicians"))}
         </p>
       ) : (
+        <>
+        <ScheduleConflictBanner conflicts={selectedConflicts} className="mb-3" />
         <ul className="max-h-52 space-y-2 overflow-y-auto py-1">
           {ranked.map(({ technician, distanceKm }) => {
             const isSelected = selectedId === technician.id;
@@ -189,6 +228,7 @@ export default function TechnicianAssignPicker({
             );
           })}
         </ul>
+        </>
       )}
 
       <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
@@ -203,7 +243,7 @@ export default function TechnicianAssignPicker({
         <button
           type="button"
           data-testid="technician-assign-confirm"
-          disabled={!selectedId || isAssigning || ranked.length === 0}
+          disabled={!selectedId || isAssigning || ranked.length === 0 || selectedConflicts.length > 0}
           onClick={handleConfirm}
           className="flex flex-1 items-center justify-center gap-2 rounded-[12px] bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
         >

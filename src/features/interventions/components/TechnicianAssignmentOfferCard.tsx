@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { requireAuthTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import type { Intervention } from "@/features/interventions/types";
 import {
   acceptTechnicianAssignmentPatch,
@@ -60,7 +61,14 @@ export default function TechnicianAssignmentOfferCard({
     if (!firestore || isUpdating) return;
     setIsUpdating(true);
     try {
-      await updateDoc(doc(firestore, "interventions", iv.id), acceptTechnicianAssignmentPatch());
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: iv.id,
+        iv,
+        toStatus: "en_route",
+        actor: requireAuthTransitionActor("technician"),
+        extraPatch: acceptTechnicianAssignmentPatch(),
+      });
       toast.success(String(t("technician_hub.dashboard.detail.assignment_accepted")));
     } catch (err) {
       console.error(err);
@@ -74,10 +82,14 @@ export default function TechnicianAssignmentOfferCard({
     if (!firestore || isUpdating) return;
     setIsUpdating(true);
     try {
-      await updateDoc(
-        doc(firestore, "interventions", iv.id),
-        declineTechnicianAssignmentPatch(technicianUid),
-      );
+      await transitionInterventionStatus({
+        db: firestore,
+        interventionId: iv.id,
+        iv,
+        toStatus: "pending",
+        actor: requireAuthTransitionActor("technician"),
+        extraPatch: declineTechnicianAssignmentPatch(technicianUid),
+      });
       toast.success(String(t("technician_hub.dashboard.detail.assignment_declined")));
     } catch (err) {
       console.error(err);

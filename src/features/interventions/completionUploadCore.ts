@@ -1,7 +1,10 @@
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, firestore, storage } from "@/core/config/firebase";
 import { dataUrlToBlob } from "@/features/interventions/finishJobCapture";
+import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import type { Intervention } from "@/features/interventions/types";
 
 const UPLOAD_FILE_TIMEOUT_MS = 120_000;
 const FIRESTORE_UPDATE_TIMEOUT_MS = 90_000;
@@ -59,13 +62,28 @@ export async function performCompletionUpload(params: {
     "Envoi signature",
   );
 
+  const snap = await getDoc(doc(fs, "interventions", interventionId));
+  const data = snap.data() as Intervention | undefined;
+  const fromStatus = data?.status ?? "in_progress";
+
   await withTimeout(
-    updateDoc(doc(fs, "interventions", interventionId), {
-      completionPhotoUrls: photoUrls,
-      completionSignatureUrl: sigUrl,
-      completedAt: serverTimestamp(),
-      completedByUid: uid,
-      status: "done",
+    transitionInterventionStatus({
+      db: fs,
+      interventionId,
+      iv: {
+        status: fromStatus,
+        assignedTechnicianUid: data?.assignedTechnicianUid ?? uid,
+        createdByUid: data?.createdByUid ?? null,
+        companyId: data?.companyId ?? null,
+      },
+      toStatus: "done",
+      actor: technicianTransitionActor(uid),
+      extraPatch: {
+        completionPhotoUrls: photoUrls,
+        completionSignatureUrl: sigUrl,
+        completedAt: serverTimestamp(),
+        completedByUid: uid,
+      },
     }),
     FIRESTORE_UPDATE_TIMEOUT_MS,
     "Mise à jour du dossier",

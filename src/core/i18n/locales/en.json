@@ -23,7 +23,41 @@
     "on_site": "On site",
     "in_progress": "In progress",
     "done": "Done",
-    "invoiced": "Invoiced"
+    "invoiced": "Invoiced",
+    "waiting_material": "Waiting for parts",
+    "cancelled": "Cancelled"
+  },
+  "scheduling": {
+    "conflict": {
+      "title": "Schedule conflict",
+      "block_assign": "This technician already has a job in that time slot.",
+      "block_save": "This slot overlaps another assignment for the technician."
+    }
+  },
+  "timeline": {
+    "title": "History & communications",
+    "empty": "No events on this case yet.",
+    "comment_placeholder": "Add an internal note…",
+    "send": "Send",
+    "sending": "Sending…",
+    "type": {
+      "status_change": "Status change",
+      "comment": "Internal note",
+      "email": "Email",
+      "material_order": "Material order"
+    }
+  },
+  "workflow": {
+    "timeline": {
+      "title": "Status history",
+      "empty": "No status changes recorded yet."
+    },
+    "owner": {
+      "dispatcher": "Dispatch",
+      "technician": "Technician",
+      "client": "Client",
+      "system": "System"
+    }
   },
   "spotlight": {
     "search_placeholder": "Name",
@@ -141,6 +175,9 @@
         "updating": "Updating...",
         "start_intervention": "Start intervention",
         "on_site": "I am on site",
+        "waiting_material": "Waiting for parts",
+        "resume_work": "Resume intervention",
+        "waiting_material_banner": "Intervention paused — waiting for parts.",
         "no_address": "No address",
         "not_provided": "Not provided",
         "new_assignment": "New assignment",
@@ -322,6 +359,8 @@
       "request_deleted": "Request deleted",
       "delete_failed": "Delete failed",
       "request_assigned": "Request assigned",
+      "request_cancelled": "Case cancelled",
+      "cancel_failed": "Could not cancel the case",
       "assign_failed": "Assignment failed",
       "firestore_unavailable": "Firestore unavailable",
       "report_verified": "Report verified",

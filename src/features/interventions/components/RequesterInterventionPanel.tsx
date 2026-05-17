@@ -187,6 +187,7 @@ export default function RequesterInterventionPanel() {
     isSubmitting,
     setIsSubmitting,
     setLastSubmittedRequest,
+    setLastSubmittedInterventionId,
     resetAll,
     triggerValidation,
     validationFailedCount,
@@ -478,6 +479,7 @@ export default function RequesterInterventionPanel() {
 
       const db = firestore;
       const newDocRef = doc(collection(db, "interventions"));
+      setLastSubmittedInterventionId(newDocRef.id);
       const title = (problemLabel.trim() || description.trim()).slice(0, 140);
       const nowIso = new Date().toISOString();
       const hour =
