@@ -154,7 +154,7 @@ export async function flushCompletionQueue(
         const snap = await getDoc(doc(db, "interventions", rec.interventionId));
         const d = snap.exists() ? snap.data() : null;
         const remoteStatus = d?.status as string | undefined;
-        const remoteCompletedAt = (d?.completedAt ?? undefined) as Timestamp | undefined;
+        const remoteCompletedAt = (d?.completedAt ?? undefined) as Timestamp | { toMillis?: () => number } | Date | undefined;
 
         if (remoteCompletionIsNewerThanQueued(remoteStatus, remoteCompletedAt, rec.queuedAtMs)) {
           onConflictSkip?.(rec.interventionId);

@@ -205,7 +205,7 @@ export default function BackOfficeInboxPanel() {
 
   const selectedReportCompletion = useMemo(() => {
     if (!selectedItem) return { photoUrls: [] as string[], signatureUrl: null as string | null };
-    if (selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") {
+    if (isInterventionPendingBackOfficeIntake(selectedItem)) {
       return { photoUrls: [], signatureUrl: null };
     }
     const bridged = pickLatestBridgedReportForIntervention(bridgedTerrainReports, selectedItem.id);
@@ -217,6 +217,11 @@ export default function BackOfficeInboxPanel() {
   const [editTime, setEditTime] = useState("");
   
   const [reportsArchiveExpanded, setReportsArchiveExpanded] = useState(false);
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
+  if (prevActiveTab !== activeTab) {
+    setPrevActiveTab(activeTab);
+    if (activeTab !== "reports") setReportsArchiveExpanded(false);
+  }
   const [assignPickerOpen, setAssignPickerOpen] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
 
@@ -312,6 +317,10 @@ export default function BackOfficeInboxPanel() {
         navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
         return;
       }
+      if (!row) {
+        toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
+        return;
+      }
       await updateDoc(
         doc(firestore, "interventions", id),
         buildAssignInterventionToTechnicianUpdate(row, technicianUid)
@@ -375,10 +384,6 @@ export default function BackOfficeInboxPanel() {
 
   const isTenant = !!workspace?.isTenantUser;
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (activeTab !== "reports") setReportsArchiveExpanded(false);
-  }, [activeTab]);
 
   useEffect(() => {
     if (!terrainBridge) return;
@@ -654,7 +659,7 @@ export default function BackOfficeInboxPanel() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <h3 className="text-[15px] font-bold text-slate-800">
-                {selectedItem.status === "pending" || selectedItem.status === "pending_needs_address"
+                {isInterventionPendingBackOfficeIntake(selectedItem)
                   ? t("backoffice.inbox.detail_title_request")
                   : t("backoffice.inbox.detail_title_report")}
               </h3>
@@ -668,9 +673,9 @@ export default function BackOfficeInboxPanel() {
                 <div className="flex items-center gap-2 mb-2">
                    <span className={cn(
                      "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                     (selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                     isInterventionPendingBackOfficeIntake(selectedItem) ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
                    )}>
-                     {selectedItem.status === "pending" || selectedItem.status === "pending_needs_address"
+                     {isInterventionPendingBackOfficeIntake(selectedItem)
                        ? t("backoffice.inbox.kind_request")
                        : t("backoffice.inbox.kind_report")}{" "}
                      • ID: {selectedItem.id.slice(-6).toUpperCase()}
@@ -699,7 +704,7 @@ export default function BackOfficeInboxPanel() {
               {/* Problem / Report Description */}
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  {selectedItem.status === "pending" || selectedItem.status === "pending_needs_address"
+                  {isInterventionPendingBackOfficeIntake(selectedItem)
                     ? t("backoffice.inbox.problem_label")
                     : t("backoffice.inbox.report_label")}
                 </span>
@@ -711,7 +716,7 @@ export default function BackOfficeInboxPanel() {
               </div>
 
               {/* Date & Time management for requests */}
-              {(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") && (
+              {isInterventionPendingBackOfficeIntake(selectedItem) && (
                 <div className="space-y-3">
                    <div className="flex justify-between items-center">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -766,18 +771,18 @@ export default function BackOfficeInboxPanel() {
               )}
 
               {/* Photos Grid */}
-              {(((selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") && selectedItem.attachmentThumbnails) ||
-                (!(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") &&
+              {((isInterventionPendingBackOfficeIntake(selectedItem) && selectedItem.attachmentThumbnails) ||
+                (!isInterventionPendingBackOfficeIntake(selectedItem) &&
                   selectedReportCompletion.photoUrls.length > 0)) && (
                 <div className="space-y-3" data-testid="backoffice-report-detail-photos-section">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    {selectedItem.status === "pending" || selectedItem.status === "pending_needs_address"
+                    {isInterventionPendingBackOfficeIntake(selectedItem)
                       ? t("backoffice.inbox.photos_client")
                       : t("backoffice.inbox.photos_completion")}
                   </span>
                   <div className="grid grid-cols-2 gap-2">
                     {(
-                      (selectedItem.status === "pending" || selectedItem.status === "pending_needs_address")
+                      isInterventionPendingBackOfficeIntake(selectedItem)
                         ? selectedItem.attachmentThumbnails
                         : selectedReportCompletion.photoUrls
                     )?.map((url, i) => (
@@ -788,7 +793,7 @@ export default function BackOfficeInboxPanel() {
                           alt="Intervention"
                           className={cn(
                             "w-full h-full object-cover",
-                            (selectedItem.status !== "pending" && selectedItem.status !== "pending_needs_address") &&
+                            !isInterventionPendingBackOfficeIntake(selectedItem) &&
                               (PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled) &&
                               "blur-lg",
                           )}
@@ -800,7 +805,7 @@ export default function BackOfficeInboxPanel() {
               )}
 
               {/* Audio / Transcription for requests (under photos) */}
-              {(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") ? (
+              {isInterventionPendingBackOfficeIntake(selectedItem) ? (
                 <div className="space-y-3">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                     {t("backoffice.inbox.voice_message")}
@@ -851,7 +856,7 @@ export default function BackOfficeInboxPanel() {
               ) : null}
 
               {/* Signature for reports */}
-              {!(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") &&
+              {!isInterventionPendingBackOfficeIntake(selectedItem) &&
                 selectedReportCompletion.signatureUrl && (
                   <div className="space-y-3" data-testid="backoffice-report-detail-signature-section">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -871,7 +876,7 @@ export default function BackOfficeInboxPanel() {
 
             {/* Sticky Actions */}
             <div className="border-t border-slate-100 bg-white/80 p-6 backdrop-blur-md">
-              {(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") ? (
+              {isInterventionPendingBackOfficeIntake(selectedItem) ? (
                 assignPickerOpen ? (
                   <TechnicianAssignPicker
                     intervention={selectedItem}
