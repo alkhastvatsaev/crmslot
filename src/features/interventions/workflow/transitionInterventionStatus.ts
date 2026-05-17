@@ -16,6 +16,7 @@ import type {
   InterventionStatusEvent,
   TransitionActor,
 } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import { dispatchStatusNotifications } from "@/features/notifications/dispatchStatusNotifications";
 
 export type TransitionInterventionStatusParams = {
   db: Firestore;
@@ -31,6 +32,10 @@ export type TransitionInterventionStatusParams = {
   now?: Date;
   /** Si false, n’écrit pas les alertes inbox (tests / offline). */
   writeInboxAlerts?: boolean;
+  /** Données intervention complètes pour les notifications email (optionnel). */
+  interventionSnapshot?: Pick<Intervention, "clientName" | "clientFirstName" | "clientLastName" | "clientPhone" | "address" | "title" | "scheduledDate" | "scheduledTime">;
+  /** Nom du technicien assigné (affiché dans les emails). */
+  technicianName?: string;
 };
 
 function appendStatusEventToBatch(
@@ -144,6 +149,19 @@ export async function transitionInterventionStatus(
   }
 
   await batch.commit();
+
+  // Fire-and-forget email/SMS notifications (never blocks the workflow)
+  if (writeInboxAlerts && params.interventionSnapshot) {
+    void dispatchStatusNotifications({
+      fromStatus,
+      toStatus,
+      intervention: {
+        id: interventionId,
+        ...params.interventionSnapshot,
+      },
+      technicianName: params.technicianName,
+    });
+  }
 
   return { id: eventId, ...eventPayload };
 }
