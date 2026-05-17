@@ -28,14 +28,30 @@ Ce projet est une application Next.js premium dédiée à la gestion d'intervent
 ## Tests
 
 ```bash
-npm run ci                # lint + typecheck + tests + build (recommandé avant merge)
-npm run ci:all            # ci + Playwright E2E
-npm run lint:ci           # ESLint (erreurs bloquantes sur src/)
-npm run test:ci           # typecheck + coverage
-npm run test:e2e          # Playwright (carte + navigation carrousel)
-npx playwright install    # une fois, avant les E2E en local
-npm run lint              # rapport complet (avertissements inclus)
+npm run release:check       # .env (staging) + ci + E2E — avant merge
+npm run release:check:prod  # idem tier production
+npm run verify:env          # variables manquantes
+npm run smoke:url https://votre-app.vercel.app
+
+npm run ci                  # lint + typecheck + tests + build
+npm run ci:all              # ci + Playwright E2E
+npx playwright install      # une fois, avant les E2E en local
 ```
+
+**GitHub Actions** : `test.yml` + `e2e.yml` sur chaque PR ; `release.yml` sur `main` (qualité + E2E, déploiement Vercel manuel via *Run workflow*). Secrets : `VERCEL_*`, `PRODUCTION_URL` (smoke hebdo).
+
+**Premier déploiement** : guide détaillé → [docs/SETUP_VERCEL_GITHUB.md](docs/SETUP_VERCEL_GITHUB.md)
+
+## Documentation stratégique
+
+| Document | Contenu |
+|----------|---------|
+| [docs/PLAN_STRATEGIQUE.md](docs/PLAN_STRATEGIQUE.md) | Phases 0–6, ordre d’exécution, commandes |
+| [docs/CHANTIERS_COMPLEXES.md](docs/CHANTIERS_COMPLEXES.md) | Analyse des gros chantiers techniques |
+| [docs/CHECKLIST_PRODUCTION.md](docs/CHECKLIST_PRODUCTION.md) | Cases à cocher avant mise en prod |
+| [docs/FIRESTORE_PRODUCTION_MIGRATION.md](docs/FIRESTORE_PRODUCTION_MIGRATION.md) | Durcissement des rules Firestore |
+| [docs/TRAVAIL_AUTONOME.md](docs/TRAVAIL_AUTONOME.md) | Sessions longues / agent sans clic |
+| [docs/TECHNICIENS_AUTH_UID.md](docs/TECHNICIENS_AUTH_UID.md) | Lier techniciens Firestore ↔ Firebase Auth |
 
 Voir `AGENTS.md` pour les règles de tests (colocation, `data-testid`, modules P0).
 

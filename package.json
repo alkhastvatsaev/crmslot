@@ -16,9 +16,19 @@
     "test:e2e": "playwright test",
     "ci": "npm run lint:ci && npm run test:ci && npm run build",
     "ci:all": "npm run ci && npm run test:e2e",
+    "verify:env": "node scripts/verify-env.mjs --tier=staging",
+    "verify:env:prod": "node scripts/verify-env.mjs --tier=production",
+    "smoke:url": "node scripts/smoke-url.mjs",
+    "vercel:ids": "node scripts/print-vercel-ids.mjs",
+    "release:check": "npm run verify:env && npm run ci:all",
+    "release:check:prod": "npm run verify:env:prod && npm run ci:all",
     "pretypecheck": "node scripts/prune-next-type-duplicates.mjs",
     "typecheck": "tsc --noEmit",
-    "cleanup:demo": "ts-node scripts/cleanupDemoData.ts"
+    "cleanup:demo": "ts-node scripts/cleanupDemoData.ts",
+    "sync:technician-uids": "node scripts/sync-technician-auth-uids.mjs",
+    "check:technician-uids": "node scripts/sync-technician-auth-uids.mjs --check",
+    "list:technician-uids": "node scripts/sync-technician-auth-uids.mjs --list",
+    "deploy:firestore-rules": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

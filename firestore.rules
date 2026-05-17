@@ -1,4 +1,5 @@
 rules_version = '2';
+// Production : voir docs/FIRESTORE_PRODUCTION_MIGRATION.md avant de durcir la lecture globale des interventions.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -155,14 +156,117 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    /** Hors portail société : lecture limitée aux dossiers non assignés (legacy / carte) ou assignés à soi. */
-    function nonPortalCanReadIntervention() {
-      return !resource.data.keys().hasAny(['assignedTechnicianUid'])
-        || resource.data.assignedTechnicianUid == null
-        || resource.data.assignedTechnicianUid == ''
-        || resource.data.assignedTechnicianUid == request.auth.uid
-        || resource.data.assignedTechnicianUid == 'demo-tech-local'
-        || (resource.data.keys().hasAny(['createdByUid']) && resource.data.createdByUid == request.auth.uid);
+    /** Back-office : membership Firestore (sync-claims pas encore fait ou repli). */
+    function canReadInterventionViaMembership() {
+      return isAuthed()
+        && interventionHasTenantScope(resource.data)
+        && userBelongsToCompany(resource.data.companyId);
+    }
+
+    /** Portail société : jetons `bmTenants` (cf. /api/company/sync-claims). */
+    function canReadInterventionViaTenantClaims() {
+      return isAuthed()
+        && isCompanyPortalUser()
+        && interventionHasTenantScope(resource.data)
+        && tenantClaimsIncludeCompany(resource.data.companyId);
+    }
+
+    /** Technicien : requêtes `where("assignedTechnicianUid","==", request.auth.uid)`. */
+    function canReadInterventionAsAssignee() {
+      return isAuthed()
+        && resource.data.keys().hasAny(['assignedTechnicianUid'])
+        && resource.data.assignedTechnicianUid is string
+        && resource.data.assignedTechnicianUid.size() > 0
+        && resource.data.assignedTechnicianUid == request.auth.uid;
+    }
+
+    /** Demandeur : ses créations (`createdByUid`). */
+    function canReadInterventionAsCreator() {
+      return isAuthed()
+        && resource.data.keys().hasAny(['createdByUid'])
+        && resource.data.createdByUid == request.auth.uid;
+    }
+
+    /**
+     * Seeds partagés staging / dev (`demo-local-company`, `demo-tech-local`).
+     * Retirer en prod stricte quand plus aucun doc de démo en base.
+     */
+    function canReadInterventionDemoStaging() {
+      return isAuthed()
+        && (
+          (
+            interventionHasTenantScope(resource.data)
+            && resource.data.companyId == 'demo-local-company'
+          )
+          || (
+            resource.data.keys().hasAny(['assignedTechnicianUid'])
+            && resource.data.assignedTechnicianUid == 'demo-tech-local'
+          )
+        );
+    }
+
+    function interventionCreateTenantAllowed(data) {
+      return !data.keys().hasAny(['companyId'])
+        || !(data.companyId is string)
+        || data.companyId.size() == 0
+        || data.companyId == 'demo-local-company'
+        || tenantClaimsIncludeCompany(data.companyId)
+        || userBelongsToCompany(data.companyId);
+    }
+
+    function canUpdateInterventionAsTenantStaff() {
+      return isCompanyPortalUser()
+        && interventionHasTenantScope(resource.data)
+        && tenantClaimsIncludeCompany(resource.data.companyId)
+        && (
+          request.auth.token.bmTenants.hasAny([resource.data.companyId + ':admin'])
+          || (
+            request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
+            && resource.data.keys().hasAny(['createdByUid'])
+            && resource.data.createdByUid == request.auth.uid
+          )
+          || tenantCollaborateurCanValidateReport()
+        );
+    }
+
+    function canUpdateInterventionViaMembershipStaff() {
+      return interventionHasTenantScope(resource.data)
+        && userBelongsToCompany(resource.data.companyId)
+        && (
+          userRoleInCompany(resource.data.companyId) == 'admin'
+          || (
+            userRoleInCompany(resource.data.companyId) == 'collaborateur'
+            && resource.data.keys().hasAny(['createdByUid'])
+            && resource.data.createdByUid == request.auth.uid
+          )
+        );
+    }
+
+    function canUpdateInterventionAsAssignee() {
+      return resource.data.keys().hasAny(['assignedTechnicianUid'])
+        && resource.data.assignedTechnicianUid is string
+        && resource.data.assignedTechnicianUid.size() > 0
+        && resource.data.assignedTechnicianUid == request.auth.uid;
+    }
+
+    /** Staging : technicien démo (assignations `demo-tech-local`). */
+    function canUpdateInterventionDemoAssignee() {
+      return resource.data.keys().hasAny(['assignedTechnicianUid'])
+        && resource.data.assignedTechnicianUid == 'demo-tech-local';
+    }
+
+    function canDeleteInterventionAsAdmin() {
+      return interventionHasTenantScope(resource.data)
+        && (
+          (
+            isCompanyPortalUser()
+            && request.auth.token.bmTenants.hasAny([resource.data.companyId + ':admin'])
+          )
+          || (
+            userBelongsToCompany(resource.data.companyId)
+            && userRoleInCompany(resource.data.companyId) == 'admin'
+          )
+        );
     }
 
     /** Alertes doublons — créées après analyse locale des nouvelles demandes (tenant). */
@@ -179,7 +283,10 @@ service cloud.firestore {
           'createdByUid',
           'detectedAt',
         ])
-        && tenantClaimsIncludeCompany(resource.data.companyId);
+        && (
+          tenantClaimsIncludeCompany(resource.data.companyId)
+          || resource.data.companyId == 'demo-local-company'
+        );
 
       allow create: if isAuthed()
         && request.resource.data.keys().hasAll([
@@ -197,7 +304,10 @@ service cloud.firestore {
         && request.resource.data.status == 'open'
         && request.resource.data.createdByUid == request.auth.uid
         && request.resource.data.newInterventionId == alertId
-        && tenantClaimsIncludeCompany(request.resource.data.companyId);
+        && (
+          tenantClaimsIncludeCompany(request.resource.data.companyId)
+          || request.resource.data.companyId == 'demo-local-company'
+        );
 
       allow update: if isAuthed()
         && resource.data.companyId is string
@@ -218,61 +328,29 @@ service cloud.firestore {
 
     match /interventions/{docId} {
       /**
-       * Plusieurs `allow read` → combinés en OU. Une seule clause avec `||` peut faire échouer les **requêtes**
-       * `where("assignedTechnicianUid","==",request.auth.uid)` (erreur « Missing or insufficient permissions »).
+       * Plusieurs `allow read` → OU logique. Garder des règles **séparées** (pas un seul `||` géant)
+       * pour que les requêtes filtrées (`companyId`, `assignedTechnicianUid`) passent la validation Firestore.
+       * Voir docs/FIRESTORE_PRODUCTION_MIGRATION.md
        */
-      // Version Ultra-Simple : Tout utilisateur connecté (hors portail client) peut lire toutes les interventions.
-      // Cela permet d'utiliser une seule requête globale simple dans le tableau de bord.
-      allow read: if isAuthed() && !isCompanyPortalUser();
+      allow read: if canReadInterventionViaTenantClaims();
+      allow read: if canReadInterventionViaMembership();
+      allow read: if canReadInterventionAsAssignee();
+      allow read: if canReadInterventionAsCreator();
+      allow read: if canReadInterventionDemoStaging();
 
-      // Pour les utilisateurs du portail client, on garde l'isolation par société.
-      allow read: if isAuthed()
-        && isCompanyPortalUser()
-        && interventionHasTenantScope(resource.data)
-        && tenantClaimsIncludeCompany(resource.data.companyId);
-
-      allow create: if isAuthed() && (
-        (
-          !isCompanyPortalUser()
-        )
-        || (
-          isCompanyPortalUser()
-          && interventionHasTenantScope(request.resource.data)
-          && tenantClaimsIncludeCompany(request.resource.data.companyId)
-          && request.resource.data.keys().hasAny(['createdByUid'])
-          && request.resource.data.createdByUid == request.auth.uid
-        )
-      );
+      allow create: if isAuthed()
+        && request.resource.data.keys().hasAny(['createdByUid'])
+        && request.resource.data.createdByUid == request.auth.uid
+        && interventionCreateTenantAllowed(request.resource.data);
 
       allow update: if isAuthed() && (
-        !isCompanyPortalUser()
-        || (
-          isCompanyPortalUser()
-          && interventionHasTenantScope(resource.data)
-          && tenantClaimsIncludeCompany(resource.data.companyId)
-          && (
-            request.auth.token.bmTenants.hasAny([resource.data.companyId + ':admin'])
-            || (
-              request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
-              && resource.data.keys().hasAny(['createdByUid'])
-              && resource.data.createdByUid == request.auth.uid
-            )
-            || (
-              resource.data.keys().hasAny(['assignedTechnicianUid'])
-              && resource.data.assignedTechnicianUid == request.auth.uid
-            )
-            || tenantCollaborateurCanValidateReport()
-          )
-        )
+        canUpdateInterventionAsTenantStaff()
+        || canUpdateInterventionViaMembershipStaff()
+        || canUpdateInterventionAsAssignee()
+        || canUpdateInterventionDemoAssignee()
       );
 
-      allow delete: if isAuthed() && (
-        !isCompanyPortalUser()
-        || (
-          interventionHasTenantScope(resource.data)
-          && request.auth.token.bmTenants.hasAny([resource.data.companyId + ':admin'])
-        )
-      );
+      allow delete: if isAuthed() && canDeleteInterventionAsAdmin();
     }
 
     /** Brouillon formulaire demande d’intervention — une entrée par utilisateur authentifié (doc id = uid). */

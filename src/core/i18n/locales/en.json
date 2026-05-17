@@ -580,7 +580,8 @@
       "eta_loading": "Calculating ETA",
       "status_available": "Available",
       "status_en_route": "En route",
-      "status_on_site": "On site"
+      "status_on_site": "On site",
+      "missing_auth_uid": "This technician has no linked Firebase account (missing authUid)."
     }
   }
 }

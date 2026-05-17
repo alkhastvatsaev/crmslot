@@ -584,7 +584,8 @@
       "eta_loading": "Calcul de l'ETA en cours",
       "status_available": "Disponible",
       "status_en_route": "En route",
-      "status_on_site": "Sur place"
+      "status_on_site": "Sur place",
+      "missing_auth_uid": "Ce technicien n’est pas lié à un compte Firebase (authUid manquant)."
     }
   }
 }

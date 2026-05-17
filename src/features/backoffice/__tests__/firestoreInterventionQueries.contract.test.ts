@@ -14,11 +14,6 @@ describe("Firestore intervention query contract", () => {
       query: 'where("assignedTechnicianUid", "==", technicianUid)',
       rule: "canReadInterventionAsAssignee | canReadInterventionDemoStaging",
     },
-    {
-      hook: "useInterventions (tenant)",
-      query: 'where("companyId", "==", tenantCompanyId)',
-      rule: "canReadInterventionViaTenantClaims | canReadInterventionViaMembership | canReadInterventionDemoStaging",
-    },
   ] as const;
 
   it.each(contracts)("$hook uses scoped query ($query)", ({ hook, query, rule }) => {

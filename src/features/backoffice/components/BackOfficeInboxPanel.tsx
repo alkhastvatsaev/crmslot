@@ -16,7 +16,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { firestore, auth } from "@/core/config/firebase";
+import { firestore } from "@/core/config/firebase";
 
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -25,7 +25,6 @@ import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeI
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
 import type { Intervention } from "@/features/interventions/types";
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
@@ -39,7 +38,10 @@ import {
 } from "@/features/backoffice/mergeReportCompletionMedia";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
-import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
+import {
+  coerceFirestoreLikeDate,
+  isInterventionPendingBackOfficeIntake,
+} from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
@@ -47,6 +49,7 @@ import {
   navigateTechnicianHub,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
+import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -98,7 +101,13 @@ function BackOfficeInboxInterventionRow({
 
   return (
     <motion.div
-      data-testid={variant === "report-archived" ? "backoffice-report-archived-row" : undefined}
+      data-testid={
+        variant === "report-archived"
+          ? "backoffice-report-archived-row"
+          : variant === "request"
+            ? `backoffice-inbox-request-row-${item.id}`
+            : undefined
+      }
       onClick={() => onSelect(item.id)}
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -208,6 +217,8 @@ export default function BackOfficeInboxPanel() {
   const [editTime, setEditTime] = useState("");
   
   const [reportsArchiveExpanded, setReportsArchiveExpanded] = useState(false);
+  const [assignPickerOpen, setAssignPickerOpen] = useState(false);
+  const [isAssigning, setIsAssigning] = useState(false);
 
   const envDefaultCompanyId = useMemo(
     () =>
@@ -237,7 +248,7 @@ export default function BackOfficeInboxPanel() {
 
   const pendingRequests = useMemo(() => 
     interventions
-      .filter((inv) => inv.status === "pending" || inv.status === "pending_needs_address")
+      .filter((inv) => isInterventionPendingBackOfficeIntake(inv))
       .sort((a, b) => {
         const timeA = coerceFirestoreLikeDate(a.createdAt)?.getTime() ?? 0;
         const timeB = coerceFirestoreLikeDate(b.createdAt)?.getTime() ?? 0;
@@ -288,21 +299,32 @@ export default function BackOfficeInboxPanel() {
     }
   };
 
-  const handleAssign = async (id: string) => {
+  const handleAssignToTechnician = async (id: string, technicianUid: string) => {
     if (!firestore) return;
+    setIsAssigning(true);
     try {
       const row = interventions.find((x) => x.id === id);
-      const targetUid = auth?.currentUser?.uid || getDefaultAssignedTechnicianUid();
+      if (id.startsWith("demo-")) {
+        toast.success(t("backoffice.toasts.request_assigned"));
+        setAssignPickerOpen(false);
+        setSelectedItemId(null);
+        setPendingCaseId(id);
+        navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+        return;
+      }
       await updateDoc(
         doc(firestore, "interventions", id),
-        buildAssignInterventionToTechnicianUpdate(row, targetUid),
+        buildAssignInterventionToTechnicianUpdate(row, technicianUid)
       );
       toast.success(t("backoffice.toasts.request_assigned"));
+      setAssignPickerOpen(false);
       setSelectedItemId(null);
       setPendingCaseId(id);
       navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
     } catch {
       toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
+    } finally {
+      setIsAssigning(false);
     }
   };
 
@@ -848,9 +870,19 @@ export default function BackOfficeInboxPanel() {
             </div>
 
             {/* Sticky Actions */}
-            <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md flex gap-3">
+            <div className="border-t border-slate-100 bg-white/80 p-6 backdrop-blur-md">
               {(selectedItem.status === "pending" || selectedItem.status === "pending_needs_address") ? (
-                <>
+                assignPickerOpen ? (
+                  <TechnicianAssignPicker
+                    intervention={selectedItem}
+                    isAssigning={isAssigning}
+                    onCancel={() => setAssignPickerOpen(false)}
+                    onAssign={(technicianUid) =>
+                      handleAssignToTechnician(selectedItem.id, technicianUid)
+                    }
+                  />
+                ) : (
+                <div className="flex gap-3">
                   <button
                     onClick={() => handleDelete(selectedItem.id)}
                     className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-red-100 bg-red-50 text-red-600 font-bold text-[14px] hover:bg-red-100 active:scale-95 transition-all"
@@ -859,13 +891,16 @@ export default function BackOfficeInboxPanel() {
                     {t("common.delete")}
                   </button>
                   <button
-                    onClick={() => handleAssign(selectedItem.id)}
+                    type="button"
+                    data-testid="backoffice-inbox-assign"
+                    onClick={() => setAssignPickerOpen(true)}
                     className="flex-[1.5] flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] bg-blue-600 text-white font-bold text-[14px] shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:bg-blue-700 active:scale-95 transition-all"
                   >
                     <UserPlus className="w-4 h-4" />
                     {t("backoffice.inbox.confirm_assign")}
                   </button>
-                </>
+                </div>
+                )
               ) : (
                 <>
                   <button

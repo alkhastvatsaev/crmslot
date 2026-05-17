@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { firestore, auth, isConfigured } from '@/core/config/firebase';
+import { devUiPreviewEnabled, realInterventionsOnly } from '@/core/config/devUiPreview';
 import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { Technician } from './types';
+import { withTechnicianAuthUid } from '@/features/technicians/withTechnicianAuthUid';
 
 const MOCK_TECHNICIANS: Technician[] = [
-  { id: '1', name: 'Alexandre V.', initial: 'A', vehicle: 'Camionnette #01', status: 'on_site', location: { lat: 50.84655, lng: 4.35415 } },
-  { id: '2', name: 'Thomas L.', initial: 'T', vehicle: 'Camionnette #03', status: 'available', location: { lat: 50.84800, lng: 4.35200 } },
-  { id: '3', name: 'Boris K.', initial: 'B', vehicle: 'Camionnette #02', status: 'en_route', location: { lat: 50.84400, lng: 4.35000 } }
+  withTechnicianAuthUid({ id: '1', name: 'Alexandre V.', initial: 'A', vehicle: 'Camionnette #01', status: 'on_site', location: { lat: 50.84655, lng: 4.35415 } }),
+  withTechnicianAuthUid({ id: '2', name: 'Thomas L.', initial: 'T', vehicle: 'Camionnette #03', status: 'available', location: { lat: 50.84800, lng: 4.35200 } }),
+  withTechnicianAuthUid({ id: '3', name: 'Boris K.', initial: 'B', vehicle: 'Camionnette #02', status: 'en_route', location: { lat: 50.84400, lng: 4.35000 } }),
 ];
 
 export function useTechnicians() {
@@ -59,10 +61,20 @@ export function useTechnicians() {
               if (!active) return;
 
               if (!snapshot.empty) {
-                const parsed = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Technician));
+                const parsed = snapshot.docs.map((d) =>
+                  withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician),
+                );
                 setTechnicians(parsed);
-              } else {
 
+                if (devUiPreviewEnabled && !realInterventionsOnly) {
+                  snapshot.docs.forEach((d) => {
+                    const row = d.data() as Technician;
+                    if (!(row.authUid ?? "").trim()) {
+                      void setDoc(d.ref, withTechnicianAuthUid({ ...row, id: d.id }), { merge: true });
+                    }
+                  });
+                }
+              } else {
                 MOCK_TECHNICIANS.forEach(async (t) => {
                   await setDoc(doc(techRef, t.id), t);
                 });

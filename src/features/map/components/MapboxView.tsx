@@ -17,6 +17,7 @@ import { realInterventionsOnly } from '@/core/config/devUiPreview';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { useGalaxyLayerBridgeOptional } from '@/features/map/GalaxyLayerBridgeContext';
 import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
+import { isCompanyDispatchViewer } from '@/features/company/isCompanyDispatchViewer';
 import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
 import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
 import {
@@ -58,14 +59,14 @@ export default function MapboxView() {
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
   
-  // Phase 2: Filtre Carte.
-  // Si l'utilisateur est un locataire (BackOffice), on charge toutes les missions de la compagnie.
-  // Sinon (Technicien), on ne charge que les missions assignées.
-  const isBackOffice = workspace?.isTenantUser ?? false;
-  const { interventions: boInterventions } = useBackOfficeInterventions(isBackOffice ? workspace?.activeCompanyId ?? null : null);
-  const { interventions: techInterventions } = useTechnicianAssignments();
-  
-  const firestoreInterventions = isBackOffice ? boInterventions : techInterventions;
+  // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
+  const isDispatchMap = isCompanyDispatchViewer(workspace);
+  const { interventions: boInterventions } = useBackOfficeInterventions(
+    isDispatchMap ? workspace?.activeCompanyId ?? null : null,
+  );
+  const { interventions: techInterventions } = useTechnicianAssignments({ enabled: !isDispatchMap });
+
+  const firestoreInterventions = isDispatchMap ? boInterventions : techInterventions;
 
   const missions = useMemo(
     () => (!devUiPreviewEnabled || realInterventionsOnly ? [] : generateDailyMissions(selectedDate)),
