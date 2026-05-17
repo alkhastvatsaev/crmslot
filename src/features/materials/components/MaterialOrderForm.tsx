@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { MaterialOrderPart } from "@/features/materials/types";
 
+import { TERRAIN_TEMPLATES } from "@/features/interventions/config/terrainTemplates";
+
 type Props = {
   interventionId: string;
   technicianUid: string;
@@ -18,6 +20,14 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
   ]);
   const [urgency, setUrgency] = useState<"low" | "normal" | "high">("normal");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleLoadTemplate = (templateId: string) => {
+    if (!templateId) return;
+    const tpl = TERRAIN_TEMPLATES.find(t => t.id === templateId);
+    if (tpl) {
+      setParts(tpl.lines.map(l => ({ description: l.description, quantity: l.quantity, reference: l.reference || "" })));
+    }
+  };
 
   const handleAddPart = () => {
     setParts([...parts, { description: "", quantity: 1, reference: "" }]);
@@ -56,6 +66,20 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
     <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm" data-testid="material-order-form">
       <h2 className="mb-2 text-xl font-bold text-slate-800">{t("materials.form.title")}</h2>
       <p className="mb-6 text-sm text-slate-500">{t("materials.form.hint")}</p>
+
+      <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+        <label className="block text-sm font-bold text-blue-900 mb-2">Charger un modèle rapide</label>
+        <select
+          onChange={(e) => handleLoadTemplate(e.target.value)}
+          defaultValue=""
+          className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
+        >
+          <option value="" disabled>-- Sélectionner un modèle --</option>
+          {TERRAIN_TEMPLATES.map(tpl => (
+            <option key={tpl.id} value={tpl.id}>{tpl.name}</option>
+          ))}
+        </select>
+      </div>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
         <div className="space-y-4">

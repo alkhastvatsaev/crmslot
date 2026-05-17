@@ -124,6 +124,7 @@ export default function TechnicianDashboardDetailPanel({
   const { setFinishJobInterventionId } = useTechnicianFinishJob();
   const pager = useDashboardPagerOptional();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [materialsPanelOpen, setMaterialsPanelOpen] = useState(false);
   const { t } = useTranslation();
 
   if (!caseId) {
@@ -195,6 +196,7 @@ export default function TechnicianDashboardDetailPanel({
         technicianUid={technicianUid}
         allowCreate
         allowStatusUpdate={false}
+        forceOpen={materialsPanelOpen}
       />
     ) : null;
 
@@ -509,7 +511,13 @@ export default function TechnicianDashboardDetailPanel({
             <span className="text-[10px] font-bold">{t("common.navigate")}</span>
           </a>
         )}
-        <button onClick={() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors">
+        <button
+          onClick={() => {
+            setMaterialsPanelOpen(true);
+            setTimeout(() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' }), 50);
+          }}
+          className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors"
+        >
           <div className="bg-amber-50 p-2 rounded-full shadow-sm"><Package className="w-5 h-5" /></div>
           <span className="text-[10px] font-bold">{t("common.materials")}</span>
         </button>

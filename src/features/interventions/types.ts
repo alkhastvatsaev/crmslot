@@ -84,6 +84,8 @@ export interface Intervention {
   invoicedAt?: unknown;
   /** Montant facturé en centimes (base commission + paiement client). */
   invoiceAmountCents?: number | null;
+  /** Lignes facturables saisies par le technicien avant clôture. */
+  billingLines?: { description: string; quantity: number; unitPriceCents: number }[];
   /** Commission technicien calculée en centimes (dénormalisé). */
   commissionAmountCents?: number | null;
   paymentStatus?: "unpaid" | "pending" | "paid" | "refunded" | null;

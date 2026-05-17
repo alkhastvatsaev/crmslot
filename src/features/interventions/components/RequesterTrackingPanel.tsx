@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName } from "@/utils/stringUtils";
+import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.5 } as const;
 
@@ -25,6 +26,9 @@ type TrackedIntervention = {
   clientCompanyName?: string;
   clientPhone?: string;
   invoicePdfUrl?: string;
+  paymentStatus?: string | null;
+  invoiceAmountCents?: number | null;
+  stripePaymentLinkUrl?: string | null;
 };
 
 function useMyLatestIntervention(searchLastName: string, profileLastName: string) {
@@ -148,10 +152,26 @@ export default function RequesterTrackingPanel() {
   const step0Done = Boolean(latestIntervention || lastSubmittedRequest);
   const step1Done = step0Done;
   const step2Done = step1Done && !["pending", "pending_needs_address"].includes(status);
-  const step3Done = step1Done && ["assigned", "en_route", "on_site", "in_progress", "done", "invoiced"].includes(status);
-  const step4Done = step1Done && ["en_route", "on_site", "in_progress", "done", "invoiced"].includes(status);
-  const step5Done = step1Done && ["on_site", "in_progress", "done", "invoiced"].includes(status);
-  const step6Done = step1Done && ["done", "invoiced"].includes(status);
+  const activeFieldStatuses = [
+    "assigned",
+    "en_route",
+    "in_progress",
+    "waiting_material",
+    "done",
+    "invoiced",
+  ] as const;
+  const step3Done = step1Done && activeFieldStatuses.includes(status as (typeof activeFieldStatuses)[number]);
+  const step4Done =
+    step1Done &&
+    (["en_route", "in_progress", "waiting_material", "done", "invoiced"] as const).includes(
+      status as "en_route" | "in_progress" | "waiting_material" | "done" | "invoiced",
+    );
+  const step5Done =
+    step1Done &&
+    (["in_progress", "waiting_material", "done", "invoiced"] as const).includes(
+      status as "in_progress" | "waiting_material" | "done" | "invoiced",
+    );
+  const step6Done = step1Done && (["done", "invoiced"] as const).includes(status as "done" | "invoiced");
 
   const steps = [
     {
@@ -281,14 +301,20 @@ export default function RequesterTrackingPanel() {
                 {getDisplayName()}
               </h2>
 
-              {status === 'en_attente_materiel' && (
-                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm font-medium">
-                  Intervention en attente de matériel. Nous vous contacterons dès réception.
+              {status === "waiting_material" && (
+                <div
+                  data-testid="tracking-waiting-material-banner"
+                  className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-800"
+                >
+                  {t("tracking.waiting_material_banner")}
                 </div>
               )}
-              {status === 'cancelled' && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
-                  Cette intervention a été annulée.
+              {status === "cancelled" && (
+                <div
+                  data-testid="tracking-cancelled-banner"
+                  className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-800"
+                >
+                  {t("tracking.cancelled_banner")}
                 </div>
               )}
               {latestIntervention?.invoicePdfUrl && (
@@ -296,12 +322,22 @@ export default function RequesterTrackingPanel() {
                   href={latestIntervention.invoicePdfUrl}
                   target="_blank"
                   rel="noreferrer"
+                  data-testid="requester-invoice-download"
                   className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded-xl text-sm font-bold transition-colors"
                 >
                   <FileText className="w-4 h-4" />
-                  Télécharger la facture
+                  {t("payment.download_invoice")}
                 </a>
               )}
+              {latestIntervention &&
+              (latestIntervention.status === "invoiced" || latestIntervention.status === "done") ? (
+                <RequesterPaymentPanel
+                  interventionId={latestIntervention.id}
+                  paymentStatus={latestIntervention.paymentStatus}
+                  invoiceAmountCents={latestIntervention.invoiceAmountCents}
+                  stripePaymentLinkUrl={latestIntervention.stripePaymentLinkUrl}
+                />
+              ) : null}
             </div>
             <div className="relative flex flex-col gap-10 my-auto">
               {/* Ligne verticale subtile (fond) avec la ligne active à l'intérieur pour de vrais pourcentages */}
