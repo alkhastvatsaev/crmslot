@@ -82,6 +82,14 @@ export interface Intervention {
   /** Chemin objet Storage relatif au bucket (ex. invoices/{id}.pdf). */
   invoicePdfStoragePath?: string | null;
   invoicedAt?: unknown;
+  /** Montant facturé en centimes (base commission + paiement client). */
+  invoiceAmountCents?: number | null;
+  /** Commission technicien calculée en centimes (dénormalisé). */
+  commissionAmountCents?: number | null;
+  paymentStatus?: "unpaid" | "pending" | "paid" | "refunded" | null;
+  stripePaymentLinkUrl?: string | null;
+  stripePaymentIntentId?: string | null;
+  paidAt?: string | null;
   completedAt?: unknown;
   completedByUid?: string | null;
   /** Validation Ivana (back-office). */

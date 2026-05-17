@@ -4,10 +4,15 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import type { InterventionEvent } from "@/features/interventions/types";
+import { subscribeInterventionEmails, type InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
 import { addInterventionTimelineComment } from "@/features/interventions/timeline/addInterventionTimelineComment";
 import { mergeInterventionTimelineEvents } from "@/features/interventions/timeline/mergeInterventionTimeline";
 import type { InterventionTimelineDoc } from "@/features/interventions/timeline/interventionTimelineTypes";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import {
+  subscribeMaterialOrders,
+  type MaterialOrderDoc,
+} from "@/features/materials/materialOrderFirestore";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
   return {
@@ -52,11 +57,15 @@ export function useInterventionTimeline(
     setLoading(true);
     let statusRows: InterventionStatusEvent[] = [];
     let timelineRows: Array<{ id: string; data: InterventionTimelineDoc }> = [];
+    let emailRows: InterventionEmailDoc[] = [];
+    let materialRows: MaterialOrderDoc[] = [];
 
     const publish = () => {
       setEvents(
         mergeInterventionTimelineEvents(statusRows, timelineRows, {
           clientVisibleOnly: options?.clientVisibleOnly,
+          emails: emailRows,
+          materialOrders: materialRows,
         }),
       );
       setLoading(false);
@@ -95,9 +104,29 @@ export function useInterventionTimeline(
       },
     );
 
+    const unsubEmails = subscribeInterventionEmails(
+      firestore,
+      interventionId,
+      (rows) => {
+        emailRows = rows;
+        publish();
+      },
+      () => {
+        emailRows = [];
+        publish();
+      },
+    );
+
+    const unsubMaterials = subscribeMaterialOrders(firestore, interventionId, (rows) => {
+      materialRows = rows;
+      publish();
+    });
+
     return () => {
       unsubStatus();
       unsubTimeline();
+      unsubEmails();
+      unsubMaterials();
     };
   }, [interventionId, options?.clientVisibleOnly]);
 

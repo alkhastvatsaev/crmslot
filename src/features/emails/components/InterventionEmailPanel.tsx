@@ -5,6 +5,7 @@ import { Mail, Send, X, Reply, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { useTranslation } from "@/core/i18n/I18nContext";
 import { firestore } from "@/core/config/firebase";
 import { markEmailRead } from "@/features/emails/interventionEmailFirestore";
 import { useInterventionEmails } from "@/features/emails/useInterventionEmails";
@@ -28,10 +29,12 @@ function EmailBubble({
   email,
   onReply,
   onMarkRead,
+  replyLabel,
 }: {
   email: InterventionEmailDoc;
   onReply: (email: InterventionEmailDoc) => void;
   onMarkRead: (id: string) => void;
+  replyLabel: string;
 }) {
   const isOutbound = email.direction === "outbound";
   const isUnread = email.direction === "inbound" && !email.readAt;
@@ -61,11 +64,12 @@ function EmailBubble({
         {!isOutbound && (
           <button
             type="button"
+            data-testid={`email-reply-${email.id}`}
             onClick={() => onReply(email)}
             className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-blue-600 transition-colors"
           >
             <Reply className="w-3 h-3" />
-            Répondre
+            {replyLabel}
           </button>
         )}
         {isUnread && (
@@ -92,6 +96,7 @@ type Props = {
 };
 
 export default function InterventionEmailPanel({ interventionId, companyId }: Props) {
+  const { t } = useTranslation();
   const { emails, loading, unreadCount } = useInterventionEmails(interventionId);
   const [expanded, setExpanded] = useState(false);
   const [composing, setComposing] = useState(false);
@@ -128,11 +133,13 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
 
   const handleSend = useCallback(async () => {
     if (!compose.to.trim() || !compose.subject.trim() || !compose.bodyText.trim()) {
-      toast.error("Champs requis", { description: "À, Sujet et Message sont obligatoires." });
+      toast.error(String(t("emails.toast_required_title")), {
+        description: String(t("emails.toast_required_body")),
+      });
       return;
     }
     if (!companyId) {
-      toast.error("Société manquante");
+      toast.error(String(t("emails.toast_missing_company")));
       return;
     }
     setSending(true);
@@ -152,31 +159,38 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string };
-        throw new Error(data.error ?? "Envoi échoué");
+        throw new Error(data.error ?? String(t("emails.toast_send_failed")));
       }
-      toast.success("Email envoyé");
+      toast.success(String(t("emails.toast_sent")));
       setCompose(EMPTY_COMPOSE);
       setComposing(false);
     } catch (err) {
-      toast.error("Erreur envoi", { description: err instanceof Error ? err.message : "Réessayez." });
+      toast.error(String(t("emails.toast_send_error")), {
+        description: err instanceof Error ? err.message : String(t("common.try_again")),
+      });
     } finally {
       setSending(false);
     }
-  }, [compose, interventionId, companyId]);
+  }, [compose, interventionId, companyId, t]);
 
   return (
-    <div style={outfit} className="space-y-2">
-      {/* Section header */}
+    <div style={outfit} data-testid="intervention-email-panel" className="space-y-2">
       <button
         type="button"
+        data-testid="email-panel-toggle"
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-center justify-between rounded-[14px] bg-slate-50 px-4 py-3 border border-slate-100 hover:bg-slate-100/80 transition-colors"
       >
         <div className="flex items-center gap-2">
           <Mail className="w-4 h-4 text-slate-500" />
-          <span className="text-[12px] font-bold text-slate-700 uppercase tracking-widest">Emails</span>
+          <span className="text-[12px] font-bold text-slate-700 uppercase tracking-widest">
+            {t("emails.panel_title")}
+          </span>
           {unreadCount > 0 && (
-            <span className="flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white">
+            <span
+              data-testid="email-unread-badge"
+              className="flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white"
+            >
               {unreadCount}
             </span>
           )}
@@ -193,10 +207,10 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
 
       {expanded && (
         <div className="rounded-[18px] border border-slate-100 bg-white overflow-hidden">
-          {/* Thread list */}
           {emails.length > 0 && (
             <div
               ref={listRef}
+              data-testid="email-thread-list"
               className="max-h-64 overflow-y-auto p-4 space-y-4"
             >
               {loading && emails.length === 0 ? (
@@ -210,6 +224,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                     email={email}
                     onReply={openReply}
                     onMarkRead={handleMarkRead}
+                    replyLabel={String(t("emails.reply"))}
                   />
                 ))
               )}
@@ -217,20 +232,23 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
           )}
 
           {emails.length === 0 && !loading && !composing && (
-            <div className="px-4 py-6 text-center text-[12px] text-slate-400">
-              Aucun email — écrivez au client ci-dessous.
+            <div
+              data-testid="email-panel-empty"
+              className="px-4 py-6 text-center text-[12px] text-slate-400"
+            >
+              {t("emails.empty")}
             </div>
           )}
 
-          {/* Compose form */}
           {composing ? (
-            <div className="border-t border-slate-100 p-4 space-y-3">
+            <div className="border-t border-slate-100 p-4 space-y-3" data-testid="email-compose-form">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                  {compose.inReplyTo ? "Répondre" : "Nouveau message"}
+                  {compose.inReplyTo ? t("emails.compose_reply") : t("emails.compose_new")}
                 </span>
                 <button
                   type="button"
+                  data-testid="email-compose-close"
                   onClick={() => { setComposing(false); setCompose(EMPTY_COMPOSE); }}
                   className="flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:bg-slate-100"
                 >
@@ -239,21 +257,24 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
               </div>
               <input
                 type="email"
-                placeholder="À : email@client.com"
+                data-testid="email-compose-to"
+                placeholder={String(t("emails.placeholder_to"))}
                 value={compose.to}
                 onChange={(e) => setCompose((s) => ({ ...s, to: e.target.value }))}
                 className="w-full rounded-[10px] border border-slate-200 px-3 py-2 text-[13px] focus:outline-none focus:border-blue-400"
               />
               <input
                 type="text"
-                placeholder="Sujet"
+                data-testid="email-compose-subject"
+                placeholder={String(t("emails.placeholder_subject"))}
                 value={compose.subject}
                 onChange={(e) => setCompose((s) => ({ ...s, subject: e.target.value }))}
                 className="w-full rounded-[10px] border border-slate-200 px-3 py-2 text-[13px] focus:outline-none focus:border-blue-400"
               />
               <textarea
                 rows={4}
-                placeholder="Votre message…"
+                data-testid="email-compose-body"
+                placeholder={String(t("emails.placeholder_body"))}
                 value={compose.bodyText}
                 onChange={(e) => setCompose((s) => ({ ...s, bodyText: e.target.value }))}
                 className="w-full resize-none rounded-[10px] border border-slate-200 px-3 py-2 text-[13px] focus:outline-none focus:border-blue-400"
@@ -261,13 +282,15 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
+                  data-testid="email-compose-cancel"
                   onClick={() => { setComposing(false); setCompose(EMPTY_COMPOSE); }}
                   className="rounded-[10px] px-3 py-2 text-[12px] font-semibold text-slate-500 hover:bg-slate-100"
                 >
-                  Annuler
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="button"
+                  data-testid="email-compose-send"
                   disabled={sending}
                   onClick={() => void handleSend()}
                   className={cn(
@@ -278,7 +301,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                   )}
                 >
                   <Send className="w-3.5 h-3.5" />
-                  {sending ? "Envoi…" : "Envoyer"}
+                  {sending ? t("emails.sending") : t("emails.send")}
                 </button>
               </div>
             </div>
@@ -286,11 +309,12 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
             <div className="border-t border-slate-100 p-3">
               <button
                 type="button"
+                data-testid="email-compose-open"
                 onClick={() => { setComposing(true); setCompose(EMPTY_COMPOSE); }}
                 className="flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                Écrire un email
+                {t("emails.write")}
               </button>
             </div>
           )}

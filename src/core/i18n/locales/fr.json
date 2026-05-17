@@ -34,6 +34,54 @@
       "block_save": "Ce créneau chevauche une autre mission du technicien."
     }
   },
+  "materials": {
+    "panel_title": "Commandes matériel",
+    "empty": "Aucune commande pour ce dossier.",
+    "new_order": "Nouvelle commande",
+    "order_created": "Commande enregistrée",
+    "status_updated": "Statut mis à jour",
+    "status": {
+      "pending": "En attente",
+      "ordered": "Commandé",
+      "received": "Reçu",
+      "cancelled": "Annulé"
+    },
+    "form": {
+      "title": "Commander du matériel",
+      "hint": "Remplissez les pièces nécessaires. Le dossier peut passer en « En attente matériel ».",
+      "description_label": "Description (obligatoire)",
+      "description_placeholder": "Ex. : cylindre européen 30×30…",
+      "qty_label": "Qté",
+      "reference_label": "Référence (optionnel)",
+      "reference_placeholder": "Réf. fournisseur…",
+      "add_line": "Ajouter une ligne",
+      "urgency_label": "Urgence de la commande",
+      "urgency_low": "Basse",
+      "urgency_normal": "Normale",
+      "urgency_high": "Haute",
+      "submit": "Commander et mettre en attente",
+      "submitting": "Envoi…"
+    }
+  },
+  "emails": {
+    "panel_title": "E-mails",
+    "empty": "Aucun e-mail — écrivez au client ci-dessous.",
+    "reply": "Répondre",
+    "compose_reply": "Répondre",
+    "compose_new": "Nouveau message",
+    "placeholder_to": "À : email@client.com",
+    "placeholder_subject": "Sujet",
+    "placeholder_body": "Votre message…",
+    "write": "Écrire un e-mail",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "toast_required_title": "Champs requis",
+    "toast_required_body": "À, sujet et message sont obligatoires.",
+    "toast_missing_company": "Société manquante",
+    "toast_sent": "E-mail envoyé",
+    "toast_send_error": "Erreur d'envoi",
+    "toast_send_failed": "Envoi échoué"
+  },
   "timeline": {
     "title": "Historique & communications",
     "empty": "Aucun événement sur ce dossier.",
@@ -274,6 +322,7 @@
   "common": {
     "delete": "Supprimer",
     "error": "Erreur",
+    "loading": "Chargement…",
     "try_again": "Réessayez dans un instant.",
     "cancel": "Annuler",
     "save": "Sauver",

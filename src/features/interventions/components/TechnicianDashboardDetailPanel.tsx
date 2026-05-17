@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Camera, MapPin, Play, Navigation, CheckCircle2, Pause } from "lucide-react";
+import { Camera, MapPin, Play, Navigation, CheckCircle2, Pause, Phone, Package } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlideAction } from "@/components/ui/slide-action";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
+import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { requireAuthTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { toast } from "sonner";
@@ -183,6 +184,19 @@ export default function TechnicianDashboardDetailPanel({
     setFinishJobInterventionId(liveIv.id);
     navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_FINISH);
   };
+
+  const technicianUid =
+    liveIv.assignedTechnicianUid?.trim() || auth?.currentUser?.uid?.trim() || "";
+
+  const renderMaterialOrders = () =>
+    technicianUid ? (
+      <InterventionMaterialOrdersPanel
+        intervention={liveIv}
+        technicianUid={technicianUid}
+        allowCreate
+        allowStatusUpdate={false}
+      />
+    ) : null;
 
   let firstName = liveIv.clientFirstName;
   let lastName = liveIv.clientLastName;
@@ -390,6 +404,7 @@ export default function TechnicianDashboardDetailPanel({
           
           <div className="h-px bg-slate-100/80 w-full" />
           {renderAudioAndTranscription()}
+          {renderMaterialOrders()}
         </div>
       </div>
 
@@ -428,7 +443,10 @@ export default function TechnicianDashboardDetailPanel({
         <p className="rounded-[16px] border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-center text-[14px] font-semibold text-amber-950">
           {t("technician_hub.dashboard.detail.waiting_material_banner")}
         </p>
-        <div className="mt-4 flex flex-col gap-4">{renderContactClient()}</div>
+        <motion.div className="mt-4 flex flex-col gap-4">
+          {renderContactClient()}
+          {renderMaterialOrders()}
+        </motion.div>
       </motion.div>
       <button
         type="button"
@@ -474,6 +492,35 @@ export default function TechnicianDashboardDetailPanel({
     return renderPending();
   }
 
+  const renderQuickActions = () => {
+    if (liveIv.status === "done" || liveIv.status === "invoiced" || liveIv.status === "cancelled" || liveIv.status === "assigned") return null;
+    
+    return (
+      <div className="flex justify-around items-center bg-white rounded-2xl p-2 shadow-sm border border-slate-100 mb-4 shrink-0 overflow-x-auto gap-2">
+        {(liveIv.clientPhone || liveIv.phone) && (
+          <a href={`tel:${liveIv.clientPhone || liveIv.phone}`} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-blue-600 transition-colors">
+            <div className="bg-blue-50 p-2 rounded-full shadow-sm"><Phone className="w-5 h-5" /></div>
+            <span className="text-[10px] font-bold">{t("common.call")}</span>
+          </a>
+        )}
+        {liveIv.address && (
+          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(liveIv.address))}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-emerald-600 transition-colors">
+            <div className="bg-emerald-50 p-2 rounded-full shadow-sm"><Navigation className="w-5 h-5" /></div>
+            <span className="text-[10px] font-bold">{t("common.navigate")}</span>
+          </a>
+        )}
+        <button onClick={() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors">
+          <div className="bg-amber-50 p-2 rounded-full shadow-sm"><Package className="w-5 h-5" /></div>
+          <span className="text-[10px] font-bold">{t("common.materials")}</span>
+        </button>
+        <button onClick={onStartFinishJob} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-purple-600 transition-colors">
+          <div className="bg-purple-50 p-2 rounded-full shadow-sm"><CheckCircle2 className="w-5 h-5" /></div>
+          <span className="text-[10px] font-bold">{t("common.finish")}</span>
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div
       data-testid="technician-dashboard-detail"
@@ -482,7 +529,8 @@ export default function TechnicianDashboardDetailPanel({
     >
 
 
-      <div className="flex-1 overflow-hidden px-4 py-2 flex flex-col">
+      <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col">
+        {renderQuickActions()}
         <AnimatePresence mode="wait">
           {renderContent()}
         </AnimatePresence>

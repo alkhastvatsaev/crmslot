@@ -3,6 +3,8 @@ export type CommissionValueType = 'percentage' | 'fixed_amount';
 
 export interface CommissionRule {
   id: string;
+  companyId: string;
+  isActive: boolean;
   /** Le niveau d'application de la règle (groupe d'équipe, technicien spécifique, ou exception par mission) */
   level: CommissionLevel;
   /** L'ID cible : l'ID du groupe, l'UID du technicien, ou l'ID de l'intervention */
