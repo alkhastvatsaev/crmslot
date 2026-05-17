@@ -15,7 +15,8 @@
     "search_placeholder": "Naam",
     "client_loading": "Klant bezig...",
     "file_of": "Dossier van",
-    "client_in_progress": "Klant in behandeling..."
+    "client_in_progress": "Klant in behandeling...",
+    "all_cases": "Mijn dossiers"
   },
   "status": {
     "pending": "In afwachting",
@@ -150,7 +151,8 @@
       "status_change": "Statuswijziging",
       "comment": "Interne notitie",
       "email": "E-mail",
-      "material_order": "Materiaalbestelling"
+      "material_order": "Materiaalbestelling",
+      "commission": "Commissie"
     }
   },
   "workflow": {
