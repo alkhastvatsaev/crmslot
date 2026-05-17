@@ -1,5 +1,7 @@
 {
   "tracking": {
+    "waiting_material_banner": "Waiting for parts. We will contact you when they arrive.",
+    "cancelled_banner": "This request was cancelled.",
     "step0": "Form",
     "step1": "Request received",
     "step2": "Searching for a technician",
@@ -60,8 +62,64 @@
       "urgency_normal": "Normal",
       "urgency_high": "High",
       "submit": "Order and set waiting",
-      "submitting": "Sending…"
+      "submitting": "Sending…",
+      "template_label": "Load a quick template",
+      "template_placeholder": "-- Select a template --",
+      "lecot_title": "Check on Lecot.be"
     }
+  },
+  "commissions": {
+    "dashboard": {
+      "title": "Commission engine",
+      "subtitle": "Rules by company, technician or case (priority: case > technician > group).",
+      "add_rule": "+ New rule",
+      "form_title": "Create a rule",
+      "level_label": "Level",
+      "level": {
+        "group": "Group",
+        "technician": "Technician",
+        "intervention": "Case"
+      },
+      "target_label": "Target ID",
+      "target_group": "Company ID (companyId)",
+      "target_technician": "Technician UID",
+      "target_intervention": "Intervention ID",
+      "value_type_label": "Type",
+      "value_percentage": "Percentage (%)",
+      "value_fixed": "Fixed amount (€)",
+      "value_label": "Value",
+      "saving": "Saving…",
+      "save_rule": "Save",
+      "empty": "No active rules.",
+      "col_level": "Level",
+      "col_target": "Target",
+      "col_value": "Commission",
+      "col_actions": "Actions"
+    },
+    "panel_title": "Technician commission",
+    "not_calculated": "Not calculated",
+    "manual_override": "Manual",
+    "recalculate": "Recalculate",
+    "override": "Override amount",
+    "recalculated": "Commission recalculated",
+    "override_saved": "Override saved",
+    "override_invalid": "Invalid amount",
+    "override_reason_required": "Reason required",
+    "override_amount_placeholder": "Amount in €",
+    "override_reason_placeholder": "Reason for adjustment",
+    "invoice_amount_label": "Invoice amount (€)",
+    "invoice_amount_invalid": "Invalid amount",
+    "invoice_amount_saved": "Amount and commission updated"
+  },
+  "payment": {
+    "pay_now": "Pay online",
+    "loading": "Preparing…",
+    "amount_due": "Amount due",
+    "status_paid": "Payment received — thank you",
+    "pending_hint": "Payment processing",
+    "error": "Payment unavailable",
+    "download_invoice": "Download invoice",
+    "return_success": "Payment recorded — thank you!"
   },
   "emails": {
     "panel_title": "Emails",
@@ -330,7 +388,11 @@
     "urgent": "Urgent",
     "dash": "—",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "call": "Call",
+    "navigate": "Navigate",
+    "materials": "Materials",
+    "finish": "Finish"
   },
   "map": {
     "transcription": {
@@ -571,7 +633,10 @@
       "back": "Previous step"
     },
     "templates": {
-      "blocked": { "label": "Door jammed", "seed": "My door is jammed." },
+      "blocked": {
+        "label": "Door jammed",
+        "seed": "My door is jammed."
+      },
       "armored": {
         "label": "Security door",
         "line1": "Security",
@@ -584,7 +649,10 @@
         "line2": "key",
         "seed": "My key broke in the lock."
       },
-      "cylinder": { "label": "Cylinder", "seed": "Issue with the lock cylinder." },
+      "cylinder": {
+        "label": "Cylinder",
+        "seed": "Issue with the lock cylinder."
+      },
       "locked_out": {
         "label": "Locked out",
         "line1": "Locked",
@@ -597,8 +665,14 @@
         "line2": "opening",
         "seed": "Problem opening a safe."
       },
-      "roller_shutter": { "label": "Roller shutter", "seed": "My roller shutter is stuck." },
-      "digicode": { "label": "Keypad", "seed": "Issue with keypad access." },
+      "roller_shutter": {
+        "label": "Roller shutter",
+        "seed": "My roller shutter is stuck."
+      },
+      "digicode": {
+        "label": "Keypad",
+        "seed": "Issue with keypad access."
+      },
       "key_copy": {
         "label": "Key copy",
         "line1": "Key",
@@ -671,5 +745,25 @@
       "status_on_site": "On site",
       "missing_auth_uid": "This technician has no linked Firebase account (missing authUid)."
     }
+  },
+  "billing": {
+    "panel_title": "Billing",
+    "invoice_amount": "Invoice amount",
+    "commission": "Technician commission",
+    "invoiced_at": "Invoice date",
+    "paid_at": "Payment date",
+    "payment_status": "Payment status",
+    "status_paid": "Paid",
+    "status_pending": "Pending",
+    "status_unpaid": "Unpaid",
+    "status_refunded": "Refunded",
+    "view_invoice_pdf": "View invoice PDF",
+    "stripe_link": "Stripe payment link",
+    "toast_status_updated": "Status updated",
+    "toast_amount_saved": "Amount saved",
+    "toast_invalid_amount": "Invalid amount",
+    "toast_error": "Error saving",
+    "template_label": "Billing template",
+    "template_placeholder": "— Load a template —"
   }
 }

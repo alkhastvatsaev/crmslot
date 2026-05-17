@@ -1,5 +1,7 @@
 {
   "tracking": {
+    "waiting_material_banner": "Intervention en attente de matériel. Nous vous recontactons dès réception.",
+    "cancelled_banner": "Cette intervention a été annulée.",
     "step0": "Formulaire",
     "step1": "Demande reçue",
     "step2": "Recherche d'un technicien",
@@ -60,8 +62,64 @@
       "urgency_normal": "Normale",
       "urgency_high": "Haute",
       "submit": "Commander et mettre en attente",
-      "submitting": "Envoi…"
+      "submitting": "Envoi…",
+      "template_label": "Charger un modèle rapide",
+      "template_placeholder": "-- Sélectionner un modèle --",
+      "lecot_title": "Vérifier sur Lecot.be"
     }
+  },
+  "commissions": {
+    "dashboard": {
+      "title": "Moteur de commissions",
+      "subtitle": "Règles par société, technicien ou dossier (priorité : dossier > technicien > groupe).",
+      "add_rule": "+ Nouvelle règle",
+      "form_title": "Créer une règle",
+      "level_label": "Niveau",
+      "level": {
+        "group": "Groupe",
+        "technician": "Technicien",
+        "intervention": "Dossier"
+      },
+      "target_label": "ID cible",
+      "target_group": "ID société (companyId)",
+      "target_technician": "UID technicien",
+      "target_intervention": "ID intervention",
+      "value_type_label": "Type",
+      "value_percentage": "Pourcentage (%)",
+      "value_fixed": "Montant fixe (€)",
+      "value_label": "Valeur",
+      "saving": "Enregistrement…",
+      "save_rule": "Enregistrer",
+      "empty": "Aucune règle active.",
+      "col_level": "Niveau",
+      "col_target": "Cible",
+      "col_value": "Commission",
+      "col_actions": "Actions"
+    },
+    "panel_title": "Commission technicien",
+    "not_calculated": "Non calculée",
+    "manual_override": "Forcée",
+    "recalculate": "Recalculer",
+    "override": "Forcer le montant",
+    "recalculated": "Commission recalculée",
+    "override_saved": "Override enregistré",
+    "override_invalid": "Montant invalide",
+    "override_reason_required": "Motif obligatoire",
+    "override_amount_placeholder": "Montant en €",
+    "override_reason_placeholder": "Motif de l'ajustement",
+    "invoice_amount_label": "Montant facture (€)",
+    "invoice_amount_invalid": "Montant invalide",
+    "invoice_amount_saved": "Montant et commission mis à jour"
+  },
+  "payment": {
+    "pay_now": "Payer en ligne",
+    "loading": "Préparation…",
+    "amount_due": "Montant dû",
+    "status_paid": "Paiement reçu — merci",
+    "pending_hint": "Paiement en cours de traitement",
+    "error": "Paiement impossible",
+    "download_invoice": "Télécharger la facture",
+    "return_success": "Paiement enregistré — merci !"
   },
   "emails": {
     "panel_title": "E-mails",
@@ -330,7 +388,11 @@
     "urgent": "Urgent",
     "dash": "—",
     "back": "Retour",
-    "close": "Fermer"
+    "close": "Fermer",
+    "call": "Appeler",
+    "navigate": "Naviguer",
+    "materials": "Matériaux",
+    "finish": "Terminer"
   },
   "map": {
     "transcription": {
@@ -575,7 +637,10 @@
       "back": "Étape précédente"
     },
     "templates": {
-      "blocked": { "label": "Porte bloquée", "seed": "Ma porte est bloquée." },
+      "blocked": {
+        "label": "Porte bloquée",
+        "seed": "Ma porte est bloquée."
+      },
       "armored": {
         "label": "Porte blindée",
         "line1": "Porte",
@@ -588,7 +653,10 @@
         "line2": "cassée",
         "seed": "Ma clé s’est cassée dans la serrure."
       },
-      "cylinder": { "label": "Cylindre", "seed": "Problème de cylindre / serrure." },
+      "cylinder": {
+        "label": "Cylindre",
+        "seed": "Problème de cylindre / serrure."
+      },
       "locked_out": {
         "label": "Porte claquée",
         "line1": "Porte",
@@ -601,8 +669,14 @@
         "line2": "fort",
         "seed": "Problème d’ouverture de coffre-fort."
       },
-      "roller_shutter": { "label": "Volet roulant", "seed": "Mon volet roulant est bloqué." },
-      "digicode": { "label": "Digicode", "seed": "Problème de digicode / accès." },
+      "roller_shutter": {
+        "label": "Volet roulant",
+        "seed": "Mon volet roulant est bloqué."
+      },
+      "digicode": {
+        "label": "Digicode",
+        "seed": "Problème de digicode / accès."
+      },
       "key_copy": {
         "label": "Double de clé",
         "line1": "Double",
@@ -647,6 +721,26 @@
     "title": "Facturation automatique",
     "description1": "Après clôture avec au moins une photo chantier et signature client sur le serveur, une fonction Cloud génère un PDF facture sur Storage et met le statut à Facturé. La checklist doit être complète avant génération.",
     "description2": "Après clôture avec checklist complète, génération PDF facture et statut facturé."
+  },
+  "billing": {
+    "panel_title": "Facturation",
+    "invoice_amount": "Montant facturé",
+    "commission": "Commission technicien",
+    "invoiced_at": "Date facturation",
+    "paid_at": "Date paiement",
+    "payment_status": "Statut paiement",
+    "status_paid": "Payé",
+    "status_pending": "En attente",
+    "status_unpaid": "Non payé",
+    "status_refunded": "Remboursé",
+    "view_invoice_pdf": "Voir la facture PDF",
+    "stripe_link": "Lien de paiement Stripe",
+    "toast_status_updated": "Statut mis à jour",
+    "toast_amount_saved": "Montant enregistré",
+    "toast_invalid_amount": "Montant invalide",
+    "toast_error": "Erreur lors de la sauvegarde",
+    "template_label": "Modèle de facturation",
+    "template_placeholder": "— Charger un modèle —"
   },
   "map_transcription": {
     "urgent": "Urgent",
