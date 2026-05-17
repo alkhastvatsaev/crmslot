@@ -15,7 +15,8 @@
     "search_placeholder": "Name",
     "client_loading": "Client in progress...",
     "file_of": "File of",
-    "client_in_progress": "Client in progress..."
+    "client_in_progress": "Client in progress...",
+    "all_cases": "My cases"
   },
   "status": {
     "pending": "Pending",
@@ -150,7 +151,8 @@
       "status_change": "Status change",
       "comment": "Internal note",
       "email": "Email",
-      "material_order": "Material order"
+      "material_order": "Material order",
+      "commission": "Commission"
     }
   },
   "workflow": {

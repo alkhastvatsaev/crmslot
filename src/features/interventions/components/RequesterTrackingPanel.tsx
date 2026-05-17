@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
-import { Check, Clock, MapPin, User, Navigation, CheckCircle2, FileText, Search, X, ArrowRight } from "lucide-react";
+import { Check, Clock, MapPin, User, Navigation, CheckCircle2, FileText, Search, X, ArrowRight, ChevronLeft, List } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
@@ -31,13 +31,12 @@ type TrackedIntervention = {
   stripePaymentLinkUrl?: string | null;
 };
 
-function useMyLatestIntervention(searchLastName: string, profileLastName: string) {
-  const [intervention, setIntervention] = useState<TrackedIntervention | null>(null);
+function useMyInterventions(searchLastName: string, profileLastName: string) {
+  const [interventions, setInterventions] = useState<TrackedIntervention[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isConfigured || !auth || !firestore) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -45,65 +44,60 @@ function useMyLatestIntervention(searchLastName: string, profileLastName: string
     let unsubSnap: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, (user) => {
-      if (unsubSnap) {
-        unsubSnap();
-        unsubSnap = undefined;
-      }
-
+      if (unsubSnap) { unsubSnap(); unsubSnap = undefined; }
       const db = firestore;
       if (!db) return;
+      if (!user) { setInterventions([]); setLoading(false); return; }
 
-      if (!user) {
-        setIntervention(null);
-        setLoading(false);
-        return;
-      }
-
-      const q = query(
-        collection(db, "interventions"), 
-        where("createdByUid", "==", user.uid)
-      );
-
+      const q = query(collection(db, "interventions"), where("createdByUid", "==", user.uid));
       unsubSnap = onSnapshot(q, (snap) => {
-        if (snap.empty) {
-          setIntervention(null);
-        } else {
-          const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TrackedIntervention);
-          const activeSearch = searchLastName.trim().length > 0 ? searchLastName.trim() : profileLastName.trim();
-          let matchedDocs = docs;
-          if (activeSearch.length > 0) {
-            const searchLower = activeSearch.toLowerCase();
-            matchedDocs = docs.filter(doc => {
-              const last = (doc.clientLastName || "").toLowerCase();
-              const first = (doc.clientFirstName || "").toLowerCase();
-              const company = (doc.clientCompanyName || "").toLowerCase();
-              return last.includes(searchLower) || first.includes(searchLower) || company.includes(searchLower);
-            });
-          }
-          matchedDocs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-          setIntervention(matchedDocs[0] || null);
+        let docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TrackedIntervention);
+        const activeSearch = searchLastName.trim() || profileLastName.trim();
+        if (activeSearch.length > 0) {
+          const s = activeSearch.toLowerCase();
+          docs = docs.filter((d) => {
+            const last = (d.clientLastName || "").toLowerCase();
+            const first = (d.clientFirstName || "").toLowerCase();
+            const co = (d.clientCompanyName || "").toLowerCase();
+            return last.includes(s) || first.includes(s) || co.includes(s);
+          });
         }
+        docs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        setInterventions(docs);
         setLoading(false);
       });
     });
 
-    return () => {
-      if (unsubSnap) unsubSnap();
-      unsubAuth();
-    };
+    return () => { if (unsubSnap) unsubSnap(); unsubAuth(); };
   }, [searchLastName, profileLastName]);
 
-  return { intervention, loading };
+  return { interventions, loading };
 }
+
+const STATUS_PILL: Record<string, string> = {
+  pending: "bg-slate-100 text-slate-500",
+  pending_needs_address: "bg-amber-100 text-amber-700",
+  assigned: "bg-blue-100 text-blue-700",
+  en_route: "bg-indigo-100 text-indigo-700",
+  on_site: "bg-violet-100 text-violet-700",
+  in_progress: "bg-purple-100 text-purple-700",
+  waiting_material: "bg-amber-100 text-amber-700",
+  done: "bg-emerald-100 text-emerald-700",
+  invoiced: "bg-green-100 text-green-700",
+  cancelled: "bg-red-100 text-red-600",
+};
 
 export default function RequesterTrackingPanel() {
   const { isSubmitting, requestData, lastSubmittedRequest, profile, setProfile, resetRequestOnly } = useRequesterHub();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [syncOnNextLoad, setSyncOnNextLoad] = useState(false);
-  
-  const { intervention: latestIntervention, loading: interventionLoading } = useMyLatestIntervention(searchQuery, profile.lastName);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const { interventions, loading: interventionLoading } = useMyInterventions(searchQuery, profile.lastName);
+  const latestIntervention = interventions[0] ?? null;
+  const selectedIntervention = selectedId ? (interventions.find((i) => i.id === selectedId) ?? latestIntervention) : latestIntervention;
   const [, setUser] = useState(auth?.currentUser ?? null);
   const { t } = useTranslation();
 
@@ -144,12 +138,14 @@ export default function RequesterTrackingPanel() {
   const draftTitle = requestData.problemLabel.trim() || requestData.description.trim();
   const hasDraft = Boolean(draftTitle || requestData.interventionAddress.trim());
   const hasSubmitted = Boolean(latestIntervention || lastSubmittedRequest);
-  
+
   const isSearching = searchQuery.trim().length > 0;
   const hasActiveUI = isSearching ? Boolean(latestIntervention) : (hasDraft || isSubmitting || hasSubmitted);
 
-  const status = latestIntervention?.status || (latestIntervention || lastSubmittedRequest ? "pending" : "draft");
-  const step0Done = Boolean(latestIntervention || lastSubmittedRequest);
+  const showList = interventions.length > 1 && !selectedId;
+
+  const status = selectedIntervention?.status || (selectedIntervention || lastSubmittedRequest ? "pending" : "draft");
+  const step0Done = Boolean(selectedIntervention || lastSubmittedRequest);
   const step1Done = step0Done;
   const step2Done = step1Done && !["pending", "pending_needs_address"].includes(status);
   const activeFieldStatuses = [
@@ -225,21 +221,26 @@ export default function RequesterTrackingPanel() {
     }
   ];
 
-  const getDisplayName = () => {
-    if (latestIntervention) {
-      if (latestIntervention.clientCompanyName) return latestIntervention.clientCompanyName;
-      const first = latestIntervention.clientFirstName || "";
-      const last = latestIntervention.clientLastName || "";
+  const getDisplayName = (iv?: TrackedIntervention | null) => {
+    const src = iv ?? selectedIntervention;
+    if (src) {
+      if (src.clientCompanyName) return src.clientCompanyName;
+      const first = src.clientFirstName || "";
+      const last = src.clientLastName || "";
       if (first || last) return `${capitalizeName(first)} ${capitalizeName(last)}`.trim();
     }
-    
-    // Fallback to current profile
     if (profile?.companyName) return profile.companyName;
     const first = profile?.firstName || "";
     const last = profile?.lastName || "";
     if (first || last) return `${capitalizeName(first)} ${capitalizeName(last)}`.trim();
-    
     return String(t("tracking.client_loading"));
+  };
+
+  const formatShortDate = (val?: string) => {
+    if (!val) return "";
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("fr-BE", { day: "2-digit", month: "short" });
   };
 
   return (
@@ -258,14 +259,12 @@ export default function RequesterTrackingPanel() {
             className="w-full pl-10 pr-[76px] py-3 rounded-2xl bg-black/[0.03] border border-black/5 focus:bg-white focus:border-black/10 focus:ring-2 focus:ring-black/5 outline-none transition-all text-[15px] font-medium placeholder:text-slate-400"
           />
           <Search className="absolute left-4 h-[18px] w-[18px] text-slate-400 pointer-events-none" />
-          
+
           <div className="absolute right-2 flex items-center gap-1">
             {searchInput.trim().length > 0 && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearchInput("");
-                }}
+                onClick={() => setSearchInput("")}
                 className="p-1.5 text-slate-400 hover:text-black transition-colors rounded-full hover:bg-black/5"
               >
                 <X className="h-[16px] w-[16px]" />
@@ -283,7 +282,7 @@ export default function RequesterTrackingPanel() {
       </div>
 
       <div className="relative flex-1 overflow-y-auto px-2 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {interventionLoading && !latestIntervention && !isSubmitting && requestData.description.trim().length === 0 ? (
+        {interventionLoading && interventions.length === 0 && !isSubmitting && requestData.description.trim().length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <motion.div
               animate={{ rotate: 360 }}
@@ -291,8 +290,51 @@ export default function RequesterTrackingPanel() {
               className="h-6 w-6 rounded-full border-2 border-slate-200 border-t-black"
             />
           </div>
+        ) : showList ? (
+          /* ── Multi-dossier list view ── */
+          <div className="max-w-[320px] mx-auto space-y-2 py-4">
+            <div className="flex items-center gap-2 mb-4 px-1">
+              <List className="w-4 h-4 text-slate-400" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                {t("tracking.all_cases") as string || "Mes dossiers"}
+              </span>
+              <span className="ml-auto text-[10px] text-slate-400">{interventions.length}</span>
+            </div>
+            {interventions.map((iv) => (
+              <button
+                key={iv.id}
+                type="button"
+                onClick={() => setSelectedId(iv.id)}
+                className="w-full text-left rounded-[16px] bg-white border border-black/5 px-4 py-3 hover:border-black/10 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[14px] font-bold text-black truncate">
+                    {iv.title || iv.problem || getDisplayName(iv)}
+                  </span>
+                  <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase", STATUS_PILL[iv.status ?? ""] ?? "bg-slate-100 text-slate-500")}>
+                    {t(`status.${iv.status ?? "pending"}`) as string || iv.status}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                  <span>{formatShortDate(iv.createdAt)}</span>
+                  {iv.address && <span className="truncate">{iv.address}</span>}
+                </div>
+              </button>
+            ))}
+          </div>
         ) : hasActiveUI ? (
           <div className="flex flex-col max-w-[320px] mx-auto min-h-full py-8">
+            {/* Back to list (when multiple interventions exist and one is selected) */}
+            {interventions.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                className="mb-4 flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 hover:text-black transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t("tracking.all_cases") as string || "Tous les dossiers"}
+              </button>
+            )}
             <div className="mb-6 pb-6 border-b border-black/5 text-center">
               <span className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-1.5 block">
                 {t("tracking.file_of") || "Dossier de"}
@@ -300,6 +342,9 @@ export default function RequesterTrackingPanel() {
               <h2 className="text-[22px] font-extrabold text-black tracking-tight">
                 {getDisplayName()}
               </h2>
+              {selectedIntervention?.title && (
+                <p className="mt-1 text-[13px] text-slate-500 font-medium">{selectedIntervention.title}</p>
+              )}
 
               {status === "waiting_material" && (
                 <div
@@ -317,9 +362,9 @@ export default function RequesterTrackingPanel() {
                   {t("tracking.cancelled_banner")}
                 </div>
               )}
-              {latestIntervention?.invoicePdfUrl && (
-                <a 
-                  href={latestIntervention.invoicePdfUrl}
+              {selectedIntervention?.invoicePdfUrl && (
+                <a
+                  href={selectedIntervention.invoicePdfUrl}
                   target="_blank"
                   rel="noreferrer"
                   data-testid="requester-invoice-download"
@@ -329,13 +374,13 @@ export default function RequesterTrackingPanel() {
                   {t("payment.download_invoice")}
                 </a>
               )}
-              {latestIntervention &&
-              (latestIntervention.status === "invoiced" || latestIntervention.status === "done") ? (
+              {selectedIntervention &&
+              (selectedIntervention.status === "invoiced" || selectedIntervention.status === "done") ? (
                 <RequesterPaymentPanel
-                  interventionId={latestIntervention.id}
-                  paymentStatus={latestIntervention.paymentStatus}
-                  invoiceAmountCents={latestIntervention.invoiceAmountCents}
-                  stripePaymentLinkUrl={latestIntervention.stripePaymentLinkUrl}
+                  interventionId={selectedIntervention.id}
+                  paymentStatus={selectedIntervention.paymentStatus}
+                  invoiceAmountCents={selectedIntervention.invoiceAmountCents}
+                  stripePaymentLinkUrl={selectedIntervention.stripePaymentLinkUrl}
                 />
               ) : null}
             </div>
