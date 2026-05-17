@@ -3,6 +3,7 @@ import {
   interventionVisibleInTechnicianMissionList,
   isInterventionPendingBackOfficeIntake,
   isInterventionReleasedToTechnicianField,
+  isInterventionVisibleOnTechnicianMap,
 } from "@/features/interventions/technicianSchedule";
 
 function iv(status: Intervention["status"]): Intervention {
@@ -28,6 +29,17 @@ describe("technicianSchedule intake gate", () => {
     expect(isInterventionReleasedToTechnicianField(iv("assigned"))).toBe(true);
     expect(isInterventionReleasedToTechnicianField(iv("in_progress"))).toBe(true);
     expect(isInterventionReleasedToTechnicianField(iv("en_route"))).toBe(true);
+  });
+
+  it("hides assigned from technician map until accept", () => {
+    expect(isInterventionVisibleOnTechnicianMap(iv("assigned"))).toBe(false);
+    expect(isInterventionVisibleOnTechnicianMap(iv("en_route"))).toBe(true);
+    expect(
+      isInterventionVisibleOnTechnicianMap({
+        ...iv("in_progress"),
+        technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+      }),
+    ).toBe(true);
   });
 });
 

@@ -193,13 +193,27 @@ export function scheduledFieldsWhenReleasingToTechnician(
  * Dossier encore uniquement dans le file IVANA « Demandes » (soumission client),
  * avant validation / envoi terrain. {@link isInterventionReleasedToTechnicianField} est l’inverse.
  */
-export function isInterventionPendingBackOfficeIntake(iv: Intervention): boolean {
-  return iv.status === "pending" || iv.status === "pending_needs_address";
+export function isPendingIntakeStatus(status: Intervention["status"]): boolean {
+  return status === "pending" || status === "pending_needs_address";
 }
 
-/** Visible sur le hub technicien : après passage back-office (ex. statut ≠ pending). */
+export function isInterventionPendingBackOfficeIntake(iv: Pick<Intervention, "status">): boolean {
+  return isPendingIntakeStatus(iv.status);
+}
+
+/** Visible sur le hub technicien (liste + offres) : après passage back-office (ex. statut ≠ pending). */
 export function isInterventionReleasedToTechnicianField(iv: Intervention): boolean {
   return !isInterventionPendingBackOfficeIntake(iv);
+}
+
+/** Carte / missions live technicien : pas avant acceptation (statut `assigned` ou legacy sans `technicianAcceptedAt`). */
+export function isInterventionVisibleOnTechnicianMap(
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+): boolean {
+  if (isInterventionPendingBackOfficeIntake(iv)) return false;
+  if (iv.status === "assigned") return false;
+  if (iv.status === "in_progress" && !(iv.technicianAcceptedAt ?? "").trim()) return false;
+  return true;
 }
 
 export function formatScheduledLabel(iv: Intervention): string {

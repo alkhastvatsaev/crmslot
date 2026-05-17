@@ -27,6 +27,7 @@ import {
   dailyMissionCardToneFromStatus,
   interventionMatchesTab,
   isInterventionReleasedToTechnicianField,
+  isInterventionVisibleOnTechnicianMap,
 } from '@/features/interventions/technicianSchedule';
 import { cn } from '@/lib/utils';
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -80,7 +81,11 @@ export default function MapboxView() {
     const liveForDay = liveMissions.filter((m) => !m.date || m.date === selectedDateStr);
     
     const realMissions: Mission[] = firestoreInterventions
-      .filter((iv) => isInterventionReleasedToTechnicianField(iv))
+      .filter((iv) =>
+        isDispatchMap
+          ? isInterventionReleasedToTechnicianField(iv)
+          : isInterventionVisibleOnTechnicianMap(iv),
+      )
       .filter((iv) => interventionMatchesTab(iv, "today", selectedDate))
       .map(iv => {
         let numericId = 0;
@@ -151,7 +156,7 @@ export default function MapboxView() {
       const ok = window.confirm(String(t("map.daily_missions.delete_confirm")));
       if (!ok) return;
 
-      if (mission.source === "live" && mission.key && !mission.key.endsWith(".json")) {
+      if (mission.source === "live" && mission.key && !mission.key.endsWith(".json") && !mission.key.startsWith("demo-")) {
         // Real Firestore mission
         try {
           await deleteDoc(doc(firestore!, "interventions", mission.key));

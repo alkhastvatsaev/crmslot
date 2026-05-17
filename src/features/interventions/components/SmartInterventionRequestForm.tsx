@@ -45,7 +45,7 @@ import {
 } from "@/features/interventions/smartInterventionConstants";
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
+import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
 import SmartFormAddressAutocomplete from "@/features/interventions/components/SmartFormAddressAutocomplete";
 import { capitalizeName } from "@/utils/stringUtils";
@@ -352,6 +352,8 @@ export default function SmartInterventionRequestForm() {
   const workspace = useCompanyWorkspaceOptional();
   const tenantCompanyId =
     workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
+  const interventionCompanyId =
+    tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
 
   const stored = typeof window !== "undefined" ? loadStorageDraft() : null;
   const initialPayload = stored ? { ...emptyDraft(), ...stored.payload } : emptyDraft();
@@ -571,10 +573,10 @@ export default function SmartInterventionRequestForm() {
       if (!db) return;
       try {
         let q;
-        if (tenantCompanyId) {
+        if (interventionCompanyId) {
           q = query(
             collection(db, "interventions"),
-            where("companyId", "==", tenantCompanyId),
+            where("companyId", "==", interventionCompanyId),
             where("status", "in", ["pending", "accepted", "in_progress", "resolved"])
           );
         } else {
@@ -595,7 +597,7 @@ export default function SmartInterventionRequestForm() {
       }
     };
     void fetchSlots();
-  }, [step, tenantCompanyId]);
+  }, [step, interventionCompanyId]);
 
   const fillAddressFromGeolocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -803,7 +805,7 @@ export default function SmartInterventionRequestForm() {
         createdAt: nowIso,
         createdByUid: user.uid,
         assignedTechnicianUid: null, // Simple : apparaît dans le pool global sans forcer d'UID.
-        ...(tenantCompanyId ? { companyId: tenantCompanyId } : {}),
+        ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
         ...(photoDataUrls.length ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) } : {}),
         ...(firstName.trim() ? { clientFirstName: capitalizeName(firstName) } : {}),
         ...(lastName.trim() ? { clientLastName: capitalizeName(lastName) } : {}),
@@ -833,7 +835,7 @@ export default function SmartInterventionRequestForm() {
           await recordDuplicateAlertIfNeeded({
             db,
             newInterventionId: newDocRef.id,
-            companyId: tenantCompanyId,
+            companyId: interventionCompanyId,
             address: address.trim(),
             problem: finalProblem,
             createdByUid: user.uid,

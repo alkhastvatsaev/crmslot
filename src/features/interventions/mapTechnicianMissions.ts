@@ -1,7 +1,7 @@
 import type { Intervention } from "@/features/interventions/types";
 import {
   interventionMatchesTab,
-  isInterventionReleasedToTechnicianField,
+  isInterventionVisibleOnTechnicianMap,
   type TechnicianTabFilter,
 } from "@/features/interventions/technicianSchedule";
 
@@ -12,7 +12,7 @@ export function filterInterventionsForMapTechnicianMissions(
   anchorDate: Date,
 ): Intervention[] {
   return rows
-    .filter((iv) => isInterventionReleasedToTechnicianField(iv))
+    .filter((iv) => isInterventionVisibleOnTechnicianMap(iv))
     .filter((iv) => interventionMatchesTab(iv, tab, anchorDate))
     .filter(
       (iv) =>
