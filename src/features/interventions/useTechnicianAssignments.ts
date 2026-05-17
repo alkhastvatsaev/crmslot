@@ -41,9 +41,26 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const hookEnabled = options.enabled !== false;
   const queryClient = useQueryClient();
   const dashboardDate = useDashboardSelectedDate();
-  const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
+
+  const noFirebaseAuth = !isConfigured || !firestore || !auth;
+
+  const [firebaseUid, setFirebaseUid] = useState<string | null>(() =>
+    noFirebaseAuth && devUiPreviewEnabled
+      ? getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID)
+      : null,
+  );
   const [error, setError] = useState<string | null>(null);
-  const [snapshotReady, setSnapshotReady] = useState(false);
+  const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
+
+  // Reset when hook is disabled — render-time update avoids setState in effect body
+  const [prevHookEnabled, setPrevHookEnabled] = useState(hookEnabled);
+  if (prevHookEnabled !== hookEnabled) {
+    setPrevHookEnabled(hookEnabled);
+    if (!hookEnabled) {
+      setFirebaseUid(null);
+      setError(null);
+    }
+  }
 
   const assignmentsQueryKey = useMemo(
     () => [TECHNICIAN_ASSIGNMENTS_QUERY_KEY, firebaseUid] as const,
@@ -98,29 +115,11 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   );
 
   useEffect(() => {
-    if (!hookEnabled) {
-      setFirebaseUid(null);
-      setSnapshotReady(true);
-      setError(null);
-      return () => {};
-    }
-
-    if (!isConfigured || !firestore || !auth) {
-      if (devUiPreviewEnabled) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setFirebaseUid(getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID));
-        setSnapshotReady(true);
-        setError(null);
-      } else {
-        setSnapshotReady(true);
-        setFirebaseUid(null);
-      }
-      return () => {};
-    }
+    if (!hookEnabled || noFirebaseAuth) return () => {};
 
     let unsubSnap: (() => void) | undefined;
 
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth!, (user) => {
       unsubSnap?.();
       unsubSnap = undefined;
 
@@ -175,7 +174,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       unsubSnap?.();
       unsubAuth();
     };
-  }, [queryClient, hookEnabled]);
+  }, [queryClient, hookEnabled, noFirebaseAuth]);
 
   return { interventions, loading, error, firebaseUid };
 }
