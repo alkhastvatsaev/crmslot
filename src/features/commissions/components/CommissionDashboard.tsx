@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCommissionRules } from "../useCommissionRules";
 import { createCommissionRule, deleteCommissionRule } from "../commissionFirestore";
 import type { CommissionLevel, CommissionValueType } from "../types";
 
 export const CommissionDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.isTenantUser ? workspace.activeCompanyId : null;
 
@@ -21,21 +23,28 @@ export const CommissionDashboard: React.FC = () => {
   const [value, setValue] = useState<number>(0);
 
   const resetForm = () => {
-    setTargetId("");
+    setTargetId(companyId ?? "");
     setValue(0);
     setLevel("group");
     setValueType("percentage");
   };
 
+  useEffect(() => {
+    if (level === "group" && companyId) setTargetId(companyId);
+  }, [level, companyId]);
+
+  const resolvedTargetId =
+    level === "group" && companyId ? companyId : targetId.trim();
+
   const handleAddRule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!companyId || !firestore) return;
-    const uid = auth?.currentUser?.uid ?? "unknown";
+    if (!companyId || !firestore || !resolvedTargetId) return;
+    const uid = auth?.currentUser?.uid?.trim() ?? "unknown";
     setSaving(true);
     try {
       await createCommissionRule(firestore, companyId, {
         level,
-        targetId: targetId.trim(),
+        targetId: resolvedTargetId,
         valueType,
         value,
         createdByUid: uid,
@@ -52,140 +61,168 @@ export const CommissionDashboard: React.FC = () => {
     await deleteCommissionRule(firestore, ruleId);
   };
 
-  const levelLabel: Record<CommissionLevel, string> = {
-    group: "Groupe",
-    technician: "Technicien",
-    intervention: "Intervention",
+  const levelLabel = (lvl: CommissionLevel) => t(`commissions.dashboard.level.${lvl}`);
+
+  const targetPlaceholder = () => {
+    if (level === "group") return String(t("commissions.dashboard.target_group"));
+    if (level === "technician") return String(t("commissions.dashboard.target_technician"));
+    return String(t("commissions.dashboard.target_intervention"));
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-200">
-      <div className="flex justify-between items-center mb-6">
+    <div data-testid="commission-dashboard" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Moteur de Commissions</h2>
-          <p className="text-sm text-slate-500">Configurez les règles multi-niveaux pour vos équipes et techniciens.</p>
+          <h2 className="text-xl font-bold text-slate-800">{t("commissions.dashboard.title")}</h2>
+          <p className="text-sm text-slate-500">{t("commissions.dashboard.subtitle")}</p>
         </div>
         <button
-          onClick={() => { setIsAdding(!isAdding); resetForm(); }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          type="button"
+          data-testid="commission-add-toggle"
+          onClick={() => {
+            setIsAdding(!isAdding);
+            resetForm();
+          }}
+          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
         >
-          {isAdding ? "Annuler" : "+ Nouvelle Règle"}
+          {isAdding ? t("common.cancel") : t("commissions.dashboard.add_rule")}
         </button>
       </div>
 
-      {isAdding && (
-        <form onSubmit={(e) => void handleAddRule(e)} className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
-          <h3 className="font-semibold text-slate-700 mb-4">Créer une nouvelle règle</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {isAdding ? (
+        <form
+          onSubmit={(e) => void handleAddRule(e)}
+          data-testid="commission-rule-form"
+          className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4"
+        >
+          <h3 className="mb-4 font-semibold text-slate-700">{t("commissions.dashboard.form_title")}</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Niveau d'application</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                {t("commissions.dashboard.level_label")}
+              </label>
               <select
+                data-testid="commission-level-select"
                 value={level}
                 onChange={(e) => setLevel(e.target.value as CommissionLevel)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="group">Groupe d'équipe</option>
-                <option value="technician">Technicien</option>
-                <option value="intervention">Intervention Spécifique</option>
+                <option value="group">{t("commissions.dashboard.level.group")}</option>
+                <option value="technician">{t("commissions.dashboard.level.technician")}</option>
+                <option value="intervention">{t("commissions.dashboard.level.intervention")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">ID Cible</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                {t("commissions.dashboard.target_label")}
+              </label>
               <input
                 type="text"
                 required
-                value={targetId}
+                readOnly={level === "group"}
+                data-testid="commission-target-input"
+                value={level === "group" && companyId ? companyId : targetId}
                 onChange={(e) => setTargetId(e.target.value)}
-                placeholder={
-                  level === "group"
-                    ? "ID du groupe..."
-                    : level === "technician"
-                    ? "ID du technicien..."
-                    : "ID de l'intervention..."
-                }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder={targetPlaceholder()}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 read-only:bg-slate-100 read-only:text-slate-600"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Type de commission</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                {t("commissions.dashboard.value_type_label")}
+              </label>
               <select
+                data-testid="commission-value-type-select"
                 value={valueType}
                 onChange={(e) => setValueType(e.target.value as CommissionValueType)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="percentage">Pourcentage (%)</option>
-                <option value="fixed_amount">Montant Fixe (€)</option>
+                <option value="percentage">{t("commissions.dashboard.value_percentage")}</option>
+                <option value="fixed_amount">{t("commissions.dashboard.value_fixed")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Valeur</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                {t("commissions.dashboard.value_label")}
+              </label>
               <input
                 type="number"
                 required
-                min="0"
+                min={0}
                 step={valueType === "percentage" ? "0.1" : "1"}
+                data-testid="commission-value-input"
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="mt-4 flex justify-end">
             <button
               type="submit"
+              data-testid="commission-rule-submit"
               disabled={saving || !companyId}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 disabled:opacity-50"
+              className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
-              {saving ? "Enregistrement..." : "Enregistrer la règle"}
+              {saving ? t("commissions.dashboard.saving") : t("commissions.dashboard.save_rule")}
             </button>
           </div>
         </form>
-      )}
+      ) : null}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-slate-200">
-              <th className="py-3 px-4 font-semibold text-slate-600 text-sm">Niveau</th>
-              <th className="py-3 px-4 font-semibold text-slate-600 text-sm">Cible</th>
-              <th className="py-3 px-4 font-semibold text-slate-600 text-sm">Commission</th>
-              <th className="py-3 px-4 font-semibold text-slate-600 text-sm text-right">Actions</th>
+              <th className="px-4 py-3 text-sm font-semibold text-slate-600">
+                {t("commissions.dashboard.col_level")}
+              </th>
+              <th className="px-4 py-3 text-sm font-semibold text-slate-600">
+                {t("commissions.dashboard.col_target")}
+              </th>
+              <th className="px-4 py-3 text-sm font-semibold text-slate-600">
+                {t("commissions.dashboard.col_value")}
+              </th>
+              <th className="px-4 py-3 text-right text-sm font-semibold text-slate-600">
+                {t("commissions.dashboard.col_actions")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center text-slate-400">
-                  <div className="flex justify-center">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500" />
-                  </div>
+                  {t("common.loading")}
                 </td>
               </tr>
             ) : rules.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center text-slate-500">
-                  Aucune règle configurée.
+                  {t("commissions.dashboard.empty")}
                 </td>
               </tr>
             ) : (
               rules.map((rule) => (
-                <tr key={rule.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="py-3 px-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize bg-blue-100 text-blue-800">
-                      {levelLabel[rule.level]}
+                <tr key={rule.id} className="border-b border-slate-100 transition-colors hover:bg-slate-50">
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium capitalize text-blue-800">
+                      {levelLabel(rule.level)}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-sm font-mono text-slate-600">{rule.targetId}</td>
-                  <td className="py-3 px-4 text-sm font-medium text-slate-800">
-                    {rule.valueType === "percentage" ? `${rule.value}%` : `${rule.value} €`}
+                  <td className="px-4 py-3 font-mono text-sm text-slate-600">{rule.targetId}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-slate-800">
+                    {rule.valueType === "percentage"
+                      ? `${rule.value}%`
+                      : `${rule.value} €`}
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="px-4 py-3 text-right">
                     <button
                       type="button"
+                      data-testid={`commission-delete-${rule.id}`}
                       onClick={() => void handleDelete(rule.id)}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium"
+                      className="text-sm font-medium text-red-500 hover:text-red-700"
                     >
-                      Supprimer
+                      {t("common.delete")}
                     </button>
                   </td>
                 </tr>

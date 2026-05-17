@@ -441,15 +441,15 @@ export default function TechnicianDashboardDetailPanel({
       className="flex flex-col gap-4 h-full justify-between pb-2"
       data-testid="technician-detail-waiting-material"
     >
-      <motion.div className={mainContainerClass}>
+      <div className={mainContainerClass}>
         <p className="rounded-[16px] border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-center text-[14px] font-semibold text-amber-950">
           {t("technician_hub.dashboard.detail.waiting_material_banner")}
         </p>
-        <motion.div className="mt-4 flex flex-col gap-4">
+        <div className="mt-4 flex flex-col gap-4">
           {renderContactClient()}
           {renderMaterialOrders()}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
       <button
         type="button"
         data-testid="technician-resume-work-btn"
@@ -495,36 +495,44 @@ export default function TechnicianDashboardDetailPanel({
   }
 
   const renderQuickActions = () => {
-    if (liveIv.status === "done" || liveIv.status === "invoiced" || liveIv.status === "cancelled" || liveIv.status === "assigned") return null;
-    
+    const s = liveIv.status;
+    if (s === "done" || s === "invoiced" || s === "cancelled" || s === "assigned") return null;
+
+    const canAccessMaterials = s === "in_progress" || s === "waiting_material";
+    const canFinish = s === "in_progress";
+
     return (
       <div className="flex justify-around items-center bg-white rounded-2xl p-2 shadow-sm border border-slate-100 mb-4 shrink-0 overflow-x-auto gap-2">
-        {(liveIv.clientPhone || liveIv.phone) && (
+        {(liveIv.clientPhone || liveIv.phone) ? (
           <a href={`tel:${liveIv.clientPhone || liveIv.phone}`} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-blue-600 transition-colors">
             <div className="bg-blue-50 p-2 rounded-full shadow-sm"><Phone className="w-5 h-5" /></div>
             <span className="text-[10px] font-bold">{t("common.call")}</span>
           </a>
-        )}
-        {liveIv.address && (
+        ) : null}
+        {liveIv.address ? (
           <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(liveIv.address))}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-emerald-600 transition-colors">
             <div className="bg-emerald-50 p-2 rounded-full shadow-sm"><Navigation className="w-5 h-5" /></div>
             <span className="text-[10px] font-bold">{t("common.navigate")}</span>
           </a>
-        )}
-        <button
-          onClick={() => {
-            setMaterialsPanelOpen(true);
-            setTimeout(() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' }), 50);
-          }}
-          className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors"
-        >
-          <div className="bg-amber-50 p-2 rounded-full shadow-sm"><Package className="w-5 h-5" /></div>
-          <span className="text-[10px] font-bold">{t("common.materials")}</span>
-        </button>
-        <button onClick={onStartFinishJob} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-purple-600 transition-colors">
-          <div className="bg-purple-50 p-2 rounded-full shadow-sm"><CheckCircle2 className="w-5 h-5" /></div>
-          <span className="text-[10px] font-bold">{t("common.finish")}</span>
-        </button>
+        ) : null}
+        {canAccessMaterials ? (
+          <button
+            onClick={() => {
+              setMaterialsPanelOpen(true);
+              setTimeout(() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' }), 50);
+            }}
+            className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors"
+          >
+            <div className="bg-amber-50 p-2 rounded-full shadow-sm"><Package className="w-5 h-5" /></div>
+            <span className="text-[10px] font-bold">{t("common.materials")}</span>
+          </button>
+        ) : null}
+        {canFinish ? (
+          <button onClick={onStartFinishJob} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-purple-600 transition-colors">
+            <div className="bg-purple-50 p-2 rounded-full shadow-sm"><CheckCircle2 className="w-5 h-5" /></div>
+            <span className="text-[10px] font-bold">{t("common.finish")}</span>
+          </button>
+        ) : null}
       </div>
     );
   };

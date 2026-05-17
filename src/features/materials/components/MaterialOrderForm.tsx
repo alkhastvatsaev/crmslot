@@ -68,13 +68,13 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
       <p className="mb-6 text-sm text-slate-500">{t("materials.form.hint")}</p>
 
       <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-        <label className="block text-sm font-bold text-blue-900 mb-2">Charger un modèle rapide</label>
+        <label className="block text-sm font-bold text-blue-900 mb-2">{t("materials.form.template_label")}</label>
         <select
           onChange={(e) => handleLoadTemplate(e.target.value)}
           defaultValue=""
           className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
         >
-          <option value="" disabled>-- Sélectionner un modèle --</option>
+          <option value="" disabled>{t("materials.form.template_placeholder")}</option>
           {TERRAIN_TEMPLATES.map(tpl => (
             <option key={tpl.id} value={tpl.id}>{tpl.name}</option>
           ))}
@@ -148,7 +148,7 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
                     onClick={(e) => {
                       if (!part.reference && !part.description) e.preventDefault();
                     }}
-                    title="Vérifier sur Lecot.be"
+                    title={String(t("materials.form.lecot_title"))}
                   >
                     Lecot
                   </a>
