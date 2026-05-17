@@ -97,8 +97,10 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       const title = payload.notification?.title ?? "BelgMap";
       const body = payload.notification?.body ?? "";
       toast.message(title, { description: body });
+      const pushType = typeof payload.data?.type === "string" ? payload.data.type : "";
       const id = typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
-      openCaseFromPayload(id);
+      if (pushType === "daily_reminder" || pushType === "appointment_reminder") return;
+      if (id?.trim()) openCaseFromPayload(id.trim());
     });
   }, [openCaseFromPayload]);
 
