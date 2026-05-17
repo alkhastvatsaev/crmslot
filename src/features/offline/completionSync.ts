@@ -157,7 +157,6 @@ export async function flushCompletionQueue(
         const remoteCompletedAt = (d?.completedAt ?? undefined) as Timestamp | undefined;
 
         if (remoteCompletionIsNewerThanQueued(remoteStatus, remoteCompletedAt, rec.queuedAtMs)) {
-          await completionQueueDelete(rec.localId);
           onConflictSkip?.(rec.interventionId);
           return "skipped";
         }
@@ -168,14 +167,17 @@ export async function flushCompletionQueue(
           signaturePngDataUrl: rec.signaturePngDataUrl,
         });
 
-        await completionQueueDelete(rec.localId);
         return "uploaded";
       };
 
+      // Deletion happens ONLY after a confirmed result — never inside processItem —
+      // so a background continuation after timeout cannot remove items from the queue.
       const result = await Promise.race([processItem(), timeoutPromise]);
       if (result === "timeout") {
         throw new Error("Délai d'attente dépassé");
-      } else if (result === "skipped") {
+      }
+      await completionQueueDelete(rec.localId);
+      if (result === "skipped") {
         report.skippedConflict += 1;
       } else {
         report.uploaded += 1;

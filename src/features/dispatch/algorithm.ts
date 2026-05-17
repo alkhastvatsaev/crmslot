@@ -1,6 +1,7 @@
 import { Technician } from '@/features/technicians/types';
 import { fetchWithAuth } from '@/core/api/fetchWithAuth';
 import { haversineDistanceKm } from '@/features/dispatch/rankTechniciansForIntervention';
+import { canResolveTechnicianAssignUid } from '@/features/dispatch/technicianAssignUid';
 
 
 export async function findBestTechnician(
@@ -10,7 +11,7 @@ export async function findBestTechnician(
 ): Promise<Technician | null> {
   
 
-  const availableTechs = technicians.filter(t => t.status === 'available');
+  const availableTechs = technicians.filter(t => t.status === 'available' && canResolveTechnicianAssignUid(t));
   
   if (availableTechs.length === 0) return null;
 
