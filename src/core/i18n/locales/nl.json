@@ -34,6 +34,54 @@
       "block_save": "Dit tijdvak overlapt een andere opdracht van de technicus."
     }
   },
+  "materials": {
+    "panel_title": "Materiaalbestellingen",
+    "empty": "Geen bestellingen voor dit dossier.",
+    "new_order": "Nieuwe bestelling",
+    "order_created": "Bestelling geregistreerd",
+    "status_updated": "Status bijgewerkt",
+    "status": {
+      "pending": "In afwachting",
+      "ordered": "Besteld",
+      "received": "Ontvangen",
+      "cancelled": "Geannuleerd"
+    },
+    "form": {
+      "title": "Materiaal bestellen",
+      "hint": "Vul de benodigde onderdelen in. Het dossier kan naar « Wacht op materiaal » gaan.",
+      "description_label": "Beschrijving (verplicht)",
+      "description_placeholder": "Bv. Europese cilinder 30×30…",
+      "qty_label": "Aantal",
+      "reference_label": "Referentie (optioneel)",
+      "reference_placeholder": "Leveranciersref…",
+      "add_line": "Regel toevoegen",
+      "urgency_label": "Urgentie bestelling",
+      "urgency_low": "Laag",
+      "urgency_normal": "Normaal",
+      "urgency_high": "Hoog",
+      "submit": "Bestellen en wachten",
+      "submitting": "Verzenden…"
+    }
+  },
+  "emails": {
+    "panel_title": "E-mails",
+    "empty": "Geen e-mails — schrijf hieronder naar de klant.",
+    "reply": "Antwoorden",
+    "compose_reply": "Antwoorden",
+    "compose_new": "Nieuw bericht",
+    "placeholder_to": "Aan: klant@email.com",
+    "placeholder_subject": "Onderwerp",
+    "placeholder_body": "Uw bericht…",
+    "write": "E-mail schrijven",
+    "send": "Verzenden",
+    "sending": "Verzenden…",
+    "toast_required_title": "Verplichte velden",
+    "toast_required_body": "Aan, onderwerp en bericht zijn verplicht.",
+    "toast_missing_company": "Bedrijf ontbreekt",
+    "toast_sent": "E-mail verzonden",
+    "toast_send_error": "Verzendfout",
+    "toast_send_failed": "Verzenden mislukt"
+  },
   "timeline": {
     "title": "Geschiedenis & communicatie",
     "empty": "Nog geen gebeurtenissen op dit dossier.",
@@ -265,6 +313,7 @@
   "common": {
     "delete": "Verwijderen",
     "error": "Fout",
+    "loading": "Laden…",
     "try_again": "Probeer het opnieuw.",
     "cancel": "Annuleren",
     "save": "Opslaan",

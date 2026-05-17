@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
-import { MaterialOrderPart } from '../types';
+"use client";
 
-interface MaterialOrderFormProps {
+import { useState } from "react";
+import { useTranslation } from "@/core/i18n/I18nContext";
+import type { MaterialOrderPart } from "@/features/materials/types";
+
+type Props = {
   interventionId: string;
   technicianUid: string;
-  onSubmitOrder: (parts: MaterialOrderPart[], urgency: 'low' | 'normal' | 'high') => Promise<void>;
+  onSubmitOrder: (parts: MaterialOrderPart[], urgency: "low" | "normal" | "high") => Promise<void>;
   onCancel: () => void;
-}
+};
 
-export const MaterialOrderForm: React.FC<MaterialOrderFormProps> = ({
-  interventionId,
-  technicianUid,
-  onSubmitOrder,
-  onCancel,
-}) => {
-  const [parts, setParts] = useState<MaterialOrderPart[]>([{ description: '', quantity: 1, reference: '' }]);
-  const [urgency, setUrgency] = useState<'low' | 'normal' | 'high'>('normal');
+export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
+  const { t } = useTranslation();
+  const [parts, setParts] = useState<MaterialOrderPart[]>([
+    { description: "", quantity: 1, reference: "" },
+  ]);
+  const [urgency, setUrgency] = useState<"low" | "normal" | "high">("normal");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddPart = () => {
-    setParts([...parts, { description: '', quantity: 1, reference: '' }]);
+    setParts([...parts, { description: "", quantity: 1, reference: "" }]);
   };
 
   const handleRemovePart = (index: number) => {
@@ -34,8 +35,7 @@ export const MaterialOrderForm: React.FC<MaterialOrderFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Filter out empty rows
-    const validParts = parts.filter(p => p.description.trim() !== '');
+    const validParts = parts.filter((p) => p.description.trim() !== "");
     if (validParts.length === 0) return;
 
     setIsSubmitting(true);
@@ -46,60 +46,89 @@ export const MaterialOrderForm: React.FC<MaterialOrderFormProps> = ({
     }
   };
 
-  return (
-    <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6">
-      <h2 className="text-xl font-bold text-slate-800 mb-2">Commander du Matériel</h2>
-      <p className="text-sm text-slate-500 mb-6">
-        Remplissez les détails des pièces nécessaires. Cette demande passera l'intervention en statut "En attente matériel".
-      </p>
+  const urgencyLabel = (level: "low" | "normal" | "high") => {
+    if (level === "low") return t("materials.form.urgency_low");
+    if (level === "high") return t("materials.form.urgency_high");
+    return t("materials.form.urgency_normal");
+  };
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+  return (
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm" data-testid="material-order-form">
+      <h2 className="mb-2 text-xl font-bold text-slate-800">{t("materials.form.title")}</h2>
+      <p className="mb-6 text-sm text-slate-500">{t("materials.form.hint")}</p>
+
+      <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
         <div className="space-y-4">
           {parts.map((part, index) => (
-            <div key={index} className="flex gap-3 items-start bg-slate-50 p-4 rounded-xl border border-slate-100 relative">
-              {parts.length > 1 && (
+            <div
+              key={index}
+              className="relative flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4"
+            >
+              {parts.length > 1 ? (
                 <button
                   type="button"
+                  data-testid={`material-order-remove-line-${index}`}
                   onClick={() => handleRemovePart(index)}
-                  className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-200 transition-colors"
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+                  aria-label={String(t("common.delete"))}
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  ×
                 </button>
-              )}
-              
+              ) : null}
+
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">Description (Obligatoire)</label>
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  {t("materials.form.description_label")}
+                </label>
                 <input
                   type="text"
                   required
+                  data-testid={`material-order-description-${index}`}
                   value={part.description}
-                  onChange={(e) => handleChangePart(index, 'description', e.target.value)}
-                  placeholder="Ex: Cylindre européen 30x30..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handleChangePart(index, "description", e.target.value)}
+                  placeholder={String(t("materials.form.description_placeholder"))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div className="w-24">
-                <label className="block text-xs font-medium text-slate-600 mb-1">Qté</label>
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  {t("materials.form.qty_label")}
+                </label>
                 <input
                   type="number"
                   required
-                  min="1"
+                  min={1}
+                  data-testid={`material-order-qty-${index}`}
                   value={part.quantity}
-                  onChange={(e) => handleChangePart(index, 'quantity', Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handleChangePart(index, "quantity", Number(e.target.value))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">Référence (Optionnel)</label>
-                <input
-                  type="text"
-                  value={part.reference || ''}
-                  onChange={(e) => handleChangePart(index, 'reference', e.target.value)}
-                  placeholder="Ref fournisseur..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="flex-1 flex flex-col">
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  {t("materials.form.reference_label")}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    data-testid={`material-order-reference-${index}`}
+                    value={part.reference || ""}
+                    onChange={(e) => handleChangePart(index, "reference", e.target.value)}
+                    placeholder={String(t("materials.form.reference_placeholder"))}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <a
+                    href={`https://lecot.be/fr-be/search?q=${encodeURIComponent(part.reference || part.description)}`}
+                    target="_blank" rel="noreferrer"
+                    className="flex shrink-0 items-center justify-center rounded-lg bg-slate-800 px-3 text-xs font-bold text-white hover:bg-slate-700 transition-colors"
+                    onClick={(e) => {
+                      if (!part.reference && !part.description) e.preventDefault();
+                    }}
+                    title="Vérifier sur Lecot.be"
+                  >
+                    Lecot
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -107,28 +136,30 @@ export const MaterialOrderForm: React.FC<MaterialOrderFormProps> = ({
 
         <button
           type="button"
+          data-testid="material-order-add-line"
           onClick={handleAddPart}
-          className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
         >
-          <span>+</span> Ajouter une ligne
+          <span>+</span> {t("materials.form.add_line")}
         </button>
 
-        <div className="pt-4 border-t border-slate-100">
-          <label className="block text-sm font-medium text-slate-700 mb-2">Urgence de la commande</label>
+        <div className="border-t border-slate-100 pt-4">
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            {t("materials.form.urgency_label")}
+          </label>
           <div className="flex gap-4">
-            {(['low', 'normal', 'high'] as const).map((level) => (
-              <label key={level} className="flex items-center gap-2 cursor-pointer">
+            {(["low", "normal", "high"] as const).map((level) => (
+              <label key={level} className="flex cursor-pointer items-center gap-2">
                 <input
                   type="radio"
                   name="urgency"
+                  data-testid={`material-order-urgency-${level}`}
                   value={level}
                   checked={urgency === level}
-                  onChange={(e) => setUrgency(e.target.value as any)}
-                  className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                  onChange={() => setUrgency(level)}
+                  className="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-slate-700 capitalize">
-                  {level === 'low' ? 'Basse' : level === 'normal' ? 'Normale' : 'Haute'}
-                </span>
+                <span className="text-sm text-slate-700">{urgencyLabel(level)}</span>
               </label>
             ))}
           </div>
@@ -137,21 +168,23 @@ export const MaterialOrderForm: React.FC<MaterialOrderFormProps> = ({
         <div className="flex gap-3 pt-4">
           <button
             type="button"
+            data-testid="material-order-cancel"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors disabled:opacity-50"
+            className="flex-1 rounded-xl bg-slate-100 px-4 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-50"
           >
-            Annuler
+            {t("common.cancel")}
           </button>
           <button
             type="submit"
-            disabled={isSubmitting || !parts.some(p => p.description.trim())}
-            className="flex-[2] px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+            data-testid="material-order-submit"
+            disabled={isSubmitting || !parts.some((p) => p.description.trim())}
+            className="flex-[2] rounded-xl bg-blue-600 px-4 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
           >
-            {isSubmitting ? 'Envoi...' : 'Commander et mettre en attente'}
+            {isSubmitting ? t("materials.form.submitting") : t("materials.form.submit")}
           </button>
         </div>
       </form>
     </div>
   );
-};
+}

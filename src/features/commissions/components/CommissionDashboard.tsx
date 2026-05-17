@@ -1,33 +1,61 @@
-import React, { useState } from 'react';
-import { CommissionRule, CommissionLevel, CommissionValueType } from '../types';
+"use client";
+
+import React, { useState } from "react";
+import { auth, firestore } from "@/core/config/firebase";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useCommissionRules } from "../useCommissionRules";
+import { createCommissionRule, deleteCommissionRule } from "../commissionFirestore";
+import type { CommissionLevel, CommissionValueType } from "../types";
 
 export const CommissionDashboard: React.FC = () => {
-  const [rules, setRules] = useState<CommissionRule[]>([]);
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId = workspace?.isTenantUser ? workspace.activeCompanyId : null;
+
+  const { rules, loading } = useCommissionRules(companyId);
+
   const [isAdding, setIsAdding] = useState(false);
-  
-  // Form State
-  const [level, setLevel] = useState<CommissionLevel>('group');
-  const [targetId, setTargetId] = useState('');
-  const [valueType, setValueType] = useState<CommissionValueType>('percentage');
+  const [saving, setSaving] = useState(false);
+  const [level, setLevel] = useState<CommissionLevel>("group");
+  const [targetId, setTargetId] = useState("");
+  const [valueType, setValueType] = useState<CommissionValueType>("percentage");
   const [value, setValue] = useState<number>(0);
 
-  const handleAddRule = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newRule: CommissionRule = {
-      id: Math.random().toString(36).substr(2, 9),
-      level,
-      targetId,
-      valueType,
-      value,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdByUid: 'admin-user',
-    };
-    setRules([...rules, newRule]);
-    setIsAdding(false);
-    // Reset form
-    setTargetId('');
+  const resetForm = () => {
+    setTargetId("");
     setValue(0);
+    setLevel("group");
+    setValueType("percentage");
+  };
+
+  const handleAddRule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyId || !firestore) return;
+    const uid = auth?.currentUser?.uid ?? "unknown";
+    setSaving(true);
+    try {
+      await createCommissionRule(firestore, companyId, {
+        level,
+        targetId: targetId.trim(),
+        valueType,
+        value,
+        createdByUid: uid,
+      });
+      setIsAdding(false);
+      resetForm();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (ruleId: string) => {
+    if (!firestore) return;
+    await deleteCommissionRule(firestore, ruleId);
+  };
+
+  const levelLabel: Record<CommissionLevel, string> = {
+    group: "Groupe",
+    technician: "Technicien",
+    intervention: "Intervention",
   };
 
   return (
@@ -38,15 +66,15 @@ export const CommissionDashboard: React.FC = () => {
           <p className="text-sm text-slate-500">Configurez les règles multi-niveaux pour vos équipes et techniciens.</p>
         </div>
         <button
-          onClick={() => setIsAdding(!isAdding)}
+          onClick={() => { setIsAdding(!isAdding); resetForm(); }}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
         >
-          {isAdding ? 'Annuler' : '+ Nouvelle Règle'}
+          {isAdding ? "Annuler" : "+ Nouvelle Règle"}
         </button>
       </div>
 
       {isAdding && (
-        <form onSubmit={handleAddRule} className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <form onSubmit={(e) => void handleAddRule(e)} className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
           <h3 className="font-semibold text-slate-700 mb-4">Créer une nouvelle règle</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -68,7 +96,13 @@ export const CommissionDashboard: React.FC = () => {
                 required
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
-                placeholder={level === 'group' ? 'ID du groupe...' : level === 'technician' ? 'ID du technicien...' : 'ID de l\'intervention...'}
+                placeholder={
+                  level === "group"
+                    ? "ID du groupe..."
+                    : level === "technician"
+                    ? "ID du technicien..."
+                    : "ID de l'intervention..."
+                }
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -89,7 +123,7 @@ export const CommissionDashboard: React.FC = () => {
                 type="number"
                 required
                 min="0"
-                step={valueType === 'percentage' ? "0.1" : "1"}
+                step={valueType === "percentage" ? "0.1" : "1"}
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -97,8 +131,12 @@ export const CommissionDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end">
-            <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700">
-              Enregistrer la règle
+            <button
+              type="submit"
+              disabled={saving || !companyId}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {saving ? "Enregistrement..." : "Enregistrer la règle"}
             </button>
           </div>
         </form>
@@ -115,26 +153,40 @@ export const CommissionDashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {rules.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-slate-400">
+                  <div className="flex justify-center">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500" />
+                  </div>
+                </td>
+              </tr>
+            ) : rules.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center text-slate-500">
                   Aucune règle configurée.
                 </td>
               </tr>
             ) : (
-              rules.map(rule => (
+              rules.map((rule) => (
                 <tr key={rule.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="py-3 px-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize bg-blue-100 text-blue-800">
-                      {rule.level}
+                      {levelLabel[rule.level]}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-sm font-mono text-slate-600">{rule.targetId}</td>
                   <td className="py-3 px-4 text-sm font-medium text-slate-800">
-                    {rule.valueType === 'percentage' ? `${rule.value}%` : `${rule.value} €`}
+                    {rule.valueType === "percentage" ? `${rule.value}%` : `${rule.value} €`}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <button className="text-red-500 hover:text-red-700 text-sm font-medium">Supprimer</button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(rule.id)}
+                      className="text-red-500 hover:text-red-700 text-sm font-medium"
+                    >
+                      Supprimer
+                    </button>
                   </td>
                 </tr>
               ))

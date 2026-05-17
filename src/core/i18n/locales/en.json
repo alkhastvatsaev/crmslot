@@ -34,6 +34,54 @@
       "block_save": "This slot overlaps another assignment for the technician."
     }
   },
+  "materials": {
+    "panel_title": "Material orders",
+    "empty": "No orders for this case.",
+    "new_order": "New order",
+    "order_created": "Order saved",
+    "status_updated": "Status updated",
+    "status": {
+      "pending": "Pending",
+      "ordered": "Ordered",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "form": {
+      "title": "Order materials",
+      "hint": "List the parts needed. The case may move to “Waiting for material”.",
+      "description_label": "Description (required)",
+      "description_placeholder": "e.g. European cylinder 30×30…",
+      "qty_label": "Qty",
+      "reference_label": "Reference (optional)",
+      "reference_placeholder": "Supplier ref…",
+      "add_line": "Add line",
+      "urgency_label": "Order urgency",
+      "urgency_low": "Low",
+      "urgency_normal": "Normal",
+      "urgency_high": "High",
+      "submit": "Order and set waiting",
+      "submitting": "Sending…"
+    }
+  },
+  "emails": {
+    "panel_title": "Emails",
+    "empty": "No emails yet — write to the client below.",
+    "reply": "Reply",
+    "compose_reply": "Reply",
+    "compose_new": "New message",
+    "placeholder_to": "To: client@email.com",
+    "placeholder_subject": "Subject",
+    "placeholder_body": "Your message…",
+    "write": "Write an email",
+    "send": "Send",
+    "sending": "Sending…",
+    "toast_required_title": "Required fields",
+    "toast_required_body": "To, subject and message are required.",
+    "toast_missing_company": "Company missing",
+    "toast_sent": "Email sent",
+    "toast_send_error": "Send error",
+    "toast_send_failed": "Send failed"
+  },
   "timeline": {
     "title": "History & communications",
     "empty": "No events on this case yet.",
@@ -274,6 +322,7 @@
   "common": {
     "delete": "Delete",
     "error": "Error",
+    "loading": "Loading…",
     "try_again": "Please try again.",
     "cancel": "Cancel",
     "save": "Save",

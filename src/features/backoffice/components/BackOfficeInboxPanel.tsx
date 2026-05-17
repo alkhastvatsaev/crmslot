@@ -61,6 +61,7 @@ import {
 } from "@/features/interventions/technicianHubNavigation";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
+import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -799,6 +800,17 @@ export default function BackOfficeInboxPanel() {
               <InterventionEmailPanel
                 interventionId={selectedItem.id}
                 companyId={selectedItem.companyId ?? null}
+              />
+
+              <InterventionMaterialOrdersPanel
+                intervention={selectedItem}
+                technicianUid={
+                  selectedItem.assignedTechnicianUid?.trim() ||
+                  auth?.currentUser?.uid?.trim() ||
+                  ""
+                }
+                allowCreate={Boolean(selectedItem.assignedTechnicianUid?.trim())}
+                allowStatusUpdate
               />
 
               {/* Date & Time management for requests */}
