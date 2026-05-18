@@ -1,4 +1,9 @@
 {
+  "client_push": {
+    "enable": "Volgnotificaties inschakelen",
+    "enabled": "Volgnotificaties ingeschakeld",
+    "blocked": "Meldingen geblokkeerd in de browser"
+  },
   "tracking": {
     "waiting_material_banner": "Wachten op materiaal. We nemen contact op zodra het binnen is.",
     "cancelled_banner": "Deze interventie is geannuleerd.",
@@ -457,7 +462,8 @@
       "problem_prefix": "Probleem",
       "photos": "Foto's",
       "verify_terrain_report_aria": "Veldrapport verifiëren",
-      "already_verified": "Al geverifieerd"
+      "already_verified": "Al geverifieerd",
+      "now": "Nu"
     },
     "toasts": {
       "request_deleted": "Aanvraag verwijderd",
@@ -762,5 +768,22 @@
     "total": "Geschat totaal",
     "skip": "Overslaan",
     "confirm": "Lijnen bevestigen"
+  },
+  "duplicate": {
+    "auth_required": "Verbinding vereist",
+    "confirm_merge": "Samenvoegen? De nieuwe aanvraag wordt verwijderd en het bestaande dossier bewaard.",
+    "merge_success": "Duplicaat samengevoegd — nieuwe aanvraag verwijderd.",
+    "merge_error": "Samenvoegen mislukt (rechten of netwerk).",
+    "ignored": "Melding genegeerd.",
+    "ignore_error": "Actie mislukt (beheerdersrechten vereist).",
+    "possible_duplicate": "Mogelijk duplicaat (48u)",
+    "admin_only": "Alleen admins: samenvoegen of negeren.",
+    "merge_label": "Samenvoegen",
+    "ignore_label": "Negeren",
+    "merge_aria": "Samenvoegen: bestaand dossier bewaren en duplicaat verwijderen",
+    "ignore_aria": "Deze melding negeren",
+    "admin_reserved": "Voorbehouden aan beheerders",
+    "readonly_sr": "Alleen-lezen — acties voorbehouden aan bedrijfsbeheerders.",
+    "recently": "onlangs"
   }
 }

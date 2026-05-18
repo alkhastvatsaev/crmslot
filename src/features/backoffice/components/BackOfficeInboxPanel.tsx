@@ -164,7 +164,7 @@ function BackOfficeInboxInterventionRow({
               {isRequest
                 ? item.createdAt
                   ? formatBackofficeRowTime(item.createdAt)
-                  : "Maintenant"
+                  : t("backoffice.inbox.now")
                 : item.completedAt
                   ? formatBackofficeRowTime(item.completedAt)
                   : ""}

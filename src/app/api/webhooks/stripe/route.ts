@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { notifyClientPaymentReceived } from "@/core/services/notifications/clientPaymentPush";
 
 export const runtime = "nodejs";
 
@@ -32,6 +33,9 @@ async function markInterventionPaid(interventionId: string, paymentIntentId?: st
     createdByUid: "system",
     companyId,
   });
+
+  const createdByUid = typeof data.createdByUid === "string" ? data.createdByUid : null;
+  await notifyClientPaymentReceived(interventionId, createdByUid).catch(() => {});
 }
 
 export async function POST(request: Request) {

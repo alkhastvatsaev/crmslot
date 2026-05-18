@@ -42,6 +42,9 @@ interface RequesterHubContextValue {
   /** Dernier dossier Firestore créé (hub société — historique). */
   lastSubmittedInterventionId: string | null;
   setLastSubmittedInterventionId: (id: string | null) => void;
+  /** Ouverture suivi depuis notification push (`bmClientCase`). */
+  pendingTrackingInterventionId: string | null;
+  setPendingTrackingInterventionId: (id: string | null) => void;
   isSubmitting: boolean;
   setIsSubmitting: (val: boolean) => void;
   validationFailedCount: number;
@@ -83,6 +86,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [lastSubmittedRequest, setLastSubmittedRequest] = useState<InterventionRequestData | null>(null);
   const [lastSubmittedInterventionId, setLastSubmittedInterventionId] = useState<string | null>(null);
+  const [pendingTrackingInterventionId, setPendingTrackingInterventionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationFailedCount, setValidationFailedCount] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -163,6 +167,8 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         setLastSubmittedRequest,
         lastSubmittedInterventionId,
         setLastSubmittedInterventionId,
+        pendingTrackingInterventionId,
+        setPendingTrackingInterventionId,
         isSubmitting,
         setIsSubmitting,
         validationFailedCount,

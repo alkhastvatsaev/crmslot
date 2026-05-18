@@ -1,4 +1,9 @@
 {
+  "client_push": {
+    "enable": "Enable tracking notifications",
+    "enabled": "Tracking notifications enabled",
+    "blocked": "Notifications blocked in your browser"
+  },
   "tracking": {
     "waiting_material_banner": "Waiting for parts. We will contact you when they arrive.",
     "cancelled_banner": "This request was cancelled.",
@@ -466,7 +471,8 @@
       "problem_prefix": "Problem",
       "photos": "Photos",
       "verify_terrain_report_aria": "Verify field report",
-      "already_verified": "Already verified"
+      "already_verified": "Already verified",
+      "now": "Now"
     },
     "toasts": {
       "request_deleted": "Request deleted",
@@ -786,5 +792,22 @@
     "total": "Estimated total",
     "skip": "Skip",
     "confirm": "Confirm lines"
+  },
+  "duplicate": {
+    "auth_required": "Authentication required",
+    "confirm_merge": "Merge? The new request will be deleted and the existing file kept.",
+    "merge_success": "Duplicate merged — new request deleted.",
+    "merge_error": "Merge failed (permissions or network).",
+    "ignored": "Alert ignored.",
+    "ignore_error": "Action failed (admin rights required).",
+    "possible_duplicate": "Possible duplicate (48h)",
+    "admin_only": "Admins only: merge or ignore.",
+    "merge_label": "Merge",
+    "ignore_label": "Ignore",
+    "merge_aria": "Merge: keep the existing file and delete the duplicate",
+    "ignore_aria": "Ignore this alert",
+    "admin_reserved": "Reserved for administrators",
+    "readonly_sr": "Read-only — actions reserved for company administrators.",
+    "recently": "recently"
   }
 }

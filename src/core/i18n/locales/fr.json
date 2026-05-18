@@ -1,4 +1,9 @@
 {
+  "client_push": {
+    "enable": "Activer les notifications de suivi",
+    "enabled": "Notifications de suivi activées",
+    "blocked": "Notifications bloquées dans le navigateur"
+  },
   "tracking": {
     "waiting_material_banner": "Intervention en attente de matériel. Nous vous recontactons dès réception.",
     "cancelled_banner": "Cette intervention a été annulée.",
@@ -470,7 +475,8 @@
       "problem_prefix": "Problème",
       "photos": "Photos",
       "verify_terrain_report_aria": "Valider le rapport terrain",
-      "already_verified": "Déjà validé"
+      "already_verified": "Déjà validé",
+      "now": "Maintenant"
     },
     "toasts": {
       "request_deleted": "Demande supprimée",
@@ -790,5 +796,22 @@
     "total": "Total estimé",
     "skip": "Passer",
     "confirm": "Confirmer les lignes"
+  },
+  "duplicate": {
+    "auth_required": "Connexion requise",
+    "confirm_merge": "Fusionner ? La nouvelle demande sera supprimée et le dossier existant sera conservé.",
+    "merge_success": "Doublon fusionné — nouvelle demande supprimée.",
+    "merge_error": "Fusion impossible (droits ou réseau).",
+    "ignored": "Alerte ignorée.",
+    "ignore_error": "Action impossible (droits admin requis).",
+    "possible_duplicate": "Possible doublon (48h)",
+    "admin_only": "Admin uniquement : fusion ou ignorer.",
+    "merge_label": "Fusionner",
+    "ignore_label": "Ignorer",
+    "merge_aria": "Fusionner : garder l'ancien dossier et supprimer le doublon",
+    "ignore_aria": "Ignorer cette alerte",
+    "admin_reserved": "Réservé aux administrateurs",
+    "readonly_sr": "Lecture seule — actions réservées aux administrateurs société.",
+    "recently": "récemment"
   }
 }

@@ -7,6 +7,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
 import { navigateCompanyHub, COMPANY_HUB_ANCHOR_CLIENT_PORTAL } from "@/features/company/companyHubNavigation";
+import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 
 /** Retour Stripe après paiement — toast + hub société (onglet suivi). */
 export default function ClientPortalPaymentReturnEffects() {
@@ -14,6 +15,7 @@ export default function ClientPortalPaymentReturnEffects() {
   const router = useRouter();
   const pager = useDashboardPagerOptional();
   const { t } = useTranslation();
+  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId } = useRequesterHub();
   const handledRef = useRef(false);
 
   useEffect(() => {
@@ -23,6 +25,12 @@ export default function ClientPortalPaymentReturnEffects() {
     handledRef.current = true;
     toast.success(String(t("payment.return_success")));
 
+    const interventionId = searchParams.get("interventionId")?.trim();
+    if (interventionId) {
+      setLastSubmittedInterventionId(interventionId);
+      setPendingTrackingInterventionId(interventionId);
+    }
+
     pager?.setPageIndex(COMPANY_HUB_PAGE_INDEX);
     navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
 
@@ -31,7 +39,7 @@ export default function ClientPortalPaymentReturnEffects() {
     next.delete("interventionId");
     const qs = next.toString();
     router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [searchParams, router, pager, t]);
+  }, [searchParams, router, pager, t, setLastSubmittedInterventionId, setPendingTrackingInterventionId]);
 
   return null;
 }

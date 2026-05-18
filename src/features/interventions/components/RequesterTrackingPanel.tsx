@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName } from "@/utils/stringUtils";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
+import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.5 } as const;
 
@@ -88,7 +89,16 @@ const STATUS_PILL: Record<string, string> = {
 };
 
 export default function RequesterTrackingPanel() {
-  const { isSubmitting, requestData, lastSubmittedRequest, profile, setProfile, resetRequestOnly } = useRequesterHub();
+  const {
+    isSubmitting,
+    requestData,
+    lastSubmittedRequest,
+    profile,
+    setProfile,
+    resetRequestOnly,
+    pendingTrackingInterventionId,
+    setPendingTrackingInterventionId,
+  } = useRequesterHub();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -105,6 +115,12 @@ export default function RequesterTrackingPanel() {
     if (!auth) return;
     return onAuthStateChanged(auth, (u) => setUser(u));
   }, []);
+
+  useEffect(() => {
+    if (!pendingTrackingInterventionId) return;
+    setSelectedId(pendingTrackingInterventionId);
+    setPendingTrackingInterventionId(null);
+  }, [pendingTrackingInterventionId, setPendingTrackingInterventionId]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,8 +264,12 @@ export default function RequesterTrackingPanel() {
       data-testid="requester-tracking-panel"
       className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-transparent font-brand"
     >
+      <motion.div className="px-6 pt-4 pb-1">
+        <RequesterPushNotificationButton />
+      </motion.div>
+
       {/* Search Bar */}
-      <div className="px-6 pt-6 pb-2">
+      <div className="px-6 pt-2 pb-2">
         <form onSubmit={handleSearch} className="relative flex items-center">
           <input
             type="text"

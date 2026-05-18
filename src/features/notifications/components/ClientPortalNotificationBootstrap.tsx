@@ -1,0 +1,33 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { navigateCompanyHub, COMPANY_HUB_ANCHOR_CLIENT_PORTAL } from "@/features/company/companyHubNavigation";
+import { BM_CLIENT_CASE_PARAM } from "@/features/notifications/notificationConstants";
+import { parseClientNotificationSearchParams } from "@/features/notifications/clientNotificationUrls";
+
+/** Traite `bmClientCase` après clic sur une notification push portail client. */
+export default function ClientPortalNotificationBootstrap() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pager = useDashboardPagerOptional();
+  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId } = useRequesterHub();
+
+  useEffect(() => {
+    const intent = parseClientNotificationSearchParams(searchParams);
+    if (intent.kind === "none") return;
+
+    navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
+    setLastSubmittedInterventionId(intent.caseId);
+    setPendingTrackingInterventionId(intent.caseId);
+
+    const next = new URLSearchParams(searchParams.toString());
+    next.delete(BM_CLIENT_CASE_PARAM);
+    const qs = next.toString();
+    router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
+  }, [searchParams, router, pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId]);
+
+  return null;
+}

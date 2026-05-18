@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 import type { DuplicateAlertRow } from "@/features/interventions/duplicateAlertTypes";
 import { ignoreDuplicateAlert, mergeDuplicateAlert } from "@/features/interventions/duplicateAlertActions";
 import { formatDuplicateRelativeCreated } from "@/features/interventions/duplicateDetectionCore";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
-function relativeSnippet(alert: DuplicateAlertRow): string {
+function relativeSnippet(alert: DuplicateAlertRow, recently: string): string {
   const ms = Date.parse(alert.similarCreatedAt);
-  if (Number.isNaN(ms)) return "récemment";
+  if (Number.isNaN(ms)) return recently;
   return formatDuplicateRelativeCreated(ms);
 }
 
@@ -28,6 +29,7 @@ export type DuplicateAlertsQueueProps = {
 };
 
 export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "compact" }: DuplicateAlertsQueueProps) {
+  const { t } = useTranslation();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const sorted = useMemo(() => {
@@ -39,20 +41,18 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
       if (!firestore || !isConfigured) return;
       const uid = auth?.currentUser?.uid;
       if (!uid) {
-        toast.error("Connexion requise");
+        toast.error(t("duplicate.auth_required"));
         return;
       }
-      const ok = window.confirm(
-        "Fusionner ? La nouvelle demande sera supprimée et le dossier existant sera conservé.",
-      );
+      const ok = window.confirm(t("duplicate.confirm_merge"));
       if (!ok) return;
       setBusyId(alert.id);
       try {
         await mergeDuplicateAlert(firestore, alert.id, alert.newInterventionId, uid);
-        toast.success("Doublon fusionné — nouvelle demande supprimée.");
+        toast.success(t("duplicate.merge_success"));
       } catch (e) {
         console.error(e);
-        toast.error("Fusion impossible (droits ou réseau).");
+        toast.error(t("duplicate.merge_error"));
       } finally {
         setBusyId(null);
       }
@@ -65,16 +65,16 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
       if (!firestore || !isConfigured) return;
       const uid = auth?.currentUser?.uid;
       if (!uid) {
-        toast.error("Connexion requise");
+        toast.error(t("duplicate.auth_required"));
         return;
       }
       setBusyId(alert.id);
       try {
         await ignoreDuplicateAlert(firestore, alert.id, uid);
-        toast.message("Alerte ignorée.");
+        toast.message(t("duplicate.ignored"));
       } catch (e) {
         console.error(e);
-        toast.error("Action impossible (droits admin requis).");
+        toast.error(t("duplicate.ignore_error"));
       } finally {
         setBusyId(null);
       }
@@ -91,7 +91,7 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
       aria-live="polite"
     >
       {sorted.map((alert) => {
-        const rel = relativeSnippet(alert);
+        const rel = relativeSnippet(alert, t("duplicate.recently"));
         const compactMsg = `Demande similaire : dossier #${alert.similarInterventionId} — même adresse, ${rel}`;
         const headlineFull = duplicateHeadlineFull(alert, rel);
         const loading = busyId === alert.id;
@@ -113,11 +113,11 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                 {variant === "full" ? (
                   <>
                     <p className="text-[14px] font-bold leading-snug tracking-tight text-amber-950">{headlineFull}</p>
-                    <p className="sr-only">Alerte doublon probable dans les 48 heures.</p>
+                    <p className="sr-only">{t("duplicate.possible_duplicate")}</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-[13px] font-bold text-amber-950">Possible doublon (48h)</p>
+                    <p className="text-[13px] font-bold text-amber-950">{t("duplicate.possible_duplicate")}</p>
                     <p className="mt-1 text-[13px] font-medium leading-snug text-amber-950/90">{compactMsg}</p>
                     <p className="mt-1 truncate font-mono text-[11px] text-amber-900/70">
                       Nouveau #{alert.newInterventionId} · similaire #{alert.similarInterventionId}
@@ -140,11 +140,11 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                       : "gap-1 bg-slate-900",
                   )}
                   onClick={() => void runMerge(alert)}
-                  aria-label="Fusionner : garder l’ancien dossier et supprimer le doublon"
-                  title="Fusionner"
+                  aria-label={t("duplicate.merge_aria")}
+                  title={t("duplicate.merge_label")}
                 >
                   <GitMerge className="h-4 w-4" aria-hidden />
-                  {controlsIconOnly ? <span className="sr-only">Fusionner</span> : "Fusionner"}
+                  {controlsIconOnly ? <span className="sr-only">{t("duplicate.merge_label")}</span> : t("duplicate.merge_label")}
                 </Button>
                 <Button
                   type="button"
@@ -158,11 +158,11 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                       : "gap-1",
                   )}
                   onClick={() => void runIgnore(alert)}
-                  aria-label="Ignorer cette alerte"
-                  title="Ignorer"
+                  aria-label={t("duplicate.ignore_aria")}
+                  title={t("duplicate.ignore_label")}
                 >
                   <XCircle className="h-4 w-4" aria-hidden />
-                  {controlsIconOnly ? <span className="sr-only">Ignorer</span> : "Ignorer"}
+                  {controlsIconOnly ? <span className="sr-only">{t("duplicate.ignore_label")}</span> : t("duplicate.ignore_label")}
                 </Button>
               </div>
             ) : (
@@ -172,12 +172,12 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                   "flex items-center gap-2 text-amber-900/85",
                   variant === "full" ? "rounded-[14px] border border-black/[0.06] bg-white/85 px-2.5 py-2" : "",
                 )}
-                title="Réservé aux administrateurs"
+                title={t("duplicate.admin_reserved")}
               >
                 <Lock className="h-4 w-4 shrink-0 text-amber-800/80" aria-hidden />
-                <span className="sr-only">Lecture seule — actions réservées aux administrateurs société.</span>
+                <span className="sr-only">{t("duplicate.readonly_sr")}</span>
                 {variant === "compact" ? (
-                  <span className="text-[12px] font-semibold leading-tight">Admin uniquement : fusion ou ignorer.</span>
+                  <span className="text-[12px] font-semibold leading-tight">{t("duplicate.admin_only")}</span>
                 ) : null}
               </div>
             )}
