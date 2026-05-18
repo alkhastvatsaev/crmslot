@@ -920,6 +920,17 @@
     "template_label": "Modèle de facturation",
     "template_placeholder": "— Charger un modèle —"
   },
+  "stock": {
+    "panel_title": "Stock véhicule",
+    "add": "Ajouter",
+    "empty": "Aucun article.",
+    "label_placeholder": "Ex. : Cylindre A2P",
+    "qty": "Quantité",
+    "min_qty": "Seuil alerte",
+    "create": "Enregistrer",
+    "error_fields_required": "SKU et libellé requis.",
+    "toast_added": "Article ajouté"
+  },
   "maintenance": {
     "panel_title": "Contrats de maintenance",
     "new": "Nouveau contrat",
