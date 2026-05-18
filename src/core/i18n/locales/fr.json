@@ -920,6 +920,9 @@
     "template_label": "Modèle de facturation",
     "template_placeholder": "— Charger un modèle —"
   },
+  "intervention_pdf": {
+    "download": "Télécharger le rapport PDF"
+  },
   "quotes": {
     "panel_title": "Devis",
     "editor_title": "Nouveau devis",
