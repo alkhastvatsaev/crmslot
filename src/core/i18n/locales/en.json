@@ -267,7 +267,34 @@
     "import_success": "{{count}} client(s) imported.",
     "interventions_title": "Linked jobs",
     "interventions_empty": "No jobs linked to this client.",
-    "offline_hint": "Offline mode — showing cached client list."
+    "offline_hint": "Offline mode — showing cached client list.",
+    "open_in_backoffice": "Open in back-office",
+    "export_csv": "Export CSV",
+    "recurring_request": "New request (same client)"
+  },
+  "finish_checklist": {
+    "title": "Pre-close checklist",
+    "photos": "Proof photos taken",
+    "lock_ok": "Lock / access verified",
+    "client_informed": "Client informed",
+    "site_safe": "Site secured",
+    "incomplete": "Complete the trade checklist."
+  },
+  "kpi_panel": {
+    "pending": "Pending",
+    "in_progress": "In progress",
+    "invoiced": "Invoiced",
+    "revenue": "Invoiced revenue",
+    "avg_close": "Avg. close time"
+  },
+  "reminders": {
+    "title": "Follow-ups",
+    "done_not_invoiced": "Done — needs invoicing",
+    "material_pending": "Material pending",
+    "unassigned_stale": "Unassigned — action needed"
+  },
+  "quote_pdf": {
+    "download": "Download quote PDF"
   },
   "catalog": {
     "search_placeholder": "Search product (SKU, label)…",
@@ -868,6 +895,36 @@
     "title": "Automatic Invoicing",
     "description1": "After closure with at least one site photo and client signature on the server, a Cloud function generates a PDF invoice on Storage and sets the status to Invoiced. The checklist must be complete before generation.",
     "description2": "After closure with a complete checklist, PDF invoice generation and invoiced status."
+  },
+  "quotes": {
+    "panel_title": "Quotes",
+    "editor_title": "New quote",
+    "new": "New quote",
+    "empty": "No quotes.",
+    "save": "Save",
+    "send": "Send to client",
+    "edit": "Edit",
+    "accept": "Accept",
+    "decline": "Decline",
+    "client_name": "Client name",
+    "client_email": "Client email",
+    "col_description": "Description",
+    "col_qty": "Qty",
+    "col_price": "Unit price",
+    "line_placeholder": "E.g.: European cylinder 30×30…",
+    "add_line": "Add line",
+    "total_ht": "Subtotal",
+    "tva_6": "VAT (6%)",
+    "total_ttc": "Total incl. VAT",
+    "validity_days": "Validity (days)",
+    "notes": "Notes",
+    "lines_count": "line(s)",
+    "unknown_client": "Unknown client",
+    "error_no_lines": "Add at least one line.",
+    "toast_saved": "Quote saved",
+    "toast_sent": "Quote sent",
+    "toast_accepted": "Quote accepted",
+    "toast_declined": "Quote declined"
   },
   "map_transcription": {
     "urgent": "Urgent",

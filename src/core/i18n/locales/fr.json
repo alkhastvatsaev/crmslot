@@ -267,7 +267,34 @@
     "import_success": "{{count}} client(s) importé(s).",
     "interventions_title": "Interventions liées",
     "interventions_empty": "Aucune intervention liée à ce client.",
-    "offline_hint": "Mode hors ligne — liste clients en cache local."
+    "offline_hint": "Mode hors ligne — liste clients en cache local.",
+    "open_in_backoffice": "Ouvrir dans le back-office",
+    "export_csv": "Exporter CSV",
+    "recurring_request": "Nouvelle demande (même client)"
+  },
+  "finish_checklist": {
+    "title": "Contrôle avant clôture",
+    "photos": "Photos de preuve prises",
+    "lock_ok": "Serrure / accès vérifiés",
+    "client_informed": "Client informé",
+    "site_safe": "Chantier sécurisé",
+    "incomplete": "Complétez la checklist métier."
+  },
+  "kpi_panel": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "invoiced": "Facturées",
+    "revenue": "CA facturé",
+    "avg_close": "Délai moyen clôture"
+  },
+  "reminders": {
+    "title": "Relances",
+    "done_not_invoiced": "Terminée — à facturer",
+    "material_pending": "Matériel en attente",
+    "unassigned_stale": "Non assignée — à traiter"
+  },
+  "quote_pdf": {
+    "download": "Télécharger devis PDF"
   },
   "catalog": {
     "search_placeholder": "Rechercher un produit (réf., libellé)…",
@@ -892,6 +919,36 @@
     "toast_error": "Erreur lors de la sauvegarde",
     "template_label": "Modèle de facturation",
     "template_placeholder": "— Charger un modèle —"
+  },
+  "quotes": {
+    "panel_title": "Devis",
+    "editor_title": "Nouveau devis",
+    "new": "Nouveau devis",
+    "empty": "Aucun devis.",
+    "save": "Enregistrer",
+    "send": "Envoyer au client",
+    "edit": "Modifier",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "client_name": "Nom du client",
+    "client_email": "Email du client",
+    "col_description": "Description",
+    "col_qty": "Qté",
+    "col_price": "Prix HT",
+    "line_placeholder": "Ex. : Cylindre européen 30×30…",
+    "add_line": "Ajouter une ligne",
+    "total_ht": "Total HT",
+    "tva_6": "TVA (6%)",
+    "total_ttc": "Total TTC",
+    "validity_days": "Validité (jours)",
+    "notes": "Notes",
+    "lines_count": "ligne(s)",
+    "unknown_client": "Client inconnu",
+    "error_no_lines": "Ajoutez au moins une ligne.",
+    "toast_saved": "Devis enregistré",
+    "toast_sent": "Devis envoyé",
+    "toast_accepted": "Devis accepté",
+    "toast_declined": "Devis refusé"
   },
   "map_transcription": {
     "urgent": "Urgent",
