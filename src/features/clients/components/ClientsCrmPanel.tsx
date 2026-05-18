@@ -119,4 +119,157 @@ export default function ClientsCrmPanel() {
   };
 
   return (
-    <motion.div data-testid="clients-crm-panel" className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div data-testid="clients-crm-panel" className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div>
+        <h2 className="text-lg font-bold text-slate-900">{t("crm.title")}</h2>
+        <p className="text-sm text-slate-500">{t("crm.subtitle")}</p>
+      </div>
+
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          data-testid="crm-client-search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={String(t("crm.search_placeholder"))}
+          className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-3 text-sm"
+        />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="min-h-[200px] rounded-lg border border-slate-100">
+          <p className="border-b border-slate-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+            {t("crm.clients_list")}
+          </p>
+          <ul className="max-h-64 overflow-y-auto p-2" data-testid="crm-clients-list">
+            {loading ? (
+              <li className="px-2 py-4 text-center text-sm text-slate-400">{t("common.loading")}</li>
+            ) : filtered.length === 0 ? (
+              <li className="px-2 py-4 text-center text-sm text-slate-500">{t("crm.clients_empty")}</li>
+            ) : (
+              filtered.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    data-testid={`crm-client-row-${c.id}`}
+                    onClick={() => setSelectedId(c.id)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm transition ${
+                      selectedId === c.id ? "bg-slate-900 text-white" : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <User className="h-4 w-4 shrink-0" />
+                    <span className="truncate font-semibold">{buildClientDisplayName(c) || c.id}</span>
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <form
+            onSubmit={(e) => void handleCreateClient(e)}
+            data-testid="crm-create-client-form"
+            className="rounded-lg border border-slate-100 bg-slate-50 p-3"
+          >
+            <p className="mb-2 text-xs font-bold uppercase text-slate-500">{t("crm.new_client")}</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                data-testid="crm-client-firstname"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder={String(t("crm.first_name"))}
+                className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+              />
+              <input
+                data-testid="crm-client-lastname"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder={String(t("crm.last_name"))}
+                className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+              />
+              <input
+                data-testid="crm-client-phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={String(t("crm.phone"))}
+                className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+              />
+              <input
+                data-testid="crm-client-email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={String(t("crm.email"))}
+                className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={busy}
+              data-testid="crm-create-client-submit"
+              className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-blue-600 py-2 text-sm font-bold text-white disabled:opacity-50"
+            >
+              <Plus className="h-4 w-4" />
+              {t("crm.add_client")}
+            </button>
+          </form>
+
+          {selected ? (
+            <div data-testid="crm-client-detail" className="rounded-lg border border-slate-100 p-3">
+              <p className="font-bold text-slate-900">{buildClientDisplayName(selected)}</p>
+              <p className="text-xs text-slate-500">
+                {selected.phone || "—"} · {selected.email || "—"}
+              </p>
+              <p className="mt-3 text-xs font-bold uppercase text-slate-400">{t("crm.sites_title")}</p>
+              {sitesLoading ? (
+                <p className="text-sm text-slate-400">{t("common.loading")}</p>
+              ) : sites.length === 0 ? (
+                <p className="text-sm text-slate-500">{t("crm.sites_empty")}</p>
+              ) : (
+                <ul className="mt-1 space-y-1" data-testid="crm-sites-list">
+                  {sites.map((s) => (
+                    <li key={s.id} className="flex gap-2 rounded-md bg-slate-50 px-2 py-1.5 text-sm">
+                      <MapPin className="h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>
+                        <span className="font-semibold">{s.label}</span>
+                        <span className="block text-xs text-slate-500">{s.address}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <form
+                onSubmit={(e) => void handleCreateSite(e)}
+                className="mt-3 space-y-2"
+                data-testid="crm-create-site-form"
+              >
+                <input
+                  value={siteLabel}
+                  onChange={(e) => setSiteLabel(e.target.value)}
+                  placeholder={String(t("crm.site_label"))}
+                  className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                />
+                <input
+                  data-testid="crm-site-address"
+                  value={siteAddress}
+                  onChange={(e) => setSiteAddress(e.target.value)}
+                  placeholder={String(t("crm.site_address"))}
+                  className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  data-testid="crm-create-site-submit"
+                  className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white disabled:opacity-50"
+                >
+                  {t("crm.add_site")}
+                </button>
+              </form>
+            </div>
+          ) : null}
+        </section>
+      </div>
+    </div>
+  );
+}

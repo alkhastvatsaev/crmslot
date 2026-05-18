@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import type { Intervention } from "@/features/interventions/types";
 import InterventionCaseTimeline from "@/features/interventions/components/InterventionCaseTimeline";
 import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
@@ -10,8 +11,9 @@ import InterventionMaterialOrdersPanel from "@/features/materials/components/Int
 import InterventionCommissionPanel from "@/features/commissions/components/InterventionCommissionPanel";
 import InterventionInvoiceAmountField from "@/features/commissions/components/InterventionInvoiceAmountField";
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
+import InterventionClientLinkPanel from "@/features/clients/components/InterventionClientLinkPanel";
 
-export type UnifiedDrawerTab = "timeline" | "emails" | "materials" | "billing";
+export type UnifiedDrawerTab = "timeline" | "emails" | "materials" | "billing" | "crm";
 
 type Props = {
   intervention: Intervention;
@@ -22,7 +24,7 @@ type Props = {
   className?: string;
 };
 
-const TABS: UnifiedDrawerTab[] = ["timeline", "emails", "materials", "billing"];
+const BASE_TABS: UnifiedDrawerTab[] = ["timeline", "emails", "materials", "billing", "crm"];
 
 export default function UnifiedInterventionDrawer({
   intervention,
@@ -33,13 +35,20 @@ export default function UnifiedInterventionDrawer({
   className,
 }: Props) {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<UnifiedDrawerTab>(defaultTab);
+  const crmEnabled = useFeatureFlag("crmContacts");
+  const tabs = useMemo(
+    () => (crmEnabled ? BASE_TABS : BASE_TABS.filter((id) => id !== "crm")),
+    [crmEnabled],
+  );
+  const safeDefault = tabs.includes(defaultTab) ? defaultTab : "timeline";
+  const [tab, setTab] = useState<UnifiedDrawerTab>(safeDefault);
 
   const labelKey: Record<UnifiedDrawerTab, string> = {
     timeline: "intervention_drawer.tab_timeline",
     emails: "intervention_drawer.tab_emails",
     materials: "intervention_drawer.tab_materials",
     billing: "intervention_drawer.tab_billing",
+    crm: "intervention_drawer.tab_crm",
   };
 
   return (
@@ -52,7 +61,7 @@ export default function UnifiedInterventionDrawer({
         role="tablist"
         data-testid="unified-intervention-drawer-tabs"
       >
-        {TABS.map((id) => (
+        {tabs.map((id) => (
           <button
             key={id}
             type="button"
@@ -100,6 +109,7 @@ export default function UnifiedInterventionDrawer({
             <InterventionCommissionPanel intervention={intervention} />
           </div>
         ) : null}
+        {tab === "crm" ? <InterventionClientLinkPanel intervention={intervention} /> : null}
       </div>
     </section>
   );

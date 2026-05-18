@@ -12,6 +12,7 @@ import type { InterventionStatusEvent } from "@/features/interventions/workflow/
 import { Clock, ArrowRight, User, MessageSquare } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
+import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -172,7 +173,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
                         STATUS_COLORS[evt.fromStatus] ?? "bg-slate-100 text-slate-500"
                       }`}
                     >
-                      {evt.fromStatus}
+                      {String(t(statusLabelKey(evt.fromStatus)))}
                     </span>
                     <ArrowRight className="h-3 w-3 text-slate-300" />
                   </>
@@ -182,7 +183,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
                     STATUS_COLORS[evt.toStatus] ?? "bg-slate-100 text-slate-500"
                   }`}
                 >
-                  {evt.toStatus}
+                  {String(t(statusLabelKey(evt.toStatus)))}
                 </span>
               </div>
 

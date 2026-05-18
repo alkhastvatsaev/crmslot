@@ -10,6 +10,7 @@ import {
   Star,
   Banknote,
   Coins,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Intervention } from "@/features/interventions/types";
@@ -33,6 +34,7 @@ interface TechMetrics {
   thisWeekCompleted: number;
   revenueCents: number;
   commissionCents: number;
+  heatmap: { zone: string; count: number; revenueCents: number }[];
 }
 
 function computeMetrics(
@@ -95,6 +97,24 @@ function computeMetrics(
   const revenueCents = completed.reduce((acc, iv) => acc + (iv.invoiceAmountCents || 0), 0);
   const commissionCents = completed.reduce((acc, iv) => acc + (iv.commissionAmountCents || 0), 0);
 
+  // Compute Heatmap (Zones by postal code or city)
+  const zones: Record<string, { count: number; revenueCents: number }> = {};
+  for (const iv of completed) {
+    // Extract 4 digit postal code for BE or fallback to "Zone inconnue"
+    const match = iv.address?.match(/\b(\d{4})\b/);
+    const zone = match ? `Code ${match[1]}` : (iv.address?.split(',')[0] || "Autre");
+    const normalizedZone = zone.length > 20 ? zone.slice(0, 20) + "..." : zone;
+    
+    if (!zones[normalizedZone]) zones[normalizedZone] = { count: 0, revenueCents: 0 };
+    zones[normalizedZone].count += 1;
+    zones[normalizedZone].revenueCents += (iv.invoiceAmountCents || 0);
+  }
+  
+  const heatmap = Object.entries(zones)
+    .map(([zone, stats]) => ({ zone, ...stats }))
+    .sort((a, b) => b.revenueCents - a.revenueCents)
+    .slice(0, 4); // top 4 zones
+
   return {
     totalAssigned: assigned.length,
     completed: completed.length,
@@ -106,6 +126,7 @@ function computeMetrics(
     thisWeekCompleted,
     revenueCents,
     commissionCents,
+    heatmap,
   };
 }
 
@@ -251,6 +272,53 @@ export default function TechnicianPerformanceDashboard({
           </div>
         ))}
       </div>
+
+      {/* Heatmap (Top Zones) */}
+      {metrics.heatmap.length > 0 && (
+        <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-rose-500" />
+              <h4 className="text-[13px] font-bold text-slate-800">
+                Heatmap (Top 4 Zones)
+              </h4>
+            </div>
+            <span className="text-[10px] font-bold text-slate-400">
+              BASÉ SUR LE C.A.
+            </span>
+          </div>
+          
+          <div className="space-y-3">
+            {metrics.heatmap.map((item, idx) => {
+              const maxRev = metrics.heatmap[0].revenueCents || 1;
+              const widthPct = Math.max(10, Math.round((item.revenueCents / maxRev) * 100));
+              
+              return (
+                <div key={item.zone} className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-bold">
+                    <span className="text-slate-700">{item.zone}</span>
+                    <span className="text-emerald-600">
+                      {(item.revenueCents / 100).toFixed(0)} €
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-700",
+                        idx === 0 ? "bg-rose-500" : idx === 1 ? "bg-orange-500" : "bg-amber-400"
+                      )}
+                      style={{ width: `${widthPct}%` }}
+                    />
+                  </div>
+                  <div className="text-[9px] font-medium text-slate-400">
+                    {item.count} intervention{item.count > 1 ? "s" : ""}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
