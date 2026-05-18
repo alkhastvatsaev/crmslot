@@ -3,6 +3,8 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import { runAutoInvoiceGeneration } from "./invoiceAutomation";
+import { notifyInterventionStatusChange } from "./statusChangeNotify";
+import { runAppointmentReminders } from "./appointmentReminder";
 
 admin.initializeApp();
 
@@ -45,6 +47,24 @@ export const autoInvoiceOnInterventionWrite = onDocumentWritten(
   },
   async (event) => {
     await runAutoInvoiceGeneration(event);
+  },
+);
+
+/** FCM lors des changements de statut (hors nouvelle assignation). */
+export const notifyInterventionStatusChangePush = onDocumentWritten(
+  {
+    document: "interventions/{interventionId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const before = event.data?.before?.exists ? event.data.before.data() : undefined;
+    const after = event.data?.after?.exists ? event.data.after.data() : undefined;
+    if (!after) return;
+    await notifyInterventionStatusChange({
+      interventionId: event.params.interventionId as string,
+      before,
+      after,
+    });
   },
 );
 
@@ -103,7 +123,14 @@ export const technicianDailyReminder1700 = onSchedule(
   },
   async () => {
     const db = admin.firestore();
-    const statuses = ["pending", "in_progress", "pending_needs_address"];
+    const statuses = [
+      "pending",
+      "pending_needs_address",
+      "assigned",
+      "en_route",
+      "in_progress",
+      "waiting_material",
+    ];
     const snap = await db.collection("interventions").where("status", "in", statuses).get();
 
     const counts = new Map<string, number>();
@@ -138,5 +165,17 @@ export const technicianDailyReminder1700 = onSchedule(
         },
       });
     }
+  },
+);
+
+/** Rappel 8h — interventions planifiées le lendemain. */
+export const technicianAppointmentReminder0800 = onSchedule(
+  {
+    schedule: "0 8 * * *",
+    timeZone: "Europe/Brussels",
+    region: "europe-west1",
+  },
+  async () => {
+    await runAppointmentReminders();
   },
 );

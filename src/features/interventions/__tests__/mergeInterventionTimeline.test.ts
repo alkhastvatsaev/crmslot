@@ -1,4 +1,5 @@
 import {
+  commissionAuditToInterventionEvent,
   emailToInterventionEvent,
   materialOrderToInterventionEvent,
   mergeInterventionTimelineEvents,
@@ -137,6 +138,46 @@ describe("mergeInterventionTimeline", () => {
       createdAt: "2026-05-17T08:00:00.000Z",
       updatedAt: "2026-05-17T08:00:00.000Z",
     }).content).toContain("(pending)");
+  });
+
+  it("merges commission audit entries", () => {
+    const audit = {
+      id: "a1",
+      interventionId: "iv-1",
+      action: "override",
+      finalCommissionAmount: 42.5,
+      reason: "Bonus",
+      byUid: "admin-1",
+      at: "2026-05-17T13:00:00.000Z",
+    };
+    const merged = mergeInterventionTimelineEvents([], [], { commissionAudit: [audit] });
+    expect(merged).toHaveLength(1);
+    expect(merged[0].type).toBe("commission");
+    expect(merged[0].content).toContain("42.50");
+    expect(merged[0].content).toContain("Bonus");
+    expect(commissionAuditToInterventionEvent(audit, "iv-1").type).toBe("commission");
+    const calculated = commissionAuditToInterventionEvent(
+      { ...audit, id: "a2", action: "calculated", reason: undefined },
+      "iv-1",
+    );
+    expect(calculated.content).toContain("Calcul automatique");
+  });
+
+  it("excludes commission from client-visible feed", () => {
+    const merged = mergeInterventionTimelineEvents([], [], {
+      clientVisibleOnly: true,
+      commissionAudit: [
+        {
+          id: "a1",
+          interventionId: "iv-1",
+          action: "override",
+          finalCommissionAmount: 10,
+          byUid: "admin-1",
+          at: "2026-05-17T13:00:00.000Z",
+        },
+      ],
+    });
+    expect(merged).toHaveLength(0);
   });
 
   it("excludes emails and material orders from client-visible feed", () => {

@@ -49,4 +49,24 @@ describe("CentralizedTimeline", () => {
     render(<CentralizedTimeline events={sampleEvents} />);
     expect(screen.queryByTestId("centralized-timeline-comment-form")).not.toBeInTheDocument();
   });
+
+  it("renders commission events", () => {
+    render(
+      <CentralizedTimeline
+        events={[
+          {
+            id: "commission-a1",
+            interventionId: "iv-1",
+            type: "commission",
+            createdAt: "2026-05-17T10:00:00.000Z",
+            createdByUid: "admin-1",
+            content: "Ajustement manuel: 42.50 €",
+            visibility: "internal",
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId("timeline-event-commission-commission-a1")).toBeInTheDocument();
+    expect(screen.getByText(/42\.50/)).toBeInTheDocument();
+  });
 });

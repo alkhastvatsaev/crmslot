@@ -45,6 +45,7 @@ export default function InterventionCommissionPanel({ intervention }: Props) {
         companyId: intervention.companyId ?? null,
         technicianUid: intervention.assignedTechnicianUid ?? null,
         invoiceAmountCents: intervention.invoiceAmountCents,
+        auditByUid: auth?.currentUser?.uid?.trim() ?? "system",
         existingOverride: existing,
       });
       toast.success(String(t("commissions.recalculated")));

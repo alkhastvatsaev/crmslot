@@ -13,6 +13,10 @@ import {
   subscribeMaterialOrders,
   type MaterialOrderDoc,
 } from "@/features/materials/materialOrderFirestore";
+import {
+  subscribeCommissionAudit,
+  type CommissionAuditRow,
+} from "@/features/commissions/commissionFirestore";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
   return {
@@ -59,6 +63,7 @@ export function useInterventionTimeline(
     let timelineRows: Array<{ id: string; data: InterventionTimelineDoc }> = [];
     let emailRows: InterventionEmailDoc[] = [];
     let materialRows: MaterialOrderDoc[] = [];
+    let commissionRows: CommissionAuditRow[] = [];
 
     const publish = () => {
       setEvents(
@@ -66,6 +71,7 @@ export function useInterventionTimeline(
           clientVisibleOnly: options?.clientVisibleOnly,
           emails: emailRows,
           materialOrders: materialRows,
+          commissionAudit: commissionRows,
         }),
       );
       setLoading(false);
@@ -122,11 +128,17 @@ export function useInterventionTimeline(
       publish();
     });
 
+    const unsubCommission = subscribeCommissionAudit(firestore, interventionId, (rows) => {
+      commissionRows = rows;
+      publish();
+    });
+
     return () => {
       unsubStatus();
       unsubTimeline();
       unsubEmails();
       unsubMaterials();
+      unsubCommission();
     };
   }, [interventionId, options?.clientVisibleOnly]);
 

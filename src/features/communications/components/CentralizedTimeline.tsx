@@ -168,6 +168,12 @@ function TimelineEventIcon({ type }: { type: InterventionEvent["type"] }) {
           📦
         </span>
       );
+    case "commission":
+      return (
+        <span className={`${base} bg-amber-100 text-amber-800`} aria-hidden>
+          €
+        </span>
+      );
     default:
       return <span className={`${base} bg-gray-100 text-gray-500`} aria-hidden>•</span>;
   }
