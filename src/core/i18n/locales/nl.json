@@ -267,7 +267,34 @@
     "import_success": "{{count}} klant(en) geïmporteerd.",
     "interventions_title": "Gekoppelde interventies",
     "interventions_empty": "Geen interventies gekoppeld aan deze klant.",
-    "offline_hint": "Offline modus — klantenlijst uit lokale cache."
+    "offline_hint": "Offline modus — klantenlijst uit lokale cache.",
+    "open_in_backoffice": "Openen in back-office",
+    "export_csv": "CSV exporteren",
+    "recurring_request": "Nieuwe aanvraag (zelfde klant)"
+  },
+  "finish_checklist": {
+    "title": "Controle vóór afsluiten",
+    "photos": "Bewijsfoto's genomen",
+    "lock_ok": "Slot / toegang gecontroleerd",
+    "client_informed": "Klant geïnformeerd",
+    "site_safe": "Werf veilig",
+    "incomplete": "Vul de vak-checklist in."
+  },
+  "kpi_panel": {
+    "pending": "In afwachting",
+    "in_progress": "Bezig",
+    "invoiced": "Gefactureerd",
+    "revenue": "Gefactureerde omzet",
+    "avg_close": "Gem. sluitingstijd"
+  },
+  "reminders": {
+    "title": "Opvolgingen",
+    "done_not_invoiced": "Afgerond — te factureren",
+    "material_pending": "Materiaal in afwachting",
+    "unassigned_stale": "Niet toegewezen — actie nodig"
+  },
+  "quote_pdf": {
+    "download": "Offerte-PDF downloaden"
   },
   "catalog": {
     "search_placeholder": "Product zoeken (ref., omschrijving)…",
@@ -859,6 +886,36 @@
     "title": "Automatische Facturatie",
     "description1": "Na afsluiting met minimaal één werkplekfoto en de handtekening van de klant op de server, genereert een Cloud-functie een PDF-factuur op Storage en wordt de status op Gefactureerd gezet. De checklist moet compleet zijn vóór generatie.",
     "description2": "Na afsluiting met een volledige checklist, generatie PDF-factuur en status gefactureerd."
+  },
+  "quotes": {
+    "panel_title": "Offertes",
+    "editor_title": "Nieuwe offerte",
+    "new": "Nieuwe offerte",
+    "empty": "Geen offertes.",
+    "save": "Opslaan",
+    "send": "Sturen naar klant",
+    "edit": "Bewerken",
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "client_name": "Klantnaam",
+    "client_email": "E-mail klant",
+    "col_description": "Omschrijving",
+    "col_qty": "Aantal",
+    "col_price": "Prijs excl. btw",
+    "line_placeholder": "Bijv.: Europees cilinder 30×30…",
+    "add_line": "Regel toevoegen",
+    "total_ht": "Subtotaal",
+    "tva_6": "BTW (6%)",
+    "total_ttc": "Totaal incl. btw",
+    "validity_days": "Geldigheid (dagen)",
+    "notes": "Notities",
+    "lines_count": "regel(s)",
+    "unknown_client": "Onbekende klant",
+    "error_no_lines": "Voeg minimaal één regel toe.",
+    "toast_saved": "Offerte opgeslagen",
+    "toast_sent": "Offerte verzonden",
+    "toast_accepted": "Offerte geaccepteerd",
+    "toast_declined": "Offerte geweigerd"
   },
   "map_transcription": {
     "urgent": "Dringend",

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
-import { CreditCard, FileText, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { CreditCard, FileText, ChevronDown, ChevronUp, ExternalLink, ClipboardList } from "lucide-react";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { firestore } from "@/core/config/firebase";
@@ -39,6 +41,7 @@ type PaymentStatus = "unpaid" | "pending" | "paid" | "refunded";
 
 export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: Props) {
   const { t } = useTranslation();
+  const quotesEnabled = useFeatureFlag("quotesEnabled");
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -208,6 +211,19 @@ export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: P
               {String(t("billing.view_invoice_pdf"))}
               <ExternalLink className="w-3 h-3 ml-auto" />
             </a>
+          )}
+
+          {/* Devis liés */}
+          {quotesEnabled && (
+            <div className="border-t border-slate-100 pt-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <ClipboardList className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                  {String(t("quotes.panel_title"))}
+                </span>
+              </div>
+              <QuoteListPanel interventionId={intervention.id} />
+            </div>
           )}
 
           {/* Stripe payment link */}

@@ -7,6 +7,22 @@ export type BelgmapFeatureFlags = {
   lecotProductSearch: boolean;
   commissionsV2: boolean;
   interventionCommandPalette: boolean;
+  /** Lot PWA v2 : CRM→BO, checklist, KPI, relances, devis PDF, SAV, etc. */
+  pwaV2Bundle: boolean;
+  /** Devis / quotations — créer et envoyer des devis avant facturation. */
+  quotesEnabled: boolean;
+  /** Contrats de maintenance récurrents avec génération auto d'interventions. */
+  maintenanceContracts: boolean;
+  /** Suivi SLA par priorité (low/medium/high/urgent). */
+  slaTracker: boolean;
+  /** Géofencing auto — changement de statut à l'arrivée sur site. */
+  geofenceAuto: boolean;
+  /** Gestion du stock véhicule par technicien. */
+  vehicleStock: boolean;
+  /** Notifications WhatsApp / SMS via Twilio. */
+  whatsappNotifications: boolean;
+  /** Portail fournisseur — commandes directes Lecot. */
+  supplierPortal: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
@@ -15,6 +31,14 @@ export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   lecotProductSearch: false,
   commissionsV2: true,
   interventionCommandPalette: true,
+  pwaV2Bundle: false,
+  quotesEnabled: false,
+  maintenanceContracts: false,
+  slaTracker: false,
+  geofenceAuto: false,
+  vehicleStock: false,
+  whatsappNotifications: false,
+  supplierPortal: false,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -45,6 +69,14 @@ export function featureFlagsFromEnv(): BelgmapFeatureFlags {
       "NEXT_PUBLIC_FF_INTERVENTION_COMMAND_PALETTE",
       DEFAULT_FEATURE_FLAGS.interventionCommandPalette,
     ),
+    pwaV2Bundle: readEnvBool("NEXT_PUBLIC_FF_PWA_V2", DEFAULT_FEATURE_FLAGS.pwaV2Bundle),
+    quotesEnabled: readEnvBool("NEXT_PUBLIC_FF_QUOTES", DEFAULT_FEATURE_FLAGS.quotesEnabled),
+    maintenanceContracts: readEnvBool("NEXT_PUBLIC_FF_MAINTENANCE", DEFAULT_FEATURE_FLAGS.maintenanceContracts),
+    slaTracker: readEnvBool("NEXT_PUBLIC_FF_SLA", DEFAULT_FEATURE_FLAGS.slaTracker),
+    geofenceAuto: readEnvBool("NEXT_PUBLIC_FF_GEOFENCE", DEFAULT_FEATURE_FLAGS.geofenceAuto),
+    vehicleStock: readEnvBool("NEXT_PUBLIC_FF_VEHICLE_STOCK", DEFAULT_FEATURE_FLAGS.vehicleStock),
+    whatsappNotifications: readEnvBool("NEXT_PUBLIC_FF_WHATSAPP", DEFAULT_FEATURE_FLAGS.whatsappNotifications),
+    supplierPortal: readEnvBool("NEXT_PUBLIC_FF_SUPPLIER_PORTAL", DEFAULT_FEATURE_FLAGS.supplierPortal),
   };
 }
 

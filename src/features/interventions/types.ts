@@ -106,4 +106,20 @@ export interface Intervention {
   clientId?: string | null;
   /** CRM — site d'intervention lié au client. */
   siteId?: string | null;
+  /** SAV / garantie — intervention parente. */
+  parentInterventionId?: string | null;
+  /** Devis lié (Phase 11). */
+  quoteId?: string | null;
+  /** Priorité SLA (Phase 16). */
+  priority?: "low" | "medium" | "high" | "urgent" | null;
+  /** Compétences requises (Phase 13). */
+  requiredSkills?: string[] | null;
+  /** Géofencing — arrivée auto détectée (Phase 17). */
+  autoArrivedAt?: string | null;
+  /** WhatsApp client (Phase 19). */
+  clientWhatsapp?: string | null;
+  /** Satisfaction client post-intervention (1–5 étoiles). */
+  clientRating?: number | null;
+  clientComment?: string | null;
+  clientRatedAt?: string | null;
 }
