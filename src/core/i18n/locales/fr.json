@@ -307,7 +307,11 @@
         "no_mission_selected": "Sélectionnez une mission pour voir les photos du client",
         "no_photos": "Aucune photo fournie par le client",
         "hidden_after_closure": "Les photos client ne s’affichent pas pour une intervention clôturée.",
-        "photo_alt": "Photo client {{index}}"
+        "photo_alt": "Photo client {{index}}",
+        "upload_btn": "Ajouter une photo",
+        "uploading": "Envoi en cours…",
+        "upload_error": "Erreur lors de l'upload",
+        "upload_success": "Photo ajoutée"
       },
       "list": {
         "missions_title": "Missions",
@@ -544,7 +548,13 @@
       "kpi_strip_aria": "Résumé des interventions du jour",
       "kpi_pending": "En attente",
       "kpi_in_progress": "En cours",
-      "kpi_done": "Terminées"
+      "kpi_done": "Terminées",
+      "kpi_total_today": "Total aujourd'hui",
+      "kpi_en_route": "En route",
+      "kpi_waiting_material": "Attente matériel",
+      "kpi_cancelled": "Annulées",
+      "kpi_invoiced": "Facturées",
+      "kpi_completion_rate": "Taux de complétion"
     },
     "incoming_requests": {
       "company_required": "Société requise pour voir les demandes.",
@@ -849,5 +859,64 @@
     "unknown_client": "Client inconnu",
     "no_description": "Aucune description fournie.",
     "signature_alt": "Signature"
+  },
+  "quote": {
+    "generate_title": "Générer un devis",
+    "email_body": "Veuillez trouver ci-joint votre devis détaillé.",
+    "send_error": "Erreur d'envoi",
+    "network_error": "Erreur réseau lors de l'envoi."
+  },
+  "company": {
+    "new_request": "Nouvelle demande d'intervention",
+    "billing_strip": "Facturation / abonnement — paiements clients via Stripe (portail + webhook).",
+    "aria": {
+      "firebase_unconfigured": "Firebase non configuré",
+      "login_required": "Connexion requise",
+      "choose_org": "Choisir une organisation cliente",
+      "open_form": "Ouvrir le formulaire de demande d'intervention",
+      "org_name": "Nom de la nouvelle organisation",
+      "create_org": "Créer organisation",
+      "invite_id": "Identifiant invitation Firestore",
+      "accept_invite": "Accepter invitation",
+      "invite_contact": "Coordonnées à inviter",
+      "send_invite": "Envoyer invitation",
+      "billing_company": "Facturation entreprise",
+      "sync_token": "Synchroniser jeton serveur"
+    },
+    "toast": {
+      "name_required": "Nom requis",
+      "company_created": "Société créée",
+      "create_failed": "Création impossible",
+      "missing_company_or_contact": "Société ou contact manquant",
+      "invite_saved": "Invitation enregistrée",
+      "invite_failed": "Échec invitation",
+      "invite_id_missing": "ID invitation manquant",
+      "invite_accepted": "Invitation acceptée",
+      "accept_failed": "Acceptation impossible",
+      "login_required": "Connexion requise",
+      "token_updated": "Token mis à jour",
+      "sync_failed": "Sync impossible"
+    }
+  },
+  "chat": {
+    "role_client": "Client (portail)",
+    "role_staff": "Équipe",
+    "typing": "Réponse en cours",
+    "remove_photo_aria": "Retirer la photo",
+    "attach_blocked_title": "Photos : configurez Firebase Storage (bucket) pour ce projet.",
+    "attach_aria": "Ajouter des photos",
+    "input_label": "Votre message",
+    "input_placeholder": "Votre message…",
+    "send_aria": "Envoyer le message",
+    "toast_storage_unavailable": "Stockage Firebase indisponible — impossible d'envoyer des photos.",
+    "toast_send_failed": "Envoi impossible",
+    "toast_login_required": "Connexion requise",
+    "toast_login_description": "Connectez-vous pour utiliser le chat.",
+    "welcome": "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le back-office vous répondra ici.",
+    "reply_urgent": "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le back-office traite ces dossiers en priorité.",
+    "reply_billing": "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l'intervention : je transmets au service concerné.",
+    "reply_schedule": "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le back-office vous confirmera la planification.",
+    "reply_thanks": "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
+    "reply_default": "Merci pour votre message. Le back-office a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
   }
 }
