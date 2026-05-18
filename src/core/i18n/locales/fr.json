@@ -920,6 +920,15 @@
     "template_label": "Modèle de facturation",
     "template_placeholder": "— Charger un modèle —"
   },
+  "suppliers": {
+    "panel_title": "Commandes fournisseur",
+    "new_order": "Nouvelle commande",
+    "empty": "Aucune commande.",
+    "add_line": "Ajouter un article",
+    "create": "Créer la commande",
+    "error_no_lines": "Ajoutez au moins un article valide.",
+    "toast_created": "Commande créée"
+  },
   "stock": {
     "panel_title": "Stock véhicule",
     "add": "Ajouter",
