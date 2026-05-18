@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package, FileText, Camera, AlertTriangle, MapPin, Clock } from 'lucide-react';
+import TourOptimizeButton from './TourOptimizeButton';
+import type { Intervention } from '@/features/interventions/types';
 
 function useClock() {
   const [now, setNow] = useState(new Date());
@@ -20,6 +22,8 @@ interface LeftPanelProps {
   onOpenMaterialOrder: () => void;
   onOpenInvoice: () => void;
   onOpenPhoto: () => void;
+  missions?: Intervention[];
+  onMissionsReordered?: (ordered: Intervention[]) => void;
 }
 
 const STATUS_CONFIG: Record<TechnicianStatus, { label: string; color: string; dot: string }> = {
@@ -43,6 +47,8 @@ export default function LeftPanel({
   onOpenMaterialOrder,
   onOpenInvoice,
   onOpenPhoto,
+  missions = [],
+  onMissionsReordered,
 }: LeftPanelProps) {
   const now = useClock();
   const timeStr = now.toLocaleTimeString('fr-BE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -123,6 +129,9 @@ export default function LeftPanel({
       {/* Quick actions */}
       <div className="flex-1 p-4 space-y-2 overflow-y-auto">
         <p className="text-xs font-bold text-white/40 uppercase tracking-wider px-1 mb-3">Accès rapide</p>
+        {onMissionsReordered && (
+          <TourOptimizeButton missions={missions} onOptimized={onMissionsReordered} />
+        )}
         {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, onClick }) => (
           <button
             key={label}
