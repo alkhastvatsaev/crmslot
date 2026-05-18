@@ -920,6 +920,17 @@
     "template_label": "Modèle de facturation",
     "template_placeholder": "— Charger un modèle —"
   },
+  "maintenance": {
+    "panel_title": "Contrats de maintenance",
+    "new": "Nouveau contrat",
+    "empty": "Aucun contrat actif.",
+    "label_placeholder": "Ex. : Maintenance annuelle serrures",
+    "template_title_placeholder": "Ex. : Vérification cylindres + huilage",
+    "create": "Créer le contrat",
+    "error_fields_required": "Libellé et titre requis.",
+    "toast_created": "Contrat créé",
+    "toast_deactivated": "Contrat désactivé"
+  },
   "intervention_pdf": {
     "download": "Télécharger le rapport PDF"
   },
