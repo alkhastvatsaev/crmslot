@@ -813,5 +813,41 @@
     "admin_reserved": "Réservé aux administrateurs",
     "readonly_sr": "Lecture seule — actions réservées aux administrateurs société.",
     "recently": "récemment"
+  },
+  "commission": {
+    "override": {
+      "title": "Forcer la commission",
+      "base_amount": "Montant de base (Facture) :",
+      "new_amount_label": "Nouveau montant de la commission (€)",
+      "reason_label": "Raison de l'override",
+      "reason_placeholder": "Ex : Prime exceptionnelle pour difficulté extrême…",
+      "reason_hint": "La justification est obligatoire pour la traçabilité comptable.",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "apply": "Appliquer l'override"
+    }
+  },
+  "offline": {
+    "sync": {
+      "title_sr": "Synchronisation hors ligne",
+      "conflict_single": "Dernière synchro : le serveur avait déjà clôturé une intervention.",
+      "conflict_multiple": "Dernière synchro : le serveur avait déjà clôturé {n} interventions.",
+      "conflict_suffix": "La copie locale n'a pas été réappliquée.",
+      "network_online_aria": "Réseau : en ligne",
+      "network_offline_aria": "Réseau : hors ligne",
+      "online": "En ligne",
+      "offline": "Hors ligne",
+      "syncing_aria": "Synchronisation en cours",
+      "idle_aria": "Synchronisation inactive",
+      "syncing": "Synchronisation en cours",
+      "idle": "Inactif",
+      "flush_aria": "Synchroniser les données en attente",
+      "flush_sr": "Synchroniser"
+    }
+  },
+  "admin": {
+    "unknown_client": "Client inconnu",
+    "no_description": "Aucune description fournie.",
+    "signature_alt": "Signature"
   }
 }

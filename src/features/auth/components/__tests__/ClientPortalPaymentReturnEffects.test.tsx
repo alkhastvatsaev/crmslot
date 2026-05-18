@@ -21,10 +21,13 @@ jest.mock("@/features/dashboard/dashboardPagerContext", () => ({
 const mockSetLastSubmittedInterventionId = jest.fn();
 const mockSetPendingTrackingInterventionId = jest.fn();
 
+const mockSetPortalRightTab = jest.fn();
+
 jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
   useRequesterHub: () => ({
     setLastSubmittedInterventionId: mockSetLastSubmittedInterventionId,
     setPendingTrackingInterventionId: mockSetPendingTrackingInterventionId,
+    setPortalRightTab: mockSetPortalRightTab,
   }),
 }));
 
@@ -38,6 +41,7 @@ describe("ClientPortalPaymentReturnEffects", () => {
     render(<ClientPortalPaymentReturnEffects />);
     expect(mockSetPageIndex).toHaveBeenCalledWith(1);
     expect(mockSetPendingTrackingInterventionId).toHaveBeenCalledWith("iv-pay-1");
+    expect(mockSetPortalRightTab).toHaveBeenCalledWith("tracking");
     expect(mockReplace).toHaveBeenCalled();
   });
 });

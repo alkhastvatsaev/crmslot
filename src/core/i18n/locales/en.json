@@ -809,5 +809,41 @@
     "admin_reserved": "Reserved for administrators",
     "readonly_sr": "Read-only — actions reserved for company administrators.",
     "recently": "recently"
+  },
+  "commission": {
+    "override": {
+      "title": "Override commission",
+      "base_amount": "Base amount (Invoice):",
+      "new_amount_label": "New commission amount (€)",
+      "reason_label": "Override reason",
+      "reason_placeholder": "E.g. Exceptional bonus for extreme difficulty…",
+      "reason_hint": "Justification is required for accounting traceability.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "apply": "Apply override"
+    }
+  },
+  "offline": {
+    "sync": {
+      "title_sr": "Offline synchronisation",
+      "conflict_single": "Last sync: the server had already closed 1 intervention.",
+      "conflict_multiple": "Last sync: the server had already closed {n} interventions.",
+      "conflict_suffix": "The local copy was not re-applied.",
+      "network_online_aria": "Network: online",
+      "network_offline_aria": "Network: offline",
+      "online": "Online",
+      "offline": "Offline",
+      "syncing_aria": "Synchronisation in progress",
+      "idle_aria": "Synchronisation idle",
+      "syncing": "Synchronising…",
+      "idle": "Idle",
+      "flush_aria": "Sync pending data",
+      "flush_sr": "Sync"
+    }
+  },
+  "admin": {
+    "unknown_client": "Unknown client",
+    "no_description": "No description provided.",
+    "signature_alt": "Signature"
   }
 }

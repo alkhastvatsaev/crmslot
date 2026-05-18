@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
@@ -29,7 +29,13 @@ export default function CompanyHubPage() {
   const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("timeline");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
-  const { lastSubmittedInterventionId } = useRequesterHub();
+  const { lastSubmittedInterventionId, portalRightTab, setPortalRightTab } = useRequesterHub();
+
+  useEffect(() => {
+    if (!portalRightTab) return;
+    setRightCategory(portalRightTab);
+    setPortalRightTab(null);
+  }, [portalRightTab, setPortalRightTab]);
 
   const ivanaChatCompanyId = useMemo(() => {
     if (workspace?.isTenantUser && workspace.activeCompanyId) return workspace.activeCompanyId;
