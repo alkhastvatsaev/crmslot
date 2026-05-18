@@ -11,4 +11,6 @@ export interface Technician {
   /** UID Firebase Auth pour `assignedTechnicianUid` (sinon repli back-office). */
   authUid?: string;
   realEta?: string;
+  /** Compétences du technicien (Phase 13). */
+  skills?: string[] | null;
 }

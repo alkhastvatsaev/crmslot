@@ -2,20 +2,23 @@ import { Technician } from '@/features/technicians/types';
 import { fetchWithAuth } from '@/core/api/fetchWithAuth';
 import { haversineDistanceKm } from '@/features/dispatch/rankTechniciansForIntervention';
 import { canResolveTechnicianAssignUid } from '@/features/dispatch/technicianAssignUid';
+import { technicianHasRequiredSkills } from '@/features/technicians/skillConstants';
 
 
 export async function findBestTechnician(
-  technicians: Technician[], 
-  interventionLat: number, 
-  interventionLng: number
+  technicians: Technician[],
+  interventionLat: number,
+  interventionLng: number,
+  requiredSkills?: string[] | null,
 ): Promise<Technician | null> {
-  
 
-  const availableTechs = technicians.filter(t => 
-    t.status === 'available' && 
+
+  const availableTechs = technicians.filter(t =>
+    t.status === 'available' &&
     canResolveTechnicianAssignUid(t) &&
     typeof t.location?.lat === 'number' && !Number.isNaN(t.location?.lat) &&
-    typeof t.location?.lng === 'number' && !Number.isNaN(t.location?.lng)
+    typeof t.location?.lng === 'number' && !Number.isNaN(t.location?.lng) &&
+    technicianHasRequiredSkills(t.skills, requiredSkills)
   );
   
   if (availableTechs.length === 0) return null;
