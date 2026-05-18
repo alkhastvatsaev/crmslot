@@ -307,7 +307,11 @@
         "no_mission_selected": "Select a mission to see client photos",
         "no_photos": "No photos provided by the client",
         "hidden_after_closure": "Client photos are not shown for a closed intervention.",
-        "photo_alt": "Client photo {{index}}"
+        "photo_alt": "Client photo {{index}}",
+        "upload_btn": "Add photo",
+        "uploading": "Uploading…",
+        "upload_error": "Upload failed",
+        "upload_success": "Photo added"
       },
       "list": {
         "missions_title": "Missions",
@@ -540,7 +544,13 @@
       "kpi_strip_aria": "Today's intervention summary",
       "kpi_pending": "Pending",
       "kpi_in_progress": "In progress",
-      "kpi_done": "Done"
+      "kpi_done": "Done",
+      "kpi_total_today": "Total today",
+      "kpi_en_route": "En route",
+      "kpi_waiting_material": "Waiting material",
+      "kpi_cancelled": "Cancelled",
+      "kpi_invoiced": "Invoiced",
+      "kpi_completion_rate": "Completion rate"
     },
     "incoming_requests": {
       "company_required": "Company required to see requests.",
@@ -845,5 +855,64 @@
     "unknown_client": "Unknown client",
     "no_description": "No description provided.",
     "signature_alt": "Signature"
+  },
+  "quote": {
+    "generate_title": "Generate quote",
+    "email_body": "Please find your detailed quote attached.",
+    "send_error": "Send error",
+    "network_error": "Network error while sending."
+  },
+  "company": {
+    "new_request": "New intervention request",
+    "billing_strip": "Billing / subscription — client payments via Stripe (portal + webhook).",
+    "aria": {
+      "firebase_unconfigured": "Firebase not configured",
+      "login_required": "Login required",
+      "choose_org": "Choose a client organisation",
+      "open_form": "Open the intervention request form",
+      "org_name": "New organisation name",
+      "create_org": "Create organisation",
+      "invite_id": "Firestore invite ID",
+      "accept_invite": "Accept invitation",
+      "invite_contact": "Contact to invite",
+      "send_invite": "Send invitation",
+      "billing_company": "Company billing",
+      "sync_token": "Sync server token"
+    },
+    "toast": {
+      "name_required": "Name required",
+      "company_created": "Company created",
+      "create_failed": "Creation failed",
+      "missing_company_or_contact": "Company or contact missing",
+      "invite_saved": "Invitation saved",
+      "invite_failed": "Invitation failed",
+      "invite_id_missing": "Invite ID missing",
+      "invite_accepted": "Invitation accepted",
+      "accept_failed": "Acceptance failed",
+      "login_required": "Login required",
+      "token_updated": "Token updated",
+      "sync_failed": "Sync failed"
+    }
+  },
+  "chat": {
+    "role_client": "Client (portal)",
+    "role_staff": "Staff",
+    "typing": "Typing…",
+    "remove_photo_aria": "Remove photo",
+    "attach_blocked_title": "Photos: configure Firebase Storage (bucket) for this project.",
+    "attach_aria": "Add photos",
+    "input_label": "Your message",
+    "input_placeholder": "Your message…",
+    "send_aria": "Send message",
+    "toast_storage_unavailable": "Firebase Storage unavailable — cannot send photos.",
+    "toast_send_failed": "Send failed",
+    "toast_login_required": "Login required",
+    "toast_login_description": "Please log in to use the chat.",
+    "welcome": "Hello — write to us for any question about an intervention, an appointment or an invoice. The back-office will reply here.",
+    "reply_urgent": "For an emergency, please provide your full address and a contact number; the back-office handles these cases as a priority.",
+    "reply_billing": "For billing or a quote, provide the name on the file or the last digits of the intervention reference — I will forward it to the relevant team.",
+    "reply_schedule": "To change a time slot, indicate the desired date and city; the back-office will confirm your schedule.",
+    "reply_thanks": "You're welcome! Don't hesitate if you have other questions.",
+    "reply_default": "Thank you for your message. The back-office has been notified and will get back to you shortly. You can also submit a request from the company space."
   }
 }

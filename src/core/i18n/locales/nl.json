@@ -298,7 +298,11 @@
         "no_mission_selected": "Selecteer een missie om klantfoto's te zien",
         "no_photos": "Geen foto's verstrekt door de klant",
         "hidden_after_closure": "Klantfoto's worden niet getoond voor een gesloten interventie.",
-        "photo_alt": "Klant foto {{index}}"
+        "photo_alt": "Klant foto {{index}}",
+        "upload_btn": "Foto toevoegen",
+        "uploading": "Uploaden…",
+        "upload_error": "Upload mislukt",
+        "upload_success": "Foto toegevoegd"
       },
       "list": {
         "missions_title": "Missies",
@@ -531,7 +535,13 @@
       "kpi_strip_aria": "Samenvatting van vandaag",
       "kpi_pending": "In afwachting",
       "kpi_in_progress": "Bezig",
-      "kpi_done": "Klaar"
+      "kpi_done": "Klaar",
+      "kpi_total_today": "Totaal vandaag",
+      "kpi_en_route": "Onderweg",
+      "kpi_waiting_material": "Wacht op materiaal",
+      "kpi_cancelled": "Geannuleerd",
+      "kpi_invoiced": "Gefactureerd",
+      "kpi_completion_rate": "Voltooiingspercentage"
     },
     "incoming_requests": {
       "company_required": "Bedrijf vereist om aanvragen te zien.",
@@ -821,5 +831,64 @@
     "unknown_client": "Onbekende klant",
     "no_description": "Geen beschrijving opgegeven.",
     "signature_alt": "Handtekening"
+  },
+  "quote": {
+    "generate_title": "Offerte genereren",
+    "email_body": "Gelieve uw gedetailleerde offerte in bijlage te vinden.",
+    "send_error": "Fout bij verzenden",
+    "network_error": "Netwerkfout bij het verzenden."
+  },
+  "company": {
+    "new_request": "Nieuw interventieverzoek",
+    "billing_strip": "Facturatie / abonnement — klantbetalingen via Stripe (portaal + webhook).",
+    "aria": {
+      "firebase_unconfigured": "Firebase niet geconfigureerd",
+      "login_required": "Aanmelding vereist",
+      "choose_org": "Kies een klantorganisatie",
+      "open_form": "Formulier voor interventieverzoek openen",
+      "org_name": "Naam nieuwe organisatie",
+      "create_org": "Organisatie aanmaken",
+      "invite_id": "Firestore uitnodigings-ID",
+      "accept_invite": "Uitnodiging accepteren",
+      "invite_contact": "Te nodigen contactpersoon",
+      "send_invite": "Uitnodiging verzenden",
+      "billing_company": "Facturatie bedrijf",
+      "sync_token": "Servertoken synchroniseren"
+    },
+    "toast": {
+      "name_required": "Naam vereist",
+      "company_created": "Bedrijf aangemaakt",
+      "create_failed": "Aanmaken mislukt",
+      "missing_company_or_contact": "Bedrijf of contactpersoon ontbreekt",
+      "invite_saved": "Uitnodiging opgeslagen",
+      "invite_failed": "Uitnodiging mislukt",
+      "invite_id_missing": "Uitnodigings-ID ontbreekt",
+      "invite_accepted": "Uitnodiging geaccepteerd",
+      "accept_failed": "Accepteren mislukt",
+      "login_required": "Aanmelding vereist",
+      "token_updated": "Token bijgewerkt",
+      "sync_failed": "Synchronisatie mislukt"
+    }
+  },
+  "chat": {
+    "role_client": "Klant (portaal)",
+    "role_staff": "Team",
+    "typing": "Antwoord bezig…",
+    "remove_photo_aria": "Foto verwijderen",
+    "attach_blocked_title": "Foto's: configureer Firebase Storage (bucket) voor dit project.",
+    "attach_aria": "Foto's toevoegen",
+    "input_label": "Uw bericht",
+    "input_placeholder": "Uw bericht…",
+    "send_aria": "Bericht versturen",
+    "toast_storage_unavailable": "Firebase Storage niet beschikbaar — foto's kunnen niet worden verzonden.",
+    "toast_send_failed": "Verzenden mislukt",
+    "toast_login_required": "Aanmelding vereist",
+    "toast_login_description": "Meld u aan om de chat te gebruiken.",
+    "welcome": "Goedendag — schrijf ons voor vragen over een interventie, een afspraak of een factuur. De back-office antwoordt hier.",
+    "reply_urgent": "Voor een noodgeval geeft u uw volledig adres en een bereikbaar nummer; de back-office behandelt deze dossiers met prioriteit.",
+    "reply_billing": "Voor facturatie of een offerte geeft u de naam op het dossier of de laatste cijfers van de interventie — ik stuur het door naar de bevoegde dienst.",
+    "reply_schedule": "Om een tijdslot te wijzigen, geeft u de gewenste datum en gemeente; de back-office bevestigt de planning.",
+    "reply_thanks": "Graag gedaan! Aarzel niet als u andere vragen heeft.",
+    "reply_default": "Bedankt voor uw bericht. De back-office is op de hoogte en neemt snel contact met u op. U kunt ook een verzoek indienen via de bedrijfsruimte."
   }
 }
