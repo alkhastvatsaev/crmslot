@@ -4,7 +4,7 @@ import type { Intervention } from "@/features/interventions/types";
 // Status-based email notification rules
 // ---------------------------------------------------------------------------
 
-export type NotificationChannel = "email" | "sms" | "push";
+export type NotificationChannel = "email" | "sms" | "push" | "whatsapp";
 
 export interface StatusNotificationRule {
   /** Transition déclencheur. "*" = tout fromStatus. */

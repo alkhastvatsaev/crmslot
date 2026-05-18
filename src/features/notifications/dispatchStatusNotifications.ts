@@ -6,7 +6,7 @@ import { findApplicableRules } from "@/features/notifications/statusNotification
 // ---------------------------------------------------------------------------
 
 export interface NotificationPayload {
-  channel: "email" | "sms" | "push";
+  channel: "email" | "sms" | "push" | "whatsapp";
   recipientRole: "client" | "technician" | "dispatcher";
   subjectKey: string;
   bodyKey: string;
