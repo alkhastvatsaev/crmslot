@@ -12,6 +12,7 @@ import {
   type QuoteRequestRow,
 } from '@/features/dashboard/quoteRequestsOrder';
 import { fetchWithAuth } from '@/core/api/fetchWithAuth';
+import { useTranslation } from '@/core/i18n/I18nContext';
 
 const baseRequests: QuoteRequestRow[] = [
   {
@@ -86,6 +87,7 @@ function buildPendingRequests(): QuoteRequestRow[] {
 }
 
 export default function QuoteRequests() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState<QuoteRequestRow[]>(() => buildPendingRequests());
   const [generatedStates, setGeneratedStates] = useState<Record<number, boolean>>({});
   const [sendingStates, setSendingStates] = useState<Record<number, boolean>>({});
@@ -163,7 +165,7 @@ export default function QuoteRequests() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientName,
-          message: `Veuillez trouver ci-joint votre devis détaillé.`,
+          message: t("quote.email_body"),
           pdfBase64
         }),
       });
@@ -182,11 +184,11 @@ export default function QuoteRequests() {
       } else {
         const errorData = await response.json();
         console.error("Erreur API Email:", errorData.error || errorData);
-        alert(`Erreur d'envoi: ${errorData.error || "Erreur inconnue"}`);
+        alert(`${t("quote.send_error")}: ${errorData.error || "Erreur inconnue"}`);
       }
     } catch (error) {
       console.error("Erreur d'envoi:", error);
-      alert("Erreur réseau lors de l'envoi.");
+      alert(t("quote.network_error"));
     } finally {
       setSendingStates(prev => ({ ...prev, [id]: false }));
     }
@@ -222,7 +224,7 @@ export default function QuoteRequests() {
                     setGeneratedStates(prev => ({ ...prev, [req.id]: true }));
                   }}
                   className="relative flex items-center justify-center w-10 h-10 bg-slate-900 text-white rounded-full transition-all duration-300 hover:bg-slate-800 hover:scale-105 active:scale-95 shadow-sm group/btn shrink-0"
-                  title="Générer un devis"
+                  title={t("quote.generate_title")}
                 >
                   {/* Paper Icon */}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute w-5 h-5 text-white transition-all duration-300 group-hover/btn:opacity-0 group-hover/btn:scale-50 group-hover/btn:-rotate-90">

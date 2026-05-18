@@ -18,6 +18,7 @@ import {
 } from "@/features/backoffice/ivanaChatFirestore";
 import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaChatStorage";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -32,28 +33,20 @@ export type IvanaChatMessage = {
   createdAt: number;
 };
 
-function pickIvanaReply(userText: string): string {
-  const t = userText.toLowerCase();
-  if (/\burgent|urgence|immédiat|rapide\b/.test(t)) {
-    return "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le back-office traite ces dossiers en priorité.";
-  }
-  if (/\bfacture|facturation|paiement|devis\b/.test(t)) {
-    return "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l’intervention : je transmets au service concerné.";
-  }
-  if (/\brdv|rendez-vous|créneau|horaire|planif\b/.test(t)) {
-    return "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le back-office vous confirmera la planification.";
-  }
-  if (/\bmerci|thanks\b/.test(t)) {
-    return "Avec plaisir ! N’hésitez pas si vous avez d’autres questions.";
-  }
-  return "Merci pour votre message. Le back-office a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l’espace société si besoin.";
+function pickIvanaReply(userText: string, t: (key: string) => string): string {
+  const lower = userText.toLowerCase();
+  if (/\burgent|urgence|immédiat|rapide\b/.test(lower)) return t("chat.reply_urgent");
+  if (/\bfacture|facturation|paiement|devis\b/.test(lower)) return t("chat.reply_billing");
+  if (/\brdv|rendez-vous|créneau|horaire|planif\b/.test(lower)) return t("chat.reply_schedule");
+  if (/\bmerci|thanks\b/.test(lower)) return t("chat.reply_thanks");
+  return t("chat.reply_default");
 }
 
-function welcomeMessage(): IvanaChatMessage {
+function welcomeMessage(t: (key: string) => string): IvanaChatMessage {
   return {
     id: "welcome",
     role: "ivana",
-    text: "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le back-office vous répondra ici.",
+    text: t("chat.welcome"),
     createdAt: Date.now(),
   };
 }
@@ -77,8 +70,9 @@ export default function IvanaClientChatPanel({
   chatCompanyId = null,
   onRemoteClientMessage,
 }: PanelProps) {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<IvanaChatMessage[]>(() => [welcomeMessage()]);
+  const [messages, setMessages] = useState<IvanaChatMessage[]>(() => [welcomeMessage(t)]);
   const [draft, setDraft] = useState("");
   const [ivanaTyping, setIvanaTyping] = useState(false);
   const [pendingImages, setPendingImages] = useState<string[]>([]);
@@ -123,7 +117,7 @@ export default function IvanaClientChatPanel({
     if (!CHAT_PERSISTENCE_ENABLED) {
       if (!cancelled) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMessages([welcomeMessage()]);
+        setMessages([welcomeMessage(t)]);
         hydratedRef.current = true;
       }
       return () => {
@@ -147,7 +141,7 @@ export default function IvanaClientChatPanel({
       /* ignore */
     }
     if (!cancelled) {
-      setMessages([welcomeMessage()]);
+      setMessages([welcomeMessage(t)]);
       hydratedRef.current = true;
     }
     return () => {
@@ -174,7 +168,7 @@ export default function IvanaClientChatPanel({
       (rows) => {
         const mapped: IvanaChatMessage[] = rows
           .map((r) => {
-            const t = coerceFirestoreLikeDate(r.createdAt)?.getTime() ?? Date.now();
+            const ts = coerceFirestoreLikeDate(r.createdAt)?.getTime() ?? Date.now();
             let role: IvanaChatMessage["role"] = "user";
             if (r.role === "client") role = "client";
             else if (r.role === "staff") role = "staff";
@@ -182,7 +176,7 @@ export default function IvanaClientChatPanel({
               id: `fs-${r.id}`,
               role,
               text: r.body,
-              createdAt: t,
+              createdAt: ts,
               images:
                 Array.isArray(r.imageUrls) && r.imageUrls.length > 0 ? r.imageUrls : undefined,
             };
@@ -193,7 +187,7 @@ export default function IvanaClientChatPanel({
         if (!fsHydratedRef.current) {
           fsHydratedRef.current = true;
           rows.forEach((r) => seenFsIdsRef.current.add(r.id));
-          setMessages(mapped.length === 0 ? [welcomeMessage()] : mapped);
+          setMessages(mapped.length === 0 ? [welcomeMessage(t)] : mapped);
           return;
         }
 
@@ -208,7 +202,7 @@ export default function IvanaClientChatPanel({
           onRemoteClientMessage();
         }
 
-        setMessages(mapped.length === 0 ? [welcomeMessage()] : mapped);
+        setMessages(mapped.length === 0 ? [welcomeMessage(t)] : mapped);
       },
       (err) => {
         console.error("[IvanaClientChatPanel] Firestore chat", err);
@@ -291,7 +285,7 @@ export default function IvanaClientChatPanel({
     if (firestoreSyncEnabled && firestore && auth?.currentUser) {
       if (pendingImages.length > 0 && !storage) {
         toast.error("Chat", {
-          description: "Stockage Firebase indisponible — impossible d’envoyer des photos.",
+          description: t("chat.toast_storage_unavailable"),
         });
         return;
       }
@@ -317,14 +311,14 @@ export default function IvanaClientChatPanel({
       } catch (e) {
         console.error(e);
         toast.error("Chat", {
-          description: e instanceof Error ? e.message : "Envoi impossible",
+          description: e instanceof Error ? e.message : t("chat.toast_send_failed"),
         });
       }
       return;
     }
 
     if (firestoreSyncEnabled && !auth?.currentUser) {
-      toast.error("Connexion requise", { description: "Connectez-vous pour utiliser le chat." });
+      toast.error(t("chat.toast_login_required"), { description: t("chat.toast_login_description") });
       return;
     }
 
@@ -353,7 +347,7 @@ export default function IvanaClientChatPanel({
       const reply: IvanaChatMessage = {
         id: `i-${Date.now()}`,
         role: "ivana",
-        text: pickIvanaReply(text),
+        text: pickIvanaReply(text, t),
         createdAt: Date.now(),
       };
       setMessages((prev) => [...prev, reply]);
@@ -409,12 +403,12 @@ export default function IvanaClientChatPanel({
             <div className={bubbleShellClass(m)}>
               {m.role === "client" ? (
                 <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-emerald-800/80">
-                  Client (portail)
+                  {t("chat.role_client")}
                 </span>
               ) : null}
               {m.role === "staff" ? (
                 <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-indigo-800/80">
-                  Équipe
+                  {t("chat.role_staff")}
                 </span>
               ) : null}
               {m.text}
@@ -444,7 +438,7 @@ export default function IvanaClientChatPanel({
         {ivanaTyping ? (
           <div className="flex justify-start" data-testid="ivana-chat-typing">
             <div className="rounded-[20px] rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 text-[12px] font-medium text-slate-500 shadow-sm">
-              Réponse en cours
+              {t("chat.typing")}
               <span className="inline-flex gap-0.5 pl-1">
                 <span className="animate-pulse">·</span>
                 <span className="animate-pulse [animation-delay:150ms]">·</span>
@@ -469,7 +463,7 @@ export default function IvanaClientChatPanel({
                   type="button"
                   onClick={() => setPendingImages((prev) => prev.filter((_, i) => i !== idx))}
                   className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/55 text-white opacity-0 transition group-hover:opacity-100"
-                  aria-label="Retirer la photo"
+                  aria-label={t("chat.remove_photo_aria")}
                 >
                   <X className="h-3.5 w-3.5" aria-hidden />
                 </button>
@@ -494,7 +488,7 @@ export default function IvanaClientChatPanel({
             disabled={attachImagesBlocked}
             title={
               attachImagesBlocked
-                ? "Photos : configurez Firebase Storage (bucket) pour ce projet."
+                ? t("chat.attach_blocked_title")
                 : undefined
             }
             className={cn(
@@ -506,12 +500,12 @@ export default function IvanaClientChatPanel({
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20",
               "active:scale-[0.98]",
             )}
-            aria-label="Ajouter des photos"
+            aria-label={t("chat.attach_aria")}
           >
             <ImagePlus className="h-5 w-5" />
           </button>
           <label htmlFor="ivana-chat-input" className="sr-only">
-            Votre message
+            {t("chat.input_label")}
           </label>
           <div className="flex min-w-0 flex-1 items-center rounded-[18px] border border-slate-200 bg-white shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20">
             <textarea
@@ -527,7 +521,7 @@ export default function IvanaClientChatPanel({
                   void send();
                 }
               }}
-              placeholder="Votre message…"
+              placeholder={t("chat.input_placeholder")}
               className="min-h-12 max-h-24 flex-1 resize-none overflow-y-auto bg-transparent px-4 py-3 text-[13px] leading-[18px] text-slate-900 placeholder:text-slate-400 focus:outline-none"
             />
           </div>
@@ -544,7 +538,7 @@ export default function IvanaClientChatPanel({
                 ? "cursor-not-allowed text-slate-400 opacity-40"
                 : "text-indigo-600 hover:bg-indigo-500/10 hover:text-indigo-700",
             )}
-            aria-label="Envoyer le message"
+            aria-label={t("chat.send_aria")}
           >
             <ArrowRight className="h-5 w-5" />
           </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
@@ -33,8 +34,10 @@ export default function CompanyHubPage() {
 
   useEffect(() => {
     if (!portalRightTab) return;
-    setRightCategory(portalRightTab);
-    setPortalRightTab(null);
+    scheduleEffectUpdate(() => {
+      setRightCategory(portalRightTab);
+      setPortalRightTab(null);
+    });
   }, [portalRightTab, setPortalRightTab]);
 
   const ivanaChatCompanyId = useMemo(() => {

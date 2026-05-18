@@ -43,9 +43,7 @@ export default function InterventionMaterialOrdersPanel({
   const [expanded, setExpanded] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    if (forceOpen) setExpanded(true);
-  }, [forceOpen]);
+  const panelExpanded = expanded || forceOpen;
 
   const handleSubmit = useCallback(
     async (parts: MaterialOrderPart[], urgency: MaterialOrder["urgency"]) => {
@@ -93,10 +91,10 @@ export default function InterventionMaterialOrdersPanel({
             <span className="text-[10px] font-bold text-slate-400">{orders.length}</span>
           ) : null}
         </span>
-        {expanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+        {panelExpanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
       </button>
 
-      {expanded ? (
+      {panelExpanded ? (
         <div className="space-y-3 rounded-[18px] border border-slate-100 bg-white p-4">
           {loading && orders.length === 0 ? (
             <p className="text-center text-[12px] text-slate-400">{t("common.loading")}</p>

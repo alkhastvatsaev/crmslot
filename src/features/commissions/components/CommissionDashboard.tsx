@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -28,10 +28,6 @@ export const CommissionDashboard: React.FC = () => {
     setLevel("group");
     setValueType("percentage");
   };
-
-  useEffect(() => {
-    if (level === "group" && companyId) setTargetId(companyId);
-  }, [level, companyId]);
 
   const resolvedTargetId =
     level === "group" && companyId ? companyId : targetId.trim();
@@ -121,7 +117,7 @@ export const CommissionDashboard: React.FC = () => {
                 required
                 readOnly={level === "group"}
                 data-testid="commission-target-input"
-                value={level === "group" && companyId ? companyId : targetId}
+                value={resolvedTargetId}
                 onChange={(e) => setTargetId(e.target.value)}
                 placeholder={targetPlaceholder()}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 read-only:bg-slate-100 read-only:text-slate-600"

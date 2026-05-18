@@ -6,24 +6,22 @@ import {
   subscribeMaterialOrders,
   type MaterialOrderDoc,
 } from "@/features/materials/materialOrderFirestore";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 export function useMaterialOrders(interventionId: string | null) {
+  const activeId = interventionId?.trim() || null;
   const [orders, setOrders] = useState<MaterialOrderDoc[]>([]);
-  const [loading, setLoading] = useState(Boolean(interventionId));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!interventionId || !firestore) {
-      setOrders([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const unsub = subscribeMaterialOrders(firestore, interventionId, (rows) => {
+    if (!activeId || !firestore) return;
+    scheduleEffectUpdate(() => setLoading(true));
+    const unsub = subscribeMaterialOrders(firestore, activeId, (rows) => {
       setOrders(rows);
       setLoading(false);
     });
     return unsub;
-  }, [interventionId]);
+  }, [activeId]);
 
-  return { orders, loading };
+  return { orders: activeId ? orders : [], loading: activeId ? loading : false };
 }

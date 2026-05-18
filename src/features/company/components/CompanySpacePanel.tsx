@@ -33,6 +33,7 @@ import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/co
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -83,6 +84,7 @@ function OfflineGlyph({
 }
 
 export default function CompanySpacePanel() {
+  const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const {
     firebaseUid,
@@ -123,7 +125,7 @@ export default function CompanySpacePanel() {
   const createCompany = async () => {
     const name = companyName.trim();
     if (!firestore || !auth?.currentUser || !name) {
-      toast.error("Nom requis");
+      toast.error(t("company.toast.name_required"));
       return;
     }
     setBusy(true);
@@ -141,10 +143,10 @@ export default function CompanySpacePanel() {
       });
       setCompanyName("");
       await refreshClaimsSilent();
-      toast.success("Société créée");
+      toast.success(t("company.toast.company_created"));
     } catch (e) {
       console.error(e);
-      toast.error("Création impossible", { description: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.create_failed"), { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
     }
@@ -153,7 +155,7 @@ export default function CompanySpacePanel() {
   const submitInvite = async () => {
     const phone = invitePhone.trim();
     if (!firestore || !auth?.currentUser || !activeCompanyId || !phone) {
-      toast.error("Société ou contact manquant");
+      toast.error(t("company.toast.missing_company_or_contact"));
       return;
     }
     if (!isAdmin) return;
@@ -168,10 +170,10 @@ export default function CompanySpacePanel() {
         invitedByUid: auth.currentUser.uid,
       });
       setInvitePhone("");
-      toast.success("Invitation enregistrée");
+      toast.success(t("company.toast.invite_saved"));
     } catch (e) {
       console.error(e);
-      toast.error("Échec invitation", { description: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.invite_failed"), { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
     }
@@ -180,7 +182,7 @@ export default function CompanySpacePanel() {
   const acceptInvite = async () => {
     const id = inviteDocId.trim();
     if (!auth?.currentUser || !id) {
-      toast.error("ID invitation manquant");
+      toast.error(t("company.toast.invite_id_missing"));
       return;
     }
     setBusy(true);
@@ -198,10 +200,10 @@ export default function CompanySpacePanel() {
       if (!res.ok || !data.ok) throw new Error(data.error || res.statusText);
       setInviteDocId("");
       await refreshClaimsSilent();
-      toast.success("Invitation acceptée");
+      toast.success(t("company.toast.invite_accepted"));
     } catch (e) {
       console.error(e);
-      toast.error("Acceptation impossible", { description: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.accept_failed"), { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
     }
@@ -209,7 +211,7 @@ export default function CompanySpacePanel() {
 
   const syncClaims = useCallback(async () => {
     if (!auth?.currentUser) {
-      toast.error("Connexion requise");
+      toast.error(t("company.toast.login_required"));
       return;
     }
     setBusy(true);
@@ -228,10 +230,10 @@ export default function CompanySpacePanel() {
       if (!res.ok || !data.ok) throw new Error(data.error || res.statusText);
       setClaimsPreview(JSON.stringify(data.claims ?? {}, null, 2));
       await auth.currentUser.getIdToken(true);
-      toast.success("Token mis à jour");
+      toast.success(t("company.toast.token_updated"));
     } catch (e) {
       console.error(e);
-      toast.error("Sync impossible", { description: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.sync_failed"), { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
     }
@@ -244,7 +246,7 @@ export default function CompanySpacePanel() {
   if (!isConfigured && !devUiPreviewEnabled) {
     return (
       <PanelShell>
-        <OfflineGlyph testId="company-panel-offline" ariaLabel="Firebase non configuré" overlay={CloudOff} />
+        <OfflineGlyph testId="company-panel-offline" ariaLabel={t("company.aria.firebase_unconfigured")} overlay={CloudOff} />
       </PanelShell>
     );
   }
@@ -252,7 +254,7 @@ export default function CompanySpacePanel() {
   if (!firebaseUid && memberships.length === 0) {
     return (
       <PanelShell>
-        <OfflineGlyph testId="company-panel-offline" ariaLabel="Connexion requise" overlay={Lock} />
+        <OfflineGlyph testId="company-panel-offline" ariaLabel={t("company.aria.login_required")} overlay={Lock} />
       </PanelShell>
     );
   }
@@ -265,7 +267,7 @@ export default function CompanySpacePanel() {
         </span>
         <select
           data-testid="company-switcher"
-          aria-label="Choisir une organisation cliente"
+          aria-label={t("company.aria.choose_org")}
           className={selectClass}
           value={activeCompanyId}
           onChange={(e) => setActiveCompanyId(e.target.value)}
@@ -292,10 +294,10 @@ export default function CompanySpacePanel() {
             type="button"
             data-testid="company-open-intervention-form-btn"
             className="min-w-0 flex-1 rounded-[14px] border border-black/[0.06] bg-white/95 px-3 py-2 text-left text-sm font-bold text-black outline-none transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-slate-900/15"
-            aria-label="Ouvrir le formulaire de demande d’intervention"
+            aria-label={t("company.aria.open_form")}
             onClick={() => navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_SMART_FORM)}
           >
-            Nouvelle demande d’intervention
+            {t("company.new_request")}
           </button>
         </div>
       ) : null}
@@ -307,7 +309,7 @@ export default function CompanySpacePanel() {
         <input
           data-testid="company-name-input"
           type="text"
-          aria-label="Nom de la nouvelle organisation"
+          aria-label={t("company.aria.org_name")}
           autoComplete="organization"
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
@@ -316,7 +318,7 @@ export default function CompanySpacePanel() {
         <button
           type="button"
           data-testid="company-create-btn"
-          aria-label="Créer organisation"
+          aria-label={t("company.aria.create_org")}
           disabled={busy || !companyName.trim()}
           onClick={() => void createCompany()}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white shadow-md transition-opacity hover:opacity-95 disabled:opacity-35"
@@ -332,7 +334,7 @@ export default function CompanySpacePanel() {
         <input
           data-testid="accept-invite-input"
           type="text"
-          aria-label="Identifiant invitation Firestore"
+          aria-label={t("company.aria.invite_id")}
           value={inviteDocId}
           onChange={(e) => setInviteDocId(e.target.value)}
           className={inputClass}
@@ -340,7 +342,7 @@ export default function CompanySpacePanel() {
         <button
           type="button"
           data-testid="accept-invite-btn"
-          aria-label="Accepter invitation"
+          aria-label={t("company.aria.accept_invite")}
           disabled={busy || !inviteDocId.trim()}
           onClick={() => void acceptInvite()}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-md transition-opacity hover:opacity-95 disabled:opacity-35"
@@ -363,7 +365,7 @@ export default function CompanySpacePanel() {
             type="text"
             inputMode="tel"
             data-testid="invite-phone-input"
-            aria-label="Coordonnées à inviter"
+            aria-label={t("company.aria.invite_contact")}
             autoComplete="tel"
             value={invitePhone}
             onChange={(e) => setInvitePhone(e.target.value)}
@@ -372,7 +374,7 @@ export default function CompanySpacePanel() {
           <button
             type="button"
             data-testid="invite-submit-btn"
-            aria-label="Envoyer invitation"
+            aria-label={t("company.aria.send_invite")}
             disabled={busy || !invitePhone.trim() || !activeCompanyId}
             onClick={() => void submitInvite()}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-md transition-opacity hover:opacity-95 disabled:opacity-35"
@@ -387,13 +389,13 @@ export default function CompanySpacePanel() {
         <div
           data-testid="company-billing-strip"
           className={`${glassRow} border-amber-200/40 bg-amber-50/50`}
-          aria-label={`Facturation entreprise ${activeCompanyLabel}`}
+          aria-label={`${t("company.aria.billing_company")} ${activeCompanyLabel}`}
         >
           <span className={`${iconRail} border-amber-200/60 bg-white text-amber-900`}>
             <CreditCard className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0 flex-1 text-[12px] font-medium text-amber-950/90">
-            Facturation / abonnement — paiements clients via Stripe (portail + webhook).
+            {t("company.billing_strip")}
           </div>
           <Lock className="h-4 w-4 shrink-0 text-amber-800/50" aria-hidden />
         </div>
@@ -407,7 +409,7 @@ export default function CompanySpacePanel() {
         <button
           type="button"
           data-testid="sync-claims-btn"
-          aria-label="Synchroniser jeton serveur"
+          aria-label={t("company.aria.sync_token")}
           disabled={busy || memberships.length === 0}
           onClick={() => void syncClaims()}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white/95 text-slate-700 shadow-sm transition-colors hover:bg-white disabled:opacity-35"

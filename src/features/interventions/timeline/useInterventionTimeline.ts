@@ -17,6 +17,7 @@ import {
   subscribeCommissionAudit,
   type CommissionAuditRow,
 } from "@/features/commissions/commissionFirestore";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
   return {
@@ -48,17 +49,14 @@ export function useInterventionTimeline(
   interventionId: string | null,
   options?: { clientVisibleOnly?: boolean; companyId?: string | null },
 ) {
+  const activeId = interventionId?.trim() || null;
   const [events, setEvents] = useState<InterventionEvent[]>([]);
-  const [loading, setLoading] = useState(Boolean(interventionId));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!interventionId || !firestore) {
-      setEvents([]);
-      setLoading(false);
-      return;
-    }
+    if (!activeId || !firestore) return;
 
-    setLoading(true);
+    scheduleEffectUpdate(() => setLoading(true));
     let statusRows: InterventionStatusEvent[] = [];
     let timelineRows: Array<{ id: string; data: InterventionTimelineDoc }> = [];
     let emailRows: InterventionEmailDoc[] = [];
@@ -79,7 +77,7 @@ export function useInterventionTimeline(
 
     const unsubStatus = onSnapshot(
       query(
-        collection(firestore, "interventions", interventionId, "status_events"),
+        collection(firestore, "interventions", activeId, "status_events"),
         orderBy("at", "asc"),
       ),
       (snap) => {
@@ -94,7 +92,7 @@ export function useInterventionTimeline(
 
     const unsubTimeline = onSnapshot(
       query(
-        collection(firestore, "interventions", interventionId, "timeline_events"),
+        collection(firestore, "interventions", activeId, "timeline_events"),
         orderBy("createdAt", "asc"),
       ),
       (snap) => {
@@ -112,7 +110,7 @@ export function useInterventionTimeline(
 
     const unsubEmails = subscribeInterventionEmails(
       firestore,
-      interventionId,
+      activeId,
       (rows) => {
         emailRows = rows;
         publish();
@@ -123,12 +121,12 @@ export function useInterventionTimeline(
       },
     );
 
-    const unsubMaterials = subscribeMaterialOrders(firestore, interventionId, (rows) => {
+    const unsubMaterials = subscribeMaterialOrders(firestore, activeId, (rows) => {
       materialRows = rows;
       publish();
     });
 
-    const unsubCommission = subscribeCommissionAudit(firestore, interventionId, (rows) => {
+    const unsubCommission = subscribeCommissionAudit(firestore, activeId, (rows) => {
       commissionRows = rows;
       publish();
     });
@@ -140,17 +138,21 @@ export function useInterventionTimeline(
       unsubMaterials();
       unsubCommission();
     };
-  }, [interventionId, options?.clientVisibleOnly]);
+  }, [activeId, options?.clientVisibleOnly]);
 
   const addComment = async (content: string) => {
-    if (!interventionId) throw new Error("Aucun dossier sélectionné");
+    if (!activeId) throw new Error("Aucun dossier sélectionné");
     await addInterventionTimelineComment({
-      interventionId,
+      interventionId: activeId,
       content,
       companyId: options?.companyId ?? null,
       visibility: "internal",
     });
   };
 
-  return { events, loading, addComment };
+  return {
+    events: activeId ? events : [],
+    loading: activeId ? loading : false,
+    addComment,
+  };
 }

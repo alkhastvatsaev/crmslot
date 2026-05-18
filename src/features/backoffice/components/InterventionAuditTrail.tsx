@@ -11,6 +11,7 @@ import { firestore } from "@/core/config/firebase";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { Clock, ArrowRight, User, MessageSquare } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -39,17 +40,16 @@ type Props = {
 
 export default function InterventionAuditTrail({ interventionId }: Props) {
   const { t } = useTranslation();
+  const activeId = interventionId?.trim() || null;
   const [events, setEvents] = useState<InterventionStatusEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!firestore || !interventionId) {
-      setLoading(false);
-      return;
-    }
+    if (!firestore || !activeId) return;
 
+    scheduleEffectUpdate(() => setLoading(true));
     const q = query(
-      collection(firestore, "interventions", interventionId, "status_events"),
+      collection(firestore, "interventions", activeId, "status_events"),
       orderBy("at", "desc"),
     );
 
@@ -67,7 +67,19 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
     );
 
     return unsub;
-  }, [interventionId]);
+  }, [activeId]);
+
+  if (!activeId) {
+    return (
+      <div
+        data-testid="audit-trail-empty"
+        style={outfit}
+        className="py-6 text-center text-[13px] text-slate-400 font-medium"
+      >
+        {String(t("audit.no_events"))}
+      </div>
+    );
+  }
 
   if (loading) {
     return (

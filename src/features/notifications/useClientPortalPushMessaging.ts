@@ -16,6 +16,7 @@ import {
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
 } from "@/features/notifications/fcmWebPush";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 export type ClientPortalPushApi = {
   status: FcmUiStatus;
@@ -90,12 +91,12 @@ export function useClientPortalPushMessaging(
     const firebaseAuth = auth;
 
     if (!enabled || !isConfigured || !app || !db || !firebaseAuth || !isFirebasePublicConfigured()) {
-      setStatus("unsupported");
+      scheduleEffectUpdate(() => setStatus("unsupported"));
       return () => {};
     }
 
     if (!vapidKey?.trim()) {
-      setStatus("needs_vapid");
+      scheduleEffectUpdate(() => setStatus("needs_vapid"));
       return () => {};
     }
 
@@ -103,7 +104,7 @@ export function useClientPortalPushMessaging(
 
     void isSupported().then((supported) => {
       if (!supported) {
-        setStatus("unsupported");
+        scheduleEffectUpdate(() => setStatus("unsupported"));
         return;
       }
 
