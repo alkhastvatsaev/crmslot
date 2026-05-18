@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -57,19 +58,18 @@ type Props = {
 
 export default function MaterialOrderManagement({ companyId }: Props) {
   const { t } = useTranslation();
+  const activeCompanyId = companyId?.trim() || null;
   const [orders, setOrders] = useState<MaterialOrder[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!firestore || !companyId) {
-      setLoading(false);
-      return;
-    }
+    if (!firestore || !activeCompanyId) return;
 
+    scheduleEffectUpdate(() => setLoading(true));
     const q = query(
       collection(firestore, "material_orders"),
-      where("companyId", "==", companyId),
+      where("companyId", "==", activeCompanyId),
       orderBy("createdAt", "desc"),
     );
 
@@ -85,7 +85,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
     );
 
     return unsub;
-  }, [companyId]);
+  }, [activeCompanyId]);
 
   const updateStatus = async (orderId: string, newStatus: MaterialOrder["status"]) => {
     if (!firestore) return;
@@ -102,6 +102,10 @@ export default function MaterialOrderManagement({ companyId }: Props) {
       setUpdatingId(null);
     }
   };
+
+  if (!activeCompanyId) {
+    return null;
+  }
 
   if (loading) {
     return (

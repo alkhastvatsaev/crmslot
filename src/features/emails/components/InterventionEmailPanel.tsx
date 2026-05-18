@@ -104,15 +104,13 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
   const [sending, setSending] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (unreadCount > 0) setExpanded(true);
-  }, [unreadCount]);
+  const panelExpanded = expanded || unreadCount > 0;
 
   useEffect(() => {
-    if (expanded && listRef.current) {
+    if (panelExpanded && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
-  }, [expanded, emails]);
+  }, [panelExpanded, emails]);
 
   const handleMarkRead = useCallback(
     (id: string) => {
@@ -198,14 +196,14 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
             <span className="text-[10px] text-slate-400">{emails.length}</span>
           )}
         </div>
-        {expanded ? (
+        {panelExpanded ? (
           <ChevronUp className="w-4 h-4 text-slate-400" />
         ) : (
           <ChevronDown className="w-4 h-4 text-slate-400" />
         )}
       </button>
 
-      {expanded && (
+      {panelExpanded && (
         <div className="rounded-[18px] border border-slate-100 bg-white overflow-hidden">
           {emails.length > 0 && (
             <div

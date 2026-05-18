@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import type { Intervention } from "@/features/interventions/types";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -28,6 +29,7 @@ interface KpiCard {
 }
 
 export default function DailyOperationsKpi({ interventions }: Props) {
+  const { t } = useTranslation();
   const kpis = useMemo<KpiCard[]>(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayInterventions = interventions.filter(
@@ -39,63 +41,63 @@ export default function DailyOperationsKpi({ interventions }: Props) {
 
     return [
       {
-        label: "Total aujourd'hui",
+        label: t("backoffice.dashboard.kpi_total_today"),
         value: todayInterventions.length,
         icon: TrendingUp,
         color: "text-slate-700",
         bgColor: "bg-slate-100",
       },
       {
-        label: "En attente",
+        label: t("backoffice.dashboard.kpi_pending"),
         value: byStatus(["pending", "pending_needs_address", "assigned"]),
         icon: Clock,
         color: "text-blue-700",
         bgColor: "bg-blue-50",
       },
       {
-        label: "En route",
+        label: t("backoffice.dashboard.kpi_en_route"),
         value: byStatus(["en_route"]),
         icon: Truck,
         color: "text-indigo-700",
         bgColor: "bg-indigo-50",
       },
       {
-        label: "En cours",
+        label: t("backoffice.dashboard.kpi_in_progress"),
         value: byStatus(["in_progress"]),
         icon: Wrench,
         color: "text-amber-700",
         bgColor: "bg-amber-50",
       },
       {
-        label: "Attente matériel",
+        label: t("backoffice.dashboard.kpi_waiting_material"),
         value: byStatus(["waiting_material"]),
         icon: AlertTriangle,
         color: "text-orange-700",
         bgColor: "bg-orange-50",
       },
       {
-        label: "Terminées",
+        label: t("backoffice.dashboard.kpi_done"),
         value: byStatus(["done", "invoiced"]),
         icon: CheckCircle2,
         color: "text-emerald-700",
         bgColor: "bg-emerald-50",
       },
       {
-        label: "Annulées",
+        label: t("backoffice.dashboard.kpi_cancelled"),
         value: byStatus(["cancelled"]),
         icon: Ban,
         color: "text-red-600",
         bgColor: "bg-red-50",
       },
       {
-        label: "Facturées",
+        label: t("backoffice.dashboard.kpi_invoiced"),
         value: byStatus(["invoiced"]),
         icon: FileText,
         color: "text-green-700",
         bgColor: "bg-green-50",
       },
     ];
-  }, [interventions]);
+  }, [interventions, t]);
 
   const completionRate = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -115,7 +117,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
       <div className="rounded-2xl border border-slate-100 bg-white p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-            Taux de complétion
+            {t("backoffice.dashboard.kpi_completion_rate")}
           </span>
           <span className="text-[18px] font-black text-slate-900">
             {completionRate}%

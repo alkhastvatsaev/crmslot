@@ -12,6 +12,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName } from "@/utils/stringUtils";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.5 } as const;
 
@@ -33,18 +34,17 @@ type TrackedIntervention = {
 };
 
 function useMyInterventions(searchLastName: string, profileLastName: string) {
+  const canSubscribe = Boolean(isConfigured && auth && firestore);
   const [interventions, setInterventions] = useState<TrackedIntervention[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(canSubscribe);
 
   useEffect(() => {
-    if (!isConfigured || !auth || !firestore) {
-      setLoading(false);
-      return;
-    }
+    if (!canSubscribe) return;
 
     let unsubSnap: (() => void) | undefined;
 
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
+    const firebaseAuth = auth!;
+    const unsubAuth = onAuthStateChanged(firebaseAuth, (user) => {
       if (unsubSnap) { unsubSnap(); unsubSnap = undefined; }
       const db = firestore;
       if (!db) return;
@@ -70,9 +70,12 @@ function useMyInterventions(searchLastName: string, profileLastName: string) {
     });
 
     return () => { if (unsubSnap) unsubSnap(); unsubAuth(); };
-  }, [searchLastName, profileLastName]);
+  }, [canSubscribe, searchLastName, profileLastName]);
 
-  return { interventions, loading };
+  return {
+    interventions: canSubscribe ? interventions : [],
+    loading: canSubscribe ? loading : false,
+  };
 }
 
 const STATUS_PILL: Record<string, string> = {
@@ -107,7 +110,10 @@ export default function RequesterTrackingPanel() {
 
   const { interventions, loading: interventionLoading } = useMyInterventions(searchQuery, profile.lastName);
   const latestIntervention = interventions[0] ?? null;
-  const selectedIntervention = selectedId ? (interventions.find((i) => i.id === selectedId) ?? latestIntervention) : latestIntervention;
+  const resolvedSelectedId = pendingTrackingInterventionId ?? selectedId;
+  const selectedIntervention = resolvedSelectedId
+    ? (interventions.find((i) => i.id === resolvedSelectedId) ?? latestIntervention)
+    : latestIntervention;
   const [, setUser] = useState(auth?.currentUser ?? null);
   const { t } = useTranslation();
 
@@ -118,8 +124,10 @@ export default function RequesterTrackingPanel() {
 
   useEffect(() => {
     if (!pendingTrackingInterventionId) return;
-    setSelectedId(pendingTrackingInterventionId);
-    setPendingTrackingInterventionId(null);
+    scheduleEffectUpdate(() => {
+      setSelectedId(pendingTrackingInterventionId);
+      setPendingTrackingInterventionId(null);
+    });
   }, [pendingTrackingInterventionId, setPendingTrackingInterventionId]);
 
   const handleSearch = (e: React.FormEvent) => {

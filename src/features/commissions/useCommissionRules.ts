@@ -4,24 +4,22 @@ import { useEffect, useState } from "react";
 import { firestore } from "@/core/config/firebase";
 import { subscribeCommissionRules } from "./commissionFirestore";
 import type { CommissionRule } from "./types";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 export function useCommissionRules(companyId: string | null) {
+  const activeCompanyId = companyId?.trim() || null;
   const [rules, setRules] = useState<CommissionRule[]>([]);
-  const [loading, setLoading] = useState(Boolean(companyId));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!companyId || !firestore) {
-      setRules([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const unsub = subscribeCommissionRules(firestore, companyId, (rows) => {
+    if (!activeCompanyId || !firestore) return;
+    scheduleEffectUpdate(() => setLoading(true));
+    const unsub = subscribeCommissionRules(firestore, activeCompanyId, (rows) => {
       setRules(rows);
       setLoading(false);
     });
     return unsub;
-  }, [companyId]);
+  }, [activeCompanyId]);
 
-  return { rules, loading };
+  return { rules: activeCompanyId ? rules : [], loading: activeCompanyId ? loading : false };
 }

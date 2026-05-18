@@ -6,20 +6,19 @@ import {
   subscribeInterventionEmails,
   type InterventionEmailDoc,
 } from "./interventionEmailFirestore";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 export function useInterventionEmails(interventionId: string | null) {
+  const activeId = interventionId?.trim() || null;
   const [emails, setEmails] = useState<InterventionEmailDoc[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!interventionId || !firestore) {
-      setEmails([]);
-      return;
-    }
-    setLoading(true);
+    if (!activeId || !firestore) return;
+    scheduleEffectUpdate(() => setLoading(true));
     const unsub = subscribeInterventionEmails(
       firestore,
-      interventionId,
+      activeId,
       (rows) => {
         setEmails(rows);
         setLoading(false);
@@ -27,12 +26,13 @@ export function useInterventionEmails(interventionId: string | null) {
       () => setLoading(false),
     );
     return unsub;
-  }, [interventionId]);
+  }, [activeId]);
 
+  const visibleEmails = activeId ? emails : [];
   const unreadCount = useMemo(
-    () => emails.filter((e) => e.direction === "inbound" && !e.readAt).length,
-    [emails],
+    () => visibleEmails.filter((e) => e.direction === "inbound" && !e.readAt).length,
+    [visibleEmails],
   );
 
-  return { emails, loading, unreadCount };
+  return { emails: visibleEmails, loading: activeId ? loading : false, unreadCount };
 }

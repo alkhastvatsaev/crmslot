@@ -27,8 +27,17 @@ function publicOrigin(): string {
   return "http://localhost:3000";
 }
 
-function caseLink(interventionId: string): string {
+function technicianCaseLink(interventionId: string): string {
   return `${publicOrigin()}/?bmTechCase=${encodeURIComponent(interventionId)}`;
+}
+
+function clientCaseLink(interventionId: string): string {
+  return `${publicOrigin()}/?bmClientCase=${encodeURIComponent(interventionId)}`;
+}
+
+async function isClientPortalUid(uid: string): Promise<boolean> {
+  const snap = await admin.firestore().collection("client_portal_profiles").doc(uid).get();
+  return snap.exists;
 }
 
 async function listTokens(uid: string): Promise<string[]> {
@@ -83,11 +92,13 @@ export async function notifyInterventionStatusChange(params: {
   const body = `Statut : ${label}`;
 
   const uids = notificationTargets(after, nextStatus);
-  const link = caseLink(interventionId);
 
   for (const uid of uids) {
     const tokens = await listTokens(uid);
     if (!tokens.length) continue;
+    const link = (await isClientPortalUid(uid))
+      ? clientCaseLink(interventionId)
+      : technicianCaseLink(interventionId);
     await sendToTokens(tokens, {
       notification: { title, body },
       data: {

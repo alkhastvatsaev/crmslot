@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
   return {
@@ -21,19 +22,16 @@ function mapStatusEventDoc(id: string, data: Record<string, unknown>): Intervent
 
 /** Abonnement temps réel au journal des transitions d’un dossier. */
 export function useInterventionStatusEvents(interventionId: string | null) {
+  const activeId = interventionId?.trim() || null;
   const [events, setEvents] = useState<InterventionStatusEvent[]>([]);
-  const [loading, setLoading] = useState(Boolean(interventionId));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!interventionId || !firestore) {
-      setEvents([]);
-      setLoading(false);
-      return;
-    }
+    if (!activeId || !firestore) return;
 
-    setLoading(true);
+    scheduleEffectUpdate(() => setLoading(true));
     const q = query(
-      collection(firestore, "interventions", interventionId, "status_events"),
+      collection(firestore, "interventions", activeId, "status_events"),
       orderBy("at", "asc"),
     );
 
@@ -52,7 +50,7 @@ export function useInterventionStatusEvents(interventionId: string | null) {
     );
 
     return () => unsub();
-  }, [interventionId]);
+  }, [activeId]);
 
-  return { events, loading };
+  return { events: activeId ? events : [], loading: activeId ? loading : false };
 }
