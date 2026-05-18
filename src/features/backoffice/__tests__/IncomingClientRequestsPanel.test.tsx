@@ -107,9 +107,12 @@ describe("IncomingClientRequestsPanel", () => {
 
     fireEvent.click(screen.getByTestId("incoming-request-card-req-1"));
     fireEvent.click(screen.getByTestId("incoming-request-assign"));
-    fireEvent.click(screen.getByTestId("technician-assign-confirm"));
 
-    await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1));
+    const confirm = screen.getByTestId("technician-assign-confirm");
+    await waitFor(() => expect(confirm).not.toBeDisabled());
+    fireEvent.click(confirm);
+
+    await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1), { timeout: 3000 });
     const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
     expect(patch.status).toBe("assigned");
     expect(patch.assignedTechnicianUid).toBe(getDefaultAssignedTechnicianUid());
