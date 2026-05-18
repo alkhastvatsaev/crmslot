@@ -107,7 +107,7 @@ export default function TechnicianAssignmentOfferCard({
       style={outfit}
       data-testid={`technician-assignment-offer-${iv.id}`}
       className={cn(
-        "w-full rounded-[20px] border px-4 py-3 transition-all",
+        "w-full rounded-[20px] border px-3 py-3 transition-all",
         isSelected
           ? "border-amber-300 bg-amber-50/95 ring-1 ring-amber-200 shadow-[0_14px_32px_-10px_rgba(245,158,11,0.35)]"
           : "border-amber-200/90 bg-amber-50/80 shadow-[0_8px_24px_-8px_rgba(245,158,11,0.2)]",
@@ -122,36 +122,36 @@ export default function TechnicianAssignmentOfferCard({
       role="button"
       tabIndex={0}
     >
-      <p className="text-center text-[10px] font-bold uppercase tracking-wide text-amber-900">
-        {t("technician_hub.dashboard.detail.new_assignment")}
-      </p>
-      <p className="mt-1 text-center text-[14px] font-bold text-slate-900">{displayLabel}</p>
-      <p className="text-center text-[12px] font-semibold text-amber-950/80">{timeLabel}</p>
+      <div className="flex items-center gap-2 mb-2.5">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500 animate-pulse" aria-hidden />
+        <span className="text-[10px] font-black uppercase tracking-widest text-amber-700">
+          {t("technician_hub.dashboard.detail.new_assignment")}
+        </span>
+        <span className="ml-auto text-[13px] font-bold tabular-nums text-amber-950/70">{timeLabel}</span>
+      </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+      <p className="truncate text-[15px] font-bold text-slate-900 mb-3">{displayLabel}</p>
+
+      <div className="flex justify-center gap-3" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           data-testid="technician-assignment-decline"
           disabled={isUpdating}
           onClick={() => void handleDecline()}
-          className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-[16px] border border-slate-200 bg-white px-2 text-[14px] font-bold text-slate-700 transition hover:bg-slate-50 active:scale-[0.98] disabled:opacity-70"
+          aria-label={String(t("technician_hub.dashboard.detail.decline_assignment"))}
+          className="flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200 bg-white text-neutral-700 transition active:scale-95 disabled:opacity-60"
         >
-          <X className="h-4 w-4 shrink-0" aria-hidden />
-          {isUpdating
-            ? t("technician_hub.dashboard.detail.updating")
-            : t("technician_hub.dashboard.detail.decline_assignment")}
+          <X className="h-6 w-6" aria-hidden />
         </button>
         <button
           type="button"
           data-testid="technician-assignment-accept"
           disabled={isUpdating}
           onClick={() => void handleAccept()}
-          className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-[16px] bg-blue-600 px-2 text-[14px] font-bold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
+          aria-label={String(t("technician_hub.dashboard.detail.accept_assignment"))}
+          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0F172A] text-white transition active:scale-95 disabled:opacity-60"
         >
-          <Check className="h-4 w-4 shrink-0" aria-hidden />
-          {isUpdating
-            ? t("technician_hub.dashboard.detail.updating")
-            : t("technician_hub.dashboard.detail.accept_assignment")}
+          <Check className="h-6 w-6 shrink-0" aria-hidden />
         </button>
       </div>
     </motion.div>

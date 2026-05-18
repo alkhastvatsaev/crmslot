@@ -1,4 +1,4 @@
-import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
+import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 
-/** Panneau hors-ligne du hub technicien (gauche du triptyque). */
-export const OFFLINE_SYNC_SLOT_INDEX = TECHNICIAN_HUB_SLOT_INDEX;
+/** Page carrousel dédiée synchro / hors-ligne (5ᵉ page). */
+export const OFFLINE_SYNC_SLOT_INDEX = OFFLINE_HUB_SLOT_INDEX;

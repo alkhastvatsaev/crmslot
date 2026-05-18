@@ -94,6 +94,9 @@ export const DASHBOARD_DESKTOP_STACK_BODY_CLASS = "dashboard-desktop-stack-body"
 
 export const DASHBOARD_DESKTOP_OVERLAY_ROOT_CLASS = "dashboard-desktop-overlay-root";
 
+/** Flèches prev/next — au-dessus du pager (z-30), dans les gouttières latérales. */
+export const DASHBOARD_DESKTOP_PAGER_CONTROLS_CLASS = "dashboard-desktop-pager-controls";
+
 /** Same grid template as header/body; chrome is column 2 (map rail). */
 export const DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS = "dashboard-desktop-galaxy-dock";
 

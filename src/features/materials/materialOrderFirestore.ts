@@ -39,7 +39,7 @@ export function subscribeMaterialOrders(
     onRows(
       snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MaterialOrderDoc, "id">) })),
     );
-  });
+  }, () => onRows([]));
 }
 
 export async function createMaterialOrderDoc(

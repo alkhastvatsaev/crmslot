@@ -23,7 +23,7 @@ export function subscribeSupplierOrders(
   const q = query(col(db, companyId), orderBy("createdAt", "desc"));
   return onSnapshot(q, (snap) => {
     onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SupplierOrder, "id">) })));
-  });
+  }, () => onData([]));
 }
 
 export async function createSupplierOrder(

@@ -37,6 +37,7 @@ import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
 import RecurringContractsPanel from "@/features/clients/components/RecurringContractsPanel";
 import StockManagementPanel from "@/features/materials/components/StockManagementPanel";
 import MultiCompanyOverviewPanel from "@/features/company/components/MultiCompanyOverviewPanel";
+import SiteQrCodePanel from "@/features/clients/components/SiteQrCodePanel";
 import CompanyCatalogPanel from "@/features/catalog/components/CompanyCatalogPanel";
 import CompanyKpiPanel from "@/features/dashboard/components/CompanyKpiPanel";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
@@ -120,15 +121,23 @@ export default function CompanySpacePanel() {
       return () => {};
     }
 
-    const q = query(collection(firestore, "company_invites"), where("invitedByUid", "==", firebaseUid));
-    return onSnapshot(
-      q,
-      (snap) => {
-        const n = snap.docs.filter((d) => (d.data() as { companyId?: string }).companyId === activeCompanyId).length;
-        setInvitesCount(n);
-      },
-      () => setInvitesCount(0),
-    );
+    let unsub: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      const q = query(collection(firestore!, "company_invites"), where("invitedByUid", "==", firebaseUid));
+      unsub = onSnapshot(
+        q,
+        (snap) => {
+          const n = snap.docs.filter((d) => (d.data() as { companyId?: string }).companyId === activeCompanyId).length;
+          setInvitesCount(n);
+        },
+        () => setInvitesCount(0),
+      );
+    }, 10);
+
+    return () => {
+      clearTimeout(timeout);
+      unsub?.();
+    };
   }, [firebaseUid, activeCompanyId, isAdmin]);
 
   const createCompany = async () => {
@@ -440,6 +449,12 @@ export default function CompanySpacePanel() {
       {activeCompanyId ? (
         <div data-testid="company-stock-management-panel" className="min-h-0 shrink-0">
           <StockManagementPanel />
+        </div>
+      ) : null}
+
+      {activeCompanyId ? (
+        <div data-testid="company-site-qr-panel" className="min-h-0 shrink-0">
+          <SiteQrCodePanel companyId={activeCompanyId} siteName={activeCompanyLabel} />
         </div>
       ) : null}
 

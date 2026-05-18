@@ -6,7 +6,8 @@ import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/f
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MapPin, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
+import { Check, MapPin, ChevronDown, ChevronUp, Image as ImageIcon, Star, FileDown } from "lucide-react";
+import { generateInterventionReport } from "@/utils/generateInterventionReport";
 import type { Intervention } from "@/features/interventions/types";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -143,6 +144,21 @@ export default function AdminValidationPanel() {
                       <MapPin className="h-4 w-4 shrink-0" />
                       <span className="truncate">{iv.address || "Adresse inconnue"}</span>
                     </div>
+                    {iv.clientRating && (
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`h-3.5 w-3.5 ${s <= iv.clientRating! ? "fill-amber-400 text-amber-400" : "text-slate-200"}`}
+                          />
+                        ))}
+                        {iv.clientComment && (
+                          <span className="ml-1 text-[11px] text-slate-500 italic truncate max-w-[140px]">
+                            &ldquo;{iv.clientComment}&rdquo;
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <AnimatePresence>
@@ -197,6 +213,12 @@ export default function AdminValidationPanel() {
                             </div>
                           )}
 
+                          <button
+                            onClick={(e) => { e.stopPropagation(); generateInterventionReport(iv); }}
+                            className="mt-2 w-full py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <FileDown className="h-4 w-4" /> Télécharger le rapport PDF
+                          </button>
                           {!isVerified && (
                             <button
                               onClick={(e) => {

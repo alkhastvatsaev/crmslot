@@ -1,17 +1,28 @@
 "use client";
 
+import { useMemo } from "react";
 import { ListTodo, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useOfflineSync } from "@/context/OfflineSyncContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { readTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
+import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 /** Page dédiée : rappels hors ligne + actions de synchro (carousel). */
 export default function TechnicianOfflineSyncPanel() {
   const { t } = useTranslation();
+  const pwaV2 = useFeatureFlag("pwaV2Bundle");
+  const { firebaseUid } = useTechnicianAssignments();
   const { navigatorOnline, pendingCompletionCount, isSyncing, lastFlushReport, flushNow } =
     useOfflineSync();
+
+  const cachedMissions = useMemo(
+    () => (firebaseUid ? readTerrainMissionsCache(firebaseUid) : []),
+    [firebaseUid, navigatorOnline],
+  );
 
   const hadConflictSkip = (lastFlushReport?.skippedConflict ?? 0) > 0;
 
@@ -74,6 +85,31 @@ export default function TechnicianOfflineSyncPanel() {
           </li>
         </ul>
       </div>
+
+      {pwaV2 ? (
+        <div
+          data-testid="offline-terrain-cache-panel"
+          className="rounded-[16px] border border-black/[0.06] bg-white/90 px-3 py-3 text-[12px] text-slate-700"
+        >
+          <p className="mb-1 font-bold text-slate-900">{t("offline.sync.terrain_cache_title")}</p>
+          {cachedMissions.length === 0 ? (
+            <p data-testid="offline-terrain-cache-empty">{t("offline.sync.terrain_cache_empty")}</p>
+          ) : (
+            <>
+              <p data-testid="offline-terrain-cache-count">
+                {t("offline.sync.terrain_cache_count").replace("{count}", String(cachedMissions.length))}
+              </p>
+              <ul className="mt-2 max-h-28 space-y-1 overflow-y-auto">
+                {cachedMissions.slice(0, 8).map((m) => (
+                  <li key={m.id} className="truncate rounded-md bg-slate-50 px-2 py-1">
+                    {m.title || m.problem || m.id}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      ) : null}
 
       <button
         type="button"

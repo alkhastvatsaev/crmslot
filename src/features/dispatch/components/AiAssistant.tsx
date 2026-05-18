@@ -844,9 +844,7 @@ export default function AiAssistant({
           asInteractiveButton={false}
           className={`h-full w-full ${showBadge ? "notified" : ""}`}
         >
-          <div className="pointer-events-none relative flex h-full w-full items-center justify-center">
-            <Waveform color="white" barCount={12} analyser={analyser} />
-          </div>
+          {/* Égaliseur (Waveform) supprimé selon la demande */}
           <AnimatePresence initial={false}>
             {showTransportControl ? (
               <motion.div

@@ -53,14 +53,6 @@ export default function OmniSearchLecot({ onSelectProduct, placeholder }: OmniSe
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (!query || query.trim().length < 2) {
-      setIsOpen(false);
-      return;
-    }
-    if (!loading) setIsOpen(true);
-  }, [query, loading, results.length]);
-
   const handleSelect = (product: LecotProduct) => {
     onSelectProduct(product);
     setQuery("");
@@ -75,7 +67,14 @@ export default function OmniSearchLecot({ onSelectProduct, placeholder }: OmniSe
           type="text"
           data-testid="omni-search-lecot-input"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            const next = e.target.value;
+            setQuery(next);
+            setIsOpen(next.trim().length >= 2);
+          }}
+          onFocus={() => {
+            if (query.trim().length >= 2) setIsOpen(true);
+          }}
           placeholder={placeholder || String(t("materials.form.search_lecot_placeholder"))}
           className="h-12 w-full rounded-xl border-2 border-blue-100 bg-blue-50/30 pl-10 pr-4 font-medium text-slate-800 placeholder-slate-400 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
         />

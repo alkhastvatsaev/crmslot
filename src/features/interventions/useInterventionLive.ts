@@ -16,14 +16,28 @@ export function useInterventionLive(interventionId: string | null, enabled = tru
       return () => {};
     }
 
-    const ref = doc(firestore, "interventions", interventionId.trim());
-    return onSnapshot(ref, (snap) => {
-      if (!snap.exists()) {
-        setData(null);
-        return;
-      }
-      setData({ id: snap.id, ...snap.data() } as Intervention);
-    });
+    let unsub: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      const ref = doc(firestore!, "interventions", interventionId.trim());
+      unsub = onSnapshot(
+        ref,
+        (snap) => {
+          if (!snap.exists()) {
+            setData(null);
+            return;
+          }
+          setData({ id: snap.id, ...snap.data() } as Intervention);
+        },
+        (error) => {
+          console.warn("[useInterventionLive] Firestore listener error:", error);
+        }
+      );
+    }, 10);
+
+    return () => {
+      clearTimeout(timeout);
+      unsub?.();
+    };
   }, [interventionId, enabled]);
 
   return data;

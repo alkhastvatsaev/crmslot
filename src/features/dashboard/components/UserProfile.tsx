@@ -15,6 +15,8 @@ export const appProfiles = [
   { name: "MANSOUR", roleKey: "technician" },
   { name: "ASLANBECK", roleKey: "back_office" },
   { name: "TIMOUR", roleKey: "admin" },
+  /** Aligné page 6 — lab `/technician`. */
+  { name: "ALEXANDRE", roleKey: "technician" },
 ];
 
 export default function UserProfile() {
@@ -23,17 +25,17 @@ export default function UserProfile() {
   const profiles = appProfiles;
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Synchronise le profil avec la page courante
+  // Synchronise le profil avec la page courante (1 profil par page carrousel).
   useEffect(() => {
-    if (pager) {
-      if (pager.pageIndex >= 0 && pager.pageIndex < 4) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCurrentIndex(pager.pageIndex);
-      }
-    }
-  }, [pager, pager?.pageIndex]);
+    if (!pager) return;
+    const index = Math.min(Math.max(0, pager.pageIndex), profiles.length - 1);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentIndex(index);
+  }, [pager, pager?.pageIndex, profiles.length]);
 
-  const currentProfile = profiles[currentIndex];
+  const safeIndex =
+    currentIndex >= 0 && currentIndex < profiles.length ? currentIndex : 0;
+  const currentProfile = profiles[safeIndex];
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();

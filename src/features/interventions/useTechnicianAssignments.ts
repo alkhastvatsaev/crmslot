@@ -18,6 +18,7 @@ import {
   getTechnicianAssignmentUid,
   matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
+import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
   loading: boolean;
@@ -111,10 +112,12 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
     if (!hookEnabled || noFirebaseAuth) return () => {};
 
     let unsubSnap: (() => void) | undefined;
+    let timeout: NodeJS.Timeout | undefined;
 
     const unsubAuth = onAuthStateChanged(auth!, (user) => {
       unsubSnap?.();
       unsubSnap = undefined;
+      if (timeout) clearTimeout(timeout);
 
       const rawAuthUid =
         devUiPreviewEnabled && (!user || user.isAnonymous)
@@ -147,23 +150,27 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
         where("assignedTechnicianUid", "==", technicianUid),
       );
 
-      unsubSnap = onSnapshot(
-        q,
-        (snapshot) => {
-          const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
-          queryClient.setQueryData([TECHNICIAN_ASSIGNMENTS_QUERY_KEY, technicianUid], data);
-          setSnapshotReady(true);
-          setError(null);
-        },
-        (e) => {
-          console.error("[useTechnicianAssignments]", e);
-          setError(e.message || "Erreur Firestore");
-          setSnapshotReady(true);
-        },
-      );
+      timeout = setTimeout(() => {
+        unsubSnap = onSnapshot(
+          q,
+          (snapshot) => {
+            const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
+            queryClient.setQueryData([TECHNICIAN_ASSIGNMENTS_QUERY_KEY, technicianUid], data);
+            writeTerrainMissionsCache(technicianUid, data);
+            setSnapshotReady(true);
+            setError(null);
+          },
+          (e) => {
+            console.error("[useTechnicianAssignments]", e);
+            setError(e.message || "Erreur Firestore");
+            setSnapshotReady(true);
+          },
+        );
+      }, 10);
     });
 
     return () => {
+      if (timeout) clearTimeout(timeout);
       unsubSnap?.();
       unsubAuth();
     };

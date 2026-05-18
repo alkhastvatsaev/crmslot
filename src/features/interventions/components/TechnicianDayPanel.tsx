@@ -1,13 +1,16 @@
 "use client";
- 
-import { useMemo } from "react";
-import { AlertCircle, Clock, Navigation2, CheckCircle2, TrendingUp } from "lucide-react";
+
+import { useMemo, useState } from "react";
+import { AlertCircle, Clock, Navigation2, CheckCircle2, TrendingUp, Route, MapPin, CalendarDays } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechnicianMissionDayAnchor";
 import { interventionMatchesTab, sortInterventionsByScheduleAsc } from "@/features/interventions/technicianSchedule";
 import TechnicianPushNotificationPanel from "@/features/notifications/components/TechnicianPushNotificationPanel";
+import { optimizeTourOrder, getCurrentPosition } from "@/features/interventions/optimizeTourOrder";
+import type { Intervention } from "@/features/interventions/types";
+import { generateIcal } from "@/utils/generateIcal";
  
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
  
@@ -29,8 +32,24 @@ export default function TechnicianDayPanel() {
   
   const progressPercent = totalToday > 0 ? Math.round((completedToday.length / totalToday) * 100) : 0;
  
-  const nextMission = pendingToday.length > 0 ? pendingToday[0] : null;
- 
+  const [optimizedOrder, setOptimizedOrder] = useState<Intervention[] | null>(null);
+  const [optimizing, setOptimizing] = useState(false);
+
+  const handleOptimize = async () => {
+    setOptimizing(true);
+    try {
+      const pos = await getCurrentPosition();
+      setOptimizedOrder(optimizeTourOrder(pendingToday, pos));
+    } catch {
+      setOptimizedOrder(optimizeTourOrder(pendingToday, { lat: 50.85, lng: 4.35 }));
+    } finally {
+      setOptimizing(false);
+    }
+  };
+
+  const displayedPending = optimizedOrder ?? pendingToday;
+  const nextMission = displayedPending.length > 0 ? displayedPending[0] : null;
+
   const getNavigationUrl = () => {
     if (!nextMission?.address) return "";
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(nextMission.address)}`;
@@ -140,11 +159,55 @@ export default function TechnicianDayPanel() {
                   <p className="mt-1 text-[12px] font-medium text-slate-500">{t("technician_hub.day.no_other_mission")}</p>
                 </div>
               )}
+
+              {pendingToday.length > 1 && (
+                <div className="mt-3 flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={handleOptimize}
+                    disabled={optimizing}
+                    className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-violet-200 bg-violet-50 px-4 py-2.5 text-[13px] font-bold text-violet-700 transition hover:bg-violet-100 disabled:opacity-50"
+                  >
+                    <Route className="h-4 w-4" />
+                    {optimizing ? "Calcul en cours…" : optimizedOrder ? "Recalculer la tournée" : "Optimiser la tournée"}
+                  </button>
+
+                  {optimizedOrder && (
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ordre optimal</p>
+                      {optimizedOrder.map((iv, idx) => (
+                        <div key={iv.id} className="flex items-center gap-2 rounded-xl border border-black/5 bg-white px-3 py-2">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[10px] font-extrabold text-violet-700">
+                            {idx + 1}
+                          </span>
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                          <span className="truncate text-[12px] font-semibold text-slate-700">
+                            {iv.title || iv.address || "Mission"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
  
+      {todayInterventions.length > 0 && (
+        <div className="shrink-0 px-1">
+          <button
+            type="button"
+            onClick={() => generateIcal(todayInterventions, "Ma journée BELGMAP")}
+            className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-slate-200 bg-white px-4 py-2.5 text-[12px] font-bold text-slate-600 transition hover:bg-slate-50"
+          >
+            <CalendarDays className="h-4 w-4" />
+            Exporter en iCal (.ics)
+          </button>
+        </div>
+      )}
+
       <TechnicianPushNotificationPanel />
     </div>
   );

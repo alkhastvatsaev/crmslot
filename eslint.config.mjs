@@ -7,6 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
+      // Firestore / sync guards use setState in effects intentionally (see scheduleEffectUpdate.ts).
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

@@ -27,6 +27,7 @@ jest.mock("@/features/clients/useClients", () => ({
       },
     ],
     loading: false,
+    offline: false,
   }),
 }));
 

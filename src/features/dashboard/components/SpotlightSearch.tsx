@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench, FileText, Phone, Navigation, ExternalLink, Download, BarChart3 } from 'lucide-react';
+import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, Smartphone, FileText, Phone, Navigation, ExternalLink, Download, BarChart3 } from 'lucide-react';
+import { BACKOFFICE_HUB_SLOT_INDEX } from '@/features/backoffice/backofficeHubConstants';
+import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
+import { TECHNICIAN_LAB_SLOT_INDEX } from '@/features/technicians/technicianLabConstants';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -34,6 +37,9 @@ export default function SpotlightSearch() {
     { index: 0, label: t('spotlight.nav_map'),        Icon: Map },
     { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
+    { index: BACKOFFICE_HUB_SLOT_INDEX, label: t('spotlight.nav_backoffice'), Icon: LayoutDashboard },
+    { index: AI_ASSISTANT_SLOT_INDEX, label: t('spotlight.nav_chatbot'), Icon: CloudOff },
+    { index: TECHNICIAN_LAB_SLOT_INDEX, label: t('spotlight.nav_technician_lab'), Icon: Smartphone },
   ], [t]);
 
   const workspace = useCompanyWorkspaceOptional();
@@ -123,12 +129,7 @@ export default function SpotlightSearch() {
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
         <span className="flex items-center gap-2 text-sm text-gray-400">
-          <Search className="w-4 h-4" />
-          <span>{t('spotlight.search_placeholder')}</span>
         </span>
-        <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-black/10 bg-black/5 px-2 py-0.5 text-xs font-medium text-gray-400">
-          ⌘K
-        </kbd>
       </button>
 
       <AnimatePresence>

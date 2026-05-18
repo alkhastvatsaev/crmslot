@@ -14,10 +14,52 @@ export type FcmUiStatus =
 
 const SW_READY_MS = 14_000;
 
+/** Service worker PWA enregistré (false en `npm run dev` sans `npm run dev:pwa`). */
+export function isPushServiceWorkerEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED === "true";
+}
+
+/** Attendu en dev local sans PWA — pas de bruit console. */
+export class PushServiceWorkerUnavailableError extends Error {
+  constructor() {
+    super(
+      "Service worker indisponible. En local : lancez « npm run dev:pwa ». En production : build + start (HTTPS).",
+    );
+    this.name = "PushServiceWorkerUnavailableError";
+  }
+}
+
+export function isPushServiceWorkerUnavailableError(e: unknown): e is PushServiceWorkerUnavailableError {
+  return e instanceof PushServiceWorkerUnavailableError;
+}
+
+export function handleFcmSyncError(
+  e: unknown,
+  setStatus: (status: FcmUiStatus) => void,
+  setLastError: (message: string | null) => void,
+  opts?: { logTag?: string; surfaceErrorInUi?: boolean },
+): void {
+  if (isPushServiceWorkerUnavailableError(e)) {
+    setStatus("idle");
+    setLastError(opts?.surfaceErrorInUi ? e.message : null);
+    return;
+  }
+  if (opts?.logTag) {
+    console.error(opts.logTag, e);
+  }
+  setStatus("error");
+  setLastError(e instanceof Error ? e.message : String(e));
+}
+
 export async function resolvePushServiceWorkerRegistration(): Promise<ServiceWorkerRegistration> {
   if (!("serviceWorker" in navigator)) {
     throw new Error("Service Worker non supporté par ce navigateur.");
   }
+
+  if (!isPushServiceWorkerEnabled()) {
+    throw new PushServiceWorkerUnavailableError();
+  }
+
   const existing = await navigator.serviceWorker.getRegistration();
   if (existing?.active) return existing;
 
@@ -25,11 +67,7 @@ export async function resolvePushServiceWorkerRegistration(): Promise<ServiceWor
     navigator.serviceWorker.ready,
     new Promise<ServiceWorkerRegistration>((_, reject) => {
       setTimeout(() => {
-        reject(
-          new Error(
-            "Aucun service worker actif. En développement : « npm run dev:pwa » ou build + start (HTTPS en prod).",
-          ),
-        );
+        reject(new PushServiceWorkerUnavailableError());
       }, SW_READY_MS);
     }),
   ]);

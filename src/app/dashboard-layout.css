@@ -82,7 +82,7 @@
     width: 100%;
     height: 100dvh;
     min-height: 0;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
 }
@@ -101,6 +101,7 @@
  * Centered block — padding defines outer bounds; inner grids align Rails 1–4.
  */
 .dashboard-desktop-stack {
+    position: relative;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -114,6 +115,10 @@
     padding-top: var(--dashboard-canvas-pad-top);
     padding-bottom: max(var(--dashboard-canvas-pad-x), env(safe-area-inset-bottom, 0px));
     gap: var(--dashboard-grid-gap);
+    --dashboard-pager-outside-gap: 0.35rem;
+    --dashboard-pager-outside-extra: calc(5px + 5mm);
+    --dashboard-pager-inset-nudge: 6px;
+    overflow: visible;
 }
 
 .dashboard-desktop-stack-header {
@@ -132,7 +137,92 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    overflow-x: clip;
+    overflow-y: visible;
+}
+
+/* Page 6 — `/technician` plein écran (pas de header 3 colonnes ni galaxy). */
+.dashboard-desktop-canvas--technician-lab {
+    align-items: stretch;
+    min-width: 0;
+}
+
+.dashboard-desktop-stack--technician-lab {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+    padding-inline: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    gap: 0;
+}
+
+.dashboard-desktop-stack--technician-lab .dashboard-desktop-pager-host {
     overflow: hidden;
+}
+
+/**
+ * Flèches carrousel — fixed, z-50, dans la gouttière hors panneaux vitre (jamais de coords négatives).
+ */
+.dashboard-desktop-pager-controls {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.dashboard-desktop-pager-controls__btn {
+    position: fixed;
+    top: 50%;
+    display: flex;
+    min-height: 3rem;
+    min-width: 3rem;
+    padding: 0.5rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: rgb(51 65 85 / 0.55);
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        opacity 0.25s ease;
+    pointer-events: auto;
+}
+
+.dashboard-desktop-pager-controls__btn:hover:not(:disabled) {
+    transform: translateY(-50%) scale(1.12);
+    color: rgb(15 23 42 / 0.9);
+}
+
+.dashboard-desktop-pager-controls__btn:active:not(:disabled) {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.dashboard-desktop-pager-controls__btn:disabled {
+    pointer-events: none;
+    opacity: 0.25;
+}
+
+/* Marge viewport (stack centré) ou padding canvas (pleine largeur) — toujours visible */
+.dashboard-desktop-pager-controls__btn--prev {
+    left: calc(
+        max(
+            0.5rem,
+            (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 + var(--dashboard-pager-outside-gap)
+        ) - var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
+    );
+}
+
+.dashboard-desktop-pager-controls__btn--next {
+    right: calc(
+        max(
+            0.5rem,
+            (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 + var(--dashboard-pager-outside-gap)
+        ) - var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
+    );
 }
 
 .dashboard-desktop-overlay-root {

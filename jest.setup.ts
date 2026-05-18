@@ -93,6 +93,14 @@ jest.mock('framer-motion', () => {
     },
     AnimatePresence: ({ children }: any) => children,
     useAnimation: () => ({ start: jest.fn(), stop: jest.fn() }),
+    useMotionValue: (initialValue: any) => ({
+      get: () => initialValue,
+      set: jest.fn(),
+      onChange: jest.fn(),
+    }),
+    useTransform: (value: any, inputRange: any, outputRange: any) => ({
+      get: () => outputRange[0],
+    }),
   };
 });
 /* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, react/display-name */

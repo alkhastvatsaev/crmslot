@@ -7,6 +7,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";
+import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 
@@ -22,7 +23,7 @@ interface AllTheProvidersProps {
  */
 export function AllTheProviders({ 
   children, 
-  pageCount = 3,
+  pageCount = 6,
   initialPageIndex = 0,
   activeCompanyId = null
 }: AllTheProvidersProps) {
@@ -40,9 +41,11 @@ export function AllTheProviders({
               <TechnicianQueryProvider>
                 <OfflineSyncProvider>
                   <TechnicianCaseIntentProvider>
-                    <TechnicianFinishJobProvider>
-                      {children}
-                    </TechnicianFinishJobProvider>
+                    <BackofficeInboxIntentProvider>
+                      <TechnicianFinishJobProvider>
+                        {children}
+                      </TechnicianFinishJobProvider>
+                    </BackofficeInboxIntentProvider>
                   </TechnicianCaseIntentProvider>
                 </OfflineSyncProvider>
               </TechnicianQueryProvider>

@@ -211,13 +211,17 @@ export function subscribeInterventionCommission(
     onRow(null);
     return () => {};
   }
-  return onSnapshot(doc(db, COMMISSION_OVERRIDES_COLLECTION, id), (snap) => {
-    if (!snap.exists()) {
-      onRow(null);
-      return;
-    }
-    onRow({ id: snap.id, ...(snap.data() as Omit<InterventionCommission, "id">) });
-  });
+  return onSnapshot(
+    doc(db, COMMISSION_OVERRIDES_COLLECTION, id),
+    (snap) => {
+      if (!snap.exists()) {
+        onRow(null);
+        return;
+      }
+      onRow({ id: snap.id, ...(snap.data() as Omit<InterventionCommission, "id">) });
+    },
+    () => onRow(null),
+  );
 }
 
 export async function getInterventionCommission(
@@ -282,13 +286,16 @@ export function subscribeManualCommissions(
     collection(db, MANUAL_COMMISSIONS_COLLECTION, cid, "entries"),
     orderBy("createdAt", "desc"),
   );
-  return onSnapshot(q, (snap) =>
-    onRows(
-      snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<ManualCommissionEntry, "id">),
-      })),
-    ),
+  return onSnapshot(
+    q,
+    (snap) =>
+      onRows(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<ManualCommissionEntry, "id">),
+        })),
+      ),
+    () => onRows([]),
   );
 }
 
@@ -308,22 +315,26 @@ export function subscribeCompanyCommissionAudit(
     where("companyId", "==", cid),
     orderBy("at", "desc"),
   );
-  return onSnapshot(q, (snap) => {
-    const rows = snap.docs.slice(0, limitCount).map((d) => {
-      const data = d.data();
-      return {
-        id: d.id,
-        companyId: String(data.companyId ?? cid),
-        interventionId: String(data.interventionId ?? ""),
-        action: String(data.action ?? "unknown"),
-        finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
-        reason: typeof data.reason === "string" ? data.reason : undefined,
-        byUid: String(data.byUid ?? ""),
-        at: data.at,
-      } satisfies CompanyCommissionAuditRow;
-    });
-    onRows(rows);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const rows = snap.docs.slice(0, limitCount).map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          companyId: String(data.companyId ?? cid),
+          interventionId: String(data.interventionId ?? ""),
+          action: String(data.action ?? "unknown"),
+          finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
+          reason: typeof data.reason === "string" ? data.reason : undefined,
+          byUid: String(data.byUid ?? ""),
+          at: data.at,
+        } satisfies CompanyCommissionAuditRow;
+      });
+      onRows(rows);
+    },
+    () => onRows([]),
+  );
 }
 
 export function subscribeCommissionRuleAudit(
@@ -342,25 +353,29 @@ export function subscribeCommissionRuleAudit(
     where("companyId", "==", cid),
     orderBy("at", "desc"),
   );
-  return onSnapshot(q, (snap) => {
-    onRows(
-      snap.docs.slice(0, limitCount).map((d) => {
-        const data = d.data();
-        return {
-          id: d.id,
-          companyId: cid,
-          ruleId: String(data.ruleId ?? ""),
-          action: String(data.action ?? "unknown") as CommissionRuleAuditAction,
-          level: typeof data.level === "string" ? data.level : undefined,
-          targetId: typeof data.targetId === "string" ? data.targetId : undefined,
-          valueType: typeof data.valueType === "string" ? data.valueType : undefined,
-          value: typeof data.value === "number" ? data.value : undefined,
-          byUid: String(data.byUid ?? ""),
-          at: data.at,
-        };
-      }),
-    );
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      onRows(
+        snap.docs.slice(0, limitCount).map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            companyId: cid,
+            ruleId: String(data.ruleId ?? ""),
+            action: String(data.action ?? "unknown") as CommissionRuleAuditAction,
+            level: typeof data.level === "string" ? data.level : undefined,
+            targetId: typeof data.targetId === "string" ? data.targetId : undefined,
+            valueType: typeof data.valueType === "string" ? data.valueType : undefined,
+            value: typeof data.value === "number" ? data.value : undefined,
+            byUid: String(data.byUid ?? ""),
+            at: data.at,
+          };
+        }),
+      );
+    },
+    () => onRows([]),
+  );
 }
 
 export function subscribeCommissionAudit(
@@ -374,20 +389,23 @@ export function subscribeCommissionAudit(
     where("interventionId", "==", interventionId),
     orderBy("at", "asc"),
   );
-  return onSnapshot(q, (snap) =>
-    onRows(
-      snap.docs.map((d) => {
-        const data = d.data();
-        return {
-          id: d.id,
-          interventionId: String(data.interventionId ?? interventionId),
-          action: String(data.action ?? "unknown"),
-          finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
-          reason: typeof data.reason === "string" ? data.reason : undefined,
-          byUid: String(data.byUid ?? ""),
-          at: data.at,
-        } satisfies CommissionAuditRow;
-      }),
-    ),
+  return onSnapshot(
+    q,
+    (snap) =>
+      onRows(
+        snap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            interventionId: String(data.interventionId ?? interventionId),
+            action: String(data.action ?? "unknown"),
+            finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
+            reason: typeof data.reason === "string" ? data.reason : undefined,
+            byUid: String(data.byUid ?? ""),
+            at: data.at,
+          } satisfies CommissionAuditRow;
+        }),
+      ),
+    () => onRows([]),
   );
 }

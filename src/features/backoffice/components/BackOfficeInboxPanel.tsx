@@ -19,9 +19,8 @@ import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
-import UnifiedInterventionDrawer from "@/features/interventions/components/UnifiedInterventionDrawer";
-
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { useDateContext } from "@/context/DateContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { cn } from "@/lib/utils";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
@@ -50,17 +49,35 @@ import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import {
   coerceFirestoreLikeDate,
+  interventionClientLabel,
   isInterventionPendingBackOfficeIntake,
+  isInterventionReleasedToTechnicianField,
+  interventionMatchesTab,
 } from "@/features/interventions/technicianSchedule";
+import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
+import {
+  interventionsToChatDayRows,
+  missionsToChatDayRows,
+} from "@/features/backoffice/chatDayMissionRow";
+import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
+import type { Mission } from "@/utils/mockMissions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
+import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import InterventionRemindersPanel from "@/features/reminders/components/InterventionRemindersPanel";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import SlaBadge from "@/features/interventions/components/SlaBadge";
+import DuplicateWarningBanner from "@/features/interventions/components/DuplicateWarningBanner";
 import {
   navigateTechnicianHub,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
+import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";
+import { useBackofficeReminderPush } from "@/features/reminders/useBackofficeReminderPush";
 import {
   proposeAvailableSlotsForTechnician,
   proposeCompanyOpenSlots,
@@ -154,6 +171,7 @@ function BackOfficeInboxInterventionRow({
               <CheckCircle2 className="w-4 h-4 text-green-500" />
             )}
             <h4 className="text-[15px] font-bold text-slate-800 truncate">{clientName}</h4>
+            <SlaBadge intervention={item} />
           </div>
           <p className="text-[13px] text-slate-500 truncate mb-2">
             {item.problem || item.title || t("backoffice.inbox.no_description")}
@@ -201,7 +219,12 @@ function BackOfficeInboxInterventionRow({
   );
 }
 
-export default function BackOfficeInboxPanel() {
+type BackOfficeInboxPanelProps = {
+  /** Missions affichées dans le rail gauche « du jour » (y compris démo). */
+  dayMissions?: Mission[];
+};
+
+export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPanelProps) {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
@@ -210,13 +233,71 @@ export default function BackOfficeInboxPanel() {
   const bridgedTerrainReports = useMemo(() => terrainBridge?.reports ?? [], [terrainBridge?.reports]);
   const pager = useDashboardPagerOptional();
   const { setPendingCaseId } = useTechnicianCaseIntent();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const pwaV2 = useFeatureFlag("pwaV2Bundle");
+  useBackofficeReminderPush(interventions);
 
   const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports">("chat");
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [dragBoardTechUid, setDragBoardTechUid] = useState("");
+  const [dragBoardDate, setDragBoardDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [selectedItemId, setSelectedItemIdLocal] = useState<string | null>(null);
+  const setSelectedItemId = (id: string | null) => {
+    const next = id?.trim() ? id.trim() : null;
+    setSelectedItemIdLocal(next);
+    inboxIntent?.setSelectedInboxInterventionId(next);
+  };
+
+  const { selectedDate } = useDateContext();
+  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
+  
+  const chatDayRows = useMemo(() => {
+    if (dayMissions !== undefined) {
+      return missionsToChatDayRows(dayMissions);
+    }
+    const isDispatchMap = isCompanyDispatchViewer(workspace);
+    const ivs = interventions.filter((iv) => {
+      if (!interventionMatchesTab(iv, "today", selectedDate)) return false;
+      if (isDispatchMap && !isInterventionReleasedToTechnicianField(iv)) return false;
+      return iv.status !== "cancelled";
+    });
+    return interventionsToChatDayRows(ivs);
+  }, [dayMissions, interventions, selectedDate, workspace]);
   const selectedItem = useMemo(
     () => (selectedItemId ? interventions.find((x) => x.id === selectedItemId) ?? null : null),
     [interventions, selectedItemId],
   );
+
+  useEffect(() => {
+    const pending = inboxIntent?.pendingInboxId?.trim();
+    if (!pending) return;
+    setSelectedItemId(pending);
+    setActiveTab("requests");
+    inboxIntent?.setPendingInboxId(null);
+  }, [inboxIntent?.pendingInboxId, inboxIntent]);
+
+  useEffect(() => {
+    const pendingChat = inboxIntent?.pendingChatInterventionId?.trim();
+    if (!pendingChat) return;
+    setSelectedChatInterventionId(pendingChat);
+    setActiveTab("chat");
+    inboxIntent?.setPendingChatInterventionId(null);
+  }, [inboxIntent?.pendingChatInterventionId, inboxIntent]);
+
+  const handleDownloadQuotePdf = async (interventionId: string) => {
+    try {
+      const res = await fetchWithAuth(`/api/interventions/${encodeURIComponent(interventionId)}/quote-pdf`);
+      if (!res.ok) throw new Error("pdf failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `devis-${interventionId}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(String(t("common.error")));
+    }
+  };
 
   const selectedReportCompletion = useMemo(() => {
     if (!selectedItem) return { photoUrls: [] as string[], signatureUrl: null as string | null };
@@ -461,6 +542,38 @@ export default function BackOfficeInboxPanel() {
     }
   };
 
+  const handleDragBoardSchedule = async (interventionId: string, time: string) => {
+    const techUid = dragBoardTechUid.trim();
+    if (!techUid) {
+      toast.error(String(t("scheduling.drag_board.pick_technician")));
+      return;
+    }
+    const schedule = { scheduledDate: dragBoardDate, scheduledTime: time };
+    const row = interventions.find((x) => x.id === interventionId);
+    if (!row) return;
+    if (row.assignedTechnicianUid?.trim()) {
+      if (!firestore) return;
+      const result = await updateInterventionSchedule({
+        db: firestore,
+        intervention: row,
+        allInterventions: interventions,
+        scheduledDate: dragBoardDate,
+        scheduledTime: time,
+      });
+      if (!result.ok) {
+        toast.error(
+          result.reason === "conflict"
+            ? t("scheduling.conflict.block_save")
+            : t("common.error"),
+        );
+        return;
+      }
+      toast.success(t("backoffice.toasts.datetime_updated"));
+      return;
+    }
+    await handleAssignToTechnician(interventionId, techUid, schedule);
+  };
+
   const handleUpdateDateTime = async () => {
     if (!selectedItem || !firestore) return;
     try {
@@ -535,6 +648,22 @@ export default function BackOfficeInboxPanel() {
       style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] bg-slate-50/30"
     >
+      {pwaV2 ? (
+        <div className="mx-4 mt-2 space-y-2">
+          <InterventionRemindersPanel interventions={interventions} />
+          {activeTab === "requests" ? (
+            <ScheduleDragBoard
+              interventions={interventions}
+              technicianUid={dragBoardTechUid}
+              onTechnicianChange={setDragBoardTechUid}
+              dateYmd={dragBoardDate}
+              onDateChange={setDragBoardDate}
+              onSchedule={(id, time) => void handleDragBoardSchedule(id, time)}
+            />
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Tab Switcher */}
       <div className="flex p-1.5 gap-1 bg-slate-200/50 rounded-[20px] mx-4 my-4 border border-slate-300/30">
         <button
@@ -588,18 +717,59 @@ export default function BackOfficeInboxPanel() {
       {}
       <div
         className={cn(
-          "flex min-h-0 flex-1 flex-col overflow-hidden",
+          "flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-50/50",
           activeTab !== "chat" && "hidden",
         )}
         aria-hidden={activeTab !== "chat"}
       >
-        <IvanaClientChatPanel
-          className="min-h-0 flex-1 px-0"
-          acceptPortalMessages
-          chatCompanyId={ivanaChatCompanyId}
-          chatInterventionId={selectedItem?.id ?? null}
-          onRemoteClientMessage={ivanaChatCompanyId ? () => setActiveTab("chat") : undefined}
-        />
+        {selectedChatInterventionId ? (
+          <div className="flex flex-col min-h-0 flex-1">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 shrink-0 shadow-sm z-10">
+              <button
+                onClick={() => setSelectedChatInterventionId(null)}
+                className="flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors shrink-0"
+                title={String(t("chat.back_to_list"))}
+                aria-label={String(t("chat.back_to_list"))}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="flex flex-col min-w-0 flex-1 items-center justify-center text-center pr-8">
+                <span className="text-[14px] font-bold text-slate-800 truncate w-full text-center">
+                  {(() => {
+                    if (selectedChatInterventionId === "global") return t("chat.global_chat_title");
+                    const row = chatDayRows.find((r) => r.threadId === selectedChatInterventionId);
+                    if (row?.clientName.trim()) return capitalizeName(row.clientName);
+                    const iv = interventions.find((x) => x.id === selectedChatInterventionId);
+                    const label = iv ? interventionClientLabel(iv) : "";
+                    return label ? capitalizeName(label) : t("chat.anonymous_client");
+                  })()}
+                </span>
+                {selectedChatInterventionId !== "global" ? (
+                  <span className="text-[11px] text-slate-500 truncate font-medium w-full text-center">
+                    {chatDayRows.find((r) => r.threadId === selectedChatInterventionId)?.address?.trim() ||
+                      interventions.find((x) => x.id === selectedChatInterventionId)?.address ||
+                      ""}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+            <IvanaClientChatPanel
+              className="min-h-0 flex-1 px-0"
+              acceptPortalMessages
+              chatCompanyId={ivanaChatCompanyId}
+              chatInterventionId={selectedChatInterventionId === "global" ? null : selectedChatInterventionId}
+              onRemoteClientMessage={ivanaChatCompanyId ? () => setActiveTab("chat") : undefined}
+            />
+          </div>
+        ) : (
+          <ChatDayClientsPicker
+            className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "py-4 px-1")}
+            rows={chatDayRows}
+            selectedThreadId={selectedChatInterventionId}
+            onSelectGlobal={() => setSelectedChatInterventionId("global")}
+            onSelectClient={(threadId) => setSelectedChatInterventionId(threadId)}
+          />
+        )}
       </div>
       <div
         className={cn(
@@ -820,17 +990,25 @@ export default function BackOfficeInboxPanel() {
                 </div>
               </div>
 
-              <UnifiedInterventionDrawer
-                intervention={selectedItem}
-                technicianUid={
-                  selectedItem.assignedTechnicianUid?.trim() ||
-                  auth?.currentUser?.uid?.trim() ||
-                  ""
-                }
-                allowMaterialCreate={Boolean(selectedItem.assignedTechnicianUid?.trim())}
-                allowMaterialStatusUpdate
-                className="mt-2"
-              />
+              {cid && selectedItem.address && (selectedItem.problem || selectedItem.title) && (
+                <DuplicateWarningBanner
+                  interventionId={selectedItem.id}
+                  address={selectedItem.address}
+                  problem={selectedItem.problem ?? selectedItem.title ?? ""}
+                  companyId={cid}
+                />
+              )}
+
+              {pwaV2 ? (
+                <button
+                  type="button"
+                  data-testid="backoffice-download-quote-pdf"
+                  onClick={() => void handleDownloadQuotePdf(selectedItem.id)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
+                >
+                  {t("quote_pdf.download")}
+                </button>
+              ) : null}
 
               {/* Date & Time management for requests */}
               {isInterventionPendingBackOfficeIntake(selectedItem) && (

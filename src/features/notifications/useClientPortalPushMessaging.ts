@@ -13,6 +13,8 @@ import { navigateCompanyHub, COMPANY_HUB_ANCHOR_CLIENT_PORTAL } from "@/features
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
 import {
   type FcmUiStatus,
+  handleFcmSyncError,
+  isPushServiceWorkerEnabled,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
 } from "@/features/notifications/fcmWebPush";
@@ -137,13 +139,16 @@ export function useClientPortalPushMessaging(
             return;
           }
 
+          if (!isPushServiceWorkerEnabled()) {
+            setStatus("idle");
+            return;
+          }
+
           try {
             setStatus("registering");
             await syncTokenForUser(user.uid);
           } catch (e) {
-            console.error("[FCM client]", e);
-            setStatus("error");
-            setLastError(e instanceof Error ? e.message : String(e));
+            handleFcmSyncError(e, setStatus, setLastError, { logTag: "[FCM client]" });
           }
         })();
       });
@@ -189,9 +194,10 @@ export function useClientPortalPushMessaging(
       }
       await syncTokenForUser(uid);
     } catch (e) {
-      console.error("[FCM client]", e);
-      setStatus("error");
-      setLastError(e instanceof Error ? e.message : String(e));
+      handleFcmSyncError(e, setStatus, setLastError, {
+        logTag: "[FCM client]",
+        surfaceErrorInUi: true,
+      });
     }
   }, [vapidKey, syncTokenForUser]);
 

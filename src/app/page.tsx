@@ -9,6 +9,10 @@ import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndic
 import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
+import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
+import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
+import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
+import { TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
@@ -20,6 +24,7 @@ import ClientPortalNotificationBootstrap from "@/features/notifications/componen
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";
+import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
 import TechnicianConnectivityBar from "@/features/offline/components/TechnicianConnectivityBar";
@@ -54,7 +59,22 @@ const TechnicianHubPage = dynamic(
   { ssr: false, loading: () => null },
 );
 
-/** Écran d’accueil — **3 pages** : carte · hub société · hub technicien (back-office via inbox sur la carte). */
+const BackOfficeHubPage = dynamic(
+  () => import("@/features/backoffice/components/BackOfficeHubPage"),
+  { ssr: false, loading: () => null },
+);
+
+const TechnicianLabCarouselPage = dynamic(
+  () => import("@/features/technicians/components/TechnicianLabCarouselPage"),
+  { ssr: false, loading: () => null },
+);
+
+const ChatbotPage = dynamic(() => import("@/features/chatbot/components/ChatbotPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/** Écran d’accueil — **6 pages** : carte · société · technicien · back-office · Chatbot · lab. */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -65,6 +85,9 @@ export default function Dashboard() {
       </>,
       <DashboardSecondaryPlaceholder key="secondary" />,
       <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
+      <BackOfficeHubPage key="backoffice-hub" slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />,
+      <ChatbotPage key="chatbot" slotIndex={AI_ASSISTANT_SLOT_INDEX} />,
+      <TechnicianLabCarouselPage key="technician-lab" slotIndex={TECHNICIAN_LAB_SLOT_INDEX} />,
     ],
     [],
   );
@@ -77,11 +100,13 @@ export default function Dashboard() {
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={dashboardPages.length}>
+                <ChatbotProvider>
                 <RequesterHubProvider>
                   <ClientPortalPushProvider>
                   <TechnicianQueryProvider>
                     <OfflineSyncProvider>
                       <TechnicianCaseIntentProvider>
+                        <BackofficeInboxIntentProvider>
                         <TechnicianBackofficeReportBridgeProvider>
                           <TechnicianFinishJobProvider>
                             <TechnicianConnectivityBar />
@@ -119,11 +144,13 @@ export default function Dashboard() {
                             />
                           </TechnicianFinishJobProvider>
                         </TechnicianBackofficeReportBridgeProvider>
+                        </BackofficeInboxIntentProvider>
                       </TechnicianCaseIntentProvider>
                     </OfflineSyncProvider>
                   </TechnicianQueryProvider>
                   </ClientPortalPushProvider>
                 </RequesterHubProvider>
+                </ChatbotProvider>
               </DashboardPagerProvider>
             </GalaxyLayerBridgeProvider>
           </CompanyWorkspaceProvider>

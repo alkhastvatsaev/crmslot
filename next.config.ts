@@ -60,6 +60,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["fluent-ffmpeg"],
   env: {
     NEXT_PUBLIC_APP_GIT_SHA: resolveGitShaForBuild(),
+    /** false en `npm run dev` sans ENABLE_PWA_IN_DEV — FCM ne tente pas le SW. */
+    NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED: pwaDisabledInDev ? "false" : "true",
   },
   outputFileTracingRoot: process.cwd(),
 };

@@ -40,32 +40,38 @@ export function useBackOfficeInterventions(companyId: string | null) {
     const cid = cidForEffect;
     const q = query(collection(firestore!, "interventions"), where("companyId", "==", cid));
 
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const raw = stripKnownSyntheticInterventions(
-          snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
-        );
-        const firestoreInterventions = filterInterventionsByCompany(cid, raw);
+    let unsub: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      unsub = onSnapshot(
+        q,
+        (snap) => {
+          const raw = stripKnownSyntheticInterventions(
+            snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
+          );
+          const firestoreInterventions = filterInterventionsByCompany(cid, raw);
 
-        if (shouldMergeDemo) {
-          const demoData = demoInterventionsForCompany(cid);
-          setInterventions([...firestoreInterventions, ...demoData]);
-        } else {
-          setInterventions(firestoreInterventions);
-        }
+          if (shouldMergeDemo) {
+            const demoData = demoInterventionsForCompany(cid);
+            setInterventions([...firestoreInterventions, ...demoData]);
+          } else {
+            setInterventions(firestoreInterventions);
+          }
 
-        setLoadedCid(cid);
-        setError(null);
-      },
-      (e) => {
-        console.error("Back-office interventions snapshot:", e);
-        setError(e.message || "Erreur Firestore");
-        setLoadedCid(cid);
-      },
-    );
+          setLoadedCid(cid);
+          setError(null);
+        },
+        (e) => {
+          console.error("Back-office interventions snapshot:", e);
+          setError(e.message || "Erreur Firestore");
+          setLoadedCid(cid);
+        },
+      );
+    }, 10); // Fix: delay listener to bypass Firebase strict-mode double-fire bug (ca9)
 
-    return () => unsub();
+    return () => {
+      clearTimeout(timeout);
+      if (unsub) unsub();
+    };
   }, [cidForEffect, shouldMergeDemo, noFirestore]);
 
   const firebaseUid = auth?.currentUser?.uid ?? null;

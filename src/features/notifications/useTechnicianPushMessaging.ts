@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { auth, app, firestore, isConfigured } from "@/core/config/firebase";
 import {
   type FcmUiStatus,
+  handleFcmSyncError,
+  isPushServiceWorkerEnabled,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
   tokenDocId,
@@ -131,13 +133,16 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
             return;
           }
 
+          if (!isPushServiceWorkerEnabled()) {
+            setStatus("idle");
+            return;
+          }
+
           try {
             setStatus("registering");
             await syncTokenForUser(user.uid);
           } catch (e) {
-            console.error("[FCM]", e);
-            setStatus("error");
-            setLastError(e instanceof Error ? e.message : String(e));
+            handleFcmSyncError(e, setStatus, setLastError, { logTag: "[FCM]" });
           }
         })();
       });
@@ -176,9 +181,10 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       }
       await syncTokenForUser(uid);
     } catch (e) {
-      console.error("[FCM]", e);
-      setStatus("error");
-      setLastError(e instanceof Error ? e.message : String(e));
+      handleFcmSyncError(e, setStatus, setLastError, {
+        logTag: "[FCM]",
+        surfaceErrorInUi: true,
+      });
     }
   }, [vapidKey, syncTokenForUser]);
 
