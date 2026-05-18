@@ -15,6 +15,8 @@ import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeConte
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
 import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuthEffects";
 import ClientPortalPaymentReturnEffects from "@/features/auth/components/ClientPortalPaymentReturnEffects";
+import { ClientPortalPushProvider } from "@/features/notifications/ClientPortalPushContext";
+import ClientPortalNotificationBootstrap from "@/features/notifications/components/ClientPortalNotificationBootstrap";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";
@@ -76,6 +78,7 @@ export default function Dashboard() {
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={dashboardPages.length}>
                 <RequesterHubProvider>
+                  <ClientPortalPushProvider>
                   <TechnicianQueryProvider>
                     <OfflineSyncProvider>
                       <TechnicianCaseIntentProvider>
@@ -87,6 +90,7 @@ export default function Dashboard() {
                             </Suspense>
                             <ClientPortalAuthEffects />
                             <Suspense fallback={null}>
+                              <ClientPortalNotificationBootstrap />
                               <ClientPortalPaymentReturnEffects />
                             </Suspense>
                             <DashboardDesktopShell
@@ -118,6 +122,7 @@ export default function Dashboard() {
                       </TechnicianCaseIntentProvider>
                     </OfflineSyncProvider>
                   </TechnicianQueryProvider>
+                  </ClientPortalPushProvider>
                 </RequesterHubProvider>
               </DashboardPagerProvider>
             </GalaxyLayerBridgeProvider>

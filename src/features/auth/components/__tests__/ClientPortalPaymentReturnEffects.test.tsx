@@ -18,6 +18,16 @@ jest.mock("@/features/dashboard/dashboardPagerContext", () => ({
   useDashboardPagerOptional: () => ({ setPageIndex: mockSetPageIndex, pageIndex: 0 }),
 }));
 
+const mockSetLastSubmittedInterventionId = jest.fn();
+const mockSetPendingTrackingInterventionId = jest.fn();
+
+jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
+  useRequesterHub: () => ({
+    setLastSubmittedInterventionId: mockSetLastSubmittedInterventionId,
+    setPendingTrackingInterventionId: mockSetPendingTrackingInterventionId,
+  }),
+}));
+
 describe("ClientPortalPaymentReturnEffects", () => {
   beforeEach(() => {
     mockReplace.mockClear();
@@ -27,6 +37,7 @@ describe("ClientPortalPaymentReturnEffects", () => {
   it("navigates to company hub and cleans URL on payment success", () => {
     render(<ClientPortalPaymentReturnEffects />);
     expect(mockSetPageIndex).toHaveBeenCalledWith(1);
+    expect(mockSetPendingTrackingInterventionId).toHaveBeenCalledWith("iv-pay-1");
     expect(mockReplace).toHaveBeenCalled();
   });
 });
