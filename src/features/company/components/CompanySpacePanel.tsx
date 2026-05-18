@@ -33,6 +33,8 @@ import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/co
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
+import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
@@ -103,6 +105,7 @@ export default function CompanySpacePanel() {
   const [invitesCount, setInvitesCount] = useState(0);
 
   const isAdmin = activeRole === "admin";
+  const crmEnabled = useFeatureFlag("crmContacts");
 
   useEffect(() => {
     if (!firestore || !firebaseUid || !activeCompanyId || !isAdmin) {
@@ -403,6 +406,12 @@ export default function CompanySpacePanel() {
           <CommissionDashboard />
         </div>
         </>
+      ) : null}
+
+      {activeCompanyId && crmEnabled ? (
+        <div data-testid="company-crm-panel" className="min-h-0 shrink-0">
+          <ClientsCrmPanel />
+        </div>
       ) : null}
 
       <div className="mt-auto flex shrink-0 justify-end pt-1">
