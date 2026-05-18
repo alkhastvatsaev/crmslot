@@ -1,4 +1,10 @@
 {
+  "rating": {
+    "title": "Hoe verliep de interventie?",
+    "comment_placeholder": "Opmerking? (optioneel)",
+    "submit": "Mijn beoordeling verzenden",
+    "thank_you": "Bedankt voor uw feedback!"
+  },
   "client_push": {
     "enable": "Volgnotificaties inschakelen",
     "enabled": "Volgnotificaties ingeschakeld",
@@ -77,7 +83,8 @@
       "submitting": "Verzenden…",
       "template_label": "Snel sjabloon laden",
       "template_placeholder": "-- Selecteer een sjabloon --",
-      "lecot_title": "Controleren op Lecot.be"
+      "lecot_title": "Controleren op Lecot.be",
+      "search_lecot_placeholder": "Zoeken in de Lecot-catalogus…"
     }
   },
   "commissions": {
@@ -251,11 +258,34 @@
     "intervention_linked": "Interventie gekoppeld aan klant.",
     "pick_client_required": "Selecteer een klant.",
     "pick_site": "Site (optioneel)",
-    "link_submit": "Interventie koppelen"
+    "link_submit": "Interventie koppelen",
+    "edit_client": "Klant bewerken",
+    "save_client": "Opslaan",
+    "client_updated": "Klant bijgewerkt.",
+    "import_csv": "CSV importeren",
+    "import_empty": "Leeg bestand of onbekend formaat.",
+    "import_success": "{{count}} klant(en) geïmporteerd.",
+    "interventions_title": "Gekoppelde interventies",
+    "interventions_empty": "Geen interventies gekoppeld aan deze klant.",
+    "offline_hint": "Offline modus — klantenlijst uit lokale cache."
   },
   "catalog": {
     "search_placeholder": "Product zoeken (ref., omschrijving)…",
-    "add_line": "Toevoegen"
+    "add_line": "Toevoegen",
+    "no_results": "Geen producten gevonden.",
+    "search_error": "Zoeken offline — lokale resultaten getoond.",
+    "searching": "Zoeken…",
+    "company_title": "Bedrijfscatalogus",
+    "company_subtitle": "Prioritaire producten in facturatiezoekopdracht.",
+    "company_sku": "Referentie",
+    "company_label": "Omschrijving",
+    "company_price": "Prijs (€)",
+    "company_add": "Toevoegen aan catalogus",
+    "company_empty": "Geen bedrijfsproducten.",
+    "company_disabled": "Schakel Lecot-productzoekopdracht in.",
+    "company_fields_required": "Referentie en omschrijving verplicht.",
+    "company_price_invalid": "Ongeldige prijs.",
+    "company_product_created": "Product toegevoegd."
   },
   "spotlight": {
     "search_placeholder": "Naam",
@@ -974,8 +1004,12 @@
     }
   },
   "catalog": {
-    "search_placeholder": "Product zoeken…",
+    "search_placeholder": "Product zoeken (ref., omschrijving)…",
     "empty": "Geen product gevonden.",
+    "no_results": "Geen producten gevonden.",
+    "search_error": "Zoeken offline — lokale resultaten getoond.",
+    "searching": "Zoeken…",
+    "add_line": "Toevoegen",
     "add_to_order": "Toevoegen aan bestelling",
     "price": "Eenheidsprijs",
     "sku": "Referentie",

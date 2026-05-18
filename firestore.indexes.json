@@ -12,6 +12,15 @@
       "collectionGroup": "interventions",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "clientId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "interventions",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "scheduledDate", "order": "ASCENDING" }
       ]
     },
@@ -111,6 +120,14 @@
       "fields": [
         { "fieldPath": "companyId", "order": "ASCENDING" },
         { "fieldPath": "clientId", "order": "ASCENDING" },
+        { "fieldPath": "label", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
         { "fieldPath": "label", "order": "ASCENDING" }
       ]
     }

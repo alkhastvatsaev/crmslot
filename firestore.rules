@@ -121,6 +121,15 @@ service cloud.firestore {
         allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
         allow write: if false;
       }
+
+      match /products/{productId} {
+        allow read: if userBelongsToCompany(companyId);
+        allow create, update: if userBelongsToCompany(companyId)
+          && userRoleInCompany(companyId) == 'admin'
+          && request.resource.data.companyId == companyId
+          && request.resource.data.keys().hasAll(['sku', 'label', 'unitPriceCents', 'isActive']);
+        allow delete: if false;
+      }
     }
 
     /** Création collaborateur uniquement via Admin SDK (accept-invite). Premier admin : créateur du doc companies. */

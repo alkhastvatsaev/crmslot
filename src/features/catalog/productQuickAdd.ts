@@ -7,7 +7,7 @@ export type CatalogProduct = {
   category?: string;
 };
 
-/** Stub catalogue — remplacer par API Lecot quand `lecotProductSearch` est activé. */
+/** Catalogue local de secours (fusionné avec Lecot via `/api/catalog/lecot-search`). */
 export const STUB_CATALOG: CatalogProduct[] = [
   { sku: "CYL-A2P", label: "Cylindre A2P", unitPriceCents: 8900, category: "serrurerie" },
   { sku: "SERR-3PT", label: "Serrure 3 points", unitPriceCents: 24500, category: "serrurerie" },

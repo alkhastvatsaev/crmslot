@@ -34,6 +34,11 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
 import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
+import RecurringContractsPanel from "@/features/clients/components/RecurringContractsPanel";
+import StockManagementPanel from "@/features/materials/components/StockManagementPanel";
+import MultiCompanyOverviewPanel from "@/features/company/components/MultiCompanyOverviewPanel";
+import CompanyCatalogPanel from "@/features/catalog/components/CompanyCatalogPanel";
+import CompanyKpiPanel from "@/features/dashboard/components/CompanyKpiPanel";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -106,6 +111,7 @@ export default function CompanySpacePanel() {
 
   const isAdmin = activeRole === "admin";
   const crmEnabled = useFeatureFlag("crmContacts");
+  const lecotEnabled = useFeatureFlag("lecotProductSearch");
 
   useEffect(() => {
     if (!firestore || !firebaseUid || !activeCompanyId || !isAdmin) {
@@ -264,6 +270,11 @@ export default function CompanySpacePanel() {
 
   return (
     <PanelShell>
+      {memberships.length > 1 && (
+        <div className="shrink-0">
+          <MultiCompanyOverviewPanel />
+        </div>
+      )}
       <div className={`${glassRow} relative`}>
         <span className={iconRail}>
           <ChevronDown className="h-4 w-4 opacity-70" aria-hidden />
@@ -408,9 +419,33 @@ export default function CompanySpacePanel() {
         </>
       ) : null}
 
+      {activeCompanyId ? (
+        <div data-testid="company-kpi-panel-wrap" className="min-h-0 shrink-0">
+          <CompanyKpiPanel />
+        </div>
+      ) : null}
+
       {activeCompanyId && crmEnabled ? (
         <div data-testid="company-crm-panel" className="min-h-0 shrink-0">
           <ClientsCrmPanel />
+        </div>
+      ) : null}
+
+      {activeCompanyId ? (
+        <div data-testid="company-recurring-contracts-panel" className="min-h-0 shrink-0">
+          <RecurringContractsPanel />
+        </div>
+      ) : null}
+
+      {activeCompanyId ? (
+        <div data-testid="company-stock-management-panel" className="min-h-0 shrink-0">
+          <StockManagementPanel />
+        </div>
+      ) : null}
+
+      {activeCompanyId && lecotEnabled && isAdmin ? (
+        <div data-testid="company-catalog-panel-wrap" className="min-h-0 shrink-0">
+          <CompanyCatalogPanel />
         </div>
       ) : null}
 

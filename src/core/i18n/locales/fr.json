@@ -1,4 +1,10 @@
 {
+  "rating": {
+    "title": "Comment s'est passée l'intervention ?",
+    "comment_placeholder": "Un commentaire ? (optionnel)",
+    "submit": "Envoyer mon avis",
+    "thank_you": "Merci pour votre avis !"
+  },
   "client_push": {
     "enable": "Activer les notifications de suivi",
     "enabled": "Notifications de suivi activées",
@@ -77,7 +83,8 @@
       "submitting": "Envoi…",
       "template_label": "Charger un modèle rapide",
       "template_placeholder": "-- Sélectionner un modèle --",
-      "lecot_title": "Vérifier sur Lecot.be"
+      "lecot_title": "Vérifier sur Lecot.be",
+      "search_lecot_placeholder": "Rechercher sur le catalogue Lecot…"
     }
   },
   "commissions": {
@@ -251,11 +258,34 @@
     "intervention_linked": "Intervention liée au client.",
     "pick_client_required": "Sélectionnez un client.",
     "pick_site": "Site (optionnel)",
-    "link_submit": "Lier l'intervention"
+    "link_submit": "Lier l'intervention",
+    "edit_client": "Modifier le client",
+    "save_client": "Enregistrer",
+    "client_updated": "Client mis à jour.",
+    "import_csv": "Importer CSV",
+    "import_empty": "Fichier vide ou format non reconnu.",
+    "import_success": "{{count}} client(s) importé(s).",
+    "interventions_title": "Interventions liées",
+    "interventions_empty": "Aucune intervention liée à ce client.",
+    "offline_hint": "Mode hors ligne — liste clients en cache local."
   },
   "catalog": {
     "search_placeholder": "Rechercher un produit (réf., libellé)…",
-    "add_line": "Ajouter"
+    "add_line": "Ajouter",
+    "no_results": "Aucun produit trouvé.",
+    "search_error": "Recherche hors ligne — résultats locaux affichés.",
+    "searching": "Recherche…",
+    "company_title": "Catalogue société",
+    "company_subtitle": "Produits prioritaires dans la recherche facturation.",
+    "company_sku": "Référence",
+    "company_label": "Libellé",
+    "company_price": "Prix (€)",
+    "company_add": "Ajouter au catalogue",
+    "company_empty": "Aucun produit société.",
+    "company_disabled": "Activez la recherche produits Lecot.",
+    "company_fields_required": "Référence et libellé obligatoires.",
+    "company_price_invalid": "Prix invalide.",
+    "company_product_created": "Produit ajouté."
   },
   "spotlight": {
     "search_placeholder": "Nom",
@@ -1002,8 +1032,12 @@
     }
   },
   "catalog": {
-    "search_placeholder": "Rechercher un produit…",
+    "search_placeholder": "Rechercher un produit (réf., libellé)…",
     "empty": "Aucun produit trouvé.",
+    "no_results": "Aucun produit trouvé.",
+    "search_error": "Recherche hors ligne — résultats locaux affichés.",
+    "searching": "Recherche…",
+    "add_line": "Ajouter",
     "add_to_order": "Ajouter à la commande",
     "price": "Prix unitaire",
     "sku": "Référence",

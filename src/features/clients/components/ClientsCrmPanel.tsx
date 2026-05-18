@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { MapPin, Plus, Search, User } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MapPin, Plus, Search, Upload, User } from "lucide-react";
 import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -10,14 +10,24 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useClients } from "@/features/clients/useClients";
 import { useClientSites } from "@/features/clients/useClientSites";
 import { buildClientDisplayName } from "@/features/clients/clientDisplayName";
-import { createClient, createSite } from "@/features/clients/clientFirestore";
+import { parseClientsCsv } from "@/features/clients/parseClientsCsv";
+import {
+  bulkCreateClients,
+  createClient,
+  createSite,
+  updateClient,
+} from "@/features/clients/clientFirestore";
+import ClientInterventionsPanel from "@/features/clients/components/ClientInterventionsPanel";
+import { downloadClientsCsv } from "@/features/clients/exportClientsCsv";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 
 export default function ClientsCrmPanel() {
   const { t } = useTranslation();
   const crmEnabled = useFeatureFlag("crmContacts");
+  const pwaV2 = useFeatureFlag("pwaV2Bundle");
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
-  const { clients, loading } = useClients();
+  const { clients, loading, offline } = useClients();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = clients.find((c) => c.id === selectedId) ?? null;
@@ -31,6 +41,21 @@ export default function ClientsCrmPanel() {
   const [siteLabel, setSiteLabel] = useState("");
   const [siteAddress, setSiteAddress] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editCompanyName, setEditCompanyName] = useState("");
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    setEditFirstName(selected.firstName ?? "");
+    setEditLastName(selected.lastName ?? "");
+    setEditPhone(selected.phone ?? "");
+    setEditEmail(selected.email ?? "");
+    setEditCompanyName(selected.companyName ?? "");
+  }, [selected]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -93,6 +118,69 @@ export default function ClientsCrmPanel() {
     }
   };
 
+  const handleSaveClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firestore || !selected) return;
+    const displayName = buildClientDisplayName({
+      displayName: "",
+      firstName: editFirstName,
+      lastName: editLastName,
+      companyName: editCompanyName,
+    });
+    if (!displayName) {
+      toast.error(String(t("crm.client_name_required")));
+      return;
+    }
+    setBusy(true);
+    try {
+      await updateClient(firestore, selected.id, {
+        displayName,
+        firstName: editFirstName.trim() || null,
+        lastName: editLastName.trim() || null,
+        companyName: editCompanyName.trim() || null,
+        phone: editPhone.trim() || null,
+        email: editEmail.trim() || null,
+      });
+      toast.success(String(t("crm.client_updated")));
+    } catch {
+      toast.error(String(t("common.error")));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleImportCsv = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !firestore || !companyId) return;
+    setBusy(true);
+    try {
+      const text = await file.text();
+      const rows = parseClientsCsv(text);
+      if (rows.length === 0) {
+        toast.error(String(t("crm.import_empty")));
+        return;
+      }
+      const n = await bulkCreateClients(
+        firestore,
+        companyId,
+        rows.map((r) => ({
+          displayName: r.displayName,
+          firstName: r.firstName ?? null,
+          lastName: r.lastName ?? null,
+          companyName: r.companyName ?? null,
+          phone: r.phone ?? null,
+          email: r.email ?? null,
+        })),
+      );
+      toast.success(String(t("crm.import_success")).replace("{{count}}", String(n)));
+    } catch {
+      toast.error(String(t("common.error")));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleCreateSite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firestore || !companyId || !selected) return;
@@ -123,6 +211,43 @@ export default function ClientsCrmPanel() {
       <div>
         <h2 className="text-lg font-bold text-slate-900">{t("crm.title")}</h2>
         <p className="text-sm text-slate-500">{t("crm.subtitle")}</p>
+        {offline ? (
+          <p data-testid="crm-offline-hint" className="mt-1 text-xs text-amber-700">
+            {t("crm.offline_hint")}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          data-testid="crm-import-input"
+          onChange={(e) => void handleImportCsv(e)}
+        />
+        <button
+          type="button"
+          data-testid="crm-import-btn"
+          disabled={busy}
+          onClick={() => importInputRef.current?.click()}
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+        >
+          <Upload className="h-3.5 w-3.5" />
+          {t("crm.import_csv")}
+        </button>
+        {pwaV2 ? (
+          <button
+            type="button"
+            data-testid="crm-export-btn"
+            disabled={busy || clients.length === 0}
+            onClick={() => downloadClientsCsv(clients)}
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {t("crm.export_csv")}
+          </button>
+        ) : null}
       </div>
 
       <div className="relative">
@@ -216,10 +341,51 @@ export default function ClientsCrmPanel() {
 
           {selected ? (
             <div data-testid="crm-client-detail" className="rounded-lg border border-slate-100 p-3">
-              <p className="font-bold text-slate-900">{buildClientDisplayName(selected)}</p>
-              <p className="text-xs text-slate-500">
-                {selected.phone || "—"} · {selected.email || "—"}
-              </p>
+              <form
+                onSubmit={(e) => void handleSaveClient(e)}
+                data-testid="crm-edit-client-form"
+                className="mb-3 space-y-2 border-b border-slate-100 pb-3"
+              >
+                <p className="text-xs font-bold uppercase text-slate-400">{t("crm.edit_client")}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <input
+                    data-testid="crm-edit-firstname"
+                    value={editFirstName}
+                    onChange={(e) => setEditFirstName(e.target.value)}
+                    placeholder={String(t("crm.first_name"))}
+                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                  />
+                  <input
+                    data-testid="crm-edit-lastname"
+                    value={editLastName}
+                    onChange={(e) => setEditLastName(e.target.value)}
+                    placeholder={String(t("crm.last_name"))}
+                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                  />
+                  <input
+                    data-testid="crm-edit-phone"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder={String(t("crm.phone"))}
+                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                  />
+                  <input
+                    data-testid="crm-edit-email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    placeholder={String(t("crm.email"))}
+                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  data-testid="crm-edit-submit"
+                  className="w-full rounded-lg bg-slate-800 py-2 text-sm font-bold text-white disabled:opacity-50"
+                >
+                  {t("crm.save_client")}
+                </button>
+              </form>
               <p className="mt-3 text-xs font-bold uppercase text-slate-400">{t("crm.sites_title")}</p>
               {sitesLoading ? (
                 <p className="text-sm text-slate-400">{t("common.loading")}</p>
@@ -266,6 +432,7 @@ export default function ClientsCrmPanel() {
                   {t("crm.add_site")}
                 </button>
               </form>
+              <ClientInterventionsPanel companyId={companyId} clientId={selected.id} />
             </div>
           ) : null}
         </section>
