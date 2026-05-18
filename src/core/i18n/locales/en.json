@@ -896,6 +896,17 @@
     "description1": "After closure with at least one site photo and client signature on the server, a Cloud function generates a PDF invoice on Storage and sets the status to Invoiced. The checklist must be complete before generation.",
     "description2": "After closure with a complete checklist, PDF invoice generation and invoiced status."
   },
+  "maintenance": {
+    "panel_title": "Maintenance contracts",
+    "new": "New contract",
+    "empty": "No active contracts.",
+    "label_placeholder": "E.g.: Annual lock maintenance",
+    "template_title_placeholder": "E.g.: Cylinder check + lubrication",
+    "create": "Create contract",
+    "error_fields_required": "Label and title required.",
+    "toast_created": "Contract created",
+    "toast_deactivated": "Contract deactivated"
+  },
   "intervention_pdf": {
     "download": "Download PDF report"
   },
