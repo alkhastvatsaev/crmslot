@@ -65,7 +65,22 @@ export function computeTodayActivitySummary(
     if (nk === today) newRequestsCount += 1;
   }
 
-  const revenueEstimateEuros = Math.round(invoicedCount * BACKOFFICE_REVENUE_ESTIMATE_TTC_EUR * 100) / 100;
+  let revenueCents = 0;
+  let invoicedWithAmount = 0;
+  for (const iv of interventions) {
+    if (invoicedDayKey(iv) !== today) continue;
+    const cents =
+      typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
+        ? Math.round(iv.invoiceAmountCents)
+        : 0;
+    if (cents > 0) {
+      revenueCents += cents;
+      invoicedWithAmount += 1;
+    }
+  }
+  const fallbackCount = Math.max(0, invoicedCount - invoicedWithAmount);
+  revenueCents += Math.round(fallbackCount * BACKOFFICE_REVENUE_ESTIMATE_TTC_EUR * 100);
+  const revenueEstimateEuros = Math.round((revenueCents / 100) * 100) / 100;
 
   return {
     completedCount,

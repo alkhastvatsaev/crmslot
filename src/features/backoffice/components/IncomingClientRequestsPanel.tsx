@@ -53,14 +53,18 @@ export default function IncomingClientRequestsPanel() {
     }
   };
 
-  const handleAssignToTechnician = async (id: string, technicianUid: string) => {
+  const handleAssignToTechnician = async (
+    id: string,
+    technicianUid: string,
+    schedule?: { scheduledDate: string; scheduledTime: string },
+  ) => {
     if (!firestore) return;
     setIsAssigning(true);
     try {
       const row = interventions.find((x) => x.id === id);
       await updateDoc(
         doc(firestore, "interventions", id),
-        buildAssignInterventionToTechnicianUpdate(row, technicianUid),
+        buildAssignInterventionToTechnicianUpdate(row, technicianUid, new Date(), schedule),
       );
       toast.success(String(t("backoffice.toasts.request_assigned")));
       setAssignPickerOpen(false);
@@ -332,10 +336,11 @@ export default function IncomingClientRequestsPanel() {
               {assignPickerOpen ? (
                 <TechnicianAssignPicker
                   intervention={selectedRequest}
+                  peerInterventions={interventions}
                   isAssigning={isAssigning}
                   onCancel={() => setAssignPickerOpen(false)}
-                  onAssign={(technicianUid) =>
-                    handleAssignToTechnician(selectedRequest.id, technicianUid)
+                  onAssign={(technicianUid, schedule) =>
+                    handleAssignToTechnician(selectedRequest.id, technicianUid, schedule)
                   }
                 />
               ) : (

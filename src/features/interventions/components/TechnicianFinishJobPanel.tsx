@@ -7,6 +7,7 @@ import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import type { Intervention } from "@/features/interventions/types";
+import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useOfflineSyncOptional } from "@/context/OfflineSyncContext";
@@ -30,6 +31,7 @@ import TechnicianSignaturePad, {
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import TechnicianBillingLinesForm, { type BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
+import FinishJobStepIndicator from "@/features/interventions/components/FinishJobStepIndicator";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -55,6 +57,7 @@ export default function TechnicianFinishJobPanel() {
   const submitInFlightRef = useRef(false);
 
   const interventionId = finishJobInterventionId;
+  const liveIv = useInterventionLive(interventionId);
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
@@ -151,6 +154,7 @@ export default function TechnicianFinishJobPanel() {
         interventionId,
         photoDataUrls,
         signaturePngDataUrl,
+        billingLines: billingLines.length > 0 ? billingLines : undefined,
       });
 
       stopCamera();
@@ -173,6 +177,7 @@ export default function TechnicianFinishJobPanel() {
             extraPatch: {
               completedAt: serverTimestamp(),
               completedByUid: auth.currentUser.uid,
+              billingLines: billingLines.length > 0 ? billingLines : undefined,
             },
           });
         }
@@ -181,6 +186,7 @@ export default function TechnicianFinishJobPanel() {
           interventionId,
           photoDataUrls,
           signaturePngDataUrl,
+          billingLines: billingLines.length > 0 ? billingLines : undefined,
         });
         if (result.outcome === "error") {
           toast.error(String(t("technician_hub.finish.toasts.server_save_title")), { description: result.message });
@@ -259,16 +265,19 @@ export default function TechnicianFinishJobPanel() {
   return (
     <div data-testid="finish-job-panel" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
       <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-5 p-6`}>
-        <div className="flex items-center justify-end pb-2">
-          <button
-            type="button"
-            onClick={goDashboard}
-            aria-label={String(t("technician_hub.finish.cancel_close"))}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-slate-500 transition-colors hover:bg-black/10 hover:text-slate-800"
-          >
-            <span className="sr-only">{String(t("technician_hub.finish.close"))}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
+        <div className="flex flex-col gap-3 pb-2">
+          <FinishJobStepIndicator current={step} />
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={goDashboard}
+              aria-label={String(t("technician_hub.finish.cancel_close"))}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-slate-500 transition-colors hover:bg-black/10 hover:text-slate-800"
+            >
+              <span className="sr-only">{String(t("technician_hub.finish.close"))}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
         </div>
 
         {step === "photos" ? (
@@ -378,6 +387,14 @@ export default function TechnicianFinishJobPanel() {
               setBillingLines([]);
               setStep("signature");
             }}
+            onBack={() => {
+              setStep("photos");
+            }}
+            intervention={
+              liveIv
+                ? { category: liveIv.category, problem: liveIv.problem }
+                : undefined
+            }
           />
         ) : null}
 
@@ -404,10 +421,9 @@ export default function TechnicianFinishJobPanel() {
               </button>
               <button
                 type="button"
-                data-testid="finish-job-back-photos"
+                data-testid="finish-job-back-billing"
                 onClick={() => {
-                  stopCamera();
-                  setStep("photos");
+                  setStep("billing");
                 }}
                 aria-label={String(t("technician_hub.finish.back_photos"))}
                 className="flex min-h-[56px] flex-1 items-center justify-center rounded-[20px] bg-white text-slate-700 shadow-sm ring-1 ring-inset ring-black/5 transition-all hover:bg-slate-50 active:scale-[0.98]"

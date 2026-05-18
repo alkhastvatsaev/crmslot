@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { pickRecommendedSlot } from "@/features/scheduling/pickRecommendedSlot";
 import { Loader2, MapPin, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
-import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
+import {
+  buildAssignInterventionToTechnicianUpdate,
+  type AssignScheduleOverride,
+} from "@/features/interventions/assignInterventionToTechnician";
+import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
+import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
 import { rankTechniciansForIntervention } from "@/features/dispatch/rankTechniciansForIntervention";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
 import {
@@ -33,7 +39,7 @@ type Props = {
     | "scheduledTime"
   >;
   peerInterventions?: Intervention[];
-  onAssign: (technicianUid: string) => void | Promise<void>;
+  onAssign: (technicianUid: string, schedule?: AssignScheduleOverride) => void | Promise<void>;
   onCancel: () => void;
   isAssigning?: boolean;
 };
@@ -62,6 +68,14 @@ export default function TechnicianAssignPicker({
   const [etaLoading, setEtaLoading] = useState(false);
   const [recommendedId, setRecommendedId] = useState<string | null>(null);
   const [etaByTechId, setEtaByTechId] = useState<Record<string, string>>({});
+  const [scheduleDate, setScheduleDate] = useState(() => {
+    const fromIv =
+      intervention.scheduledDate?.trim() ||
+      intervention.requestedDate?.trim() ||
+      "";
+    return fromIv || new Date().toISOString().slice(0, 10);
+  });
+  const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
 
   const ranked = useMemo(
     () =>
@@ -110,12 +124,45 @@ export default function TechnicianAssignPicker({
     };
   }, [intervention.location.lat, intervention.location.lng, technicians, ranked.length]);
 
+  const scheduleOverride = useMemo((): AssignScheduleOverride | undefined => {
+    if (!selectedSlotTime?.trim()) return undefined;
+    return { scheduledDate: scheduleDate, scheduledTime: selectedSlotTime };
+  }, [scheduleDate, selectedSlotTime]);
+
+  const proposedSlots = useMemo(() => {
+    if (!selectedId) return [];
+    const tech = ranked.find((r) => r.technician.id === selectedId);
+    if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
+    return proposeAvailableSlotsForTechnician({
+      interventions: peerInterventions,
+      technicianUid: resolveTechnicianAssignUid(tech.technician),
+      dateYmd: scheduleDate,
+      excludeInterventionId: intervention.id,
+    });
+  }, [selectedId, ranked, peerInterventions, scheduleDate, intervention.id]);
+
+  useEffect(() => {
+    if (!selectedId || proposedSlots.length === 0) return;
+    setSelectedSlotTime((prev) => {
+      if (prev && proposedSlots.some((s) => s.time === prev)) return prev;
+      return pickRecommendedSlot(
+        proposedSlots,
+        intervention.requestedTime ?? intervention.scheduledTime,
+      );
+    });
+  }, [
+    selectedId,
+    proposedSlots,
+    intervention.requestedTime,
+    intervention.scheduledTime,
+  ]);
+
   const selectedConflicts = useMemo(() => {
     if (!selectedId) return [];
     const tech = ranked.find((r) => r.technician.id === selectedId);
     if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
     const uid = resolveTechnicianAssignUid(tech.technician);
-    const patch = buildAssignInterventionToTechnicianUpdate(intervention, uid);
+    const patch = buildAssignInterventionToTechnicianUpdate(intervention, uid, new Date(), scheduleOverride);
     const range = candidateRangeFromScheduleFields(patch.scheduledDate, patch.scheduledTime);
     if (!range) return [];
     return findTechnicianScheduleConflicts({
@@ -124,7 +171,7 @@ export default function TechnicianAssignPicker({
       candidateRange: range,
       excludeInterventionId: intervention.id,
     });
-  }, [selectedId, ranked, intervention, peerInterventions]);
+  }, [selectedId, ranked, intervention, peerInterventions, scheduleOverride]);
 
   const handleConfirm = () => {
     const row = ranked.find((r) => r.technician.id === selectedId);
@@ -137,7 +184,7 @@ export default function TechnicianAssignPicker({
       toast.error(String(t("scheduling.conflict.block_assign")));
       return;
     }
-    void onAssign(resolveTechnicianAssignUid(row.technician));
+    void onAssign(resolveTechnicianAssignUid(row.technician), scheduleOverride);
   };
 
   return (
@@ -180,6 +227,19 @@ export default function TechnicianAssignPicker({
       ) : (
         <>
         <ScheduleConflictBanner conflicts={selectedConflicts} className="mb-3" />
+        {selectedId ? (
+          <ProposedScheduleSlots
+            className="mb-3"
+            dateYmd={scheduleDate}
+            onDateChange={(date) => {
+              setScheduleDate(date);
+              setSelectedSlotTime(null);
+            }}
+            slots={proposedSlots}
+            selectedTime={selectedSlotTime}
+            onSelectTime={setSelectedSlotTime}
+          />
+        ) : null}
         <ul className="max-h-52 space-y-2 overflow-y-auto py-1">
           {ranked.map(({ technician, distanceKm }) => {
             const isSelected = selectedId === technician.id;

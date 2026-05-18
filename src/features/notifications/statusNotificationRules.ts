@@ -34,6 +34,15 @@ export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
     subjectKey: "notifications.email.assigned.subject",
     bodyKey: "notifications.email.assigned.body",
   },
+  // Technicien notifié par Push quand assigné
+  {
+    fromStatus: "*",
+    toStatus: "assigned",
+    targets: ["technician"],
+    channels: ["push"],
+    subjectKey: "notifications.push.assigned.subject",
+    bodyKey: "notifications.push.assigned.body",
+  },
   // Client notifié quand technicien en route
   {
     fromStatus: "assigned",

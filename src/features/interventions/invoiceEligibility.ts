@@ -1,8 +1,9 @@
 import type { Intervention } from "@/features/interventions/types";
+import { completionPhotoUrlsFromIntervention } from "@/features/interventions/completionPhotoUrls";
 
 /** Checklist facture : au moins une photo chantier + signature (URLs Storage). */
 export function isInvoiceChecklistComplete(iv: Partial<Intervention> | null | undefined): boolean {
-  const photos = Array.isArray(iv?.completionPhotoUrls) ? iv!.completionPhotoUrls! : [];
+  const photos = completionPhotoUrlsFromIntervention(iv);
   const sig = iv?.completionSignatureUrl;
   const hasPhotos = photos.length > 0;
   const hasSig = typeof sig === "string" && sig.trim().length > 0;

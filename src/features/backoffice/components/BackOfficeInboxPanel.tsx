@@ -19,7 +19,7 @@ import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
-import InterventionCaseTimeline from "@/features/interventions/components/InterventionCaseTimeline";
+import UnifiedInterventionDrawer from "@/features/interventions/components/UnifiedInterventionDrawer";
 
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -60,11 +60,11 @@ import {
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
-import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
-import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
-import InterventionCommissionPanel from "@/features/commissions/components/InterventionCommissionPanel";
-import InterventionInvoiceAmountField from "@/features/commissions/components/InterventionInvoiceAmountField";
-import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
+import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
+import {
+  proposeAvailableSlotsForTechnician,
+  proposeCompanyOpenSlots,
+} from "@/features/scheduling/proposeAvailableSlots";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -243,6 +243,28 @@ export default function BackOfficeInboxPanel() {
     });
   }, [selectedItem, isEditingDateTime, editDate, editTime, interventions]);
 
+  const intakeProposedSlots = useMemo(() => {
+    if (!selectedItem || !isEditingDateTime) return [];
+    const dateYmd =
+      editDate.trim() ||
+      selectedItem.requestedDate?.trim() ||
+      new Date().toISOString().slice(0, 10);
+    const tech = (selectedItem.assignedTechnicianUid ?? "").trim();
+    if (tech) {
+      return proposeAvailableSlotsForTechnician({
+        interventions,
+        technicianUid: tech,
+        dateYmd,
+        excludeInterventionId: selectedItem.id,
+      });
+    }
+    return proposeCompanyOpenSlots({ interventions, dateYmd });
+  }, [selectedItem, isEditingDateTime, editDate, interventions]);
+
+  const intakeSlotsTitleKey = (selectedItem?.assignedTechnicianUid ?? "").trim()
+    ? "scheduling.proposed_slots.title"
+    : "scheduling.proposed_slots.company_title";
+
   const [reportsArchiveExpanded, setReportsArchiveExpanded] = useState(false);
   const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
   if (prevActiveTab !== activeTab) {
@@ -331,7 +353,11 @@ export default function BackOfficeInboxPanel() {
     }
   };
 
-  const handleAssignToTechnician = async (id: string, technicianUid: string) => {
+  const handleAssignToTechnician = async (
+    id: string,
+    technicianUid: string,
+    schedule?: { scheduledDate: string; scheduledTime: string },
+  ) => {
     if (!firestore) return;
     setIsAssigning(true);
     try {
@@ -348,7 +374,7 @@ export default function BackOfficeInboxPanel() {
         toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
         return;
       }
-      const assignPatch = buildAssignInterventionToTechnicianUpdate(row, technicianUid);
+      const assignPatch = buildAssignInterventionToTechnicianUpdate(row, technicianUid, new Date(), schedule);
       const actorUid = auth?.currentUser?.uid?.trim();
       if (!actorUid) {
         toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
@@ -571,6 +597,7 @@ export default function BackOfficeInboxPanel() {
           className="min-h-0 flex-1 px-0"
           acceptPortalMessages
           chatCompanyId={ivanaChatCompanyId}
+          chatInterventionId={selectedItem?.id ?? null}
           onRemoteClientMessage={ivanaChatCompanyId ? () => setActiveTab("chat") : undefined}
         />
       </div>
@@ -779,12 +806,6 @@ export default function BackOfficeInboxPanel() {
                 <p className="text-[15px] font-semibold text-slate-800">{formatAddress(selectedItem.address)}</p>
               </div>
 
-              <InterventionCaseTimeline
-                interventionId={selectedItem.id}
-                companyId={selectedItem.companyId ?? null}
-                className="mt-2 min-h-[280px]"
-              />
-
               {/* Problem / Report Description */}
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -799,26 +820,17 @@ export default function BackOfficeInboxPanel() {
                 </div>
               </div>
 
-              {/* Emails par dossier */}
-              <InterventionEmailPanel
-                interventionId={selectedItem.id}
-                companyId={selectedItem.companyId ?? null}
-              />
-
-              <InterventionMaterialOrdersPanel
+              <UnifiedInterventionDrawer
                 intervention={selectedItem}
                 technicianUid={
                   selectedItem.assignedTechnicianUid?.trim() ||
                   auth?.currentUser?.uid?.trim() ||
                   ""
                 }
-                allowCreate={Boolean(selectedItem.assignedTechnicianUid?.trim())}
-                allowStatusUpdate
+                allowMaterialCreate={Boolean(selectedItem.assignedTechnicianUid?.trim())}
+                allowMaterialStatusUpdate
+                className="mt-2"
               />
-
-              <InterventionInvoiceAmountField intervention={selectedItem} />
-              <InvoiceBillingPanel intervention={selectedItem} />
-              <InterventionCommissionPanel intervention={selectedItem} />
 
               {/* Date & Time management for requests */}
               {isInterventionPendingBackOfficeIntake(selectedItem) && (
@@ -844,6 +856,21 @@ export default function BackOfficeInboxPanel() {
                   {isEditingDateTime ? (
                     <div className="space-y-2">
                       <ScheduleConflictBanner conflicts={editScheduleConflicts} />
+                      <ProposedScheduleSlots
+                        titleKey={intakeSlotsTitleKey}
+                        dateYmd={
+                          editDate.trim() ||
+                          selectedItem.requestedDate?.trim() ||
+                          new Date().toISOString().slice(0, 10)
+                        }
+                        onDateChange={(date) => {
+                          setEditDate(date);
+                          setEditTime("");
+                        }}
+                        slots={intakeProposedSlots}
+                        selectedTime={editTime || null}
+                        onSelectTime={setEditTime}
+                      />
                     <div className="grid grid-cols-2 gap-2">
                       <input 
                         type="date" 
@@ -996,8 +1023,8 @@ export default function BackOfficeInboxPanel() {
                     peerInterventions={interventions}
                     isAssigning={isAssigning}
                     onCancel={() => setAssignPickerOpen(false)}
-                    onAssign={(technicianUid) =>
-                      handleAssignToTechnician(selectedItem.id, technicianUid)
+                    onAssign={(technicianUid, schedule) =>
+                      handleAssignToTechnician(selectedItem.id, technicianUid, schedule)
                     }
                   />
                 ) : (

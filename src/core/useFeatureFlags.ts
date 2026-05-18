@@ -1,0 +1,48 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import {
+  DEFAULT_FEATURE_FLAGS,
+  featureFlagsFromEnv,
+  mergeFeatureFlags,
+  type BelgmapFeatureFlags,
+} from "@/core/featureFlags";
+import { firestore, isConfigured } from "@/core/config/firebase";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+
+export function useFeatureFlags(): BelgmapFeatureFlags {
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId = workspace?.activeCompanyId?.trim() ?? "";
+  const [remote, setRemote] = useState<Partial<BelgmapFeatureFlags> | null>(null);
+
+  useEffect(() => {
+    if (!firestore || !isConfigured || !companyId) {
+      setRemote(null);
+      return () => {};
+    }
+    const ref = doc(firestore, "companies", companyId);
+    return onSnapshot(
+      ref,
+      (snap) => {
+        const raw = snap.data()?.featureFlags;
+        if (!raw || typeof raw !== "object") {
+          setRemote(null);
+          return;
+        }
+        setRemote(raw as Partial<BelgmapFeatureFlags>);
+      },
+      () => setRemote(null),
+    );
+  }, [companyId]);
+
+  return useMemo(
+    () => mergeFeatureFlags(featureFlagsFromEnv(), remote),
+    [remote],
+  );
+}
+
+export function useFeatureFlag<K extends keyof BelgmapFeatureFlags>(key: K): boolean {
+  const flags = useFeatureFlags();
+  return flags[key];
+}

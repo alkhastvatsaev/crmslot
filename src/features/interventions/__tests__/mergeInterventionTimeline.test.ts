@@ -3,6 +3,7 @@ import {
   emailToInterventionEvent,
   materialOrderToInterventionEvent,
   mergeInterventionTimelineEvents,
+  portalChatToInterventionEvent,
   statusEventToInterventionEvent,
 } from "@/features/interventions/timeline/mergeInterventionTimeline";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
@@ -215,5 +216,34 @@ describe("mergeInterventionTimeline", () => {
       },
     );
     expect(merged.every((e) => e.type !== "email" && e.type !== "material_order")).toBe(true);
+  });
+
+  it("merges portal chat and shows in client-visible feed", () => {
+    const chat = portalChatToInterventionEvent({
+      id: "pc1",
+      companyId: "co-1",
+      interventionId: "iv-1",
+      body: "Bonjour",
+      role: "client",
+      senderUid: "client-1",
+      createdAt: "2026-05-17T14:00:00.000Z",
+    });
+    expect(chat.type).toBe("portal_chat");
+
+    const merged = mergeInterventionTimelineEvents([], [], {
+      clientVisibleOnly: true,
+      portalChat: [
+        {
+          id: "pc1",
+          companyId: "co-1",
+          interventionId: "iv-1",
+          body: "Bonjour",
+          role: "client",
+          senderUid: "client-1",
+          createdAt: "2026-05-17T14:00:00.000Z",
+        },
+      ],
+    });
+    expect(merged.some((e) => e.type === "portal_chat" && e.content?.includes("Bonjour"))).toBe(true);
   });
 });

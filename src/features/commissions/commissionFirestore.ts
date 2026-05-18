@@ -18,6 +18,37 @@ import type { CommissionRule, InterventionCommission } from "./types";
 export const COMMISSION_RULES_COLLECTION = "commission_rules";
 export const COMMISSION_OVERRIDES_COLLECTION = "commission_overrides";
 export const COMMISSION_AUDIT_COLLECTION = "commission_audit";
+export const COMMISSION_RULE_AUDIT_COLLECTION = "commission_rule_audit";
+export const MANUAL_COMMISSIONS_COLLECTION = "manual_commissions";
+
+export type CommissionRuleAuditAction = "created" | "updated" | "deactivated";
+
+export type CommissionRuleAuditRow = {
+  id: string;
+  companyId: string;
+  ruleId: string;
+  action: CommissionRuleAuditAction;
+  level?: string;
+  targetId?: string;
+  valueType?: string;
+  value?: number;
+  byUid: string;
+  at: unknown;
+};
+
+export type CompanyCommissionAuditRow = CommissionAuditRow & {
+  companyId: string;
+};
+
+export type ManualCommissionEntry = {
+  id: string;
+  technicianUid: string;
+  amountEuros: number;
+  reason: string;
+  date: string;
+  createdByUid: string;
+  createdAt: unknown;
+};
 
 export type CommissionAuditRow = {
   id: string;
@@ -81,6 +112,31 @@ export function subscribeCommissionRules(
   );
 }
 
+export async function appendCommissionRuleAuditEntry(
+  db: Firestore,
+  params: {
+    companyId: string;
+    ruleId: string;
+    action: CommissionRuleAuditAction;
+    byUid: string;
+    snapshot?: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">;
+  },
+): Promise<void> {
+  const companyId = params.companyId.trim();
+  if (!companyId) return;
+  await addDoc(collection(db, COMMISSION_RULE_AUDIT_COLLECTION), {
+    companyId,
+    ruleId: params.ruleId,
+    action: params.action,
+    byUid: params.byUid,
+    level: params.snapshot?.level ?? null,
+    targetId: params.snapshot?.targetId ?? null,
+    valueType: params.snapshot?.valueType ?? null,
+    value: params.snapshot?.value ?? null,
+    at: serverTimestamp(),
+  });
+}
+
 export async function createCommissionRule(
   db: Firestore,
   companyId: string,
@@ -93,13 +149,53 @@ export async function createCommissionRule(
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
+  await appendCommissionRuleAuditEntry(db, {
+    companyId,
+    ruleId: ref.id,
+    action: "created",
+    byUid: params.createdByUid,
+    snapshot: params,
+  });
   return ref.id;
 }
 
-export async function deleteCommissionRule(db: Firestore, ruleId: string): Promise<void> {
+export async function updateCommissionRule(
+  db: Firestore,
+  ruleId: string,
+  companyId: string,
+  patch: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">,
+  byUid: string,
+): Promise<void> {
+  await updateDoc(doc(db, COMMISSION_RULES_COLLECTION, ruleId), {
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  });
+  await appendCommissionRuleAuditEntry(db, {
+    companyId,
+    ruleId,
+    action: "updated",
+    byUid,
+    snapshot: patch,
+  });
+}
+
+export async function deleteCommissionRule(
+  db: Firestore,
+  ruleId: string,
+  companyId: string,
+  byUid: string,
+  snapshot?: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">,
+): Promise<void> {
   await updateDoc(doc(db, COMMISSION_RULES_COLLECTION, ruleId), {
     isActive: false,
     updatedAt: new Date().toISOString(),
+  });
+  await appendCommissionRuleAuditEntry(db, {
+    companyId,
+    ruleId,
+    action: "deactivated",
+    byUid,
+    snapshot,
   });
 }
 
@@ -158,6 +254,112 @@ export async function saveCommissionOverride(
     finalCommissionAmount: override.finalCommissionAmount,
     byUid: auditByUid,
     reason: auditReason,
+  });
+}
+
+// ─── Manual commission entries ──────────────────────────────────────────────────
+
+export async function createManualCommission(
+  db: Firestore,
+  companyId: string,
+  params: Pick<ManualCommissionEntry, "technicianUid" | "amountEuros" | "reason" | "date" | "createdByUid">,
+): Promise<string> {
+  const ref = await addDoc(
+    collection(db, MANUAL_COMMISSIONS_COLLECTION, companyId, "entries"),
+    { ...params, createdAt: serverTimestamp() },
+  );
+  return ref.id;
+}
+
+export function subscribeManualCommissions(
+  db: Firestore,
+  companyId: string,
+  onRows: (rows: ManualCommissionEntry[]) => void,
+): () => void {
+  const cid = companyId.trim();
+  if (!cid) { onRows([]); return () => {}; }
+  const q = query(
+    collection(db, MANUAL_COMMISSIONS_COLLECTION, cid, "entries"),
+    orderBy("createdAt", "desc"),
+  );
+  return onSnapshot(q, (snap) =>
+    onRows(
+      snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<ManualCommissionEntry, "id">),
+      })),
+    ),
+  );
+}
+
+export function subscribeCompanyCommissionAudit(
+  db: Firestore,
+  companyId: string,
+  onRows: (rows: CompanyCommissionAuditRow[]) => void,
+  limitCount = 80,
+): () => void {
+  const cid = companyId.trim();
+  if (!cid) {
+    onRows([]);
+    return () => {};
+  }
+  const q = query(
+    collection(db, COMMISSION_AUDIT_COLLECTION),
+    where("companyId", "==", cid),
+    orderBy("at", "desc"),
+  );
+  return onSnapshot(q, (snap) => {
+    const rows = snap.docs.slice(0, limitCount).map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        companyId: String(data.companyId ?? cid),
+        interventionId: String(data.interventionId ?? ""),
+        action: String(data.action ?? "unknown"),
+        finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
+        reason: typeof data.reason === "string" ? data.reason : undefined,
+        byUid: String(data.byUid ?? ""),
+        at: data.at,
+      } satisfies CompanyCommissionAuditRow;
+    });
+    onRows(rows);
+  });
+}
+
+export function subscribeCommissionRuleAudit(
+  db: Firestore,
+  companyId: string,
+  onRows: (rows: CommissionRuleAuditRow[]) => void,
+  limitCount = 80,
+): () => void {
+  const cid = companyId.trim();
+  if (!cid) {
+    onRows([]);
+    return () => {};
+  }
+  const q = query(
+    collection(db, COMMISSION_RULE_AUDIT_COLLECTION),
+    where("companyId", "==", cid),
+    orderBy("at", "desc"),
+  );
+  return onSnapshot(q, (snap) => {
+    onRows(
+      snap.docs.slice(0, limitCount).map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          companyId: cid,
+          ruleId: String(data.ruleId ?? ""),
+          action: String(data.action ?? "unknown") as CommissionRuleAuditAction,
+          level: typeof data.level === "string" ? data.level : undefined,
+          targetId: typeof data.targetId === "string" ? data.targetId : undefined,
+          valueType: typeof data.valueType === "string" ? data.valueType : undefined,
+          value: typeof data.value === "number" ? data.value : undefined,
+          byUid: String(data.byUid ?? ""),
+          at: data.at,
+        };
+      }),
+    );
   });
 }
 

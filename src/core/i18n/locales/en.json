@@ -40,6 +40,12 @@
       "title": "Schedule conflict",
       "block_assign": "This technician already has a job in that time slot.",
       "block_save": "This slot overlaps another assignment for the technician."
+    },
+    "proposed_slots": {
+      "title": "Available slots",
+      "date_label": "Intervention date",
+      "empty": "No free slots for this technician on that date.",
+      "company_title": "Open slots (all technicians)"
     }
   },
   "materials": {
@@ -100,8 +106,45 @@
       "col_level": "Level",
       "col_target": "Target",
       "col_value": "Commission",
-      "col_actions": "Actions"
+      "col_actions": "Actions",
+      "tab_rules": "Automatic rules",
+      "tab_manual": "Manual entry",
+      "manual_title": "New manual entry",
+      "manual_tech_uid": "Technician UID",
+      "manual_tech_uid_placeholder": "technician_uid",
+      "manual_amount": "Amount (€)",
+      "manual_reason": "Reason",
+      "manual_reason_placeholder": "Bonus, adjustment…",
+      "manual_date": "Date",
+      "manual_saving": "Saving…",
+      "manual_save": "Save entry",
+      "col_tech": "Technician",
+      "col_amount": "Amount",
+      "col_reason": "Reason",
+      "col_date": "Date",
+      "tab_history": "History",
+      "select_technician": "Select technician",
+      "form_edit_title": "Edit rule",
+      "update_rule": "Update",
+      "edit_rule": "Edit",
+      "history": {
+        "rules_title": "Rule changes",
+        "interventions_title": "Intervention commissions",
+        "empty": "No events recorded.",
+        "rule_id": "Rule",
+        "intervention_id": "Case",
+        "rule_action": {
+          "created": "Rule created",
+          "updated": "Rule updated",
+          "deactivated": "Rule deactivated"
+        },
+        "iv_action": {
+          "calculated": "Auto calculated",
+          "override": "Manual override"
+        }
+      }
     },
+    "audit_title": "Commission history",
     "panel_title": "Technician commission",
     "not_calculated": "Not calculated",
     "manual_override": "Manual",
@@ -157,7 +200,8 @@
       "comment": "Internal note",
       "email": "Email",
       "material_order": "Material order",
-      "commission": "Commission"
+      "commission": "Commission",
+      "portal_chat": "Portal message"
     }
   },
   "workflow": {
@@ -171,6 +215,16 @@
       "client": "Client",
       "system": "System"
     }
+  },
+  "intervention_drawer": {
+    "tab_timeline": "Timeline",
+    "tab_emails": "Emails",
+    "tab_materials": "Materials",
+    "tab_billing": "Billing"
+  },
+  "catalog": {
+    "search_placeholder": "Search product (SKU, label)…",
+    "add_line": "Add"
   },
   "spotlight": {
     "search_placeholder": "Name",
@@ -303,6 +357,18 @@
         "update_failed": "Update failed",
         "assignment_respond_in_list": "Accept or decline this job using the list on the left."
       },
+      "mission_action": {
+        "depart": "I'm on my way",
+        "photo": "Photo"
+      },
+      "command_palette": {
+        "title": "Mission actions",
+        "placeholder": "Search a mission or action…",
+        "empty": "No results",
+        "missions": "Today's missions",
+        "actions": "Quick actions",
+        "active": "Active"
+      },
       "images": {
         "no_mission_selected": "Select a mission to see client photos",
         "no_photos": "No photos provided by the client",
@@ -346,6 +412,12 @@
       "no_details": "Details to be specified"
     },
     "finish": {
+      "steps": {
+        "aria": "Closure steps",
+        "photos": "Photos",
+        "billing": "Invoice",
+        "signature": "Signature"
+      },
       "no_mission": "No intervention selected. Open a folder from missions, then use Finish.",
       "select_to_close": "Select a mission from the dashboard to close it.",
       "see_missions": "See missions",
@@ -893,6 +965,24 @@
       "token_updated": "Token updated",
       "sync_failed": "Sync failed"
     }
+  },
+  "catalog": {
+    "search_placeholder": "Search product…",
+    "empty": "No product found.",
+    "add_to_order": "Add to order",
+    "price": "Unit price",
+    "sku": "Reference",
+    "supplier": "Supplier",
+    "open_catalog": "Product catalogue"
+  },
+  "planning": {
+    "title": "Daily planning",
+    "date_label": "Date",
+    "unassigned_title": "To assign",
+    "no_unassigned": "All interventions assigned.",
+    "cell_available": "Available",
+    "cell_busy": "Occupied",
+    "assign_here": "Assign here"
   },
   "chat": {
     "role_client": "Client (portal)",

@@ -23,6 +23,10 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import { AnimatePresence, motion } from "framer-motion";
+import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { navigateTechnicianHub } from "@/features/interventions/technicianHubNavigation";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 type Props = { slotIndex: number };
 
@@ -34,8 +38,11 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const { pendingCaseId, setPendingCaseId } = useTechnicianCaseIntent();
-  const { finishJobInterventionId } = useTechnicianFinishJob();
+  const { finishJobInterventionId, setFinishJobInterventionId } = useTechnicianFinishJob();
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
+  const pager = useDashboardPagerOptional();
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
@@ -87,6 +94,20 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   }, [pendingCaseId, setPendingCaseId, interventions, missionDayAnchor, activeTodaySorted, firebaseUid]);
 
   return (
+    <>
+    {commandPaletteEnabled ? (
+      <InterventionCommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        missions={filteredSorted}
+        selectedCaseId={selectedCaseId}
+        onSelectCase={setSelectedCaseId}
+        onFinishCase={(id) => {
+          setFinishJobInterventionId(id);
+          navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_FINISH);
+        }}
+      />
+    ) : null}
     <DashboardTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
@@ -138,5 +159,6 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         </div>
       }
     />
+    </>
   );
 }

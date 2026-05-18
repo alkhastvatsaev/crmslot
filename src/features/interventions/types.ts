@@ -1,7 +1,7 @@
 export interface InterventionEvent {
   id: string;
   interventionId: string;
-  type: 'status_change' | 'comment' | 'email' | 'material_order' | 'commission';
+  type: 'status_change' | 'comment' | 'email' | 'material_order' | 'commission' | 'portal_chat';
   createdAt: string;
   createdByUid: string;
   content?: string;
@@ -85,7 +85,7 @@ export interface Intervention {
   /** Montant facturé en centimes (base commission + paiement client). */
   invoiceAmountCents?: number | null;
   /** Lignes facturables saisies par le technicien avant clôture. */
-  billingLines?: { description: string; quantity: number; unitPriceCents: number }[];
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
   /** Commission technicien calculée en centimes (dénormalisé). */
   commissionAmountCents?: number | null;
   paymentStatus?: "unpaid" | "pending" | "paid" | "refunded" | null;
@@ -96,4 +96,14 @@ export interface Intervention {
   completedByUid?: string | null;
   /** Validation Ivana (back-office). */
   ivanaVerified?: boolean;
+  /** Durée prévue de l'intervention (minutes). Améliore la précision des conflits de planning. */
+  estimatedDurationMinutes?: number | null;
+  /** Durée réelle calculée à la clôture (completedAt − technicianAcceptedAt). */
+  actualDurationMinutes?: number | null;
+  /** Token UUID d'accès portail client (lecture anonyme via API route). */
+  portalAccessToken?: string | null;
+  /** CRM — référence client société. */
+  clientId?: string | null;
+  /** CRM — site d'intervention lié au client. */
+  siteId?: string | null;
 }

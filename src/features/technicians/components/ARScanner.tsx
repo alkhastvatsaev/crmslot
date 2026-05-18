@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera, X, ScanFace, CheckCircle2 } from 'lucide-react';
 
-export default function ARScanner({ onClose }: { onClose: () => void }) {
+interface ARScannerProps {
+  onClose: () => void;
+  onIdentified?: (part: { description: string; reference: string }) => void;
+}
+
+export default function ARScanner({ onClose, onIdentified }: ARScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [phase, setPhase] = useState<'init' | 'scanning' | 'analyzing' | 'success'>('init');
   const [hasCamera, setHasCamera] = useState(false);
@@ -39,6 +44,7 @@ export default function ARScanner({ onClose }: { onClose: () => void }) {
     } else if (phase === 'analyzing') {
       setTimeout(() => setPhase('success'), 2000);
     } else if (phase === 'success') {
+      onIdentified?.({ description: 'Cylindre Bricard Astral', reference: 'BRIC-ASTRAL-30' });
       setTimeout(() => {
         onClose();
       }, 3000);

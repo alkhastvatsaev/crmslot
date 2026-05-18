@@ -27,7 +27,7 @@ describe("createMaterialOrder", () => {
     mockCreateDoc.mockReset();
     mockTransition.mockReset();
     mockCreateDoc.mockResolvedValue("order-abc");
-    mockTransition.mockResolvedValue({ id: "event-1" } as any);
+    mockTransition.mockResolvedValue({} as never);
   });
 
   it("creates order doc and transitions to waiting_material when in progress", async () => {

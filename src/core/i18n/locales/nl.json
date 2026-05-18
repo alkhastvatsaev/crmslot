@@ -40,6 +40,12 @@
       "title": "Planningsconflict",
       "block_assign": "Deze technicus heeft al een opdracht in dit tijdvak.",
       "block_save": "Dit tijdvak overlapt een andere opdracht van de technicus."
+    },
+    "proposed_slots": {
+      "title": "Vrije tijdvakken",
+      "date_label": "Interventiedatum",
+      "empty": "Geen vrij tijdvak voor deze technicus op die datum.",
+      "company_title": "Vrije tijdvakken (alle technici)"
     }
   },
   "materials": {
@@ -100,8 +106,45 @@
       "col_level": "Niveau",
       "col_target": "Doel",
       "col_value": "Commissie",
-      "col_actions": "Acties"
+      "col_actions": "Acties",
+      "tab_rules": "Automatische regels",
+      "tab_manual": "Handmatige invoer",
+      "manual_title": "Nieuwe handmatige invoer",
+      "manual_tech_uid": "Technicien UID",
+      "manual_tech_uid_placeholder": "technicien_uid",
+      "manual_amount": "Bedrag (€)",
+      "manual_reason": "Reden",
+      "manual_reason_placeholder": "Bonus, aanpassing…",
+      "manual_date": "Datum",
+      "manual_saving": "Opslaan…",
+      "manual_save": "Invoer opslaan",
+      "col_tech": "Technicien",
+      "col_amount": "Bedrag",
+      "col_reason": "Reden",
+      "col_date": "Datum",
+      "tab_history": "Geschiedenis",
+      "select_technician": "Technicus kiezen",
+      "form_edit_title": "Regel bewerken",
+      "update_rule": "Bijwerken",
+      "edit_rule": "Bewerken",
+      "history": {
+        "rules_title": "Regelwijzigingen",
+        "interventions_title": "Commissies per dossier",
+        "empty": "Geen gebeurtenissen.",
+        "rule_id": "Regel",
+        "intervention_id": "Dossier",
+        "rule_action": {
+          "created": "Regel aangemaakt",
+          "updated": "Regel gewijzigd",
+          "deactivated": "Regel gedeactiveerd"
+        },
+        "iv_action": {
+          "calculated": "Auto berekend",
+          "override": "Handmatige override"
+        }
+      }
     },
+    "audit_title": "Commissiegeschiedenis",
     "panel_title": "Technicuscommissie",
     "not_calculated": "Niet berekend",
     "manual_override": "Handmatig",
@@ -157,7 +200,8 @@
       "comment": "Interne notitie",
       "email": "E-mail",
       "material_order": "Materiaalbestelling",
-      "commission": "Commissie"
+      "commission": "Commissie",
+      "portal_chat": "Portaalbericht"
     }
   },
   "workflow": {
@@ -171,6 +215,16 @@
       "client": "Klant",
       "system": "Systeem"
     }
+  },
+  "intervention_drawer": {
+    "tab_timeline": "Tijdlijn",
+    "tab_emails": "E-mails",
+    "tab_materials": "Materiaal",
+    "tab_billing": "Facturatie"
+  },
+  "catalog": {
+    "search_placeholder": "Product zoeken (ref., omschrijving)…",
+    "add_line": "Toevoegen"
   },
   "spotlight": {
     "search_placeholder": "Naam",
@@ -294,6 +348,18 @@
         "no_address": "Geen adres",
         "not_provided": "Niet opgegeven"
       },
+      "mission_action": {
+        "depart": "Ik vertrek",
+        "photo": "Foto"
+      },
+      "command_palette": {
+        "title": "Missie-acties",
+        "placeholder": "Zoek een missie of actie…",
+        "empty": "Geen resultaten",
+        "missions": "Missies vandaag",
+        "actions": "Snelle acties",
+        "active": "Actief"
+      },
       "images": {
         "no_mission_selected": "Selecteer een missie om klantfoto's te zien",
         "no_photos": "Geen foto's verstrekt door de klant",
@@ -337,6 +403,12 @@
       "no_details": "Details nader te bepalen"
     },
     "finish": {
+      "steps": {
+        "aria": "Afsluitstappen",
+        "photos": "Foto's",
+        "billing": "Factuur",
+        "signature": "Handtekening"
+      },
       "no_mission": "Geen interventie geselecteerd. Open een map vanuit missies, gebruik dan Voltooien.",
       "select_to_close": "Selecteer een missie op het dashboard om deze te sluiten.",
       "see_missions": "Zie missies",
@@ -869,6 +941,24 @@
       "token_updated": "Token bijgewerkt",
       "sync_failed": "Synchronisatie mislukt"
     }
+  },
+  "catalog": {
+    "search_placeholder": "Product zoeken…",
+    "empty": "Geen product gevonden.",
+    "add_to_order": "Toevoegen aan bestelling",
+    "price": "Eenheidsprijs",
+    "sku": "Referentie",
+    "supplier": "Leverancier",
+    "open_catalog": "Productcatalogus"
+  },
+  "planning": {
+    "title": "Dagplanning",
+    "date_label": "Datum",
+    "unassigned_title": "Toe te wijzen",
+    "no_unassigned": "Alle interventies zijn toegewezen.",
+    "cell_available": "Beschikbaar",
+    "cell_busy": "Bezet",
+    "assign_here": "Hier toewijzen"
   },
   "chat": {
     "role_client": "Klant (portaal)",

@@ -119,6 +119,7 @@ export interface BillingTemplateLine {
   description: string;
   quantity: number;
   unitPriceCents: number;
+  reference?: string;
 }
 
 export interface BillingTemplate {
@@ -179,6 +180,39 @@ export const BILLING_TEMPLATES: BillingTemplate[] = [
     lines: [
       { description: "Diagnostic et dépannage", quantity: 1, unitPriceCents: 7500 },
       { description: "Main d'œuvre (Heure)", quantity: 1, unitPriceCents: 5500 },
+      { description: "Déplacement forfaitaire", quantity: 1, unitPriceCents: 3500 },
+    ],
+  },
+  {
+    id: "bill-securisation-provisoire",
+    name: "Facturation — Sécurisation Provisoire (Post-effraction)",
+    category: "serrurerie",
+    lines: [
+      { description: "Mise en sécurité provisoire (placage OSB)", quantity: 1, unitPriceCents: 15000 },
+      { description: "Fournitures (bois, visserie, fixation)", quantity: 1, unitPriceCents: 4500 },
+      { description: "Main d'œuvre (Heure)", quantity: 2, unitPriceCents: 5500 },
+      { description: "Déplacement urgent (nuit/weekend)", quantity: 1, unitPriceCents: 8500 },
+    ],
+  },
+  {
+    id: "bill-installation-coffre",
+    name: "Facturation — Installation Coffre-fort",
+    category: "serrurerie",
+    lines: [
+      { description: "Coffre-fort certifié (ignifuge)", quantity: 1, unitPriceCents: 65000 },
+      { description: "Ancrage chimique au sol/mur", quantity: 1, unitPriceCents: 8500 },
+      { description: "Forfait d'installation et mise en service", quantity: 1, unitPriceCents: 12000 },
+      { description: "Déplacement forfaitaire", quantity: 1, unitPriceCents: 3500 },
+    ],
+  },
+  {
+    id: "bill-vitrage-double",
+    name: "Facturation — Remplacement Double Vitrage",
+    category: "vitrerie",
+    lines: [
+      { description: "Double vitrage standard (sur mesure)", quantity: 1, unitPriceCents: 21000 },
+      { description: "Joints d'étanchéité", quantity: 1, unitPriceCents: 2500 },
+      { description: "Main d'œuvre (Heure)", quantity: 1.5, unitPriceCents: 5500 },
       { description: "Déplacement forfaitaire", quantity: 1, unitPriceCents: 3500 },
     ],
   },

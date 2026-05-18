@@ -7,6 +7,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useInterventionCommission } from "@/features/commissions/useInterventionCommission";
 import { saveCommissionOverride } from "@/features/commissions/commissionFirestore";
 import { computeAndPersistInterventionCommission } from "@/features/commissions/computeInterventionCommission";
+import InterventionCommissionAuditList from "@/features/commissions/components/InterventionCommissionAuditList";
 import type { Intervention } from "@/features/interventions/types";
 
 type Props = {
@@ -179,6 +180,7 @@ export default function InterventionCommissionPanel({ intervention }: Props) {
           </button>
         </div>
       ) : null}
+      <InterventionCommissionAuditList interventionId={intervention.id} />
     </div>
   );
 }

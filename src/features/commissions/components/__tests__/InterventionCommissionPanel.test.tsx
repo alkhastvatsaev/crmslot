@@ -23,6 +23,10 @@ jest.mock("@/features/commissions/computeInterventionCommission", () => ({
 
 jest.mock("@/features/commissions/commissionFirestore", () => ({
   saveCommissionOverride: jest.fn().mockResolvedValue(undefined),
+  subscribeCommissionAudit: jest.fn((_, __, cb) => {
+    cb([]);
+    return () => {};
+  }),
 }));
 
 jest.mock("sonner", () => ({

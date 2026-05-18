@@ -13,6 +13,10 @@ import type { Intervention } from "@/features/interventions/types";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
+function formatEur(cents: number): string {
+  return (cents / 100).toFixed(2).replace(".", ",") + " €";
+}
+
 const STATUS_STYLES: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
   pending: "bg-amber-100 text-amber-700",
@@ -91,6 +95,47 @@ export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: P
 
       {expanded && (
         <div className="rounded-[18px] border border-slate-100 bg-white p-4 space-y-4">
+          {/* Billing Lines Display */}
+          {intervention.billingLines && intervention.billingLines.length > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 overflow-hidden">
+              <div className="bg-slate-100 px-3 py-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider flex justify-between">
+                <span>Description</span>
+                <span>Total</span>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {intervention.billingLines.map((line, idx) => (
+                  <div key={idx} className="px-3 py-2 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-semibold text-slate-800">
+                        {line.description} {line.reference ? <span className="text-slate-400 text-[11px]">[{line.reference}]</span> : ""}
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        {line.quantity} × {formatEur(line.unitPriceCents)}
+                      </span>
+                    </div>
+                    <span className="text-[13px] font-bold text-slate-700">
+                      {formatEur(Math.round(line.quantity * line.unitPriceCents))}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white px-3 py-3 border-t border-slate-200 flex flex-col items-end gap-1">
+                <div className="text-[11px] font-semibold text-slate-500 flex justify-between w-full max-w-[150px]">
+                  <span>Total HT :</span>
+                  <span>{formatEur(intervention.billingLines.reduce((sum, l) => sum + Math.round(l.quantity * l.unitPriceCents), 0))}</span>
+                </div>
+                <div className="text-[11px] font-semibold text-slate-500 flex justify-between w-full max-w-[150px]">
+                  <span>TVA (6%) :</span>
+                  <span>{formatEur(Math.round(intervention.billingLines.reduce((sum, l) => sum + Math.round(l.quantity * l.unitPriceCents), 0) * 0.06))}</span>
+                </div>
+                <div className="text-[14px] font-black text-blue-700 flex justify-between w-full max-w-[150px] mt-1 pt-1 border-t border-slate-100">
+                  <span>TTC :</span>
+                  <span>{formatEur(Math.round(intervention.billingLines.reduce((sum, l) => sum + Math.round(l.quantity * l.unitPriceCents), 0) * 1.06))}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Billing template quick-fill */}
           <div>
             <label className="mb-1.5 block text-[11px] font-bold text-slate-400 uppercase tracking-widest">

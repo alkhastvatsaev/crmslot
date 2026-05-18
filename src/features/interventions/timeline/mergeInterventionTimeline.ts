@@ -4,6 +4,7 @@ import type { InterventionTimelineDoc } from "@/features/interventions/timeline/
 import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import type { CommissionAuditRow } from "@/features/commissions/commissionFirestore";
+import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 function toIsoString(value: unknown): string {
@@ -77,6 +78,23 @@ export function materialOrderToInterventionEvent(order: MaterialOrderDoc): Inter
   };
 }
 
+export function portalChatToInterventionEvent(msg: IvanaPortalChatDoc): InterventionEvent {
+  const fromClient = msg.role === "client";
+  const imageNote =
+    msg.imageUrls && msg.imageUrls.length > 0
+      ? `\n[${msg.imageUrls.length} image(s)]`
+      : "";
+  return {
+    id: `portal-chat-${msg.id}`,
+    interventionId: msg.interventionId?.trim() ?? "",
+    type: "portal_chat",
+    createdAt: toIsoString(msg.createdAt),
+    createdByUid: msg.senderUid,
+    content: `${fromClient ? "Client" : "Équipe"} : ${msg.body}${imageNote}`,
+    visibility: "client",
+  };
+}
+
 export function timelineDocToInterventionEvent(
   id: string,
   doc: InterventionTimelineDoc,
@@ -101,6 +119,7 @@ export function mergeInterventionTimelineEvents(
     emails?: InterventionEmailDoc[];
     materialOrders?: MaterialOrderDoc[];
     commissionAudit?: CommissionAuditRow[];
+    portalChat?: IvanaPortalChatDoc[];
   },
 ): InterventionEvent[] {
   const clientOnly = options?.clientVisibleOnly === true;
@@ -112,12 +131,14 @@ export function mergeInterventionTimelineEvents(
     ...(options?.commissionAudit ?? []).map((row) =>
       commissionAuditToInterventionEvent(row, row.interventionId),
     ),
+    ...(options?.portalChat ?? []).map(portalChatToInterventionEvent),
   ];
 
   const filtered = clientOnly
     ? rows.filter(
         (r) =>
           r.type === "status_change" ||
+          r.type === "portal_chat" ||
           (r.visibility === "client" &&
             r.type !== "email" &&
             r.type !== "material_order" &&

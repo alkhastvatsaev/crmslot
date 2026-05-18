@@ -40,6 +40,12 @@
       "title": "Conflit de planning",
       "block_assign": "Ce technicien a déjà une mission sur ce créneau.",
       "block_save": "Ce créneau chevauche une autre mission du technicien."
+    },
+    "proposed_slots": {
+      "title": "Créneaux libres",
+      "date_label": "Date d'intervention",
+      "empty": "Aucun créneau libre pour ce technicien à cette date.",
+      "company_title": "Créneaux libres (tous techniciens)"
     }
   },
   "materials": {
@@ -100,8 +106,45 @@
       "col_level": "Niveau",
       "col_target": "Cible",
       "col_value": "Commission",
-      "col_actions": "Actions"
+      "col_actions": "Actions",
+      "tab_rules": "Règles automatiques",
+      "tab_manual": "Saisie manuelle",
+      "manual_title": "Nouvelle entrée manuelle",
+      "manual_tech_uid": "UID Technicien",
+      "manual_tech_uid_placeholder": "uid_technicien",
+      "manual_amount": "Montant (€)",
+      "manual_reason": "Motif",
+      "manual_reason_placeholder": "Bonus, ajustement…",
+      "manual_date": "Date",
+      "manual_saving": "Enregistrement…",
+      "manual_save": "Enregistrer l'entrée",
+      "col_tech": "Technicien",
+      "col_amount": "Montant",
+      "col_reason": "Motif",
+      "col_date": "Date",
+      "tab_history": "Historique",
+      "select_technician": "Choisir un technicien",
+      "form_edit_title": "Modifier la règle",
+      "update_rule": "Mettre à jour",
+      "edit_rule": "Modifier",
+      "history": {
+        "rules_title": "Modifications des règles",
+        "interventions_title": "Commissions par dossier",
+        "empty": "Aucun événement enregistré.",
+        "rule_id": "Règle",
+        "intervention_id": "Dossier",
+        "rule_action": {
+          "created": "Règle créée",
+          "updated": "Règle modifiée",
+          "deactivated": "Règle désactivée"
+        },
+        "iv_action": {
+          "calculated": "Calcul auto",
+          "override": "Override manuel"
+        }
+      }
     },
+    "audit_title": "Historique commission",
     "panel_title": "Commission technicien",
     "not_calculated": "Non calculée",
     "manual_override": "Forcée",
@@ -157,7 +200,8 @@
       "comment": "Note interne",
       "email": "E-mail",
       "material_order": "Commande matériel",
-      "commission": "Commission"
+      "commission": "Commission",
+      "portal_chat": "Message portail"
     }
   },
   "workflow": {
@@ -171,6 +215,16 @@
       "client": "Client",
       "system": "Système"
     }
+  },
+  "intervention_drawer": {
+    "tab_timeline": "Historique",
+    "tab_emails": "Emails",
+    "tab_materials": "Matériel",
+    "tab_billing": "Facturation"
+  },
+  "catalog": {
+    "search_placeholder": "Rechercher un produit (réf., libellé)…",
+    "add_line": "Ajouter"
   },
   "spotlight": {
     "search_placeholder": "Nom",
@@ -303,6 +357,18 @@
         "update_failed": "Mise à jour impossible",
         "assignment_respond_in_list": "Acceptez ou refusez cette mission dans la liste à gauche."
       },
+      "mission_action": {
+        "depart": "Je pars",
+        "photo": "Photo"
+      },
+      "command_palette": {
+        "title": "Actions mission",
+        "placeholder": "Rechercher une mission ou une action…",
+        "empty": "Aucun résultat",
+        "missions": "Missions du jour",
+        "actions": "Actions rapides",
+        "active": "Active"
+      },
       "images": {
         "no_mission_selected": "Sélectionnez une mission pour voir les photos du client",
         "no_photos": "Aucune photo fournie par le client",
@@ -346,6 +412,12 @@
       "no_details": "Détails à préciser"
     },
     "finish": {
+      "steps": {
+        "aria": "Étapes de clôture",
+        "photos": "Photos",
+        "billing": "Facture",
+        "signature": "Signature"
+      },
       "no_mission": "Aucune intervention sélectionnée. Ouvrez un dossier depuis les missions, puis utilisez Terminer.",
       "select_to_close": "Sélectionnez une mission depuis le tableau de bord pour la clôturer.",
       "see_missions": "Voir les missions",
@@ -897,6 +969,24 @@
       "token_updated": "Token mis à jour",
       "sync_failed": "Sync impossible"
     }
+  },
+  "catalog": {
+    "search_placeholder": "Rechercher un produit…",
+    "empty": "Aucun produit trouvé.",
+    "add_to_order": "Ajouter à la commande",
+    "price": "Prix unitaire",
+    "sku": "Référence",
+    "supplier": "Fournisseur",
+    "open_catalog": "Catalogue produits"
+  },
+  "planning": {
+    "title": "Planning journalier",
+    "date_label": "Date",
+    "unassigned_title": "À assigner",
+    "no_unassigned": "Toutes les interventions sont assignées.",
+    "cell_available": "Disponible",
+    "cell_busy": "Occupé",
+    "assign_here": "Assigner ici"
   },
   "chat": {
     "role_client": "Client (portail)",

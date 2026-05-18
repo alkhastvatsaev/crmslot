@@ -43,7 +43,7 @@ function assignmentIv(partial: Partial<Intervention> = {}): Intervention {
 describe("TechnicianAssignmentOfferCard", () => {
   beforeEach(() => {
     mockTransition.mockClear();
-    mockTransition.mockResolvedValue({ id: "evt-1" } as any);
+    mockTransition.mockResolvedValue({} as never);
   });
 
   it("renders offer actions for assigned mission", () => {

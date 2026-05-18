@@ -11,6 +11,7 @@ import { storage, firestore } from "@/core/config/firebase";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import QuickCameraUploader from "./QuickCameraUploader";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -33,6 +34,27 @@ export default function TechnicianDashboardImagesPanel({
     e.target.value = "";
     if (!file || !caseId || !storage || !firestore) return;
 
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `interventions/${caseId}/terrain/${generateId()}.${ext}`;
+      const storageRef = ref(storage, path);
+      await uploadBytes(storageRef, file, { contentType: file.type });
+      const url = await getDownloadURL(storageRef);
+      await updateDoc(doc(firestore, "interventions", caseId), {
+        attachmentThumbnails: arrayUnion(url),
+        updatedAt: new Date().toISOString(),
+      });
+      toast.success(String(t("technician_hub.dashboard.images.upload_success")));
+    } catch {
+      toast.error(String(t("technician_hub.dashboard.images.upload_error")));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePhotoTaken = async (file: File) => {
+    if (!caseId || !storage || !firestore) return;
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() ?? "jpg";
@@ -153,24 +175,11 @@ export default function TechnicianDashboardImagesPanel({
           </motion.div>
         )}
 
-        <button
-          type="button"
-          disabled={uploading}
-          onClick={() => fileInputRef.current?.click()}
-          className="flex items-center justify-center gap-2 rounded-[14px] border border-dashed border-blue-200 bg-blue-50 px-4 py-3 text-[13px] font-semibold text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-60"
-        >
-          {uploading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {String(t("technician_hub.dashboard.images.uploading"))}
-            </>
-          ) : (
-            <>
-              <Camera className="h-4 w-4" />
-              {String(t("technician_hub.dashboard.images.upload_btn"))}
-            </>
-          )}
-        </button>
+        <QuickCameraUploader 
+          onPhotoTaken={(file) => void handlePhotoTaken(file)} 
+          label={String(t("technician_hub.dashboard.images.upload_btn"))}
+          isUploading={uploading}
+        />
       </div>
     </div>
   );

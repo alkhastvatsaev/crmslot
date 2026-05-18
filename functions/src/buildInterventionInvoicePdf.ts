@@ -2,18 +2,42 @@ import { randomUUID } from "crypto";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+type BillingLineInput = {
+  description: string;
+  quantity: number;
+  unitPriceCents: number;
+  reference?: string;
+};
+
 type InterventionInvoiceInput = {
   id: string;
   title?: string;
   address?: string;
   clientName?: string | null;
   problem?: string | null;
+  invoiceAmountCents?: number;
+  billingLines?: BillingLineInput[];
 };
 
 /**
  * PDF facture minimal (montants indicatifs — à ajuster avec Stripe / compta).
  */
+function formatEur(cents: number): string {
+  return (cents / 100).toFixed(2).replace(".", ",") + " €";
+}
+
 export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput): Buffer {
+  const activeLines = (iv.billingLines ?? []).filter(
+    (l) => l.description.trim() && l.quantity > 0 && l.unitPriceCents > 0
+  );
+  const htCents = activeLines.length > 0
+    ? activeLines.reduce((sum, l) => sum + Math.round(l.quantity * l.unitPriceCents), 0)
+    : typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
+      ? Math.round(iv.invoiceAmountCents)
+      : 22000;
+  const tvaCents = Math.round(htCents * 0.06);
+  const ttcCents = htCents + tvaCents;
+
   const doc = new jsPDF();
 
   const colors = {
@@ -77,10 +101,19 @@ export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput):
 
   y += 7 + probLines.length * 5 + 8;
 
+  const tableBody: string[][] = activeLines.length > 0
+    ? activeLines.map((l) => [
+        l.description.trim() + (l.reference ? ` [${l.reference}]` : ""),
+        String(l.quantity),
+        formatEur(l.unitPriceCents),
+        formatEur(Math.round(l.quantity * l.unitPriceCents)),
+      ])
+    : [["Prestation terrain — intervention réalisée et validée (photos + signature)", "1", formatEur(htCents), formatEur(htCents)]];
+
   autoTable(doc, {
     startY: y,
     head: [["Description", "Qté", "Prix HT", "Total HT"]],
-    body: [["Prestation terrain — intervention réalisée et validée (photos + signature)", "1", "220,00 €", "220,00 €"]],
+    body: tableBody,
     headStyles: { fillColor: colors.primary, textColor: [255, 255, 255], fontSize: 10 },
     bodyStyles: { fontSize: 9, textColor: colors.secondary },
     margin: { left: 20, right: 20 },
@@ -97,15 +130,15 @@ export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput):
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...colors.secondary);
   doc.text("Total HT :", labelX, finalY);
-  doc.text("220,00 €", valX, finalY, { align: "right" });
+  doc.text(formatEur(htCents), valX, finalY, { align: "right" });
   doc.text("TVA (6 %) :", labelX, finalY + 8);
-  doc.text("13,20 €", valX, finalY + 8, { align: "right" });
+  doc.text(formatEur(tvaCents), valX, finalY + 8, { align: "right" });
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.setTextColor(...colors.accent);
   doc.text("Total TTC :", labelX, finalY + 20);
-  doc.text("233,20 €", valX, finalY + 20, { align: "right" });
+  doc.text(formatEur(ttcCents), valX, finalY + 20, { align: "right" });
 
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);

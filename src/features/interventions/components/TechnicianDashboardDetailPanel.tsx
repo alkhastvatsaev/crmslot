@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Camera, MapPin, Play, Navigation, CheckCircle2, Pause, Phone, Package } from "lucide-react";
+import { MapPin, Play, Navigation, CheckCircle2, Pause, Phone, Package, Camera } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlideAction } from "@/components/ui/slide-action";
+import MissionActionBar from "@/features/interventions/components/MissionActionBar";
+import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import { auth, firestore } from "@/core/config/firebase";
 import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
@@ -188,6 +190,10 @@ export default function TechnicianDashboardDetailPanel({
 
   const technicianUid =
     liveIv.assignedTechnicianUid?.trim() || auth?.currentUser?.uid?.trim() || "";
+  const awaitingAssignment = isTechnicianAssignmentAwaitingResponse(
+    liveIv,
+    auth?.currentUser?.uid,
+  );
 
   const renderMaterialOrders = () =>
     technicianUid ? (
@@ -326,14 +332,6 @@ export default function TechnicianDashboardDetailPanel({
         </div>
       </div>
 
-      <button
-        onClick={() => handleUpdateStatus("en_route")}
-        disabled={isUpdating}
-        className="group flex min-h-[54px] shrink-0 w-full items-center justify-center gap-2 rounded-[22px] bg-blue-600 px-4 text-[17px] font-bold text-white shadow-[0_14px_40px_-14px_rgba(37,99,235,0.55)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none"
-      >
-        <Play className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1" />
-        {isUpdating ? t("technician_hub.dashboard.detail.updating") : t("technician_hub.dashboard.detail.start_intervention")}
-      </button>
     </motion.div>
   );
 
@@ -372,14 +370,6 @@ export default function TechnicianDashboardDetailPanel({
         </div>
       </div>
 
-      <button
-        onClick={() => handleUpdateStatus("in_progress")}
-        disabled={isUpdating}
-        className="group flex min-h-[54px] shrink-0 w-full items-center justify-center gap-2 rounded-[22px] bg-amber-500 px-4 text-[17px] font-bold text-white shadow-[0_14px_40px_-14px_rgba(245,158,11,0.55)] transition-all hover:bg-amber-600 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none"
-      >
-        <MapPin className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
-        {isUpdating ? t("technician_hub.dashboard.detail.updating") : t("technician_hub.dashboard.detail.on_site")}
-      </button>
     </motion.div>
   );
 
@@ -411,24 +401,6 @@ export default function TechnicianDashboardDetailPanel({
       </div>
 
 
-      <motion.div className="flex flex-col gap-2 shrink-0">
-        <button
-          type="button"
-          data-testid="technician-waiting-material-btn"
-          onClick={() => void handleUpdateStatus("waiting_material")}
-          disabled={isUpdating}
-          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[20px] border border-amber-200 bg-amber-50 px-4 text-[15px] font-bold text-amber-950 transition hover:bg-amber-100 disabled:opacity-70"
-        >
-          <Pause className="h-4 w-4 shrink-0" />
-          {t("technician_hub.dashboard.detail.waiting_material")}
-        </button>
-        <SlideAction
-          onAction={onStartFinishJob}
-          label={t("technician_hub.dashboard.detail.finish_job")}
-          icon={Camera}
-          className="shrink-0"
-        />
-      </motion.div>
     </motion.div>
   );
 
@@ -450,16 +422,6 @@ export default function TechnicianDashboardDetailPanel({
           {renderMaterialOrders()}
         </div>
       </div>
-      <button
-        type="button"
-        data-testid="technician-resume-work-btn"
-        onClick={() => void handleUpdateStatus("in_progress")}
-        disabled={isUpdating}
-        className="flex min-h-[54px] shrink-0 w-full items-center justify-center gap-2 rounded-[22px] bg-blue-600 px-4 text-[17px] font-bold text-white shadow-[0_14px_40px_-14px_rgba(37,99,235,0.55)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
-      >
-        <Play className="h-5 w-5 shrink-0" />
-        {isUpdating ? t("technician_hub.dashboard.detail.updating") : t("technician_hub.dashboard.detail.resume_work")}
-      </button>
     </motion.div>
   );
 
@@ -494,62 +456,35 @@ export default function TechnicianDashboardDetailPanel({
     return renderPending();
   }
 
-  const renderQuickActions = () => {
-    const s = liveIv.status;
-    if (s === "done" || s === "invoiced" || s === "cancelled" || s === "assigned") return null;
-
-    const canAccessMaterials = s === "in_progress" || s === "waiting_material";
-    const canFinish = s === "in_progress";
-
-    return (
-      <div className="flex justify-around items-center bg-white rounded-2xl p-2 shadow-sm border border-slate-100 mb-4 shrink-0 overflow-x-auto gap-2">
-        {(liveIv.clientPhone || liveIv.phone) ? (
-          <a href={`tel:${liveIv.clientPhone || liveIv.phone}`} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-blue-600 transition-colors">
-            <div className="bg-blue-50 p-2 rounded-full shadow-sm"><Phone className="w-5 h-5" /></div>
-            <span className="text-[10px] font-bold">{t("common.call")}</span>
-          </a>
-        ) : null}
-        {liveIv.address ? (
-          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(liveIv.address))}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-emerald-600 transition-colors">
-            <div className="bg-emerald-50 p-2 rounded-full shadow-sm"><Navigation className="w-5 h-5" /></div>
-            <span className="text-[10px] font-bold">{t("common.navigate")}</span>
-          </a>
-        ) : null}
-        {canAccessMaterials ? (
-          <button
-            onClick={() => {
-              setMaterialsPanelOpen(true);
-              setTimeout(() => document.getElementById('technician-material-orders')?.scrollIntoView({ behavior: 'smooth' }), 50);
-            }}
-            className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-amber-600 transition-colors"
-          >
-            <div className="bg-amber-50 p-2 rounded-full shadow-sm"><Package className="w-5 h-5" /></div>
-            <span className="text-[10px] font-bold">{t("common.materials")}</span>
-          </button>
-        ) : null}
-        {canFinish ? (
-          <button onClick={onStartFinishJob} className="flex flex-col items-center gap-1 min-w-[72px] p-2 rounded-xl hover:bg-slate-50 text-purple-600 transition-colors">
-            <div className="bg-purple-50 p-2 rounded-full shadow-sm"><CheckCircle2 className="w-5 h-5" /></div>
-            <span className="text-[10px] font-bold">{t("common.finish")}</span>
-          </button>
-        ) : null}
-      </div>
-    );
-  };
-
   return (
     <div
       data-testid="technician-dashboard-detail"
       style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
     >
-
-
-      <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col">
-        {renderQuickActions()}
-        <AnimatePresence mode="wait">
-          {renderContent()}
-        </AnimatePresence>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex-1 overflow-y-auto px-4 py-2">
+          <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
+        </div>
+        <MissionActionBar
+          intervention={liveIv}
+          awaitingAssignment={awaitingAssignment}
+          isUpdating={isUpdating}
+          onPrimaryTransition={(toStatus) => void handleUpdateStatus(toStatus)}
+          onFinish={onStartFinishJob}
+          onWaitingMaterial={() => void handleUpdateStatus("waiting_material")}
+          onOpenMaterials={() => {
+            setMaterialsPanelOpen(true);
+            setTimeout(
+              () =>
+                document
+                  .getElementById("technician-material-orders")
+                  ?.scrollIntoView({ behavior: "smooth" }),
+              50,
+            );
+          }}
+          onQuickPhoto={() => navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_FINISH)}
+        />
       </div>
     </div>
   );

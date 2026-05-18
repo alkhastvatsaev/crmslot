@@ -17,6 +17,10 @@ import {
   subscribeCommissionAudit,
   type CommissionAuditRow,
 } from "@/features/commissions/commissionFirestore";
+import {
+  subscribePortalChatForIntervention,
+  type IvanaPortalChatDoc,
+} from "@/features/backoffice/ivanaChatFirestore";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
@@ -62,6 +66,7 @@ export function useInterventionTimeline(
     let emailRows: InterventionEmailDoc[] = [];
     let materialRows: MaterialOrderDoc[] = [];
     let commissionRows: CommissionAuditRow[] = [];
+    let portalChatRows: IvanaPortalChatDoc[] = [];
 
     const publish = () => {
       setEvents(
@@ -70,6 +75,7 @@ export function useInterventionTimeline(
           emails: emailRows,
           materialOrders: materialRows,
           commissionAudit: commissionRows,
+          portalChat: portalChatRows,
         }),
       );
       setLoading(false);
@@ -131,12 +137,26 @@ export function useInterventionTimeline(
       publish();
     });
 
+    const unsubPortalChat = subscribePortalChatForIntervention(
+      firestore,
+      activeId,
+      (rows) => {
+        portalChatRows = rows;
+        publish();
+      },
+      () => {
+        portalChatRows = [];
+        publish();
+      },
+    );
+
     return () => {
       unsubStatus();
       unsubTimeline();
       unsubEmails();
       unsubMaterials();
       unsubCommission();
+      unsubPortalChat();
     };
   }, [activeId, options?.clientVisibleOnly]);
 
