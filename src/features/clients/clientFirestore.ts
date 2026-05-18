@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   updateDoc,
   where,
+  writeBatch,
   type Firestore,
 } from "firebase/firestore";
 import type { ClientRecord, SiteRecord } from "./types";
@@ -49,6 +50,30 @@ export function subscribeClients(
     },
     (err) => onError?.(err),
   );
+}
+
+const BULK_IMPORT_MAX = 80;
+
+export async function bulkCreateClients(
+  db: Firestore,
+  companyId: string,
+  rows: Array<Omit<ClientRecord, "id" | "companyId" | "createdAt" | "updatedAt">>,
+): Promise<number> {
+  const cid = companyId.trim();
+  if (!cid || rows.length === 0) return 0;
+  const slice = rows.slice(0, BULK_IMPORT_MAX);
+  const batch = writeBatch(db);
+  for (const row of slice) {
+    const ref = doc(collection(db, CLIENTS_COLLECTION));
+    batch.set(ref, {
+      ...row,
+      companyId: cid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  }
+  await batch.commit();
+  return slice.length;
 }
 
 export async function createClient(

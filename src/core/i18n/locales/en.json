@@ -1,4 +1,10 @@
 {
+  "rating": {
+    "title": "How did the intervention go?",
+    "comment_placeholder": "Any comments? (optional)",
+    "submit": "Submit my review",
+    "thank_you": "Thank you for your feedback!"
+  },
   "client_push": {
     "enable": "Enable tracking notifications",
     "enabled": "Tracking notifications enabled",
@@ -77,7 +83,8 @@
       "submitting": "Sending…",
       "template_label": "Load a quick template",
       "template_placeholder": "-- Select a template --",
-      "lecot_title": "Check on Lecot.be"
+      "lecot_title": "Check on Lecot.be",
+      "search_lecot_placeholder": "Search the Lecot catalogue…"
     }
   },
   "commissions": {
@@ -251,11 +258,34 @@
     "intervention_linked": "Job linked to client.",
     "pick_client_required": "Select a client.",
     "pick_site": "Site (optional)",
-    "link_submit": "Link job"
+    "link_submit": "Link job",
+    "edit_client": "Edit client",
+    "save_client": "Save",
+    "client_updated": "Client updated.",
+    "import_csv": "Import CSV",
+    "import_empty": "Empty file or unrecognized format.",
+    "import_success": "{{count}} client(s) imported.",
+    "interventions_title": "Linked jobs",
+    "interventions_empty": "No jobs linked to this client.",
+    "offline_hint": "Offline mode — showing cached client list."
   },
   "catalog": {
     "search_placeholder": "Search product (SKU, label)…",
-    "add_line": "Add"
+    "add_line": "Add",
+    "no_results": "No products found.",
+    "search_error": "Search offline — showing local results.",
+    "searching": "Searching…",
+    "company_title": "Company catalog",
+    "company_subtitle": "Priority products in billing search.",
+    "company_sku": "SKU",
+    "company_label": "Label",
+    "company_price": "Price (€)",
+    "company_add": "Add to catalog",
+    "company_empty": "No company products.",
+    "company_disabled": "Enable Lecot product search.",
+    "company_fields_required": "SKU and label are required.",
+    "company_price_invalid": "Invalid price.",
+    "company_product_created": "Product added."
   },
   "spotlight": {
     "search_placeholder": "Name",
@@ -998,8 +1028,12 @@
     }
   },
   "catalog": {
-    "search_placeholder": "Search product…",
+    "search_placeholder": "Search product (SKU, label)…",
     "empty": "No product found.",
+    "no_results": "No products found.",
+    "search_error": "Search offline — showing local results.",
+    "searching": "Searching…",
+    "add_line": "Add",
     "add_to_order": "Add to order",
     "price": "Unit price",
     "sku": "Reference",

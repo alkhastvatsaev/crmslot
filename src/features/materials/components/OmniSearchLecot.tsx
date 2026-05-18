@@ -1,21 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Search, Loader2, Package } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-
-// Mock catalogue Lecot (À remplacer par l'API réelle)
-const LECOT_MOCK_CATALOG = [
-  { ref: "LEC-1001", name: "Vis à bois tête fraisée 4x40mm (Boîte 200)", price: 12.5 },
-  { ref: "LEC-1002", name: "Vis à bois tête fraisée 5x60mm (Boîte 200)", price: 18.0 },
-  { ref: "LEC-2001", name: "Serrure multipoints à encastrer 3 points", price: 145.0 },
-  { ref: "LEC-2002", name: "Serrure en applique monopoint", price: 45.0 },
-  { ref: "LEC-3001", name: "Cylindre européen de sécurité 30x30", price: 35.0 },
-  { ref: "LEC-3002", name: "Cylindre européen débrayable 40x40", price: 55.0 },
-  { ref: "LEC-4001", name: "Poignée de porte sur rosace Inox", price: 25.0 },
-  { ref: "LEC-5001", name: "Mousse expansive polyuréthane 750ml", price: 9.5 },
-  { ref: "LEC-5002", name: "Silicone neutre transparent 310ml", price: 6.5 },
-];
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { useLecotProductSearch } from "@/features/catalog/useLecotProductSearch";
+import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
+import { searchCatalogProducts } from "@/features/catalog/searchCatalogProducts";
 
 export interface LecotProduct {
   ref: string;
@@ -28,20 +19,31 @@ interface OmniSearchLecotProps {
   placeholder?: string;
 }
 
+function toLecotProduct(p: { sku: string; label: string; unitPriceCents: number }): LecotProduct {
+  return {
+    ref: p.sku,
+    name: p.label,
+    price: p.unitPriceCents / 100,
+  };
+}
+
 /**
- * OmniSearchLecot
- * Barre de recherche ultra-rapide pré-filtrée pour le catalogue matériel.
+ * OmniSearchLecot — recherche catalogue matériel (API Lecot ou fallback local).
  */
 export default function OmniSearchLecot({ onSelectProduct, placeholder }: OmniSearchLecotProps) {
   const { t } = useTranslation();
+  const lecotEnabled = useFeatureFlag("lecotProductSearch");
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<LecotProduct[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { products: remoteProducts, loading, error } = useLecotProductSearch(query, lecotEnabled);
+
+  const results: LecotProduct[] =
+    query.trim().length >= 2
+      ? remoteProducts.map(toLecotProduct)
+      : searchCatalogProducts(LECOT_CATALOG, query, 6).map(toLecotProduct);
 
   useEffect(() => {
-    // Click outside handler
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -53,25 +55,11 @@ export default function OmniSearchLecot({ onSelectProduct, placeholder }: OmniSe
 
   useEffect(() => {
     if (!query || query.trim().length < 2) {
-      setResults([]);
       setIsOpen(false);
       return;
     }
-
-    setIsSearching(true);
-    // Simuler une recherche réseau / debounce
-    const timer = setTimeout(() => {
-      const q = query.toLowerCase();
-      const filtered = LECOT_MOCK_CATALOG.filter(
-        (p) => p.name.toLowerCase().includes(q) || p.ref.toLowerCase().includes(q)
-      );
-      setResults(filtered);
-      setIsOpen(true);
-      setIsSearching(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [query]);
+    if (!loading) setIsOpen(true);
+  }, [query, loading, results.length]);
 
   const handleSelect = (product: LecotProduct) => {
     onSelectProduct(product);
@@ -80,47 +68,64 @@ export default function OmniSearchLecot({ onSelectProduct, placeholder }: OmniSe
   };
 
   return (
-    <div ref={wrapperRef} className="relative w-full">
+    <div ref={wrapperRef} className="relative w-full" data-testid="omni-search-lecot">
       <div className="relative flex items-center">
-        <Search className="absolute left-3 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-3 h-5 w-5 text-slate-400" />
         <input
           type="text"
+          data-testid="omni-search-lecot-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder || String(t("materials.form.search_lecot_placeholder"))}
-          className="w-full h-12 pl-10 pr-4 rounded-xl border-2 border-blue-100 bg-blue-50/30 text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all font-medium outline-none"
+          className="h-12 w-full rounded-xl border-2 border-blue-100 bg-blue-50/30 pl-10 pr-4 font-medium text-slate-800 placeholder-slate-400 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
         />
-        {isSearching && (
-          <Loader2 className="absolute right-3 w-5 h-5 text-blue-500 animate-spin" />
-        )}
+        {loading ? (
+          <Loader2
+            data-testid="omni-search-lecot-loading"
+            className="absolute right-3 h-5 w-5 animate-spin text-blue-500"
+          />
+        ) : null}
       </div>
 
-      {/* Résultats */}
-      {isOpen && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-slate-100 max-h-64 overflow-y-auto">
+      {error ? (
+        <p data-testid="omni-search-lecot-error" className="mt-1 text-xs text-amber-700">
+          {t("catalog.search_error")}
+        </p>
+      ) : null}
+
+      {isOpen && results.length > 0 ? (
+        <div
+          data-testid="omni-search-lecot-results"
+          className="absolute z-50 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-xl"
+        >
           {results.map((product) => (
             <button
               key={product.ref}
+              type="button"
+              data-testid={`omni-search-lecot-${product.ref}`}
               onClick={() => handleSelect(product)}
-              className="w-full flex items-center gap-3 p-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+              className="flex w-full items-center gap-3 border-b border-slate-50 p-3 text-left transition-colors last:border-0 hover:bg-slate-50"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
-                <Package className="w-5 h-5" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
+                <Package className="h-5 w-5" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-slate-800 text-[14px] truncate">{product.name}</div>
-                <div className="text-[12px] text-slate-500 font-mono mt-0.5">{product.ref}</div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14px] font-bold text-slate-800">{product.name}</div>
+                <div className="mt-0.5 font-mono text-[12px] text-slate-500">{product.ref}</div>
               </div>
             </button>
           ))}
         </div>
-      )}
+      ) : null}
 
-      {isOpen && results.length === 0 && !isSearching && query.trim().length >= 2 && (
-        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-slate-100 p-4 text-center">
-          <p className="text-[14px] font-medium text-slate-500">Aucun produit trouvé pour &quot;{query}&quot;</p>
+      {isOpen && results.length === 0 && !loading && query.trim().length >= 2 ? (
+        <div
+          data-testid="omni-search-lecot-empty"
+          className="absolute z-50 mt-2 w-full rounded-xl border border-slate-100 bg-white p-4 text-center shadow-xl"
+        >
+          <p className="text-[14px] font-medium text-slate-500">{t("catalog.no_results")}</p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
