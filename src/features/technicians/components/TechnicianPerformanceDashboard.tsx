@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Star,
+  Banknote,
+  Coins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Intervention } from "@/features/interventions/types";
@@ -29,6 +31,8 @@ interface TechMetrics {
   avgResponseMinutes: number | null;
   todayCompleted: number;
   thisWeekCompleted: number;
+  revenueCents: number;
+  commissionCents: number;
 }
 
 function computeMetrics(
@@ -88,6 +92,9 @@ function computeMetrics(
       iv.completedAt >= weekAgoIso,
   ).length;
 
+  const revenueCents = completed.reduce((acc, iv) => acc + (iv.invoiceAmountCents || 0), 0);
+  const commissionCents = completed.reduce((acc, iv) => acc + (iv.commissionAmountCents || 0), 0);
+
   return {
     totalAssigned: assigned.length,
     completed: completed.length,
@@ -97,6 +104,8 @@ function computeMetrics(
     avgResponseMinutes,
     todayCompleted,
     thisWeekCompleted,
+    revenueCents,
+    commissionCents,
   };
 }
 
@@ -155,11 +164,25 @@ export default function TechnicianPerformanceDashboard({
       bg: "bg-orange-50",
     },
     {
-      label: "Temps réponse moy.",
+      label: "Temps réponse",
       value: formatResponseTime(metrics.avgResponseMinutes),
       icon: Clock,
       color: "text-violet-700",
       bg: "bg-violet-50",
+    },
+    {
+      label: "Chiffre d'Affaires",
+      value: `${(metrics.revenueCents / 100).toFixed(0)} €`,
+      icon: Banknote,
+      color: "text-emerald-700",
+      bg: "bg-emerald-50",
+    },
+    {
+      label: "Commissions",
+      value: `${(metrics.commissionCents / 100).toFixed(0)} €`,
+      icon: Coins,
+      color: "text-amber-700",
+      bg: "bg-amber-50",
     },
   ];
 
@@ -212,7 +235,7 @@ export default function TechnicianPerformanceDashboard({
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {cards.map((card) => (
           <div
             key={card.label}

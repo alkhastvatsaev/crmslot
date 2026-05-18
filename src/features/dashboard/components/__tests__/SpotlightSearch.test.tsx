@@ -3,6 +3,16 @@ import { screen, fireEvent, within } from '@testing-library/react';
 import { renderWithPager } from '@/test-utils/renderWithPager';
 import SpotlightSearch from '../SpotlightSearch';
 
+jest.mock('@/context/CompanyWorkspaceContext', () => ({
+  useCompanyWorkspaceOptional: () => null,
+}));
+jest.mock('@/features/backoffice/useBackOfficeInterventions', () => ({
+  useBackOfficeInterventions: () => ({ interventions: [] }),
+}));
+jest.mock('@/features/interventions/useTechnicianAssignments', () => ({
+  useTechnicianAssignments: () => ({ interventions: [] }),
+}));
+
 // cmdk calls scrollIntoView on selected items — not available in jsdom
 Element.prototype.scrollIntoView = jest.fn();
 

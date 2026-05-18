@@ -14,6 +14,11 @@ import {
 } from '@/core/ui/glassPanelChrome';
 import { dashboardHeaderPanelShellClass } from '@/core/ui/dashboardDesktopLayout';
 import { useTranslation, Language } from '@/core/i18n/I18nContext';
+import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
+import { isCompanyDispatchViewer } from '@/features/company/isCompanyDispatchViewer';
+import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
+import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
+import { interventionClientLabel } from '@/features/interventions/technicianSchedule';
 
 const languages: { code: Language; label: string }[] = [
   { code: 'fr', label: 'FR' },
@@ -30,6 +35,14 @@ export default function SpotlightSearch() {
     { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
   ], [t]);
+
+  const workspace = useCompanyWorkspaceOptional();
+  const isDispatchMap = isCompanyDispatchViewer(workspace);
+  const { interventions: boInterventions } = useBackOfficeInterventions(
+    isDispatchMap ? workspace?.activeCompanyId ?? null : null,
+  );
+  const { interventions: techInterventions } = useTechnicianAssignments({ enabled: !isDispatchMap });
+  const firestoreInterventions = isDispatchMap ? boInterventions : techInterventions;
 
   const quickActions = useMemo(() => [
     {
@@ -230,6 +243,59 @@ export default function SpotlightSearch() {
                       </Command.Item>
                     ))}
                   </Command.Group>
+
+                  {/* Interventions Actives */}
+                  {firestoreInterventions.length > 0 && (
+                    <Command.Group heading="Interventions" className="px-2 py-2">
+                      {firestoreInterventions.slice(0, 15).map((iv) => {
+                        const name = interventionClientLabel(iv) || 'Client inconnu';
+                        const address = iv.address || '';
+                        const phone = iv.clientPhone || iv.phone || '';
+                        const searchTerms = `${name} ${address} ${phone} ${iv.id} ${iv.title || ''}`.toLowerCase();
+                        return (
+                          <Command.Item
+                            key={iv.id}
+                            data-testid={`search-intervention-${iv.id}`}
+                            value={searchTerms}
+                            onSelect={() => {
+                              setOpen(false);
+                              if (phone) {
+                                window.location.href = `tel:${phone}`;
+                              }
+                            }}
+                            className="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-black/5 aria-selected:bg-black/5"
+                          >
+                            <FileText className="w-4 h-4 shrink-0 opacity-60" />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-slate-800 truncate">{name}</div>
+                              {address && <div className="text-xs text-slate-500 truncate">{address}</div>}
+                            </div>
+                            <div className="flex gap-1.5 shrink-0">
+                              {phone && (
+                                <button 
+                                  className="rounded-full bg-green-100 p-1.5 text-green-700 hover:bg-green-200 transition"
+                                  onClick={(e) => { e.stopPropagation(); window.location.href = `tel:${phone}`; }}
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                              {address && (
+                                <button 
+                                  className="rounded-full bg-blue-100 p-1.5 text-blue-700 hover:bg-blue-200 transition"
+                                  onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    window.open(`https://maps.google.com/?q=${encodeURIComponent(address)}`, '_blank'); 
+                                  }}
+                                >
+                                  <Navigation className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </Command.Item>
+                        );
+                      })}
+                    </Command.Group>
+                  )}
 
                   {/* Supplier Links */}
                   <Command.Group heading="Fournisseurs" className="px-2 py-2">

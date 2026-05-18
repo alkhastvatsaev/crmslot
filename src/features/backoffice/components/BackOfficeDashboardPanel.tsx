@@ -55,6 +55,7 @@ import {
 import { buildInterventionHistory } from "@/features/backoffice/interventionHistory";
 import { computeTodayActivitySummary } from "@/features/backoffice/todayActivity";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import DailyOperationsKpi from "@/features/backoffice/components/DailyOperationsKpi";
 
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
@@ -437,6 +438,10 @@ export default function BackOfficeDashboardPanel() {
             <p className="sr-only">{summary.newRequestsCount} nouvelles demandes</p>
           </div>
         </div>
+
+        {tenantReady && !loading ? (
+          <DailyOperationsKpi interventions={interventions} />
+        ) : null}
 
         <div
           className="shrink-0 rounded-[16px] border border-black/[0.06] bg-white/90 px-2 py-2 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"

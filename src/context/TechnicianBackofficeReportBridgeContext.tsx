@@ -19,6 +19,7 @@ export type BridgedTechnicianReport = {
   photoDataUrls: string[];
   signaturePngDataUrl: string;
   receivedAt: number;
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
 };
 
 export type TechnicianBackofficeReportBridgeApi = {
@@ -27,6 +28,7 @@ export type TechnicianBackofficeReportBridgeApi = {
     interventionId: string;
     photoDataUrls: string[];
     signaturePngDataUrl: string;
+    billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
   }) => void;
   dismissReport: (localId: string) => void;
 };
@@ -65,7 +67,7 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
   }, []);
 
   const pushReport = useCallback(
-    (p: { interventionId: string; photoDataUrls: string[]; signaturePngDataUrl: string }) => {
+    (p: { interventionId: string; photoDataUrls: string[]; signaturePngDataUrl: string; billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[] }) => {
       const localId =
         typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
           ? crypto.randomUUID()

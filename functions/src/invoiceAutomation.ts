@@ -8,9 +8,20 @@ import {
 } from "./buildInterventionInvoicePdf";
 import { runCommissionOnInvoiced } from "./commissionAutomation";
 
+function completionPhotoUrls(data: admin.firestore.DocumentData): string[] {
+  const structured = Array.isArray(data.completionPhotos)
+    ? (data.completionPhotos as { url?: string }[])
+        .map((p) => (typeof p?.url === "string" ? p.url.trim() : ""))
+        .filter((u) => u.length > 0)
+    : [];
+  if (structured.length > 0) return structured;
+  const legacy = Array.isArray(data.completionPhotoUrls) ? data.completionPhotoUrls : [];
+  return legacy.filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+}
+
 function checklistComplete(data: admin.firestore.DocumentData | undefined): boolean {
   if (!data) return false;
-  const photos = Array.isArray(data.completionPhotoUrls) ? data.completionPhotoUrls : [];
+  const photos = completionPhotoUrls(data);
   const sig = data.completionSignatureUrl;
   return photos.length > 0 && typeof sig === "string" && sig.trim().length > 0;
 }
@@ -38,12 +49,19 @@ export async function runAutoInvoiceGeneration(event: {
   const db = admin.firestore();
   const ref = db.collection("interventions").doc(interventionId);
 
+  const invoiceAmountCents =
+    typeof after.invoiceAmountCents === "number" && after.invoiceAmountCents > 0
+      ? Math.round(after.invoiceAmountCents)
+      : 15_000;
+
   const pdfBuffer = buildInterventionInvoicePdfBuffer({
     id: interventionId,
     title: typeof after.title === "string" ? after.title : "",
     address: typeof after.address === "string" ? after.address : "",
     clientName: after.clientName ?? null,
     problem: typeof after.problem === "string" ? after.problem : null,
+    invoiceAmountCents,
+    billingLines: Array.isArray(after.billingLines) ? after.billingLines : [],
   });
 
   const bucket = admin.storage().bucket();
@@ -63,11 +81,6 @@ export async function runAutoInvoiceGeneration(event: {
   });
 
   const invoicePdfUrl = firebaseDownloadUrl(bucket.name, objectPath, token);
-
-  const invoiceAmountCents =
-    typeof after.invoiceAmountCents === "number" && after.invoiceAmountCents > 0
-      ? Math.round(after.invoiceAmountCents)
-      : 15_000;
 
   await ref.update({
     invoicePdfUrl,

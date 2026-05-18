@@ -174,6 +174,12 @@ function TimelineEventIcon({ type }: { type: InterventionEvent["type"] }) {
           €
         </span>
       );
+    case "portal_chat":
+      return (
+        <span className={`${base} bg-indigo-100 text-indigo-700`} aria-hidden>
+          💬
+        </span>
+      );
     default:
       return <span className={`${base} bg-gray-100 text-gray-500`} aria-hidden>•</span>;
   }

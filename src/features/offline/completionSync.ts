@@ -72,12 +72,14 @@ async function enqueueCompletionPayload(params: {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
 }): Promise<{ outcome: "queued" } | { outcome: "error"; message: string }> {
   try {
     await enqueueCompletionRecord({
       interventionId: params.interventionId,
       photoDataUrls: params.photoDataUrls,
       signaturePngDataUrl: params.signaturePngDataUrl,
+      billingLines: params.billingLines,
     });
     return { outcome: "queued" };
   } catch (e) {
@@ -89,6 +91,7 @@ export async function finalizeCompletionOfflineAware(params: {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
 }): Promise<{ outcome: "sent" } | { outcome: "queued" } | { outcome: "error"; message: string }> {
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     return enqueueCompletionPayload(params);
@@ -165,6 +168,7 @@ export async function flushCompletionQueue(
           interventionId: rec.interventionId,
           photoDataUrls: rec.photoDataUrls,
           signaturePngDataUrl: rec.signaturePngDataUrl,
+          billingLines: rec.billingLines,
         });
 
         return "uploaded";

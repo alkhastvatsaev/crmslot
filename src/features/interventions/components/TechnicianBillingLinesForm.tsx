@@ -6,30 +6,38 @@ import {
   BILLING_TEMPLATES,
   type BillingTemplateLine,
 } from "@/features/interventions/config/terrainTemplates";
+import ProductQuickAddBar from "@/features/catalog/components/ProductQuickAddBar";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import type { Intervention } from "@/features/interventions/types";
 
 export interface BillingLine {
   description: string;
   quantity: number;
   unitPriceCents: number;
+  reference?: string;
 }
 
 type Props = {
   initialLines?: BillingLine[];
   onConfirm: (lines: BillingLine[]) => void;
   onSkip: () => void;
+  onBack?: () => void;
+  intervention?: Pick<Intervention, "category" | "problem">;
 };
 
 const emptyLine = (): BillingLine => ({
   description: "",
   quantity: 1,
   unitPriceCents: 0,
+  reference: "",
 });
 
 export default function TechnicianBillingLinesForm({
   initialLines,
   onConfirm,
   onSkip,
+  onBack,
+  intervention,
 }: Props) {
   const { t } = useTranslation();
   const [lines, setLines] = useState<BillingLine[]>(
@@ -45,6 +53,7 @@ export default function TechnicianBillingLinesForm({
         description: l.description,
         quantity: l.quantity,
         unitPriceCents: l.unitPriceCents,
+        reference: l.reference || "",
       })),
     );
   };
@@ -76,6 +85,12 @@ export default function TechnicianBillingLinesForm({
       data-testid="billing-lines-form"
       className="flex flex-col gap-4 animate-in fade-in slide-in-from-right-4 duration-500"
     >
+      {intervention ? (
+        <ProductQuickAddBar
+          intervention={intervention}
+          onAddLine={(line) => setLines((prev) => [...prev, line])}
+        />
+      ) : null}
       {/* Header */}
       <div className="flex items-center gap-2 px-1">
         <FileText className="h-5 w-5 text-slate-800" aria-hidden />
@@ -89,21 +104,19 @@ export default function TechnicianBillingLinesForm({
         <label className="mb-1.5 block text-[12px] font-bold text-blue-900">
           {t("billing_lines.template_label")}
         </label>
-        <select
-          data-testid="billing-template-select"
-          onChange={(e) => handleLoadTemplate(e.target.value)}
-          defaultValue=""
-          className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-[13px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="" disabled>
-            {t("billing_lines.template_placeholder")}
-          </option>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {BILLING_TEMPLATES.map((tpl) => (
-            <option key={tpl.id} value={tpl.id}>
+            <button
+              key={tpl.id}
+              type="button"
+              data-testid={`billing-template-${tpl.id}`}
+              onClick={() => handleLoadTemplate(tpl.id)}
+              className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-blue-700 border border-blue-200 shadow-sm transition-all hover:bg-blue-600 hover:text-white hover:border-blue-600 active:scale-95"
+            >
               {tpl.name}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* Line items */}
@@ -137,6 +150,32 @@ export default function TechnicianBillingLinesForm({
               <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    {t("materials.form.reference_label")}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      data-testid={`billing-line-reference-${idx}`}
+                      value={line.reference || ""}
+                      onChange={(e) => updateLine(idx, "reference", e.target.value)}
+                      placeholder={String(t("materials.form.reference_placeholder"))}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-[13px] focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                    <a
+                      href={`https://lecot.be/fr-be/search?q=${encodeURIComponent(line.reference || line.description)}`}
+                      target="_blank" rel="noreferrer"
+                      className="flex shrink-0 items-center justify-center rounded-lg bg-slate-800 px-3 text-[11px] font-bold text-white hover:bg-slate-700 transition-colors"
+                      onClick={(e) => {
+                        if (!line.reference && !line.description) e.preventDefault();
+                      }}
+                      title={String(t("materials.form.lecot_title"))}
+                    >
+                      Lecot
+                    </a>
+                  </div>
+                </div>
+                <div className="w-16 shrink-0">
+                  <label className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     {t("billing_lines.qty")}
                   </label>
                   <input
@@ -151,7 +190,7 @@ export default function TechnicianBillingLinesForm({
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-[13px] focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
-                <div className="flex-1">
+                <div className="w-24 shrink-0">
                   <label className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     {t("billing_lines.unit_price")}
                   </label>
@@ -200,14 +239,25 @@ export default function TechnicianBillingLinesForm({
 
       {/* Actions */}
       <div className="flex gap-3">
-        <button
-          type="button"
-          data-testid="billing-skip"
-          onClick={onSkip}
-          className="flex min-h-[52px] flex-1 items-center justify-center rounded-[20px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
-        >
-          {t("billing_lines.skip")}
-        </button>
+        {onBack ? (
+          <button
+            type="button"
+            data-testid="billing-back"
+            onClick={onBack}
+            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[20px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
+          >
+            ← {t("billing_lines.skip")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            data-testid="billing-skip"
+            onClick={onSkip}
+            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[20px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
+          >
+            {t("billing_lines.skip")}
+          </button>
+        )}
         <button
           type="button"
           data-testid="billing-confirm"

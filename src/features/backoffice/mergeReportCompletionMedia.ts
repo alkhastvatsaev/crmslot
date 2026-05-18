@@ -1,5 +1,6 @@
 import type { BridgedTechnicianReport } from "@/context/TechnicianBackofficeReportBridgeContext";
 import type { Intervention } from "@/features/interventions/types";
+import { completionPhotoUrlsFromIntervention } from "@/features/interventions/completionPhotoUrls";
 
 export function pickLatestBridgedReportForIntervention(
   reports: BridgedTechnicianReport[],
@@ -12,12 +13,10 @@ export function pickLatestBridgedReportForIntervention(
 
 /** Préfère les URLs Storage Firestore ; sinon repli sur le pont technicien (même onglet / mode démo). */
 export function mergeReportCompletionMedia(
-  intervention: Pick<Intervention, "completionPhotoUrls" | "completionSignatureUrl">,
+  intervention: Pick<Intervention, "completionPhotoUrls" | "completionPhotos" | "completionSignatureUrl">,
   bridged: BridgedTechnicianReport | null,
 ): { photoUrls: string[]; signatureUrl: string | null } {
-  const fromFs = Array.isArray(intervention.completionPhotoUrls)
-    ? intervention.completionPhotoUrls.filter((u) => typeof u === "string" && u.trim() !== "")
-    : [];
+  const fromFs = completionPhotoUrlsFromIntervention(intervention);
   const fsSig =
     typeof intervention.completionSignatureUrl === "string" &&
     intervention.completionSignatureUrl.trim() !== ""
@@ -40,14 +39,14 @@ export function mergeReportCompletionMedia(
 
 /** Retire le pont local seulement quand le serveur a les médias ou le dossier est déjà facturé / archivé. */
 export function shouldDismissBridgedTerrainReport(
-  intervention: Pick<Intervention, "status" | "completionPhotoUrls" | "completionSignatureUrl"> | undefined,
+  intervention:
+    | Pick<Intervention, "status" | "completionPhotoUrls" | "completionPhotos" | "completionSignatureUrl">
+    | undefined,
 ): boolean {
   if (!intervention) return false;
   if (intervention.status === "invoiced") return true;
   if (intervention.status !== "done") return false;
-  const photos = Array.isArray(intervention.completionPhotoUrls)
-    ? intervention.completionPhotoUrls.filter((u) => typeof u === "string" && u.trim() !== "")
-    : [];
+  const photos = completionPhotoUrlsFromIntervention(intervention);
   const hasSig =
     typeof intervention.completionSignatureUrl === "string" &&
     intervention.completionSignatureUrl.trim() !== "";

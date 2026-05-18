@@ -9,6 +9,11 @@ export type AssignInterventionToTechnicianUpdate = {
 };
 
 /** Patch Firestore quand IVANA assigne un dossier au technicien (statut `assigned`). */
+export type AssignScheduleOverride = Pick<
+  AssignInterventionToTechnicianUpdate,
+  "scheduledDate" | "scheduledTime"
+>;
+
 export function buildAssignInterventionToTechnicianUpdate(
   row:
     | Pick<
@@ -19,7 +24,19 @@ export function buildAssignInterventionToTechnicianUpdate(
     | undefined,
   assignedTechnicianUid: string,
   now = new Date(),
+  scheduleOverride?: AssignScheduleOverride,
 ): AssignInterventionToTechnicianUpdate {
+  const date = scheduleOverride?.scheduledDate?.trim();
+  const time = scheduleOverride?.scheduledTime?.trim();
+  if (date && time) {
+    return {
+      status: "assigned",
+      assignedTechnicianUid,
+      scheduledDate: date,
+      scheduledTime: time,
+    };
+  }
+
   const schedule = scheduledFieldsWhenReleasingToTechnician(row ?? {}, now);
   return {
     status: "assigned",

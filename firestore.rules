@@ -466,6 +466,10 @@ service cloud.firestore {
             request.resource.data.imageUrls is list
             && request.resource.data.imageUrls.size() <= 12
           )
+        )
+        && (
+          !request.resource.data.keys().hasAny(['interventionId'])
+          || request.resource.data.interventionId is string
         );
 
       allow update, delete: if false;
@@ -493,9 +497,28 @@ service cloud.firestore {
           userBelongsToCompany(resource.data.companyId)
           || tenantClaimsIncludeCompany(resource.data.companyId)
         )
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['isActive', 'updatedAt']);
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'isActive', 'updatedAt', 'level', 'targetId', 'valueType', 'value'
+        ]);
 
       allow delete: if false;
+    }
+
+    match /commission_rule_audit/{auditId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && request.resource.data.byUid == request.auth.uid
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow update, delete: if false;
     }
 
     match /commission_overrides/{interventionId} {
@@ -526,6 +549,27 @@ service cloud.firestore {
         && (
           userBelongsToCompany(request.resource.data.companyId)
           || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow update, delete: if false;
+    }
+
+    match /manual_commissions/{companyId}/entries/{entryId} {
+      allow read: if isAuthed()
+        && (
+          userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
+        );
+      allow create: if isAuthed()
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.technicianUid is string
+        && request.resource.data.technicianUid.size() > 0
+        && request.resource.data.amountEuros is number
+        && request.resource.data.amountEuros >= 0
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && (
+          userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
         );
       allow update, delete: if false;
     }
@@ -592,6 +636,52 @@ service cloud.firestore {
         )
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['readAt']);
 
+      allow delete: if false;
+    }
+
+    match /clients/{clientId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && request.resource.data.companyId.size() > 0
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow update: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow delete: if false;
+    }
+
+    match /sites/{siteId} {
+      allow read: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
+      allow create: if isAuthed()
+        && request.resource.data.companyId is string
+        && request.resource.data.companyId.size() > 0
+        && (
+          userBelongsToCompany(request.resource.data.companyId)
+          || tenantClaimsIncludeCompany(request.resource.data.companyId)
+        );
+      allow update: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
       allow delete: if false;
     }
 

@@ -59,7 +59,8 @@ type PanelProps = {
   acceptPortalMessages?: boolean;
   
   chatCompanyId?: string | null;
-  
+  /** Dossier lié — messages tagués pour la timeline du dossier. */
+  chatInterventionId?: string | null;
   onRemoteClientMessage?: () => void;
 };
 
@@ -68,6 +69,7 @@ export default function IvanaClientChatPanel({
   publishAsPortal = false,
   acceptPortalMessages = false,
   chatCompanyId = null,
+  chatInterventionId = null,
   onRemoteClientMessage,
 }: PanelProps) {
   const { t } = useTranslation();
@@ -304,6 +306,7 @@ export default function IvanaClientChatPanel({
           body: text,
           role,
           senderUid: auth.currentUser.uid,
+          interventionId: chatInterventionId,
           ...(imageUrls && imageUrls.length > 0 ? { imageUrls } : {}),
         });
         setDraft("");

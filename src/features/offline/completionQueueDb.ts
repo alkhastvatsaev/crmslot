@@ -6,6 +6,7 @@ export type CompletionQueueRecord = {
   photoDataUrls: string[];
   signaturePngDataUrl: string;
   queuedAtMs: number;
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
 };
 
 const DB_NAME = "bm-tech-offline-v1";

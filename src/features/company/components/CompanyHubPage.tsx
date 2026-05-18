@@ -30,7 +30,14 @@ export default function CompanyHubPage() {
   const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("timeline");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
-  const { lastSubmittedInterventionId, portalRightTab, setPortalRightTab } = useRequesterHub();
+  const {
+    lastSubmittedInterventionId,
+    pendingTrackingInterventionId,
+    portalRightTab,
+    setPortalRightTab,
+  } = useRequesterHub();
+
+  const portalCaseId = pendingTrackingInterventionId ?? lastSubmittedInterventionId;
 
   useEffect(() => {
     if (!portalRightTab) return;
@@ -137,10 +144,11 @@ export default function CompanyHubPage() {
                 className="min-h-0 flex-1"
                 publishAsPortal
                 chatCompanyId={ivanaChatCompanyId}
+                chatInterventionId={portalCaseId}
               />
             ) : (
               <CompanyHubTimelineTab
-                interventionId={lastSubmittedInterventionId}
+                interventionId={portalCaseId}
                 companyId={ivanaChatCompanyId}
               />
             )}

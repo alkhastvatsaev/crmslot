@@ -5,19 +5,28 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import type { MaterialOrderPart } from "@/features/materials/types";
 
 import { TERRAIN_TEMPLATES } from "@/features/interventions/config/terrainTemplates";
+import OmniSearchLecot, { LecotProduct } from "./OmniSearchLecot";
 
 type Props = {
   interventionId: string;
   technicianUid: string;
+  initialTemplateId?: string;
+  initialParts?: MaterialOrderPart[];
   onSubmitOrder: (parts: MaterialOrderPart[], urgency: "low" | "normal" | "high") => Promise<void>;
   onCancel: () => void;
 };
 
-export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
+function getInitialParts(templateId?: string, parts?: MaterialOrderPart[]): MaterialOrderPart[] {
+  if (parts && parts.length > 0) return parts;
+  if (!templateId) return [{ description: "", quantity: 1, reference: "" }];
+  const tpl = TERRAIN_TEMPLATES.find(t => t.id === templateId);
+  if (!tpl) return [{ description: "", quantity: 1, reference: "" }];
+  return tpl.lines.map(l => ({ description: l.description, quantity: l.quantity, reference: l.reference ?? "" }));
+}
+
+export function MaterialOrderForm({ onSubmitOrder, onCancel, initialTemplateId, initialParts }: Props) {
   const { t } = useTranslation();
-  const [parts, setParts] = useState<MaterialOrderPart[]>([
-    { description: "", quantity: 1, reference: "" },
-  ]);
+  const [parts, setParts] = useState<MaterialOrderPart[]>(() => getInitialParts(initialTemplateId, initialParts));
   const [urgency, setUrgency] = useState<"low" | "normal" | "high">("normal");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,6 +40,10 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
 
   const handleAddPart = () => {
     setParts([...parts, { description: "", quantity: 1, reference: "" }]);
+  };
+
+  const handleAddProductFromLecot = (product: LecotProduct) => {
+    setParts([...parts, { description: product.name, quantity: 1, reference: product.ref }]);
   };
 
   const handleRemovePart = (index: number) => {
@@ -69,19 +82,27 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel }: Props) {
 
       <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
         <label className="block text-sm font-bold text-blue-900 mb-2">{t("materials.form.template_label")}</label>
-        <select
-          onChange={(e) => handleLoadTemplate(e.target.value)}
-          defaultValue=""
-          className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
-        >
-          <option value="" disabled>{t("materials.form.template_placeholder")}</option>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {TERRAIN_TEMPLATES.map(tpl => (
-            <option key={tpl.id} value={tpl.id}>{tpl.name}</option>
+            <button
+              key={tpl.id}
+              type="button"
+              data-testid={`material-template-${tpl.id}`}
+              onClick={() => handleLoadTemplate(tpl.id)}
+              className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-blue-700 border border-blue-200 shadow-sm transition-all hover:bg-blue-600 hover:text-white hover:border-blue-600 active:scale-95"
+            >
+              {tpl.name}
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+        <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 mb-6">
+          <label className="block text-sm font-bold text-slate-800 mb-2">{t("materials.form.search_catalog") || "Ajout rapide depuis le catalogue"}</label>
+          <OmniSearchLecot onSelectProduct={handleAddProductFromLecot} />
+        </div>
+
         <div className="space-y-4">
           {parts.map((part, index) => (
             <div

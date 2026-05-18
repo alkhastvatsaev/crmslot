@@ -23,8 +23,9 @@ export async function performCompletionUpload(params: {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
+  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
 }): Promise<void> {
-  const { interventionId, photoDataUrls, signaturePngDataUrl } = params;
+  const { interventionId, photoDataUrls, signaturePngDataUrl, billingLines } = params;
   const st = storage;
   const fs = firestore;
   const user = auth?.currentUser;
@@ -83,6 +84,7 @@ export async function performCompletionUpload(params: {
         completionSignatureUrl: sigUrl,
         completedAt: serverTimestamp(),
         completedByUid: uid,
+        billingLines: billingLines ?? undefined,
       },
     }),
     FIRESTORE_UPDATE_TIMEOUT_MS,

@@ -26,4 +26,13 @@ describe("buildAssignInterventionToTechnicianUpdate", () => {
     expect(patch.scheduledDate).toBe("2026-05-16");
     expect(patch.scheduledTime).toMatch(/^\d{2}:\d{2}$/);
   });
+
+  it("uses schedule override when provided", () => {
+    const patch = buildAssignInterventionToTechnicianUpdate({}, techUid, now, {
+      scheduledDate: "2026-07-04",
+      scheduledTime: "14:00",
+    });
+    expect(patch.scheduledDate).toBe("2026-07-04");
+    expect(patch.scheduledTime).toBe("14:00");
+  });
 });
