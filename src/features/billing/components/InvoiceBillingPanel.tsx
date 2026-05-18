@@ -5,6 +5,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { CreditCard, FileText, ChevronDown, ChevronUp, ExternalLink, ClipboardList } from "lucide-react";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
+import InterventionPdfButton from "@/features/interventions/components/InterventionPdfButton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { firestore } from "@/core/config/firebase";
@@ -212,6 +213,9 @@ export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: P
               <ExternalLink className="w-3 h-3 ml-auto" />
             </a>
           )}
+
+          {/* PDF rapport d'intervention */}
+          <InterventionPdfButton intervention={intervention} />
 
           {/* Devis liés */}
           {quotesEnabled && (

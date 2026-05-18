@@ -887,6 +887,9 @@
     "description1": "Na afsluiting met minimaal één werkplekfoto en de handtekening van de klant op de server, genereert een Cloud-functie een PDF-factuur op Storage en wordt de status op Gefactureerd gezet. De checklist moet compleet zijn vóór generatie.",
     "description2": "Na afsluiting met een volledige checklist, generatie PDF-factuur en status gefactureerd."
   },
+  "intervention_pdf": {
+    "download": "PDF-rapport downloaden"
+  },
   "quotes": {
     "panel_title": "Offertes",
     "editor_title": "Nieuwe offerte",
