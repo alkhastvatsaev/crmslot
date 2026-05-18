@@ -1,6 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
 import {
   DASHBOARD_DESKTOP_APP_SHELL_CLASS,
   DASHBOARD_DESKTOP_CANVAS_CLASS,
@@ -12,6 +15,7 @@ import {
   DASHBOARD_DESKTOP_STACK_CLASS,
   DASHBOARD_DESKTOP_STACK_HEADER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
+import DashboardPagerControls from "@/features/dashboard/components/DashboardPagerControls";
 
 type Props = {
   header: ReactNode;
@@ -21,16 +25,32 @@ type Props = {
 
 /**
  * Desktop shell — rails 1–4 via `.dashboard-desktop-grid`.
- * Galaxy dock reuses the same grid; bar is column 2 only (under the map).
+ * Page 6 (`/technician`) : mode immersif sans header ni galaxy (écran autonome).
  */
 export default function DashboardDesktopShell({ header, pager, galaxy }: Props) {
+  const dashboardPager = useDashboardPagerOptional();
+  const immersiveTechnicianLab = dashboardPager?.pageIndex === TECHNICIAN_LAB_SLOT_INDEX;
+
   return (
     <div id="dashboard-root-scroll" className={DASHBOARD_DESKTOP_APP_SHELL_CLASS}>
-      <div className={DASHBOARD_DESKTOP_CANVAS_CLASS}>
-        <div className={DASHBOARD_DESKTOP_STACK_CLASS} data-testid="dashboard-desktop-stack">
-          <header className={DASHBOARD_DESKTOP_STACK_HEADER_CLASS} data-testid="dashboard-global-header">
-            <div className={DASHBOARD_DESKTOP_GRID_CLASS}>{header}</div>
-          </header>
+      <div
+        className={cn(
+          DASHBOARD_DESKTOP_CANVAS_CLASS,
+          immersiveTechnicianLab && "dashboard-desktop-canvas--technician-lab",
+        )}
+      >
+        <div
+          className={cn(
+            DASHBOARD_DESKTOP_STACK_CLASS,
+            immersiveTechnicianLab && "dashboard-desktop-stack--technician-lab",
+          )}
+          data-testid="dashboard-desktop-stack"
+        >
+          {!immersiveTechnicianLab ? (
+            <header className={DASHBOARD_DESKTOP_STACK_HEADER_CLASS} data-testid="dashboard-global-header">
+              <div className={DASHBOARD_DESKTOP_GRID_CLASS}>{header}</div>
+            </header>
+          ) : null}
 
           <div className={DASHBOARD_DESKTOP_STACK_BODY_CLASS}>
             <div
@@ -41,18 +61,22 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
             <div className="dashboard-desktop-pager-host">{pager}</div>
           </div>
 
-          <div
-            id="dashboard-galaxy-dock"
-            className={DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS}
-            data-testid="dashboard-galaxy-dock"
-          >
+          {!immersiveTechnicianLab ? (
             <div
-              className={DASHBOARD_DESKTOP_GALAXY_DOCK_CHROME_CLASS}
-              data-testid="dashboard-galaxy-center-slot"
+              id="dashboard-galaxy-dock"
+              className={DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS}
+              data-testid="dashboard-galaxy-dock"
             >
-              <div className="dashboard-desktop-galaxy-dock-chrome-inner">{galaxy}</div>
+              <div
+                className={DASHBOARD_DESKTOP_GALAXY_DOCK_CHROME_CLASS}
+                data-testid="dashboard-galaxy-center-slot"
+              >
+                <div className="dashboard-desktop-galaxy-dock-chrome-inner">{galaxy}</div>
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          <DashboardPagerControls />
         </div>
       </div>
     </div>

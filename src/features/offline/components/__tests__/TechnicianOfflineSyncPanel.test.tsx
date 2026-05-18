@@ -8,6 +8,10 @@ jest.mock("@/context/OfflineSyncContext", () => ({
   useOfflineSync: jest.fn(),
 }));
 
+jest.mock("@/features/interventions/useTechnicianAssignments", () => ({
+  useTechnicianAssignments: () => ({ firebaseUid: "tech-123" }),
+}));
+
 import { useOfflineSync } from "@/context/OfflineSyncContext";
 
 const mockUseOfflineSync = useOfflineSync as jest.MockedFunction<typeof useOfflineSync>;

@@ -2,29 +2,20 @@
 
 import {
   Camera,
+  Clock,
   MapPin,
-  Navigation,
+  Navigation2,
   Package,
-  Pause,
   Phone,
   Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
-import {
-  resolveMissionActionBar,
-  type MissionActionVariant,
-} from "@/features/interventions/missionActionBar";
+import { resolveMissionActionBar } from "@/features/interventions/missionActionBar";
 import { formatAddress } from "@/utils/stringUtils";
-
-const variantClass: Record<MissionActionVariant, string> = {
-  blue: "bg-blue-600 hover:bg-blue-700 shadow-[0_14px_40px_-14px_rgba(37,99,235,0.55)]",
-  amber: "bg-amber-500 hover:bg-amber-600 shadow-[0_14px_40px_-14px_rgba(245,158,11,0.55)]",
-  emerald: "bg-emerald-600 hover:bg-emerald-700 shadow-[0_14px_40px_-14px_rgba(5,150,105,0.45)]",
-  purple:
-    "bg-purple-600 hover:bg-purple-700 shadow-[0_14px_40px_-14px_rgba(147,51,234,0.45)]",
-};
+import FieldIconButton, { FieldIconButtonRow } from "@/core/ui/FieldIconButton";
+import { SlideAction } from "@/components/ui/slide-action";
 
 type Props = {
   intervention: Pick<
@@ -63,126 +54,96 @@ export default function MissionActionBar({
 
   if (!config.primary && !config.showQuickRow) return null;
 
-  const renderPrimaryIcon = () => {
-    if (!config.primary) return null;
-    if (config.primary.kind === "finish") {
-      return <Camera className="h-5 w-5 shrink-0" />;
-    }
-    if (config.primary.toStatus === "en_route") {
-      return <Play className="h-5 w-5 shrink-0" />;
-    }
-    if (config.primary.toStatus === "in_progress") {
-      return <MapPin className="h-5 w-5 shrink-0" />;
-    }
-    return <Play className="h-5 w-5 shrink-0" />;
-  };
-
-  const handlePrimary = () => {
-    if (!config.primary || isUpdating) return;
-    if (config.primary.kind === "finish") {
-      onFinish();
-      return;
-    }
+  const handleTransition = () => {
+    if (!config.primary || config.primary.kind !== "transition" || isUpdating) return;
     onPrimaryTransition(config.primary.toStatus);
   };
 
-  const primaryVariant: MissionActionVariant =
-    config.primary?.kind === "transition" ? config.primary.variant : "purple";
+  const slideIcon =
+    config.primary?.kind === "transition" && config.primary.toStatus === "en_route"
+      ? Navigation2
+      : config.primary?.kind === "transition" && config.primary.toStatus === "in_progress"
+        ? MapPin
+        : Play;
+
+  const slideLabel =
+    config.primary?.kind === "transition"
+      ? t(config.primary.labelKey)
+      : "";
 
   return (
     <div
       data-testid="mission-action-bar"
-      className="shrink-0 border-t border-black/[0.06] bg-white/95 px-4 py-3 backdrop-blur-md"
+      className="shrink-0 border-t border-neutral-200/80 bg-white px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       {config.showQuickRow ? (
-        <div
-          className="mb-3 flex justify-around gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-white p-2 shadow-sm"
-          data-testid="mission-action-quick-row"
-        >
+        <FieldIconButtonRow className="mb-3" data-testid="mission-action-quick-row">
           {phone ? (
-            <a
+            <FieldIconButton
               href={`tel:${phone}`}
-              data-testid="mission-action-call"
-              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl p-2 text-blue-600 transition-colors hover:bg-slate-50"
-            >
-              <div className="rounded-full bg-blue-50 p-2 shadow-sm">
-                <Phone className="h-5 w-5" />
-              </div>
-              <span className="text-[10px] font-bold">{t("common.call")}</span>
-            </a>
+              testId="mission-action-call"
+              label={t("common.call")}
+              icon={<Phone className="h-6 w-6" />}
+            />
           ) : null}
           {mapsUrl ? (
-            <a
+            <FieldIconButton
               href={mapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              data-testid="mission-action-navigate"
-              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl p-2 text-emerald-600 transition-colors hover:bg-slate-50"
-            >
-              <div className="rounded-full bg-emerald-50 p-2 shadow-sm">
-                <Navigation className="h-5 w-5" />
-              </div>
-              <span className="text-[10px] font-bold">{t("common.navigate")}</span>
-            </a>
+              testId="mission-action-navigate"
+              label={t("common.navigate")}
+              icon={<Navigation2 className="h-6 w-6" />}
+            />
           ) : null}
           {config.canMaterials && onOpenMaterials ? (
-            <button
-              type="button"
-              data-testid="mission-action-materials"
+            <FieldIconButton
+              testId="mission-action-materials"
+              label={t("common.materials")}
               onClick={onOpenMaterials}
-              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl p-2 text-amber-600 transition-colors hover:bg-slate-50"
-            >
-              <div className="rounded-full bg-amber-50 p-2 shadow-sm">
-                <Package className="h-5 w-5" />
-              </div>
-              <span className="text-[10px] font-bold">{t("common.materials")}</span>
-            </button>
+              icon={<Package className="h-6 w-6" />}
+            />
+          ) : null}
+          {intervention.status === "in_progress" && onWaitingMaterial ? (
+            <FieldIconButton
+              testId="technician-waiting-material-btn"
+              label={t("technician_hub.dashboard.detail.waiting_material")}
+              disabled={isUpdating}
+              onClick={onWaitingMaterial}
+              icon={<Clock className="h-6 w-6" />}
+            />
           ) : null}
           {intervention.status === "in_progress" && onQuickPhoto ? (
-            <button
-              type="button"
-              data-testid="mission-action-photo"
+            <FieldIconButton
+              testId="mission-action-photo"
+              label={t("technician_hub.mission_action.photo")}
               onClick={onQuickPhoto}
-              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl p-2 text-violet-600 transition-colors hover:bg-slate-50"
-            >
-              <div className="rounded-full bg-violet-50 p-2 shadow-sm">
-                <Camera className="h-5 w-5" />
-              </div>
-              <span className="text-[10px] font-bold">{t("technician_hub.mission_action.photo")}</span>
-            </button>
+              icon={<Camera className="h-6 w-6" />}
+            />
           ) : null}
-        </div>
+        </FieldIconButtonRow>
       ) : null}
 
-      {intervention.status === "in_progress" && onWaitingMaterial ? (
+      {config.primary?.kind === "finish" ? (
         <button
           type="button"
-          data-testid="technician-waiting-material-btn"
+          data-testid="mission-action-primary-finish"
           disabled={isUpdating}
-          onClick={onWaitingMaterial}
-          className="mb-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[20px] border border-amber-200 bg-amber-50 px-4 text-[15px] font-bold text-amber-950 transition hover:bg-amber-100 disabled:opacity-70"
-        >
-          <Pause className="h-4 w-4 shrink-0" />
-          {t("technician_hub.dashboard.detail.waiting_material")}
-        </button>
-      ) : null}
-
-      {config.primary ? (
-        <button
-          type="button"
-          data-testid={config.primary.testId}
-          disabled={isUpdating}
-          onClick={handlePrimary}
+          onClick={onFinish}
+          aria-label={t(config.primary.labelKey)}
           className={cn(
-            "group flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[22px] px-4 text-[17px] font-bold text-white transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70",
-            variantClass[primaryVariant],
+            "flex h-[66px] w-full items-center justify-center rounded-2xl bg-[#0F172A] text-white transition active:scale-[0.98] disabled:opacity-50",
           )}
         >
-          {renderPrimaryIcon()}
-          {isUpdating
-            ? t("technician_hub.dashboard.detail.updating")
-            : t(config.primary.labelKey)}
+          <Camera className="h-7 w-7" />
         </button>
+      ) : config.primary?.kind === "transition" ? (
+        <SlideAction
+          testId={config.primary.testId}
+          label={slideLabel}
+          icon={slideIcon}
+          disabled={isUpdating}
+          variant="field"
+          onAction={handleTransition}
+        />
       ) : null}
     </div>
   );

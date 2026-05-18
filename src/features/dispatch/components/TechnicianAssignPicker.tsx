@@ -33,6 +33,7 @@ type Props = {
     | "id"
     | "location"
     | "address"
+    | "problem"
     | "requestedDate"
     | "requestedTime"
     | "scheduledDate"
@@ -67,6 +68,7 @@ export default function TechnicianAssignPicker({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [etaLoading, setEtaLoading] = useState(false);
   const [recommendedId, setRecommendedId] = useState<string | null>(null);
+  const [aiReasoning, setAiReasoning] = useState<string | null>(null);
   const [etaByTechId, setEtaByTechId] = useState<Record<string, string>>({});
   const [scheduleDate, setScheduleDate] = useState(() => {
     const fromIv =
@@ -101,13 +103,19 @@ export default function TechnicianAssignPicker({
     const calculateBest = async () => {
       setEtaLoading(true);
       try {
-        const best = await findBestTechnician(
+        const result = await findBestTechnician(
           technicians,
           intervention.location.lat,
           intervention.location.lng,
+          intervention.problem,
+          intervention.address,
         );
-        if (cancelled || !best) return;
+        if (cancelled || !result) return;
+        const best = result.technician;
         setRecommendedId(best.id);
+        if (result.reasoning) {
+          setAiReasoning(result.reasoning);
+        }
         if (best.realEta) {
           setEtaByTechId((prev) => ({ ...prev, [best.id]: best.realEta! }));
         }
@@ -282,6 +290,14 @@ export default function TechnicianAssignPicker({
                       {eta ? <span>· ETA {eta}</span> : null}
                       <span>· {String(t(statusLabelKey[technician.status]))}</span>
                     </span>
+                    {isRecommended && aiReasoning ? (
+                      <div className="mt-2.5 rounded-[12px] bg-indigo-50/80 border border-indigo-100/50 p-2.5 flex items-start gap-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)]">
+                        <Sparkles className="h-4 w-4 shrink-0 text-indigo-500 mt-0.5" />
+                        <span className="text-[12px] text-indigo-900 font-medium leading-snug">
+                          {aiReasoning}
+                        </span>
+                      </div>
+                    ) : null}
                   </span>
                 </button>
               </li>

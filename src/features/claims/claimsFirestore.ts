@@ -13,8 +13,10 @@ export function subscribeClaims(
   onData: (claims: Claim[]) => void,
 ): () => void {
   const q = query(col(db, companyId), orderBy("createdAt", "desc"));
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Claim, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Claim, "id">) }))),
+    () => onData([]),
   );
 }
 
@@ -29,8 +31,10 @@ export function subscribeClaimsByIntervention(
     where("interventionId", "==", interventionId),
     orderBy("createdAt", "desc"),
   );
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Claim, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Claim, "id">) }))),
+    () => onData([]),
   );
 }
 

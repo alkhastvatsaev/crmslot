@@ -17,6 +17,7 @@ import { realInterventionsOnly } from '@/core/config/devUiPreview';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { useGalaxyLayerBridgeOptional } from '@/features/map/GalaxyLayerBridgeContext';
 import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
+import { useBackofficeInboxIntentOptional } from '@/context/BackofficeInboxIntentContext';
 import { isCompanyDispatchViewer } from '@/features/company/isCompanyDispatchViewer';
 import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
 import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
@@ -59,6 +60,7 @@ export default function MapboxView() {
   
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
+  const inboxIntent = useBackofficeInboxIntentOptional();
   
   // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
   const isDispatchMap = isCompanyDispatchViewer(workspace);
@@ -417,6 +419,9 @@ export default function MapboxView() {
 
   const handleMissionClick = (mission: Mission) => {
     setSelectedMission(mission);
+    if (inboxIntent) {
+      inboxIntent.setPendingChatInterventionId(missionStableKey(mission));
+    }
     if (mapRef.current && mission.coordinates) {
       mapRef.current.flyTo({
         center: mission.coordinates,
@@ -453,7 +458,6 @@ export default function MapboxView() {
           shellClassName={dashboardTripleSideShellClass}
           innerClassName={`${GLASS_PANEL_BODY_SCROLL} flex min-h-0 flex-col`}
         >
-          <DashboardKpiStrip {...kpiCounts} />
           <DailyMissions
             missions={visibleMissions}
             onMissionClick={handleMissionClick}
@@ -477,7 +481,7 @@ export default function MapboxView() {
       {/* Premium Recenter Button */}
       <button
         onClick={handleRecenter}
-        className={`group absolute z-[1] flex h-[46px] w-[46px] cursor-pointer items-center justify-center rounded-[14px] border border-white/75 bg-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.076),0_2px_10px_rgba(0,0,0,0.038)] backdrop-blur-2xl backdrop-saturate-[180%] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_40px_rgba(0,0,0,0.11)] active:translate-y-0 active:scale-95 ${DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS} ${DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS}`}
+        className={`group absolute z-[1] flex h-[46px] w-[46px] cursor-pointer items-center justify-center rounded-[14px] border border-white/75 bg-white/95 opacity-80 hover:opacity-100 shadow-[0_8px_30px_rgba(0,0,0,0.076),0_2px_10px_rgba(0,0,0,0.038)] backdrop-blur-2xl backdrop-saturate-[180%] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_40px_rgba(0,0,0,0.11)] active:translate-y-0 active:scale-95 ${DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS} ${DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS}`}
         title="Recentrer la carte"
       >
         <svg
@@ -488,7 +492,6 @@ export default function MapboxView() {
           aria-hidden
         >
           <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-          <circle cx="12" cy="12" r="2" fill="currentColor" />
         </svg>
       </button>
 
@@ -607,7 +610,7 @@ export default function MapboxView() {
           innerClassName="flex min-h-0 flex-1 flex-col"
         >
           <div className={cn("flex min-h-0 flex-1 flex-col", dashboardPageIndex !== 0 && "hidden")}>
-            <BackOfficeInboxPanel />
+            <BackOfficeInboxPanel dayMissions={visibleMissions} />
           </div>
           <div className={cn("flex min-h-0 flex-1 flex-col", dashboardPageIndex === 0 && "hidden")}>
             <RequesterTrackingPanel />

@@ -19,6 +19,7 @@ export default function CompanyCatalogPanel() {
   const { products, loading } = useCompanyCatalog();
 
   const [sku, setSku] = useState("");
+  const [lecotSku, setLecotSku] = useState("");
   const [label, setLabel] = useState("");
   const [priceEuros, setPriceEuros] = useState("");
   const [busy, setBusy] = useState(false);
@@ -52,10 +53,12 @@ export default function CompanyCatalogPanel() {
         label: label.trim(),
         unitPriceCents: Math.round(euros * 100),
         supplier: "company",
+        lecotSku: lecotSku.trim() || null,
         category: null,
         isActive: true,
       });
       setSku("");
+      setLecotSku("");
       setLabel("");
       setPriceEuros("");
       toast.success(String(t("catalog.company_product_created")));
@@ -82,6 +85,13 @@ export default function CompanyCatalogPanel() {
           value={sku}
           onChange={(e) => setSku(e.target.value)}
           placeholder={String(t("catalog.company_sku"))}
+          className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+        />
+        <input
+          data-testid="company-catalog-lecot-sku"
+          value={lecotSku}
+          onChange={(e) => setLecotSku(e.target.value)}
+          placeholder={String(t("catalog.company_lecot_sku"))}
           className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
         />
         <input
@@ -125,6 +135,17 @@ export default function CompanyCatalogPanel() {
               <Package className="h-4 w-4 shrink-0 text-slate-400" />
               <span className="min-w-0 flex-1 truncate font-medium">{p.label}</span>
               <span className="shrink-0 font-mono text-xs text-slate-500">{p.sku}</span>
+              {p.lecotSku?.trim() ? (
+                <a
+                  href={`https://www.lecot.be/fr/search?q=${encodeURIComponent(p.lecotSku.trim())}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid={`company-catalog-lecot-link-${p.id}`}
+                  className="shrink-0 text-[10px] font-bold text-blue-600 hover:underline"
+                >
+                  {t("catalog.company_lecot_link")}
+                </a>
+              ) : null}
             </li>
           ))
         )}

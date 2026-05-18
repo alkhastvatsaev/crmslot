@@ -1,7 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Camera, ClipboardList, FileSignature, Loader2, SendHorizontal, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  Check,
+  CheckCircle2,
+  ClipboardList,
+  FileSignature,
+  Loader2,
+  MoreHorizontal,
+  Package,
+  RotateCcw,
+  SendHorizontal,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
@@ -32,8 +48,16 @@ import { useTechnicianBackofficeReportBridgeOptional } from "@/context/Technicia
 import { useTranslation } from "@/core/i18n/I18nContext";
 import TechnicianBillingLinesForm, { type BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
 import FinishJobStepIndicator from "@/features/interventions/components/FinishJobStepIndicator";
+import CategoryFinishChecklist from "@/features/interventions/components/CategoryFinishChecklist";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+
+const CATEGORY_ICONS = {
+  panne: AlertTriangle,
+  materiel: Package,
+  preuve: CheckCircle2,
+  autre: MoreHorizontal,
+} as const;
 
 type WizardStep = "photos" | "billing" | "signature";
 
@@ -53,6 +77,7 @@ export default function TechnicianFinishJobPanel() {
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
 
   const [submitBusy, setSubmitBusy] = useState(false);
+  const [checklistComplete, setChecklistComplete] = useState(true);
 
   const submitInFlightRef = useRef(false);
 
@@ -272,10 +297,9 @@ export default function TechnicianFinishJobPanel() {
               type="button"
               onClick={goDashboard}
               aria-label={String(t("technician_hub.finish.cancel_close"))}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-slate-500 transition-colors hover:bg-black/10 hover:text-slate-800"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-slate-200 hover:text-slate-800 active:scale-[0.95]"
             >
-              <span className="sr-only">{String(t("technician_hub.finish.close"))}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <X className="h-5 w-5 stroke-[2.5]" aria-hidden />
             </button>
           </div>
         </div>
@@ -284,57 +308,67 @@ export default function TechnicianFinishJobPanel() {
           <>
 
 
-            <div className="relative mt-2 overflow-hidden rounded-[24px] bg-slate-900 shadow-xl ring-1 ring-black/5">
-              { }
+            <div className="relative mt-2 overflow-hidden rounded-[28px] bg-slate-950 shadow-2xl ring-1 ring-black/10">
               <video
                 ref={videoRef}
                 className={cn(
-                  "aspect-[4/3] w-full object-cover opacity-90 transition-opacity duration-300",
-                  PRESENTATION_PRIVACY_MODE ? "blur-xl" : null,
+                  "aspect-[4/3] w-full object-cover opacity-95 transition-opacity duration-300",
+                  PRESENTATION_PRIVACY_MODE ? "blur-2xl" : null,
                 )}
                 muted
                 playsInline
                 autoPlay
                 aria-label={String(t("technician_hub.finish.camera_done"))}
               />
-              <div className="absolute inset-0 pointer-events-none rounded-[24px] ring-1 ring-inset ring-white/10" />
+              <div className="absolute inset-0 pointer-events-none rounded-[28px] ring-1 ring-inset ring-white/10" />
+              
+              {/* Shutter overlay button */}
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center z-25">
+                <button
+                  type="button"
+                  data-testid="finish-job-capture-btn"
+                  disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
+                  onClick={captureShot}
+                  aria-label={String(t("technician_hub.finish.capture_photo"))}
+                  className="flex h-16 w-16 items-center justify-center rounded-full bg-white border-[4px] border-slate-950/80 shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all hover:scale-105 active:scale-90 disabled:opacity-40 disabled:hover:scale-100"
+                >
+                  <div className="h-10 w-10 rounded-full bg-slate-900 active:bg-slate-800 transition-colors" />
+                </button>
+              </div>
+
               {PRESENTATION_PRIVACY_MODE ? (
-                <div className="absolute left-3 top-3 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur">
+                <div className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
                   {String(t("technician_hub.finish.presentation_mode"))}
                 </div>
               ) : null}
             </div>
 
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-2 px-1 scrollbar-hide">
-              {(['panne', 'materiel', 'preuve', 'autre'] as const).map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setCurrentCategory(cat)}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-[13px] font-semibold capitalize whitespace-nowrap transition-colors border",
-                    currentCategory === cat
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                  )}
-                >
-                  {cat}
-                </button>
-              ))}
+            {/* Minimalist category selectors */}
+            <div className="mt-4 flex justify-center items-center gap-4 bg-slate-50 rounded-[20px] p-2.5 border border-slate-100">
+              {(['panne', 'materiel', 'preuve', 'autre'] as const).map(cat => {
+                const IconComponent = CATEGORY_ICONS[cat];
+                const isActive = currentCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCurrentCategory(cat)}
+                    title={cat}
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-full transition-all active:scale-90",
+                      isActive
+                        ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
+                        : "bg-white text-slate-500 border border-slate-200/60 hover:text-slate-800"
+                    )}
+                  >
+                    <IconComponent className="h-5 w-5 stroke-[2]" />
+                  </button>
+                );
+              })}
             </div>
 
-            <button
-              type="button"
-              data-testid="finish-job-capture-btn"
-              disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
-              onClick={captureShot}
-              aria-label={String(t("technician_hub.finish.capture_photo"))}
-              className="mt-2 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[24px] bg-slate-900 text-white shadow-[0_8px_20px_-8px_rgba(15,23,42,0.5)] transition-all hover:bg-slate-800 hover:shadow-[0_12px_24px_-8px_rgba(15,23,42,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:scale-100"
-            >
-              <Camera className="h-7 w-7" aria-hidden />
-              <span className="font-semibold tracking-wide">{String(t("technician_hub.finish.capture"))}</span>
-            </button>
-
-            <div data-testid="finish-job-photo-strip" className="flex flex-wrap gap-3 mt-2">
+            {/* Photo Strip */}
+            <div data-testid="finish-job-photo-strip" className="flex flex-wrap gap-3 mt-4 justify-center">
               {photos.map((photo, i) => (
                 <div key={`${i}-${photo.url ? photo.url.slice(0, 24) : ''}`} className="relative h-20 w-20 overflow-hidden rounded-[16px] border border-black/5 bg-slate-100 shadow-sm transition-transform hover:scale-105">
                   <div className="absolute top-0 left-0 w-full bg-black/60 text-white text-[10px] font-bold text-center py-0.5 capitalize z-10 backdrop-blur-sm">
@@ -359,27 +393,40 @@ export default function TechnicianFinishJobPanel() {
               ))}
             </div>
 
-            <button
-              type="button"
-              data-testid="finish-job-continue-photos"
-              disabled={photos.length < FINISH_JOB_MIN_PHOTOS}
-              onClick={() => {
-                stopCamera();
-                setStep("billing");
-              }}
-              aria-label={String(t("technician_hub.finish.continue_signature"))}
-              className="mt-6 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[20px] bg-slate-900 px-4 text-white shadow-lg transition-all hover:bg-slate-800 disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:scale-100 active:scale-[0.98]"
-            >
-              <span className="font-semibold tracking-wide">{String(t("technician_hub.finish.next_step"))}</span>
-              <ArrowRight className="h-5 w-5" aria-hidden />
-            </button>
+            {/* Next step button */}
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                data-testid="finish-job-continue-photos"
+                disabled={photos.length < FINISH_JOB_MIN_PHOTOS}
+                onClick={() => {
+                  stopCamera();
+                  setStep("billing");
+                }}
+                aria-label={String(t("technician_hub.finish.continue_signature"))}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition-all hover:bg-slate-800 active:scale-[0.90] disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ArrowRight className="h-6 w-6 stroke-[2.5]" aria-hidden />
+              </button>
+            </div>
           </>
+        ) : null}
+
+        {step === "billing" && liveIv ? (
+          <CategoryFinishChecklist
+            intervention={liveIv}
+            onCompleteChange={setChecklistComplete}
+          />
         ) : null}
 
         {step === "billing" ? (
           <TechnicianBillingLinesForm
             initialLines={billingLines}
             onConfirm={(confirmed) => {
+              if (!checklistComplete) {
+                toast.error(String(t("finish_checklist.incomplete")));
+                return;
+              }
               setBillingLines(confirmed);
               setStep("signature");
             }}
@@ -409,16 +456,7 @@ export default function TechnicianFinishJobPanel() {
               <TechnicianSignaturePad ref={sigRef} />
             </div>
 
-            <div className="flex gap-3 mt-2">
-              <button
-                type="button"
-                data-testid="finish-job-clear-signature"
-                onClick={() => sigRef.current?.clear()}
-                aria-label={String(t("technician_hub.finish.clear_signature"))}
-                className="flex min-h-[56px] flex-1 items-center justify-center rounded-[20px] bg-white text-rose-500 shadow-sm ring-1 ring-inset ring-black/5 transition-all hover:bg-rose-50 hover:ring-rose-200 active:scale-[0.98]"
-              >
-                <Trash2 className="h-5 w-5" aria-hidden />
-              </button>
+            <div className="flex gap-4 justify-center mt-2">
               <button
                 type="button"
                 data-testid="finish-job-back-billing"
@@ -426,31 +464,37 @@ export default function TechnicianFinishJobPanel() {
                   setStep("billing");
                 }}
                 aria-label={String(t("technician_hub.finish.back_photos"))}
-                className="flex min-h-[56px] flex-1 items-center justify-center rounded-[20px] bg-white text-slate-700 shadow-sm ring-1 ring-inset ring-black/5 transition-all hover:bg-slate-50 active:scale-[0.98]"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-all active:scale-[0.90]"
               >
-                <Camera className="h-5 w-5" aria-hidden />
+                <ArrowLeft className="h-5 w-5 stroke-[2.5]" aria-hidden />
+              </button>
+              <button
+                type="button"
+                data-testid="finish-job-clear-signature"
+                onClick={() => sigRef.current?.clear()}
+                aria-label={String(t("technician_hub.finish.clear_signature"))}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm ring-1 ring-slate-200 hover:bg-rose-50 hover:ring-rose-200 transition-all active:scale-[0.90]"
+              >
+                <RotateCcw className="h-5 w-5 stroke-[2.5]" aria-hidden />
               </button>
             </div>
 
-            <button
-              type="button"
-              data-testid="finish-job-submit"
-              disabled={submitBusy}
-              onClick={() => void submitAll()}
-              aria-label={String(t("technician_hub.finish.send_closure"))}
-              className="mt-4 flex min-h-[64px] w-full items-center justify-center gap-3 rounded-[24px] bg-emerald-500 px-4 text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.6)] transition-all hover:bg-emerald-600 hover:shadow-[0_12px_28px_-8px_rgba(16,185,129,0.7)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
-            >
-              {submitBusy ? (
-                <Loader2 className="h-6 w-6 shrink-0 animate-spin" aria-hidden />
-              ) : (
-                <SendHorizontal className="h-6 w-6 shrink-0" aria-hidden />
-              )}
-              <span className="font-semibold tracking-wide text-[16px]">
-                {submitBusy
-                  ? String(t("technician_hub.finish.submit.busy"))
-                  : String(t("technician_hub.finish.submit.cta"))}
-              </span>
-            </button>
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                data-testid="finish-job-submit"
+                disabled={submitBusy}
+                onClick={() => void submitAll()}
+                aria-label={String(t("technician_hub.finish.send_closure"))}
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_8px_24px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-600 active:scale-[0.90] disabled:pointer-events-none disabled:opacity-70"
+              >
+                {submitBusy ? (
+                  <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
+                ) : (
+                  <Check className="h-8 w-8 stroke-[3]" aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
         ) : null}
       </div>

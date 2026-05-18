@@ -52,6 +52,15 @@
       "date_label": "Interventiedatum",
       "empty": "Geen vrij tijdvak voor deze technicus op die datum.",
       "company_title": "Vrije tijdvakken (alle technici)"
+    },
+    "drag_board": {
+      "title": "Planning slepen-neerzetten",
+      "technician": "Technicus",
+      "pick_technician": "Kies een technicus…",
+      "unassigned": "Niet-toegewezen aanvragen",
+      "no_unassigned": "Geen openstaande aanvragen.",
+      "drop_slots": "Vrije tijdvakken",
+      "hint": "Sleep een aanvraag naar een groen tijdvak om te plannen."
     }
   },
   "materials": {
@@ -291,7 +300,24 @@
     "title": "Opvolgingen",
     "done_not_invoiced": "Afgerond — te factureren",
     "material_pending": "Materiaal in afwachting",
-    "unassigned_stale": "Niet toegewezen — actie nodig"
+    "unassigned_stale": "Niet toegewezen — actie nodig",
+    "push_title": "Backoffice-opvolgingen",
+    "push_body": "{count} dossier(s) vragen uw aandacht."
+  },
+  "workspace_switcher": {
+    "label": "Actief bedrijf"
+  },
+  "portal_enrichment": {
+    "eta_label": "Gepland bezoek",
+    "eta_asap": "Zo snel mogelijk",
+    "invoice_pdf": "Factuur-PDF downloaden",
+    "payment_paid": "Betaling ontvangen",
+    "payment_pending": "Betaling in afwachting",
+    "pay_now": "Online betalen"
+  },
+  "sav": {
+    "follow_up": "Garantieaanvraag ( gekoppeld )",
+    "badge": "Garantie"
   },
   "quote_pdf": {
     "download": "Offerte-PDF downloaden"
@@ -312,7 +338,9 @@
     "company_disabled": "Schakel Lecot-productzoekopdracht in.",
     "company_fields_required": "Referentie en omschrijving verplicht.",
     "company_price_invalid": "Ongeldige prijs.",
-    "company_product_created": "Product toegevoegd."
+    "company_product_created": "Product toegevoegd.",
+    "company_lecot_sku": "Lecot-ref. (optioneel)",
+    "company_lecot_link": "Lecot"
   },
   "spotlight": {
     "search_placeholder": "Naam",
@@ -324,6 +352,10 @@
     "nav_map": "Kaart",
     "nav_company": "Bedrijfshub",
     "nav_technician": "Technieker",
+    "nav_backoffice": "Backoffice",
+    "nav_offline": "AI-assistent",
+    "nav_chatbot": "Chatbot",
+    "nav_technician_lab": "Technicuslab",
     "open_aria": "Zoek openen",
     "active_label": "Actief",
     "nav_group_heading": "Navigatie"
@@ -410,6 +442,21 @@
       "tracking": "Dossiertracking",
       "chat": "Chat"
     }
+  },
+  "technician_lab": {
+    "banner_standalone": "Labprototype — productie-hub staat op de startcarrousel.",
+    "banner_carousel": "Technicuslab — zelfde scherm als /technician (carrouselpagina 6).",
+    "van_label": "Bestelwagen #01",
+    "urgent_label": "Dringende interventie",
+    "sample_mission_title": "Deur dichtgevallen",
+    "sample_address": "Kunstberg, 1000 Brussel",
+    "en_route": "Onderweg",
+    "on_site": "Ter plaatse",
+    "mission_done": "Missie afgerond",
+    "collect": "Innen",
+    "tap_to_pay": "Tap to Pay (iPhone)",
+    "scan_aria": "AR-scan",
+    "status_updated": "Status bijgewerkt"
   },
   "technician_hub": {
     "aria": {
@@ -582,6 +629,20 @@
     }
   },
   "backoffice": {
+    "hub": {
+      "drawer_empty_title": "Geen dossier geselecteerd",
+      "drawer_empty_hint": "Open het tabblad Aanvragen op de kaart en kies een aanvraag om hier geschiedenis, e-mails, materiaal en facturatie te tonen.",
+      "panel_waiting": "Kies een aanvraag op de kaart.",
+      "example_badge": "Voorbeeld",
+      "example_email_in": "Ontvangen",
+      "example_email_out": "Verzonden",
+      "example_paid": "Betaald",
+      "example_total": "Totaal incl. btw",
+      "example_commission": "Technicuscommissie",
+      "aria": {
+        "page": "Pagina"
+      }
+    },
     "inbox": {
       "report": "Rapport",
       "terrain_report": "Veldrapport",
@@ -1001,7 +1062,9 @@
     "add_line": "Lijn toevoegen",
     "total": "Geschat totaal",
     "skip": "Overslaan",
-    "confirm": "Lijnen bevestigen"
+    "confirm": "Lijnen bevestigen",
+    "suggestions_title": "Terreinsuggestie",
+    "suggestions_apply": "{count} voorgestelde lijn(en) toepassen"
   },
   "duplicate": {
     "auth_required": "Verbinding vereist",
@@ -1034,6 +1097,16 @@
     }
   },
   "offline": {
+    "hub": {
+      "aria": { "page": "Pagina" },
+      "panel_network": "Verbinding",
+      "panel_sync": "Synchronisatie",
+      "left_hint": "Afrondingen en foto's offline worden in de wachtrij gezet tot u weer online bent.",
+      "queue_label": "Wacht op upload",
+      "cache_pwa_hint": "Activeer de PWA v2-bundle om gecachte missies op dit apparaat te zien.",
+      "example_network_hint": "Voorbeeld: twee veldafsluitingen wachten op upload zodra het netwerk terug is.",
+      "example_sync_hint": "Voorbeeld: gebruik de knop hieronder om de wachtrij te synchroniseren."
+    },
     "sync": {
       "title_sr": "Offline synchronisatie",
       "conflict_single": "Laatste sync: de server had al 1 interventie afgesloten.",
@@ -1048,7 +1121,10 @@
       "syncing": "Synchroniseren…",
       "idle": "Inactief",
       "flush_aria": "Wachtende gegevens synchroniseren",
-      "flush_sr": "Synchroniseren"
+      "flush_sr": "Synchroniseren",
+      "terrain_cache_title": "Gecachte missies",
+      "terrain_cache_empty": "Geen gecachte missies.",
+      "terrain_cache_count": "{count} missie(s) offline beschikbaar"
     }
   },
   "admin": {
@@ -1130,11 +1206,51 @@
     "toast_send_failed": "Verzenden mislukt",
     "toast_login_required": "Aanmelding vereist",
     "toast_login_description": "Meld u aan om de chat te gebruiken.",
+    "global_chat_title": "Teamchat",
+    "global_chat_subtitle": "Algemene berichten van het bedrijf",
+    "day_clients_title": "Klanten van vandaag ({count})",
+    "day_clients_empty": "Geen klanten gepland voor deze datum",
+    "anonymous_client": "Klant",
+    "back_to_list": "Gesprekslijst",
     "welcome": "Goedendag — schrijf ons voor vragen over een interventie, een afspraak of een factuur. De back-office antwoordt hier.",
     "reply_urgent": "Voor een noodgeval geeft u uw volledig adres en een bereikbaar nummer; de back-office behandelt deze dossiers met prioriteit.",
     "reply_billing": "Voor facturatie of een offerte geeft u de naam op het dossier of de laatste cijfers van de interventie — ik stuur het door naar de bevoegde dienst.",
     "reply_schedule": "Om een tijdslot te wijzigen, geeft u de gewenste datum en gemeente; de back-office bevestigt de planning.",
     "reply_thanks": "Graag gedaan! Aarzel niet als u andere vragen heeft.",
     "reply_default": "Bedankt voor uw bericht. De back-office is op de hoogte en neemt snel contact met u op. U kunt ook een verzoek indienen via de bedrijfsruimte."
+  },
+  "copilot": {
+    "aria": { "page": "Pagina" },
+    "panel_context": "Context",
+    "panel_chat": "Assistent",
+    "panel_suggestions": "Suggesties",
+    "title": "BELGMAP Copilot",
+    "subtitle_company": "Actief bedrijf: {name}",
+    "loading_context": "Dossiers laden…",
+    "no_company": "Selecteer een bedrijf (switcher) om de assistent te activeren.",
+    "context_live": "Live context",
+    "welcome": "Goedendag — ik zie uw BELGMAP-dossiers, klanten en facturatie. Stel een vraag of kies een suggestie rechts.",
+    "input_label": "Bericht aan de assistent",
+    "input_placeholder": "bv. Welke urgente dossiers zijn open? Wie heeft niet betaald?",
+    "send_aria": "Versturen",
+    "typing": "Bezig…",
+    "error_generic": "Kan de assistent niet bereiken.",
+    "error_empty": "Leeg antwoord.",
+    "openai_missing": "OpenAI-sleutel ontbreekt op de server.",
+    "stat_total": "Dossiers",
+    "stat_urgent": "Open urgente",
+    "stat_in_progress": "Bezig",
+    "stat_unpaid": "Onbetaald",
+    "stat_clients": "Klanten (overzicht)",
+    "stat_offline_queue": "Backend-wachtrij",
+    "network_online": "Online",
+    "network_offline": "Offline",
+    "snapshot_hint": "{count} gedetailleerde dossiers naar het model",
+    "suggestions_title": "Snelle vragen",
+    "prompt_priorities": "Wat zijn de prioriteiten vandaag (urgent, niet toegewezen)?",
+    "prompt_unpaid": "Lijst afgeronde maar onbetaalde interventies met bedragen.",
+    "prompt_urgent": "Vat open urgente dossiers samen.",
+    "prompt_clients": "Welke klanten hebben de meeste actieve dossiers?",
+    "prompt_summary_day": "Geef een operationele briefing voor de back-office vandaag."
   }
 }

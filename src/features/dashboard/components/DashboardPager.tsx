@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
-import DashboardPagerControls from "@/features/dashboard/components/DashboardPagerControls";
 
 type Props = {
   pages: ReactNode[];
@@ -24,7 +23,7 @@ export default function DashboardPager({ pages }: Props) {
 
   return (
     <div
-      className="absolute inset-0 z-0 overflow-hidden"
+      className="absolute inset-0 z-0"
       data-testid="dashboard-pager-root"
     >
       <div
@@ -38,7 +37,7 @@ export default function DashboardPager({ pages }: Props) {
         {pages.map((node, i) => (
           <section
             key={i}
-            className={`relative h-full shrink-0 overflow-hidden ${
+            className={`relative h-full shrink-0 ${
               pageIndex !== i ? "pointer-events-none" : ""
             }`}
             style={{ width: `${100 / pageCount}%`, transform: "translateZ(0)", backfaceVisibility: "hidden" }}
@@ -64,8 +63,6 @@ export default function DashboardPager({ pages }: Props) {
           </section>
         ))}
       </div>
-
-      <DashboardPagerControls />
     </div>
   );
 }

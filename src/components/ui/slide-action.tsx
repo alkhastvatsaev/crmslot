@@ -7,8 +7,10 @@ interface SlideActionProps {
   onAction: () => void;
   label?: string;
   icon?: LucideIcon;
-  actionText?: string;
   className?: string;
+  testId?: string;
+  disabled?: boolean;
+  variant?: "glass" | "field";
 }
 
 export function SlideAction({
@@ -16,6 +18,9 @@ export function SlideAction({
   label = "Glisser pour terminer",
   icon: Icon = ArrowRight,
   className,
+  testId,
+  disabled = false,
+  variant = "field",
 }: SlideActionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
@@ -24,8 +29,6 @@ export function SlideAction({
   const [bounds, setBounds] = useState({ left: 0, right: 0 });
 
   const x = useMotionValue(0);
-
-  // Map the x position to opacity to fade out the text as we drag
   const textOpacity = useTransform(x, [0, 150], [1, 0]);
 
   useEffect(() => {
@@ -36,15 +39,20 @@ export function SlideAction({
     }
   }, []);
 
-  const handleDragEnd = async (_event: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number } }) => {
-    if (!containerRef.current || !knobRef.current) return;
-    
+  const handleDragEnd = async (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { x: number } },
+  ) => {
+    if (disabled || !containerRef.current || !knobRef.current) return;
+
     const maxDrag = bounds.right;
-    
-    // Threshold to trigger action (e.g. 75% of max drag)
+
     if (info.offset.x > maxDrag * 0.75) {
       setIsSuccess(true);
-      await controls.start({ x: maxDrag, transition: { type: "spring", stiffness: 300, damping: 25 } });
+      await controls.start({
+        x: maxDrag,
+        transition: { type: "spring", stiffness: 300, damping: 25 },
+      });
       onAction();
     } else {
       controls.start({ x: 0, transition: { type: "spring", stiffness: 400, damping: 30 } });
@@ -53,7 +61,6 @@ export function SlideAction({
 
   useEffect(() => {
     if (isSuccess) {
-      // Reset after some time if needed, but usually we unmount or navigate
       const timer = setTimeout(() => {
         setIsSuccess(false);
         controls.start({ x: 0, transition: { type: "spring", stiffness: 300, damping: 25 } });
@@ -62,54 +69,60 @@ export function SlideAction({
     }
   }, [isSuccess, controls]);
 
+  const isField = variant === "field";
+
   return (
     <div
       ref={containerRef}
+      data-testid={testId}
       className={cn(
-        "relative flex h-[72px] w-full items-center overflow-hidden rounded-[36px] p-2",
-        "bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.06)]",
-        className
+        "relative flex h-[66px] w-full items-center overflow-hidden rounded-2xl p-1.5",
+        isField
+          ? "border border-neutral-200 bg-neutral-100"
+          : "rounded-[36px] border border-white/60 bg-white/40 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl",
+        disabled && "pointer-events-none opacity-50",
+        className,
       )}
     >
-      {/* Glossy overlay */}
-      <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-gradient-to-b from-white/40 to-transparent opacity-50" />
+      {!isField ? (
+        <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-gradient-to-b from-white/40 to-transparent opacity-50" />
+      ) : null}
 
-      {/* Shimmer text effect */}
       <motion.div
         style={{ opacity: textOpacity }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center pl-10"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center pl-14"
       >
-        <span className="font-semibold tracking-wide text-slate-800/60 mix-blend-overlay text-[15px]">
+        <span
+          className={cn(
+            "text-[13px] font-semibold tracking-wide",
+            isField ? "text-neutral-500" : "text-slate-800/60 mix-blend-overlay",
+          )}
+        >
           {label}
         </span>
-        
-        {/* Animated shimmer over text */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-[shimmer_2.5s_infinite] w-[200%] mix-blend-overlay" />
       </motion.div>
 
       <motion.div
         ref={knobRef}
-        drag={isSuccess ? false : "x"}
+        drag={disabled || isSuccess ? false : "x"}
         dragConstraints={bounds}
         dragElastic={0.02}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
         animate={controls}
-        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.96 }}
         style={{ x }}
         className={cn(
-          "relative z-10 flex h-[56px] w-[56px] cursor-grab items-center justify-center rounded-full transition-all duration-500 ease-out active:cursor-grabbing",
-          isSuccess 
-            ? "bg-emerald-500 text-white shadow-[0_4px_20px_rgba(16,185,129,0.4)]" 
-            : "bg-white text-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)]"
+          "relative z-10 flex h-[54px] w-[54px] cursor-grab items-center justify-center rounded-xl active:cursor-grabbing",
+          isSuccess
+            ? "bg-emerald-600 text-white"
+            : isField
+              ? "bg-[#0F172A] text-white shadow-sm"
+              : "bg-white text-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
         )}
       >
-        {/* Inner subtle gradient for knob */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white to-transparent opacity-50 pointer-events-none" />
-        <Icon className={cn("relative z-10 h-6 w-6 transition-transform duration-500", isSuccess ? "scale-110" : "")} />
+        <Icon className="h-5 w-5" />
       </motion.div>
     </div>
   );
 }
-

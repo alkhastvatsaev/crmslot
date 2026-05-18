@@ -46,12 +46,10 @@ describe("TechnicianHubPage", () => {
     });
   });
 
-  it("renders missions layout and offline sync panel", () => {
+  it("renders missions layout", () => {
     render(<TechnicianHubPage slotIndex={2} />);
 
     expect(screen.getByTestId("dashboard-pager-slot-2")).toBeInTheDocument();
     expect(screen.getByTestId("technician-dashboard-list")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-offline-sync-panel")).toBeInTheDocument();
-    expect(document.getElementById("technician-hub-offline")).toBeTruthy();
   });
 });

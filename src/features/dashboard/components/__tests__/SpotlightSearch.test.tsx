@@ -18,36 +18,41 @@ Element.prototype.scrollIntoView = jest.fn();
 
 describe('SpotlightSearch', () => {
   it('renders trigger button', () => {
-    renderWithPager(<SpotlightSearch />, 3);
+    renderWithPager(<SpotlightSearch />, 6);
     expect(screen.getByTestId('spotlight-trigger')).toBeInTheDocument();
   });
 
-  it('shows 3 nav items when open', () => {
-    renderWithPager(<SpotlightSearch />, 3);
+  it('shows 6 nav items when open', () => {
+    renderWithPager(<SpotlightSearch />, 6);
     fireEvent.click(screen.getByTestId('spotlight-trigger'));
-    expect(screen.getByTestId('nav-item-0')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-1')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-2')).toBeInTheDocument();
+    for (let i = 0; i < 6; i += 1) {
+      expect(screen.getByTestId(`nav-item-${i}`)).toBeInTheDocument();
+    }
   });
 
   it('nav items have correct translated text content', () => {
-    renderWithPager(<SpotlightSearch />, 3);
+    renderWithPager(<SpotlightSearch />, 6);
     fireEvent.click(screen.getByTestId('spotlight-trigger'));
     // Verify that each nav item contains the expected label text (from spotlight.nav_* i18n keys)
     const item0 = screen.getByTestId('nav-item-0');
     const item1 = screen.getByTestId('nav-item-1');
     const item2 = screen.getByTestId('nav-item-2');
+    const item3 = screen.getByTestId('nav-item-3');
+    const item4 = screen.getByTestId('nav-item-4');
+    const item5 = screen.getByTestId('nav-item-5');
     expect(item0).toBeInTheDocument();
     expect(item1).toBeInTheDocument();
     expect(item2).toBeInTheDocument();
-    // Each item should have non-empty text
-    expect(item0.textContent?.trim().length).toBeGreaterThan(0);
-    expect(item1.textContent?.trim().length).toBeGreaterThan(0);
-    expect(item2.textContent?.trim().length).toBeGreaterThan(0);
+    expect(item3).toBeInTheDocument();
+    expect(item4).toBeInTheDocument();
+    expect(item5).toBeInTheDocument();
+    for (const item of [item0, item1, item2, item3, item4, item5]) {
+      expect(item.textContent?.trim().length).toBeGreaterThan(0);
+    }
   });
 
   it('closes modal when nav item selected', () => {
-    renderWithPager(<SpotlightSearch />, 3);
+    renderWithPager(<SpotlightSearch />, 6);
     fireEvent.click(screen.getByTestId('spotlight-trigger'));
     fireEvent.click(screen.getByTestId('nav-item-0'));
     // Modal should close (nav items no longer rendered)
@@ -58,7 +63,7 @@ describe('SpotlightSearch', () => {
     // Start at page 0 (default). Click nav-item-1 which maps to pageIndex=1.
     // After selection, the modal closes. Re-open to verify the active indicator
     // appears on nav-item-1, confirming setPageIndex(1) was called.
-    renderWithPager(<SpotlightSearch />, 3);
+    renderWithPager(<SpotlightSearch />, 6);
 
     // Open modal and click nav-item-1 (pageIndex=1)
     fireEvent.click(screen.getByTestId('spotlight-trigger'));

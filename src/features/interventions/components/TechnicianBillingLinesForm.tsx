@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, FileText } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Trash2, FileText, Mic, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useBrowserSpeechDictation } from "@/features/interventions/useBrowserSpeechDictation";
 import {
   BILLING_TEMPLATES,
   type BillingTemplateLine,
 } from "@/features/interventions/config/terrainTemplates";
 import ProductQuickAddBar from "@/features/catalog/components/ProductQuickAddBar";
+import BillingLineSuggestions from "@/features/interventions/components/BillingLineSuggestions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -43,6 +46,61 @@ export default function TechnicianBillingLinesForm({
   const [lines, setLines] = useState<BillingLine[]>(
     initialLines && initialLines.length > 0 ? initialLines : [emptyLine()],
   );
+
+  const [dictatedText, setDictatedText] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const handleTranscript = (text: string) => {
+    setDictatedText((prev) => (prev ? `${prev} ${text}` : text));
+  };
+
+  const { listening, toggleListening, interimTranscript } = useBrowserSpeechDictation(
+    handleTranscript
+  );
+
+  const handleDictationResult = async (text: string) => {
+    if (!text.trim()) return;
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/ai/parse-billing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: text }),
+      });
+      const data = await res.json();
+      if (data.success && data.lines && data.lines.length > 0) {
+        const newLines = data.lines.map((l: Partial<BillingLine>) => ({
+          description: l.description || "",
+          quantity: l.quantity || 1,
+          unitPriceCents: l.unitPriceCents || 0,
+          reference: l.reference || "",
+        }));
+        
+        setLines((prev) => {
+          if (prev.length === 1 && !prev[0].description) {
+            return newLines;
+          }
+          return [...prev, ...newLines];
+        });
+        toast.success(t("billing_lines.voice_success") || "Lignes ajoutées via IA");
+      } else {
+        toast.error(t("billing_lines.voice_empty") || "Aucune ligne détectée");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error(t("billing_lines.voice_error") || "Erreur lors de l'analyse");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!listening && dictatedText.trim()) {
+      const textToAnalyze = dictatedText;
+      setDictatedText("");
+      handleDictationResult(textToAnalyze);
+    }
+  }, [listening, dictatedText]);
 
   const handleLoadTemplate = (templateId: string) => {
     if (!templateId) return;
@@ -91,13 +149,49 @@ export default function TechnicianBillingLinesForm({
           onAddLine={(line) => setLines((prev) => [...prev, line])}
         />
       ) : null}
+      {intervention ? (
+        <BillingLineSuggestions
+          problem={intervention.problem}
+          category={intervention.category}
+          onApply={(suggested) => setLines(suggested)}
+        />
+      ) : null}
       {/* Header */}
-      <div className="flex items-center gap-2 px-1">
-        <FileText className="h-5 w-5 text-slate-800" aria-hidden />
-        <h2 className="text-[15px] font-semibold text-slate-800">
-          {t("billing_lines.title")}
-        </h2>
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-slate-800" aria-hidden />
+          <h2 className="text-[15px] font-semibold text-slate-800">
+            {t("billing_lines.title")}
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (!listening) setDictatedText("");
+            toggleListening();
+          }}
+          className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-bold transition-all ${
+            listening 
+              ? "bg-red-100 text-red-600 animate-pulse" 
+              : "bg-purple-100 text-purple-700 hover:bg-purple-200"
+          }`}
+          disabled={isAnalyzing}
+          title="Dictez votre facturation pour générer les lignes automatiquement"
+        >
+          {isAnalyzing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+          {isAnalyzing ? "Analyse..." : listening ? "Écoute..." : "Saisie IA"}
+        </button>
       </div>
+
+      {(interimTranscript || dictatedText) && listening && (
+        <div className="px-3 py-2 text-[13px] italic text-slate-600 bg-slate-100 rounded-lg animate-in fade-in">
+          {dictatedText} {interimTranscript}
+        </div>
+      )}
 
       {/* Template selector */}
       <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-3">

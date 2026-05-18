@@ -10,6 +10,8 @@ import {
   Ban,
   FileText,
   TrendingUp,
+  Banknote,
+  Hourglass,
 } from "lucide-react";
 import type { Intervention } from "@/features/interventions/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -22,7 +24,7 @@ type Props = {
 
 interface KpiCard {
   label: string;
-  value: number;
+  value: string | number;
   icon: typeof Clock;
   color: string;
   bgColor: string;
@@ -39,7 +41,43 @@ export default function DailyOperationsKpi({ interventions }: Props) {
     const byStatus = (statuses: Intervention["status"][]) =>
       todayInterventions.filter((iv) => statuses.includes(iv.status)).length;
 
+    const revenueCents = todayInterventions
+      .filter((iv) => iv.status === "invoiced" || iv.status === "done")
+      .reduce((sum, iv) => sum + (iv.invoiceAmountCents || 0), 0);
+    const revenueEuro = (revenueCents / 100).toLocaleString("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    });
+
+    const durationIvs = todayInterventions.filter(
+      (iv) => iv.actualDurationMinutes != null && iv.actualDurationMinutes > 0,
+    );
+    const avgDuration =
+      durationIvs.length > 0
+        ? Math.round(
+            durationIvs.reduce(
+              (sum, iv) => sum + (iv.actualDurationMinutes || 0),
+              0,
+            ) / durationIvs.length,
+          )
+        : 0;
+
     return [
+      {
+        label: t("backoffice.dashboard.kpi_revenue_today") || "CA du jour",
+        value: revenueEuro,
+        icon: Banknote,
+        color: "text-emerald-700",
+        bgColor: "bg-emerald-100",
+      },
+      {
+        label: t("backoffice.dashboard.kpi_avg_duration") || "Temps moyen",
+        value: `${avgDuration} min`,
+        icon: Hourglass,
+        color: "text-purple-700",
+        bgColor: "bg-purple-100",
+      },
       {
         label: t("backoffice.dashboard.kpi_total_today"),
         value: todayInterventions.length,
@@ -47,13 +85,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
         color: "text-slate-700",
         bgColor: "bg-slate-100",
       },
-      {
-        label: t("backoffice.dashboard.kpi_pending"),
-        value: byStatus(["pending", "pending_needs_address", "assigned"]),
-        icon: Clock,
-        color: "text-blue-700",
-        bgColor: "bg-blue-50",
-      },
+
       {
         label: t("backoffice.dashboard.kpi_en_route"),
         value: byStatus(["en_route"]),
@@ -61,13 +93,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
         color: "text-indigo-700",
         bgColor: "bg-indigo-50",
       },
-      {
-        label: t("backoffice.dashboard.kpi_in_progress"),
-        value: byStatus(["in_progress"]),
-        icon: Wrench,
-        color: "text-amber-700",
-        bgColor: "bg-amber-50",
-      },
+
       {
         label: t("backoffice.dashboard.kpi_waiting_material"),
         value: byStatus(["waiting_material"]),
@@ -75,13 +101,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
         color: "text-orange-700",
         bgColor: "bg-orange-50",
       },
-      {
-        label: t("backoffice.dashboard.kpi_done"),
-        value: byStatus(["done", "invoiced"]),
-        icon: CheckCircle2,
-        color: "text-emerald-700",
-        bgColor: "bg-emerald-50",
-      },
+
       {
         label: t("backoffice.dashboard.kpi_cancelled"),
         value: byStatus(["cancelled"]),

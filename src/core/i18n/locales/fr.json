@@ -52,6 +52,15 @@
       "date_label": "Date d'intervention",
       "empty": "Aucun créneau libre pour ce technicien à cette date.",
       "company_title": "Créneaux libres (tous techniciens)"
+    },
+    "drag_board": {
+      "title": "Planning glisser-déposer",
+      "technician": "Technicien",
+      "pick_technician": "Choisir un technicien…",
+      "unassigned": "Demandes non assignées",
+      "no_unassigned": "Aucune demande en attente.",
+      "drop_slots": "Créneaux libres",
+      "hint": "Glissez une demande sur un créneau vert pour planifier."
     }
   },
   "materials": {
@@ -291,7 +300,24 @@
     "title": "Relances",
     "done_not_invoiced": "Terminée — à facturer",
     "material_pending": "Matériel en attente",
-    "unassigned_stale": "Non assignée — à traiter"
+    "unassigned_stale": "Non assignée — à traiter",
+    "push_title": "Relances back-office",
+    "push_body": "{count} dossier(s) nécessitent votre attention."
+  },
+  "workspace_switcher": {
+    "label": "Société active"
+  },
+  "portal_enrichment": {
+    "eta_label": "Rendez-vous prévu",
+    "eta_asap": "Dès que possible",
+    "invoice_pdf": "Télécharger la facture PDF",
+    "payment_paid": "Paiement reçu",
+    "payment_pending": "Paiement en attente",
+    "pay_now": "Payer en ligne"
+  },
+  "sav": {
+    "follow_up": "Demande SAV (liée)",
+    "badge": "SAV"
   },
   "quote_pdf": {
     "download": "Télécharger devis PDF"
@@ -312,10 +338,12 @@
     "company_disabled": "Activez la recherche produits Lecot.",
     "company_fields_required": "Référence et libellé obligatoires.",
     "company_price_invalid": "Prix invalide.",
-    "company_product_created": "Produit ajouté."
+    "company_product_created": "Produit ajouté.",
+    "company_lecot_sku": "Réf. Lecot (optionnel)",
+    "company_lecot_link": "Lecot"
   },
   "spotlight": {
-    "search_placeholder": "Nom",
+    "search_placeholder": "Rechercher...",
     "map_action_title": "Carte",
     "map_action_desc": "Ouvrir la carte des interventions",
     "tech_action_title": "Techniciens",
@@ -324,6 +352,10 @@
     "nav_map": "Carte",
     "nav_company": "Espace société",
     "nav_technician": "Technicien",
+    "nav_backoffice": "Back-office",
+    "nav_offline": "Assistant IA",
+    "nav_chatbot": "Chatbot",
+    "nav_technician_lab": "Lab technicien",
     "open_aria": "Ouvrir la recherche",
     "active_label": "Actif",
     "nav_group_heading": "Navigation"
@@ -410,6 +442,21 @@
       "tracking": "Suivi dossier",
       "chat": "Chat"
     }
+  },
+  "technician_lab": {
+    "banner_standalone": "Prototype laboratoire — le hub technicien de production est sur la page d'accueil (carrousel).",
+    "banner_carousel": "Lab technicien — même écran que /technician (page 6 du carrousel).",
+    "van_label": "Camionnette #01",
+    "urgent_label": "Intervention urgente",
+    "sample_mission_title": "Porte claquée",
+    "sample_address": "Mont des Arts, 1000 Bruxelles",
+    "en_route": "Je suis en route",
+    "on_site": "Arrivé sur place",
+    "mission_done": "Mission terminée",
+    "collect": "Encaisser",
+    "tap_to_pay": "Tap-to-Pay iPhone",
+    "scan_aria": "Scanner AR",
+    "status_updated": "Statut mis à jour"
   },
   "technician_hub": {
     "aria": {
@@ -595,6 +642,20 @@
     }
   },
   "backoffice": {
+    "hub": {
+      "drawer_empty_title": "Aucun dossier sélectionné",
+      "drawer_empty_hint": "Ouvrez l’onglet Demandes sur la carte et choisissez une demande pour afficher l’historique, les emails, le matériel et la facturation ici.",
+      "panel_waiting": "Choisissez une demande sur la carte.",
+      "example_badge": "Exemple",
+      "example_email_in": "Reçu",
+      "example_email_out": "Envoyé",
+      "example_paid": "Payé",
+      "example_total": "Total TTC",
+      "example_commission": "Commission technicien",
+      "aria": {
+        "page": "Page"
+      }
+    },
     "inbox": {
       "report": "Rapport",
       "terrain_report": "Rapport terrain",
@@ -1029,7 +1090,9 @@
     "add_line": "Ajouter une ligne",
     "total": "Total estimé",
     "skip": "Passer",
-    "confirm": "Confirmer les lignes"
+    "confirm": "Confirmer les lignes",
+    "suggestions_title": "Suggestion terrain",
+    "suggestions_apply": "Appliquer {count} ligne(s) suggérée(s)"
   },
   "duplicate": {
     "auth_required": "Connexion requise",
@@ -1062,6 +1125,16 @@
     }
   },
   "offline": {
+    "hub": {
+      "aria": { "page": "Page" },
+      "panel_network": "Connexion",
+      "panel_sync": "Synchronisation",
+      "left_hint": "Les clôtures et photos prises hors réseau sont mises en file jusqu’au retour en ligne.",
+      "queue_label": "En attente d’envoi",
+      "cache_pwa_hint": "Activez le bundle PWA v2 pour voir les missions mises en cache sur l’appareil.",
+      "example_network_hint": "Exemple : deux clôtures terrain attendent l’envoi dès que le réseau revient.",
+      "example_sync_hint": "Exemple : utilisez le bouton ci-dessous pour envoyer la file d’attente."
+    },
     "sync": {
       "title_sr": "Synchronisation hors ligne",
       "conflict_single": "Dernière synchro : le serveur avait déjà clôturé une intervention.",
@@ -1076,7 +1149,10 @@
       "syncing": "Synchronisation en cours",
       "idle": "Inactif",
       "flush_aria": "Synchroniser les données en attente",
-      "flush_sr": "Synchroniser"
+      "flush_sr": "Synchroniser",
+      "terrain_cache_title": "Missions en cache",
+      "terrain_cache_empty": "Aucune mission mise en cache.",
+      "terrain_cache_count": "{count} mission(s) disponibles hors ligne"
     }
   },
   "admin": {
@@ -1158,11 +1234,51 @@
     "toast_send_failed": "Envoi impossible",
     "toast_login_required": "Connexion requise",
     "toast_login_description": "Connectez-vous pour utiliser le chat.",
+    "global_chat_title": "Chat d'équipe",
+    "global_chat_subtitle": "Messages généraux de la société",
+    "day_clients_title": "Clients du jour ({count})",
+    "day_clients_empty": "Aucun client prévu pour cette date",
+    "anonymous_client": "Client",
+    "back_to_list": "Liste des conversations",
     "welcome": "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le back-office vous répondra ici.",
     "reply_urgent": "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le back-office traite ces dossiers en priorité.",
     "reply_billing": "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l'intervention : je transmets au service concerné.",
     "reply_schedule": "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le back-office vous confirmera la planification.",
     "reply_thanks": "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
     "reply_default": "Merci pour votre message. Le back-office a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
+  },
+  "copilot": {
+    "aria": { "page": "Page" },
+    "panel_context": "Contexte",
+    "panel_chat": "Assistant",
+    "panel_suggestions": "Suggestions",
+    "title": "BELGMAP Copilot",
+    "subtitle_company": "Société active : {name}",
+    "loading_context": "Chargement des dossiers…",
+    "no_company": "Sélectionnez une société (switcher) pour activer l’assistant.",
+    "context_live": "Contexte live",
+    "welcome": "Bonjour — je connais les dossiers, clients et factures de votre espace BELGMAP. Posez une question ou choisissez une suggestion à droite.",
+    "input_label": "Message pour l’assistant",
+    "input_placeholder": "Ex. Quelles urgences sont ouvertes ? Qui n’a pas payé ?",
+    "send_aria": "Envoyer",
+    "typing": "Réflexion…",
+    "error_generic": "Impossible de joindre l’assistant.",
+    "error_empty": "Réponse vide.",
+    "openai_missing": "Clé OpenAI absente sur le serveur.",
+    "stat_total": "Dossiers",
+    "stat_urgent": "Urgences ouvertes",
+    "stat_in_progress": "En cours",
+    "stat_unpaid": "À encaisser",
+    "stat_clients": "Clients (aperçu)",
+    "stat_offline_queue": "File backend",
+    "network_online": "En ligne",
+    "network_offline": "Hors ligne",
+    "snapshot_hint": "{count} dossiers détaillés envoyés au modèle",
+    "suggestions_title": "Questions rapides",
+    "prompt_priorities": "Quelles sont les priorités du jour (urgences, non assignés) ?",
+    "prompt_unpaid": "Liste les interventions terminées mais non payées avec montants.",
+    "prompt_urgent": "Résume les dossiers urgents encore ouverts.",
+    "prompt_clients": "Quels clients ont le plus de dossiers actifs ?",
+    "prompt_summary_day": "Fais un briefing opérationnel de la journée pour le back-office."
   }
 }

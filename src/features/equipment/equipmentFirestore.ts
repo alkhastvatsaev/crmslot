@@ -18,8 +18,10 @@ export function subscribeEquipmentByClient(
     where("clientId", "==", clientId),
     orderBy("label"),
   );
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClientEquipment, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClientEquipment, "id">) }))),
+    () => onData([]),
   );
 }
 
@@ -34,8 +36,10 @@ export function subscribeEquipmentBySite(
     where("siteId", "==", siteId),
     orderBy("label"),
   );
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClientEquipment, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClientEquipment, "id">) }))),
+    () => onData([]),
   );
 }
 

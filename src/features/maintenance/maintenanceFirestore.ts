@@ -23,7 +23,7 @@ export function subscribeMaintenanceContracts(
   const q = query(col(db, companyId), where("isActive", "==", true), orderBy("nextDueDate"));
   return onSnapshot(q, (snap) => {
     onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MaintenanceContract, "id">) })));
-  });
+  }, () => onData([]));
 }
 
 export async function createMaintenanceContract(

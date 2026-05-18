@@ -43,19 +43,26 @@ export function subscribeIvanaPortalMessages(
     orderBy("createdAt", "asc"),
     limit(200),
   );
-  return onSnapshot(
-    q,
-    (snap) => {
-      const rows = snap.docs.map((d) => {
-        const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
-        return { id: d.id, ...data } as IvanaPortalChatDoc;
-      });
-      onRows(rows);
-    },
-    (e) => {
-      onError?.(e instanceof Error ? e : new Error(String(e)));
-    },
-  );
+  let unsub: (() => void) | undefined;
+  const timeout = setTimeout(() => {
+    unsub = onSnapshot(
+      q,
+      (snap) => {
+        const rows = snap.docs.map((d) => {
+          const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
+          return { id: d.id, ...data } as IvanaPortalChatDoc;
+        });
+        onRows(rows);
+      },
+      (e) => {
+        onError?.(e instanceof Error ? e : new Error(String(e)));
+      },
+    );
+  }, 10);
+  return () => {
+    clearTimeout(timeout);
+    unsub?.();
+  };
 }
 
 export function subscribePortalChatForIntervention(
@@ -75,18 +82,25 @@ export function subscribePortalChatForIntervention(
     orderBy("createdAt", "asc"),
     limit(200),
   );
-  return onSnapshot(
-    q,
-    (snap) => {
-      onRows(
-        snap.docs.map((d) => {
-          const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
-          return { id: d.id, ...data };
-        }),
-      );
-    },
-    (e) => onError?.(e instanceof Error ? e : new Error(String(e))),
-  );
+  let unsub: (() => void) | undefined;
+  const timeout = setTimeout(() => {
+    unsub = onSnapshot(
+      q,
+      (snap) => {
+        onRows(
+          snap.docs.map((d) => {
+            const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
+            return { id: d.id, ...data };
+          }),
+        );
+      },
+      (e) => onError?.(e instanceof Error ? e : new Error(String(e))),
+    );
+  }, 10);
+  return () => {
+    clearTimeout(timeout);
+    unsub?.();
+  };
 }
 
 export async function sendIvanaPortalMessage(

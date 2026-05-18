@@ -9,8 +9,10 @@ export async function findBestTechnician(
   technicians: Technician[],
   interventionLat: number,
   interventionLng: number,
+  interventionProblem?: string | null,
+  interventionAddress?: string | null,
   requiredSkills?: string[] | null,
-): Promise<Technician | null> {
+): Promise<{ technician: Technician; reasoning?: string } | null> {
 
 
   const availableTechs = technicians.filter(t =>
@@ -60,5 +62,36 @@ export async function findBestTechnician(
   }
 
 
-  return bestTech || top3[0];
+  // On met à jour les top3 avec leur realEta s'il a été trouvé
+  const updatedTop3 = top3.map(t => {
+    if (bestTech && t.id === bestTech.id) return bestTech;
+    return t;
+  });
+
+  try {
+    const res = await fetchWithAuth('/api/ai/smart-dispatch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        problem: interventionProblem,
+        address: interventionAddress,
+        technicians: updatedTop3
+      })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.bestTechnicianId) {
+        const aiChosen = updatedTop3.find(t => t.id === data.bestTechnicianId);
+        if (aiChosen) {
+          return { technician: aiChosen, reasoning: data.reasoning };
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Erreur Smart Dispatch AI", e);
+  }
+
+  // Fallback if AI fails: return the closest one with Maps ETA
+  return bestTech ? { technician: bestTech } : top3[0] ? { technician: top3[0] } : null;
 }

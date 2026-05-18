@@ -62,25 +62,31 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
     setLoading(true);
     const q = query(collection(firestore, "intervention_duplicate_alerts"), where("companyId", "==", cid));
 
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const parsed = snap.docs.map((d) => ({ id: d.id, ...(d.data() as DuplicateAlertDoc) }));
-        setRows(
-          parsed.filter(
-            (r) =>
-              !isSyntheticInterventionId(r.similarInterventionId) &&
-              !isSyntheticInterventionId(r.newInterventionId),
-          ),
-        );
-        setLoading(false);
-      },
-      () => {
-        setLoading(false);
-      },
-    );
+    let unsub: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      unsub = onSnapshot(
+        q,
+        (snap) => {
+          const parsed = snap.docs.map((d) => ({ id: d.id, ...(d.data() as DuplicateAlertDoc) }));
+          setRows(
+            parsed.filter(
+              (r) =>
+                !isSyntheticInterventionId(r.similarInterventionId) &&
+                !isSyntheticInterventionId(r.newInterventionId),
+            ),
+          );
+          setLoading(false);
+        },
+        () => {
+          setLoading(false);
+        },
+      );
+    }, 10);
 
-    return () => unsub();
+    return () => {
+      clearTimeout(timeout);
+      unsub?.();
+    };
   }, [companyId]);
 
   const openAlerts = useMemo(() => rows.filter((r) => r.status === "open"), [rows]);

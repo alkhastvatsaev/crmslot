@@ -23,7 +23,7 @@ export function subscribeChecklist(
     if (snap.empty) { onData(null); return; }
     const d = snap.docs[0]!;
     onData({ id: d.id, ...(d.data() as Omit<InterventionChecklist, "id">) });
-  });
+  }, () => onData(null));
 }
 
 export async function createChecklist(

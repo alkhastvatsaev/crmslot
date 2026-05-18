@@ -27,7 +27,7 @@ export function subscribeQuotes(
   const q = query(col(db, companyId), orderBy("createdAt", "desc"));
   return onSnapshot(q, (snap) => {
     onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Quote, "id">) })));
-  });
+  }, () => onData([]));
 }
 
 export function subscribeQuotesByIntervention(
@@ -43,7 +43,7 @@ export function subscribeQuotesByIntervention(
   );
   return onSnapshot(q, (snap) => {
     onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Quote, "id">) })));
-  });
+  }, () => onData([]));
 }
 
 export async function createQuote(

@@ -81,39 +81,7 @@ export function useInterventionTimeline(
       setLoading(false);
     };
 
-    const unsubStatus = onSnapshot(
-      query(
-        collection(firestore, "interventions", activeId, "status_events"),
-        orderBy("at", "asc"),
-      ),
-      (snap) => {
-        statusRows = snap.docs.map((d) => mapStatusEventDoc(d.id, d.data() as Record<string, unknown>));
-        publish();
-      },
-      () => {
-        statusRows = [];
-        publish();
-      },
-    );
-
-    const unsubTimeline = onSnapshot(
-      query(
-        collection(firestore, "interventions", activeId, "timeline_events"),
-        orderBy("createdAt", "asc"),
-      ),
-      (snap) => {
-        timelineRows = snap.docs.map((d) => ({
-          id: d.id,
-          data: mapTimelineDoc(d.id, d.data() as Record<string, unknown>),
-        }));
-        publish();
-      },
-      () => {
-        timelineRows = [];
-        publish();
-      },
-    );
-
+    let unsubStatus: (() => void) | undefined;
     const unsubEmails = subscribeInterventionEmails(
       firestore,
       activeId,
@@ -126,6 +94,42 @@ export function useInterventionTimeline(
         publish();
       },
     );
+
+    let unsubTimeline: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      unsubStatus = onSnapshot(
+        query(
+          collection(firestore!, "interventions", activeId, "status_events"),
+          orderBy("at", "asc"),
+        ),
+        (snap) => {
+          statusRows = snap.docs.map((d) => mapStatusEventDoc(d.id, d.data() as Record<string, unknown>));
+          publish();
+        },
+        () => {
+          statusRows = [];
+          publish();
+        },
+      );
+
+      unsubTimeline = onSnapshot(
+        query(
+          collection(firestore!, "interventions", activeId, "timeline_events"),
+          orderBy("createdAt", "asc"),
+        ),
+        (snap) => {
+          timelineRows = snap.docs.map((d) => ({
+            id: d.id,
+            data: mapTimelineDoc(d.id, d.data() as Record<string, unknown>),
+          }));
+          publish();
+        },
+        () => {
+          timelineRows = [];
+          publish();
+        },
+      );
+    }, 10);
 
     const unsubMaterials = subscribeMaterialOrders(firestore, activeId, (rows) => {
       materialRows = rows;
@@ -151,8 +155,9 @@ export function useInterventionTimeline(
     );
 
     return () => {
-      unsubStatus();
-      unsubTimeline();
+      clearTimeout(timeout);
+      unsubStatus?.();
+      unsubTimeline?.();
       unsubEmails();
       unsubMaterials();
       unsubCommission();

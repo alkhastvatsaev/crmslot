@@ -26,7 +26,9 @@ export function useGeofenceMonitor(
 ) {
   const triggeredRef = useRef<Set<string>>(new Set());
   const onArrivalRef = useRef(onArrival);
-  onArrivalRef.current = onArrival;
+  useEffect(() => {
+    onArrivalRef.current = onArrival;
+  }, [onArrival]);
 
   const check = useCallback(
     (pos: GeolocationPosition) => {

@@ -25,7 +25,7 @@ export function subscribeCatalogProducts(
     onData(
       snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<CatalogProduct, "id">) }))
     );
-  });
+  }, () => onData([]));
 }
 
 export async function createCatalogProduct(

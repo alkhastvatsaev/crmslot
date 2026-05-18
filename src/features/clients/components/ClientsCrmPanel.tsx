@@ -19,7 +19,8 @@ import {
 } from "@/features/clients/clientFirestore";
 import ClientInterventionsPanel from "@/features/clients/components/ClientInterventionsPanel";
 import { downloadClientsCsv } from "@/features/clients/exportClientsCsv";
-import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/company/companyHubNavigation";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 export default function ClientsCrmPanel() {
   const { t } = useTranslation();
@@ -27,6 +28,7 @@ export default function ClientsCrmPanel() {
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
+  const pager = useDashboardPagerOptional();
   const { clients, loading, offline } = useClients();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -432,6 +434,29 @@ export default function ClientsCrmPanel() {
                   {t("crm.add_site")}
                 </button>
               </form>
+              {pwaV2 ? (
+                <button
+                  type="button"
+                  data-testid="crm-recurring-request-btn"
+                  className="mt-3 w-full rounded-lg border border-blue-200 bg-blue-50 py-2 text-sm font-bold text-blue-800"
+                  onClick={() => {
+                    if (typeof sessionStorage !== "undefined") {
+                      sessionStorage.setItem(
+                        "belgmap_prefill_client",
+                        JSON.stringify({
+                          clientId: selected.id,
+                          clientName: buildClientDisplayName(selected),
+                          phone: selected.phone,
+                          email: selected.email,
+                        }),
+                      );
+                    }
+                    navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_SMART_FORM);
+                  }}
+                >
+                  {t("crm.recurring_request")}
+                </button>
+              ) : null}
               <ClientInterventionsPanel companyId={companyId} clientId={selected.id} />
             </div>
           ) : null}

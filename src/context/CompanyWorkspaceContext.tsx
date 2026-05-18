@@ -76,33 +76,43 @@ export function CompanyWorkspaceProvider({
       return () => {};
     }
 
-    const membershipsCol = collection(firestore, "users", firebaseUid, "company_memberships");
-    return onSnapshot(membershipsCol, (snap) => {
-      const rows: CompanyMembershipRow[] = snap.docs.map((d) => {
-        const data = d.data() as { role?: string; companyName?: string };
-        return {
-          companyId: d.id,
-          companyName: typeof data.companyName === "string" ? data.companyName : "Sans nom",
-          role: data.role === "admin" ? "admin" : "collaborateur",
-        };
-      });
-      setMemberships(rows);
+    let unsub: (() => void) | undefined;
+    const timeout = setTimeout(() => {
+      const membershipsCol = collection(firestore!, "users", firebaseUid, "company_memberships");
+      unsub = onSnapshot(membershipsCol, (snap) => {
+        const rows: CompanyMembershipRow[] = snap.docs.map((d) => {
+          const data = d.data() as { role?: string; companyName?: string };
+          return {
+            companyId: d.id,
+            companyName: typeof data.companyName === "string" ? data.companyName : "Sans nom",
+            role: data.role === "admin" ? "admin" : "collaborateur",
+          };
+        });
+        setMemberships(rows);
 
-      const stored =
-        typeof window !== "undefined" ? window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY) : null;
+        const stored =
+          typeof window !== "undefined" ? window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY) : null;
 
-      setActiveCompanyIdState((prev) => {
-        let next = "";
-        if (stored && rows.some((r) => r.companyId === stored)) next = stored;
-        else if (prev && rows.some((r) => r.companyId === prev)) next = prev;
-        else next = rows[0]?.companyId ?? "";
-        if (typeof window !== "undefined") {
-          if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
-          else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
-        }
-        return next;
+        setActiveCompanyIdState((prev) => {
+          let next = "";
+          if (stored && rows.some((r) => r.companyId === stored)) next = stored;
+          else if (prev && rows.some((r) => r.companyId === prev)) next = prev;
+          else next = rows[0]?.companyId ?? "";
+          if (typeof window !== "undefined") {
+            if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
+            else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
+          }
+          return next;
+        });
+      }, () => {
+        setMemberships([]);
       });
-    });
+    }, 10);
+
+    return () => {
+      clearTimeout(timeout);
+      unsub?.();
+    };
   }, [firebaseUid]);
 
   const demoTenantActive =

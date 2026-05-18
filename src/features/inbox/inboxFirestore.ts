@@ -21,8 +21,10 @@ export function subscribeInbox(
   ];
   if (limitToUnread) constraints.push(where("read", "==", false));
   const q = query(col(db, companyId), ...constraints);
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InboxNotification, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InboxNotification, "id">) }))),
+    () => onData([]),
   );
 }
 

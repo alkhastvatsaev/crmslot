@@ -52,6 +52,15 @@
       "date_label": "Intervention date",
       "empty": "No free slots for this technician on that date.",
       "company_title": "Open slots (all technicians)"
+    },
+    "drag_board": {
+      "title": "Drag-and-drop scheduling",
+      "technician": "Technician",
+      "pick_technician": "Select a technician…",
+      "unassigned": "Unassigned requests",
+      "no_unassigned": "No pending requests.",
+      "drop_slots": "Free slots",
+      "hint": "Drag a request onto a green slot to schedule."
     }
   },
   "materials": {
@@ -291,7 +300,24 @@
     "title": "Follow-ups",
     "done_not_invoiced": "Done — needs invoicing",
     "material_pending": "Material pending",
-    "unassigned_stale": "Unassigned — action needed"
+    "unassigned_stale": "Unassigned — action needed",
+    "push_title": "Back-office reminders",
+    "push_body": "{count} case(s) need your attention."
+  },
+  "workspace_switcher": {
+    "label": "Active company"
+  },
+  "portal_enrichment": {
+    "eta_label": "Scheduled visit",
+    "eta_asap": "As soon as possible",
+    "invoice_pdf": "Download invoice PDF",
+    "payment_paid": "Payment received",
+    "payment_pending": "Payment pending",
+    "pay_now": "Pay online"
+  },
+  "sav": {
+    "follow_up": "Warranty request (linked)",
+    "badge": "Warranty"
   },
   "quote_pdf": {
     "download": "Download quote PDF"
@@ -312,7 +338,9 @@
     "company_disabled": "Enable Lecot product search.",
     "company_fields_required": "SKU and label are required.",
     "company_price_invalid": "Invalid price.",
-    "company_product_created": "Product added."
+    "company_product_created": "Product added.",
+    "company_lecot_sku": "Lecot ref. (optional)",
+    "company_lecot_link": "Lecot"
   },
   "spotlight": {
     "search_placeholder": "Name",
@@ -324,6 +352,10 @@
     "nav_map": "Map",
     "nav_company": "Company Hub",
     "nav_technician": "Technician",
+    "nav_backoffice": "Back office",
+    "nav_offline": "AI assistant",
+    "nav_chatbot": "Chatbot",
+    "nav_technician_lab": "Technician lab",
     "open_aria": "Open search",
     "active_label": "Active",
     "nav_group_heading": "Navigation"
@@ -410,6 +442,21 @@
       "tracking": "Case tracking",
       "chat": "Chat"
     }
+  },
+  "technician_lab": {
+    "banner_standalone": "Lab prototype — production technician hub is on the home carousel.",
+    "banner_carousel": "Technician lab — same screen as /technician (carousel page 6).",
+    "van_label": "Van #01",
+    "urgent_label": "Urgent job",
+    "sample_mission_title": "Locked door",
+    "sample_address": "Mont des Arts, 1000 Brussels",
+    "en_route": "En route",
+    "on_site": "On site",
+    "mission_done": "Job completed",
+    "collect": "Collect payment",
+    "tap_to_pay": "Tap to Pay (iPhone)",
+    "scan_aria": "AR scan",
+    "status_updated": "Status updated"
   },
   "technician_hub": {
     "aria": {
@@ -591,6 +638,20 @@
     }
   },
   "backoffice": {
+    "hub": {
+      "drawer_empty_title": "No case selected",
+      "drawer_empty_hint": "Open the Requests tab on the map and pick a request to view history, emails, materials and billing here.",
+      "panel_waiting": "Pick a request on the map.",
+      "example_badge": "Sample",
+      "example_email_in": "Received",
+      "example_email_out": "Sent",
+      "example_paid": "Paid",
+      "example_total": "Total incl. VAT",
+      "example_commission": "Technician commission",
+      "aria": {
+        "page": "Page"
+      }
+    },
     "inbox": {
       "report": "Report",
       "terrain_report": "Field report",
@@ -1025,7 +1086,9 @@
     "add_line": "Add a line",
     "total": "Estimated total",
     "skip": "Skip",
-    "confirm": "Confirm lines"
+    "confirm": "Confirm lines",
+    "suggestions_title": "Field suggestion",
+    "suggestions_apply": "Apply {count} suggested line(s)"
   },
   "duplicate": {
     "auth_required": "Authentication required",
@@ -1058,6 +1121,16 @@
     }
   },
   "offline": {
+    "hub": {
+      "aria": { "page": "Page" },
+      "panel_network": "Connection",
+      "panel_sync": "Synchronisation",
+      "left_hint": "Completions and photos taken offline are queued until you are back online.",
+      "queue_label": "Pending upload",
+      "cache_pwa_hint": "Enable the PWA v2 bundle to see missions cached on this device.",
+      "example_network_hint": "Sample: two field completions are waiting to upload when the network returns.",
+      "example_sync_hint": "Sample: use the button below to flush the pending queue."
+    },
     "sync": {
       "title_sr": "Offline synchronisation",
       "conflict_single": "Last sync: the server had already closed 1 intervention.",
@@ -1072,7 +1145,10 @@
       "syncing": "Synchronising…",
       "idle": "Idle",
       "flush_aria": "Sync pending data",
-      "flush_sr": "Sync"
+      "flush_sr": "Sync",
+      "terrain_cache_title": "Cached missions",
+      "terrain_cache_empty": "No cached missions.",
+      "terrain_cache_count": "{count} mission(s) available offline"
     }
   },
   "admin": {
@@ -1154,11 +1230,51 @@
     "toast_send_failed": "Send failed",
     "toast_login_required": "Login required",
     "toast_login_description": "Please log in to use the chat.",
+    "global_chat_title": "Team chat",
+    "global_chat_subtitle": "Company-wide messages",
+    "day_clients_title": "Today's clients ({count})",
+    "day_clients_empty": "No clients scheduled for this date",
+    "anonymous_client": "Client",
+    "back_to_list": "Conversation list",
     "welcome": "Hello — write to us for any question about an intervention, an appointment or an invoice. The back-office will reply here.",
     "reply_urgent": "For an emergency, please provide your full address and a contact number; the back-office handles these cases as a priority.",
     "reply_billing": "For billing or a quote, provide the name on the file or the last digits of the intervention reference — I will forward it to the relevant team.",
     "reply_schedule": "To change a time slot, indicate the desired date and city; the back-office will confirm your schedule.",
     "reply_thanks": "You're welcome! Don't hesitate if you have other questions.",
     "reply_default": "Thank you for your message. The back-office has been notified and will get back to you shortly. You can also submit a request from the company space."
+  },
+  "copilot": {
+    "aria": { "page": "Page" },
+    "panel_context": "Context",
+    "panel_chat": "Assistant",
+    "panel_suggestions": "Suggestions",
+    "title": "BELGMAP Copilot",
+    "subtitle_company": "Active company: {name}",
+    "loading_context": "Loading cases…",
+    "no_company": "Select a company (switcher) to enable the assistant.",
+    "context_live": "Live context",
+    "welcome": "Hello — I can see your BELGMAP cases, clients, and billing. Ask a question or pick a suggestion on the right.",
+    "input_label": "Message to the assistant",
+    "input_placeholder": "e.g. Which urgent cases are open? Who has not paid?",
+    "send_aria": "Send",
+    "typing": "Thinking…",
+    "error_generic": "Could not reach the assistant.",
+    "error_empty": "Empty response.",
+    "openai_missing": "OpenAI API key missing on the server.",
+    "stat_total": "Cases",
+    "stat_urgent": "Open urgent",
+    "stat_in_progress": "In progress",
+    "stat_unpaid": "Unpaid",
+    "stat_clients": "Clients (sample)",
+    "stat_offline_queue": "Backend queue",
+    "network_online": "Online",
+    "network_offline": "Offline",
+    "snapshot_hint": "{count} detailed cases sent to the model",
+    "suggestions_title": "Quick questions",
+    "prompt_priorities": "What are today's priorities (urgent, unassigned)?",
+    "prompt_unpaid": "List completed but unpaid interventions with amounts.",
+    "prompt_urgent": "Summarize open urgent cases.",
+    "prompt_clients": "Which clients have the most active cases?",
+    "prompt_summary_day": "Give an operational briefing for the back office today."
   }
 }

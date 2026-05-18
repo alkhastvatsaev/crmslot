@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, Play, Navigation, CheckCircle2, Pause, Phone, Package, Camera } from "lucide-react";
+import { Play, CheckCircle2, Pause } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SlideAction } from "@/components/ui/slide-action";
 import MissionActionBar from "@/features/interventions/components/MissionActionBar";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import { auth, firestore } from "@/core/config/firebase";
@@ -15,7 +14,6 @@ import { toast } from "sonner";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import type { Intervention } from "@/features/interventions/types";
 
-import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 
 import {
@@ -160,8 +158,7 @@ export default function TechnicianDashboardDetailPanel({
     );
   }
 
-  const cardClass = "flex flex-col items-center text-center py-1.5";
-  const mainContainerClass = "rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] border border-white/40 backdrop-blur-sm";
+  const mainContainerClass = "rounded-2xl border border-neutral-200/80 bg-white p-4";
 
   const handleUpdateStatus = async (newStatus: Intervention["status"], note?: string) => {
     if (!liveIv || isUpdating || !firestore) return;
@@ -215,77 +212,37 @@ export default function TechnicianDashboardDetailPanel({
     lastName = parts.slice(1).join(" ");
   }
 
-  const prefix = firstName ? guessGenderPrefixFromName(firstName) : "";
-  const displayLastName = capitalizeName(lastName || firstName || "");
-  const clientDisplayName = `${prefix} ${displayLastName}`.trim() || t("technician_hub.dashboard.detail.not_provided");
+  const clientDisplayName =
+    capitalizeName([firstName, lastName].filter(Boolean).join(" ").trim()) ||
+    capitalizeName(liveIv.clientName ?? "") ||
+    t("technician_hub.dashboard.detail.not_provided");
 
   const renderContactClient = () => (
-    <div className="flex flex-col gap-3 w-full">
-      <div className={cardClass}>
-        <div className="text-[18px] font-black text-black">
-          {formatScheduledTimeOnly(liveIv)}
-        </div>
-      </div>
-      
-      <div className="h-px bg-slate-100/80 w-full" />
-      
-      <div className={cardClass}>
-        <div className="text-[18px] font-black text-black">
-          {clientDisplayName}
-        </div>
-      </div>
-
-      {(liveIv.clientPhone || liveIv.phone) && (
-        <>
-          <div className="h-px bg-slate-100/80 w-full" />
-          <div className={cardClass}>
-            <a href={`tel:${liveIv.clientPhone || liveIv.phone}`} className="text-[17px] font-black text-blue-600 hover:scale-105 transition-transform flex items-center gap-2">
-              {liveIv.clientPhone || liveIv.phone}
-            </a>
-          </div>
-        </>
-      )}
-
-      {liveIv.address && (
-        <>
-          <div className="h-px bg-slate-100/80 w-full" />
-          <div className={cardClass}>
-             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(liveIv.address))}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[15px] font-bold leading-snug text-black hover:text-blue-600 transition-colors text-center"
-            >
-              {formatAddress(liveIv.address)}
-            </a>
-          </div>
-        </>
-      )}
+    <div className="w-full space-y-1">
+      <p className="text-[13px] font-semibold tabular-nums text-neutral-500">
+        {formatScheduledTimeOnly(liveIv)}
+      </p>
+      <h1 className="text-[20px] font-bold leading-tight text-neutral-900">{clientDisplayName}</h1>
+      {liveIv.address ? (
+        <p className="text-[14px] leading-snug text-neutral-600">{formatAddress(liveIv.address)}</p>
+      ) : null}
     </div>
   );
 
-  const renderAudioAndTranscription = () => {
-    return (
-      <div className="flex flex-col items-center text-center gap-2 w-full">
-        
-        {liveIv.audioUrl ? (
-          <div className="w-full flex flex-col gap-2 items-center">
-            <AudioUrlPlayer url={liveIv.audioUrl} t={t} />
-          </div>
-        ) : (
-          <div className="w-full max-w-[250px] h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 text-sm font-medium border border-slate-100">
-            {t("technician_hub.dashboard.detail.no_voice_message")}
-          </div>
-        )}
-
-        {liveIv.transcription && (
-          <div className="mt-1 text-[15px] font-bold text-black italic bg-blue-50/30 p-4 rounded-2xl border border-blue-100/50 w-full text-left leading-relaxed">
-            &quot;{liveIv.transcription}&quot;
-          </div>
-        )}
-      </div>
-    );
-  };
+  const renderAudioAndTranscription = () => (
+    <div className="w-full space-y-2">
+      {liveIv.audioUrl ? (
+        <AudioUrlPlayer url={liveIv.audioUrl} t={t} />
+      ) : (
+        <p className="text-[13px] text-neutral-400">{t("technician_hub.dashboard.detail.no_voice_message")}</p>
+      )}
+      {liveIv.transcription ? (
+        <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-[14px] leading-relaxed text-neutral-800">
+          {liveIv.transcription}
+        </p>
+      ) : null}
+    </div>
+  );
 
   const renderAwaitingAssignmentHint = () => (
     <motion.div
@@ -298,12 +255,9 @@ export default function TechnicianDashboardDetailPanel({
     >
       <div className={mainContainerClass}>
         <div className="flex flex-col gap-4">
-          <p className="rounded-[16px] border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-center text-[14px] font-semibold text-amber-950">
-            {t("technician_hub.dashboard.detail.assignment_respond_in_list")}
-          </p>
+          <p className="mb-3 text-[13px] font-medium text-amber-800">{t("technician_hub.dashboard.detail.assignment_respond_in_list")}</p>
           {renderContactClient()}
-          <div className="h-px bg-slate-100/80 w-full" />
-          {renderAudioAndTranscription()}
+          <div className="mt-4">{renderAudioAndTranscription()}</div>
         </div>
       </div>
     </motion.div>
@@ -319,16 +273,10 @@ export default function TechnicianDashboardDetailPanel({
       <div className={mainContainerClass}>
         <div className="flex flex-col gap-4">
           {renderContactClient()}
-          
-          <div className="h-px bg-slate-100/80 w-full" />
-
-          <div className={cardClass}>
-            <div className="text-[17px] font-black text-black">{liveIv.title || "—"}</div>
-          </div>
-
-          <div className="h-px bg-slate-100/80 w-full" />
-          
-          {renderAudioAndTranscription()}
+          {liveIv.title ? (
+            <p className="text-[15px] font-medium text-neutral-800">{liveIv.title}</p>
+          ) : null}
+          <div className="mt-2">{renderAudioAndTranscription()}</div>
         </div>
       </div>
 
@@ -338,38 +286,15 @@ export default function TechnicianDashboardDetailPanel({
   const renderEnRoute = () => (
     <motion.div
       key="en_route"
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col gap-4 h-full justify-between pb-2"
+      exit={{ opacity: 0, x: -12 }}
+      className="flex flex-col gap-3 pb-2"
     >
       <div className={mainContainerClass}>
-        <div className="flex flex-col gap-4">
-          <div className="rounded-[20px] bg-blue-600 p-4 shadow-[0_12px_24px_-8px_rgba(37,99,235,0.4)] text-white">
-            <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <div className="text-[10px] font-black uppercase tracking-[0.15em] text-blue-100/80 mb-1">{t("technician_hub.dashboard.detail.gps_navigation")}</div>
-                  <div className="text-[15px] font-bold leading-snug">{formatAddress(liveIv.address) || t("technician_hub.dashboard.detail.no_address")}</div>
-               </div>
-               {liveIv.address && (
-                  <a 
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(liveIv.address))}`}
-                    target="_blank" rel="noreferrer"
-                    className="flex shrink-0 h-11 w-11 items-center justify-center rounded-full bg-white text-blue-600 shadow-xl hover:scale-105 transition-transform active:scale-95"
-                  >
-                    <Navigation className="h-5 w-5 fill-current" />
-                  </a>
-               )}
-            </div>
-          </div>
-
-          <div className="h-px bg-slate-100/80 w-full" />
-          {renderContactClient()}
-          <div className="h-px bg-slate-100/80 w-full" />
-          {renderAudioAndTranscription()}
-        </div>
+        {renderContactClient()}
+        {renderAudioAndTranscription()}
       </div>
-
     </motion.div>
   );
 
@@ -387,10 +312,7 @@ export default function TechnicianDashboardDetailPanel({
           
           {liveIv.problem && (
             <>
-              <div className="h-px bg-slate-100/80 w-full" />
-              <div className={cardClass}>
-                <div className="whitespace-pre-wrap text-[15px] font-bold leading-relaxed text-black text-center">{liveIv.problem}</div>
-              </div>
+              <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-neutral-800">{liveIv.problem}</p>
             </>
           )}
           

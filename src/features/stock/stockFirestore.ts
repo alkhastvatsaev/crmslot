@@ -23,7 +23,7 @@ export function subscribeStockItems(
   const q = query(col(db, companyId, techUid), orderBy("label"));
   return onSnapshot(q, (snap) => {
     onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<StockItem, "id">) })));
-  });
+  }, () => onData([]));
 }
 
 export async function createStockItem(

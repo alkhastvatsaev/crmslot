@@ -14,7 +14,6 @@ import {
   TECHNICIAN_HUB_ANCHOR_FINISH,
   TECHNICIAN_HUB_ANCHOR_OFFLINE,
 } from "@/features/interventions/technicianHubNavigation";
-import TechnicianOfflineSyncPanel from "@/features/offline/components/TechnicianOfflineSyncPanel";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechnicianMissionDayAnchor";
 import {
@@ -25,6 +24,7 @@ import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions
 import { AnimatePresence, motion } from "framer-motion";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
+import CompanyWorkspaceSwitcher from "@/features/company/components/CompanyWorkspaceSwitcher";
 import { navigateTechnicianHub } from "@/features/interventions/technicianHubNavigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
@@ -118,15 +118,10 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       rightAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`}
       left={
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden pb-4">
+          <CompanyWorkspaceSwitcher className="shrink-0 mx-1" />
           <div className="min-h-0 flex-1 overflow-hidden">
             <TechnicianDashboardListPanel selectedCaseId={selectedCaseId} onSelect={setSelectedCaseId} />
           </div>
-          <section
-            id={TECHNICIAN_HUB_ANCHOR_OFFLINE}
-            className="shrink-0 scroll-mt-2 border-t border-black/[0.06] pt-2"
-          >
-            <TechnicianOfflineSyncPanel />
-          </section>
         </div>
       }
       centerPadding={false}

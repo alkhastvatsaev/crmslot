@@ -12,6 +12,8 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName } from "@/utils/stringUtils";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
+import RequesterPortalEnrichment from "@/features/interventions/components/RequesterPortalEnrichment";
+import ClientRatingPanel from "@/features/interventions/components/ClientRatingPanel";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.5 } as const;
@@ -22,6 +24,10 @@ type TrackedIntervention = {
   title?: string;
   problem?: string;
   address?: string;
+  scheduledDate?: string | null;
+  scheduledTime?: string | null;
+  requestedDate?: string | null;
+  requestedTime?: string | null;
   createdAt?: string;
   clientFirstName?: string;
   clientLastName?: string;
@@ -31,6 +37,8 @@ type TrackedIntervention = {
   paymentStatus?: string | null;
   invoiceAmountCents?: number | null;
   stripePaymentLinkUrl?: string | null;
+  clientRating?: number | null;
+  clientComment?: string | null;
 };
 
 function useMyInterventions(searchLastName: string, profileLastName: string) {
@@ -42,34 +50,49 @@ function useMyInterventions(searchLastName: string, profileLastName: string) {
     if (!canSubscribe) return;
 
     let unsubSnap: (() => void) | undefined;
+    let timeout: NodeJS.Timeout | undefined;
 
     const firebaseAuth = auth!;
     const unsubAuth = onAuthStateChanged(firebaseAuth, (user) => {
       if (unsubSnap) { unsubSnap(); unsubSnap = undefined; }
+      if (timeout) clearTimeout(timeout);
       const db = firestore;
       if (!db) return;
       if (!user) { setInterventions([]); setLoading(false); return; }
 
       const q = query(collection(db, "interventions"), where("createdByUid", "==", user.uid));
-      unsubSnap = onSnapshot(q, (snap) => {
-        let docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TrackedIntervention);
-        const activeSearch = searchLastName.trim() || profileLastName.trim();
-        if (activeSearch.length > 0) {
-          const s = activeSearch.toLowerCase();
-          docs = docs.filter((d) => {
-            const last = (d.clientLastName || "").toLowerCase();
-            const first = (d.clientFirstName || "").toLowerCase();
-            const co = (d.clientCompanyName || "").toLowerCase();
-            return last.includes(s) || first.includes(s) || co.includes(s);
-          });
-        }
-        docs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-        setInterventions(docs);
-        setLoading(false);
-      });
+      timeout = setTimeout(() => {
+        unsubSnap = onSnapshot(
+          q,
+          (snap) => {
+            let docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TrackedIntervention);
+            const activeSearch = searchLastName.trim() || profileLastName.trim();
+            if (activeSearch.length > 0) {
+              const s = activeSearch.toLowerCase();
+              docs = docs.filter((d) => {
+                const last = (d.clientLastName || "").toLowerCase();
+                const first = (d.clientFirstName || "").toLowerCase();
+                const co = (d.clientCompanyName || "").toLowerCase();
+                return last.includes(s) || first.includes(s) || co.includes(s);
+              });
+            }
+            docs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            setInterventions(docs);
+            setLoading(false);
+          },
+          (error) => {
+            console.warn("[RequesterTrackingPanel] Firestore listener error:", error);
+            setLoading(false);
+          }
+        );
+      }, 10);
     });
 
-    return () => { if (unsubSnap) unsubSnap(); unsubAuth(); };
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      if (unsubSnap) unsubSnap();
+      unsubAuth();
+    };
   }, [canSubscribe, searchLastName, profileLastName]);
 
   return {
@@ -272,9 +295,21 @@ export default function RequesterTrackingPanel() {
       data-testid="requester-tracking-panel"
       className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-transparent font-brand"
     >
-      <motion.div className="px-6 pt-4 pb-1">
+      <div className="px-6 pt-4 pb-1">
         <RequesterPushNotificationButton />
-      </motion.div>
+      </div>
+      {selectedIntervention ? (
+        <RequesterPortalEnrichment
+          status={selectedIntervention.status}
+          scheduledDate={selectedIntervention.scheduledDate}
+          scheduledTime={selectedIntervention.scheduledTime}
+          requestedDate={selectedIntervention.requestedDate}
+          requestedTime={selectedIntervention.requestedTime}
+          invoicePdfUrl={selectedIntervention.invoicePdfUrl}
+          paymentStatus={selectedIntervention.paymentStatus}
+          stripePaymentLinkUrl={selectedIntervention.stripePaymentLinkUrl}
+        />
+      ) : null}
 
       {/* Search Bar */}
       <div className="px-6 pt-2 pb-2">
@@ -404,12 +439,19 @@ export default function RequesterTrackingPanel() {
               )}
               {selectedIntervention &&
               (selectedIntervention.status === "invoiced" || selectedIntervention.status === "done") ? (
-                <RequesterPaymentPanel
-                  interventionId={selectedIntervention.id}
-                  paymentStatus={selectedIntervention.paymentStatus}
-                  invoiceAmountCents={selectedIntervention.invoiceAmountCents}
-                  stripePaymentLinkUrl={selectedIntervention.stripePaymentLinkUrl}
-                />
+                <>
+                  <RequesterPaymentPanel
+                    interventionId={selectedIntervention.id}
+                    paymentStatus={selectedIntervention.paymentStatus}
+                    invoiceAmountCents={selectedIntervention.invoiceAmountCents}
+                    stripePaymentLinkUrl={selectedIntervention.stripePaymentLinkUrl}
+                  />
+                  <ClientRatingPanel
+                    interventionId={selectedIntervention.id}
+                    existingRating={selectedIntervention.clientRating}
+                    existingComment={selectedIntervention.clientComment}
+                  />
+                </>
               ) : null}
             </div>
             <div className="relative flex flex-col gap-10 my-auto">

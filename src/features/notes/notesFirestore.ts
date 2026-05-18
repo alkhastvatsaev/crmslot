@@ -19,8 +19,10 @@ export function subscribeNotesByIntervention(
     orderBy("pinned", "desc"),
     orderBy("createdAt", "desc"),
   );
-  return onSnapshot(q, (snap) =>
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<QuickNote, "id">) }))),
+  return onSnapshot(
+    q,
+    (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<QuickNote, "id">) }))),
+    () => onData([]),
   );
 }
 
