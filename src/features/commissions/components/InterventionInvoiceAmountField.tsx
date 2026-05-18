@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { computeAndPersistInterventionCommission } from "@/features/commissions/computeInterventionCommission";
 import type { Intervention } from "@/features/interventions/types";
@@ -45,6 +45,7 @@ export default function InterventionInvoiceAmountField({ intervention }: Props) 
         companyId: intervention.companyId ?? null,
         technicianUid: intervention.assignedTechnicianUid ?? null,
         invoiceAmountCents: cents,
+        auditByUid: auth?.currentUser?.uid?.trim() ?? "system",
       });
       toast.success(String(t("commissions.invoice_amount_saved")));
     } catch {

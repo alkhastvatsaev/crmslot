@@ -19,6 +19,42 @@ export const COMMISSION_RULES_COLLECTION = "commission_rules";
 export const COMMISSION_OVERRIDES_COLLECTION = "commission_overrides";
 export const COMMISSION_AUDIT_COLLECTION = "commission_audit";
 
+export type CommissionAuditRow = {
+  id: string;
+  interventionId: string;
+  action: string;
+  finalCommissionAmount: number;
+  reason?: string;
+  byUid: string;
+  at: unknown;
+};
+
+export type CommissionAuditAction = "calculated" | "override";
+
+export async function appendCommissionAuditEntry(
+  db: Firestore,
+  params: {
+    companyId: string;
+    interventionId: string;
+    action: CommissionAuditAction;
+    finalCommissionAmount: number;
+    byUid: string;
+    reason?: string | null;
+  },
+): Promise<void> {
+  const companyId = params.companyId.trim();
+  if (!companyId) return;
+  await addDoc(collection(db, COMMISSION_AUDIT_COLLECTION), {
+    companyId,
+    interventionId: params.interventionId,
+    action: params.action,
+    finalCommissionAmount: params.finalCommissionAmount,
+    reason: params.reason?.trim() ? params.reason.trim() : null,
+    byUid: params.byUid,
+    at: serverTimestamp(),
+  });
+}
+
 // ─── Rules CRUD ────────────────────────────────────────────────────────────────
 
 export function subscribeCommissionRules(
@@ -115,21 +151,20 @@ export async function saveCommissionOverride(
     commissionAmountCents: Math.round(override.finalCommissionAmount * 100),
   }).catch(() => {});
 
-  await addDoc(collection(db, COMMISSION_AUDIT_COLLECTION), {
+  await appendCommissionAuditEntry(db, {
     companyId,
     interventionId: override.interventionId,
     action: "override",
     finalCommissionAmount: override.finalCommissionAmount,
-    reason: auditReason,
     byUid: auditByUid,
-    at: serverTimestamp(),
+    reason: auditReason,
   });
 }
 
 export function subscribeCommissionAudit(
   db: Firestore,
   interventionId: string,
-  onRows: (rows: { id: string; action: string; finalCommissionAmount: number; reason?: string; byUid: string; at: unknown }[]) => void,
+  onRows: (rows: CommissionAuditRow[]) => void,
 ): () => void {
   if (!interventionId) { onRows([]); return () => {}; }
   const q = query(
@@ -138,6 +173,19 @@ export function subscribeCommissionAudit(
     orderBy("at", "asc"),
   );
   return onSnapshot(q, (snap) =>
-    onRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as { id: string; action: string; finalCommissionAmount: number; reason?: string; byUid: string; at: unknown }))),
+    onRows(
+      snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          interventionId: String(data.interventionId ?? interventionId),
+          action: String(data.action ?? "unknown"),
+          finalCommissionAmount: Number(data.finalCommissionAmount ?? 0),
+          reason: typeof data.reason === "string" ? data.reason : undefined,
+          byUid: String(data.byUid ?? ""),
+          at: data.at,
+        } satisfies CommissionAuditRow;
+      }),
+    ),
   );
 }

@@ -767,5 +767,24 @@
     "toast_error": "Error saving",
     "template_label": "Billing template",
     "template_placeholder": "— Load a template —"
+  },
+  "invoice": {
+    "download_pdf": "Download PDF invoice",
+    "generate": "Generate Invoice",
+    "generating": "Generating invoice…",
+    "complete_checklist_first": "Complete checklist first"
+  },
+  "billing_lines": {
+    "title": "Billable lines",
+    "template_label": "Load a billing template",
+    "template_placeholder": "-- Select a template --",
+    "remove_line": "Remove line",
+    "description_placeholder": "Service / material description",
+    "qty": "Qty",
+    "unit_price": "Unit price (€)",
+    "add_line": "Add a line",
+    "total": "Estimated total",
+    "skip": "Skip",
+    "confirm": "Confirm lines"
   }
 }

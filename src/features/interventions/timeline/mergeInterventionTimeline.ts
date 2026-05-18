@@ -3,6 +3,7 @@ import type { InterventionStatusEvent } from "@/features/interventions/workflow/
 import type { InterventionTimelineDoc } from "@/features/interventions/timeline/interventionTimelineTypes";
 import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { CommissionAuditRow } from "@/features/commissions/commissionFirestore";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 function toIsoString(value: unknown): string {
@@ -34,6 +35,29 @@ export function emailToInterventionEvent(email: InterventionEmailDoc): Intervent
     createdAt: toIsoString(email.createdAt),
     createdByUid: email.sentByUid ?? "system",
     content: `${outbound ? "→" : "←"} ${email.subject}\n${email.bodyText}`,
+    visibility: "internal",
+  };
+}
+
+export function commissionAuditToInterventionEvent(
+  row: CommissionAuditRow,
+  interventionId: string,
+): InterventionEvent {
+  const euros = row.finalCommissionAmount.toFixed(2);
+  const reasonPart = row.reason?.trim() ? ` — ${row.reason.trim()}` : "";
+  const actionLabel =
+    row.action === "override"
+      ? "Ajustement manuel"
+      : row.action === "calculated"
+        ? "Calcul automatique"
+        : row.action;
+  return {
+    id: `commission-${row.id}`,
+    interventionId,
+    type: "commission",
+    createdAt: toIsoString(row.at),
+    createdByUid: row.byUid,
+    content: `${actionLabel}: ${euros} €${reasonPart}`,
     visibility: "internal",
   };
 }
@@ -76,6 +100,7 @@ export function mergeInterventionTimelineEvents(
     clientVisibleOnly?: boolean;
     emails?: InterventionEmailDoc[];
     materialOrders?: MaterialOrderDoc[];
+    commissionAudit?: CommissionAuditRow[];
   },
 ): InterventionEvent[] {
   const clientOnly = options?.clientVisibleOnly === true;
@@ -84,13 +109,19 @@ export function mergeInterventionTimelineEvents(
     ...timelineDocs.map(({ id, data }) => timelineDocToInterventionEvent(id, data)),
     ...(options?.emails ?? []).map(emailToInterventionEvent),
     ...(options?.materialOrders ?? []).map(materialOrderToInterventionEvent),
+    ...(options?.commissionAudit ?? []).map((row) =>
+      commissionAuditToInterventionEvent(row, row.interventionId),
+    ),
   ];
 
   const filtered = clientOnly
     ? rows.filter(
         (r) =>
           r.type === "status_change" ||
-          (r.visibility === "client" && r.type !== "email" && r.type !== "material_order"),
+          (r.visibility === "client" &&
+            r.type !== "email" &&
+            r.type !== "material_order" &&
+            r.type !== "commission"),
       )
     : rows;
 

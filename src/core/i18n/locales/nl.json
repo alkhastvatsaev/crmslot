@@ -743,5 +743,24 @@
     "toast_error": "Fout bij opslaan",
     "template_label": "Facturatiesjabloon",
     "template_placeholder": "— Sjabloon laden —"
+  },
+  "invoice": {
+    "download_pdf": "Factuur PDF downloaden",
+    "generate": "Factuur genereren",
+    "generating": "Factuur wordt aangemaakt…",
+    "complete_checklist_first": "Vul eerst de checklist in"
+  },
+  "billing_lines": {
+    "title": "Factureerbare lijnen",
+    "template_label": "Facturatiesjabloon laden",
+    "template_placeholder": "-- Selecteer een sjabloon --",
+    "remove_line": "Lijn verwijderen",
+    "description_placeholder": "Omschrijving dienst / materiaal",
+    "qty": "Aant.",
+    "unit_price": "Eenheidsprijs (€)",
+    "add_line": "Lijn toevoegen",
+    "total": "Geschat totaal",
+    "skip": "Overslaan",
+    "confirm": "Lijnen bevestigen"
   }
 }

@@ -120,5 +120,17 @@ export async function runCommissionOnInvoiced(
     { merge: true },
   );
 
+  if (companyId) {
+    await db.collection("commission_audit").add({
+      companyId,
+      interventionId,
+      action: "calculated",
+      finalCommissionAmount,
+      reason: null,
+      byUid: "system",
+      at: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
   logger.info("Commission computed on invoiced", { interventionId, commissionAmountCents });
 }

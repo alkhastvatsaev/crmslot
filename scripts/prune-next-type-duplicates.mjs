@@ -9,7 +9,7 @@ const dir = path.join(process.cwd(), ".next", "types");
 if (!fs.existsSync(dir)) process.exit(0);
 
 for (const name of fs.readdirSync(dir)) {
-  if (/\s2\.(ts|json)$/.test(name)) {
+  if (/\s\d+\.(ts|json)$/.test(name)) {
     fs.unlinkSync(path.join(dir, name));
     console.log("[prune-next-types] removed", name);
   }

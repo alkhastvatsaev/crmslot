@@ -1,6 +1,7 @@
 import { setDoc, doc, updateDoc, type Firestore } from "firebase/firestore";
 import { calculateCommission } from "@/features/commissions/engine";
 import {
+  appendCommissionAuditEntry,
   COMMISSION_OVERRIDES_COLLECTION,
   subscribeCommissionRules,
 } from "@/features/commissions/commissionFirestore";
@@ -44,6 +45,7 @@ export async function computeAndPersistInterventionCommission(params: {
   companyId: string | null;
   technicianUid: string | null;
   invoiceAmountCents?: number | null;
+  auditByUid?: string;
   existingOverride?: Pick<
     InterventionCommission,
     "isManualOverride" | "finalCommissionAmount" | "overrideReason" | "overrideByUid"
@@ -109,6 +111,16 @@ export async function computeAndPersistInterventionCommission(params: {
     commissionAmountCents,
     invoiceAmountCents: baseAmountCents,
   });
+
+  if (companyId?.trim()) {
+    await appendCommissionAuditEntry(db, {
+      companyId: companyId.trim(),
+      interventionId,
+      action: "calculated",
+      finalCommissionAmount: computed.finalCommissionAmount,
+      byUid: params.auditByUid?.trim() || "system",
+    });
+  }
 
   return { baseAmountCents, commissionAmountCents };
 }

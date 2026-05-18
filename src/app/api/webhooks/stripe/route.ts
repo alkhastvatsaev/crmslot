@@ -11,10 +11,26 @@ async function markInterventionPaid(interventionId: string, paymentIntentId?: st
   const snap = await ref.get();
   if (!snap.exists) return;
 
+  const data = snap.data() ?? {};
+  const paidAt = new Date().toISOString();
+
   await ref.update({
     paymentStatus: "paid",
-    paidAt: new Date().toISOString(),
+    paidAt,
     ...(paymentIntentId ? { stripePaymentIntentId: paymentIntentId } : {}),
+  });
+
+  const companyId =
+    typeof data.companyId === "string" && data.companyId.length > 0 ? data.companyId : null;
+
+  await ref.collection("timeline_events").add({
+    interventionId,
+    type: "comment",
+    content: "Paiement enregistré",
+    visibility: "client",
+    createdAt: paidAt,
+    createdByUid: "system",
+    companyId,
   });
 }
 

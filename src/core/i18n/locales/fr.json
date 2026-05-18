@@ -771,5 +771,24 @@
       "status_on_site": "Sur place",
       "missing_auth_uid": "Ce technicien n’est pas lié à un compte Firebase (authUid manquant)."
     }
+  },
+  "invoice": {
+    "download_pdf": "Télécharger la facture PDF",
+    "generate": "Générer la facture",
+    "generating": "Facture en cours de génération…",
+    "complete_checklist_first": "Complétez la checklist d'abord"
+  },
+  "billing_lines": {
+    "title": "Lignes facturables",
+    "template_label": "Charger un modèle de facturation",
+    "template_placeholder": "-- Sélectionner un modèle --",
+    "remove_line": "Supprimer la ligne",
+    "description_placeholder": "Description du service / matériel",
+    "qty": "Qté",
+    "unit_price": "Prix unit. (€)",
+    "add_line": "Ajouter une ligne",
+    "total": "Total estimé",
+    "skip": "Passer",
+    "confirm": "Confirmer les lignes"
   }
 }

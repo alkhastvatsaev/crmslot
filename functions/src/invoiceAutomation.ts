@@ -6,6 +6,7 @@ import {
   firebaseDownloadUrl,
   newDownloadToken,
 } from "./buildInterventionInvoicePdf";
+import { runCommissionOnInvoiced } from "./commissionAutomation";
 
 function checklistComplete(data: admin.firestore.DocumentData | undefined): boolean {
   if (!data) return false;
@@ -63,12 +64,25 @@ export async function runAutoInvoiceGeneration(event: {
 
   const invoicePdfUrl = firebaseDownloadUrl(bucket.name, objectPath, token);
 
+  const invoiceAmountCents =
+    typeof after.invoiceAmountCents === "number" && after.invoiceAmountCents > 0
+      ? Math.round(after.invoiceAmountCents)
+      : 15_000;
+
   await ref.update({
     invoicePdfUrl,
     invoicePdfStoragePath: objectPath,
     status: "invoiced",
     invoicedAt: FieldValue.serverTimestamp(),
+    invoiceAmountCents,
+    paymentStatus: after.paymentStatus === "paid" ? "paid" : "unpaid",
   });
+
+  const invoicedSnap = await ref.get();
+  const invoicedData = invoicedSnap.data();
+  if (invoicedData) {
+    await runCommissionOnInvoiced(interventionId, invoicedData);
+  }
 
   logger.info("Auto invoice generated", { interventionId, objectPath });
 }

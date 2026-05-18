@@ -1,7 +1,7 @@
 export interface InterventionEvent {
   id: string;
   interventionId: string;
-  type: 'status_change' | 'comment' | 'email' | 'material_order';
+  type: 'status_change' | 'comment' | 'email' | 'material_order' | 'commission';
   createdAt: string;
   createdByUid: string;
   content?: string;
