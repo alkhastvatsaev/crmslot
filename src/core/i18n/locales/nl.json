@@ -785,5 +785,41 @@
     "admin_reserved": "Voorbehouden aan beheerders",
     "readonly_sr": "Alleen-lezen — acties voorbehouden aan bedrijfsbeheerders.",
     "recently": "onlangs"
+  },
+  "commission": {
+    "override": {
+      "title": "Commissie overschrijven",
+      "base_amount": "Basisbedrag (Factuur):",
+      "new_amount_label": "Nieuw commissiebedrag (€)",
+      "reason_label": "Reden van overschrijving",
+      "reason_placeholder": "Bijv. Uitzonderlijke bonus voor extreme moeilijkheid…",
+      "reason_hint": "Motivering is verplicht voor boekhoudkundige traceerbaarheid.",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "apply": "Overschrijving toepassen"
+    }
+  },
+  "offline": {
+    "sync": {
+      "title_sr": "Offline synchronisatie",
+      "conflict_single": "Laatste sync: de server had al 1 interventie afgesloten.",
+      "conflict_multiple": "Laatste sync: de server had al {n} interventies afgesloten.",
+      "conflict_suffix": "De lokale kopie werd niet opnieuw toegepast.",
+      "network_online_aria": "Netwerk: online",
+      "network_offline_aria": "Netwerk: offline",
+      "online": "Online",
+      "offline": "Offline",
+      "syncing_aria": "Synchronisatie bezig",
+      "idle_aria": "Synchronisatie inactief",
+      "syncing": "Synchroniseren…",
+      "idle": "Inactief",
+      "flush_aria": "Wachtende gegevens synchroniseren",
+      "flush_sr": "Synchroniseren"
+    }
+  },
+  "admin": {
+    "unknown_client": "Onbekende klant",
+    "no_description": "Geen beschrijving opgegeven.",
+    "signature_alt": "Handtekening"
   }
 }

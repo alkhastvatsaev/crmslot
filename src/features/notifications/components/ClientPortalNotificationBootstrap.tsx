@@ -13,7 +13,8 @@ export default function ClientPortalNotificationBootstrap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pager = useDashboardPagerOptional();
-  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId } = useRequesterHub();
+  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab } =
+    useRequesterHub();
 
   useEffect(() => {
     const intent = parseClientNotificationSearchParams(searchParams);
@@ -22,12 +23,20 @@ export default function ClientPortalNotificationBootstrap() {
     navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
     setLastSubmittedInterventionId(intent.caseId);
     setPendingTrackingInterventionId(intent.caseId);
+    setPortalRightTab("tracking");
 
     const next = new URLSearchParams(searchParams.toString());
     next.delete(BM_CLIENT_CASE_PARAM);
     const qs = next.toString();
     router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [searchParams, router, pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId]);
+  }, [
+    searchParams,
+    router,
+    pager,
+    setLastSubmittedInterventionId,
+    setPendingTrackingInterventionId,
+    setPortalRightTab,
+  ]);
 
   return null;
 }

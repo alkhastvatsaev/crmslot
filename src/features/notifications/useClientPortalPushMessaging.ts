@@ -29,7 +29,8 @@ export function useClientPortalPushMessaging(
 ): ClientPortalPushApi {
   const enabled = opts?.enabled !== false;
   const pager = useDashboardPagerOptional();
-  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId } = useRequesterHub();
+  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab } =
+    useRequesterHub();
 
   const [status, setStatus] = useState<FcmUiStatus>("idle");
   const [lastError, setLastError] = useState<string | null>(null);
@@ -42,8 +43,9 @@ export function useClientPortalPushMessaging(
       navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
       setLastSubmittedInterventionId(id);
       setPendingTrackingInterventionId(id);
+      setPortalRightTab("tracking");
     },
-    [pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId],
+    [pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab],
   );
 
   const attachForegroundListener = useCallback(() => {

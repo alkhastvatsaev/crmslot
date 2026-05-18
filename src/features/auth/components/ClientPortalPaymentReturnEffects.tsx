@@ -15,7 +15,8 @@ export default function ClientPortalPaymentReturnEffects() {
   const router = useRouter();
   const pager = useDashboardPagerOptional();
   const { t } = useTranslation();
-  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId } = useRequesterHub();
+  const { setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab } =
+    useRequesterHub();
   const handledRef = useRef(false);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function ClientPortalPaymentReturnEffects() {
     if (interventionId) {
       setLastSubmittedInterventionId(interventionId);
       setPendingTrackingInterventionId(interventionId);
+      setPortalRightTab("tracking");
     }
 
     pager?.setPageIndex(COMPANY_HUB_PAGE_INDEX);
@@ -39,7 +41,15 @@ export default function ClientPortalPaymentReturnEffects() {
     next.delete("interventionId");
     const qs = next.toString();
     router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [searchParams, router, pager, t, setLastSubmittedInterventionId, setPendingTrackingInterventionId]);
+  }, [
+    searchParams,
+    router,
+    pager,
+    t,
+    setLastSubmittedInterventionId,
+    setPendingTrackingInterventionId,
+    setPortalRightTab,
+  ]);
 
   return null;
 }

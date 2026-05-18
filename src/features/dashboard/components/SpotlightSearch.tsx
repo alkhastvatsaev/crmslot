@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench, FileText, Phone, Navigation, ExternalLink } from 'lucide-react';
+import { X, Globe, Search, Map, Building2, Wrench, FileText, Phone, Navigation, ExternalLink, Download, BarChart3 } from 'lucide-react';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -62,6 +62,26 @@ export default function SpotlightSearch() {
       searchTerms: 'technicien terrain missions planning',
       Icon: Wrench,
       badge: 'Tech',
+      onSelect: () => pager?.setPageIndex(2),
+    },
+    {
+      id: 'export-csv',
+      label: 'Exporter les interventions (CSV)',
+      searchTerms: 'export csv excel rapport interventions télécharger',
+      Icon: Download,
+      badge: 'Export',
+      onSelect: () => {
+        import('@/features/backoffice/exportInterventionsCSV').then(m => {
+          m.exportInterventionsCSV([]);
+        });
+      },
+    },
+    {
+      id: 'performance',
+      label: 'Performance techniciens',
+      searchTerms: 'performance statistiques technicien métriques taux complétion',
+      Icon: BarChart3,
+      badge: 'Stats',
       onSelect: () => pager?.setPageIndex(2),
     },
   ], [pager]);

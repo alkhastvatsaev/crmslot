@@ -45,6 +45,9 @@ interface RequesterHubContextValue {
   /** Ouverture suivi depuis notification push (`bmClientCase`). */
   pendingTrackingInterventionId: string | null;
   setPendingTrackingInterventionId: (id: string | null) => void;
+  /** Force l’onglet droit du hub société (push / retour paiement). */
+  portalRightTab: "tracking" | "chat" | "timeline" | null;
+  setPortalRightTab: (tab: "tracking" | "chat" | "timeline" | null) => void;
   isSubmitting: boolean;
   setIsSubmitting: (val: boolean) => void;
   validationFailedCount: number;
@@ -87,6 +90,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   const [lastSubmittedRequest, setLastSubmittedRequest] = useState<InterventionRequestData | null>(null);
   const [lastSubmittedInterventionId, setLastSubmittedInterventionId] = useState<string | null>(null);
   const [pendingTrackingInterventionId, setPendingTrackingInterventionId] = useState<string | null>(null);
+  const [portalRightTab, setPortalRightTab] = useState<"tracking" | "chat" | "timeline" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationFailedCount, setValidationFailedCount] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -169,6 +173,8 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         setLastSubmittedInterventionId,
         pendingTrackingInterventionId,
         setPendingTrackingInterventionId,
+        portalRightTab,
+        setPortalRightTab,
         isSubmitting,
         setIsSubmitting,
         validationFailedCount,
