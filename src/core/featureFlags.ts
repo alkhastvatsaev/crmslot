@@ -23,6 +23,8 @@ export type BelgmapFeatureFlags = {
   whatsappNotifications: boolean;
   /** Portail fournisseur — commandes directes Lecot. */
   supplierPortal: boolean;
+  /** Parc matériel client — inventaire équipements par client/site. */
+  equipmentInventory: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
@@ -39,6 +41,7 @@ export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   vehicleStock: false,
   whatsappNotifications: false,
   supplierPortal: false,
+  equipmentInventory: false,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -77,6 +80,7 @@ export function featureFlagsFromEnv(): BelgmapFeatureFlags {
     vehicleStock: readEnvBool("NEXT_PUBLIC_FF_VEHICLE_STOCK", DEFAULT_FEATURE_FLAGS.vehicleStock),
     whatsappNotifications: readEnvBool("NEXT_PUBLIC_FF_WHATSAPP", DEFAULT_FEATURE_FLAGS.whatsappNotifications),
     supplierPortal: readEnvBool("NEXT_PUBLIC_FF_SUPPLIER_PORTAL", DEFAULT_FEATURE_FLAGS.supplierPortal),
+    equipmentInventory: readEnvBool("NEXT_PUBLIC_FF_EQUIPMENT_INVENTORY", DEFAULT_FEATURE_FLAGS.equipmentInventory),
   };
 }
 
