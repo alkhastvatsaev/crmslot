@@ -84,6 +84,8 @@ function clientLabel(data: Record<string, unknown>): string {
 }
 
 function requireConfirmed(name: string, input: Record<string, unknown>): void {
+  // order_lecot_parts gère sa propre confirmation via le panel UI Lecot (chatbot-openai.ts).
+  // userConfirmed=true y est injecté par le flow confirmTool, pas ici.
   if (name === "order_lecot_parts") return;
   if (!isChatbotWriteTool(name)) return;
   if (input.userConfirmed !== true) {
