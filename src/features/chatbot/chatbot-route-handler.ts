@@ -99,7 +99,7 @@ async function handleChatbotPostInner(
   const companyId = (body?.companyId ?? "").trim();
   const companyName = (body?.companyName ?? "Société").trim() || "Société";
   const role = body?.role ?? null;
-  let messages = Array.isArray(body?.messages) ? [...body!.messages!] : [];
+  const messages = Array.isArray(body?.messages) ? [...body!.messages!] : [];
 
   if (!companyId) {
     return new Response(JSON.stringify({ error: "companyId requis" }), { status: 400 });

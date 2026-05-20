@@ -1,48 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
-import { getGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
+import {
+  getGmailOAuthConfig,
+  persistGmailOAuthFromCallback,
+} from "@/core/services/email/gmailOAuthConfig";
+import { getStoredGmailOAuth } from "@/core/services/email/gmailOAuthStore";
+import { setGmailHubDisconnectedCookie } from "@/core/services/email/gmailHubSession";
 
-/** Callback OAuth — affiche le refresh token à copier dans GMAIL_REFRESH_TOKEN (.env.local). */
-export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code");
-  const err = req.nextUrl.searchParams.get("error");
+export const runtime = "nodejs";
 
-  if (err) {
-    return htmlPage(`Erreur Google : ${err}`, false);
+function appOrigin(): string {
+  return process.env.PUBLIC_APP_URL?.replace(/\/$/, "") || "http://localhost:3000";
+}
+
+function redirectToHub(query: Record<string, string>): NextResponse {
+  const url = new URL("/", appOrigin());
+  for (const [k, v] of Object.entries(query)) {
+    if (v) url.searchParams.set(k, v);
   }
+  const res = NextResponse.redirect(url);
+  if (query.gmail_connected === "1") {
+    setGmailHubDisconnectedCookie(res, false);
+  }
+  return res;
+}
+
+/** Callback OAuth — enregistre le token (Firestore) et renvoie vers la page 7. */
+export async function GET(req: NextRequest) {
+  const err = req.nextUrl.searchParams.get("error");
+  if (err) {
+    return redirectToHub({ gmail_error: err });
+  }
+
+  const code = req.nextUrl.searchParams.get("code");
   if (!code) {
-    return htmlPage("Code OAuth manquant.", false);
+    return redirectToHub({ gmail_error: "missing_code" });
   }
 
   const { clientId, clientSecret, redirectUri } = getGmailOAuthConfig();
   if (!clientId || !clientSecret) {
-    return htmlPage("GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET manquants.", false);
+    return redirectToHub({ gmail_error: "missing_client" });
   }
 
   const oauth2 = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
   try {
     const { tokens } = await oauth2.getToken(code);
-    const refresh = tokens.refresh_token ?? "(aucun — reconnectez avec prompt=consent)";
-    const body = `
-      <p>Ajoutez dans <code>.env.local</code> puis redémarrez <code>npm run dev</code> :</p>
-      <pre style="background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto">GMAIL_USER=alkhastvatsaev@gmail.com
-GOOGLE_CLIENT_ID=${clientId}
-GOOGLE_CLIENT_SECRET=votre_secret_ici
-GMAIL_REFRESH_TOKEN=${refresh}</pre>
-      <p><strong>Ne partagez pas ces valeurs.</strong> Fermez cette page après copie.</p>
-    `;
-    return htmlPage(body, true);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Échange de code échoué.";
-    return htmlPage(msg, false);
-  }
-}
+    const existing = await getStoredGmailOAuth();
+    const refreshToken = tokens.refresh_token ?? existing?.refreshToken ?? "";
+    if (!refreshToken) {
+      return redirectToHub({ gmail_error: "no_refresh_token" });
+    }
 
-function htmlPage(inner: string, ok: boolean): NextResponse {
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"/><title>Gmail BELGMAP</title></head>
-<body style="font-family:system-ui,sans-serif;max-width:720px;margin:40px auto;padding:0 20px">
-<h1 style="color:${ok ? "#059669" : "#dc2626"}">${ok ? "Gmail connecté" : "Échec"}</h1>
-${inner}
-</body></html>`;
-  return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    oauth2.setCredentials({ refresh_token: refreshToken, access_token: tokens.access_token });
+    const gmail = google.gmail({ version: "v1", auth: oauth2 });
+    const profile = await gmail.users.getProfile({ userId: "me" });
+    const email = profile.data.emailAddress?.trim() || existing?.email || "";
+    if (!email) {
+      return redirectToHub({ gmail_error: "no_email" });
+    }
+
+    await persistGmailOAuthFromCallback({ refreshToken, email });
+    return redirectToHub({ gmail_connected: "1" });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "oauth_exchange_failed";
+    return redirectToHub({ gmail_error: msg.slice(0, 120) });
+  }
 }

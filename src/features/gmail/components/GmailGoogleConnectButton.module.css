@@ -1,0 +1,41 @@
+/* Asset officiel Google (signin-assets.zip) — wrapper cliquable transparent. */
+
+.root {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.root:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.asset {
+  display: block;
+  width: auto;
+  height: 40px;
+  max-width: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.root:hover:not(:disabled) .asset {
+  filter: brightness(0.98);
+}
+
+.root:active:not(:disabled) .asset {
+  filter: brightness(0.95);
+}
