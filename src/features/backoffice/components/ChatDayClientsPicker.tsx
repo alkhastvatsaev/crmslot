@@ -32,7 +32,7 @@ export default function ChatDayClientsPicker({
         type="button"
         data-testid="chat-day-global-btn"
         onClick={onSelectGlobal}
-        className="flex w-full items-center justify-center rounded-[18px] border border-indigo-100 bg-indigo-50/70 py-4.5 px-4 text-center shadow-sm transition-all hover:bg-indigo-100/90 active:scale-[0.99]"
+        className="flex mx-4 w-[calc(100%-2rem)] items-center justify-center rounded-[18px] border border-indigo-100 bg-indigo-50/70 py-4.5 px-4 text-center shadow-sm transition-all hover:bg-indigo-100/90 active:scale-[0.99]"
       >
         <div className="min-w-0 flex-1 flex flex-col justify-center items-center text-center">
           <span className="truncate text-[14px] font-bold text-indigo-950 w-full text-center">
@@ -68,7 +68,7 @@ export default function ChatDayClientsPicker({
                   data-testid={`chat-day-client-row-${row.threadId}`}
                   onClick={() => onSelectClient(row.threadId)}
                   className={cn(
-                    "group flex w-full items-center justify-center rounded-[18px] border bg-white py-4.5 px-4 text-center shadow-sm transition-all active:scale-[0.99]",
+                    "group flex mx-4 w-[calc(100%-2rem)] items-center justify-center rounded-[18px] border bg-white py-4.5 px-4 text-center shadow-sm transition-all active:scale-[0.99]",
                     active
                       ? "border-indigo-300 ring-2 ring-indigo-100 bg-indigo-50/20"
                       : "border-slate-200/80 hover:border-blue-300 hover:bg-slate-50/50 hover:shadow-md",

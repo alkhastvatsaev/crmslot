@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { firestore, auth, isConfigured } from '@/core/config/firebase';
-import { devUiPreviewEnabled, realInterventionsOnly } from '@/core/config/devUiPreview';
+import { devUiPreviewEnabled } from '@/core/config/devUiPreview';
 import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { Technician } from './types';
 import { withTechnicianAuthUid } from '@/features/technicians/withTechnicianAuthUid';
@@ -66,7 +66,7 @@ export function useTechnicians() {
                 );
                 setTechnicians(parsed);
 
-                if (devUiPreviewEnabled && !realInterventionsOnly) {
+                if (devUiPreviewEnabled) {
                   snapshot.docs.forEach((d) => {
                     const row = d.data() as Technician;
                     if (!(row.authUid ?? "").trim()) {

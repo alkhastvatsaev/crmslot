@@ -21,13 +21,14 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 const railGap = `flex min-h-0 flex-1 flex-col ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
 
 import { CompanyHubTimelineTab } from "@/features/company/components/CompanyHubTimelineTab";
+import { CompanyHubDocumentsTab } from "@/features/company/components/CompanyHubDocumentsTab";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 
-type CompanyHubRightCategory = "tracking" | "chat" | "timeline";
+type CompanyHubRightCategory = "tracking" | "chat" | "timeline" | "documents";
 
 /** Interface Demandeur (Page 2) — Qui demande, Que faut-il réparer, Où en est ma demande. */
 export default function CompanyHubPage() {
-  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("timeline");
+  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("documents");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
   const {
@@ -42,7 +43,7 @@ export default function CompanyHubPage() {
   useEffect(() => {
     if (!portalRightTab) return;
     scheduleEffectUpdate(() => {
-      setRightCategory(portalRightTab);
+      setRightCategory(portalRightTab as CompanyHubRightCategory);
       setPortalRightTab(null);
     });
   }, [portalRightTab, setPortalRightTab]);
@@ -123,6 +124,21 @@ export default function CompanyHubPage() {
             <button
               type="button"
               role="tab"
+              aria-selected={rightCategory === "documents"}
+              data-testid="company-hub-right-tab-documents"
+              onClick={() => setRightCategory("documents")}
+              className={cn(
+                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
+                rightCategory === "documents"
+                  ? "bg-white text-rose-600 shadow-sm"
+                  : "text-slate-500 hover:bg-slate-300/30",
+              )}
+            >
+              Documents
+            </button>
+            <button
+              type="button"
+              role="tab"
               aria-selected={rightCategory === "timeline"}
               data-testid="company-hub-right-tab-timeline"
               onClick={() => setRightCategory("timeline")}
@@ -145,6 +161,11 @@ export default function CompanyHubPage() {
                 publishAsPortal
                 chatCompanyId={ivanaChatCompanyId}
                 chatInterventionId={portalCaseId}
+              />
+            ) : rightCategory === "documents" ? (
+              <CompanyHubDocumentsTab
+                interventionId={portalCaseId}
+                companyId={ivanaChatCompanyId}
               />
             ) : (
               <CompanyHubTimelineTab

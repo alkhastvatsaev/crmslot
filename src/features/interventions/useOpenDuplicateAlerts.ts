@@ -2,12 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { auth, firestore, isConfigured } from "@/core/config/firebase";
+import { firestore, isConfigured } from "@/core/config/firebase";
 import {
-  DEMO_COMPANY_ID,
-  devUiPreviewEnabled,
   isSyntheticInterventionId,
-  realInterventionsOnly,
 } from "@/core/config/devUiPreview";
 import type { DuplicateAlertDoc, DuplicateAlertRow } from "@/features/interventions/duplicateAlertTypes";
 
@@ -18,34 +15,6 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
 
   useEffect(() => {
     const cid = (companyId ?? "").trim();
-    const demoAlertMode =
-      devUiPreviewEnabled &&
-      !realInterventionsOnly &&
-      (cid === DEMO_COMPANY_ID || !cid);
-
-    if (demoAlertMode) {
-      if (cid && cid !== DEMO_COMPANY_ID) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setRows([]);
-      } else {
-        const similarInterventionId = `mock-day-${new Date().toLocaleDateString("en-CA")}-0`;
-        const fakeAlert: DuplicateAlertRow = {
-          id: "demo-dup-alert",
-          companyId: DEMO_COMPANY_ID,
-          newInterventionId: "demo-new-dup",
-          similarInterventionId,
-          similarAddress: "Rue Neuve 45, 1000 Bruxelles",
-          similarProblemPreview: "Clé bloquée",
-          similarCreatedAt: new Date().toISOString(),
-          status: "open",
-          createdByUid: "demo-creator",
-          detectedAt: new Date().toISOString(),
-        };
-        setRows([fakeAlert]);
-      }
-      setLoading(false);
-      return () => {};
-    }
 
     if (!isConfigured || !firestore) {
       setRows([]);
@@ -91,7 +60,5 @@ export function useOpenDuplicateAlerts(companyId: string | null) {
 
   const openAlerts = useMemo(() => rows.filter((r) => r.status === "open"), [rows]);
 
-  const firebaseUid = auth?.currentUser?.uid ?? null;
-
-  return { alerts: rows, openAlerts, loading, firebaseUid };
+  return { openAlerts, loading };
 }

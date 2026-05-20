@@ -1,9 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { useDateContext } from "@/context/DateContext";
-import { generateDailyMissions, type Mission } from "@/utils/mockMissions";
-import { devUiPreviewEnabled, realInterventionsOnly } from "@/core/config/devUiPreview";
+import type { Mission } from "@/features/map/missionTypes";
 import { dailyMissionCardToneFromStatus } from "@/features/interventions/technicianSchedule";
 import {
   DASHBOARD_PANEL_CHROME_BLUR,
@@ -23,13 +21,7 @@ export default function DailyMissions({
   onMissionClick?: (mission: Mission) => void;
   isEmbedded?: boolean;
 }) {
-  const { selectedDate } = useDateContext();
-  const missions = useMemo(() => {
-    if (missionsProp !== undefined) return missionsProp;
-    // Never show synthetic clients unless UI demo preview is explicitly enabled.
-    if (!devUiPreviewEnabled || realInterventionsOnly) return [];
-    return generateDailyMissions(selectedDate);
-  }, [missionsProp, selectedDate]);
+  const missions = useMemo(() => missionsProp ?? [], [missionsProp]);
 
   const content = (
     <div className={cn(

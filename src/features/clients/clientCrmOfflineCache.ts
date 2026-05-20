@@ -22,3 +22,12 @@ export function writeClientsOfflineCache(companyId: string, clients: ClientRecor
     /* quota */
   }
 }
+
+export function clearClientsOfflineCache(companyId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(`${STORAGE_PREFIX}${companyId.trim()}`);
+  } catch {
+    /* ignore */
+  }
+}

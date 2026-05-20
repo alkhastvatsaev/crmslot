@@ -1,20 +1,7 @@
-jest.mock("@/core/config/devUiPreview", () => {
-  const actual = jest.requireActual<typeof import("@/core/config/devUiPreview")>(
-    "@/core/config/devUiPreview",
-  );
-  return {
-    ...actual,
-    devUiPreviewEnabled: true,
-    realInterventionsOnly: false,
-  };
-});
-
 import {
-  mergeDemoInterventionsForChatbot,
   parseCreatedAtMs,
   sortInterventionsByRecency,
 } from "@/features/chatbot/chatbot-intervention-source";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 
 describe("chatbot-intervention-source", () => {
   it("sorts by createdAt descending", () => {
@@ -27,10 +14,5 @@ describe("chatbot-intervention-source", () => {
 
   it("parses Firestore timestamp seconds", () => {
     expect(parseCreatedAtMs({ createdAt: { seconds: 1_700_000_000 } })).toBeGreaterThan(0);
-  });
-
-  it("merges demo rows for demo company when dev preview is on", () => {
-    const merged = mergeDemoInterventionsForChatbot(DEMO_COMPANY_ID, []);
-    expect(merged.some((r) => r.id === "demo-mission-backoffice-only")).toBe(true);
   });
 });

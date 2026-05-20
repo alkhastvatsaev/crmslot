@@ -9,6 +9,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { createCatalogProduct } from "@/features/catalog/catalogFirestore";
 import { useCompanyCatalog } from "@/features/catalog/useCompanyCatalog";
+import { lecotShopCatalogSearchUrl } from "@/features/catalog/lecotShopConfig";
 
 export default function CompanyCatalogPanel() {
   const { t } = useTranslation();
@@ -137,7 +138,7 @@ export default function CompanyCatalogPanel() {
               <span className="shrink-0 font-mono text-xs text-slate-500">{p.sku}</span>
               {p.lecotSku?.trim() ? (
                 <a
-                  href={`https://www.lecot.be/fr/search?q=${encodeURIComponent(p.lecotSku.trim())}`}
+                  href={lecotShopCatalogSearchUrl(p.lecotSku.trim())}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-testid={`company-catalog-lecot-link-${p.id}`}

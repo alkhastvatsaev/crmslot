@@ -55,3 +55,7 @@ _prototype_backup/
 test_output.txt
 *.backup
 .vercel
+
+# Données d'entraînement chatbot (générées localement — ne pas committer)
+data/chatbot-training/
+training-data/

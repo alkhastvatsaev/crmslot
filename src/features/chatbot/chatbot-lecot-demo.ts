@@ -1,0 +1,71 @@
+import type { SupplierOrder, SupplierOrderLine, SupplierOrderStatus } from "@/features/suppliers/types";
+
+export type LecotOrderToolResult = {
+  supplierOrderId: string;
+  materialOrderId?: string | null;
+  status?: SupplierOrderStatus;
+  totalCents: number;
+  lines: Array<{
+    sku: string;
+    label: string;
+    quantity: number;
+    unitPriceCents?: number;
+    unitPriceEur?: number;
+  }>;
+  demoMode?: boolean;
+  demoReference?: string;
+};
+
+export function buildLecotDemoReference(orderId: string): string {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  return `DEMO-LECOT-${stamp}-${orderId.slice(0, 6).toUpperCase()}`;
+}
+
+/** Aperçu panneau droit — affiché avant sync Firestore (ou si règles / index en échec). */
+export function buildSupplierOrderPreviewFromToolResult(
+  companyId: string,
+  result: LecotOrderToolResult,
+): SupplierOrder {
+  const now = new Date().toISOString();
+  const lines: SupplierOrderLine[] = (result.lines ?? []).map((l) => {
+    let unitPriceCents = Math.round(Number(l.unitPriceCents) || 0);
+    if (!unitPriceCents && typeof l.unitPriceEur === "number") {
+      unitPriceCents = Math.round(l.unitPriceEur * 100);
+    }
+    return {
+      sku: l.sku,
+      label: l.label,
+      quantity: l.quantity,
+      unitPriceCents: Math.max(0, unitPriceCents),
+    };
+  });
+
+  const status: SupplierOrderStatus = result.demoMode
+    ? "sent"
+    : result.status === "sent" ||
+        result.status === "draft" ||
+        result.status === "confirmed" ||
+        result.status === "delivered" ||
+        result.status === "cancelled"
+      ? result.status
+      : "draft";
+
+  const notes = result.demoMode
+    ? `Simulation démo BELGMAP — ${result.demoReference ?? result.supplierOrderId}. Compte Lecot pro non connecté ; aucun envoi réel.`
+    : null;
+
+  return {
+    id: result.supplierOrderId,
+    companyId,
+    supplierId: "lecot",
+    supplierName: "Lecot",
+    status,
+    lines,
+    totalCents: result.totalCents,
+    notes,
+    createdAt: now,
+    updatedAt: now,
+    sentAt: status === "sent" ? now : null,
+    isDemo: Boolean(result.demoMode),
+  };
+}

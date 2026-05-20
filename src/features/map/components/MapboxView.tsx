@@ -12,8 +12,7 @@ import BackOfficeInboxPanel from '@/features/backoffice/components/BackOfficeInb
 import RequesterTrackingPanel from '@/features/interventions/components/RequesterTrackingPanel';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useDateContext } from '@/context/DateContext';
-import { generateDailyMissions, type Mission } from '@/utils/mockMissions';
-import { realInterventionsOnly } from '@/core/config/devUiPreview';
+import type { Mission } from '@/features/map/missionTypes';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { useGalaxyLayerBridgeOptional } from '@/features/map/GalaxyLayerBridgeContext';
 import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
@@ -32,7 +31,6 @@ import {
 } from '@/features/interventions/technicianSchedule';
 import { cn } from '@/lib/utils';
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { missionStableKey } from "@/features/map/missionStableKey";
 import { useMapArchivedMissions } from "@/features/map/useMapArchivedMissions";
 import {
@@ -71,10 +69,6 @@ export default function MapboxView() {
 
   const firestoreInterventions = isDispatchMap ? boInterventions : techInterventions;
 
-  const missions = useMemo(
-    () => (!devUiPreviewEnabled || realInterventionsOnly ? [] : generateDailyMissions(selectedDate)),
-    [selectedDate],
-  );
   const [liveMissions, setLiveMissions] = useState<Mission[]>([]);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString('en-CA'), [selectedDate]);
@@ -111,7 +105,7 @@ export default function MapboxView() {
         };
       });
 
-    const all = [...realMissions, ...liveForDay, ...missions];
+    const all = [...realMissions, ...liveForDay];
     
     // Deduplicate by key or id
     const unique = new Map<string | number, Mission>();
@@ -131,7 +125,7 @@ export default function MapboxView() {
       return Number(m[1]) * 60 + Number(m[2]);
     };
     return [...deduped].sort((a, b) => score(a.time) - score(b.time));
-  }, [missions, liveMissions, firestoreInterventions, selectedDateStr, selectedDate, t]);
+  }, [liveMissions, firestoreInterventions, selectedDateStr, selectedDate, isDispatchMap, t]);
 
   const visibleMissions = useMemo(
     () => allMissions.filter((m) => !archivedKeys.has(missionStableKey(m))),
@@ -158,17 +152,15 @@ export default function MapboxView() {
       const ok = window.confirm(String(t("map.daily_missions.delete_confirm")));
       if (!ok) return;
 
-      if (mission.source === "live" && mission.key && !mission.key.endsWith(".json") && !mission.key.startsWith("demo-")) {
-        // Real Firestore mission
+      if (mission.key && firestore) {
         try {
-          await deleteDoc(doc(firestore!, "interventions", mission.key));
+          await deleteDoc(doc(firestore, "interventions", mission.key));
           toast.success(String(t("map.daily_missions.deleted_toast")));
           setSelectedMission(null);
         } catch {
           toast.error("Erreur de suppression");
         }
       } else {
-        // Mock mission, just archive it locally
         archiveKey(missionStableKey(mission));
         setSelectedMission(null);
         toast.success(String(t("map.daily_missions.deleted_toast")));
@@ -189,69 +181,6 @@ export default function MapboxView() {
 
     return () => galaxyBridge.registerInterventionConsumer(null);
   }, [galaxyBridge, selectedDateStr]);
-
-  useEffect(() => {
-    if (realInterventionsOnly) return;
-    let cancelled = false;
-    const loadLocal = async () => {
-      try {
-        const { fetchWithAuth } = await import("@/core/api/fetchWithAuth");
-        const res = await fetchWithAuth("/api/interventions/local");
-        if (!res.ok || cancelled) return;
-        const data = (await res.json()) as {
-          interventions: Array<{
-            file: string;
-            clientName: string | null;
-            title: string;
-            date: string | null;
-            time: string;
-            status: string;
-            location: { lat: number; lng: number } | null;
-          }>;
-        };
-        const next: Mission[] = (data.interventions || [])
-          .filter((i) => i.date === selectedDateStr)
-          .filter((i) => i.location && typeof i.location.lat === "number" && typeof i.location.lng === "number")
-          .map((i) => ({
-            id: Math.abs(
-              i.file.split("").reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 0)
-            ),
-            key: i.file,
-            clientName: i.clientName
-              ? `M. ${i.clientName.charAt(0).toUpperCase()}${i.clientName.slice(1).toLowerCase()}`
-              : i.title || t("map.mission.fallback_title"),
-            coordinates: [i.location!.lng, i.location!.lat],
-            time: i.time,
-            status: i.status,
-            source: "live",
-            date: i.date ?? selectedDateStr,
-          }));
-        setLiveMissions((prev) => {
-          // merge by stable key (disk) while keeping any newly created in-memory ones
-          const seen = new Set<string>(next.map((m) => m.key ?? String(m.id)));
-          const keep = prev.filter((m) => !seen.has(m.key ?? String(m.id)));
-          return [...keep, ...next];
-        });
-      } catch {
-        /* ignore */
-      }
-    };
-    void loadLocal();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedDateStr, t]);
-
-  useEffect(() => {
-    if (!realInterventionsOnly) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLiveMissions((prev) =>
-      prev.filter((m) => {
-        const k = m.key;
-        return typeof k !== "string" || !k.endsWith(".intervention.json");
-      }),
-    );
-  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;

@@ -279,7 +279,10 @@
     "offline_hint": "Offline mode — showing cached client list.",
     "open_in_backoffice": "Open in back-office",
     "export_csv": "Export CSV",
-    "recurring_request": "New request (same client)"
+    "recurring_request": "New request (same client)",
+    "delete_client": "Delete",
+    "delete_client_confirm": "Permanently delete “{{name}}” and all sites? This cannot be undone.",
+    "client_deleted": "Contact removed from the directory."
   },
   "finish_checklist": {
     "title": "Pre-close checklist",

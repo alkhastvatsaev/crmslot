@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
+import { parseAttachDocumentType } from "@/core/services/email/interventionEmailAttachOptions";
+import type { InterventionEmailPdfKind } from "@/core/services/email/interventionEmailPdfAttachment";
 import { sendViaGmailApi } from "@/core/services/email/sendViaGmailApi";
 
 const COLLECTION = "intervention_emails";
@@ -17,10 +19,12 @@ export type SendInterventionEmailInput = {
   references?: string;
   sentByUid: string;
   sentVia?: string;
+  /** quote | invoice = joint PDF généré par la PWA ; none = pas de pièce jointe */
+  attachDocumentType?: InterventionEmailPdfKind | "none";
 };
 
 export type SendInterventionEmailResult =
-  | { ok: true; messageId: string }
+  | { ok: true; messageId: string; attachmentFilename?: string }
   | { ok: false; error: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,17 +78,47 @@ export async function sendInterventionEmail(
   const messageId = `<${crypto.randomUUID()}@${replyToDomain}>`;
   const replyTo = `support+${interventionId}@${replyToDomain}`;
 
+  const attachKind = parseAttachDocumentType(input.attachDocumentType ?? "invoice");
+  let attachmentFilename: string | undefined;
+  let pdfAttachment: { filename: string; content: Buffer; contentType: string } | undefined;
+
+  if (attachKind !== "none") {
+    try {
+      const { buildInterventionEmailPdfAttachment } =
+        await import("@/core/services/email/interventionEmailPdfAttachment");
+      const att = await buildInterventionEmailPdfAttachment(interventionId, attachKind);
+      pdfAttachment = att;
+      attachmentFilename = att.filename;
+    } catch (pdfErr) {
+      const detail = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
+      console.error("[sendInterventionEmail] PDF attachment failed:", pdfErr);
+      return {
+        ok: false,
+        error: `Impossible de joindre le PDF ${attachKind === "quote" ? "devis" : "facture"} : ${detail}`,
+      };
+    }
+    if (!pdfAttachment?.content?.length) {
+      return {
+        ok: false,
+        error: `PDF ${attachKind === "quote" ? "devis" : "facture"} vide ou non généré pour ce dossier.`,
+      };
+    }
+  }
+
+  const bodyHtml = input.bodyHtml ?? `<p>${bodyText.replace(/\n/g, "<br>")}</p>`;
+
   try {
     if (isGmailOAuthConfigured()) {
       await sendViaGmailApi({
         to,
         subject,
         bodyText,
-        bodyHtml: input.bodyHtml,
+        bodyHtml,
         messageId,
         replyTo,
         inReplyTo: input.inReplyTo,
         references: input.references,
+        attachment: pdfAttachment,
       });
     } else {
       const transporter = nodemailer.createTransport({
@@ -96,7 +130,7 @@ export async function sendInterventionEmail(
         to,
         subject,
         text: bodyText,
-        html: input.bodyHtml ?? `<p>${bodyText.replace(/\n/g, "<br>")}</p>`,
+        html: bodyHtml,
         replyTo,
         headers: {
           "Message-ID": messageId,
@@ -104,6 +138,17 @@ export async function sendInterventionEmail(
           ...(input.references ? { References: input.references } : {}),
           "X-Intervention-ID": interventionId,
         },
+        ...(pdfAttachment
+          ? {
+              attachments: [
+                {
+                  filename: pdfAttachment.filename,
+                  content: pdfAttachment.content,
+                  contentType: pdfAttachment.contentType,
+                },
+              ],
+            }
+          : {}),
       });
     }
   } catch (err) {
@@ -128,11 +173,12 @@ export async function sendInterventionEmail(
       createdAt: FieldValue.serverTimestamp(),
       sentByUid: input.sentByUid,
       ...(input.sentVia ? { sentVia: input.sentVia } : {}),
+      ...(attachmentFilename ? { attachmentFilename } : {}),
       readAt: new Date().toISOString(),
     });
   } catch (err) {
     console.error("[sendInterventionEmail] Firestore write failed:", err);
   }
 
-  return { ok: true, messageId };
+  return { ok: true, messageId, attachmentFilename };
 }

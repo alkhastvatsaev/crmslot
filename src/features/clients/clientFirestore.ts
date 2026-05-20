@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -97,6 +98,32 @@ export async function updateClient(
     ...patch,
     updatedAt: serverTimestamp(),
   });
+}
+
+/** Supprime les sites du client puis la fiche CRM (irréversible). */
+export async function deleteClientWithSites(
+  db: Firestore,
+  companyId: string,
+  clientId: string,
+): Promise<void> {
+  const cid = companyId.trim();
+  const clid = clientId.trim();
+  if (!cid || !clid) throw new Error("companyId et clientId requis");
+
+  const sitesSnap = await getDocs(
+    query(
+      collection(db, SITES_COLLECTION),
+      where("companyId", "==", cid),
+      where("clientId", "==", clid),
+    ),
+  );
+
+  const batch = writeBatch(db);
+  for (const siteDoc of sitesSnap.docs) {
+    batch.delete(siteDoc.ref);
+  }
+  batch.delete(doc(db, CLIENTS_COLLECTION, clid));
+  await batch.commit();
 }
 
 export async function createSite(

@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
 
@@ -38,6 +38,9 @@ jest.mock("@/features/clients/useClientSites", () => ({
 jest.mock("@/features/clients/clientFirestore", () => ({
   createClient: jest.fn().mockResolvedValue("cl-new"),
   createSite: jest.fn().mockResolvedValue("st-new"),
+  deleteClientWithSites: jest.fn().mockResolvedValue(undefined),
+  updateClient: jest.fn().mockResolvedValue(undefined),
+  bulkCreateClients: jest.fn().mockResolvedValue(0),
 }));
 
 describe("ClientsCrmPanel", () => {
@@ -55,5 +58,11 @@ describe("ClientsCrmPanel", () => {
     flagState.crmContacts = false;
     render(<ClientsCrmPanel />);
     expect(screen.getByTestId("crm-disabled-hint")).toBeInTheDocument();
+  });
+
+  it("shows delete control when a client is selected", () => {
+    render(<ClientsCrmPanel />);
+    fireEvent.click(screen.getByTestId("crm-client-row-cl-1"));
+    expect(screen.getByTestId("crm-delete-client-btn")).toBeInTheDocument();
   });
 });

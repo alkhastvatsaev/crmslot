@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { buildMimeMultipartEmail, type MimeAttachment } from "@/core/services/email/buildMimeEmail";
 import { getGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
 
 export type GmailApiSendParams = {
@@ -10,6 +11,7 @@ export type GmailApiSendParams = {
   replyTo: string;
   inReplyTo?: string;
   references?: string;
+  attachment?: MimeAttachment;
 };
 
 function encodeSubjectUtf8(subject: string): string {
@@ -19,6 +21,20 @@ function encodeSubjectUtf8(subject: string): string {
 
 function buildRfc822Raw(params: GmailApiSendParams, fromEmail: string, fromName: string): string {
   const html = params.bodyHtml ?? `<p>${params.bodyText.replace(/\n/g, "<br>")}</p>`;
+  if (params.attachment) {
+    return buildMimeMultipartEmail({
+      fromEmail,
+      fromName,
+      to: params.to,
+      subject: params.subject,
+      bodyHtml: html,
+      messageId: params.messageId,
+      replyTo: params.replyTo,
+      inReplyTo: params.inReplyTo,
+      references: params.references,
+      attachment: params.attachment,
+    });
+  }
   const lines = [
     `From: "${fromName}" <${fromEmail}>`,
     `To: ${params.to}`,

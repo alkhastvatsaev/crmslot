@@ -22,14 +22,17 @@ export interface SupplierOrder {
   sentAt?: string | null;
   deliveredAt?: string | null;
   createdByUid?: string | null;
+  /** Commande simulée (pas d'envoi Lecot réel). */
+  isDemo?: boolean;
+  interventionId?: string | null;
 }
 
 export const SUPPLIER_ORDER_STATUS_LABELS: Record<SupplierOrderStatus, string> = {
-  draft: "Brouillon",
-  sent: "Envoyé",
-  confirmed: "Confirmé",
-  delivered: "Livré",
-  cancelled: "Annulé",
+  draft: "Validée",
+  sent: "Préparation",
+  confirmed: "Expédiée",
+  delivered: "Livrée",
+  cancelled: "Annulée",
 };
 
 export function computeOrderTotal(lines: SupplierOrderLine[]): number {

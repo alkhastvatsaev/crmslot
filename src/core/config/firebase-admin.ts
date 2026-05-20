@@ -1,10 +1,23 @@
-import * as admin from 'firebase-admin';
+import * as admin from "firebase-admin";
 
-if (!admin.apps.length) {
+function tryInitFirebaseAdmin(): void {
+  if (admin.apps.length) return;
+
   try {
-    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const jsonRaw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+    if (jsonRaw) {
+      const serviceAccount = JSON.parse(jsonRaw) as admin.ServiceAccount;
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      return;
+    }
+
+    const projectId =
+      process.env.FIREBASE_PROJECT_ID?.trim() ||
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim();
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
     if (projectId && clientEmail && privateKey) {
       admin.initializeApp({
@@ -14,21 +27,35 @@ if (!admin.apps.length) {
           privateKey,
         }),
       });
-    } else {
-      console.warn('Firebase Admin variables missing - some server-side features may be disabled.');
+      return;
+    }
+
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS?.trim()) {
+      admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
+      });
     }
   } catch (error) {
-    console.error('Firebase admin initialization error', error);
+    console.error("Firebase admin initialization error", error);
   }
 }
 
-// Export a function or a getter to avoid crashing at build time
-export const getAdminDb = () => {
+tryInitFirebaseAdmin();
+
+/** Indique si les routes serveur (chatbot commandes, registry) peuvent écrire/lire Admin. */
+export function isFirebaseAdminReady(): boolean {
+  return admin.apps.length > 0;
+}
+
+export function getAdminDb(): admin.firestore.Firestore {
   if (!admin.apps.length) {
-    throw new Error('Firebase Admin not initialized. Check your environment variables.');
+    throw new Error(
+      "Firebase Admin non initialisé. Ajoutez dans .env.local : FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT_JSON).",
+    );
   }
   return admin.firestore();
-};
+}
 
-// Legacy export for compatibility, but safe-guarded
-export const adminDb = admin.apps.length ? admin.firestore() : null as unknown as admin.firestore.Firestore;
+export const adminDb = admin.apps.length
+  ? admin.firestore()
+  : (null as unknown as admin.firestore.Firestore);

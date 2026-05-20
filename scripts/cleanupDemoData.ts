@@ -83,6 +83,23 @@ async function main() {
   snapChatByCompany.docs.forEach((d) => chatRefs.push(d.ref));
   await deleteDocsByRefs(chatRefs, { dryRun, label: "portal_ivana_chat_messages" });
 
+  // 4) CRM : sites puis clients de la société démo
+  const siteRefs: FirebaseFirestore.DocumentReference[] = [];
+  const snapSitesByCompany = await db
+    .collection("sites")
+    .where("companyId", "==", DEMO_COMPANY_ID)
+    .get();
+  snapSitesByCompany.docs.forEach((d) => siteRefs.push(d.ref));
+  await deleteDocsByRefs(siteRefs, { dryRun, label: "sites" });
+
+  const clientRefs: FirebaseFirestore.DocumentReference[] = [];
+  const snapClientsByCompany = await db
+    .collection("clients")
+    .where("companyId", "==", DEMO_COMPANY_ID)
+    .get();
+  snapClientsByCompany.docs.forEach((d) => clientRefs.push(d.ref));
+  await deleteDocsByRefs(clientRefs, { dryRun, label: "clients" });
+
   console.log("cleanupDemoData done");
   console.log(
     dryRun

@@ -1,4 +1,6 @@
 import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
+import { lecotPlaywrightSearchEnabled } from "@/features/catalog/lecotOrderFlags";
+import { searchLecotViaPlaywright } from "@/features/catalog/lecotPlaywrightScraper";
 
 type LecotApiHit = {
   sku?: string;
@@ -34,10 +36,22 @@ export function lecotApiSearchPath(): string {
   return "/products/search";
 }
 
-/** Appelle l'API Lecot configurée (sinon null → fallback catalogue local). */
+/**
+ * Appelle l'API Lecot si configurée, sinon Playwright (opt-in), sinon null → catalogue local JSON.
+ */
 export async function searchLecotViaApi(query: string): Promise<CatalogProduct[] | null> {
   const base = lecotApiBaseUrl();
-  if (!base) return null;
+  if (!base) {
+    if (lecotPlaywrightSearchEnabled()) {
+      try {
+        return await searchLecotViaPlaywright(query);
+      } catch (err) {
+        console.warn("[lecot/search] Playwright échoué, fallback catalogue local.", err);
+        return null;
+      }
+    }
+    return null;
+  }
 
   const url = new URL(lecotApiSearchPath(), base.endsWith("/") ? base : `${base}/`);
   url.searchParams.set("q", query);

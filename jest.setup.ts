@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
+import { TextDecoder, TextEncoder } from 'util';
 import { mockState } from './src/test-utils/mockState';
+
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+  global.TextEncoder = TextEncoder as typeof global.TextEncoder;
+}
 
 afterEach(() => {
   mockState.reset();
@@ -13,6 +19,12 @@ class ResizeObserverMock {
 }
 
 global.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+
+// cmdk / chat panels call scrollIntoView / scrollTo — not available in jsdom (skip in node env)
+if (typeof Element !== "undefined") {
+  Element.prototype.scrollIntoView = jest.fn();
+  Element.prototype.scrollTo = jest.fn();
+}
 
 // --- GLOBAL MOCKS FOR AI TESTING ARCHITECTURE ---
 

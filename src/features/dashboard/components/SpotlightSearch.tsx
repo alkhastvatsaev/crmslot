@@ -22,6 +22,7 @@ import { isCompanyDispatchViewer } from '@/features/company/isCompanyDispatchVie
 import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
 import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
 import { interventionClientLabel } from '@/features/interventions/technicianSchedule';
+import { lecotShopBaseUrl } from '@/features/catalog/lecotShopConfig';
 
 const languages: { code: Language; label: string }[] = [
   { code: 'fr', label: 'FR' },
@@ -303,7 +304,7 @@ export default function SpotlightSearch() {
                     <Command.Item
                       value="lecot fournisseur matériel pièces recherche"
                       onSelect={() => {
-                        window.open('https://lecot.be/fr-be', '_blank', 'noopener');
+                        window.open(lecotShopBaseUrl(), "_blank", "noopener");
                         setOpen(false);
                       }}
                       className="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-black/5 aria-selected:bg-black/5"

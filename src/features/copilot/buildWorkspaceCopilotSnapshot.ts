@@ -5,8 +5,8 @@ import type {
   WorkspaceCopilotSnapshot,
 } from "@/features/copilot/types";
 
-const MAX_INTERVENTIONS = 45;
-const MAX_CLIENTS = 30;
+const MAX_INTERVENTIONS = 20;
+const MAX_CLIENTS = 10;
 
 function interventionClientName(iv: Intervention): string {
   const parts = [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ").trim();
@@ -97,6 +97,7 @@ export function buildWorkspaceCopilotSnapshot(
       urgency: Boolean(iv.urgency),
       hasAudio: Boolean(iv.audioUrl || iv.audioStoragePath || iv.transcription),
       hasInvoicePdf: Boolean(iv.invoicePdfUrl || iv.invoicePdfStoragePath),
+      clientEmail: iv.clientEmail ?? null,
     }));
 
   return {

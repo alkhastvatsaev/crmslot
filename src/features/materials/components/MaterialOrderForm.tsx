@@ -6,6 +6,7 @@ import type { MaterialOrderPart } from "@/features/materials/types";
 
 import { TERRAIN_TEMPLATES } from "@/features/interventions/config/terrainTemplates";
 import OmniSearchLecot, { LecotProduct } from "./OmniSearchLecot";
+import { lecotShopCatalogSearchUrl } from "@/features/catalog/lecotShopConfig";
 
 type Props = {
   interventionId: string;
@@ -163,7 +164,7 @@ export function MaterialOrderForm({ onSubmitOrder, onCancel, initialTemplateId, 
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
                   />
                   <a
-                    href={`https://lecot.be/fr-be/search?q=${encodeURIComponent(part.reference || part.description)}`}
+                    href={lecotShopCatalogSearchUrl(part.reference || part.description)}
                     target="_blank" rel="noreferrer"
                     className="flex shrink-0 items-center justify-center rounded-lg bg-slate-800 px-3 text-xs font-bold text-white hover:bg-slate-700 transition-colors"
                     onClick={(e) => {

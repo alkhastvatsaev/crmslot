@@ -1,6 +1,7 @@
 import {
   mergeCatalogProducts,
   searchCatalogProducts,
+  searchCatalogProductsScored,
 } from "@/features/catalog/searchCatalogProducts";
 
 describe("searchCatalogProducts", () => {
@@ -17,6 +18,15 @@ describe("searchCatalogProducts", () => {
     expect(searchCatalogProducts(catalog, "cyl", 12)).toEqual([
       { sku: "A", label: "Cylindre A2P", unitPriceCents: 100 },
     ]);
+  });
+
+  it("matches long natural-language queries by tokens", () => {
+    const hits = searchCatalogProductsScored(
+      catalog,
+      "Cylindre double de chantier FTH fermeture differente",
+      5,
+    );
+    expect(hits.some((p) => p.label.toLowerCase().includes("cylindre"))).toBe(true);
   });
 
   it("deduplicates merged catalogs by sku", () => {

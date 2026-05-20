@@ -279,7 +279,10 @@
     "offline_hint": "Offline modus — klantenlijst uit lokale cache.",
     "open_in_backoffice": "Openen in back-office",
     "export_csv": "CSV exporteren",
-    "recurring_request": "Nieuwe aanvraag (zelfde klant)"
+    "recurring_request": "Nieuwe aanvraag (zelfde klant)",
+    "delete_client": "Verwijderen",
+    "delete_client_confirm": "« {{name}} » en alle sites definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "client_deleted": "Contact uit het adresboek verwijderd."
   },
   "finish_checklist": {
     "title": "Controle vóór afsluiten",

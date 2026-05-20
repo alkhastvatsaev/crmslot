@@ -1,24 +1,19 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import {
-  DEMO_TECHNICIAN_UID,
-  devUiPreviewEnabled,
-  realInterventionsOnly,
-  stripKnownSyntheticInterventions,
-} from "@/core/config/devUiPreview";
-import { useDashboardSelectedDate } from "@/context/DateContext";
+import { DEMO_TECHNICIAN_UID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import type { Intervention } from "@/features/interventions/types";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
-import { generateDailyAssignmentsAsInterventions } from "@/utils/dailyMockAssignments";
-import { isInterventionReleasedToTechnicianField } from "@/features/interventions/technicianSchedule";
+import { buildTechnicianInterventionList } from "@/features/interventions/technicianAssignmentsFilter";
 import {
   getTechnicianAssignmentUid,
-  matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
 import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
+
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
   loading: boolean;
@@ -32,14 +27,11 @@ type Options = {
 };
 
 /**
- * Temps réel — interventions visibles par le technicien **après** le goulot IVANA
- * (les dossiers `pending` / `pending_needs_address` restent dans « Demandes » uniquement).
- * Sources : assignées au technicien, repli démo, pool société une fois libérées du statut intake.
+ * Temps réel — interventions visibles par le technicien **après** le goulot IVANA.
  */
 export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
   const hookEnabled = options.enabled !== false;
   const queryClient = useQueryClient();
-  const dashboardDate = useDashboardSelectedDate();
 
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
 
@@ -51,7 +43,6 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
 
-  // Reset when hook is disabled — render-time update avoids setState in effect body
   const [prevHookEnabled, setPrevHookEnabled] = useState(hookEnabled);
   if (prevHookEnabled !== hookEnabled) {
     setPrevHookEnabled(hookEnabled);
@@ -79,24 +70,14 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
   const firestoreInterventions = useMemo(() => assignmentsQuery.data ?? [], [assignmentsQuery.data]);
 
-  const interventions = useMemo(() => {
-    const filterReleased = (rows: Intervention[]) => {
-      const uid = (firebaseUid ?? "").trim();
-      if (!uid) return [];
-      return rows.filter((iv) => {
-        if (!isInterventionReleasedToTechnicianField(iv)) return false;
-        return matchesAssignedTechnician(iv, uid);
-      });
-    };
-
-    if (devUiPreviewEnabled && !realInterventionsOnly) {
-      const mockRows = generateDailyAssignmentsAsInterventions(dashboardDate);
-      const map = new Map(mockRows.map((r) => [r.id, r]));
-      firestoreInterventions.forEach((r) => map.set(r.id, r));
-      return filterReleased(Array.from(map.values()));
-    }
-    return stripKnownSyntheticInterventions(filterReleased(firestoreInterventions));
-  }, [firestoreInterventions, dashboardDate, firebaseUid]);
+  const interventions = useMemo(
+    () =>
+      buildTechnicianInterventionList({
+        firestoreInterventions,
+        technicianUid: firebaseUid,
+      }),
+    [firestoreInterventions, firebaseUid],
+  );
 
   const loading = Boolean(
     isConfigured &&

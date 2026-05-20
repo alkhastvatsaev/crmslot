@@ -19,7 +19,6 @@ jest.mock("@/core/config/firebase", () => ({
 jest.mock("@/core/config/devUiPreview", () => ({
   ...jest.requireActual("@/core/config/devUiPreview"),
   devUiPreviewEnabled: false,
-  realInterventionsOnly: true,
   stripKnownSyntheticInterventions: (rows: Intervention[]) => rows,
 }));
 

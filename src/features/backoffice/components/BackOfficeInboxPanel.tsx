@@ -60,7 +60,7 @@ import {
   missionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
-import type { Mission } from "@/utils/mockMissions";
+import type { Mission } from "@/features/map/missionTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";

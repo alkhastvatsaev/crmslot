@@ -26,6 +26,7 @@ export type WorkspaceCopilotInterventionRow = {
   urgency: boolean;
   hasAudio: boolean;
   hasInvoicePdf: boolean;
+  clientEmail: string | null;
 };
 
 export type WorkspaceCopilotSnapshot = {

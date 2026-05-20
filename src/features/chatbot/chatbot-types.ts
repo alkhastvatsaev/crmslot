@@ -1,3 +1,6 @@
+import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
+
 export type ChatbotChatRole = "user" | "assistant";
 
 export type ChatbotUiMessage = {
@@ -5,6 +8,8 @@ export type ChatbotUiMessage = {
   role: ChatbotChatRole;
   content: string;
   createdAt: number;
+  /** Boutons cliquables (commande Lecot, réponses courtes, etc.). */
+  actions?: ChatbotQuickAction[];
 };
 
 export type ChatbotConversation = {
@@ -29,5 +34,21 @@ export type ChatbotStreamEvent =
   | { type: "tool_start"; tool: string; label: string }
   | { type: "tool_end"; tool: string }
   | { type: "tool_pending"; pending: ChatbotPendingTool }
+  | {
+      type: "document_preview";
+      interventionId: string;
+      documentType: ChatbotDocumentKind;
+    }
+  | {
+      type: "supplier_orders_panel";
+      highlightOrderId: string;
+      materialOrderId?: string | null;
+      previewOrder?: import("@/features/suppliers/types").SupplierOrder;
+    }
+  | { type: "supplier_order_pdf"; companyId: string; orderId: string }
+  | { type: "registry_refresh" }
+  | { type: "quick_actions"; actions: ChatbotQuickAction[] }
   | { type: "done"; apiMessages?: unknown[] }
   | { type: "error"; message: string };
+
+export type ChatbotStreamEmit = (event: ChatbotStreamEvent) => void;
