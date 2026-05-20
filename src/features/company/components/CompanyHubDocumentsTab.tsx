@@ -21,9 +21,10 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
 
   useEffect(() => {
     if (!interventionId || !companyId || !firestore) return;
+    const db = firestore;
     const fetchOrders = async () => {
       const q = query(
-        collection(firestore, "companies", companyId, "supplierOrders"),
+        collection(db, "companies", companyId, "supplierOrders"),
         where("interventionId", "==", interventionId)
       );
       try {

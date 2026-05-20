@@ -196,7 +196,6 @@ async function handleChatbotPostInner(
 
   const instantOrder = await buildInstantLecotOrderPayload(companyId, lastUser, messages, {
     focusInterventionId,
-    focusInterventionId: (body?.focusInterventionId ?? "").trim() || undefined,
   });
   if (instantOrder && !isChatbotGreetingMessage(lastUser)) {
     return streamLecotOrderToolOutcome({

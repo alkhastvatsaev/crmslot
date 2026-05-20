@@ -118,7 +118,9 @@ describe("appendChatbotTrainingLog", () => {
 
     expect(companiesDoc).toHaveBeenCalledWith("co-acme");
     expect(mockAdd).toHaveBeenCalledTimes(1);
-    const payload = mockAdd.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = mockAdd.mock.calls[0] as unknown as [Record<string, unknown>] | undefined;
+    expect(firstCall).toBeDefined();
+    const payload = firstCall![0];
     expect(payload.actorUid).toBe("uid-42");
     expect(payload.modelName).toBe("gpt-4o");
     expect(payload.conversationId).toBe("thread-1");
