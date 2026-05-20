@@ -12,6 +12,19 @@ import {
 } from "@/core/ui/glassPanelChrome";
 import { cn } from "@/lib/utils";
 
+const DAILY_MISSIONS_GRID_SLOTS = 12;
+
+function DailyMissionEmptySlot({ index }: { index: number }) {
+  return (
+    <div
+      key={`empty-slot-${index}`}
+      data-testid={`daily-missions-empty-slot-${index}`}
+      aria-hidden
+      className="aspect-square w-full max-w-[95px] justify-self-center rounded-[24px] border border-black/[0.06] bg-white/50 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6),0_4px_14px_-6px_rgba(15,23,42,0.08)]"
+    />
+  );
+}
+
 export default function DailyMissions({
   missions: missionsProp,
   onMissionClick,
@@ -22,15 +35,25 @@ export default function DailyMissions({
   isEmbedded?: boolean;
 }) {
   const missions = useMemo(() => missionsProp ?? [], [missionsProp]);
+  const isEmpty = missions.length === 0;
+  const gridMissions = useMemo(
+    () => missions.slice(0, DAILY_MISSIONS_GRID_SLOTS),
+    [missions],
+  );
+  const trailingEmptySlots = DAILY_MISSIONS_GRID_SLOTS - gridMissions.length;
 
   const content = (
-    <div className={cn(
-      "flex flex-col flex-1 min-h-0",
-      !isEmbedded && GLASS_PANEL_BODY_SCROLL
-    )}>
-      {/* Aligning the mission items to the top */}
-      <div className="grid grid-cols-3 gap-3 px-3 pb-8 pt-4 [grid-template-columns:repeat(3,minmax(0,1fr))]">
-          {missions.map((mission, index) => {
+    <div
+      className={cn(
+        "flex min-h-0 flex-1 flex-col",
+        isEmbedded ? "min-h-0 flex-1" : GLASS_PANEL_BODY_SCROLL,
+      )}
+    >
+      <div
+        className="grid shrink-0 grid-cols-3 gap-3 px-3 pb-6 pt-4 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]"
+        data-testid={isEmpty ? "daily-missions-empty-grid" : "daily-missions-grid"}
+      >
+          {gridMissions.map((mission, index) => {
             const tone = mission.statusCode
               ? dailyMissionCardToneFromStatus(mission.statusCode)
               : "upcoming";
@@ -97,6 +120,11 @@ export default function DailyMissions({
               </motion.div>
             );
           })}
+          {trailingEmptySlots > 0
+            ? Array.from({ length: trailingEmptySlots }, (_, i) => (
+                <DailyMissionEmptySlot key={`trailing-empty-${i}`} index={gridMissions.length + i} />
+              ))
+            : null}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const MAX_BODY_CHARS = 4500;
 async function assertGmailReady(): Promise<void> {
   if (!(await isGmailOAuthConfigured())) {
     throw new Error(
-      "Gmail non connecté : connectez Gmail depuis la page 7 (bouton Google) ou configurez OAuth côté serveur.",
+      "Gmail non connecté : connectez Gmail depuis la page 6 (bouton Google) ou configurez OAuth côté serveur.",
     );
   }
 }
@@ -38,7 +38,7 @@ async function assertInterventionAccess(companyId: string, interventionId: strin
   }
 }
 
-/** Liste les mails récents de la boîte connectée (même compte que la page 7). */
+/** Liste les mails récents de la boîte connectée (même compte que la page 6). */
 export async function listGmailInboxForChatbot(input: {
   q?: string;
   labelId?: string;

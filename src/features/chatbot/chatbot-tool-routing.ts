@@ -47,8 +47,14 @@ export const CHATBOT_TOOL_STATS = ["statistiques_periode", "list_quotes"] as con
 
 export const CHATBOT_TOOL_INBOX = ["list_inbox_notifications", "list_portal_chat"] as const;
 
-/** Boîte Gmail connectée (page 7) — colis, mails clients, suivi. */
-export const CHATBOT_TOOL_GMAIL = ["list_gmail_inbox", "get_gmail_message"] as const;
+/** Boîte Gmail connectée (page 6) — colis, mails clients, suivi. */
+export const CHATBOT_TOOL_GMAIL = [
+  "list_gmail_inbox",
+  "get_gmail_message",
+  "suggest_gmail_intervention_links",
+  "send_gmail_reply",
+  "link_gmail_to_intervention",
+] as const;
 
 export const CHATBOT_TOOL_STOCK = ["list_stock_alerts"] as const;
 

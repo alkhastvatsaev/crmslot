@@ -86,6 +86,22 @@ export function documentToolSuccessMessage(toolName: string, result: unknown): s
   }
   const r = result as { clientName?: string; totalEur?: number };
 
+  if (toolName === "send_gmail_reply") {
+    const r = result as { sentTo?: string; subject?: string };
+    const to = r.sentTo ?? "destinataire";
+    const subject = String(r.subject ?? "").trim();
+    return subject
+      ? `✅ Réponse Gmail envoyée à **${to}**. Objet : « ${subject.slice(0, 60)} ».`
+      : `✅ Réponse Gmail envoyée à **${to}**.`;
+  }
+
+  if (toolName === "link_gmail_to_intervention") {
+    const r = result as { interventionId?: string; subject?: string; from?: string };
+    const id = r.interventionId ?? "dossier";
+    const subject = String(r.subject ?? "").slice(0, 50);
+    return `✅ Mail lié au dossier **${id}**${subject ? ` — « ${subject} »` : ""}${r.from ? ` (${r.from})` : ""}.`;
+  }
+
   if (toolName === "send_intervention_email") {
     const r = result as {
       to?: string;

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
+import { TECHNICIAN_LAB_IN_CAROUSEL, TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
 import {
   DASHBOARD_DESKTOP_APP_SHELL_CLASS,
   DASHBOARD_DESKTOP_CANVAS_CLASS,
@@ -29,7 +29,8 @@ type Props = {
  */
 export default function DashboardDesktopShell({ header, pager, galaxy }: Props) {
   const dashboardPager = useDashboardPagerOptional();
-  const immersiveTechnicianLab = dashboardPager?.pageIndex === TECHNICIAN_LAB_SLOT_INDEX;
+  const immersiveTechnicianLab =
+    TECHNICIAN_LAB_IN_CAROUSEL && dashboardPager?.pageIndex === TECHNICIAN_LAB_SLOT_INDEX;
 
   return (
     <div id="dashboard-root-scroll" className={DASHBOARD_DESKTOP_APP_SHELL_CLASS}>

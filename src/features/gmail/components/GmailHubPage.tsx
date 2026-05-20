@@ -8,9 +8,14 @@ import DashboardTriplePanelLayout from "@/features/dashboard/components/Dashboar
 import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
+import { useGmailHubLinkIntervention } from "@/features/gmail/useGmailHubLinkIntervention";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import GmailHubSetupPanel from "@/features/gmail/components/GmailHubSetupPanel";
+import GmailHubLinkInterventionPanel from "@/features/gmail/components/GmailHubLinkInterventionPanel";
 import GmailHubSidebar from "@/features/gmail/components/GmailHubSidebar";
 import GmailHubInboxList from "@/features/gmail/components/GmailHubInboxList";
 import GmailHubReaderPane from "@/features/gmail/components/GmailHubReaderPane";
@@ -18,7 +23,7 @@ import {
   base64ToBlobUrl,
   revokeBlobUrl,
 } from "@/features/gmail/gmailHubAttachmentBlob";
-import { parseSenderEmail } from "@/features/gmail/gmailHubUi";
+import { gmailShell, parseSenderEmail } from "@/features/gmail/gmailHubUi";
 import type { GmailHubAttachment, GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
 
 type Props = { slotIndex?: number };
@@ -28,6 +33,20 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId =
+    (workspace?.activeCompanyId ?? "").trim() ||
+    (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+  const { interventions } = useBackOfficeInterventions(companyId);
+  const {
+    candidates: linkCandidates,
+    loadingSuggestions: linkLoadingSuggestions,
+    linking: linkLinking,
+    error: linkError,
+    loadSuggestions: loadLinkSuggestions,
+    linkToIntervention,
+    reset: resetGmailLink,
+  } = useGmailHubLinkIntervention(companyId);
   const oauthReturnHandled = useRef(false);
   const [activeLabelId, setActiveLabelId] = useState("INBOX");
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,6 +61,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const [pdfPreviewAttachmentId, setPdfPreviewAttachmentId] = useState<string | null>(null);
   const [pdfPreviewLoadingId, setPdfPreviewLoadingId] = useState<string | null>(null);
   const [pdfPreviewError, setPdfPreviewError] = useState<string | null>(null);
+  const [linkPanelOpen, setLinkPanelOpen] = useState(false);
 
   const closePdfPreview = useCallback(() => {
     setPdfPreviewUrl((prev) => {
@@ -56,6 +76,11 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   useEffect(() => {
     closePdfPreview();
   }, [selectedId, closePdfPreview]);
+
+  useEffect(() => {
+    setLinkPanelOpen(false);
+    resetGmailLink();
+  }, [selectedId, resetGmailLink]);
 
   useEffect(() => {
     if (typeof window === "undefined" || oauthReturnHandled.current) return;
@@ -171,8 +196,26 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       setComposing(false);
       void hub.loadThread(msg.threadId, msg.id);
     },
-    [hub],
+    [hub.loadThread],
   );
+
+  /** Ouvre le mail le plus récent (1er de la liste Gmail) quand rien n'est sélectionné. */
+  useEffect(() => {
+    if (hub.status?.oauthConfigured !== true || composing || hub.loadingList) return;
+    const { messages } = hub;
+    if (messages.length === 0) return;
+    if (selectedId && messages.some((m) => m.id === selectedId)) return;
+    const latest = messages[0];
+    setSelectedId(latest.id);
+    void hub.loadThread(latest.threadId, latest.id);
+  }, [
+    hub.status?.oauthConfigured,
+    composing,
+    hub.loadingList,
+    hub.messages,
+    selectedId,
+    hub.loadThread,
+  ]);
 
   const handleListToggleRead = useCallback(
     async (msg: GmailHubMessageSummary, markAsUnread: boolean) => {
@@ -253,11 +296,28 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const handleReply = () => {
     const m = hub.selectedMessage;
     if (!m) return;
+    setLinkPanelOpen(false);
     setComposeTo(parseSenderEmail(m.from));
     setComposeSubject(m.subject.startsWith("Re:") ? m.subject : `Re: ${m.subject}`);
     setComposeBody(`\n\n—\n${m.bodyText}`);
     setComposing(true);
   };
+
+  const handleLinkToIntervention = useCallback(
+    async (interventionId: string, note?: string) => {
+      const m = hub.selectedMessage;
+      if (!m) return;
+      try {
+        await linkToIntervention(m.id, interventionId, note);
+        toast.success(String(t("gmail.hub.link_ok")));
+        setLinkPanelOpen(false);
+        resetGmailLink();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : String(t("common.error")));
+      }
+    },
+    [hub.selectedMessage, linkToIntervention, resetGmailLink, t],
+  );
 
   const handleSend = async () => {
     const m = hub.selectedMessage;
@@ -365,7 +425,6 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   });
 
   return (
-    <div data-testid="gmail-hub-page" className="gmail-hub-page-root">
     <DashboardTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
@@ -378,7 +437,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       rightPadding={false}
       left={
         hub.loadingStatus && !hub.status ? (
-          <div data-testid="gmail-hub-panel-left" className="flex flex-1 items-center justify-center p-6">
+          <div className={`${gmailShell} items-center justify-center p-6`}>
             <p className="text-[13px] text-slate-400">{t("common.loading")}</p>
           </div>
         ) : !connected ? undefined : (
@@ -396,10 +455,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       }
       center={
         hub.loadingStatus && !hub.status ? (
-          <div
-            data-testid="gmail-hub-panel-center"
-            className="flex h-full items-center justify-center px-6"
-          >
+          <div className={`${gmailShell} items-center justify-center px-6`}>
             <p className="text-[13px] text-slate-400">{t("common.loading")}</p>
           </div>
         ) : !connected ? (
@@ -450,6 +506,22 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             userLabels={userLabels}
             loadingDetail={hub.loadingDetail}
             onReply={handleReply}
+            linkPanelOpen={linkPanelOpen}
+            onToggleLinkPanel={() => setLinkPanelOpen((v) => !v)}
+            linkPanel={
+              <GmailHubLinkInterventionPanel
+                open={linkPanelOpen}
+                messageId={hub.selectedMessage?.id ?? ""}
+                companyId={companyId}
+                candidates={linkCandidates}
+                loadingSuggestions={linkLoadingSuggestions}
+                linking={linkLinking}
+                suggestionsError={linkError}
+                interventions={interventions}
+                onLoadSuggestions={(id) => void loadLinkSuggestions(id)}
+                onLink={(ivId, note) => void handleLinkToIntervention(ivId, note)}
+              />
+            }
             onToggleRead={handleReaderToggleRead}
             onToggleLabel={handleToggleLabel}
             onStar={() => void handleStar()}
@@ -465,6 +537,5 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         )
       }
     />
-    </div>
   );
 }

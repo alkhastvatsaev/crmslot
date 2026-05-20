@@ -13,10 +13,22 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
 
 
   useEffect(() => {
-    if (devUiPreviewEnabled) {
+    if (!auth) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsAuthenticated(true);
       setLoadingState('ready');
+      return;
+    }
+
+    if (devUiPreviewEnabled) {
+      void (async () => {
+        try {
+          if (!auth.currentUser) await signInAnonymously(auth);
+        } catch (e) {
+          console.warn("[LoginOverlay] dev anonymous sign-in failed", e);
+        }
+        setIsAuthenticated(true);
+        setLoadingState('ready');
+      })();
       return;
     }
 

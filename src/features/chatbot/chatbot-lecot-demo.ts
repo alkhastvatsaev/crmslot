@@ -2,6 +2,7 @@ import type { SupplierOrder, SupplierOrderLine, SupplierOrderStatus } from "@/fe
 
 export type LecotOrderToolResult = {
   supplierOrderId: string;
+  interventionId?: string | null;
   materialOrderId?: string | null;
   status?: SupplierOrderStatus;
   totalCents: number;
@@ -67,5 +68,6 @@ export function buildSupplierOrderPreviewFromToolResult(
     updatedAt: now,
     sentAt: status === "sent" ? now : null,
     isDemo: Boolean(result.demoMode),
+    interventionId: result.interventionId?.trim() || undefined,
   };
 }

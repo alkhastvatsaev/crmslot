@@ -71,12 +71,12 @@ Si on te pose une question sur un élément qui n'est pas dans le contexte, pré
 
 ${contextLines.join("\n")}`;
 
-    const apiMessages = [
+    const apiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemPrompt },
-      ...messages.map((m: any) => ({
-        role: m.role,
+      ...messages.map((m: { role: string; content: string }) => ({
+        role: m.role as "user" | "assistant" | "system",
         content: m.content,
-      }))
+      })),
     ];
 
     // 2. Stream from OpenAI
@@ -107,8 +107,9 @@ ${contextLines.join("\n")}`;
         "Connection": "keep-alive",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur API Chat AI:", error);
-    return NextResponse.json({ error: error.message || "Erreur interne" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Erreur interne";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -46,7 +46,7 @@ function drawHeader(
   const companyLines = doc.splitTextToSize(branding.companyName.toUpperCase(), 95);
   doc.text(companyLines, M, 22);
 
-  let tagY = 22 + companyLines.length * 6.5;
+  const tagY = 22 + companyLines.length * 6.5;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   setColor(doc, C.secondary);

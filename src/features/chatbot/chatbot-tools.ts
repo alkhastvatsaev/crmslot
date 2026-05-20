@@ -139,7 +139,7 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   {
     name: "list_gmail_inbox",
     description:
-      "Lit la boîte Gmail connectée (page 7 — même compte OAuth). Liste les mails récents avec extrait. Utilise pour colis (Bpost, Colissimo, DPD…), mails clients non encore dans un dossier, ou « quoi de neuf dans mes mails ». Paramètre q = syntaxe recherche Gmail (ex. « colis OR bpost », « from:client@be », « is:unread »). Enchaîne avec get_gmail_message pour le corps complet.",
+      "Lit la boîte Gmail connectée (page 6 — même compte OAuth). Liste les mails récents avec extrait. Utilise pour colis (Bpost, Colissimo, DPD…), mails clients non encore dans un dossier, ou « quoi de neuf dans mes mails ». Paramètre q = syntaxe recherche Gmail (ex. « colis OR bpost », « from:client@be », « is:unread »). Enchaîne avec get_gmail_message pour le corps complet.",
     input_schema: {
       type: "object",
       properties: {
@@ -154,6 +154,18 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
     name: "get_gmail_message",
     description:
       "Corps complet d'un mail Gmail (id retourné par list_gmail_inbox). Indispensable pour numéro de colis, adresse client, demande dans un email entrant.",
+    input_schema: {
+      type: "object",
+      properties: {
+        messageId: { type: "string", description: "ID message Gmail" },
+      },
+      required: ["messageId"],
+    },
+  },
+  {
+    name: "suggest_gmail_intervention_links",
+    description:
+      "Propose des dossiers intervention à lier à un mail Gmail (lecture seule, scoring email/nom/corps). Appelle avant link_gmail_to_intervention quand le dossier n'est pas évident.",
     input_schema: {
       type: "object",
       properties: {

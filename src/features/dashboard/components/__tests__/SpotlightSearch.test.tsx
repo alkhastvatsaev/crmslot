@@ -4,11 +4,18 @@ import { renderWithPager } from '@/test-utils/renderWithPager';
 import SpotlightSearch from '../SpotlightSearch';
 import { BACKOFFICE_HUB_SLOT_INDEX } from '@/features/backoffice/backofficeHubConstants';
 import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
-import { TECHNICIAN_LAB_SLOT_INDEX } from '@/features/technicians/technicianLabConstants';
+import { GMAIL_HUB_SLOT_INDEX } from '@/features/gmail/gmailHubConstants';
 
-/** Indices réels des entrées spotlight (pas 0..n-1 : lab = slot 6). */
-const SPOTLIGHT_NAV_INDICES = [0, 1, 2, BACKOFFICE_HUB_SLOT_INDEX, AI_ASSISTANT_SLOT_INDEX, TECHNICIAN_LAB_SLOT_INDEX];
-const SPOTLIGHT_PAGE_COUNT = TECHNICIAN_LAB_SLOT_INDEX + 1;
+/** Indices réels des entrées spotlight (Gmail = 5). */
+const SPOTLIGHT_NAV_INDICES = [
+  0,
+  1,
+  2,
+  BACKOFFICE_HUB_SLOT_INDEX,
+  AI_ASSISTANT_SLOT_INDEX,
+  GMAIL_HUB_SLOT_INDEX,
+];
+const SPOTLIGHT_PAGE_COUNT = GMAIL_HUB_SLOT_INDEX + 1;
 
 jest.mock('@/context/CompanyWorkspaceContext', () => ({
   useCompanyWorkspaceOptional: () => null,

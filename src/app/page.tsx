@@ -12,7 +12,6 @@ import DashboardPager from "@/features/dashboard/components/DashboardPager";
 import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
 import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
-import { TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
@@ -65,11 +64,6 @@ const BackOfficeHubPage = dynamic(
   { ssr: false, loading: () => null },
 );
 
-const TechnicianLabCarouselPage = dynamic(
-  () => import("@/features/technicians/components/TechnicianLabCarouselPage"),
-  { ssr: false, loading: () => null },
-);
-
 const ChatbotPage = dynamic(() => import("@/features/chatbot/components/ChatbotPage"), {
   ssr: false,
   loading: () => null,
@@ -80,7 +74,7 @@ const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubP
   loading: () => null,
 });
 
-/** Écran d’accueil — **7 pages** : carte · société · technicien · back-office · Chatbot · lab · Gmail. */
+/** Écran d’accueil — **6 pages** : carte · société · technicien · back-office · Chatbot · Gmail (lab page 6 archivé). */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -93,7 +87,6 @@ export default function Dashboard() {
       <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
       <BackOfficeHubPage key="backoffice-hub" slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />,
       <ChatbotPage key="chatbot" slotIndex={AI_ASSISTANT_SLOT_INDEX} />,
-      <TechnicianLabCarouselPage key="technician-lab" slotIndex={TECHNICIAN_LAB_SLOT_INDEX} />,
       <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
     ],
     [],

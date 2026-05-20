@@ -497,7 +497,9 @@ export async function orderLecotPartsForChatbot(
 
     const billingNote = billingSynced
       ? " Lignes ajoutées à la facture du dossier ; PDF bon de commande et facture à droite."
-      : "";
+      : interventionId
+        ? " ⚠ Sync facturation échouée — vérifiez manuellement les lignes sur le dossier."
+        : "";
 
     return {
       ok: true,
@@ -593,7 +595,9 @@ export async function orderLecotPartsForChatbot(
       : "";
   const billingNote = billingSynced
     ? " Lignes sur la facture dossier ; bons de commande et facture ouverts à droite."
-    : "";
+    : interventionId
+      ? " ⚠ Sync facturation échouée — vérifiez manuellement les lignes sur le dossier."
+      : "";
 
   return {
     ok: true,

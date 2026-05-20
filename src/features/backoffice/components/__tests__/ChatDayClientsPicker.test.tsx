@@ -22,10 +22,12 @@ describe("ChatDayClientsPicker", () => {
     expect(onSelectClient).toHaveBeenCalledWith("202605180");
   });
 
-  it("shows empty state", () => {
+  it("shows no client list when there are no rows", () => {
     render(
       <ChatDayClientsPicker rows={[]} onSelectGlobal={jest.fn()} onSelectClient={jest.fn()} />,
     );
-    expect(screen.getByTestId("chat-day-clients-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("chat-day-global-btn")).toBeInTheDocument();
+    expect(screen.queryByTestId("chat-day-clients-list")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chat-day-clients-empty")).not.toBeInTheDocument();
   });
 });

@@ -25,7 +25,7 @@ function redirectToHub(query: Record<string, string>): NextResponse {
   return res;
 }
 
-/** Callback OAuth — enregistre le token (Firestore) et renvoie vers la page 7. */
+/** Callback OAuth — enregistre le token (Firestore) et renvoie vers la page 6 (Gmail). */
 export async function GET(req: NextRequest) {
   const err = req.nextUrl.searchParams.get("error");
   if (err) {

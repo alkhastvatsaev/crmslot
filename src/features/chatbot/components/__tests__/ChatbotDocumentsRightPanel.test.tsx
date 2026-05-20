@@ -92,4 +92,22 @@ describe("ChatbotDocumentsRightPanel", () => {
     fireEvent.click(screen.getByTestId("chatbot-documents-preview-close"));
     expect(closeDocumentPreview).toHaveBeenCalledTimes(1);
   });
+
+  it("filters documents with smart search", () => {
+    render(<ChatbotDocumentsRightPanel />);
+    const search = screen.getByTestId("chatbot-documents-search").querySelector("input");
+    expect(search).toBeTruthy();
+    fireEvent.change(search!, { target: { value: "facture dupont" } });
+    expect(screen.getByTestId("chatbot-document-invoice-iv-1")).toBeInTheDocument();
+    expect(screen.queryByTestId("chatbot-document-order-ord-1")).not.toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-documents-count")).toHaveTextContent("1/2");
+  });
+
+  it("shows no-results state when search matches nothing", () => {
+    render(<ChatbotDocumentsRightPanel />);
+    const search = screen.getByTestId("chatbot-documents-search").querySelector("input");
+    fireEvent.change(search!, { target: { value: "zzz inexistant" } });
+    expect(screen.getByTestId("chatbot-documents-no-results")).toBeInTheDocument();
+    expect(screen.queryByTestId("chatbot-document-invoice-iv-1")).not.toBeInTheDocument();
+  });
 });

@@ -11,7 +11,8 @@ import {
 
 export const gmailHubFont = { fontFamily: "'Outfit', sans-serif" } as const;
 
-export const gmailShell = "flex h-full min-h-0 flex-1 flex-col overflow-hidden";
+/** Même contraintes que les rails Chatbot / Back-office (`flex-1 min-h-0` dans GlassPanel). */
+export const gmailShell = "flex min-h-0 flex-1 flex-col overflow-hidden";
 
 export const gmailDivider = "border-black/[0.06]";
 

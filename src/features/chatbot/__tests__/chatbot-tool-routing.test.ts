@@ -33,6 +33,9 @@ describe("chatbot-tool-routing", () => {
     const scope = inferChatbotToolScope("Y a-t-il un update colis Bpost dans mes mails ?");
     expect(scope).toContain("list_gmail_inbox");
     expect(scope).toContain("get_gmail_message");
+    expect(scope).toContain("suggest_gmail_intervention_links");
+    expect(scope).toContain("send_gmail_reply");
+    expect(scope).toContain("link_gmail_to_intervention");
   });
 
   it("returns core scope for generic chat without domain hints", () => {

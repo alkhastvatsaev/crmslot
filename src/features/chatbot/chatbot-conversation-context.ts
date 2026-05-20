@@ -122,6 +122,9 @@ const TOOL_NAME_TO_FLOW: Record<string, ChatbotFlowId> = {
   list_portal_chat: "inbox",
   list_gmail_inbox: "gmail",
   get_gmail_message: "gmail",
+  suggest_gmail_intervention_links: "gmail",
+  send_gmail_reply: "gmail",
+  link_gmail_to_intervention: "gmail",
   list_stock_alerts: "stock",
 };
 
