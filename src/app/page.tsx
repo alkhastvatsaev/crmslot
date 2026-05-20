@@ -13,6 +13,7 @@ import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubCo
 import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
+import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
@@ -74,7 +75,12 @@ const ChatbotPage = dynamic(() => import("@/features/chatbot/components/ChatbotP
   loading: () => null,
 });
 
-/** Écran d’accueil — **6 pages** : carte · société · technicien · back-office · Chatbot · lab. */
+const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/** Écran d’accueil — **7 pages** : carte · société · technicien · back-office · Chatbot · lab · Gmail. */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -88,6 +94,7 @@ export default function Dashboard() {
       <BackOfficeHubPage key="backoffice-hub" slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />,
       <ChatbotPage key="chatbot" slotIndex={AI_ASSISTANT_SLOT_INDEX} />,
       <TechnicianLabCarouselPage key="technician-lab" slotIndex={TECHNICIAN_LAB_SLOT_INDEX} />,
+      <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
     ],
     [],
   );

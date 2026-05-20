@@ -55,6 +55,29 @@ export async function requireAuthenticatedUser(
   return { uid: decoded.uid, decoded };
 }
 
+/** UID synthétique — routes Gmail en `npm run dev` sans login manuel. */
+export const LOCAL_DEV_GMAIL_UID = "local-dev-gmail";
+
+export function isLocalDevelopmentRuntime(): boolean {
+  return process.env.NODE_ENV === "development";
+}
+
+/**
+ * Gmail hub local : Bearer si présent, sinon accès autorisé en développement uniquement.
+ * Production : identique à {@link requireAuthenticatedUser}.
+ */
+export async function requireAuthenticatedUserOrLocalDev(
+  request: Request,
+): Promise<AuthenticatedRequest | AuthGuardFailure> {
+  const authResult = await requireAuthenticatedUser(request);
+  if (!("response" in authResult)) return authResult;
+  if (!isLocalDevelopmentRuntime()) return authResult;
+  return {
+    uid: LOCAL_DEV_GMAIL_UID,
+    decoded: { uid: LOCAL_DEV_GMAIL_UID } as admin.auth.DecodedIdToken,
+  };
+}
+
 /** Routes démo : indisponibles en production. */
 export function blockIfProduction(): NextResponse | null {
   if (isProductionNodeEnv()) {

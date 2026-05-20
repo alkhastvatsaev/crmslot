@@ -29,6 +29,12 @@ describe("chatbot-tool-routing", () => {
     expect(inferChatbotToolScope("Bonjour")).toEqual([]);
   });
 
+  it("scopes gmail tools for colis / mailbox questions", () => {
+    const scope = inferChatbotToolScope("Y a-t-il un update colis Bpost dans mes mails ?");
+    expect(scope).toContain("list_gmail_inbox");
+    expect(scope).toContain("get_gmail_message");
+  });
+
   it("returns core scope for generic chat without domain hints", () => {
     const scope = inferChatbotToolScope("Où en est le dossier Dupont ?");
     expect(scope).toContain("list_interventions");

@@ -6,6 +6,7 @@ import {
   authorizeProcessUploads,
   blockIfProduction,
   requireAuthenticatedUser,
+  requireAuthenticatedUserOrLocalDev,
 } from "@/core/api/routeAuth";
 
 const verifyIdToken = jest.fn();
@@ -38,6 +39,25 @@ describe("requireAuthenticatedUser", () => {
       }),
     );
     expect("uid" in result && result.uid).toBe("user-1");
+  });
+});
+
+describe("requireAuthenticatedUserOrLocalDev", () => {
+  it("allows local dev without Bearer when NODE_ENV is development", async () => {
+    jest.replaceProperty(process, "env", { ...process.env, NODE_ENV: "development" });
+    const result = await requireAuthenticatedUserOrLocalDev(
+      new Request("http://localhost/api/integrations/gmail/status"),
+    );
+    expect("uid" in result && result.uid).toBe("local-dev-gmail");
+  });
+
+  it("returns 401 in production without Bearer", async () => {
+    jest.replaceProperty(process, "env", { ...process.env, NODE_ENV: "production" });
+    const result = await requireAuthenticatedUserOrLocalDev(
+      new Request("http://localhost/api/integrations/gmail/status"),
+    );
+    expect("response" in result).toBe(true);
+    if ("response" in result) expect(result.response.status).toBe(401);
   });
 });
 

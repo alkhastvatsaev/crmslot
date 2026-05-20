@@ -56,6 +56,8 @@ const TOOL_LABELS: Record<string, string> = {
   list_material_orders: "Commandes matériel",
 
   list_inbox_notifications: "Inbox",
+  list_gmail_inbox: "Gmail — boîte",
+  get_gmail_message: "Gmail — lecture",
   list_intervention_emails: "Emails dossier",
   get_intervention_billing: "Facturation",
   list_portal_chat: "Chat portail",

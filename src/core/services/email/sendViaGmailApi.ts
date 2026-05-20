@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { buildMimeMultipartEmail, type MimeAttachment } from "@/core/services/email/buildMimeEmail";
-import { getGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
+import { resolveGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
 
 export type GmailApiSendParams = {
   to: string;
@@ -53,7 +53,7 @@ function buildRfc822Raw(params: GmailApiSendParams, fromEmail: string, fromName:
 }
 
 export async function sendViaGmailApi(params: GmailApiSendParams): Promise<void> {
-  const { clientId, clientSecret, redirectUri, refreshToken, senderEmail } = getGmailOAuthConfig();
+  const { clientId, clientSecret, redirectUri, refreshToken, senderEmail } = await resolveGmailOAuthConfig();
   if (!clientId || !clientSecret || !refreshToken || !senderEmail) {
     throw new Error("OAuth Gmail incomplet (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_USER).");
   }

@@ -10,6 +10,7 @@ import { readSseJsonLines } from "@/features/chatbot/testFixtures/readSseJsonLin
 import { executeChatbotTool } from "@/features/chatbot/chatbot-tool-executor";
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { buildChatbotTestSnapshot } from "@/features/chatbot/testFixtures/chatbotWorkspaceSnapshot";
+import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
 
 jest.mock("@/features/chatbot/chatbot-tool-executor", () => ({
   executeChatbotTool: jest.fn(),
@@ -101,7 +102,7 @@ describe("chatbot-route-handler", () => {
       expect.objectContaining({ companyId: "co-test", actorUid: "uid-test" }),
     );
 
-    const events = (await readSseJsonLines(res)) as any[];
+    const events = await readSseJsonLines(res);
     expect(events).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -124,7 +125,7 @@ describe("chatbot-route-handler", () => {
       auth,
     );
 
-    const events = (await readSseJsonLines(res)) as any[];
+    const events = await readSseJsonLines(res);
     expect(events).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -169,9 +170,9 @@ describe("chatbot-route-handler", () => {
       auth,
     );
 
-    const events = (await readSseJsonLines(res)) as any[];
+    const events = await readSseJsonLines(res);
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-    expect(events.some((e) => e.type === "done")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
     expect(mockExecuteChatbotTool).toHaveBeenCalled();
   });
 
@@ -199,8 +200,8 @@ describe("chatbot-route-handler", () => {
       expect.objectContaining({ interventionId: "iv-lombard", documentType: "invoice" }),
       expect.any(Object),
     );
-    expect(events.some((e) => e.type === "document_preview")).toBe(true);
-    expect(events.some((e) => e.type === "done")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "document_preview")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
   });
 
   it("returns instant Lecot catalogue for serrure without OpenAI", async () => {
@@ -215,9 +216,9 @@ describe("chatbot-route-handler", () => {
 
     const events = (await readSseJsonLines(res)) as Array<{ type: string }>;
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-    expect(events.some((e) => e.type === "text")).toBe(true);
-    expect(events.some((e) => e.type === "quick_actions")).toBe(true);
-    expect(events.some((e) => e.type === "done")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "text")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "quick_actions")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
   });
 
   it("places instant Lecot order on Commander SKU without OpenAI", async () => {
@@ -256,8 +257,8 @@ describe("chatbot-route-handler", () => {
       }),
       expect.objectContaining({ companyId: "co-test" }),
     );
-    expect(events.some((e) => e.type === "tool_start")).toBe(true);
-    expect(events.some((e) => e.type === "done")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "tool_start")).toBe(true);
+    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
   });
 
   it("returns instant Lecot catalogue for commande serrure client", async () => {

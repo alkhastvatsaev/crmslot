@@ -137,8 +137,34 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
     },
   },
   {
+    name: "list_gmail_inbox",
+    description:
+      "Lit la boîte Gmail connectée (page 7 — même compte OAuth). Liste les mails récents avec extrait. Utilise pour colis (Bpost, Colissimo, DPD…), mails clients non encore dans un dossier, ou « quoi de neuf dans mes mails ». Paramètre q = syntaxe recherche Gmail (ex. « colis OR bpost », « from:client@be », « is:unread »). Enchaîne avec get_gmail_message pour le corps complet.",
+    input_schema: {
+      type: "object",
+      properties: {
+        q: { type: "string", description: "Recherche Gmail (optionnel)" },
+        labelId: { type: "string", description: "INBOX, STARRED, etc. (optionnel)" },
+        unreadOnly: { type: "boolean", description: "Uniquement non lus" },
+        limit: { type: "number", description: "Nombre max (défaut 12, max 20)" },
+      },
+    },
+  },
+  {
+    name: "get_gmail_message",
+    description:
+      "Corps complet d'un mail Gmail (id retourné par list_gmail_inbox). Indispensable pour numéro de colis, adresse client, demande dans un email entrant.",
+    input_schema: {
+      type: "object",
+      properties: {
+        messageId: { type: "string", description: "ID message Gmail" },
+      },
+      required: ["messageId"],
+    },
+  },
+  {
     name: "list_intervention_emails",
-    description: "Emails liés à une intervention (fil de communication).",
+    description: "Emails liés à une intervention (fil Firestore / dossier — pas la boîte Gmail globale).",
     input_schema: {
       type: "object",
       properties: {

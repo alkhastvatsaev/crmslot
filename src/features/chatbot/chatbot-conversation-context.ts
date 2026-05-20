@@ -21,6 +21,7 @@ import {
   CHATBOT_TOOL_CORE_NO_SNAPSHOT,
   CHATBOT_TOOL_EMAIL,
   CHATBOT_TOOL_INBOX,
+  CHATBOT_TOOL_GMAIL,
   CHATBOT_TOOL_LECOT,
   CHATBOT_TOOL_PLANNING,
   CHATBOT_TOOL_STATS,
@@ -34,6 +35,7 @@ export type ChatbotFlowId =
   | "planning"
   | "stats"
   | "inbox"
+  | "gmail"
   | "stock";
 
 export type ChatbotConversationContext = {
@@ -58,6 +60,7 @@ const FLOW_TOOLS: Record<ChatbotFlowId, readonly string[]> = {
   planning: [...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_PLANNING],
   stats: [...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_STATS],
   inbox: [...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_INBOX],
+  gmail: [...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_GMAIL],
   stock: [...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_STOCK],
 };
 
@@ -70,6 +73,8 @@ const FLOW_HINTS: Record<ChatbotFlowId, RegExp> = {
     /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i,
   stats: /statistique|chiffre|ca\b|chiffre d'affaires|trimestre|mois|kpi/i,
   inbox: /inbox|notification|portail|chat client|ivana/i,
+  gmail:
+    /gmail|bo[iî]te\s+(?:mail|réception)|mes\s+mails|colis|livraison|bpost|colissimo|dpd|tracking|suivi\s+colis|exp[eé]dition/i,
   stock: /stock|alerte stock|rupture/i,
 };
 
@@ -83,6 +88,7 @@ const ASSISTANT_AWAITING: Record<ChatbotFlowId, RegExp> = {
   planning: /quel(?:le)?\s+technicien|quand\s+planifier|créneau|date\s+et\s+heure/i,
   stats: /quelle\s+période|quel\s+mois/i,
   inbox: /quel\s+message|quelle\s+notification/i,
+  gmail: /quel\s+mail|quelle\s+adresse|num[eé]ro\s+de\s+suivi|quel\s+colis/i,
   stock: /quel\s+article|quelle\s+référence\s+stock/i,
 };
 
@@ -114,6 +120,8 @@ const TOOL_NAME_TO_FLOW: Record<string, ChatbotFlowId> = {
   list_quotes: "stats",
   list_inbox_notifications: "inbox",
   list_portal_chat: "inbox",
+  list_gmail_inbox: "gmail",
+  get_gmail_message: "gmail",
   list_stock_alerts: "stock",
 };
 

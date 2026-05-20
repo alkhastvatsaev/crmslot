@@ -47,6 +47,9 @@ export const CHATBOT_TOOL_STATS = ["statistiques_periode", "list_quotes"] as con
 
 export const CHATBOT_TOOL_INBOX = ["list_inbox_notifications", "list_portal_chat"] as const;
 
+/** Boîte Gmail connectée (page 7) — colis, mails clients, suivi. */
+export const CHATBOT_TOOL_GMAIL = ["list_gmail_inbox", "get_gmail_message"] as const;
+
 export const CHATBOT_TOOL_STOCK = ["list_stock_alerts"] as const;
 
 export const CHATBOT_TOOL_TIMELINE = ["add_timeline_comment"] as const;
@@ -61,6 +64,8 @@ const PLANNING_HINT =
   /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i;
 const STATS_HINT = /statistique|chiffre|ca\b|chiffre d'affaires|trimestre|mois|kpi/i;
 const INBOX_HINT = /inbox|notification|portail|chat client|ivana/i;
+const GMAIL_HINT =
+  /gmail|bo[iî]te\s+(?:mail|réception)|mes\s+mails|nouveau(?:x)?\s+mails?|colis|livraison|bpost|colissimo|dpd|chronopost|gls|tracking|num[eé]ro\s+de\s+suivi|exp[eé]dition|transporteur|mail\s+re[cç]u/i;
 const STOCK_HINT = /stock|alerte stock|rupture/i;
 const TIMELINE_HINT = /note interne|commentaire|timeline|historique dossier/i;
 
@@ -100,6 +105,9 @@ export function inferChatbotToolScope(userText: string): string[] | undefined {
   if (INBOX_HINT.test(t)) {
     scopes.push([...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_INBOX]);
   }
+  if (GMAIL_HINT.test(t)) {
+    scopes.push([...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_GMAIL]);
+  }
   if (STOCK_HINT.test(t)) {
     scopes.push([...CHATBOT_TOOL_CORE, ...CHATBOT_TOOL_STOCK]);
   }
@@ -124,5 +132,6 @@ export function filterChatbotToolDefinitions<T extends { name: string }>(
   if (scope.length === 0) return [];
   const allowed = new Set(scope);
   const filtered = definitions.filter((d) => allowed.has(d.name));
-  return filtered.length > 0 ? filtered : definitions.filter(d => CHATBOT_TOOL_CORE.includes(d.name as any));
+  const coreNames = new Set<string>(CHATBOT_TOOL_CORE);
+  return filtered.length > 0 ? filtered : definitions.filter((d) => coreNames.has(d.name));
 }

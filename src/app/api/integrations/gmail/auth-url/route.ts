@@ -3,10 +3,11 @@ import { google } from "googleapis";
 import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import { GMAIL_HUB_SCOPES } from "@/core/services/email/gmailHubScopes";
 import { getGmailOAuthConfig, isGmailOAuthClientConfigured } from "@/core/services/email/gmailOAuthConfig";
+import { setGmailHubDisconnectedCookie } from "@/core/services/email/gmailHubSession";
 
 export const runtime = "nodejs";
 
-/** Démarre le consentement OAuth Gmail (admin connecté). */
+/** URL OAuth Gmail (JSON) — à ouvrir côté client après `fetchWithAuth` (pas dans la barre d’adresse). */
 export async function GET(req: NextRequest) {
   const auth = await requireAuthenticatedUserOrLocalDev(req);
   if ("response" in auth) return auth.response;
@@ -29,10 +30,7 @@ export async function GET(req: NextRequest) {
     scope: [...GMAIL_HUB_SCOPES],
   });
 
-  return NextResponse.redirect(url);
+  const res = NextResponse.json({ url });
+  setGmailHubDisconnectedCookie(res, false);
+  return res;
 }
-
-/**
- * En `npm run dev`, accessible sans login (démo locale).
- * En production : `Authorization: Bearer` requis.
- */

@@ -29,6 +29,10 @@ import {
 import { buildLecotSearchUrl } from "@/features/chatbot/chatbot-lecot-url";
 import { resolveSendInterventionEmailAttachType } from "@/features/chatbot/chatbot-email-attach";
 import { persistInterventionClientEmail } from "@/features/chatbot/chatbot-client-email";
+import {
+  getGmailMessageForChatbot,
+  listGmailInboxForChatbot,
+} from "@/features/chatbot/chatbot-gmail";
 
 export type ChatbotToolContext = {
   companyId: string;
@@ -129,6 +133,15 @@ export async function executeChatbotTool(
       return orderLecotPartsForChatbot(ctx, input);
     case "list_inbox_notifications":
       return listInboxNotifications(ctx, input);
+    case "list_gmail_inbox":
+      return listGmailInboxForChatbot({
+        q: String(input.q || ""),
+        labelId: String(input.labelId || ""),
+        limit: Number(input.limit) || 12,
+        unreadOnly: Boolean(input.unreadOnly),
+      });
+    case "get_gmail_message":
+      return getGmailMessageForChatbot(String(input.messageId || ""));
     case "list_intervention_emails":
       return listInterventionEmails(String(input.interventionId || ""), input);
     case "get_intervention_billing":

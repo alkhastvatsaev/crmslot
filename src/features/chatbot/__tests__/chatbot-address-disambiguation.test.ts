@@ -1,8 +1,12 @@
 import {
+  buildPendingInterventionIdsFromAssistant,
+  extractInterventionIdFromInvoiceReply,
   extractNumberedAddressLines,
   findClientQueryFromConversation,
   isAddressDisambiguationPrompt,
+  listInterventionsForClientQuery,
   mapNumberedAddressesToInterventionIds,
+  parseNumericChoiceIndex,
   resolveNumericInterventionChoice,
   shouldAutoPreviewInvoiceInPanel,
 } from "@/features/chatbot/chatbot-address-disambiguation";
@@ -152,6 +156,40 @@ describe("chatbot-address-disambiguation", () => {
         "La facture pour l'intervention de Monsieur Vatsaev à la Rue de la Fourche 9 est déjà créée avec un total de 350 €.",
       ),
     ).toBe(true);
+  });
+
+  it("parseNumericChoiceIndex rejects invalid choices", () => {
+    expect(parseNumericChoiceIndex("")).toBeNull();
+    expect(parseNumericChoiceIndex("abc")).toBeNull();
+    expect(parseNumericChoiceIndex("21")).toBeNull();
+    expect(parseNumericChoiceIndex("2")).toBe(2);
+  });
+
+  it("listInterventionsForClientQuery returns sorted client rows", () => {
+    const rows = listInterventionsForClientQuery(snapshot, "Vatsaev");
+    expect(rows).toHaveLength(3);
+    expect(rows.map((r) => r.interventionId).sort()).toEqual(["iv-1", "iv-2", "iv-3"]);
+  });
+
+  it("buildPendingInterventionIdsFromAssistant returns ids for disambiguation reply", () => {
+    const ids = buildPendingInterventionIdsFromAssistant(disambiguationAssistant, snapshot, [
+      { role: "user", content: "facture monsieur vatsaev" },
+    ]);
+    expect(ids).toEqual(["iv-1", "iv-2", "iv-3"]);
+  });
+
+  it("extractInterventionIdFromInvoiceReply matches address in assistant text", () => {
+    const id = extractInterventionIdFromInvoiceReply(
+      "Facture pour Monsieur Vatsaev — Rue de la Fourche 9, 1000 Bruxelles — total 350 €.",
+      snapshot,
+      [{ role: "user", content: "facture monsieur vatsaev" }],
+    );
+    expect(id).toBe("iv-2");
+  });
+
+  it("resolveNumericInterventionChoice uses pendingInterventionIds when provided", () => {
+    const choice = resolveNumericInterventionChoice("2", snapshot, [], ["iv-a", "iv-b"]);
+    expect(choice?.interventionId).toBe("iv-b");
   });
 
 });
