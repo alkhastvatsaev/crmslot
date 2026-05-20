@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import { createGmailApiClient } from "@/core/services/email/gmailApiClient";
-import { encodeGmailRawMessage } from "@/core/services/email/gmailMessageBody";
-import { isGmailOAuthConfigured, resolveGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
-import { sendViaGmailApi } from "@/core/services/email/sendViaGmailApi";
+import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
+import { sendGmailThreadReply } from "@/core/services/email/sendGmailThreadReply";
 import { mapGmailMessageSummary } from "@/features/gmail/gmailHubMappers";
 
 export const runtime = "nodejs";
@@ -13,11 +12,6 @@ const CACHE_TTL = 60_000;
 
 function msgCacheKey(labelId: string | undefined, q: string | undefined, maxResults: number, pageToken: string | undefined) {
   return `${labelId ?? ""}|${q ?? ""}|${maxResults}|${pageToken ?? ""}`;
-}
-
-function encodeSubjectUtf8(subject: string): string {
-  const b64 = Buffer.from(subject, "utf8").toString("base64");
-  return `=?UTF-8?B?${b64}?=`;
 }
 
 /** Liste ou envoi de messages Gmail. */
@@ -113,46 +107,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Champs requis : to, subject, bodyText." }, { status: 400 });
   }
 
-  const { senderEmail } = await resolveGmailOAuthConfig();
-  const fromName = process.env.EMAIL_FROM_NAME?.trim() || "MAP BELGIQUE";
-  const messageId = `<${crypto.randomUUID()}@${senderEmail?.split("@")[1] ?? "mapbelgique.com"}>`;
-  const replyTo = senderEmail ?? to;
-
   try {
-    if (threadId) {
-      const gmail = await createGmailApiClient();
-      const html = `<p>${bodyText.replace(/\n/g, "<br>")}</p>`;
-      const lines = [
-        `From: "${fromName}" <${senderEmail}>`,
-        `To: ${to}`,
-        `Subject: ${encodeSubjectUtf8(subject)}`,
-        `Message-ID: ${messageId}`,
-        "MIME-Version: 1.0",
-        "Content-Type: text/html; charset=UTF-8",
-        "Content-Transfer-Encoding: base64",
-        ...(inReplyTo ? [`In-Reply-To: ${inReplyTo}`] : []),
-        ...(references ? [`References: ${references}`] : []),
-        "",
-        Buffer.from(html, "utf8").toString("base64"),
-      ];
-      const raw = encodeGmailRawMessage(lines.join("\r\n"));
-      const sent = await gmail.users.messages.send({
-        userId: "me",
-        requestBody: { raw, threadId },
-      });
-      return NextResponse.json({ ok: true, id: sent.data.id ?? null, threadId: sent.data.threadId ?? threadId });
-    }
-
-    await sendViaGmailApi({
+    const sent = await sendGmailThreadReply({
       to,
       subject,
       bodyText,
-      messageId,
-      replyTo,
+      threadId,
       inReplyTo,
       references,
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      id: sent.id,
+      threadId: sent.threadId,
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Envoi impossible.";
     return NextResponse.json({ error: msg }, { status: 502 });

@@ -5,7 +5,7 @@ export type GmailHubStatus = {
   email: string | null;
   /** true en `npm run dev` — pas de login Firebase obligatoire pour le hub Gmail. */
   devLocalMode?: boolean;
-  /** Déconnexion volontaire depuis la page 7 (cookie — réversible via OAuth). */
+  /** Déconnexion volontaire depuis la page 6 (cookie — réversible via OAuth). */
   userDisconnected?: boolean;
 };
 

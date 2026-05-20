@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
+import { getGmailOAuthConfig, isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
 import { parseAttachDocumentType } from "@/core/services/email/interventionEmailAttachOptions";
 import type { InterventionEmailPdfKind } from "@/core/services/email/interventionEmailPdfAttachment";
 import { sendViaGmailApi } from "@/core/services/email/sendViaGmailApi";
@@ -39,7 +39,9 @@ export function isValidRecipientEmail(email: string): boolean {
 
 export function isGmailConfigured(): boolean {
   const hasSmtp = Boolean(process.env.GMAIL_USER?.trim() && process.env.GMAIL_APP_PASSWORD?.trim());
-  return hasSmtp || isGmailOAuthConfigured();
+  const c = getGmailOAuthConfig();
+  const oauthEnv = Boolean(c.clientId && c.clientSecret && c.refreshToken && c.senderEmail);
+  return hasSmtp || oauthEnv;
 }
 
 /**
@@ -64,7 +66,8 @@ export async function sendInterventionEmail(
   const gmailUser = process.env.GMAIL_USER?.trim();
   const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
 
-  if (!isGmailOAuthConfigured() && (!gmailUser || !gmailPass)) {
+  const oauthReady = await isGmailOAuthConfigured();
+  if (!oauthReady && (!gmailUser || !gmailPass)) {
     return {
       ok: false,
       error:
@@ -108,7 +111,7 @@ export async function sendInterventionEmail(
   const bodyHtml = input.bodyHtml ?? `<p>${bodyText.replace(/\n/g, "<br>")}</p>`;
 
   try {
-    if (isGmailOAuthConfigured()) {
+    if (oauthReady) {
       await sendViaGmailApi({
         to,
         subject,

@@ -58,6 +58,7 @@ const TOOL_LABELS: Record<string, string> = {
   list_inbox_notifications: "Inbox",
   list_gmail_inbox: "Gmail — boîte",
   get_gmail_message: "Gmail — lecture",
+  suggest_gmail_intervention_links: "Gmail — dossiers suggérés",
   send_gmail_reply: "Gmail — réponse",
   link_gmail_to_intervention: "Gmail — lien dossier",
   list_intervention_emails: "Emails dossier",
@@ -134,6 +135,10 @@ function pendingSummary(name: string, input: Record<string, unknown>): string {
       const count = parts.reduce((acc, p) => acc + (Number(p.quantity) || 1), 0);
       return `Commander ${count} pièce(s) chez Lecot`;
     }
+    case "send_gmail_reply":
+      return `Répondre au mail ${input.messageId} : « ${String(input.bodyText || "").slice(0, 80)} »`;
+    case "link_gmail_to_intervention":
+      return `Lier le mail ${input.messageId} au dossier ${input.interventionId}`;
     default:
       return `Action : ${name}`;
   }
@@ -434,7 +439,12 @@ export async function runChatbotOpenAI(params: {
         return { status: "done", apiMessages };
       }
 
-      if (call.name === "send_intervention_email" || call.name === "save_client_email") {
+      if (
+        call.name === "send_intervention_email" ||
+        call.name === "save_client_email" ||
+        call.name === "send_gmail_reply" ||
+        call.name === "link_gmail_to_intervention"
+      ) {
         const successMsg = buildChatbotPostToolReply(call.name, result);
         params.emit({ type: "text", delta: successMsg });
         apiMessages = [

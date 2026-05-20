@@ -60,6 +60,7 @@ import {
   missionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
+import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
 import type { Mission } from "@/features/map/missionTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
@@ -237,7 +238,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
   useBackofficeReminderPush(interventions);
 
-  const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports">("chat");
+  const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
   const [dragBoardTechUid, setDragBoardTechUid] = useState("");
   const [dragBoardDate, setDragBoardDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedItemId, setSelectedItemIdLocal] = useState<string | null>(null);
@@ -712,6 +713,19 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         >
           {t("backoffice.inbox.tabs.chat")}
         </button>
+        <button
+          type="button"
+          data-testid="backoffice-inbox-tab-documents"
+          onClick={() => setActiveTab("documents")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
+            activeTab === "documents"
+              ? "bg-white text-slate-800 shadow-sm"
+              : "text-slate-500 hover:bg-slate-300/30",
+          )}
+        >
+          {t("backoffice.inbox.tabs.documents")}
+        </button>
       </div>
 
       {}
@@ -773,11 +787,21 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
       </div>
       <div
         className={cn(
+          "flex min-h-0 flex-1 flex-col overflow-hidden",
+          activeTab !== "documents" && "hidden",
+        )}
+        aria-hidden={activeTab !== "documents"}
+        data-testid="backoffice-inbox-documents-panel"
+      >
+        <ChatbotDocumentsRightPanel />
+      </div>
+      <div
+        className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
           "flex min-h-0 flex-1 flex-col gap-3 px-4 pb-6",
-          activeTab === "chat" && "hidden",
+          (activeTab === "chat" || activeTab === "documents") && "hidden",
         )}
-        aria-hidden={activeTab === "chat"}
+        aria-hidden={activeTab === "chat" || activeTab === "documents"}
       >
         {activeTab === "reports" &&
           bridgedTerrainVisible.map((r) => (

@@ -316,7 +316,15 @@
       "thread_messages_suffix": "messages in conversation",
       "shortcuts_hint": "Shortcuts: r reply · e archive · # trash · j/k next/prev",
       "archived": "Message archived.",
-      "trashed": "Message moved to trash."
+      "trashed": "Message moved to trash.",
+      "link_to_case": "Link to case",
+      "link_no_company": "Select an active company (company menu) to link this email.",
+      "link_search_placeholder": "Search a case by name…",
+      "link_loading": "Analyzing email…",
+      "link_no_candidates": "No obvious case — search by name above.",
+      "link_note_optional": "Internal note (optional)",
+      "link_confirm": "Link to case",
+      "link_ok": "Email saved on the case."
     }
   },
   "crm": {
@@ -697,6 +705,9 @@
     "finish": "Finish"
   },
   "map": {
+    "boot_error_token": "Map unavailable — missing Mapbox token",
+    "boot_error_token_hint": "Add NEXT_PUBLIC_MAPBOX_TOKEN to .env.local and restart npm run dev.",
+    "boot_error_load": "Could not load the Mapbox map. Check your token and network.",
     "transcription": {
       "address": "Address",
       "client_name": "Client name",
@@ -762,7 +773,8 @@
       "tabs": {
         "requests": "Requests",
         "reports": "Reports",
-        "chat": "Chat"
+        "chat": "Chat",
+        "documents": "Documents"
       },
       "asap": "As soon as possible",
       "photos_client": "Client photos",
@@ -1314,12 +1326,16 @@
     "toast_send_failed": "Send failed",
     "toast_login_required": "Login required",
     "toast_login_description": "Please log in to use the chat.",
-    "global_chat_title": "Team chat",
+    "global_chat_title": "TEAM CHAT",
     "global_chat_subtitle": "Company-wide messages",
     "day_clients_title": "Today's clients ({count})",
     "day_clients_empty": "No clients scheduled for this date",
     "anonymous_client": "Client",
     "back_to_list": "Conversation list",
+    "documents_search_placeholder": "Client, case, supplier, invoice…",
+    "documents_search_aria": "Search company documents",
+    "documents_search_clear": "Clear search",
+    "documents_no_results": "No documents match your search.",
     "welcome": "Hello — write to us for any question about an intervention, an appointment or an invoice. The back-office will reply here.",
     "reply_urgent": "For an emergency, please provide your full address and a contact number; the back-office handles these cases as a priority.",
     "reply_billing": "For billing or a quote, provide the name on the file or the last digits of the intervention reference — I will forward it to the relevant team.",

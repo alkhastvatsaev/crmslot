@@ -1,6 +1,7 @@
 "use client";
 
-import { Archive, Loader2, Mail, MailOpen, Reply, Star, Tag, Trash2, X } from "lucide-react";
+import type { ReactNode } from "react";
+import { Archive, Link2, Loader2, Mail, MailOpen, Reply, Star, Tag, Trash2, X } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import GmailHubAttachments from "@/features/gmail/components/GmailHubAttachments";
@@ -43,6 +44,9 @@ type Props = {
   userLabels: GmailHubLabel[];
   loadingDetail: boolean;
   onReply: () => void;
+  linkPanelOpen: boolean;
+  onToggleLinkPanel: () => void;
+  linkPanel: ReactNode;
   onToggleRead: () => void;
   onToggleLabel: (labelId: string) => void;
   onStar: () => void;
@@ -69,6 +73,9 @@ export default function GmailHubReaderPane({
   userLabels,
   loadingDetail,
   onReply,
+  linkPanelOpen,
+  onToggleLinkPanel,
+  linkPanel,
   onToggleRead,
   onToggleLabel,
   onStar,
@@ -144,21 +151,11 @@ export default function GmailHubReaderPane({
   if (!message && !pdfPanelOpen) {
     return (
       <div
-        className={`${gmailShell} items-center justify-center px-8`}
+        className={gmailShell}
         data-testid="gmail-hub-panel-right"
         style={gmailHubFont}
-      >
-        <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200/80 text-slate-400 shadow-inner">
-          <Mail className="h-7 w-7" strokeWidth={1.15} />
-        </span>
-        <p className="text-center text-[14px] font-medium text-slate-700">
-          {t("gmail.hub.pick_message")}
-        </p>
-        <p className="mt-2 max-w-[240px] text-center text-[12px] leading-relaxed text-slate-400">
-          {t("gmail.hub.pick_message_hint")}
-        </p>
-        <p className="mt-4 text-center text-[11px] text-slate-400">{t("gmail.hub.shortcuts_hint")}</p>
-      </div>
+        aria-hidden
+      />
     );
   }
 
@@ -233,6 +230,18 @@ export default function GmailHubReaderPane({
           </button>
           <button
             type="button"
+            data-testid="gmail-hub-link-toggle-btn"
+            onClick={onToggleLinkPanel}
+            className={cn(
+              gmailToolbarBtn,
+              linkPanelOpen && "bg-white/90 text-slate-900 shadow-[0_1px_3px_rgba(15,23,42,0.08)]",
+            )}
+            title={String(t("gmail.hub.link_to_case"))}
+          >
+            <Link2 className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
             data-testid="gmail-hub-read-toggle-btn"
             onClick={onToggleRead}
             className={gmailToolbarBtn}
@@ -304,6 +313,8 @@ export default function GmailHubReaderPane({
           </label>
         ) : null}
       </div>
+
+      {linkPanelOpen ? linkPanel : null}
 
       {threadMessages.length > 1 ? (
         <p

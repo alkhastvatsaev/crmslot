@@ -110,16 +110,15 @@ describe("GmailHubPage", () => {
     });
   });
 
-  it("renders inbox list and message detail on slot 6", async () => {
+  it("renders inbox list and auto-opens the latest message on slot 6", async () => {
     renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1);
-    expect(screen.getByTestId(`dashboard-pager-slot-${GMAIL_HUB_SLOT_INDEX}`)).toBeInTheDocument();
+    const pageRoot = screen.getByTestId(`dashboard-pager-slot-${GMAIL_HUB_SLOT_INDEX}`);
+    expect(pageRoot).toBeInTheDocument();
+    expect(pageRoot).toHaveClass("dashboard-desktop-page-root");
     expect(await screen.findByTestId("gmail-hub-message-list")).toBeInTheDocument();
     expect(await screen.findByTestId("gmail-hub-row-m1")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("gmail-hub-row-m1"));
     expect(await screen.findByTestId("gmail-hub-detail")).toBeInTheDocument();
     expect(screen.getByTestId("gmail-hub-body-text")).toHaveTextContent("Corps du mail");
-    expect(screen.getByTestId("gmail-hub-page")).toHaveClass("gmail-hub-page-root");
-    expect(screen.getByTestId("gmail-hub-page")).not.toHaveClass("gmail-hub-page-root--reading");
     expect(screen.getByTestId("gmail-hub-disconnect-btn")).toBeInTheDocument();
   });
 

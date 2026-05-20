@@ -87,4 +87,47 @@ describe("technicianAssignmentActions", () => {
     expect(patch.assignedTechnicianUid).toBeNull();
     expect(patch.technicianDeclinedByUid).toBe("tech-1");
   });
+
+  it("matchesAssignedTechnician is false when uids differ outside dev preview", () => {
+    expect(
+      matchesAssignedTechnician(
+        iv({ status: "assigned", assignedTechnicianUid: "tech-assigned" }),
+        "tech-other",
+      ),
+    ).toBe(false);
+  });
+
+  it("matchesAssignedTechnician is false when uid or assignment is empty", () => {
+    expect(matchesAssignedTechnician(iv({ status: "assigned" }), "tech-1")).toBe(false);
+    expect(
+      matchesAssignedTechnician(
+        iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
+        null,
+      ),
+    ).toBe(false);
+  });
+
+  it("isTechnicianAssignmentAwaitingResponse is false when not the assigned technician", () => {
+    expect(
+      isTechnicianAssignmentAwaitingResponse(
+        iv({ status: "assigned", assignedTechnicianUid: "tech-2" }),
+        "tech-1",
+      ),
+    ).toBe(false);
+  });
+
+  it("getTechnicianAssignmentUid maps demo auth uid to default technician in dev preview", async () => {
+    const prev = process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW;
+    process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW = "true";
+    jest.resetModules();
+    const actions = await import("@/features/interventions/technicianAssignmentActions");
+    const { getDefaultAssignedTechnicianUid: defaultUid } = await import(
+      "@/features/interventions/defaultAssignedTechnicianUid",
+    );
+    expect(actions.getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID)).toBe(defaultUid());
+    expect(actions.getTechnicianAssignmentUid("real-tech-uid")).toBe("real-tech-uid");
+    jest.resetModules();
+    if (prev === undefined) delete process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW;
+    else process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW = prev;
+  });
 });

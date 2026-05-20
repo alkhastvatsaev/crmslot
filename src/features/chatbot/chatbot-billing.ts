@@ -36,7 +36,7 @@ export function applyBillingLinePatch(
   },
 ): ChatbotBillingLine[] {
   const idx = Math.max(0, patch.lineIndex ?? 0);
-  let lines = existing.length > 0 ? [...existing] : [{ description: "Prestation", quantity: 1, unitPriceCents: 0 }];
+  const lines = existing.length > 0 ? [...existing] : [{ description: "Prestation", quantity: 1, unitPriceCents: 0 }];
 
   while (lines.length <= idx) {
     lines.push({ description: "Prestation", quantity: 1, unitPriceCents: 0 });
@@ -92,7 +92,7 @@ export function interventionForPdf(
   return {
     id: String(data.id || ""),
     title: typeof data.title === "string" ? data.title : "",
-    ...(data as any),
+    ...(data as Omit<Intervention, "id" | "title" | "clientName" | "billingLines" | "invoiceAmountCents">),
     clientName: clientName ?? undefined,
     billingLines,
     invoiceAmountCents: totalCents,

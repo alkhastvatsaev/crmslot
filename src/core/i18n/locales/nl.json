@@ -312,7 +312,15 @@
       "thread_messages_suffix": "berichten in het gesprek",
       "shortcuts_hint": "Sneltoetsen: r antwoorden · e archiveren · # prullenbak · j/k volgende/vorige",
       "archived": "Bericht gearchiveerd.",
-      "trashed": "Bericht naar prullenbak verplaatst."
+      "trashed": "Bericht naar prullenbak verplaatst.",
+      "link_to_case": "Koppel aan dossier",
+      "link_no_company": "Kies een actief bedrijf (bedrijfsmenu) om deze mail te koppelen.",
+      "link_search_placeholder": "Zoek een dossier op naam…",
+      "link_loading": "E-mail analyseren…",
+      "link_no_candidates": "Geen duidelijk dossier — zoek hierboven op naam.",
+      "link_note_optional": "Interne notitie (optioneel)",
+      "link_confirm": "Koppel aan dossier",
+      "link_ok": "Mail opgeslagen op het dossier."
     }
   },
   "crm": {
@@ -684,6 +692,9 @@
     "finish": "Afronden"
   },
   "map": {
+    "boot_error_token": "Kaart niet beschikbaar — Mapbox-token ontbreekt",
+    "boot_error_token_hint": "Voeg NEXT_PUBLIC_MAPBOX_TOKEN toe aan .env.local en herstart npm run dev.",
+    "boot_error_load": "Mapbox-kaart laden mislukt. Controleer token en verbinding.",
     "transcription": {
       "address": "Adres",
       "client_name": "Klantnaam",
@@ -749,7 +760,8 @@
       "tabs": {
         "requests": "Aanvragen",
         "reports": "Rapporten",
-        "chat": "Chat"
+        "chat": "Chat",
+        "documents": "Documenten"
       },
       "asap": "Zo snel mogelijk",
       "photos_client": "Klantfoto's",
@@ -1286,12 +1298,16 @@
     "toast_send_failed": "Verzenden mislukt",
     "toast_login_required": "Aanmelding vereist",
     "toast_login_description": "Meld u aan om de chat te gebruiken.",
-    "global_chat_title": "Teamchat",
+    "global_chat_title": "TEAM CHAT",
     "global_chat_subtitle": "Algemene berichten van het bedrijf",
     "day_clients_title": "Klanten van vandaag ({count})",
     "day_clients_empty": "Geen klanten gepland voor deze datum",
     "anonymous_client": "Klant",
     "back_to_list": "Gesprekslijst",
+    "documents_search_placeholder": "Klant, dossier, leverancier, factuur…",
+    "documents_search_aria": "Zoeken in bedrijfsdocumenten",
+    "documents_search_clear": "Zoekopdracht wissen",
+    "documents_no_results": "Geen documenten komen overeen met uw zoekopdracht.",
     "welcome": "Goedendag — schrijf ons voor vragen over een interventie, een afspraak of een factuur. De back-office antwoordt hier.",
     "reply_urgent": "Voor een noodgeval geeft u uw volledig adres en een bereikbaar nummer; de back-office behandelt deze dossiers met prioriteit.",
     "reply_billing": "Voor facturatie of een offerte geeft u de naam op het dossier of de laatste cijfers van de interventie — ik stuur het door naar de bevoegde dienst.",

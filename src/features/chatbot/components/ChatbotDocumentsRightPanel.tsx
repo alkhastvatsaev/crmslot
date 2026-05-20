@@ -1,11 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
-import { FileText, Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { FileText, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
+import {
+  filterChatbotInvoices,
+  filterChatbotSupplierOrders,
+  parseDocumentsSearchQuery,
+} from "@/features/chatbot/filterChatbotDocuments";
+import { useTranslation } from "@/core/i18n/I18nContext";
 import type { SupplierOrder } from "@/features/suppliers/types";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
@@ -134,6 +141,7 @@ function SectionLabel({ children }: { children: string }) {
 
 /** Rail droit page 5 — liste plein écran ; PDF en overlay + fermeture. */
 export default function ChatbotDocumentsRightPanel() {
+  const { t } = useTranslation();
   const {
     companyId,
     chatbotInvoices,
@@ -145,13 +153,28 @@ export default function ChatbotDocumentsRightPanel() {
     closeDocumentPreview,
   } = useChatbotContext();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const selectedKey = resolveSelectedKey(documentPreview);
   const previewOpen = isPreviewOverlayForTarget(documentPreview, "right");
 
-  const supplierRows = useMemo(() => supplierOrders.slice(0, 20), [supplierOrders]);
+  const parsedSearch = useMemo(() => parseDocumentsSearchQuery(searchQuery), [searchQuery]);
 
-  const docCount = chatbotInvoices.length + supplierRows.length;
+  const filteredInvoices = useMemo(
+    () => filterChatbotInvoices(chatbotInvoices, parsedSearch),
+    [chatbotInvoices, parsedSearch],
+  );
+
+  const filteredOrders = useMemo(
+    () => filterChatbotSupplierOrders(supplierOrders, parsedSearch),
+    [supplierOrders, parsedSearch],
+  );
+
+  const docCount = filteredInvoices.length + filteredOrders.length;
+  const libraryCount = chatbotInvoices.length + supplierOrders.length;
+  const hasLibrary = libraryCount > 0;
   const hasList = docCount > 0;
+  const showSearchNoResults = parsedSearch.hasQuery && !chatbotInvoicesLoading && hasLibrary && !hasList;
 
   return (
     <div
@@ -160,11 +183,38 @@ export default function ChatbotDocumentsRightPanel() {
       style={outfit}
     >
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="shrink-0 px-4 pt-4 pb-3">
+        <div className="shrink-0 space-y-3 px-4 pt-4 pb-3">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">Documents</h2>
-            {hasList ? (
-              <span className="text-[10px] tabular-nums text-slate-400">{docCount}</span>
+            {hasLibrary ? (
+              <span className="text-[10px] tabular-nums text-slate-400" data-testid="chatbot-documents-count">
+                {parsedSearch.hasQuery ? `${docCount}/${libraryCount}` : libraryCount}
+              </span>
+            ) : null}
+          </div>
+          <div className="relative" data-testid="chatbot-documents-search">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+              aria-hidden
+            />
+            <Input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={String(t("chat.documents_search_placeholder"))}
+              aria-label={String(t("chat.documents_search_aria"))}
+              className="h-9 rounded-[14px] border-slate-200/80 bg-white/90 pr-9 pl-9 text-[12px] shadow-sm placeholder:text-slate-400"
+            />
+            {searchQuery.trim() ? (
+              <button
+                type="button"
+                data-testid="chatbot-documents-search-clear"
+                onClick={() => setSearchQuery("")}
+                className="absolute top-1/2 right-2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label={String(t("chat.documents_search_clear"))}
+              >
+                <X className="h-3.5 w-3.5" aria-hidden />
+              </button>
             ) : null}
           </div>
         </div>
@@ -177,6 +227,13 @@ export default function ChatbotDocumentsRightPanel() {
             <div className="flex justify-center py-10" data-testid="chatbot-documents-loading">
               <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
             </div>
+          ) : showSearchNoResults ? (
+            <p
+              className="py-12 text-center text-[12px] leading-relaxed text-slate-400"
+              data-testid="chatbot-documents-no-results"
+            >
+              {t("chat.documents_no_results")}
+            </p>
           ) : !hasList ? (
             <p
               className="py-12 text-center text-[12px] leading-relaxed text-slate-400"
@@ -186,11 +243,11 @@ export default function ChatbotDocumentsRightPanel() {
             </p>
           ) : (
             <div className="space-y-5">
-              {chatbotInvoices.length > 0 ? (
+              {filteredInvoices.length > 0 ? (
                 <section data-testid="chatbot-documents-section-invoices">
                   <SectionLabel>Factures</SectionLabel>
                   <ul className="grid grid-cols-2 gap-2.5" data-testid="chatbot-documents-grid-invoices">
-                    {chatbotInvoices.map((row) => {
+                    {filteredInvoices.map((row) => {
                       const key = `invoice:${row.interventionId}`;
                       return (
                         <li key={key} className="min-w-0">
@@ -211,11 +268,11 @@ export default function ChatbotDocumentsRightPanel() {
                 </section>
               ) : null}
 
-              {supplierRows.length > 0 ? (
+              {filteredOrders.length > 0 ? (
                 <section data-testid="chatbot-documents-section-orders">
                   <SectionLabel>Commandes</SectionLabel>
                   <ul className="grid grid-cols-2 gap-2.5" data-testid="chatbot-documents-grid-orders">
-                    {supplierRows.map((order) => {
+                    {filteredOrders.map((order) => {
                       const key = `supplier:${order.id}`;
                       return (
                         <li key={key} className="min-w-0">

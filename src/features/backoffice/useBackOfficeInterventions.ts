@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { DEMO_COMPANY_ID, devUiPreviewEnabled, stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { demoInterventionsForCompany } from "@/features/dev/demoInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
 
 export function useBackOfficeInterventions(companyId: string | null) {
   const cidForEffect = (companyId ?? "").trim();
 
+  const isDemo = devUiPreviewEnabled && cidForEffect === DEMO_COMPANY_ID;
   const noFirestore = !isConfigured || !firestore;
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
@@ -49,6 +51,10 @@ export function useBackOfficeInterventions(companyId: string | null) {
   }, [cidForEffect, noFirestore]);
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
+
+  if (isDemo) {
+    return { interventions: demoInterventionsForCompany(cidForEffect), loading: false, error: null, firebaseUid };
+  }
 
   if (!cidForEffect || noFirestore) {
     return { interventions, loading: false, error: null, firebaseUid };

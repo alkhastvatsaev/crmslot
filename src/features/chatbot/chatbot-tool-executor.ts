@@ -34,6 +34,7 @@ import {
   linkGmailToIntervention,
   listGmailInboxForChatbot,
   sendGmailReplyFromChatbot,
+  suggestGmailInterventionLinksForChatbot,
 } from "@/features/chatbot/chatbot-gmail";
 
 export type ChatbotToolContext = {
@@ -144,6 +145,10 @@ export async function executeChatbotTool(
       });
     case "get_gmail_message":
       return getGmailMessageForChatbot(String(input.messageId || ""));
+    case "suggest_gmail_intervention_links":
+      return suggestGmailInterventionLinksForChatbot(ctx.companyId, {
+        messageId: String(input.messageId || ""),
+      });
     case "send_gmail_reply":
       return sendGmailReplyFromChatbot(input as { messageId: string; bodyText: string; to?: string; subject?: string });
     case "link_gmail_to_intervention":
@@ -944,8 +949,6 @@ async function sendInterventionEmailFromChatbot(
 
   const doc = await assertInterventionAccess(ctx.companyId, interventionId);
   const data = doc.data()!;
-
-  await persistInterventionClientEmail(db(), ctx.companyId, interventionId, to, data);
 
   const attachDocumentType = resolveSendInterventionEmailAttachType(input, ctx.lastUserText);
   input.attachDocumentType = attachDocumentType;

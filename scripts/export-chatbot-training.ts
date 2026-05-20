@@ -7,6 +7,14 @@ loadEnvConfig(process.cwd());
 
 import { getAdminDb, isFirebaseAdminReady } from "../src/core/config/firebase-admin";
 
+type TrainingExportMessage = {
+  role: string;
+  content?: string;
+  tool_calls?: unknown;
+  tool_call_id?: string;
+  name?: string;
+};
+
 async function runExport() {
   if (!isFirebaseAdminReady()) {
     console.error("Firebase Admin is not configured. Please ensure .env.local has required credentials.");
@@ -37,21 +45,21 @@ async function runExport() {
     // Construct the OpenAI fine-tuning format
     // {"messages": [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
     
-    const messages: any[] = [];
+    const messages: TrainingExportMessage[] = [];
     if (data.systemPrompt) {
-      messages.push({ role: "system", content: data.systemPrompt });
+      messages.push({ role: "system", content: String(data.systemPrompt) });
     }
 
     // append apiMessages which contains the entire conversation up to the assistant's final response
     if (Array.isArray(data.apiMessages)) {
-      data.apiMessages.forEach((msg: any) => {
+      data.apiMessages.forEach((msg: Record<string, unknown>) => {
         if (msg.role && (msg.content !== undefined || msg.tool_calls)) {
           // Keep only necessary fields for fine-tuning
-          const cleanMsg: any = { role: msg.role };
-          if (msg.content) cleanMsg.content = msg.content;
-          if (msg.tool_calls) cleanMsg.tool_calls = msg.tool_calls;
-          if (msg.tool_call_id) cleanMsg.tool_call_id = msg.tool_call_id;
-          if (msg.name) cleanMsg.name = msg.name;
+          const cleanMsg: TrainingExportMessage = { role: String(msg.role) };
+          if (msg.content !== undefined) cleanMsg.content = String(msg.content);
+          if (msg.tool_calls !== undefined) cleanMsg.tool_calls = msg.tool_calls;
+          if (msg.tool_call_id !== undefined) cleanMsg.tool_call_id = String(msg.tool_call_id);
+          if (msg.name !== undefined) cleanMsg.name = String(msg.name);
           messages.push(cleanMsg);
         }
       });

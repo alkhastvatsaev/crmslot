@@ -317,7 +317,15 @@
       "thread_messages_suffix": "messages dans la conversation",
       "shortcuts_hint": "Raccourcis : r répondre · e archiver · # corbeille · j/k suivant/précédent",
       "archived": "Message archivé.",
-      "trashed": "Message déplacé vers la corbeille."
+      "trashed": "Message déplacé vers la corbeille.",
+      "link_to_case": "Lier au dossier",
+      "link_no_company": "Choisissez une société active (menu société) pour lier ce mail.",
+      "link_search_placeholder": "Rechercher un dossier par nom…",
+      "link_loading": "Analyse du mail…",
+      "link_no_candidates": "Aucun dossier évident — recherchez par nom ci-dessus.",
+      "link_note_optional": "Note interne (optionnel)",
+      "link_confirm": "Lier au dossier",
+      "link_ok": "Mail enregistré sur le dossier."
     }
   },
   "crm": {
@@ -698,6 +706,9 @@
     "finish": "Terminer"
   },
   "map": {
+    "boot_error_token": "Carte indisponible — jeton Mapbox manquant",
+    "boot_error_token_hint": "Ajoutez NEXT_PUBLIC_MAPBOX_TOKEN dans .env.local puis relancez npm run dev.",
+    "boot_error_load": "Impossible de charger la carte Mapbox. Vérifiez le jeton et votre connexion.",
     "transcription": {
       "address": "Adresse",
       "client_name": "Nom client",
@@ -767,7 +778,8 @@
       "tabs": {
         "requests": "Demandes",
         "reports": "Rapports",
-        "chat": "Chat"
+        "chat": "Chat",
+        "documents": "Documents"
       },
       "asap": "Dès que possible",
       "photos_client": "Photos du client",
@@ -1319,12 +1331,16 @@
     "toast_send_failed": "Envoi impossible",
     "toast_login_required": "Connexion requise",
     "toast_login_description": "Connectez-vous pour utiliser le chat.",
-    "global_chat_title": "Chat d'équipe",
+    "global_chat_title": "TEAM CHAT",
     "global_chat_subtitle": "Messages généraux de la société",
     "day_clients_title": "Clients du jour ({count})",
     "day_clients_empty": "Aucun client prévu pour cette date",
     "anonymous_client": "Client",
     "back_to_list": "Liste des conversations",
+    "documents_search_placeholder": "Client, dossier, fournisseur, facture…",
+    "documents_search_aria": "Rechercher dans les documents de l'entreprise",
+    "documents_search_clear": "Effacer la recherche",
+    "documents_no_results": "Aucun document ne correspond à votre recherche.",
     "welcome": "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le back-office vous répondra ici.",
     "reply_urgent": "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le back-office traite ces dossiers en priorité.",
     "reply_billing": "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l'intervention : je transmets au service concerné.",

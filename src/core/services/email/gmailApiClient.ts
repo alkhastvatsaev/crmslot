@@ -5,7 +5,7 @@ export async function createGmailApiClient(): Promise<gmail_v1.Gmail> {
   const { clientId, clientSecret, redirectUri, refreshToken } = await resolveGmailOAuthConfig();
   if (!clientId || !clientSecret || !refreshToken) {
     throw new Error(
-      "OAuth Gmail incomplet — connectez Gmail depuis la page 7 ou configurez GOOGLE_CLIENT_* et GMAIL_REFRESH_TOKEN.",
+      "OAuth Gmail incomplet — connectez Gmail depuis la page 6 ou configurez GOOGLE_CLIENT_* et GMAIL_REFRESH_TOKEN.",
     );
   }
   const oauth2 = new google.auth.OAuth2(clientId, clientSecret, redirectUri);

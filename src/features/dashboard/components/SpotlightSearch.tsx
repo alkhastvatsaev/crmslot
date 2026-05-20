@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, Smartphone, FileText, Phone, Navigation, ExternalLink, Download, BarChart3 } from 'lucide-react';
+import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, FileText, Phone, Navigation, ExternalLink, Download, BarChart3, Mail } from 'lucide-react';
 import { BACKOFFICE_HUB_SLOT_INDEX } from '@/features/backoffice/backofficeHubConstants';
 import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
-import { TECHNICIAN_LAB_SLOT_INDEX } from '@/features/technicians/technicianLabConstants';
+import { GMAIL_HUB_SLOT_INDEX } from '@/features/gmail/gmailHubConstants';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -40,7 +40,7 @@ export default function SpotlightSearch() {
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
     { index: BACKOFFICE_HUB_SLOT_INDEX, label: t('spotlight.nav_backoffice'), Icon: LayoutDashboard },
     { index: AI_ASSISTANT_SLOT_INDEX, label: t('spotlight.nav_chatbot'), Icon: CloudOff },
-    { index: TECHNICIAN_LAB_SLOT_INDEX, label: t('spotlight.nav_technician_lab'), Icon: Smartphone },
+    { index: GMAIL_HUB_SLOT_INDEX, label: t('spotlight.nav_gmail'), Icon: Mail },
   ], [t]);
 
   const workspace = useCompanyWorkspaceOptional();

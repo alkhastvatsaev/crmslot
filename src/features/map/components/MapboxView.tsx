@@ -7,7 +7,6 @@ import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/core/config/firebase';
 import { toast } from "sonner";
 import DailyMissions from '@/features/dashboard/components/DailyMissions';
-import DashboardKpiStrip from '@/features/dashboard/components/DashboardKpiStrip';
 import BackOfficeInboxPanel from '@/features/backoffice/components/BackOfficeInboxPanel';
 import RequesterTrackingPanel from '@/features/interventions/components/RequesterTrackingPanel';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -46,6 +45,18 @@ import {
 } from "@/core/ui/dashboardDesktopLayout";
 import GlassPanel from "@/core/ui/GlassPanel";
 import { GLASS_PANEL_BODY_SCROLL } from "@/core/ui/glassPanelChrome";
+import type { Intervention } from "@/features/interventions/types";
+
+function interventionHasMapCoordinates(iv: Intervention): boolean {
+  const loc = iv.location;
+  if (!loc || typeof loc.lat !== "number" || typeof loc.lng !== "number") return false;
+  return Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
+}
+
+function isValidMissionCoordinates(coords: [number, number]): boolean {
+  const [lng, lat] = coords;
+  return Number.isFinite(lng) && Number.isFinite(lat) && !(lng === 0 && lat === 0);
+}
 
 export default function MapboxView() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +82,8 @@ export default function MapboxView() {
 
   const [liveMissions, setLiveMissions] = useState<Mission[]>([]);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+  const [mapBootError, setMapBootError] = useState<"token" | "load" | null>(null);
+  const [mapReady, setMapReady] = useState(false);
   const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString('en-CA'), [selectedDate]);
 
   const allMissions = useMemo(() => {
@@ -83,6 +96,7 @@ export default function MapboxView() {
           : isInterventionVisibleOnTechnicianMap(iv),
       )
       .filter((iv) => interventionMatchesTab(iv, "today", selectedDate))
+      .filter(interventionHasMapCoordinates)
       .map(iv => {
         let numericId = 0;
         for (let i = 0; i < iv.id.length; i++) {
@@ -183,61 +197,130 @@ export default function MapboxView() {
   }, [galaxyBridge, selectedDateStr]);
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container || mapRef.current) return;
 
-    if (!mapRef.current) {
-      mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
+    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() ?? "";
+    if (!token) {
+      setMapBootError("token");
+      return;
+    }
 
-      const initialCenter: [number, number] = [4.3522, 50.8466]; // Par défaut : Bruxelles
+    let cancelled = false;
+    let sizeObserver: ResizeObserver | null = null;
+
+    const attachMap = () => {
+      if (cancelled || mapRef.current) return;
+      if (container.clientWidth < 2 || container.clientHeight < 2) return;
+
+      mapboxgl.accessToken = token;
+      const initialCenter: [number, number] = [4.3522, 50.8466];
 
       const map = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/standard',
+        container,
+        style: "mapbox://styles/mapbox/standard",
         center: initialCenter,
         zoom: 12.5,
         pitch: 0,
         bearing: 0,
         antialias: true,
         maxBounds: [
-          [4.15, 50.70],
-          [4.55, 50.95]
+          [4.15, 50.7],
+          [4.55, 50.95],
         ],
         minZoom: 11.8,
         attributionControl: false,
-        localIdeographFontFamily: "'Noto Sans', 'Helvetica Neue', Arial, sans-serif"
+        localIdeographFontFamily: "'Noto Sans', 'Helvetica Neue', Arial, sans-serif",
       });
 
       mapRef.current = map;
+      setMapBootError(null);
 
-      map.on('style.load', () => {
-        map.setConfigProperty('basemap', 'showPointOfInterestLabels', false);
-        map.setConfigProperty('basemap', 'showTransitLabels', false);
-        map.setConfigProperty('basemap', 'showRoadLabels', true);
+      map.on("load", () => {
+        if (cancelled) return;
+        setMapReady(true);
+        try {
+          map.resize();
+        } catch {
+          /* ignore */
+        }
       });
 
-      map.on('moveend', () => {
+      map.on("style.load", () => {
+        try {
+          map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+          map.setConfigProperty("basemap", "showTransitLabels", false);
+          map.setConfigProperty("basemap", "showRoadLabels", true);
+        } catch {
+          /* style sans config basemap */
+        }
+      });
+
+      map.on("error", (ev) => {
+        console.error("[mapbox]", ev);
+        if (!cancelled) setMapBootError("load");
+      });
+
+      map.on("moveend", () => {
         const currentState = {
           center: map.getCenter().toArray(),
           zoom: map.getZoom(),
           pitch: 0,
-          bearing: 0
+          bearing: 0,
         };
-        localStorage.setItem('mapboxViewState', JSON.stringify(currentState));
+        localStorage.setItem("mapboxViewState", JSON.stringify(currentState));
       });
+
+      sizeObserver = new ResizeObserver(() => {
+        try {
+          map.resize();
+        } catch {
+          /* ignore */
+        }
+      });
+      sizeObserver.observe(container);
+    };
+
+    attachMap();
+    if (!mapRef.current) {
+      const waitObserver = new ResizeObserver(() => attachMap());
+      waitObserver.observe(container);
+      return () => {
+        cancelled = true;
+        waitObserver.disconnect();
+        sizeObserver?.disconnect();
+        if (mapRef.current) {
+          mapRef.current.remove();
+          mapRef.current = null;
+        }
+        setMapReady(false);
+      };
     }
 
-    // Cleanup existing markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    markersRef.current = {};
+    return () => {
+      cancelled = true;
+      sizeObserver?.disconnect();
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      setMapReady(false);
+    };
+  }, []);
 
+  useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map || !mapReady) return;
+
+    Object.values(markersRef.current).forEach((marker) => marker.remove());
+    markersRef.current = {};
 
     const bounds = new mapboxgl.LngLatBounds();
 
-    // Ajouter les marqueurs pour les missions
     visibleMissions.forEach((mission, index) => {
-      bounds.extend(mission.coordinates as [number, number]);
+      const coords = mission.coordinates as [number, number];
+      if (!isValidMissionCoordinates(coords)) return;
+      bounds.extend(coords);
 
       const isLive = mission.source === "live";
       const tone =
@@ -318,17 +401,7 @@ export default function MapboxView() {
     });
 
 
-  }, [visibleMissions]);
-
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
+  }, [visibleMissions, mapReady]);
 
   const dashboardPageIndex = pager?.pageIndex ?? 0;
 
@@ -336,15 +409,17 @@ export default function MapboxView() {
     if (dashboardPageIndex !== 0) return;
     const map = mapRef.current;
     if (!map) return;
-    const id = window.setTimeout(() => {
+    const resize = () => {
       try {
         map.resize();
       } catch {
         /* ignore */
       }
-    }, 520);
+    };
+    resize();
+    const id = window.setTimeout(resize, 520);
     return () => clearTimeout(id);
-  }, [dashboardPageIndex]);
+  }, [dashboardPageIndex, mapReady]);
 
   const handleMissionClick = (mission: Mission) => {
     setSelectedMission(mission);
@@ -385,7 +460,7 @@ export default function MapboxView() {
           id="dashboard-left-rail"
           className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left`}
           shellClassName={dashboardTripleSideShellClass}
-          innerClassName={`${GLASS_PANEL_BODY_SCROLL} flex min-h-0 flex-col`}
+          innerClassName={`${GLASS_PANEL_BODY_SCROLL} !overflow-y-auto flex min-h-0 flex-col`}
         >
           <DailyMissions
             missions={visibleMissions}
@@ -405,7 +480,22 @@ export default function MapboxView() {
               className="relative flex min-h-0 flex-1 flex-col"
               style={{ userSelect: "none", WebkitUserSelect: "none", background: "#f8fafc" }}
             >
-          <div ref={mapContainerRef} id="map" className="absolute inset-0 h-full w-full" />
+          <div ref={mapContainerRef} id="map" className="absolute inset-0 h-full w-full min-h-[240px]" />
+          {mapBootError ? (
+            <div
+              data-testid="map-boot-error"
+              className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 bg-slate-50/95 px-6 text-center"
+            >
+              <p className="text-[14px] font-medium text-slate-800">
+                {mapBootError === "token"
+                  ? t("map.boot_error_token")
+                  : t("map.boot_error_load")}
+              </p>
+              {mapBootError === "token" ? (
+                <p className="max-w-sm text-[12px] text-slate-500">{t("map.boot_error_token_hint")}</p>
+              ) : null}
+            </div>
+          ) : null}
       
       {/* Premium Recenter Button */}
       <button

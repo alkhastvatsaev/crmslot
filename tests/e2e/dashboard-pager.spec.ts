@@ -38,8 +38,10 @@ test.describe("Dashboard carousel", () => {
     await expect(page.locator('[data-testid="dashboard-page-5"]')).toBeVisible({
       timeout: 20_000,
     });
-    const technicianLabFrame = page.frameLocator('[data-testid="technician-lab-iframe"]');
-    await expect(technicianLabFrame.locator('[data-testid="technician-lab-view"]')).toBeVisible({
+    await expect(page.locator('[data-testid="dashboard-pager-slot-5-panel-center"]')).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.locator('[data-testid="gmail-hub-panel-center"]')).toBeVisible({
       timeout: 20_000,
     });
 

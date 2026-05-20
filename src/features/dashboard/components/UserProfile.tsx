@@ -15,8 +15,8 @@ export const appProfiles = [
   { name: "MANSOUR", roleKey: "technician" },
   { name: "ASLANBECK", roleKey: "back_office" },
   { name: "TIMOUR", roleKey: "admin" },
-  /** Aligné page 6 — lab `/technician`. */
-  { name: "ALEXANDRE", roleKey: "technician" },
+  /** Aligné page 6 — hub Gmail. */
+  { name: "GMAIL", roleKey: "back_office" },
 ];
 
 export default function UserProfile() {

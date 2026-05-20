@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/I18nContext";
 import GmailGoogleConnectButton from "@/features/gmail/components/GmailGoogleConnectButton";
+import { gmailShell } from "@/features/gmail/gmailHubUi";
 
 type Props = {
   unauthorized: boolean;
@@ -16,7 +17,7 @@ export default function GmailHubSetupPanel({ unauthorized, clientReady, onConnec
   return (
     <div
       data-testid="gmail-hub-setup"
-      className="flex h-full min-h-0 flex-1 flex-col items-center justify-center px-8 py-10"
+      className={`${gmailShell} items-center justify-center px-8 py-10`}
     >
       {unauthorized ? (
         <p className="max-w-sm text-center text-[13px] text-slate-500">{t("gmail.hub.needs_login")}</p>

@@ -71,7 +71,7 @@ const config: Config = {
       lines: 100,
     },
     // Chatbot P0 — ratchet progressif (voir docs/TESTING.md §3.4).
-    './src/features/chatbot/chatbot-local-intent.ts': {
+    './src/features/chatbot/chatbot-pwa-intent.ts': {
       statements: 65,
       branches: 75,
       functions: 90,
@@ -111,6 +111,8 @@ const config: Config = {
   moduleNameMapper: {
     // Handle module aliases
     '^@/(.*)$': '<rootDir>/src/$1',
+    // qrcode is only used in generateEquipmentQrDataUrl — not in scope for unit tests
+    '^qrcode$': '<rootDir>/src/__mocks__/qrcode.ts',
   },
 };
 

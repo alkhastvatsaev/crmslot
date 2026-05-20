@@ -40,13 +40,6 @@
   color-scheme: light;
 }
 
-/* Scope page 7 — même grille / dimensions que les autres pages (dashboard-layout.css). */
-.gmail-hub-page-root {
-  position: relative;
-  height: 100%;
-  min-height: 0;
-}
-
 /* ── Backdrop + overlay PDF plein écran (portal → document.body) ── */
 
 .gmail-hub-pdf-backdrop {

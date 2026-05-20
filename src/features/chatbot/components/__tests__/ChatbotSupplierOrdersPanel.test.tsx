@@ -2,6 +2,15 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import ChatbotSupplierOrdersPanel from "@/features/chatbot/components/ChatbotSupplierOrdersPanel";
 
+jest.mock("@/features/backoffice/useBackOfficeInterventions", () => ({
+  useBackOfficeInterventions: () => ({
+    interventions: [],
+    loading: false,
+    error: null,
+    firebaseUid: null,
+  }),
+}));
+
 jest.mock("@/features/chatbot/ChatbotContext", () => ({
   useChatbotContext: () => ({
     supplierOrdersPanel: {
@@ -40,16 +49,91 @@ jest.mock("@/features/chatbot/ChatbotContext", () => ({
       overlayTarget: null,
     },
     closeDocumentPreview: jest.fn(),
+    chatbotInvoices: [],
+    workspaceSnapshot: null,
   }),
 }));
 
 describe("ChatbotSupplierOrdersPanel", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("renders supplier orders list", () => {
     render(<ChatbotSupplierOrdersPanel />);
     expect(screen.getByTestId("chatbot-supplier-orders-panel")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-supplier-order-ord-1")).toBeInTheDocument();
     expect(screen.getByText(/Cylindre/)).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-supplier-order-pdf-ord-1")).toBeInTheDocument();
+  });
+
+  it("shows client name when order is linked to an intervention", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock interventions
+    jest.spyOn(
+      require("@/features/backoffice/useBackOfficeInterventions"),
+      "useBackOfficeInterventions",
+    ).mockReturnValue({
+      interventions: [
+        {
+          id: "iv-dupont",
+          companyId: "co-1",
+          status: "assigned",
+          clientFirstName: "Jean",
+          clientLastName: "Dupont",
+        },
+      ],
+      loading: false,
+      error: null,
+      firebaseUid: null,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
+    jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
+      supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
+      supplierOrders: [
+        {
+          id: "ord-1",
+          companyId: "co-1",
+          supplierId: "lecot",
+          supplierName: "Lecot",
+          status: "sent",
+          interventionId: "iv-dupont",
+          lines: [{ sku: "A1", label: "Cylindre", quantity: 1, unitPriceCents: 5000 }],
+          totalCents: 5000,
+          createdAt: "2026-05-18T10:00:00.000Z",
+          updatedAt: "2026-05-18T10:00:00.000Z",
+        },
+      ],
+      materialOrders: [],
+      companyId: "co-1",
+      chatbotInvoices: [
+        {
+          interventionId: "iv-dupont",
+          clientLabel: "M. Dupont",
+          status: "invoiced",
+          totalCents: 5000,
+          invoicedAt: null,
+          problem: null,
+        },
+      ],
+      workspaceSnapshot: null,
+      closeSupplierOrdersPanel: jest.fn(),
+      openSupplierOrderPdf: jest.fn(),
+      openDocumentPreview: jest.fn(),
+      ensureRightPanelOpen: jest.fn(),
+      documentPreview: {
+        interventionId: "",
+        kind: "material_order",
+        title: "Bon",
+        blobUrl: null,
+        loading: false,
+        error: null,
+        supplierOrderId: null,
+        overlayTarget: null,
+      },
+      closeDocumentPreview: jest.fn(),
+    });
+    render(<ChatbotSupplierOrdersPanel placement="leftRail" />);
+    expect(screen.getByText("Jean Dupont")).toBeInTheDocument();
   });
 
   it("shows demo progress on left rail for isDemo orders", () => {
@@ -62,6 +146,7 @@ describe("ChatbotSupplierOrdersPanel", () => {
 
   it("opens supplier pdf on left overlay without switching to right panel", () => {
     const openSupplierOrderPdf = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
       supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
       supplierOrders: [
@@ -97,6 +182,8 @@ describe("ChatbotSupplierOrdersPanel", () => {
       },
       closeDocumentPreview: jest.fn(),
       refreshRegistry: jest.fn(),
+      chatbotInvoices: [],
+      workspaceSnapshot: null,
     });
     render(<ChatbotSupplierOrdersPanel placement="leftRail" />);
     fireEvent.click(screen.getByTestId("chatbot-supplier-order-pdf-ord-1"));
@@ -107,6 +194,7 @@ describe("ChatbotSupplierOrdersPanel", () => {
 
   it("closes left overlay on close button", () => {
     const closeDocumentPreview = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
       supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
       supplierOrders: [
@@ -142,6 +230,8 @@ describe("ChatbotSupplierOrdersPanel", () => {
       },
       closeDocumentPreview,
       refreshRegistry: jest.fn(),
+      chatbotInvoices: [],
+      workspaceSnapshot: null,
     });
     render(<ChatbotSupplierOrdersPanel placement="leftRail" />);
     fireEvent.click(screen.getByTestId("chatbot-orders-preview-close"));
@@ -150,11 +240,14 @@ describe("ChatbotSupplierOrdersPanel", () => {
 
   it("closes panel", () => {
     const close = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
       supplierOrdersPanel: { open: true, highlightOrderId: null, highlightMaterialOrderId: null },
       supplierOrders: [],
       materialOrders: [],
       closeSupplierOrdersPanel: close,
+      chatbotInvoices: [],
+      workspaceSnapshot: null,
     });
     render(<ChatbotSupplierOrdersPanel />);
     fireEvent.click(screen.getByTestId("chatbot-supplier-orders-close"));

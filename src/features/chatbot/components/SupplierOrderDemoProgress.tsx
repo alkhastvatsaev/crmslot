@@ -14,7 +14,7 @@ type Props = {
 
 /** Barre + étapes — mode démonstration uniquement. */
 export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
-  const { activeIndex, percent, cancelled } = resolveDemoSupplierOrderProgress(status);
+  const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress(status);
 
   if (cancelled) {
     return (
@@ -36,10 +36,6 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
       data-testid={`chatbot-supplier-order-demo-progress-${orderId}`}
       aria-label="Progression commande démo"
     >
-      <div className="flex justify-between items-center text-[10px] font-medium tracking-wide uppercase text-slate-500 mb-1.5 px-0.5">
-        <span>Statut de la commande</span>
-      </div>
-
       <div className="flex items-center gap-0" role="list">
         {DEMO_SUPPLIER_ORDER_STEPS.map((step, idx) => {
           const done = idx < activeIndex;
@@ -91,22 +87,6 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
             </div>
           );
         })}
-      </div>
-
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-blue-100/60">
-        <div
-          className="relative h-full rounded-full bg-blue-500 transition-[width] duration-500 ease-out"
-          style={{ width: `${percent}%` }}
-          data-testid={`chatbot-supplier-order-demo-progress-bar-${orderId}`}
-          role="progressbar"
-          aria-valuenow={percent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-        >
-          {activeIndex >= 0 && activeIndex < DEMO_SUPPLIER_ORDER_STEPS.length - 1 ? (
-            <div className="absolute inset-0 bg-white/25 animate-pulse" aria-hidden />
-          ) : null}
-        </div>
       </div>
     </div>
   );

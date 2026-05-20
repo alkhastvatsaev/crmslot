@@ -17,6 +17,7 @@ export const MATERIAL_ORDERS_COLLECTION = "material_orders";
 
 export type MaterialOrderDoc = MaterialOrder & {
   companyId?: string | null;
+  supplierOrderId?: string | null;
 };
 
 export function subscribeMaterialOrders(

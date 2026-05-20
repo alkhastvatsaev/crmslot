@@ -70,7 +70,7 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-slate-50 p-4 sm:p-6">
-      <h3 className="mb-6 text-[15px] font-semibold text-slate-900">Documents liés à l'intervention</h3>
+      <h3 className="mb-6 text-[15px] font-semibold text-slate-900">Documents liés à l&apos;intervention</h3>
       
       <div className="flex flex-col gap-4">
         {/* Invoice */}
@@ -82,7 +82,7 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
             <Receipt className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <div className="text-[14px] font-semibold text-slate-900 transition-colors group-hover:text-blue-700">Facture de l'intervention</div>
+            <div className="text-[14px] font-semibold text-slate-900 transition-colors group-hover:text-blue-700">Facture de l&apos;intervention</div>
             <div className="mt-0.5 text-[12px] text-slate-500">Visualiser ou générer la facture</div>
           </div>
         </button>

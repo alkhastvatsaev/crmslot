@@ -1,12 +1,21 @@
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
+import {
+  buildInterventionClientLabelMap,
+  buildSupplierOrderInterventionIdByOrderId,
+  resolveSupplierOrderClientLabel,
+} from "@/features/chatbot/chatbotOrderClientLabels";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
-import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrder } from "@/features/suppliers/types";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import type { SupplierOrder } from "@/features/suppliers/types";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import SupplierOrderDemoProgress from "@/features/chatbot/components/SupplierOrderDemoProgress";
+import { capitalizeName } from "@/utils/stringUtils";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -21,17 +30,6 @@ const ACCENT = {
   count: "text-blue-600/70",
   demo: "text-blue-600",
 } as const;
-
-const STATUS_SHORT: Record<string, string> = {
-  draft: "Brouillon",
-  sent: "Envoyée",
-  confirmed: "Confirmée",
-  delivered: "Livrée",
-  cancelled: "Annulée",
-  pending: "En attente",
-  ordered: "Commandé",
-  received: "Reçu",
-};
 
 function formatEur(cents: number): string {
   return `${(cents / 100).toLocaleString("fr-BE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} €`;
@@ -58,18 +56,22 @@ function orderTitle(order: SupplierOrder): string {
   return `${first} · ${lines.length} articles`;
 }
 
-function OrderMetaLine({ order }: { order: SupplierOrder }) {
-  const date = formatWhenShort(order.createdAt);
-  const status = SUPPLIER_ORDER_STATUS_LABELS[order.status] ?? order.status;
+function OrderClientLine({ clientLabel }: { clientLabel: string | null }) {
+  if (!clientLabel) return null;
   return (
-    <p className="mt-0.5 truncate text-[11px] text-slate-400">
-      {date ? <span>{date}</span> : null}
-      {date && status ? <span className="text-slate-300"> · </span> : null}
-      {status ? (
-        <span className="text-slate-500">{status}</span>
-      ) : null}
+    <p
+      className="mt-0.5 truncate text-[12px] font-semibold text-slate-700"
+      data-testid="chatbot-order-client-label"
+    >
+      {capitalizeName(clientLabel)}
     </p>
   );
+}
+
+function OrderDateLine({ createdAt }: { createdAt: unknown }) {
+  const date = formatWhenShort(createdAt);
+  if (!date) return null;
+  return <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p>;
 }
 
 function materialTitle(order: MaterialOrderDoc): string {
@@ -95,10 +97,12 @@ function getDemoOrderStatus(orderId: string, originalStatus: string): SupplierOr
 
 function SupplierOrderRow({
   order,
+  clientLabel,
   highlighted,
   onViewPdf,
 }: {
   order: SupplierOrder;
+  clientLabel: string | null;
   highlighted: boolean;
   onViewPdf: () => void;
 }) {
@@ -134,7 +138,8 @@ function SupplierOrderRow({
               <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
                 {orderTitle(displayOrder)}
               </p>
-              <OrderMetaLine order={displayOrder} />
+              <OrderClientLine clientLabel={clientLabel} />
+              <OrderDateLine createdAt={displayOrder.createdAt} />
             </button>
             <p className={cn("shrink-0 text-[13px] font-semibold tabular-nums ml-2", ACCENT.price)}>
               {formatEur(displayOrder.totalCents)}
@@ -152,19 +157,16 @@ function SupplierOrderRow({
 
 function MaterialOrderRow({
   order,
+  clientLabel,
   highlighted,
   onViewPdf,
 }: {
   order: MaterialOrderDoc;
+  clientLabel: string | null;
   highlighted: boolean;
   onViewPdf?: () => void;
 }) {
-  const meta = [
-    formatWhenShort(order.createdAt),
-    STATUS_SHORT[order.status] ?? order.status,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const date = formatWhenShort(order.createdAt);
 
   return (
     <article
@@ -186,14 +188,16 @@ function MaterialOrderRow({
           <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
             {materialTitle(order)}
           </p>
-          <p className="mt-0.5 truncate text-[11px] text-slate-400">{meta}</p>
+          <OrderClientLine clientLabel={clientLabel} />
+          {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
         </button>
       ) : (
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
             {materialTitle(order)}
           </p>
-          <p className="mt-0.5 truncate text-[11px] text-slate-400">{meta}</p>
+          <OrderClientLine clientLabel={clientLabel} />
+          {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
         </div>
       )}
     </article>
@@ -221,7 +225,24 @@ export default function ChatbotSupplierOrdersPanel({
     documentPreview,
     closeDocumentPreview,
     refreshRegistry,
+    chatbotInvoices,
+    workspaceSnapshot,
   } = useChatbotContext();
+
+  const workspace = useCompanyWorkspaceOptional();
+  const interventionsCompanyId =
+    (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
+  const { interventions } = useBackOfficeInterventions(interventionsCompanyId);
+
+  const clientLabelByInterventionId = useMemo(
+    () => buildInterventionClientLabelMap(chatbotInvoices, workspaceSnapshot, interventions),
+    [chatbotInvoices, workspaceSnapshot, interventions],
+  );
+
+  const orderInterventionIdByOrderId = useMemo(
+    () => buildSupplierOrderInterventionIdByOrderId(supplierOrders, materialOrders),
+    [supplierOrders, materialOrders],
+  );
 
   const isLeftRail = placement === "leftRail";
   const highlightId = supplierOrdersPanel.highlightOrderId;
@@ -304,6 +325,12 @@ export default function ChatbotSupplierOrdersPanel({
             <SupplierOrderRow
               key={order.id}
               order={order}
+              clientLabel={resolveSupplierOrderClientLabel(
+                order.id,
+                order.interventionId,
+                orderInterventionIdByOrderId,
+                clientLabelByInterventionId,
+              )}
               highlighted={isSupplierHighlighted(order.id)}
               onViewPdf={() => {
                 if (!companyId) return;
@@ -327,6 +354,12 @@ export default function ChatbotSupplierOrdersPanel({
               <MaterialOrderRow
                 key={order.id}
                 order={order}
+                clientLabel={resolveSupplierOrderClientLabel(
+                  order.id,
+                  order.interventionId,
+                  orderInterventionIdByOrderId,
+                  clientLabelByInterventionId,
+                )}
                 highlighted={isMaterialHighlighted(order.id)}
                 onViewPdf={
                   order.interventionId
