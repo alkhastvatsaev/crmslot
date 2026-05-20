@@ -6,8 +6,20 @@ describe("chatbot-tools", () => {
     expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "search_workspace")).toBe(true);
     expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "list_inbox_notifications")).toBe(true);
     expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "send_intervention_email")).toBe(true);
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "focus_intervention_document")).toBe(
+      true,
+    );
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "search_lecot_products")).toBe(true);
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "order_lecot_parts")).toBe(true);
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "list_supplier_orders")).toBe(true);
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "patch_intervention_billing")).toBe(true);
+    expect(CHATBOT_TOOL_DEFINITIONS.some((t) => t.name === "update_intervention_billing")).toBe(
+      true,
+    );
     expect(isChatbotWriteTool("update_intervention_status")).toBe(true);
     expect(isChatbotWriteTool("send_intervention_email")).toBe(true);
     expect(isChatbotWriteTool("list_interventions")).toBe(false);
+    expect(isChatbotWriteTool("order_lecot_parts")).toBe(true);
+    expect(isChatbotWriteTool("search_lecot_products")).toBe(false);
   });
 });

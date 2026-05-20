@@ -12,6 +12,83 @@ export function mergeCatalogProducts(...lists: CatalogProduct[][]): CatalogProdu
   return Array.from(bySku.values());
 }
 
+const QUERY_STOP_WORDS = new Set([
+  "de",
+  "du",
+  "des",
+  "la",
+  "le",
+  "les",
+  "un",
+  "une",
+  "pour",
+  "avec",
+  "sur",
+  "chez",
+  "juste",
+  "et",
+  "ou",
+  "en",
+  "au",
+  "aux",
+  "a",
+  "à",
+]);
+
+function normalizeAccents(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+/** Tokens utiles pour recherche catalogue (phrases longues type chatbot). */
+export function tokenizeCatalogQuery(query: string): string[] {
+  return normalizeAccents(query)
+    .toLowerCase()
+    .split(/[\s,;.\-/()[\]]+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length >= 2 && !QUERY_STOP_WORDS.has(t));
+}
+
+function scoreCatalogProduct(product: CatalogProduct, tokens: string[]): number {
+  const hay = normalizeAccents(`${product.sku} ${product.label}`).toLowerCase();
+  let score = 0;
+  for (const token of tokens) {
+    if (hay.includes(token)) {
+      score += token.length >= 4 ? 3 : 1;
+    }
+  }
+  return score;
+}
+
+/** Recherche par mots-clés (meilleur pour descriptions longues). */
+export function searchCatalogProductsScored(
+  products: CatalogProduct[],
+  query: string,
+  limit = 12,
+): CatalogProduct[] {
+  const q = query.trim();
+  if (!q) return products.slice(0, limit);
+
+  const qNorm = normalizeAccents(q.toLowerCase());
+  const exact = products.filter(
+    (p) =>
+      normalizeAccents(p.label.toLowerCase()).includes(qNorm) ||
+      p.sku.toLowerCase().includes(qNorm),
+  );
+  if (exact.length > 0) return exact.slice(0, limit);
+
+  const tokens = tokenizeCatalogQuery(q);
+  if (tokens.length === 0) return [];
+
+  const ranked = products
+    .map((p) => ({ p, score: scoreCatalogProduct(p, tokens) }))
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (ranked.length > 0) return ranked.slice(0, limit).map((row) => row.p);
+
+  return [];
+}
+
 export function searchCatalogProducts(
   products: CatalogProduct[],
   query: string,
@@ -19,8 +96,5 @@ export function searchCatalogProducts(
 ): CatalogProduct[] {
   const q = query.trim().toLowerCase();
   if (!q) return products.slice(0, limit);
-  const matches = products.filter(
-    (p) => p.label.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q),
-  );
-  return matches.slice(0, limit);
+  return searchCatalogProductsScored(products, q, limit);
 }

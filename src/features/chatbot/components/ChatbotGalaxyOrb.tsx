@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { startGalaxyStarsAnimation } from "@/core/ui/GalaxyButton/galaxyStarsAnimation";
 import "@/core/ui/GalaxyButton/GalaxyButton.css";
 
-const STAR_COUNT = 210;
+const STAR_COUNT = 420;
 
 /** Cercle avatar Chatbot 32×32 — même animation étoiles / fond bleu que GalaxyButton. */
 export default function ChatbotGalaxyOrb({ className }: { className?: string }) {

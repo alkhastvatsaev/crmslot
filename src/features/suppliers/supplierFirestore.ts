@@ -4,8 +4,6 @@ import {
   addDoc,
   updateDoc,
   doc,
-  query,
-  orderBy,
   serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
@@ -15,15 +13,37 @@ import { computeOrderTotal } from "./types";
 const col = (db: Firestore, companyId: string) =>
   collection(db, "companies", companyId, "supplierOrders");
 
+function sortSupplierOrdersNewestFirst(rows: SupplierOrder[]): SupplierOrder[] {
+  return [...rows].sort((a, b) => {
+    const ta = typeof a.createdAt === "object" && a.createdAt !== null && "seconds" in a.createdAt
+      ? (a.createdAt as { seconds: number }).seconds * 1000
+      : Date.parse(String(a.createdAt));
+    const tb = typeof b.createdAt === "object" && b.createdAt !== null && "seconds" in b.createdAt
+      ? (b.createdAt as { seconds: number }).seconds * 1000
+      : Date.parse(String(b.createdAt));
+    return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0);
+  });
+}
+
 export function subscribeSupplierOrders(
   db: Firestore,
   companyId: string,
   onData: (orders: SupplierOrder[]) => void,
 ): () => void {
-  const q = query(col(db, companyId), orderBy("createdAt", "desc"));
-  return onSnapshot(q, (snap) => {
-    onData(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SupplierOrder, "id">) })));
-  }, () => onData([]));
+  return onSnapshot(
+    col(db, companyId),
+    (snap) => {
+      const rows = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<SupplierOrder, "id">),
+      }));
+      onData(sortSupplierOrdersNewestFirst(rows));
+    },
+    (err) => {
+      console.warn("[supplierOrders] onSnapshot error:", err);
+      onData([]);
+    },
+  );
 }
 
 export async function createSupplierOrder(

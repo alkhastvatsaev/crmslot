@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPin, Plus, Search, Upload, User } from "lucide-react";
+import { MapPin, Plus, Search, Trash2, Upload, User } from "lucide-react";
 import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -11,10 +11,12 @@ import { useClients } from "@/features/clients/useClients";
 import { useClientSites } from "@/features/clients/useClientSites";
 import { buildClientDisplayName } from "@/features/clients/clientDisplayName";
 import { parseClientsCsv } from "@/features/clients/parseClientsCsv";
+import { clearClientsOfflineCache } from "@/features/clients/clientCrmOfflineCache";
 import {
   bulkCreateClients,
   createClient,
   createSite,
+  deleteClientWithSites,
   updateClient,
 } from "@/features/clients/clientFirestore";
 import ClientInterventionsPanel from "@/features/clients/components/ClientInterventionsPanel";
@@ -113,6 +115,23 @@ export default function ClientsCrmPanel() {
       setCompanyName("");
       setSelectedId(id);
       toast.success(String(t("crm.client_created")));
+    } catch {
+      toast.error(String(t("common.error")));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteClient = async () => {
+    if (!firestore || !companyId || !selected) return;
+    const name = buildClientDisplayName(selected) || selected.id;
+    if (!window.confirm(t("crm.delete_client_confirm").replace("{{name}}", name))) return;
+    setBusy(true);
+    try {
+      await deleteClientWithSites(firestore, companyId, selected.id);
+      clearClientsOfflineCache(companyId);
+      setSelectedId(null);
+      toast.success(String(t("crm.client_deleted")));
     } catch {
       toast.error(String(t("common.error")));
     } finally {
@@ -348,7 +367,19 @@ export default function ClientsCrmPanel() {
                 data-testid="crm-edit-client-form"
                 className="mb-3 space-y-2 border-b border-slate-100 pb-3"
               >
-                <p className="text-xs font-bold uppercase text-slate-400">{t("crm.edit_client")}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-bold uppercase text-slate-400">{t("crm.edit_client")}</p>
+                  <button
+                    type="button"
+                    data-testid="crm-delete-client-btn"
+                    disabled={busy}
+                    onClick={() => void handleDeleteClient()}
+                    className="flex items-center gap-1 rounded-lg border border-red-200 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t("crm.delete_client")}
+                  </button>
+                </div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <input
                     data-testid="crm-edit-firstname"

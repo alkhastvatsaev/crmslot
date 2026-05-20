@@ -1,7 +1,7 @@
 import {
   missionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
-import type { Mission } from "@/utils/mockMissions";
+import type { Mission } from "@/features/map/missionTypes";
 
 describe("missionsToChatDayRows", () => {
   it("maps demo missions with stable thread id", () => {

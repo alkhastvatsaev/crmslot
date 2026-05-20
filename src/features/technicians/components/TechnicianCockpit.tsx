@@ -8,8 +8,6 @@ import MissionFinishModal from './MissionFinishModal';
 import { MaterialOrderForm } from '@/features/materials/components/MaterialOrderForm';
 import { BILLING_TEMPLATES } from '@/features/interventions/config/terrainTemplates';
 import type { MaterialOrderPart } from '@/features/materials/types';
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
-
 type TechnicianStatus = 'available' | 'on-mission' | 'break';
 
 interface Mission {
@@ -22,26 +20,7 @@ interface Mission {
   phone?: string;
 }
 
-const mockMissions: Mission[] = devUiPreviewEnabled ? [
-  {
-    id: "1",
-    client: "Jean Dupont",
-    type: "Porte Claquée",
-    address: "Rue Neuve 12, 1000 Bruxelles",
-    eta: "10 min",
-    distance: "2.3 km",
-    phone: "+32471234567",
-  },
-  {
-    id: "2",
-    client: "Marie Lambert",
-    type: "Perte de Clés",
-    address: "Avenue Louise 45, 1050 Ixelles",
-    eta: "25 min",
-    distance: "6.1 km",
-    phone: "+32498765432",
-  },
-] : [];
+const mockMissions: Mission[] = [];
 
 export default function TechnicianCockpit() {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);

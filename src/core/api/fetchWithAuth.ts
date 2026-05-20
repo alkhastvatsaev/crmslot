@@ -7,7 +7,7 @@ export async function authHeaders(
   const headers: Record<string, string> = { ...extra };
   if (auth?.currentUser) {
     try {
-      headers.Authorization = `Bearer ${await auth.currentUser.getIdToken()}`;
+      headers.Authorization = `Bearer ${await auth.currentUser.getIdToken(false)}`;
     } catch {
       /* refresh échoué */
     }

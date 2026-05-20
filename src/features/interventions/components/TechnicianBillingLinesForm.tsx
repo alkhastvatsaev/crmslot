@@ -12,6 +12,7 @@ import ProductQuickAddBar from "@/features/catalog/components/ProductQuickAddBar
 import BillingLineSuggestions from "@/features/interventions/components/BillingLineSuggestions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
+import { lecotShopCatalogSearchUrl } from "@/features/catalog/lecotShopConfig";
 
 export interface BillingLine {
   description: string;
@@ -256,7 +257,7 @@ export default function TechnicianBillingLinesForm({
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-[13px] focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                     <a
-                      href={`https://lecot.be/fr-be/search?q=${encodeURIComponent(line.reference || line.description)}`}
+                      href={lecotShopCatalogSearchUrl(line.reference || line.description)}
                       target="_blank" rel="noreferrer"
                       className="flex shrink-0 items-center justify-center rounded-lg bg-slate-800 px-3 text-[11px] font-bold text-white hover:bg-slate-700 transition-colors"
                       onClick={(e) => {

@@ -10,6 +10,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import { lecotShopCatalogSearchUrl } from "@/features/catalog/lecotShopConfig";
 import {
   Package,
   CheckCircle2,
@@ -199,7 +200,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                         <span className="text-slate-500">×{part.quantity}</span>
                         {part.reference && (
                           <a
-                            href={`https://lecot.be/fr-be/search?q=${encodeURIComponent(part.reference)}`}
+                            href={lecotShopCatalogSearchUrl(part.reference)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-0.5 rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-bold text-white hover:bg-slate-700 transition"

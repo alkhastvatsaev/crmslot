@@ -53,18 +53,16 @@ describe("filterInterventionsReleasedToTechnician", () => {
 
 describe("buildTechnicianInterventionList", () => {
   const techUid = getDefaultAssignedTechnicianUid();
-  const dashboardDate = new Date("2026-05-16T12:00:00");
 
-  it("merges firestore rows without demo mocks when preview demos disabled", () => {
+  it("returns only released firestore rows for the technician", () => {
     const firestoreRows = [
       iv({ id: "live-1", status: "assigned", assignedTechnicianUid: techUid }),
       iv({ id: "pending-1", status: "pending" }),
+      iv({ id: "mock-day-2026-05-16-0", status: "assigned", assignedTechnicianUid: techUid }),
     ];
     const list = buildTechnicianInterventionList({
       firestoreInterventions: firestoreRows,
       technicianUid: techUid,
-      dashboardDate,
-      devUiPreviewWithDemos: false,
     });
     expect(list.map((r) => r.id)).toEqual(["live-1"]);
   });

@@ -1,4 +1,5 @@
 import {
+  clearClientsOfflineCache,
   readClientsOfflineCache,
   writeClientsOfflineCache,
 } from "@/features/clients/clientCrmOfflineCache";
@@ -18,5 +19,11 @@ describe("clientCrmOfflineCache", () => {
     ]);
     expect(readClientsOfflineCache("co-1")).toHaveLength(1);
     expect(readClientsOfflineCache("co-2")).toHaveLength(0);
+  });
+
+  it("clearClientsOfflineCache removes stored list", () => {
+    writeClientsOfflineCache("co-1", [{ id: "cl-1", companyId: "co-1", displayName: "Test" }]);
+    clearClientsOfflineCache("co-1");
+    expect(readClientsOfflineCache("co-1")).toHaveLength(0);
   });
 });

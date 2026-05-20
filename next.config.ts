@@ -57,7 +57,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["fluent-ffmpeg"],
+  serverExternalPackages: ["fluent-ffmpeg", "playwright", "playwright-core"],
   env: {
     NEXT_PUBLIC_APP_GIT_SHA: resolveGitShaForBuild(),
     /** false en `npm run dev` sans ENABLE_PWA_IN_DEV — FCM ne tente pas le SW. */

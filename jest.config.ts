@@ -70,6 +70,43 @@ const config: Config = {
       functions: 100,
       lines: 100,
     },
+    // Chatbot P0 — ratchet progressif (voir docs/TESTING.md §3.4).
+    './src/features/chatbot/chatbot-local-intent.ts': {
+      statements: 65,
+      branches: 75,
+      functions: 90,
+      lines: 65,
+    },
+    './src/features/chatbot/chatbot-address-disambiguation.ts': {
+      statements: 72,
+      branches: 58,
+      functions: 85,
+      lines: 72,
+    },
+    './src/features/chatbot/chatbot-route-handler.ts': {
+      statements: 75,
+      branches: 60,
+      functions: 75,
+      lines: 75,
+    },
+    './src/features/chatbot/chatbot-document-action-handler.ts': {
+      statements: 65,
+      branches: 50,
+      functions: 100,
+      lines: 65,
+    },
+    './src/features/chatbot/chatbot-tool-routing.ts': {
+      statements: 85,
+      branches: 50,
+      functions: 100,
+      lines: 85,
+    },
+    './src/features/chatbot/chatbot-tool-executor.ts': {
+      statements: 65,
+      branches: 38,
+      functions: 70,
+      lines: 65,
+    },
   },
   moduleNameMapper: {
     // Handle module aliases

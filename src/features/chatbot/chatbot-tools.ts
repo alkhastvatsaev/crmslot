@@ -151,13 +151,78 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   {
     name: "get_intervention_billing",
     description:
-      "Facturation d'une intervention : lignes, montants, statut paiement, PDF facture.",
+      "Facturation d'une intervention : lignes, montants, statut paiement, PDF facture. Utilise search_workspace ou list_interventions pour trouver l'id dossier si l'utilisateur cite un nom (ex. Vatsaev).",
     input_schema: {
       type: "object",
       properties: {
         interventionId: { type: "string" },
       },
       required: ["interventionId"],
+    },
+  },
+  {
+    name: "patch_intervention_billing",
+    description:
+      "Modifie une ligne de facturation (prix unitPriceEur, quantité, description, clientName). La PWA affiche le PDF facture à droite — tu ne génères jamais le PDF. Préférer pour changer un prix. workflow : search_workspace si besoin → get_intervention_billing → patch. userConfirmed=true obligatoire (ou confirmation UI si false).",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+        lineIndex: { type: "number", description: "Index ligne (défaut 0)" },
+        unitPriceEur: { type: "number", description: "Prix unitaire en euros (ex. 500)" },
+        unitPriceCents: { type: "number", description: "Alternative en centimes" },
+        quantity: { type: "number" },
+        description: { type: "string" },
+        clientName: { type: "string", description: "Nom client sur la facture PDF" },
+        previewDocumentType: { type: "string", enum: ["quote", "invoice"] },
+        userConfirmed: { type: "boolean" },
+      },
+      required: ["interventionId", "userConfirmed"],
+    },
+  },
+  {
+    name: "update_intervention_billing",
+    description:
+      "Remplace toutes les lignes de facturation (unitPriceCents en centimes). La PWA génère le PDF. userConfirmed=true obligatoire.",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+        clientName: { type: "string" },
+        clientAddress: { type: "string" },
+        billingLines: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              description: { type: "string" },
+              quantity: { type: "number" },
+              unitPriceCents: { type: "number" },
+              reference: { type: "string" },
+            },
+            required: ["description", "quantity", "unitPriceCents"],
+          },
+        },
+        previewDocumentType: { type: "string", enum: ["quote", "invoice"] },
+        userConfirmed: { type: "boolean" },
+      },
+      required: ["interventionId", "billingLines", "userConfirmed"],
+    },
+  },
+  {
+    name: "focus_intervention_document",
+    description:
+      "Affiche le PDF à droite (devis, facture, rapport) sans modifier Firestore. Après patch_intervention_billing le PDF s'affiche déjà — ne pas rappeler.",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+        documentType: {
+          type: "string",
+          enum: ["quote", "invoice", "report"],
+        },
+      },
+      required: ["interventionId", "documentType"],
     },
   },
   {
@@ -258,9 +323,22 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
     },
   },
   {
+    name: "save_client_email",
+    description:
+      "Enregistre l'adresse email sur le dossier intervention et la fiche CRM (champ `em` du snapshot pour les prochains messages). Utilise quand l'utilisateur donne un mail dans le chat sans envoyer tout de suite, ou avant send_intervention_email.",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+        email: { type: "string", description: "Adresse email à mémoriser" },
+      },
+      required: ["interventionId", "email"],
+    },
+  },
+  {
     name: "send_intervention_email",
     description:
-      "Envoie un email au client (ou autre destinataire) lié à une intervention via la boîte Gmail configurée (SMTP). Enregistre le fil dans intervention_emails. userConfirmed=true obligatoire. Utilise get_intervention_detail / list_intervention_emails pour l'adresse et le contexte.",
+      "Envoie un email au client lié à une intervention. Par défaut joint le PDF facture du dossier (attachDocumentType=invoice). Devis → quote. Omettre attachDocumentType ou invoice si l'utilisateur demande d'envoyer la facture / le PDF. none uniquement si envoi sans pièce jointe explicite. Utilise `em` du snapshot ou clientEmail si présent ; adresse citée dans le chat → `to`. userConfirmed=true obligatoire.",
     input_schema: {
       type: "object",
       properties: {
@@ -272,9 +350,82 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
           type: "string",
           description: "Message-ID d'un email existant pour répondre dans le fil (optionnel)",
         },
+        attachDocumentType: {
+          type: "string",
+          enum: ["invoice", "quote", "none"],
+          description:
+            "PDF joint généré depuis le dossier : invoice=facture (défaut, à utiliser pour « envoyer la facture »), quote=devis, none=sans PJ",
+        },
         userConfirmed: { type: "boolean" },
       },
       required: ["interventionId", "to", "subject", "bodyText", "userConfirmed"],
+    },
+  },
+  {
+    name: "search_lecot_products",
+    description:
+      "OBLIGATOIRE si l'utilisateur demande une pièce/outil ou demande des suggestions (ex. « perceuse », « 5 serrures »). Tu AS ACCÈS au catalogue via cet outil, ne dis jamais l'inverse. Recherche le catalogue Lecot (local + API) et renvoie des suggestions avec prix, sku. Ne renvoie pas l'utilisateur sur le site sans l'avoir appelé.",
+    input_schema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Terme de recherche en français (ex: perceuse, cylindre Yale, serrure multipoints)",
+        },
+        limit: {
+          type: "number",
+          description: "Nombre max de résultats (défaut 3 pour proposer un choix)",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "list_supplier_orders",
+    description:
+      "Liste les commandes fournisseur (Lecot, etc.) de la société, avec statut et détail des lignes.",
+    input_schema: {
+      type: "object",
+      properties: {
+        limit: { type: "number", description: "Max 20, défaut 10" },
+        interventionId: { type: "string", description: "Filtrer par dossier (optionnel)" },
+      },
+    },
+  },
+  {
+    name: "order_lecot_parts",
+    description:
+      "Crée une commande fournisseur Lecot. IMPORTANT : reprendre sku + unitPriceEur (ou unitPriceCents) EXACTEMENT depuis search_lecot_products. Quantité : toujours 1 par défaut — ne jamais demander la quantité à l'utilisateur. NE PAS inclure userConfirmed : confirmation via l'interface.",
+    input_schema: {
+      type: "object",
+      properties: {
+        lines: {
+          type: "array",
+          description: "Lignes de commande — reprendre sku et unitPriceEur depuis search_lecot_products",
+          items: {
+            type: "object",
+            properties: {
+              sku: { type: "string", description: "Référence SKU du catalogue (ex. LEC-SER-1001) — copier depuis search_lecot_products" },
+              label: { type: "string", description: "Libellé exact du produit — copier depuis search_lecot_products" },
+              quantity: { type: "number", description: "Quantité (mets toujours 1 par défaut, ne demande jamais à l'utilisateur)" },
+              unitPriceEur: { type: "number", description: "OBLIGATOIRE — prix unitaire HT en euros depuis search_lecot_products (ex. 145.00)" },
+              unitPriceCents: { type: "number", description: "Alternative : prix unitaire HT en centimes (ex. 14500 = 145 €)" },
+            },
+            required: ["label", "unitPriceEur"],
+          },
+        },
+        interventionId: {
+          type: "string",
+          description:
+            "ID dossier lié — crée bon matériel + enregistre commande PWA + ajoute lignes à la facture",
+        },
+        syncBilling: {
+          type: "boolean",
+          description: "Ajouter les lignes à la facture dossier (défaut true si interventionId)",
+        },
+        notes: { type: "string", description: "Notes internes (optionnel)" },
+      },
+      required: ["lines"],
     },
   },
 ];
@@ -285,6 +436,9 @@ export const CHATBOT_WRITE_TOOLS = new Set([
   "update_intervention_schedule",
   "add_timeline_comment",
   "send_intervention_email",
+  "patch_intervention_billing",
+  "update_intervention_billing",
+  "order_lecot_parts",
 ]);
 
 export function isChatbotWriteTool(name: string): boolean {

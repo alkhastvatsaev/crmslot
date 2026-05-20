@@ -31,11 +31,12 @@ const COLORS = [
 const GALAXY_TILT = 1.1;
 const GALAXY_ANGLE = 0.3;
 
-const BG_CENTER = "#3b82f6";
-const BG_OUTER = "#1e3a8a";
-
-function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number) {
-  surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, ${BG_CENTER} 0%, ${BG_OUTER} 120%)`;
+function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number, isAvatar: boolean = false) {
+  if (isAvatar) {
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 120%)`;
+  } else {
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
+  }
 }
 
 export function startGalaxyStarsAnimation(
@@ -82,8 +83,8 @@ export function startGalaxyStarsAnimation(
     const mini = Math.min(width, height);
     const isAvatar = variant === "avatar";
 
-    const baseRadius = isAvatar ? mini * 0.36 : Math.max(width, height) * 0.75;
-    maxDrawRadius = isAvatar ? 0.42 : Infinity;
+    const baseRadius = isAvatar ? mini * 0.55 : Math.max(width, height) * 0.75;
+    maxDrawRadius = isAvatar ? 0.6 : Infinity;
     depthZScale = isAvatar ? mini * 1.8 : 150;
 
     for (let i = 0; i < starCount; i += 1) {
@@ -95,7 +96,7 @@ export function startGalaxyStarsAnimation(
       const color = COLORS[Math.floor(Math.random() * COLORS.length)]!;
 
       const size = isAvatar
-        ? Math.random() * 0.12 + 0.04
+        ? Math.random() * 0.2 + 0.1
         : Math.random() * 0.4 + 0.1;
 
       stars.push({
@@ -111,7 +112,7 @@ export function startGalaxyStarsAnimation(
       });
     }
 
-    paintGalaxyBackground(surface, 50, 50);
+    paintGalaxyBackground(surface, 50, 50, isAvatar);
   };
 
   const animate = () => {
@@ -155,7 +156,7 @@ export function startGalaxyStarsAnimation(
     if (width > 0 && height > 0) {
       const xPct = (currentX / width) * 100;
       const yPct = (currentY / height) * 100;
-      paintGalaxyBackground(surface, xPct, yPct);
+      paintGalaxyBackground(surface, xPct, yPct, variant === "avatar");
     }
 
     animationFrameId = requestAnimationFrame(animate);
@@ -193,7 +194,7 @@ export function startGalaxyStarsAnimation(
       : null;
   resizeObserver?.observe(surface);
 
-  paintGalaxyBackground(surface, 50, 50);
+  paintGalaxyBackground(surface, 50, 50, options.variant === "avatar");
   initCanvas();
   animate();
 

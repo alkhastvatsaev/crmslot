@@ -2,36 +2,9 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { firestore, auth, isConfigured } from "@/core/config/firebase";
 import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
-import { collection, onSnapshot, doc, setDoc, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Intervention } from "./types";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-
-const MOCK_INTERVENTIONS: Intervention[] = [
-  {
-    id: "1",
-    title: "Porte claquée",
-    address: "Mont des Arts, Bruxelles",
-    time: "Maintenant",
-    status: "in_progress",
-    location: { lat: 50.84655, lng: 4.35415 },
-  },
-  {
-    id: "2",
-    title: "Changement de cylindre",
-    address: "Grand Place, Bruxelles",
-    time: "14:30",
-    status: "pending",
-    location: { lat: 50.8468, lng: 4.3528 },
-  },
-  {
-    id: "3",
-    title: "Ouverture de coffre-fort",
-    address: "Avenue Louise, Bruxelles",
-    time: "11:00",
-    status: "done",
-    location: { lat: 50.84, lng: 4.36 },
-  },
-];
 
 export function useInterventions() {
   const workspace = useCompanyWorkspaceOptional();
@@ -67,23 +40,10 @@ export function useInterventions() {
       unsubSnap = onSnapshot(
         intRef,
         (snapshot) => {
-          if (!snapshot.empty) {
-            const parsed = stripKnownSyntheticInterventions(
-              snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
-            );
-            setInterventions(parsed);
-          } else if (
-            !tenantCompanyId &&
-            process.env.NEXT_PUBLIC_SEED_LEGACY_INTERVENTIONS === "true"
-          ) {
-            MOCK_INTERVENTIONS.forEach(async (i) => {
-              await setDoc(doc(collection(db, "interventions"), i.id), i);
-            });
-          } else if (!tenantCompanyId) {
-            setInterventions([]);
-          } else {
-            setInterventions([]);
-          }
+          const parsed = stripKnownSyntheticInterventions(
+            snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
+          );
+          setInterventions(parsed);
           setLoading(false);
         },
         (error) => {

@@ -116,6 +116,8 @@ export interface Intervention {
   requiredSkills?: string[] | null;
   /** Géofencing — arrivée auto détectée (Phase 17). */
   autoArrivedAt?: string | null;
+  /** Email client — enregistré automatiquement lors d'un envoi via chatbot. */
+  clientEmail?: string | null;
   /** WhatsApp client (Phase 19). */
   clientWhatsapp?: string | null;
   /** Satisfaction client post-intervention (1–5 étoiles). */

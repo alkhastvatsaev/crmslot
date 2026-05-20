@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     bodyHtml?: string;
     inReplyTo?: string;
     references?: string;
+    attachDocumentType?: "invoice" | "quote" | "none";
   };
 
   try {
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { interventionId, companyId, to, subject, bodyText, bodyHtml, inReplyTo, references } = body;
+  const { interventionId, companyId, to, subject, bodyText, bodyHtml, inReplyTo, references, attachDocumentType } = body;
 
   if (!interventionId || !companyId || !to || !subject || !bodyText) {
     return NextResponse.json({ ok: false, error: "Champs manquants." }, { status: 400 });
@@ -40,11 +41,16 @@ export async function POST(req: Request) {
     references,
     sentByUid: auth.uid,
     sentVia: "api",
+    attachDocumentType,
   });
 
   if (!result.ok) {
     return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, messageId: result.messageId });
+  return NextResponse.json({
+    ok: true,
+    messageId: result.messageId,
+    attachmentFilename: result.attachmentFilename,
+  });
 }

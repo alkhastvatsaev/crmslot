@@ -1,6 +1,5 @@
 jest.mock("@/core/config/devUiPreview", () => ({
   devUiPreviewEnabled: true,
-  realInterventionsOnly: false,
 }));
 
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";

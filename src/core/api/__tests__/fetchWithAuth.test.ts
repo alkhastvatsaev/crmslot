@@ -8,6 +8,7 @@ jest.mock("@/core/config/firebase", () => ({
   },
 }));
 
+import { auth } from "@/core/config/firebase";
 import { authHeaders, fetchWithAuth } from "@/core/api/fetchWithAuth";
 
 describe("fetchWithAuth", () => {
@@ -22,6 +23,11 @@ describe("fetchWithAuth", () => {
     const headers = await authHeaders({ "Content-Type": "application/json" });
     expect(headers.Authorization).toBe("Bearer mock-id-token");
     expect(headers["Content-Type"]).toBe("application/json");
+  });
+
+  it("uses cached id token (no forced refresh)", async () => {
+    await authHeaders();
+    expect(auth!.currentUser!.getIdToken).toHaveBeenCalledWith(false);
   });
 
   it("calls fetch with merged headers", async () => {

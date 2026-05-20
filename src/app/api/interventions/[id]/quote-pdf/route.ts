@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { generateInterventionQuotePdf } from "@/features/billing/generateQuotePdf";
+import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
 import type { Intervention } from "@/features/interventions/types";
 
 export const runtime = "nodejs";
@@ -24,8 +25,13 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const iv = { id: snap.id, ...snap.data() } as Intervention;
-  const pdf = generateInterventionQuotePdf(iv);
+  const data = snap.data()!;
+  const iv = { id: snap.id, ...data } as Intervention;
+  const companyId = String(data.companyId || "").trim();
+  const branding = companyId
+    ? await loadBillingPdfBrandingForIntervention(admin.firestore(), companyId)
+    : undefined;
+  const pdf = generateInterventionQuotePdf(iv, branding);
 
   return new NextResponse(Buffer.from(pdf), {
     status: 200,

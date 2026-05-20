@@ -4,7 +4,7 @@ import {
   formatScheduledTimeOnly,
   interventionClientLabel,
 } from "@/features/interventions/technicianSchedule";
-import type { Mission } from "@/utils/mockMissions";
+import type { Mission } from "@/features/map/missionTypes";
 
 /** Une ligne « client du jour » pour le picker chat (aligné rail missions). */
 export type ChatDayMissionRow = {

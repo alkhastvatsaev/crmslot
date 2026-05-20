@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { lecotApiBaseUrl } from "@/features/catalog/lecotApiSearch";
+import { submitLecotSupplierOrder } from "@/features/catalog/lecotSupplierOrder";
 import type { SupplierOrderLine } from "@/features/suppliers/types";
 
 export const runtime = "nodejs";
@@ -28,37 +28,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "No order lines provided" }, { status: 400 });
   }
 
-  const lecotBase = lecotApiBaseUrl();
-
-  if (lecotBase && body.supplierId === "lecot") {
-    try {
-      const orderUrl = new URL("/orders", lecotBase.endsWith("/") ? lecotBase : `${lecotBase}/`);
-      const apiKey = process.env.LECOT_API_KEY?.trim() || process.env.LECOT_API_TOKEN?.trim();
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
-
-      const res = await fetch(orderUrl.toString(), {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ lines, notes: body.notes }),
-      });
-
-      if (!res.ok) {
-        return NextResponse.json({ ok: false, error: `Lecot API returned ${res.status}` }, { status: 502 });
-      }
-
-      const data = (await res.json().catch(() => null)) as { orderId?: string } | null;
-      return NextResponse.json({ ok: true, source: "api", orderId: data?.orderId });
-    } catch {
-      return NextResponse.json({ ok: false, error: "Failed to reach Lecot API" }, { status: 502 });
+  if (body.supplierId === "lecot") {
+    const result = await submitLecotSupplierOrder({ lines, notes: body.notes });
+    if (!result.ok) {
+      return NextResponse.json({ ok: false, error: result.error }, { status: 502 });
     }
+    if (result.source === "manual") {
+      return NextResponse.json({ ok: true, source: "manual", message: result.message, lines: result.lines });
+    }
+    return NextResponse.json({ ok: true, source: result.source, orderId: result.orderId });
   }
 
-  // No external API — return order for manual processing
   return NextResponse.json({
     ok: true,
     source: "manual",
-    message: "Commande enregistrée. Envoi manuel requis (API fournisseur non configurée).",
+    message: "Fournisseur non pris en charge par l'API — traitement manuel.",
     lines,
   });
 }

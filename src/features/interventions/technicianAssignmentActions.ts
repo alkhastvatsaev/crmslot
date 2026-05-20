@@ -1,8 +1,4 @@
-import {
-  devUiPreviewEnabled,
-  DEMO_TECHNICIAN_UID,
-  realInterventionsOnly,
-} from "@/core/config/devUiPreview";
+import { devUiPreviewEnabled, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
 import type { Intervention } from "@/features/interventions/types";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 
@@ -14,7 +10,6 @@ export function getTechnicianAssignmentUid(
   authUid: string | null | undefined,
 ): string | null {
   const uid = (authUid ?? "").trim();
-  if (realInterventionsOnly) return uid || null;
   if (devUiPreviewEnabled) {
     if (!uid || uid === DEMO_TECHNICIAN_UID) return getDefaultAssignedTechnicianUid();
     return uid;
@@ -31,7 +26,7 @@ export function matchesAssignedTechnician(
   const assigned = (iv.assignedTechnicianUid ?? "").trim();
   if (!uid || !assigned) return false;
   if (assigned === uid) return true;
-  if (realInterventionsOnly || !devUiPreviewEnabled) return false;
+  if (!devUiPreviewEnabled) return false;
   const defaultUid = getDefaultAssignedTechnicianUid();
   return (
     assigned === defaultUid &&

@@ -130,6 +130,20 @@ service cloud.firestore {
           && request.resource.data.keys().hasAll(['sku', 'label', 'unitPriceCents', 'isActive']);
         allow delete: if false;
       }
+
+      /** Commandes fournisseur (Lecot, etc.) — créées via Admin SDK / Chatbot ; lecture back-office. */
+      match /supplierOrders/{orderId} {
+        allow read: if userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
+          || companyId == 'demo-local-company';
+        allow write: if false;
+      }
+
+      /** Logs Q/R chatbot (fine-tuning) — écriture Admin SDK ; lecture admin société uniquement. */
+      match /chatbot_training_logs/{logId} {
+        allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
+        allow create, update, delete: if false;
+      }
     }
 
     /** Création collaborateur uniquement via Admin SDK (accept-invite). Premier admin : créateur du doc companies. */
@@ -668,7 +682,12 @@ service cloud.firestore {
           userBelongsToCompany(resource.data.companyId)
           || tenantClaimsIncludeCompany(resource.data.companyId)
         );
-      allow delete: if false;
+      allow delete: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
     }
 
     match /sites/{siteId} {
@@ -691,7 +710,12 @@ service cloud.firestore {
           userBelongsToCompany(resource.data.companyId)
           || tenantClaimsIncludeCompany(resource.data.companyId)
         );
-      allow delete: if false;
+      allow delete: if isAuthed()
+        && resource.data.companyId is string
+        && (
+          userBelongsToCompany(resource.data.companyId)
+          || tenantClaimsIncludeCompany(resource.data.companyId)
+        );
     }
 
     match /{document=**} {

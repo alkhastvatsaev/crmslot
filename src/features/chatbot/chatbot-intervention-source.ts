@@ -1,11 +1,5 @@
 import type * as admin from "firebase-admin";
-import {
-  DEMO_COMPANY_ID,
-  devUiPreviewEnabled,
-  realInterventionsOnly,
-  stripKnownSyntheticInterventions,
-} from "@/core/config/devUiPreview";
-import { demoInterventionsForCompany } from "@/features/dev/demoInterventions";
+import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
 
 export function parseCreatedAtMs(data: Record<string, unknown>): number {
   const raw = data.createdAt ?? data.statusUpdatedAt ?? data.scheduledDate;
@@ -24,44 +18,42 @@ export function sortInterventionsByRecency(rows: Record<string, unknown>[]): Rec
   return [...rows].sort((a, b) => parseCreatedAtMs(b) - parseCreatedAtMs(a));
 }
 
-/** Données démo visibles dans le back-office mais absentes de Firestore. */
-export function mergeDemoInterventionsForChatbot(
-  companyId: string,
-  firestoreRows: Record<string, unknown>[],
-): Record<string, unknown>[] {
-  const shouldMerge =
-    devUiPreviewEnabled &&
-    !realInterventionsOnly &&
-    companyId.trim() === DEMO_COMPANY_ID;
-  if (!shouldMerge) return firestoreRows;
-
-  const byId = new Map<string, Record<string, unknown>>();
-  for (const row of firestoreRows) byId.set(String(row.id), row);
-  for (const iv of demoInterventionsForCompany(companyId)) {
-    byId.set(iv.id, { ...iv } as Record<string, unknown>);
-  }
-  return sortInterventionsByRecency([...byId.values()]);
-}
+type CacheEntry = { rows: Record<string, unknown>[]; expiry: number };
+const _interventionCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 45_000;
 
 /**
  * Interventions société — sans orderBy Firestore (évite l'index composite manquant
- * companyId + createdAt). Tri en mémoire + fusion démo en dev.
+ * companyId + createdAt). Tri en mémoire. Cache 45 s par session chatbot.
  */
 export async function fetchInterventionsForCompany(
   firestore: admin.firestore.Firestore,
   companyId: string,
-  limit = 150,
+  limit = 100,
 ): Promise<Record<string, unknown>[]> {
+  const cacheKey = `${companyId}:${limit}`;
+  const cached = _interventionCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiry) return cached.rows;
+
   const snap = await firestore
     .collection("interventions")
     .where("companyId", "==", companyId)
     .limit(Math.min(limit, 200))
     .get();
 
-  const stripped = stripKnownSyntheticInterventions(
-    snap.docs.map((d) => ({ id: d.id, ...d.data() })),
-  ) as Record<string, unknown>[];
+  const rows = sortInterventionsByRecency(
+    stripKnownSyntheticInterventions(
+      snap.docs.map((d) => ({ id: d.id, ...d.data() })),
+    ) as Record<string, unknown>[],
+  );
 
-  const sorted = sortInterventionsByRecency(stripped);
-  return mergeDemoInterventionsForChatbot(companyId, sorted);
+  _interventionCache.set(cacheKey, { rows, expiry: Date.now() + CACHE_TTL_MS });
+  return rows;
+}
+
+/** Invalide le cache pour une société (après une écriture chatbot). */
+export function invalidateInterventionCache(companyId: string): void {
+  for (const key of _interventionCache.keys()) {
+    if (key.startsWith(`${companyId}:`)) _interventionCache.delete(key);
+  }
 }

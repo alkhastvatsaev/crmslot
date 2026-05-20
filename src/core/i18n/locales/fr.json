@@ -279,7 +279,10 @@
     "offline_hint": "Mode hors ligne — liste clients en cache local.",
     "open_in_backoffice": "Ouvrir dans le back-office",
     "export_csv": "Exporter CSV",
-    "recurring_request": "Nouvelle demande (même client)"
+    "recurring_request": "Nouvelle demande (même client)",
+    "delete_client": "Supprimer",
+    "delete_client_confirm": "Supprimer définitivement « {{name}} » et ses sites ? Cette action est irréversible.",
+    "client_deleted": "Contact supprimé du répertoire."
   },
   "finish_checklist": {
     "title": "Contrôle avant clôture",

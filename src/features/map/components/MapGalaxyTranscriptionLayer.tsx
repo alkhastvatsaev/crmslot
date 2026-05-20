@@ -14,12 +14,19 @@ type Props = {
   transcriptionArmed: boolean;
   onUserPressPlay: () => void;
   onInterventionCreated?: (mission: { id: number; key: string; clientName: string; coordinates: [number, number]; time: string; status: string; source?: "live"; date?: string }) => void;
+  /** true = overlays + file audio seulement (dock Galaxy = Chatbot). */
+  hideDockStrip?: boolean;
 };
 
 /**
  * Isole l’état `playbackSync` (~60 Hz) pour ne pas re-rendre MapboxView / la carte à chaque frame.
  */
-export default function MapGalaxyTranscriptionLayer({ transcriptionArmed, onUserPressPlay, onInterventionCreated }: Props) {
+export default function MapGalaxyTranscriptionLayer({
+  transcriptionArmed,
+  onUserPressPlay,
+  onInterventionCreated,
+  hideDockStrip = false,
+}: Props) {
   const [playbackSync, setPlaybackSync] = useState<AiPlaybackSync>(null);
   const [openEditSignal, setOpenEditSignal] = useState(0);
   const [transcriptOverlayOpen, setTranscriptOverlayOpen] = useState(false);
@@ -89,7 +96,8 @@ export default function MapGalaxyTranscriptionLayer({ transcriptionArmed, onUser
     <>
       {overlayRoot ? createPortal(overlays, overlayRoot) : null}
       <AiAssistant
-        dockLayout
+        headless={hideDockStrip}
+        dockLayout={!hideDockStrip}
         transcriptOverlayVisible={transcriptOverlayOpen}
         onActiveClipUrlChange={onActiveClipFromAssistant}
         onUserPressPlay={() => {

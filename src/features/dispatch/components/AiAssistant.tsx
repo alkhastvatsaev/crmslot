@@ -170,6 +170,8 @@ export type AiPlaybackSync =
 type AiAssistantProps = {
   /** Bande dans le dock (largeur colonne centre = carte), pas en flottant viewport. */
   dockLayout?: boolean;
+  /** Logique audio / file conservée ; pas de rendu Galaxy (dock réservé au Chatbot). */
+  headless?: boolean;
   onUserPressPlay?: () => void;
   onPlaybackSync?: (sync: AiPlaybackSync) => void;
   onActiveClipUrlChange?: (clipPublicUrl: string | null) => void;
@@ -180,6 +182,7 @@ type AiAssistantProps = {
 
 export default function AiAssistant({
   dockLayout = false,
+  headless = false,
   onUserPressPlay,
   onPlaybackSync,
   onActiveClipUrlChange,
@@ -812,6 +815,10 @@ export default function AiAssistant({
         };
 
   const isHidden = false; // Toujours visible pour assurer la continuité de la transcription sur toutes les pages
+
+  if (headless) {
+    return null;
+  }
 
   return (
     <AnimatePresence>

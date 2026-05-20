@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
-import { Loader2, MessageSquarePlus, ShieldCheck, Wrench } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Loader2, ShieldCheck, Wrench } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
@@ -10,58 +10,15 @@ import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
 import { openInterventionFromChatbot } from "@/features/chatbot/chatbot-navigation";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import ChatbotGalaxyOrb from "@/features/chatbot/components/ChatbotGalaxyOrb";
+import { renderChatbotMarkdownLite } from "@/features/chatbot/chatbot-message-markdown";
+import {
+  deriveChatbotQuickActions,
+  mergeQuickActions,
+  type ChatbotQuickAction,
+} from "@/features/chatbot/chatbot-quick-actions";
+import ChatbotQuickActions from "@/features/chatbot/components/ChatbotQuickActions";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
-const QUICK_PROMPTS = [
-  "Briefing du jour",
-  "Interventions urgentes non assignées",
-  "Dossiers terminés non payés",
-  "Résumé clients actifs",
-  "Stock en alerte",
-];
-
-function renderMarkdownLite(text: string): ReactNode {
-  const lines = text.split("\n");
-  return lines.map((line, i) => {
-    const isLast = i === lines.length - 1;
-    const br = !isLast ? <br /> : null;
-
-    if (/^#{1,3} /.test(line)) {
-      const content = line.replace(/^#+\s/, "");
-      return (
-        <span key={i} className="block font-bold text-[15px] mt-2 mb-0.5">
-          {renderInline(content)}
-          {br}
-        </span>
-      );
-    }
-    if (/^[-*] /.test(line)) {
-      return (
-        <span key={i} className="block pl-3 before:content-['•'] before:mr-1.5 before:text-slate-400">
-          {renderInline(line.slice(2))}
-          {br}
-        </span>
-      );
-    }
-    return (
-      <span key={i}>
-        {renderInline(line)}
-        {br}
-      </span>
-    );
-  });
-}
-
-function renderInline(text: string): ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
-    }
-    return <span key={i}>{part}</span>;
-  });
-}
 
 function extractOpenInterventionIds(text: string): string[] {
   const ids = new Set<string>();
@@ -78,18 +35,64 @@ function stripOpenMarkers(text: string): string {
   return text.replace(/\(ouvrir:[a-zA-Z0-9_-]+\)/g, "").trim();
 }
 
+function extractSuggestions(text: string): string[] {
+  const suggestions = new Set<string>();
+  const re = /<suggestion>(.*?)<\/suggestion>/gi;
+  let match = re.exec(text);
+  while (match) {
+    suggestions.add(match[1].trim());
+    match = re.exec(text);
+  }
+  return [...suggestions];
+}
+
+function stripSuggestions(text: string): string {
+  return text.replace(/<suggestion>.*?<\/suggestion>/gi, "").trim();
+}
+
+function suggestionTagsToActions(tags: string[]): ChatbotQuickAction[] {
+  return tags.map((label, i) => ({
+    id: `suggestion-tag-${i}`,
+    label,
+    kind: "send_message",
+    payload: label,
+    variant: "outline" as const,
+  }));
+}
+
 function Bubble({
   role,
   content,
+  actions,
   onOpenIntervention,
+  onQuickAction,
+  quickActionsDisabled,
+  isLatest,
 }: {
   role: "user" | "assistant";
   content: string;
+  actions?: ChatbotQuickAction[];
   onOpenIntervention?: (id: string) => void;
+  onQuickAction?: (text: string) => void;
+  quickActionsDisabled?: boolean;
+  isLatest?: boolean;
 }) {
   const isUser = role === "user";
   const openIds = !isUser ? extractOpenInterventionIds(content) : [];
-  const displayText = isUser ? content : stripOpenMarkers(content);
+  const suggestionTags = !isUser && isLatest ? extractSuggestions(content) : [];
+  let displayText = isUser ? content : stripOpenMarkers(content);
+  displayText = isUser ? displayText : stripSuggestions(displayText);
+
+  const quickActions =
+    !isUser && isLatest && onQuickAction
+      ? mergeQuickActions(
+          actions ?? [],
+          mergeQuickActions(
+            deriveChatbotQuickActions(displayText),
+            suggestionTagsToActions(suggestionTags),
+          ),
+        )
+      : [];
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -106,7 +109,7 @@ function Bubble({
             : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm",
         )}
       >
-        {isUser ? displayText : renderMarkdownLite(displayText)}
+        {isUser ? displayText : renderChatbotMarkdownLite(displayText)}
         {openIds.length > 0 && onOpenIntervention ? (
           <div className="mt-2 flex flex-wrap gap-2 border-t border-slate-100 pt-2">
             {openIds.map((id) => (
@@ -123,6 +126,13 @@ function Bubble({
             ))}
           </div>
         ) : null}
+        {quickActions.length > 0 && onQuickAction ? (
+          <ChatbotQuickActions
+            actions={quickActions}
+            disabled={quickActionsDisabled}
+            onSendMessage={onQuickAction}
+          />
+        ) : null}
       </motion.div>
     </motion.div>
   );
@@ -136,12 +146,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
 
   const {
     companyId,
-    companyName,
-    conversations,
     activeConversation,
-    activeId,
-    setActiveId,
-    newConversation,
     sendMessage,
     streaming,
     streamingText,
@@ -164,39 +169,6 @@ export default function ChatbotChat({ className }: { className?: string }) {
       style={outfit}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden bg-[#f8f9fc]", className)}
     >
-      <motion.div className="flex shrink-0 items-center justify-end gap-2 border-b border-slate-200/80 bg-white px-4 py-3">
-        {/* Header texte supprimé selon la demande */}
-        <button
-          type="button"
-          data-testid="chatbot-new-conversation"
-          onClick={newConversation}
-          className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-        >
-          <MessageSquarePlus className="h-3.5 w-3.5" />
-          Nouveau
-        </button>
-      </motion.div>
-
-      {conversations.length > 1 ? (
-        <motion.div className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-100 bg-white/80 px-3 py-2">
-          {conversations.slice(0, 8).map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setActiveId(c.id)}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition",
-                c.id === activeId
-                  ? "bg-indigo-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200",
-              )}
-            >
-              {c.title.slice(0, 28)}
-            </button>
-          ))}
-        </motion.div>
-      ) : null}
-
       <motion.div
         className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
@@ -219,40 +191,43 @@ export default function ChatbotChat({ className }: { className?: string }) {
           </div>
         ) : null}
 
-        {(activeConversation?.messages.length ?? 0) === 0 && !streaming && (
-          <motion.div className="flex flex-col items-center gap-3 py-8 text-center">
-            <ChatbotGalaxyOrb />
-            <p className="max-w-sm text-[14px] text-slate-600">
-            Je peux lire et modifier vos interventions, clients, devis et planning — toujours avec
-            votre confirmation pour les changements.
-            </p>
-            <motion.div className="mt-2 flex flex-wrap justify-center gap-2">
-              {QUICK_PROMPTS.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  disabled={!companyId || streaming}
-                  onClick={() => void sendMessage(q)}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-medium text-slate-700 hover:border-indigo-200 hover:text-indigo-700 disabled:opacity-40"
-                >
-                  {q}
-                </button>
-              ))}
+        <AnimatePresence>
+          {(activeConversation?.messages.length ?? 0) === 0 && !streaming && (
+            <motion.div
+              key="chatbot-empty-orb-1"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
+            >
+              <ChatbotGalaxyOrb className="scale-[2]" />
             </motion.div>
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
 
-        {activeConversation?.messages.map((m) => (
+        {activeConversation?.messages.map((m, index) => (
           <Bubble
             key={m.id}
             role={m.role}
             content={m.content}
+            actions={m.actions}
             onOpenIntervention={m.role === "assistant" ? openIntervention : undefined}
+            onQuickAction={(text) => void sendMessage(text)}
+            quickActionsDisabled={streaming || Boolean(pendingTool) || !companyId}
+            isLatest={
+              index === activeConversation.messages.length - 1 && !streaming && !streamingText
+            }
           />
         ))}
 
         {streaming && streamingText ? (
-          <Bubble role="assistant" content={streamingText} onOpenIntervention={openIntervention} />
+          <Bubble
+            role="assistant"
+            content={streamingText}
+            onOpenIntervention={openIntervention}
+            isLatest
+          />
         ) : null}
 
         <AnimatePresence>
@@ -295,6 +270,9 @@ export default function ChatbotChat({ className }: { className?: string }) {
               Confirmation requise
             </p>
             <p className="mb-3 text-[13px] text-amber-950">{pendingTool.summary}</p>
+            <p className="mb-3 text-[11px] text-amber-800">
+              Cliquez <strong>Confirmer</strong> ou tapez <strong>oui</strong> dans le champ ci-dessous.
+            </p>
             <motion.div className="flex gap-2">
               <button
                 type="button"

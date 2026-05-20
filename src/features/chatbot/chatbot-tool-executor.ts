@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
-import { fetchInterventionsForCompany, parseCreatedAtMs } from "@/features/chatbot/chatbot-intervention-source";
+import { fetchInterventionsForCompany, invalidateInterventionCache, parseCreatedAtMs } from "@/features/chatbot/chatbot-intervention-source";
 import { isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
 import {
   clientSearchHaystack,
@@ -10,11 +10,32 @@ import {
   searchWorkspace,
 } from "@/features/chatbot/chatbot-workspace-search";
 import { sendInterventionEmail } from "@/core/services/email/sendInterventionEmail";
+import {
+  isChatbotDocumentKind,
+  type ChatbotDocumentKind,
+} from "@/features/chatbot/chatbot-document";
+import {
+  applyBillingLinePatch,
+  billingLinesTotalCents,
+  normalizeBillingLinesFromFirestore,
+  parseUnitPriceCents,
+  type ChatbotBillingLine,
+} from "@/features/chatbot/chatbot-billing";
+import { clientNameFirestorePatchIfMissing } from "@/features/interventions/resolveInterventionClientName";
+import {
+  orderLecotPartsForChatbot,
+  searchLecotProductsForChatbot,
+} from "@/features/chatbot/chatbot-lecot";
+import { buildLecotSearchUrl } from "@/features/chatbot/chatbot-lecot-url";
+import { resolveSendInterventionEmailAttachType } from "@/features/chatbot/chatbot-email-attach";
+import { persistInterventionClientEmail } from "@/features/chatbot/chatbot-client-email";
 
 export type ChatbotToolContext = {
   companyId: string;
   actorUid: string;
   role: "admin" | "collaborateur" | null;
+  /** Dernier message utilisateur (routage PJ email). */
+  lastUserText?: string | null;
 };
 
 function db(): admin.firestore.Firestore {
@@ -56,6 +77,7 @@ function clientLabel(data: Record<string, unknown>): string {
 }
 
 function requireConfirmed(name: string, input: Record<string, unknown>): void {
+  if (name === "order_lecot_parts") return;
   if (!isChatbotWriteTool(name)) return;
   if (input.userConfirmed !== true) {
     throw new Error(
@@ -98,6 +120,13 @@ export async function executeChatbotTool(
       return listStockAlerts(ctx.companyId);
     case "list_material_orders":
       return listMaterialOrders(String(input.interventionId || ""), input);
+
+    case "search_lecot_products":
+      return searchLecotProductsForChatbot(ctx.companyId, String(input.query || ""), Number(input.limit) || 8);
+    case "list_supplier_orders":
+      return listSupplierOrders(ctx.companyId, input);
+    case "order_lecot_parts":
+      return orderLecotPartsForChatbot(ctx, input);
     case "list_inbox_notifications":
       return listInboxNotifications(ctx, input);
     case "list_intervention_emails":
@@ -108,16 +137,35 @@ export async function executeChatbotTool(
       return listPortalChat(ctx.companyId, input);
     case "statistiques_periode":
       return statistiquesPeriode(ctx.companyId, input);
-    case "update_intervention_status":
-      return updateInterventionStatus(ctx, input);
-    case "assign_technician":
-      return assignTechnician(ctx, input);
-    case "update_intervention_schedule":
-      return updateSchedule(ctx, input);
+    case "update_intervention_status": {
+      const r = await updateInterventionStatus(ctx, input);
+      invalidateInterventionCache(ctx.companyId);
+      return r;
+    }
+    case "assign_technician": {
+      const r = await assignTechnician(ctx, input);
+      invalidateInterventionCache(ctx.companyId);
+      return r;
+    }
+    case "update_intervention_schedule": {
+      const r = await updateSchedule(ctx, input);
+      invalidateInterventionCache(ctx.companyId);
+      return r;
+    }
     case "add_timeline_comment":
       return addTimelineComment(ctx, input);
+    case "save_client_email":
+      return saveClientEmailFromChatbot(ctx, input);
     case "send_intervention_email":
       return sendInterventionEmailFromChatbot(ctx, input);
+    case "focus_intervention_document":
+      return focusInterventionDocument(ctx, input);
+    case "update_intervention_billing":
+      return updateInterventionBilling(ctx, input);
+    case "patch_intervention_billing":
+      return patchInterventionBilling(ctx, input);
+    case "append_intervention_billing_lines":
+      return appendInterventionBillingLines(ctx, input);
     default:
       throw new Error(`Outil inconnu : ${name}`);
   }
@@ -126,7 +174,7 @@ export async function executeChatbotTool(
 async function getWorkspaceSummary(companyId: string) {
   const firestore = db();
   const [interventions, techSnap, stockRows] = await Promise.all([
-    fetchInterventionsForCompany(firestore, companyId, 150),
+    fetchInterventionsForCompany(firestore, companyId, 100),
     firestore.collection("technicians").where("companyId", "==", companyId).limit(40).get(),
     fetchStockDocs(companyId),
   ]);
@@ -236,13 +284,43 @@ async function getInterventionDetail(companyId: string, interventionId: string) 
     ref.collection("timeline_events").orderBy("createdAt", "desc").limit(8).get().catch(() => null),
   ]);
 
+  const billingLines = normalizeBillingLinesFromFirestore(data.billingLines);
+  const clientName = clientLabel(data);
+
   return {
     id: doc.id,
-    ...data,
-    client: clientLabel(data),
-    quotes: quotesSnap?.docs.map((d) => ({ id: d.id, ...d.data() })) ?? [],
-    materialOrders: ordersSnap?.docs.map((d) => ({ id: d.id, ...d.data() })) ?? [],
-    recentTimeline: timelineSnap?.docs.map((d) => ({ id: d.id, ...d.data() })) ?? [],
+    status: data.status,
+    clientName,
+    address: data.address ?? null,
+    problem: data.problem ?? data.title ?? null,
+    scheduledDate: data.scheduledDate ?? data.requestedDate ?? null,
+    scheduledTime: data.scheduledTime ?? data.requestedTime ?? null,
+    paymentStatus: data.paymentStatus ?? null,
+    invoiceAmountCents: data.invoiceAmountCents ?? billingLinesTotalCents(billingLines),
+    billingLines,
+    assignedTechnicianUid: data.assignedTechnicianUid ?? null,
+    clientPhone: data.clientPhone ?? data.phone ?? null,
+    clientEmail: data.clientEmail ?? data.email ?? null,
+    quotes:
+      quotesSnap?.docs.map((d) => {
+        const q = d.data();
+        return { id: d.id, status: q.status, totalCents: q.totalCents };
+      }) ?? [],
+    materialOrders:
+      ordersSnap?.docs.map((d) => {
+        const o = d.data();
+        return { id: d.id, status: o.status };
+      }) ?? [],
+    recentTimeline:
+      timelineSnap?.docs.map((d) => {
+        const e = d.data();
+        return {
+          id: d.id,
+          type: e.type,
+          createdAt: e.createdAt,
+          content: String(e.content ?? "").slice(0, 200),
+        };
+      }) ?? [],
   };
 }
 
@@ -377,6 +455,24 @@ async function listMaterialOrders(interventionId: string, input: Record<string, 
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Record<string, unknown>));
 }
 
+async function listSupplierOrders(companyId: string, input: Record<string, unknown>) {
+  const limit = Math.min(30, Math.max(1, Number(input.limit) || 15));
+  let query = db()
+    .collection("companies")
+    .doc(companyId)
+    .collection("supplierOrders")
+    .orderBy("createdAt", "desc")
+    .limit(limit);
+  if (typeof input.supplierId === "string" && input.supplierId.trim()) {
+    query = query.where("supplierId", "==", input.supplierId.trim()) as typeof query;
+  }
+  if (typeof input.status === "string" && input.status.trim()) {
+    query = query.where("status", "==", input.status.trim()) as typeof query;
+  }
+  const snap = await query.get();
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Record<string, unknown>));
+}
+
 async function listInboxNotifications(ctx: ChatbotToolContext, input: Record<string, unknown>) {
   const limit = Math.min(40, Math.max(1, Number(input.limit) || 20));
   const unreadOnly = input.unreadOnly === true;
@@ -450,6 +546,7 @@ async function getInterventionBilling(companyId: string, interventionId: string)
 
   return {
     interventionId: id,
+    clientName: clientLabel(data),
     paymentStatus: data.paymentStatus ?? null,
     invoiceAmountCents: data.invoiceAmountCents ?? totalCents,
     totalEur: Math.round(totalCents) / 100,
@@ -601,6 +698,219 @@ async function updateSchedule(ctx: ChatbotToolContext, input: Record<string, unk
   return { ok: true, interventionId, scheduledDate, scheduledTime };
 }
 
+/** Vérifie l'accès dossier ; la PWA génère le PDF (route document-pdf). */
+async function focusInterventionDocument(ctx: ChatbotToolContext, input: Record<string, unknown>) {
+  const interventionId = String(input.interventionId || "").trim();
+  const documentType = String(input.documentType || "invoice").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+  if (!isChatbotDocumentKind(documentType)) {
+    throw new Error("documentType invalide (quote | invoice | report)");
+  }
+  await assertInterventionAccess(ctx.companyId, interventionId);
+  return {
+    ok: true,
+    interventionId,
+    documentType,
+  };
+}
+
+async function saveInterventionBilling(
+  ctx: ChatbotToolContext,
+  interventionId: string,
+  data: Record<string, unknown>,
+  billingLines: ChatbotBillingLine[],
+  previewDocumentType: ChatbotDocumentKind,
+  clientNameOverride?: string,
+) {
+  const totalCents = billingLinesTotalCents(billingLines);
+  const namePatch = clientNameFirestorePatchIfMissing(data, clientNameOverride);
+
+  await db()
+    .collection("interventions")
+    .doc(interventionId)
+    .update({
+      billingLines,
+      invoiceAmountCents: totalCents,
+      statusUpdatedAt: new Date().toISOString(),
+      ...(namePatch ?? {}),
+    });
+
+  const clientName =
+    namePatch?.clientName ??
+    clientNameOverride ??
+    (typeof data.clientName === "string" && data.clientName.trim()
+      ? data.clientName.trim()
+      : clientLabel(data));
+
+  return {
+    ok: true,
+    interventionId,
+    clientName,
+    totalEur: totalCents / 100,
+    previewDocumentType,
+    documentType: previewDocumentType,
+    message: "Facturation enregistrée.",
+  };
+}
+
+async function patchInterventionBilling(ctx: ChatbotToolContext, input: Record<string, unknown>) {
+  const interventionId = String(input.interventionId || "").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+
+  const unitPriceCents = parseUnitPriceCents(input);
+  const hasPrice = unitPriceCents != null;
+  const hasDesc = typeof input.description === "string" && input.description.trim();
+  const hasQty = input.quantity != null && Number.isFinite(Number(input.quantity));
+  const hasClient = typeof input.clientName === "string" && input.clientName.trim();
+
+  if (!hasPrice && !hasDesc && !hasQty && !hasClient) {
+    throw new Error(
+      "Précisez au moins unitPriceEur, description, quantity ou clientName pour le patch.",
+    );
+  }
+
+  const doc = await assertInterventionAccess(ctx.companyId, interventionId);
+  const data = doc.data()!;
+  const existing = normalizeBillingLinesFromFirestore(data.billingLines);
+  const lineIndex = Math.max(0, Number(input.lineIndex) || 0);
+
+  const billingLines = applyBillingLinePatch(existing, {
+    lineIndex,
+    unitPriceCents: hasPrice ? unitPriceCents : null,
+    quantity: hasQty ? Number(input.quantity) : undefined,
+    description: hasDesc ? String(input.description).trim() : undefined,
+  });
+
+  let previewDocumentType: ChatbotDocumentKind = "invoice";
+  const pdt = String(input.previewDocumentType || "invoice").trim();
+  if (isChatbotDocumentKind(pdt) && pdt !== "report") previewDocumentType = pdt;
+
+  const saved = await saveInterventionBilling(
+    ctx,
+    interventionId,
+    data,
+    billingLines,
+    previewDocumentType,
+    hasClient ? String(input.clientName).trim() : undefined,
+  );
+  return { ...saved, linePatched: lineIndex };
+}
+
+/** Ajoute des lignes à la facture existante (sans remplacer). */
+async function appendInterventionBillingLines(
+  ctx: ChatbotToolContext,
+  input: Record<string, unknown>,
+) {
+  const interventionId = String(input.interventionId || "").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+
+  const rawLines = input.lines;
+  if (!Array.isArray(rawLines) || rawLines.length === 0) {
+    throw new Error("lines requis (au moins une ligne)");
+  }
+
+  const newLines = rawLines.map((row, i) => {
+    if (!row || typeof row !== "object") throw new Error(`Ligne ${i + 1} invalide`);
+    const l = row as Record<string, unknown>;
+    const description = String(l.description || "").trim();
+    const quantity = l.quantity != null ? Number(l.quantity) : 1;
+    const unitPriceCents = parseUnitPriceCents(l);
+    if (!description) throw new Error(`Ligne ${i + 1} : description requise`);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      throw new Error(`Ligne ${i + 1} : quantité invalide`);
+    }
+    if (unitPriceCents == null || unitPriceCents < 0) {
+      throw new Error(`Ligne ${i + 1} : prix invalide`);
+    }
+    return { description, quantity, unitPriceCents };
+  });
+
+  const doc = await assertInterventionAccess(ctx.companyId, interventionId);
+  const data = doc.data()!;
+  const existing = normalizeBillingLinesFromFirestore(data.billingLines);
+  const billingLines = [...existing, ...newLines];
+
+  let previewDocumentType: ChatbotDocumentKind = "invoice";
+  const pdt = String(input.previewDocumentType || "invoice").trim();
+  if (isChatbotDocumentKind(pdt) && pdt !== "report") previewDocumentType = pdt;
+
+  const saved = await saveInterventionBilling(
+    ctx,
+    interventionId,
+    data,
+    billingLines,
+    previewDocumentType,
+  );
+  return {
+    ...saved,
+    linesAdded: newLines.length,
+    addedDescriptions: newLines.map((l) => l.description),
+  };
+}
+
+async function updateInterventionBilling(ctx: ChatbotToolContext, input: Record<string, unknown>) {
+  const interventionId = String(input.interventionId || "").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+
+  const rawLines = input.billingLines;
+  if (!Array.isArray(rawLines) || rawLines.length === 0) {
+    throw new Error("billingLines requis (au moins une ligne)");
+  }
+
+  const billingLines = rawLines.map((row, i) => {
+    if (!row || typeof row !== "object") throw new Error(`Ligne ${i + 1} invalide`);
+    const l = row as Record<string, unknown>;
+    const description = String(l.description || "").trim();
+    const quantity = Number(l.quantity);
+    const unitPriceCents = parseUnitPriceCents(l) ?? Math.round(Number(l.unitPriceCents));
+    if (!description) throw new Error(`Ligne ${i + 1} : description requise`);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      throw new Error(`Ligne ${i + 1} : quantité invalide`);
+    }
+    if (!Number.isFinite(unitPriceCents) || unitPriceCents < 0) {
+      throw new Error(`Ligne ${i + 1} : prix unitaire invalide`);
+    }
+    return {
+      description,
+      quantity,
+      unitPriceCents,
+      ...(typeof l.reference === "string" && l.reference.trim()
+        ? { reference: l.reference.trim() }
+        : {}),
+    };
+  });
+
+  const doc = await assertInterventionAccess(ctx.companyId, interventionId);
+  const data = doc.data()!;
+
+  let previewDocumentType: ChatbotDocumentKind = "invoice";
+  const pdt = String(input.previewDocumentType || "invoice").trim();
+  if (isChatbotDocumentKind(pdt) && pdt !== "report") previewDocumentType = pdt;
+
+  const clientOverride =
+    typeof input.clientName === "string" && input.clientName.trim()
+      ? input.clientName.trim()
+      : undefined;
+
+  const saved = await saveInterventionBilling(
+    ctx,
+    interventionId,
+    data,
+    billingLines,
+    previewDocumentType,
+    clientOverride,
+  );
+
+  if (typeof input.clientAddress === "string" && input.clientAddress.trim()) {
+    await db()
+      .collection("interventions")
+      .doc(interventionId)
+      .update({ address: input.clientAddress.trim() });
+  }
+
+  return saved;
+}
+
 async function sendInterventionEmailFromChatbot(
   ctx: ChatbotToolContext,
   input: Record<string, unknown>,
@@ -613,7 +923,13 @@ async function sendInterventionEmailFromChatbot(
     throw new Error("interventionId, to, subject et bodyText requis");
   }
 
-  await assertInterventionAccess(ctx.companyId, interventionId);
+  const doc = await assertInterventionAccess(ctx.companyId, interventionId);
+  const data = doc.data()!;
+
+  await persistInterventionClientEmail(db(), ctx.companyId, interventionId, to, data);
+
+  const attachDocumentType = resolveSendInterventionEmailAttachType(input, ctx.lastUserText);
+  input.attachDocumentType = attachDocumentType;
 
   const result = await sendInterventionEmail({
     interventionId,
@@ -624,11 +940,21 @@ async function sendInterventionEmailFromChatbot(
     inReplyTo: typeof input.inReplyTo === "string" ? input.inReplyTo.trim() : undefined,
     sentByUid: ctx.actorUid,
     sentVia: "chatbot",
+    attachDocumentType,
   });
 
   if (!result.ok) {
     throw new Error(result.error);
   }
+
+  const saved = await persistInterventionClientEmail(
+    db(),
+    ctx.companyId,
+    interventionId,
+    to,
+    data,
+  );
+  invalidateInterventionCache(ctx.companyId);
 
   return {
     ok: true,
@@ -636,6 +962,36 @@ async function sendInterventionEmailFromChatbot(
     to,
     subject,
     messageId: result.messageId,
+    attachDocumentType,
+    attachmentFilename: result.attachmentFilename ?? null,
+    emailSaved: saved.savedOnIntervention || saved.savedOnClient,
+    savedOnCrm: saved.savedOnClient,
+  };
+}
+
+async function saveClientEmailFromChatbot(ctx: ChatbotToolContext, input: Record<string, unknown>) {
+  const interventionId = String(input.interventionId || "").trim();
+  const email = String(input.email || input.to || "").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+  if (!email) throw new Error("email requis");
+
+  const doc = await assertInterventionAccess(ctx.companyId, interventionId);
+  const saved = await persistInterventionClientEmail(
+    db(),
+    ctx.companyId,
+    interventionId,
+    email,
+    doc.data()!,
+  );
+  invalidateInterventionCache(ctx.companyId);
+
+  return {
+    ok: true,
+    interventionId,
+    email: saved.email,
+    savedOnIntervention: saved.savedOnIntervention,
+    savedOnClient: saved.savedOnClient,
+    clientName: clientLabel(doc.data()!),
   };
 }
 
@@ -672,3 +1028,5 @@ async function assertInterventionAccess(companyId: string, interventionId: strin
   }
   return doc;
 }
+
+
