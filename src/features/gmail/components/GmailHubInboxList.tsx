@@ -1,9 +1,11 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import { Inbox, Loader2, Search } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import GmailHubAvatar from "@/features/gmail/components/GmailHubAvatar";
+import { GMAIL_HUB_SEARCH_CHIPS } from "@/features/gmail/gmailHubConstants";
 import {
   formatMailDateShort,
   gmailDivider,
@@ -12,8 +14,11 @@ import {
   gmailHubFont,
   gmailShell,
   parseSenderName,
+  snippetPreviewLines,
 } from "@/features/gmail/gmailHubUi";
 import type { GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
+
+type RowMenu = { x: number; y: number; msg: GmailHubMessageSummary };
 
 type Props = {
   activeLabelKey: string;
@@ -23,8 +28,12 @@ type Props = {
   messages: GmailHubMessageSummary[];
   selectedId: string | null;
   loading: boolean;
-  error: string | null;
+  loadingMore: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
   onSelectMessage: (msg: GmailHubMessageSummary) => void;
+  onToggleRead: (msg: GmailHubMessageSummary, markAsUnread: boolean) => void;
+  error?: string | null;
 };
 
 function InboxSkeleton() {
@@ -52,10 +61,33 @@ export default function GmailHubInboxList({
   messages,
   selectedId,
   loading,
-  error,
+  loadingMore,
+  hasMore,
+  onLoadMore,
   onSelectMessage,
+  onToggleRead,
+  error,
 }: Props) {
   const { t } = useTranslation();
+  const [rowMenu, setRowMenu] = useState<RowMenu | null>(null);
+
+  const closeMenu = useCallback(() => setRowMenu(null), []);
+
+  useEffect(() => {
+    if (!rowMenu) return;
+    const onDoc = () => closeMenu();
+    window.addEventListener("click", onDoc);
+    window.addEventListener("scroll", onDoc, true);
+    return () => {
+      window.removeEventListener("click", onDoc);
+      window.removeEventListener("scroll", onDoc, true);
+    };
+  }, [rowMenu, closeMenu]);
+
+  const applyChip = (q: string) => {
+    onSearchChange(q);
+    onSearchSubmit();
+  };
 
   return (
     <div className={gmailShell} data-testid="gmail-hub-panel-center" style={gmailHubFont}>
@@ -89,6 +121,27 @@ export default function GmailHubInboxList({
             className={`${gmailFieldClass} pl-9`}
           />
         </div>
+        <div
+          className="mt-2 flex flex-wrap gap-1.5"
+          data-testid="gmail-hub-search-chips"
+        >
+          {GMAIL_HUB_SEARCH_CHIPS.map((chip) => (
+            <button
+              key={chip.id}
+              type="button"
+              data-testid={`gmail-hub-chip-${chip.id}`}
+              onClick={() => applyChip(chip.q)}
+              className={cn(
+                "rounded-full border border-black/[0.08] bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors",
+                searchQuery === chip.q
+                  ? "border-slate-400 bg-slate-100 text-slate-900"
+                  : "hover:bg-black/[0.03]",
+              )}
+            >
+              {t(chip.labelKey)}
+            </button>
+          ))}
+        </div>
       </header>
 
       {error ? (
@@ -98,6 +151,41 @@ export default function GmailHubInboxList({
         >
           {error}
         </p>
+      ) : null}
+
+      {rowMenu ? (
+        <div
+          data-testid="gmail-hub-row-menu"
+          className="fixed z-[120] min-w-[168px] rounded-xl border border-black/[0.08] bg-white py-1 shadow-lg"
+          style={{ left: rowMenu.x, top: rowMenu.y }}
+          role="menu"
+        >
+          {rowMenu.msg.isUnread ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="block w-full px-3 py-2 text-left text-[13px] text-slate-700 hover:bg-black/[0.04]"
+              onClick={() => {
+                onToggleRead(rowMenu.msg, false);
+                closeMenu();
+              }}
+            >
+              {t("gmail.hub.mark_read")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              role="menuitem"
+              className="block w-full px-3 py-2 text-left text-[13px] text-slate-700 hover:bg-black/[0.04]"
+              onClick={() => {
+                onToggleRead(rowMenu.msg, true);
+                closeMenu();
+              }}
+            >
+              {t("gmail.hub.mark_unread")}
+            </button>
+          )}
+        </div>
       ) : null}
 
       <ul
@@ -119,12 +207,18 @@ export default function GmailHubInboxList({
         ) : (
           messages.map((msg) => {
             const selected = selectedId === msg.id;
+            const preview = snippetPreviewLines(msg.snippet, 2);
             return (
               <li key={msg.id}>
                 <button
                   type="button"
                   data-testid={`gmail-hub-row-${msg.id}`}
+                  title={preview}
                   onClick={() => onSelectMessage(msg)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setRowMenu({ x: e.clientX, y: e.clientY, msg });
+                  }}
                   className={cn(
                     "flex w-full gap-3 px-3 py-3 text-left transition-colors",
                     selected ? "gmail-hub-row-selected" : "hover:bg-black/[0.02]",
@@ -153,7 +247,7 @@ export default function GmailHubInboxList({
                     >
                       {msg.subject || `(${t("gmail.hub.no_subject")})`}
                     </span>
-                    <span className="mt-1 block truncate text-[11px] leading-snug text-slate-400">
+                    <span className="mt-1 line-clamp-2 text-[11px] leading-snug text-slate-400">
                       {msg.snippet}
                     </span>
                   </span>
@@ -164,7 +258,25 @@ export default function GmailHubInboxList({
         )}
       </ul>
 
-      {loading && messages.length > 0 ? (
+      {hasMore ? (
+        <div className="shrink-0 border-t border-black/[0.05] px-4 py-3">
+          <button
+            type="button"
+            data-testid="gmail-hub-load-more"
+            disabled={loadingMore}
+            onClick={onLoadMore}
+            className="w-full rounded-xl border border-black/[0.08] bg-white py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-black/[0.03] disabled:opacity-50"
+          >
+            {loadingMore ? (
+              <Loader2 className="mx-auto h-4 w-4 animate-spin" strokeWidth={1.5} />
+            ) : (
+              t("gmail.hub.load_more")
+            )}
+          </button>
+        </div>
+      ) : null}
+
+      {loading && messages.length > 0 && !loadingMore ? (
         <div className="flex shrink-0 justify-center border-t border-black/[0.05] py-2 text-slate-400">
           <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
         </div>

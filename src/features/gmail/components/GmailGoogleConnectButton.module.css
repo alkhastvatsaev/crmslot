@@ -10,6 +10,8 @@
   line-height: 0;
   vertical-align: middle;
   -webkit-tap-highlight-color: transparent;
+  transform-origin: center center;
+  transition: transform 0.14s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .root:focus-visible {
@@ -30,12 +32,49 @@
   max-width: 100%;
   pointer-events: none;
   user-select: none;
+  transform-origin: center center;
+  transition:
+    transform 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.14s ease;
 }
 
-.root:hover:not(:disabled) .asset {
-  filter: brightness(0.98);
+.root:hover:not(:disabled):not(.pressed) {
+  transform: scale(1.02);
 }
 
-.root:active:not(:disabled) .asset {
-  filter: brightness(0.95);
+.root:hover:not(:disabled):not(.pressed) .asset {
+  filter: brightness(0.99);
+}
+
+.root:active:not(:disabled),
+.root.pressed {
+  transform: scale(0.96);
+}
+
+.root:active:not(:disabled) .asset,
+.root.pressed .asset {
+  transform: scale(0.98);
+  filter: brightness(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .asset {
+    transition: none;
+  }
+
+  .root:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .root:active:not(:disabled),
+  .root.pressed {
+    transform: none;
+  }
+
+  .root:active:not(:disabled) .asset,
+  .root.pressed .asset {
+    transform: none;
+    filter: brightness(0.92);
+  }
 }

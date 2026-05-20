@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import styles from "@/features/gmail/components/GmailGoogleConnectButton.module.css";
@@ -27,19 +28,43 @@ const BRAND_ASSETS = {
   },
 } as const;
 
+/** Délai court pour voir l’animation avant redirection OAuth. */
+const PRESS_FEEDBACK_MS = 140;
+
 /** Bouton Google pré-approuvé (asset officiel) — clic → OAuth BELGMAP. */
 export default function GmailGoogleConnectButton({ onClick, disabled }: Props) {
   const { t, language } = useTranslation();
   const label = String(t("gmail.hub.connect_with_google"));
   const asset = BRAND_ASSETS[language] ?? BRAND_ASSETS.fr;
+  const [pressed, setPressed] = useState(false);
+  const pendingOAuthRef = useRef(false);
+
+  const releasePress = useCallback(() => {
+    if (!pendingOAuthRef.current) setPressed(false);
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (disabled || pendingOAuthRef.current) return;
+    pendingOAuthRef.current = true;
+    setPressed(true);
+    window.setTimeout(() => {
+      onClick();
+    }, PRESS_FEEDBACK_MS);
+  }, [disabled, onClick]);
 
   return (
     <button
       type="button"
       data-testid="gmail-hub-connect-btn"
       disabled={disabled}
-      onClick={onClick}
-      className={styles.root}
+      onClick={handleClick}
+      onPointerDown={() => {
+        if (!disabled) setPressed(true);
+      }}
+      onPointerUp={releasePress}
+      onPointerLeave={releasePress}
+      onPointerCancel={releasePress}
+      className={`${styles.root}${pressed ? ` ${styles.pressed}` : ""}`}
       aria-label={label}
     >
       <Image
