@@ -304,6 +304,18 @@
       "trash_confirm": "Déplacer ce message vers la corbeille ?",
       "sent_ok": "Message envoyé.",
       "star_updated": "Suivi mis à jour.",
+      "load_more": "Charger plus",
+      "mark_read": "Marquer comme lu",
+      "mark_unread": "Marquer comme non lu",
+      "marked_read": "Message marqué comme lu.",
+      "marked_unread": "Message marqué comme non lu.",
+      "apply_label": "Libellé…",
+      "label_updated": "Libellé mis à jour.",
+      "chip_unread": "Non lus",
+      "chip_attachment": "Pièces jointes",
+      "chip_starred": "Suivis",
+      "thread_messages_suffix": "messages dans la conversation",
+      "shortcuts_hint": "Raccourcis : r répondre · e archiver · # corbeille · j/k suivant/précédent",
       "archived": "Message archivé.",
       "trashed": "Message déplacé vers la corbeille."
     }

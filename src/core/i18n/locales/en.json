@@ -303,6 +303,18 @@
       "trash_confirm": "Move this message to trash?",
       "sent_ok": "Message sent.",
       "star_updated": "Star updated.",
+      "load_more": "Load more",
+      "mark_read": "Mark as read",
+      "mark_unread": "Mark as unread",
+      "marked_read": "Marked as read.",
+      "marked_unread": "Marked as unread.",
+      "apply_label": "Label…",
+      "label_updated": "Label updated.",
+      "chip_unread": "Unread",
+      "chip_attachment": "Has attachment",
+      "chip_starred": "Starred",
+      "thread_messages_suffix": "messages in conversation",
+      "shortcuts_hint": "Shortcuts: r reply · e archive · # trash · j/k next/prev",
       "archived": "Message archived.",
       "trashed": "Message moved to trash."
     }

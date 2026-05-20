@@ -50,6 +50,33 @@ describe("GmailHubPage", () => {
                 isUnread: true,
               },
             ],
+            nextPageToken: null,
+          }),
+        };
+      }
+      if (url.includes("/threads/t1")) {
+        return {
+          ok: true,
+          json: async () => ({
+            threadId: "t1",
+            messages: [
+              {
+                id: "m1",
+                threadId: "t1",
+                snippet: "Hello",
+                from: "client@example.com",
+                to: "alkhastvatsaev@gmail.com",
+                subject: "Devis",
+                date: "Mon, 1 Jan 2026 10:00:00 +0000",
+                labelIds: ["INBOX"],
+                isUnread: false,
+                bodyText: "Corps du mail",
+                bodyHtml: "",
+                messageIdHeader: "<m1@mail>",
+                referencesHeader: "",
+                attachments: [],
+              },
+            ],
           }),
         };
       }
@@ -128,6 +155,40 @@ describe("GmailHubPage", () => {
                 isUnread: false,
               },
             ],
+            nextPageToken: null,
+          }),
+        };
+      }
+      if (url.includes("/threads/t2")) {
+        return {
+          ok: true,
+          json: async () => ({
+            threadId: "t2",
+            messages: [
+              {
+                id: "m2",
+                threadId: "t2",
+                snippet: "PDF",
+                from: "client@example.com",
+                to: "me@test.com",
+                subject: "Facture",
+                date: "Mon, 1 Jan 2026 10:00:00 +0000",
+                labelIds: ["INBOX"],
+                isUnread: false,
+                bodyText: "Voir PJ",
+                bodyHtml: "",
+                messageIdHeader: "<m2@mail>",
+                referencesHeader: "",
+                attachments: [
+                  {
+                    attachmentId: "att-pdf",
+                    filename: "facture.pdf",
+                    mimeType: "application/pdf",
+                    size: 8000,
+                  },
+                ],
+              },
+            ],
           }),
         };
       }
@@ -142,34 +203,7 @@ describe("GmailHubPage", () => {
         };
       }
       if (url.includes("/messages/m2")) {
-        return {
-          ok: true,
-          json: async () => ({
-            message: {
-              id: "m2",
-              threadId: "t2",
-              snippet: "PDF",
-              from: "client@example.com",
-              to: "me@test.com",
-              subject: "Facture",
-              date: "Mon, 1 Jan 2026 10:00:00 +0000",
-              labelIds: ["INBOX"],
-              isUnread: false,
-              bodyText: "Voir PJ",
-              bodyHtml: "",
-              messageIdHeader: "<m2@mail>",
-              referencesHeader: "",
-              attachments: [
-                {
-                  attachmentId: "att-pdf",
-                  filename: "facture.pdf",
-                  mimeType: "application/pdf",
-                  size: 8000,
-                },
-              ],
-            },
-          }),
-        };
+        return { ok: true, json: async () => ({ message: {} }) };
       }
       return { ok: true, json: async () => ({}) };
     });

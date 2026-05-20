@@ -118,3 +118,18 @@ export function senderAvatarColor(name: string): { bg: string; text: string } {
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
   return AVATAR_BG_TEXT[Math.abs(h) % AVATAR_BG_TEXT.length]!;
 }
+
+/** Aperçu survol liste (2 lignes max). */
+export function snippetPreviewLines(snippet: string, maxLines = 2): string {
+  const clean = snippet.replace(/\s+/g, " ").trim();
+  if (!clean) return "";
+  const words = clean.split(" ");
+  const approxChars = maxLines * 72;
+  if (clean.length <= approxChars) return clean;
+  let out = "";
+  for (const w of words) {
+    if ((out + w).length > approxChars) break;
+    out = out ? `${out} ${w}` : w;
+  }
+  return `${out}…`;
+}

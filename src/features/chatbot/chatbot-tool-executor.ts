@@ -31,7 +31,9 @@ import { resolveSendInterventionEmailAttachType } from "@/features/chatbot/chatb
 import { persistInterventionClientEmail } from "@/features/chatbot/chatbot-client-email";
 import {
   getGmailMessageForChatbot,
+  linkGmailToIntervention,
   listGmailInboxForChatbot,
+  sendGmailReplyFromChatbot,
 } from "@/features/chatbot/chatbot-gmail";
 
 export type ChatbotToolContext = {
@@ -142,6 +144,10 @@ export async function executeChatbotTool(
       });
     case "get_gmail_message":
       return getGmailMessageForChatbot(String(input.messageId || ""));
+    case "send_gmail_reply":
+      return sendGmailReplyFromChatbot(input as { messageId: string; bodyText: string; to?: string; subject?: string });
+    case "link_gmail_to_intervention":
+      return linkGmailToIntervention(ctx, input as { messageId: string; interventionId: string; note?: string });
     case "list_intervention_emails":
       return listInterventionEmails(String(input.interventionId || ""), input);
     case "get_intervention_billing":

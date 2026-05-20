@@ -58,6 +58,8 @@ const TOOL_LABELS: Record<string, string> = {
   list_inbox_notifications: "Inbox",
   list_gmail_inbox: "Gmail — boîte",
   get_gmail_message: "Gmail — lecture",
+  send_gmail_reply: "Gmail — réponse",
+  link_gmail_to_intervention: "Gmail — lien dossier",
   list_intervention_emails: "Emails dossier",
   get_intervention_billing: "Facturation",
   list_portal_chat: "Chat portail",

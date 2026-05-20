@@ -454,6 +454,35 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
       required: ["lines"],
     },
   },
+  {
+    name: "send_gmail_reply",
+    description:
+      "Compose et envoie une réponse Gmail à un mail spécifique. Utilise quand l'utilisateur demande de répondre à un mail (ex: 'Réponds au mail de client@example.com en disant que l'intervention est fixée lundi'). Requiert l'id du mail (obtenu via list_gmail_inbox ou get_gmail_message). Ne jamais envoyer sans confirmation explicite de l'utilisateur.",
+    input_schema: {
+      type: "object",
+      properties: {
+        messageId: { type: "string", description: "ID du mail auquel répondre (obtenu via list_gmail_inbox)" },
+        bodyText: { type: "string", description: "Corps de la réponse en texte plain" },
+        to: { type: "string", description: "Adresse email du destinataire (optionnel, déduit du mail original si absent)" },
+        subject: { type: "string", description: "Sujet (optionnel, 'Re: <sujet original>' par défaut)" },
+      },
+      required: ["messageId", "bodyText"],
+    },
+  },
+  {
+    name: "link_gmail_to_intervention",
+    description:
+      "Lie un mail Gmail à une intervention existante et sauvegarde les infos extraites (expéditeur, corps) dans le dossier. Utile quand un client envoie un mail avec des informations pertinentes pour un dossier (demande, adresse, update de colis…). Appelle get_gmail_message puis search_workspace avant d'appeler cet outil.",
+    input_schema: {
+      type: "object",
+      properties: {
+        messageId: { type: "string", description: "ID du mail Gmail" },
+        interventionId: { type: "string", description: "ID de l'intervention à lier" },
+        note: { type: "string", description: "Note optionnelle à ajouter à la timeline de l'intervention" },
+      },
+      required: ["messageId", "interventionId"],
+    },
+  },
 ];
 
 export const CHATBOT_WRITE_TOOLS = new Set([
@@ -465,6 +494,8 @@ export const CHATBOT_WRITE_TOOLS = new Set([
   "patch_intervention_billing",
   "update_intervention_billing",
   "order_lecot_parts",
+  "send_gmail_reply",
+  "link_gmail_to_intervention",
 ]);
 
 export function isChatbotWriteTool(name: string): boolean {

@@ -1,7 +1,8 @@
 "use client";
 
-import { Archive, Loader2, Mail, Reply, Star, Trash2, X } from "lucide-react";
+import { Archive, Loader2, Mail, MailOpen, Reply, Star, Tag, Trash2, X } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { cn } from "@/lib/utils";
 import GmailHubAttachments from "@/features/gmail/components/GmailHubAttachments";
 import GmailHubAvatar from "@/features/gmail/components/GmailHubAvatar";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/features/gmail/gmailHubUi";
 import type {
   GmailHubAttachment,
+  GmailHubLabel,
   GmailHubMessageDetail,
 } from "@/features/gmail/gmailHubTypes";
 
@@ -36,8 +38,13 @@ type Props = {
   onSend: () => void;
   sending: boolean;
   message: GmailHubMessageDetail | null;
+  threadMessages: GmailHubMessageDetail[];
+  onFocusThreadMessage: (messageId: string) => void;
+  userLabels: GmailHubLabel[];
   loadingDetail: boolean;
   onReply: () => void;
+  onToggleRead: () => void;
+  onToggleLabel: (labelId: string) => void;
   onStar: () => void;
   onArchive: () => void;
   onTrash: () => void;
@@ -57,8 +64,13 @@ export default function GmailHubReaderPane({
   onSend,
   sending,
   message,
+  threadMessages,
+  onFocusThreadMessage,
+  userLabels,
   loadingDetail,
   onReply,
+  onToggleRead,
+  onToggleLabel,
   onStar,
   onArchive,
   onTrash,
@@ -145,6 +157,7 @@ export default function GmailHubReaderPane({
         <p className="mt-2 max-w-[240px] text-center text-[12px] leading-relaxed text-slate-400">
           {t("gmail.hub.pick_message_hint")}
         </p>
+        <p className="mt-4 text-center text-[11px] text-slate-400">{t("gmail.hub.shortcuts_hint")}</p>
       </div>
     );
   }
@@ -203,11 +216,12 @@ export default function GmailHubReaderPane({
   if (!message) return null;
 
   const starred = message.labelIds.includes("STARRED");
+  const thread = threadMessages.length > 1 ? threadMessages : [message];
 
   return (
     <div className={gmailShell} data-testid="gmail-hub-detail" style={gmailHubFont}>
       <div className={`flex shrink-0 items-center justify-between gap-2 border-b ${gmailDivider} px-3 py-2`}>
-        <div className="flex items-center gap-0.5 rounded-2xl bg-black/[0.03] p-0.5">
+        <div className="flex min-w-0 flex-1 items-center gap-0.5 rounded-2xl bg-black/[0.03] p-0.5">
           <button
             type="button"
             data-testid="gmail-hub-reply-btn"
@@ -216,6 +230,23 @@ export default function GmailHubReaderPane({
             title={String(t("gmail.hub.reply"))}
           >
             <Reply className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            data-testid="gmail-hub-read-toggle-btn"
+            onClick={onToggleRead}
+            className={gmailToolbarBtn}
+            title={
+              message.isUnread
+                ? String(t("gmail.hub.mark_read"))
+                : String(t("gmail.hub.mark_unread"))
+            }
+          >
+            {message.isUnread ? (
+              <MailOpen className="h-4 w-4" strokeWidth={1.5} />
+            ) : (
+              <Mail className="h-4 w-4" strokeWidth={1.5} />
+            )}
           </button>
           <button
             type="button"
@@ -249,56 +280,110 @@ export default function GmailHubReaderPane({
             <Trash2 className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
+        {userLabels.length > 0 ? (
+          <label className="relative flex shrink-0 items-center">
+            <Tag className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-slate-400" strokeWidth={1.5} />
+            <select
+              data-testid="gmail-hub-label-select"
+              className="h-9 max-w-[140px] appearance-none rounded-xl border-0 bg-white/70 pl-7 pr-2 text-[11px] text-slate-700 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.08)] outline-none"
+              defaultValue=""
+              onChange={(e) => {
+                const id = e.target.value;
+                if (id) onToggleLabel(id);
+                e.target.value = "";
+              }}
+              aria-label={String(t("gmail.hub.apply_label"))}
+            >
+              <option value="">{t("gmail.hub.apply_label")}</option>
+              {userLabels.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {message.labelIds.includes(l.id) ? `✓ ${l.name}` : l.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
       </div>
 
-      <div
-        className={`gmail-hub-detail-header--compact shrink-0 border-b ${gmailDivider} px-4`}
-      >
-        <div className="flex gap-3">
-          <GmailHubAvatar seed={message.from} size="sm" />
-          <div className="min-w-0 flex-1">
-            <h3 className="line-clamp-2 text-[15px] font-medium leading-snug tracking-tight text-slate-900">
-              {message.subject || `(${t("gmail.hub.no_subject")})`}
-            </h3>
-            <p className="mt-1 truncate text-[12px] text-slate-600">
-              <span className="font-medium">{parseSenderName(message.from)}</span>
-              <span className="text-slate-400"> · </span>
-              <span className="text-slate-500">{parseSenderEmail(message.from)}</span>
-              <span className="text-slate-400"> · </span>
-              <span className="text-slate-400">{formatMailDateLong(message.date)}</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {(message.attachments ?? []).length > 0 ? (
-        <GmailHubAttachments
-          attachments={message.attachments ?? []}
-          activeAttachmentId={pdfPreviewAttachmentId}
-          loadingId={pdfPreviewLoadingId}
-          onOpenPdf={onOpenPdf}
-        />
+      {threadMessages.length > 1 ? (
+        <p
+          className="shrink-0 border-b border-black/[0.05] px-4 py-2 text-[11px] text-slate-500"
+          data-testid="gmail-hub-thread-count"
+        >
+          {`${threadMessages.length} ${t("gmail.hub.thread_messages_suffix")}`}
+        </p>
       ) : null}
 
-      <div className="gmail-hub-reader-surface min-h-0 flex-1 overflow-hidden">
-        {message.bodyHtml ? (
-          <iframe
-            data-testid="gmail-hub-body-html"
-            srcDoc={wrapHtmlEmail(message.bodyHtml)}
-            sandbox="allow-same-origin"
-            title="Email"
-            className="gmail-hub-iframe h-full w-full border-0"
-          />
-        ) : (
-          <div className="h-full overflow-y-auto px-5 py-5 custom-scrollbar">
-            <p
-              data-testid="gmail-hub-body-text"
-              className="whitespace-pre-wrap text-[14px] leading-[1.65] text-slate-700"
+      <div className="gmail-hub-reader-surface min-h-0 flex-1 overflow-y-auto custom-scrollbar">
+        {thread.map((tm) => {
+          const focused = tm.id === message.id;
+          return (
+            <article
+              key={tm.id}
+              data-testid={`gmail-hub-thread-msg-${tm.id}`}
+              className={cn(
+                "border-b border-black/[0.06]",
+                focused ? "bg-white/50" : "cursor-pointer hover:bg-black/[0.02]",
+              )}
+              onClick={() => {
+                if (!focused) onFocusThreadMessage(tm.id);
+              }}
             >
-              {message.bodyText}
-            </p>
-          </div>
-        )}
+              <div className={`gmail-hub-detail-header--compact shrink-0 px-4 ${gmailDivider}`}>
+                <div className="flex gap-3 py-3">
+                  <GmailHubAvatar seed={tm.from} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="line-clamp-2 text-[14px] font-medium leading-snug text-slate-900">
+                      {tm.subject || `(${t("gmail.hub.no_subject")})`}
+                    </h3>
+                    <p className="mt-1 truncate text-[12px] text-slate-600">
+                      <span className="font-medium">{parseSenderName(tm.from)}</span>
+                      <span className="text-slate-400"> · </span>
+                      <span className="text-slate-500">{parseSenderEmail(tm.from)}</span>
+                      <span className="text-slate-400"> · </span>
+                      <span className="text-slate-400">{formatMailDateLong(tm.date)}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {focused && (tm.attachments ?? []).length > 0 ? (
+                <GmailHubAttachments
+                  attachments={tm.attachments ?? []}
+                  activeAttachmentId={pdfPreviewAttachmentId}
+                  loadingId={pdfPreviewLoadingId}
+                  onOpenPdf={onOpenPdf}
+                />
+              ) : null}
+
+              {focused ? (
+                tm.bodyHtml ? (
+                  <iframe
+                    data-testid="gmail-hub-body-html"
+                    srcDoc={wrapHtmlEmail(tm.bodyHtml)}
+                    sandbox="allow-same-origin"
+                    title="Email"
+                    className="gmail-hub-iframe min-h-[200px] w-full border-0"
+                    style={{ height: "min(50vh, 480px)" }}
+                  />
+                ) : (
+                  <div className="px-5 py-4">
+                    <p
+                      data-testid="gmail-hub-body-text"
+                      className="whitespace-pre-wrap text-[14px] leading-[1.65] text-slate-700"
+                    >
+                      {tm.bodyText}
+                    </p>
+                  </div>
+                )
+              ) : (
+                <p className="line-clamp-3 px-5 pb-4 text-[13px] leading-relaxed text-slate-500">
+                  {tm.bodyText || tm.snippet}
+                </p>
+              )}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

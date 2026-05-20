@@ -7,6 +7,7 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
+import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import GmailHubSetupPanel from "@/features/gmail/components/GmailHubSetupPanel";
@@ -139,8 +140,10 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   }, [activeLabelId, userLabels, t]);
 
   const reloadInbox = useCallback(() => {
+    hub.clearThread();
+    setSelectedId(null);
     void hub.loadMessages({ labelId: activeLabelId, q: searchQuery });
-  }, [hub.loadMessages, activeLabelId, searchQuery]);
+  }, [hub, activeLabelId, searchQuery]);
 
   const selectLabel = useCallback(
     (id: string) => {
@@ -148,7 +151,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       setSelectedId(null);
       setSearchQuery("");
       setComposing(false);
-      hub.setSelectedMessage(null);
+      hub.clearThread();
     },
     [hub],
   );
@@ -162,11 +165,61 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
     setComposeBody("");
   }, [hub]);
 
-  const handleSelectMessage = (msg: GmailHubMessageSummary) => {
-    setSelectedId(msg.id);
-    setComposing(false);
-    void hub.loadMessageDetail(msg.id);
-  };
+  const handleSelectMessage = useCallback(
+    (msg: GmailHubMessageSummary) => {
+      setSelectedId(msg.id);
+      setComposing(false);
+      void hub.loadThread(msg.threadId, msg.id);
+    },
+    [hub],
+  );
+
+  const handleListToggleRead = useCallback(
+    async (msg: GmailHubMessageSummary, markAsUnread: boolean) => {
+      try {
+        await hub.toggleReadState(msg.id, markAsUnread);
+        toast.success(
+          String(markAsUnread ? t("gmail.hub.marked_unread") : t("gmail.hub.marked_read")),
+        );
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : String(t("common.error")));
+      }
+    },
+    [hub, t],
+  );
+
+  const handleReaderToggleRead = useCallback(() => {
+    const m = hub.selectedMessage;
+    if (!m) return;
+    void handleListToggleRead(m, !m.isUnread);
+  }, [hub.selectedMessage, handleListToggleRead]);
+
+  const handleToggleLabel = useCallback(
+    (labelId: string) => {
+      const m = hub.selectedMessage;
+      if (!m) return;
+      void (async () => {
+        try {
+          await hub.toggleUserLabel(m.id, labelId, m.labelIds.includes(labelId));
+          toast.success(String(t("gmail.hub.label_updated")));
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : String(t("common.error")));
+        }
+      })();
+    },
+    [hub, t],
+  );
+
+  const goAdjacentMessage = useCallback(
+    (delta: number) => {
+      if (!selectedId || hub.messages.length === 0) return;
+      const idx = hub.messages.findIndex((m) => m.id === selectedId);
+      if (idx < 0) return;
+      const next = hub.messages[idx + delta];
+      if (next) handleSelectMessage(next);
+    },
+    [selectedId, hub.messages, handleSelectMessage],
+  );
 
   const handleConnect = async () => {
     try {
@@ -254,7 +307,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
     try {
       await hub.modifyMessage(m.id, add, remove);
       toast.success(String(t("gmail.hub.star_updated")));
-      void hub.loadMessageDetail(m.id);
+      void hub.loadThread(m.threadId, m.id);
     } catch (e) {
       reloadInbox(); // revert
       toast.error(e instanceof Error ? e.message : String(t("common.error")));
@@ -301,6 +354,15 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       hub.error?.toLowerCase().includes("unauthorized"));
   const clientReady = hub.status?.oauthClientConfigured === true;
   const connected = hub.status?.oauthConfigured === true;
+
+  useGmailHubKeyboard({
+    enabled: connected && !composing,
+    onReply: handleReply,
+    onArchive: () => void handleArchive(),
+    onTrash: () => void handleTrash(),
+    onNext: () => goAdjacentMessage(1),
+    onPrev: () => goAdjacentMessage(-1),
+  });
 
   return (
     <div data-testid="gmail-hub-page" className="gmail-hub-page-root">
@@ -355,8 +417,14 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             messages={hub.messages}
             selectedId={selectedId}
             loading={hub.loadingList}
+            loadingMore={hub.loadingMore}
+            hasMore={Boolean(hub.nextPageToken)}
+            onLoadMore={() =>
+              void hub.loadMoreMessages({ labelId: activeLabelId, q: searchQuery })
+            }
             error={hub.error}
             onSelectMessage={handleSelectMessage}
+            onToggleRead={(msg, markAsUnread) => void handleListToggleRead(msg, markAsUnread)}
           />
         )
       }
@@ -374,8 +442,16 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             onSend={() => void handleSend()}
             sending={sending}
             message={hub.selectedMessage}
+            threadMessages={hub.threadMessages}
+            onFocusThreadMessage={(id) => {
+              setSelectedId(id);
+              hub.focusThreadMessage(id);
+            }}
+            userLabels={userLabels}
             loadingDetail={hub.loadingDetail}
             onReply={handleReply}
+            onToggleRead={handleReaderToggleRead}
+            onToggleLabel={handleToggleLabel}
             onStar={() => void handleStar()}
             onArchive={() => void handleArchive()}
             onTrash={() => void handleTrash()}

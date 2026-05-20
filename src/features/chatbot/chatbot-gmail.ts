@@ -1,3 +1,5 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { getAdminDb } from "@/core/config/firebase-admin";
 import { createGmailApiClient } from "@/core/services/email/gmailApiClient";
 import {
   isGmailOAuthConfigured,
@@ -8,6 +10,9 @@ import {
   extractMessageBodies,
   getMessageHeader,
 } from "@/core/services/email/gmailMessageBody";
+import { sendGmailReplyToMessage } from "@/core/services/email/sendGmailThreadReply";
+import { fetchInterventionsForCompany } from "@/features/chatbot/chatbot-intervention-source";
+import { interventionSearchHaystack } from "@/features/chatbot/chatbot-workspace-search";
 import { mapGmailMessageSummary } from "@/features/gmail/gmailHubMappers";
 
 const MAX_LIST = 20;
@@ -18,6 +23,18 @@ async function assertGmailReady(): Promise<void> {
     throw new Error(
       "Gmail non connecté : connectez Gmail depuis la page 7 (bouton Google) ou configurez OAuth côté serveur.",
     );
+  }
+}
+
+function parseSenderEmail(from: string): string {
+  return from.match(/<([^>]+)>/)?.[1]?.trim().toLowerCase() || from.trim().toLowerCase();
+}
+
+async function assertInterventionAccess(companyId: string, interventionId: string) {
+  const doc = await getAdminDb().collection("interventions").doc(interventionId).get();
+  if (!doc.exists) throw new Error("Intervention introuvable");
+  if (String(doc.data()?.companyId || "") !== companyId) {
+    throw new Error("Accès refusé (autre société)");
   }
 }
 
@@ -85,7 +102,7 @@ export async function listGmailInboxForChatbot(input: {
     query: q ?? null,
     messages,
     hint:
-      "Pour le détail (colis, infos client, corps du mail), appelez get_gmail_message avec id. Exemples de recherche q : « colis OR colissimo OR bpost », « from:client@example.com », « is:unread ».",
+      "Pour le détail, appelez get_gmail_message. Pour lier à un dossier : suggest_gmail_intervention_links puis link_gmail_to_intervention. Pour répondre : send_gmail_reply (confirmation requise).",
   };
 }
 
@@ -139,6 +156,173 @@ export async function getGmailMessageForChatbot(messageId: string): Promise<{
     isUnread: (data.labelIds ?? []).includes("UNREAD"),
     labelIds: data.labelIds ?? [],
     attachments,
-    hint: "Utilisez ces infos pour répondre au client ou mettre à jour le dossier intervention.",
+    hint: "Utilisez suggest_gmail_intervention_links pour proposer des dossiers, send_gmail_reply pour répondre (avec confirmation).",
+  };
+}
+
+/** Propose des dossiers intervention à lier à un mail (lecture seule). */
+export async function suggestGmailInterventionLinksForChatbot(
+  companyId: string,
+  input: { messageId: string },
+): Promise<{
+  messageId: string;
+  from: string;
+  subject: string;
+  senderEmail: string | null;
+  candidates: Array<{
+    interventionId: string;
+    clientName: string;
+    status: string | null;
+    score: number;
+    reasons: string[];
+  }>;
+  hint: string;
+}> {
+  await assertGmailReady();
+  const msg = await getGmailMessageForChatbot(input.messageId);
+  const haystack = `${msg.from} ${msg.subject} ${msg.bodyText} ${msg.snippet}`.toLowerCase();
+  const senderEmail = parseSenderEmail(msg.from);
+
+  const interventions = await fetchInterventionsForCompany(getAdminDb(), companyId, 250);
+  const scored: Array<{
+    interventionId: string;
+    clientName: string;
+    status: string | null;
+    score: number;
+    reasons: string[];
+  }> = [];
+
+  for (const row of interventions) {
+    const id = String(row.id || "");
+    if (!id) continue;
+    const clientName =
+      String(row.clientName || "").trim() ||
+      [row.clientFirstName, row.clientLastName].filter(Boolean).join(" ").trim() ||
+      String(row.clientCompanyName || "").trim() ||
+      "Client";
+    const ivHaystack = interventionSearchHaystack(row).toLowerCase();
+    const reasons: string[] = [];
+    let score = 0;
+
+    const ivEmail = String(row.clientEmail || row.email || "").trim().toLowerCase();
+    if (senderEmail && ivEmail && senderEmail === ivEmail) {
+      score += 40;
+      reasons.push("email expéditeur = email dossier");
+    }
+
+    const nameLower = clientName.toLowerCase();
+    if (nameLower.length >= 3 && haystack.includes(nameLower)) {
+      score += 25;
+      reasons.push(`nom « ${clientName} » dans le mail`);
+    }
+
+    const tokens = nameLower.split(/\s+/).filter((t) => t.length >= 4);
+    for (const token of tokens) {
+      if (haystack.includes(token)) {
+        score += 8;
+        reasons.push(`mot « ${token} »`);
+      }
+    }
+
+    if (ivHaystack && haystack.split(/\s+/).some((w) => w.length >= 5 && ivHaystack.includes(w))) {
+      score += 5;
+    }
+
+    if (score > 0) {
+      scored.push({
+        interventionId: id,
+        clientName,
+        status: row.status != null ? String(row.status) : null,
+        score,
+        reasons: [...new Set(reasons)].slice(0, 4),
+      });
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  const candidates = scored.slice(0, 5);
+
+  return {
+    messageId: msg.id,
+    from: msg.from,
+    subject: msg.subject,
+    senderEmail: senderEmail || null,
+    candidates,
+    hint:
+      candidates.length > 0
+        ? "Proposez link_gmail_to_intervention avec interventionId du candidat le plus pertinent (après confirmation utilisateur)."
+        : "Aucun dossier évident — utilisez search_workspace avec le nom du client puis link_gmail_to_intervention.",
+  };
+}
+
+/** Répond à un mail Gmail depuis le chatbot (fil de discussion). */
+export async function sendGmailReplyFromChatbot(input: {
+  messageId: string;
+  bodyText: string;
+  to?: string;
+  subject?: string;
+}): Promise<{ ok: boolean; sentTo: string; subject: string; threadId: string | null }> {
+  await assertGmailReady();
+  const sent = await sendGmailReplyToMessage(input);
+  return {
+    ok: true,
+    sentTo: sent.sentTo,
+    subject: sent.subject,
+    threadId: sent.threadId,
+  };
+}
+
+/** Lie un mail Gmail à une intervention (timeline Firestore). */
+export async function linkGmailToIntervention(
+  ctx: { companyId: string; actorUid: string },
+  input: { messageId: string; interventionId: string; note?: string },
+): Promise<{
+  ok: boolean;
+  interventionId: string;
+  from: string;
+  subject: string;
+  eventId: string;
+}> {
+  await assertGmailReady();
+  const messageId = input.messageId.trim();
+  const interventionId = input.interventionId.trim();
+  if (!messageId || !interventionId) {
+    throw new Error("messageId et interventionId requis");
+  }
+
+  await assertInterventionAccess(ctx.companyId, interventionId);
+
+  const detail = await getGmailMessageForChatbot(messageId);
+  const senderEmail = parseSenderEmail(detail.from);
+  const excerpt = detail.bodyText.slice(0, 500);
+
+  const ref = await getAdminDb()
+    .collection("interventions")
+    .doc(interventionId)
+    .collection("timeline_events")
+    .add({
+      interventionId,
+      type: "gmail_link",
+      gmailMessageId: messageId,
+      gmailThreadId: detail.threadId || null,
+      from: detail.from,
+      senderEmail: senderEmail || null,
+      subject: detail.subject,
+      date: detail.date,
+      excerpt,
+      note: input.note?.trim() || null,
+      visibility: "internal",
+      createdAt: new Date().toISOString(),
+      createdByUid: ctx.actorUid,
+      companyId: ctx.companyId,
+      linkedAt: FieldValue.serverTimestamp(),
+    });
+
+  return {
+    ok: true,
+    interventionId,
+    from: detail.from,
+    subject: detail.subject,
+    eventId: ref.id,
   };
 }

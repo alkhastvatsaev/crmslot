@@ -299,6 +299,18 @@
       "trash_confirm": "Dit bericht naar de prullenbak verplaatsen?",
       "sent_ok": "Bericht verzonden.",
       "star_updated": "Ster bijgewerkt.",
+      "load_more": "Meer laden",
+      "mark_read": "Als gelezen markeren",
+      "mark_unread": "Als ongelezen markeren",
+      "marked_read": "Als gelezen gemarkeerd.",
+      "marked_unread": "Als ongelezen gemarkeerd.",
+      "apply_label": "Label…",
+      "label_updated": "Label bijgewerkt.",
+      "chip_unread": "Ongelezen",
+      "chip_attachment": "Bijlagen",
+      "chip_starred": "Met ster",
+      "thread_messages_suffix": "berichten in het gesprek",
+      "shortcuts_hint": "Sneltoetsen: r antwoorden · e archiveren · # prullenbak · j/k volgende/vorige",
       "archived": "Bericht gearchiveerd.",
       "trashed": "Bericht naar prullenbak verplaatst."
     }

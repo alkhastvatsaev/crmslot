@@ -43,3 +43,8 @@ export type GmailHubMessageDetail = GmailHubMessageSummary & {
   referencesHeader: string;
   attachments: GmailHubAttachment[];
 };
+
+export type GmailHubInboxPage = {
+  messages: GmailHubMessageSummary[];
+  nextPageToken: string | null;
+};
