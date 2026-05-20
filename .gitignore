@@ -51,10 +51,26 @@ Thumbs.db
 extracted_fr.txt
 used_keys.txt
 tsconfig.tsbuildinfo
+tsconfig*.tsbuildinfo
 _prototype_backup/
 test_output.txt
 *.backup
 .vercel
+
+# Firebase Functions (dépendances séparées, régénérables)
+functions/node_modules/
+functions/lib/
+
+# Fichiers de dev / scratch (scripts de test manuels, pas du code prod)
+scratch.ts
+scratch/
+
+# Photos de test (images téléchargées manuellement, pas du code)
+photos portes/
+
+# Copies macOS (fichiers "nom 2.ext", "nom 3.ext" créés par macOS)
+* [0-9].*
+* [0-9][0-9].*
 
 # Données d'entraînement chatbot (générées localement — ne pas committer)
 data/chatbot-training/
