@@ -356,7 +356,7 @@ export default function MapTranscriptionActionsPanel({
               id: createdRef.id,
               title: doc.title,
               address: doc.address,
-              status: doc.status,
+              status: doc.status as import("@/features/interventions/types").Intervention["status"],
               companyId: fallbackTenantCompanyId,
               clientName: doc.clientName ?? undefined,
             },

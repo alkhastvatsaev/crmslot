@@ -56,3 +56,7 @@ export function useBillingHubIntent(): BillingHubIntentApi {
   }
   return ctx;
 }
+
+export function useBillingHubIntentOptional(): BillingHubIntentApi | null {
+  return useContext(BillingHubIntentContext);
+}

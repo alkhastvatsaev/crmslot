@@ -22,7 +22,7 @@ export async function renderPdfPagesToDataUrls(
       canvas.height = Math.floor(viewport.height);
       const ctx = canvas.getContext("2d");
       if (!ctx) continue;
-      await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+      await page.render({ canvasContext: ctx, viewport }).promise;
       pages.push(canvas.toDataURL("image/jpeg", 0.9));
     }
   } finally {

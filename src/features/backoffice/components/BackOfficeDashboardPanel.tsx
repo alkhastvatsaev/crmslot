@@ -18,7 +18,6 @@ import {
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { auth } from "@/core/config/firebase";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { toast } from "sonner";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";

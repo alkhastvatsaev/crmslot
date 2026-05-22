@@ -55,6 +55,7 @@ jest.mock("@/features/featureHub/hooks/useCompanyMaterialOrdersRecent", () => ({
 }));
 
 jest.mock("@/features/chatbot/ChatbotContext", () => ({
+  useChatbotContextOptional: () => null,
   useChatbotContext: () => ({
     ensureRightPanelOpen: jest.fn(),
     refreshRegistry: jest.fn(),

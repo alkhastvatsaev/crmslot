@@ -6,7 +6,8 @@ const mockTransitionAdmin = jest.fn(async () => ({ id: "evt-1" }));
 const mockUpdate = jest.fn(async () => undefined);
 
 jest.mock("@/features/interventions/workflow/transitionInterventionStatusAdmin", () => ({
-  transitionInterventionStatusAdmin: (...args: unknown[]) => mockTransitionAdmin(...args),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transitionInterventionStatusAdmin: (...args: any[]) => (mockTransitionAdmin as any)(...args),
 }));
 
 jest.mock("firebase-admin", () => ({
@@ -79,7 +80,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
 
     expect(mockTransitionAdmin).not.toHaveBeenCalled();
     expect(mockUpdate).toHaveBeenCalledTimes(1);
-    const patch = mockUpdate.mock.calls[0]?.[0] as Record<string, unknown>;
+    const patch = (mockUpdate.mock.calls as unknown[][])[0]![0] as Record<string, unknown>;
     expect(patch.assignedTechnicianUid).toBe("tech-2");
     expect(patch.status).toBe("assigned");
     expect(patch.technicianAcceptedAt).toBe("__delete__");

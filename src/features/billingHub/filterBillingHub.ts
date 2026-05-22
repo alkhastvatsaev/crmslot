@@ -28,7 +28,7 @@ export function filterBillingBySearch(rows: Intervention[], query: string): Inte
   const q = query.trim().toLowerCase();
   if (!q) return rows;
   return rows.filter((iv) => {
-    const hay = `${iv.clientName ?? ""} ${iv.address ?? ""} ${iv.id} ${iv.reference ?? ""}`.toLowerCase();
+    const hay = `${iv.clientName ?? ""} ${iv.address ?? ""} ${iv.id}`.toLowerCase();
     return hay.includes(q);
   });
 }
