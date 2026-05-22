@@ -6,6 +6,7 @@ import {
   MATERIAL_AGENT_TOOL_SCOPE,
   handleMaterialAgentPost,
 } from "@/features/featureHub/materialAgentRouteHandler";
+
 jest.mock("@/features/chatbot/chatbot-openai", () => ({
   ...jest.requireActual("@/features/chatbot/chatbot-openai"),
   runChatbotOpenAI: jest.fn(),
@@ -31,13 +32,17 @@ describe("materialAgentRouteHandler", () => {
     else process.env.OPENAI_API_KEY = envOpenAI;
   });
 
-  it("exports a stock-only tool scope", () => {
+  it("exports expanded material hub tool scope", () => {
     expect(MATERIAL_AGENT_TOOL_SCOPE).toEqual([
       "get_workspace_summary",
       "list_stock_alerts",
+      "list_company_material_orders",
       "list_material_orders",
+      "list_supplier_orders",
       "search_lecot_products",
       "order_lecot_parts",
+      "approve_material_orders",
+      "focus_stock_item",
     ]);
   });
 
@@ -74,6 +79,8 @@ describe("materialAgentRouteHandler", () => {
     expect(mockRunChatbotOpenAI).toHaveBeenCalledWith(
       expect.objectContaining({
         toolScope: [...MATERIAL_AGENT_TOOL_SCOPE],
+        hubAgentMode: true,
+        conversationContext: expect.objectContaining({ toolScope: [...MATERIAL_AGENT_TOOL_SCOPE] }),
         toolCtx: expect.objectContaining({ companyId: "co-mat", actorUid: "uid-mat" }),
       }),
     );
@@ -81,6 +88,63 @@ describe("materialAgentRouteHandler", () => {
     expect(call?.system).toContain("Agent Matériel");
     expect(call?.system).toContain("Atelier Test (co-mat)");
     expect(call?.system).toContain('"totalSkus":3');
+    expect(call?.system).toMatch(/search_lecot_products/);
+  });
+
+  it("registers client name reply without OpenAI when awaiting name", async () => {
+    const res = await handleMaterialAgentPost(
+      {
+        companyId: "co-mat",
+        messages: [
+          { role: "user", content: "Commander CYL-1 — Cylindre" },
+          {
+            role: "assistant",
+            content:
+              "Quel est le **nom du client** pour cette commande ?\n[[material-agent-need-client-name]]",
+          },
+          { role: "user", content: "Dupont" },
+        ],
+      },
+      auth,
+    );
+    const events = await readSseJsonLines(res);
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: "material_order_client", clientName: "Dupont" }),
+    );
+    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+  });
+
+  it("clears session client and delegates Lecot to OpenAI", async () => {
+    const res = await handleMaterialAgentPost(
+      {
+        companyId: "co-mat",
+        orderClientName: "Ancien Client",
+        messages: [{ role: "user", content: "nouvelle commande lecot" }],
+      },
+      auth,
+    );
+    const events = await readSseJsonLines(res);
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: "material_order_client", clientName: "" }),
+    );
+    expect(mockRunChatbotOpenAI).toHaveBeenCalled();
+  });
+
+  it("delegates commande lecot to OpenAI (no instant catalogue shortcut)", async () => {
+    const res = await handleMaterialAgentPost(
+      {
+        companyId: "co-mat",
+        messages: [{ role: "user", content: "commande lecot" }],
+      },
+      auth,
+    );
+    await readSseJsonLines(res);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hubAgentMode: true,
+        toolCtx: expect.objectContaining({ materialOrderClientName: null }),
+      }),
+    );
   });
 
   it("streams error when OPENAI_API_KEY is missing", async () => {

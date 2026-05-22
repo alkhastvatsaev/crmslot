@@ -26,7 +26,7 @@ const OFF_TOPIC_PATTERNS: { re: RegExp; weight: number }[] = [
 const GREETING_RE =
   /^(?:bonjour|salut|hello|coucou|bonsoir|hey|merci|ok|ça va|ca va)(?:\s*[!?.]*)?$/i;
 
-const HELP_RE = /aide|help|\?|que\s+peux|qu'?est-ce\s+que\s+tu|comment\s+(?:ça\s+)?marche/i;
+const HELP_RE = /aide|help|que\s+peux|qu'?est-ce\s+que\s+tu|comment\s+(?:ça\s+)?marche/i;
 
 export function scoreMaterialRelevance(text: string): { material: number; offTopic: number } {
   const t = text.trim();
@@ -66,10 +66,10 @@ const INTENT_RULES: { intent: CompanyStockAgentIntent; re: RegExp; priority: num
   { intent: "lecot", re: /lecot|catalogue\s+fournisseur|commander\s+(?:chez|via)/i, priority: 8 },
   { intent: "add_item", re: /ajouter|créer|creer|nouveau\s+article|nouvelle\s+réf/i, priority: 7 },
   { intent: "waiting_jobs", re: /chantier|intervention.*attente|waiting_material|attente\s+mat/i, priority: 7 },
-  { intent: "pending_orders", re: /demande|commande\s+terrain|pending|technicien.*mat|matériel\s+demand/i, priority: 7 },
+  { intent: "pending_orders", re: /demandes?|commandes?\s+(?:en\s+attente|terrain)|pending|bons?\s+mat|technicien.*mat|matériel\s+demand/i, priority: 7 },
+  { intent: "list_alerts", re: /alertes?|problème|probleme|urgent|priorité|priorite/i, priority: 6 },
   { intent: "list_out", re: /rupture|épuisé|epuise|plus\s+en\s+stock|qty\s*0|quantité\s*0/i, priority: 6 },
-  { intent: "list_low", re: /stock\s+bas|sous\s+seuil|alerte|faible|bas\s+seuil/i, priority: 6 },
-  { intent: "list_alerts", re: /alertes?|problème|probleme|urgent|priorité|priorite/i, priority: 5 },
+  { intent: "list_low", re: /stock\s+bas|sous\s+(?:le\s+)?seuil|faible|bas\s+seuil/i, priority: 6 },
   { intent: "summary", re: /résumé|resume|état|etat|situation|combien|vue\s+d'ensemble|synthèse|synthese|couverture/i, priority: 5 },
   { intent: "search", re: /.+/i, priority: 1 },
 ];

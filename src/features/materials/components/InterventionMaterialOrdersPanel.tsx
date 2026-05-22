@@ -21,7 +21,16 @@ const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 type Props = {
   intervention: Pick<
     Intervention,
-    "id" | "status" | "companyId" | "assignedTechnicianUid" | "createdByUid"
+    | "id"
+    | "status"
+    | "companyId"
+    | "assignedTechnicianUid"
+    | "createdByUid"
+    | "title"
+    | "clientFirstName"
+    | "clientLastName"
+    | "clientName"
+    | "clientCompanyName"
   >;
   technicianUid: string;
   allowCreate?: boolean;

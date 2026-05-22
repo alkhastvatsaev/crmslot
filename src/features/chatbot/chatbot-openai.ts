@@ -15,12 +15,21 @@ import type { ChatbotConversationContext } from "@/features/chatbot/chatbot-conv
 import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
 import { buildLecotProductQuickActions } from "@/features/chatbot/chatbot-quick-actions";
 import {
+  materialAgentAskClientNameAssistantContent,
+  isMaterialAgentLecotCommandText,
+} from "@/features/featureHub/materialAgentOrderClient";
+import {
   extractDocumentPreviewFromResult,
   isChatbotZeroTokenUiTool,
   MINIMAL_DOCUMENT_TOOL_RESULT_JSON,
   documentToolSuccessMessage,
 } from "@/features/chatbot/chatbot-document-side-effect";
 import { emitChatbotOrderRegisteredEvents } from "@/features/chatbot/chatbot-order-side-effect";
+import {
+  emitHubAgentToolSideEffects,
+  hubUiToolSuccessMessage,
+} from "@/features/hubAgents/hubAgentSideEffects";
+import { HUB_AGENT_IMMEDIATE_UI_TOOLS } from "@/features/hubAgents/hubAgentToolScopes";
 import { executeChatbotTool, type ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import {
   normalizeStoredMessages,
@@ -79,6 +88,11 @@ const TOOL_LABELS: Record<string, string> = {
   search_lecot_products: "Catalogue Lecot",
   list_supplier_orders: "Commandes fournisseur",
   order_lecot_parts: "Commande Lecot",
+  list_company_material_orders: "Bons matériel société",
+  approve_material_orders: "Validation demandes matériel",
+  focus_stock_item: "Focus stock",
+  focus_billing_case: "Focus facturation",
+  open_crm_dossier: "Ouvrir dossier",
 };
 
 export type OpenAIRunResult =
@@ -181,6 +195,10 @@ export async function runChatbotOpenAI(params: {
   toolScope?: string[];
   conversationContext?: ChatbotConversationContext;
   hasWorkspaceSnapshot?: boolean;
+  /** Agents hub dédiés : auto-confirme les écritures (sauf order_lecot). */
+  hubAgentMode?: boolean;
+  /** Température OpenAI (défaut 0.25). Les agents déterministes peuvent descendre à 0.15. */
+  temperature?: number;
   emit: ChatbotStreamEmit;
 }): Promise<OpenAIRunResult> {
   const stored = trimChatbotMessagesForApi(normalizeStoredMessages(params.messages));
@@ -210,7 +228,7 @@ export async function runChatbotOpenAI(params: {
   // Pré-exécution garantie : si le contexte détecte une requête Lecot, on appelle
   // search_lecot_products directement (sans passer par le modèle) et on injecte
   // le résultat dans l'historique. OpenAI génère ensuite la réponse textuelle.
-  if (ctx.forceToolName === "search_lecot_products" && ctx.lecotSearchQuery) {
+  if (ctx.forceToolName === "search_lecot_products" && ctx.lecotSearchQuery && !params.hubAgentMode) {
     const preCallId = `force_lecot_${Date.now()}`;
     const preArgs = { query: ctx.lecotSearchQuery, limit: 5 };
     params.emit({ type: "tool_start", tool: "search_lecot_products", label: TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot" });
@@ -251,7 +269,7 @@ export async function runChatbotOpenAI(params: {
       ...(resolvedTools.length > 0
         ? { tools: resolvedTools, tool_choice: "auto" as const }
         : {}),
-      temperature: 0.25,
+      temperature: params.temperature ?? 0.25,
       max_tokens: maxTokens,
       stream: true,
     });
@@ -302,6 +320,30 @@ export async function runChatbotOpenAI(params: {
       return { id: tc.id, name: tc.name, arguments: args };
     });
 
+    if (params.hubAgentMode && params.toolCtx.requireMaterialOrderClientName) {
+      const orderCall = parsedCalls.find((c) => c.name === "order_lecot_parts");
+      if (orderCall) {
+        const rawFromAI = String(orderCall.arguments.clientName ?? "").trim();
+        // Rejeter les hallucinations (textes de commande passés comme clientName).
+        const aiNameValid =
+          rawFromAI && !isMaterialAgentLecotCommandText(rawFromAI) && rawFromAI.length <= 80;
+        // Fallback sur le client enregistré en session si l'IA n'en fournit pas de valide.
+        const effectiveClient = aiNameValid
+          ? rawFromAI
+          : (params.toolCtx.materialOrderClientName?.trim() || "");
+        if (!effectiveClient) {
+          const ask = materialAgentAskClientNameAssistantContent();
+          params.emit({ type: "text", delta: ask });
+          return {
+            status: "done",
+            apiMessages: [...apiMessages, { role: "assistant", content: ask }],
+          };
+        }
+        // Injecter le nom résolu pour que l'exécuteur n'ait pas besoin de re-résoudre.
+        orderCall.arguments.clientName = effectiveClient;
+      }
+    }
+
     const assistantTurn: ChatbotStoredMessage = {
       role: "assistant",
       content: textAcc.trim() || null,
@@ -328,7 +370,8 @@ export async function runChatbotOpenAI(params: {
       if (
         isWrite &&
         !confirmed &&
-        (shouldAutoConfirmChatbotBillingWrite(call.name, lastUserText) ||
+        (params.hubAgentMode ||
+          shouldAutoConfirmChatbotBillingWrite(call.name, lastUserText) ||
           shouldAutoConfirmChatbotEmailWrite(call.name, lastUserText))
       ) {
         call.arguments.userConfirmed = true;
@@ -384,13 +427,43 @@ export async function runChatbotOpenAI(params: {
     for (const { call, result } of executed) {
       params.emit({ type: "tool_end", tool: call.name });
 
+      emitHubAgentToolSideEffects(call.name, result, params.emit, params.toolCtx.companyId);
+
       const preview = extractDocumentPreviewFromResult(result);
       if (preview) {
         params.emit({ type: "document_preview", ...preview });
       }
+
+      if (HUB_AGENT_IMMEDIATE_UI_TOOLS.has(call.name)) {
+        const successMsg = hubUiToolSuccessMessage(call.name, result);
+        params.emit({ type: "text", delta: successMsg });
+        const content = MINIMAL_DOCUMENT_TOOL_RESULT_JSON;
+        toolResultMessages.push({
+          role: "tool",
+          tool_call_id: call.id,
+          content,
+        });
+        openaiMessages.push({
+          role: "tool",
+          tool_call_id: call.id,
+          content,
+        });
+        apiMessages = [
+          ...apiMessages,
+          ...toolResultMessages,
+          { role: "assistant", content: successMsg },
+        ];
+        return { status: "done", apiMessages };
+      }
+
       if (call.name === "order_lecot_parts") {
         emitChatbotOrderRegisteredEvents(params.emit, params.toolCtx.companyId, result);
-        if (result && typeof result === "object" && !("error" in result)) {
+        if (params.hubAgentMode) {
+          const clientName = String(call.arguments.clientName ?? "").trim();
+          if (clientName) {
+            params.emit({ type: "material_order_client", clientName });
+          }
+        } else if (result && typeof result === "object" && !("error" in result)) {
           const orderText = documentToolSuccessMessage("order_lecot_parts", result);
           params.emit({ type: "text", delta: orderText });
           apiMessages = [

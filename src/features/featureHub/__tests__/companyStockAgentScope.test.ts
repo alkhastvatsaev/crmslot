@@ -16,6 +16,11 @@ describe("companyStockAgentScope", () => {
     expect(classifyCompanyStockAgentIntent("planning technicien", false)).toBe("off_topic");
   });
 
+  it("does not treat bare question-mark as help (HELP_RE regression)", () => {
+    // A billing question with ? must NOT pass scope just because of the ?
+    expect(isCompanyStockAgentInScope("quelle est la facture du client ?")).toBe(false);
+  });
+
   it("classifies summary and search", () => {
     expect(classifyCompanyStockAgentIntent("état du stock", true)).toBe("summary");
     expect(classifyCompanyStockAgentIntent("cherche cylindre euro", true)).toBe("search");

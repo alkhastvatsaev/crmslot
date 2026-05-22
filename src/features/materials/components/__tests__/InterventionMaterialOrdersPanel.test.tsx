@@ -28,6 +28,11 @@ const intervention = {
   companyId: "co-1",
   assignedTechnicianUid: "tech-1",
   createdByUid: "client-1",
+  title: "Test intervention",
+  clientFirstName: null,
+  clientLastName: null,
+  clientName: "Client",
+  clientCompanyName: null,
 };
 
 describe("InterventionMaterialOrdersPanel", () => {

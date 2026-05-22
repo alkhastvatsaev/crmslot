@@ -27,4 +27,29 @@ describe("buildMaterialAgentSystemPrompt", () => {
     });
     expect(prompt).not.toMatch(/Snapshot stock actuel/);
   });
+
+  it("includes client session block when orderClientName is set", () => {
+    const prompt = buildMaterialAgentSystemPrompt({
+      companyName: "X",
+      companyId: "y",
+      today: "2026-01-01",
+      stockSnapshot: null,
+      orderClientName: "Dupont",
+    });
+    expect(prompt).toMatch(/Client Lecot session en cours/);
+    expect(prompt).toContain("Dupont");
+    expect(prompt).not.toMatch(/Aucun client enregistré/);
+  });
+
+  it("shows no-client warning when orderClientName is null", () => {
+    const prompt = buildMaterialAgentSystemPrompt({
+      companyName: "X",
+      companyId: "y",
+      today: "2026-01-01",
+      stockSnapshot: null,
+      orderClientName: null,
+    });
+    expect(prompt).toMatch(/Aucun client enregistré/);
+    expect(prompt).not.toMatch(/Client Lecot session en cours/);
+  });
 });
