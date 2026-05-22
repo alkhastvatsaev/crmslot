@@ -10,6 +10,7 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
+  forceExit: true,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testPathIgnorePatterns: ['<rootDir>/_prototype_backup/', '<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/'],
   collectCoverageFrom: [
@@ -106,6 +107,26 @@ const config: Config = {
       branches: 38,
       functions: 70,
       lines: 65,
+    },
+    // Page 2 — portail client
+    './src/features/interventions/context/RequesterHubContext.tsx': {
+      statements: 80,
+      branches: 70,
+      functions: 90,
+      lines: 80,
+    },
+    './src/features/interventions/components/RequesterInterventionPanel.tsx': {
+      statements: 40,
+      branches: 30,
+      functions: 18,
+      lines: 40,
+    },
+    // Logique Firestore critique
+    './src/features/clients/linkInterventionToClient.ts': {
+      statements: 80,
+      branches: 60,
+      functions: 100,
+      lines: 80,
     },
   },
   moduleNameMapper: {

@@ -26,6 +26,7 @@ export function buildInterventionClientPatch(
     clientLastName: params.client.lastName?.trim() || null,
     clientCompanyName: params.client.companyName?.trim() || null,
     clientPhone: params.client.phone?.trim() || params.client.phone || null,
+    clientEmail: params.client.email?.trim() || null,
   };
   if (params.site?.address?.trim()) {
     patch.address = params.site.address.trim();

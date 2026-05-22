@@ -1,3 +1,4 @@
+import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Technician } from "@/features/technicians/types";
 
 export function haversineDistanceKm(
@@ -56,4 +57,22 @@ export function rankTechniciansForIntervention(
     })
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .map((row, index) => ({ ...row, rank: index + 1 }));
+}
+
+/** Met Mansour / UID par défaut en tête du picker (aligné page 3 technicien). */
+export function prioritizeDefaultAssignTechnician(ranked: RankedTechnician[]): RankedTechnician[] {
+  const defaultUid = getDefaultAssignedTechnicianUid();
+  const sorted = [...ranked].sort((a, b) => {
+    const score = (t: Technician) => {
+      const uid = (t.authUid ?? "").trim();
+      if (uid && uid === defaultUid) return 0;
+      if (/mansour/i.test(t.name)) return 0;
+      return 1;
+    };
+    const sa = score(a.technician);
+    const sb = score(b.technician);
+    if (sa !== sb) return sa - sb;
+    return a.distanceKm - b.distanceKm;
+  });
+  return sorted.map((row, index) => ({ ...row, rank: index + 1 }));
 }

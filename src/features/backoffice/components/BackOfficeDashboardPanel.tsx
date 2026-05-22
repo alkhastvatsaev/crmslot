@@ -18,6 +18,8 @@ import {
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { auth } from "@/core/config/firebase";
+import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { toast } from "sonner";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { Badge, badgeVariants } from "@/components/ui/badge";
@@ -178,6 +180,16 @@ function BackOfficeDetailDrawer({
                 <p className="mt-1 font-semibold text-slate-900">{merged.phone}</p>
               </div>
             ) : null}
+            {merged.clientEmail?.trim() ? (
+              <div>
+                <span className="font-medium text-slate-600">Mail</span>
+                <p className="mt-1 font-semibold text-slate-900 break-all">
+                  <a href={`mailto:${merged.clientEmail}`} className="hover:underline">
+                    {merged.clientEmail}
+                  </a>
+                </p>
+              </div>
+            ) : null}
             {merged.invoicePdfUrl?.trim() ? (
               <a
                 href={merged.invoicePdfUrl}
@@ -267,6 +279,17 @@ export default function BackOfficeDashboardPanel() {
     if (!window.confirm(String(t("common.confirm_delete")) || "Confirmer la suppression ?")) return;
 
     try {
+      const row = interventions.find((x) => x.id === id);
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
+      if (row) {
+        await logCrmInterventionAction({
+          kind: "intervention_deleted",
+          iv: row,
+          actorUid,
+          actorRole: "dispatcher",
+          note: "Suppression depuis le tableau de bord",
+        });
+      }
       await deleteDoc(doc(firestore, "interventions", id));
       toast.success(String(t("backoffice.toasts.request_deleted")));
       setDetail(null);
@@ -279,9 +302,24 @@ export default function BackOfficeDashboardPanel() {
   const handleArchive = async (id: string) => {
     if (!firestore) return;
     try {
+      const row = interventions.find((x) => x.id === id);
+      const invoicedAt = new Date().toISOString();
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
       await updateDoc(doc(firestore, "interventions", id), {
         status: "invoiced",
+        invoicedAt,
       });
+      if (row) {
+        await logCrmInterventionAction({
+          kind: "intervention_invoiced",
+          iv: { ...row, status: "invoiced", invoicedAt },
+          actorUid,
+          actorRole: "dispatcher",
+          statusBefore: row.status,
+          statusAfter: "invoiced",
+          note: "Marqué facturé (tableau de bord)",
+        });
+      }
       toast.success(String(t("backoffice.toasts.status_updated")));
       setDetail(null);
     } catch (e) {
@@ -632,6 +670,13 @@ export default function BackOfficeDashboardPanel() {
                           <p className="truncate font-bold text-slate-900">{interventionClientLabel(iv)}</p>
                           {(iv.clientPhone || iv.phone) && (
                             <p className="font-bold text-slate-900 mt-0.5 text-[13px]">{iv.clientPhone || iv.phone}</p>
+                          )}
+                          {iv.clientEmail && (
+                            <p className="font-medium text-slate-600 mt-0.5 text-[13px] break-all">
+                              <a href={`mailto:${iv.clientEmail}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                                {iv.clientEmail}
+                              </a>
+                            </p>
                           )}
                         </td>
                         <td className="px-3 py-2">

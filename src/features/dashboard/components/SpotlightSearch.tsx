@@ -1,8 +1,11 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, FileText, Phone, Navigation, ExternalLink, Download, BarChart3, Mail } from 'lucide-react';
-import { BACKOFFICE_HUB_SLOT_INDEX } from '@/features/backoffice/backofficeHubConstants';
+import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, FileText, Phone, Navigation, ExternalLink, Download, BarChart3, Mail, Sparkles } from 'lucide-react';
+import { FEATURE_HUB_SLOT_INDEX } from '@/features/featureHub/featureHubConstants';
+import { CRM_HISTORY_SLOT_INDEX } from '@/features/crmHistory/crmHistoryConstants';
+import { BILLING_HUB_SLOT_INDEX } from '@/features/billingHub/billingHubConstants';
+import { Receipt } from 'lucide-react';
 import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
 import { GMAIL_HUB_SLOT_INDEX } from '@/features/gmail/gmailHubConstants';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
@@ -38,9 +41,11 @@ export default function SpotlightSearch() {
     { index: 0, label: t('spotlight.nav_map'),        Icon: Map },
     { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
     { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
-    { index: BACKOFFICE_HUB_SLOT_INDEX, label: t('spotlight.nav_backoffice'), Icon: LayoutDashboard },
     { index: AI_ASSISTANT_SLOT_INDEX, label: t('spotlight.nav_chatbot'), Icon: CloudOff },
     { index: GMAIL_HUB_SLOT_INDEX, label: t('spotlight.nav_gmail'), Icon: Mail },
+    { index: FEATURE_HUB_SLOT_INDEX, label: t('spotlight.nav_feature_hub'), Icon: Sparkles },
+    { index: CRM_HISTORY_SLOT_INDEX, label: t('spotlight.nav_crm_history'), Icon: Sparkles },
+    { index: BILLING_HUB_SLOT_INDEX, label: t('spotlight.nav_billing_hub'), Icon: Receipt },
   ], [t]);
 
   const workspace = useCompanyWorkspaceOptional();
@@ -253,7 +258,8 @@ export default function SpotlightSearch() {
                         const name = interventionClientLabel(iv) || 'Client inconnu';
                         const address = iv.address || '';
                         const phone = iv.clientPhone || iv.phone || '';
-                        const searchTerms = `${name} ${address} ${phone} ${iv.id} ${iv.title || ''}`.toLowerCase();
+                        const email = iv.clientEmail || '';
+                        const searchTerms = `${name} ${address} ${phone} ${email} ${iv.id} ${iv.title || ''}`.toLowerCase();
                         return (
                           <Command.Item
                             key={iv.id}
@@ -273,6 +279,14 @@ export default function SpotlightSearch() {
                               {address && <div className="text-xs text-slate-500 truncate">{address}</div>}
                             </div>
                             <div className="flex gap-1.5 shrink-0">
+                              {email && (
+                                <button 
+                                  className="rounded-full bg-orange-100 p-1.5 text-orange-700 hover:bg-orange-200 transition"
+                                  onClick={(e) => { e.stopPropagation(); window.location.href = `mailto:${email}`; }}
+                                >
+                                  <Mail className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                               {phone && (
                                 <button 
                                   className="rounded-full bg-green-100 p-1.5 text-green-700 hover:bg-green-200 transition"

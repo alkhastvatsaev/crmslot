@@ -17,8 +17,12 @@ jest.mock("@/context/TechnicianCaseIntentContext", () => ({
   }),
 }));
 
+const mockSetFinishJob = jest.fn();
 jest.mock("@/context/TechnicianFinishJobContext", () => ({
-  useTechnicianFinishJob: () => ({ finishJobInterventionId: null }),
+  useTechnicianFinishJob: () => ({
+    finishJobInterventionId: null,
+    setFinishJobInterventionId: mockSetFinishJob,
+  }),
 }));
 
 jest.mock("@/context/OfflineSyncContext", () => ({
@@ -46,10 +50,15 @@ describe("TechnicianHubPage", () => {
     });
   });
 
-  it("renders missions layout", () => {
+  it("renders missions layout with detail view by default", () => {
     render(<TechnicianHubPage slotIndex={2} />);
 
     expect(screen.getByTestId("dashboard-pager-slot-2")).toBeInTheDocument();
     expect(screen.getByTestId("technician-dashboard-list")).toBeInTheDocument();
+    expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
+      "data-technician-center-view",
+      "detail",
+    );
+    expect(screen.queryByTestId("technician-finish-job-layer")).not.toBeInTheDocument();
   });
 });

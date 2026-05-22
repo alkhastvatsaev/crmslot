@@ -1,6 +1,8 @@
 import { doc, updateDoc } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 import type { Intervention } from "@/features/interventions/types";
+import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
+import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import {
   candidateRangeFromScheduleFields,
   findTechnicianScheduleConflicts,
@@ -16,6 +18,7 @@ export type UpdateInterventionScheduleParams = {
   scheduledTime?: string;
   /** Si true, écrit malgré le chevauchement (dispatch). */
   force?: boolean;
+  audit?: { actorUid: string; actorRole: WorkflowOwnerRole; note?: string };
 };
 
 export type UpdateInterventionScheduleResult =
@@ -65,5 +68,22 @@ export async function updateInterventionSchedule(
   }
 
   await updateDoc(doc(db, "interventions", intervention.id), patch);
+
+  if (params.audit) {
+    const scheduleNote = [
+      scheduledDate ?? intervention.scheduledDate,
+      scheduledTime ?? intervention.scheduledTime,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    await logCrmInterventionAction({
+      kind: "intervention_schedule_updated",
+      iv: intervention,
+      actorUid: params.audit.actorUid,
+      actorRole: params.audit.actorRole,
+      note: params.audit.note ?? (scheduleNote ? `Créneau ${scheduleNote}` : "Planning mis à jour"),
+    });
+  }
+
   return { ok: true };
 }

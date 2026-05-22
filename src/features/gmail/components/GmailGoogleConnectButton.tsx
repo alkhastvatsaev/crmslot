@@ -8,6 +8,9 @@ import styles from "@/features/gmail/components/GmailGoogleConnectButton.module.
 type Props = {
   onClick: () => void;
   disabled?: boolean;
+  /** Surcharge accessibilité (ex. portail client). */
+  ariaLabel?: string;
+  dataTestId?: string;
 };
 
 const BRAND_ASSETS = {
@@ -32,9 +35,14 @@ const BRAND_ASSETS = {
 const PRESS_FEEDBACK_MS = 140;
 
 /** Bouton Google pré-approuvé (asset officiel) — clic → OAuth BELGMAP. */
-export default function GmailGoogleConnectButton({ onClick, disabled }: Props) {
+export default function GmailGoogleConnectButton({
+  onClick,
+  disabled,
+  ariaLabel,
+  dataTestId = "gmail-hub-connect-btn",
+}: Props) {
   const { t, language } = useTranslation();
-  const label = String(t("gmail.hub.connect_with_google"));
+  const label = ariaLabel ?? String(t("gmail.hub.connect_with_google"));
   const asset = BRAND_ASSETS[language] ?? BRAND_ASSETS.fr;
   const [pressed, setPressed] = useState(false);
   const pendingOAuthRef = useRef(false);
@@ -55,7 +63,7 @@ export default function GmailGoogleConnectButton({ onClick, disabled }: Props) {
   return (
     <button
       type="button"
-      data-testid="gmail-hub-connect-btn"
+      data-testid={dataTestId}
       disabled={disabled}
       onClick={handleClick}
       onPointerDown={() => {

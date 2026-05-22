@@ -10,7 +10,7 @@ export interface RequesterProfile {
   lastName: string;
   companyName: string;
   phone: string;
-  defaultAddress: string;
+  email: string;
   defaultLatLng?: { lat: number; lng: number };
   accessCode: string;
 }
@@ -62,7 +62,7 @@ const defaultProfile: RequesterProfile = {
   lastName: "",
   companyName: "",
   phone: "",
-  defaultAddress: "",
+  email: "",
   accessCode: "",
 };
 

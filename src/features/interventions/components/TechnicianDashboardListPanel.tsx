@@ -139,7 +139,7 @@ export default function TechnicianDashboardListPanel({
         <h2 className="sr-only">{t("technician_hub.dashboard.list.missions_title")}</h2>
 
         {offlineAuth ? (
-          <p className="rounded-[14px] border border-amber-200/50 bg-amber-50/80 px-3 py-2 text-[12px] font-medium text-amber-950">
+          <p className="rounded-[14px] border border-neutral-200 bg-neutral-50 px-3 py-2 text-[12px] font-medium text-neutral-700">
             {t("technician_hub.dashboard.list.offline_auth_warning")}
           </p>
         ) : null}
@@ -194,7 +194,6 @@ export default function TechnicianDashboardListPanel({
                     iv={iv}
                     index={index}
                     isSelected={selectedCaseId === iv.id}
-                    technicianUid={firebaseUid!}
                     onSelect={() => onSelect(iv.id)}
                   />
                 ) : (

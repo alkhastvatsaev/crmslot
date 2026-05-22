@@ -1,6 +1,11 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getDatabase, type Database } from 'firebase/database';
-import { enableMultiTabIndexedDbPersistence, initializeFirestore } from 'firebase/firestore';
+import {
+  enableMultiTabIndexedDbPersistence,
+  getFirestore,
+  initializeFirestore,
+  type Firestore,
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
@@ -31,26 +36,46 @@ const firebaseConfig = {
 
 const isConfigured = !!firebaseConfig.projectId;
 
-const app = isConfigured 
-  ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)) 
+const app = isConfigured
+  ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig))
   : null;
 
-// Ancienne Realtime Database — projet basé sur Firestore uniquement : laisser `null` sans NEXT_PUBLIC_FIREBASE_DATABASE_URL.
 const db: Database | null =
   app && realtimeDatabaseUrl ? getDatabase(app) : null;
 
-// Nouvelle base de données avec mode HORS-LIGNE (Firestore) et forçage du Long Polling pour Vercel/Node
-const firestore = app ? initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-}) : null;
+/**
+ * Une seule instance Firestore par app (évite INTERNAL ASSERTION sur HMR / double init).
+ * Long polling uniquement hors navigateur (SSR) — en client WebChannel + persistence est plus stable.
+ */
+function getOrInitFirestore(firebaseApp: FirebaseApp): Firestore {
+  const forceLongPolling =
+    typeof window === 'undefined' ||
+    process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === 'true';
 
-// Authentification + fichiers (photos fin d’intervention)
+  if (!forceLongPolling) {
+    try {
+      return getFirestore(firebaseApp);
+    } catch {
+      /* pas encore initialisé */
+    }
+    return initializeFirestore(firebaseApp, {});
+  }
+
+  try {
+    return getFirestore(firebaseApp);
+  } catch {
+    return initializeFirestore(firebaseApp, { experimentalForceLongPolling: true });
+  }
+}
+
+const firestore = app ? getOrInitFirestore(app) : null;
+
 const auth = app ? getAuth(app) : null;
 const storage = app ? getStorage(app) : null;
 
-// Activer le cache hors-ligne uniquement côté client (navigateur)
-if (typeof window !== 'undefined' && firestore) {
-  enableMultiTabIndexedDbPersistence(firestore).catch((err) => {
+/** Persistence IndexedDB : utile en prod PWA ; en dev/HMR elle amplifie les races listener (assertion ca9). */
+if (typeof window !== 'undefined' && firestore && process.env.NODE_ENV === 'production') {
+  enableMultiTabIndexedDbPersistence(firestore).catch((err: { code?: string }) => {
     if (err.code === 'failed-precondition') {
       console.warn("Le mode hors-ligne ne peut être activé que sur un seul onglet à la fois.");
     } else if (err.code === 'unimplemented') {

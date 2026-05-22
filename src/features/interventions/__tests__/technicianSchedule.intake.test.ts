@@ -59,7 +59,7 @@ describe("interventionVisibleInTechnicianMissionList", () => {
     expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(true);
   });
 
-  it("hides accepted missions outside the today tab window", () => {
+  it("keeps accepted en_route missions visible even if not scheduled today", () => {
     const row = {
       ...iv("en_route"),
       assignedTechnicianUid: techUid,
@@ -67,7 +67,7 @@ describe("interventionVisibleInTechnicianMissionList", () => {
       scheduledDate: "2030-01-01",
       scheduledTime: "09:00",
     };
-    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(false);
+    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(true);
   });
 
   it("shows accepted missions scheduled for today", () => {

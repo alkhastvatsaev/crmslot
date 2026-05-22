@@ -31,6 +31,18 @@ export default function ClientPortalAuthEffects() {
         }
       } catch (e) {
         console.warn("[ClientPortalAuthEffects] getRedirectResult", e);
+        const code =
+          e !== null && typeof e === "object" && "code" in e && typeof (e as { code: unknown }).code === "string"
+            ? (e as { code: string }).code
+            : "";
+        if (code && code !== "auth/popup-closed-by-user") {
+          toast.error("Connexion Google impossible", {
+            description:
+              code === "auth/operation-not-allowed"
+                ? "Activez le fournisseur Google dans Firebase Console → Authentication."
+                : code,
+          });
+        }
       }
 
       try {

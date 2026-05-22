@@ -47,6 +47,12 @@ export type ChatbotStreamEvent =
     }
   | { type: "supplier_order_pdf"; companyId: string; orderId: string }
   | { type: "registry_refresh" }
+  | {
+      type: "focus_stock_hub";
+      companyId: string;
+      stockItemId?: string | null;
+      filter?: "all" | "low" | "orders" | "lecot";
+    }
   | { type: "quick_actions"; actions: ChatbotQuickAction[] }
   | { type: "done"; apiMessages?: unknown[] }
   | { type: "error"; message: string };

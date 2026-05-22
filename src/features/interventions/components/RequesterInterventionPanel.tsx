@@ -8,10 +8,12 @@ import { useRequesterHub } from "../context/RequesterHubContext";
 import { ImagePlus, Loader2, MapPin, Mic, SendHorizontal, Trash2, Square, Play, Pause, Download } from "lucide-react";
 import { SmartTimeSlotPicker } from "./SmartTimeSlotPicker";
 import { toast } from "sonner";
-import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, setDoc, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -23,6 +25,8 @@ import {
   type SmartFormTemplate,
 } from "@/features/interventions/smartInterventionConstants";
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
+import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
+import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
 import SmartFormAddressAutocomplete from "@/features/interventions/components/SmartFormAddressAutocomplete";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
@@ -193,9 +197,17 @@ export default function RequesterInterventionPanel() {
     validationFailedCount,
   } = useRequesterHub();
   const workspace = useCompanyWorkspaceOptional();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const pager = useDashboardPagerOptional();
+  const portalDefaultCompanyId =
+    typeof process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID === "string"
+      ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim()
+      : "";
   const tenantCompanyId = workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
   const interventionCompanyId =
-    tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
+    tenantCompanyId ??
+    (portalDefaultCompanyId || null) ??
+    (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
   const { t, language } = useTranslation();
   const locale = language === "nl" ? "nl-BE" : language === "en" ? "en-GB" : "fr-BE";
   const [locatingAddress, setLocatingAddress] = useState(false);
@@ -241,12 +253,7 @@ export default function RequesterInterventionPanel() {
     });
   }, [language, problemTemplateId, problemLabel, t, setRequestData]);
 
-  // Use profile.defaultAddress if interventionAddress is empty
-  useEffect(() => {
-    if (!interventionAddress && profile.defaultAddress) {
-      setRequestData((prev) => ({ ...prev, interventionAddress: profile.defaultAddress }));
-    }
-  }, [profile.defaultAddress, interventionAddress, setRequestData]);
+  // Address logic previously used profile.defaultAddress here, removed per user request
 
   // Voice dictation
   const appendDescriptionFromVoice = useCallback(
@@ -415,7 +422,7 @@ export default function RequesterInterventionPanel() {
       if (!profile.firstName.trim()) missingProfileFields.push("firstName");
       if (!profile.lastName.trim()) missingProfileFields.push("lastName");
       if (!profile.phone.trim()) missingProfileFields.push("phone");
-      if (!profile.defaultAddress.trim()) missingProfileFields.push("defaultAddress");
+      if (!profile.email.trim()) missingProfileFields.push("email");
 
       if (missingProfileFields.length > 0) {
         triggerValidation();
@@ -440,12 +447,31 @@ export default function RequesterInterventionPanel() {
       toast.error(String(t("requester.toasts.company_required")));
       return;
     }
-    
+    if (!interventionCompanyId) {
+      toast.error(String(t("requester.toasts.company_required")));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const user = await ensureUserForInterventionSubmit();
       if (!user || !firestore) {
         toast.error(String(t("requester.toasts.auth_failed")));
+        return;
+      }
+
+      // DUPLICATE CHECK BEFORE SUBMISSION
+      const problemForDedupe = description.trim() || problemLabel.trim();
+      const qDup = query(collection(firestore, "interventions"), where("companyId", "==", interventionCompanyId));
+      const snapDup = await getDocs(qDup);
+      const existing = snapDup.docs.map(d => ({ id: d.id, ...d.data() } as any));
+      const matches = findPotentialDuplicates({ address: interventionAddress.trim(), problem: problemForDedupe }, existing, 0.95);
+      
+      if (matches.length > 0) {
+        toast.error("VOTRE ENTREPRISE A DEJA FAIT CETTE DEMANDE", {
+           description: "Une demande identique a déjà été soumise."
+        });
+        setIsSubmitting(false);
         return;
       }
 
@@ -485,66 +511,83 @@ export default function RequesterInterventionPanel() {
       const hour =
         interventionTime ||
         new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
-      const problemForDedupe = description.trim() || problemLabel.trim();
 
-      // BACKGROUND TASK (Ne pas attendre pour débloquer l'interface)
+      let lat = interventionLatLng?.lat;
+      let lng = interventionLatLng?.lng;
+      if (lat === undefined || lng === undefined) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        try {
+          const geo = await fetchWithAuth(
+            `/api/maps/geocode?q=${encodeURIComponent(interventionAddress.trim())}`,
+            { signal: controller.signal },
+          );
+          const gj = (await geo.json()) as { location?: { lat: number; lng: number } };
+          lat = gj.location?.lat ?? 50.8466;
+          lng = gj.location?.lng ?? 4.3522;
+        } catch {
+          lat = 50.8466;
+          lng = 4.3522;
+        } finally {
+          clearTimeout(timeoutId);
+        }
+      }
+
+      const portalUser =
+        profile.type === "login" && auth?.currentUser && !auth.currentUser.isAnonymous
+          ? auth.currentUser
+          : null;
+      let clientFirstRaw = profile.firstName.trim();
+      let clientLastRaw = profile.lastName.trim();
+      if (portalUser && !clientFirstRaw && !clientLastRaw && portalUser.displayName?.trim()) {
+        const parts = portalUser.displayName.trim().split(/\s+/);
+        clientFirstRaw = parts[0] ?? "";
+        clientLastRaw = parts.slice(1).join(" ");
+      }
+      const clientPhoneRaw = (profile.phone.trim() || (portalUser?.phoneNumber ?? "").trim());
+
+      await setDoc(newDocRef, {
+        title,
+        address: interventionAddress.trim(),
+        time: hour,
+        status: "pending",
+        location: { lat, lng },
+        urgency,
+        problem: problemForDedupe,
+        category: "serrurerie",
+        createdAt: nowIso,
+        createdByUid: user.uid,
+        assignedTechnicianUid: null,
+        companyId: interventionCompanyId,
+        ...(photoDataUrls.length ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) } : {}),
+        ...(clientFirstRaw ? { clientFirstName: capitalizeName(clientFirstRaw) } : {}),
+        ...(clientLastRaw ? { clientLastName: capitalizeName(clientLastRaw) } : {}),
+        ...(clientPhoneRaw ? { clientPhone: clientPhoneRaw } : {}),
+        ...(profile.email.trim() ? { clientEmail: profile.email.trim() } : {}),
+        ...(interventionDate ? { requestedDate: interventionDate } : {}),
+        ...(interventionTime ? { requestedTime: interventionTime } : {}),
+        ...(demoAudioUrlForDoc && isPersistableClientAudioUrl(demoAudioUrlForDoc)
+          ? { audioUrl: demoAudioUrlForDoc }
+          : {}),
+      });
+
+      void logCrmInterventionCreated({
+        intervention: {
+          id: newDocRef.id,
+          title,
+          address: interventionAddress.trim(),
+          status: "pending",
+          companyId: interventionCompanyId,
+          ...(clientFirstRaw ? { clientFirstName: capitalizeName(clientFirstRaw) } : {}),
+          ...(clientLastRaw ? { clientLastName: capitalizeName(clientLastRaw) } : {}),
+        },
+        actorUid: user.uid,
+        actorRole: "client",
+        source: "hub_requester_panel",
+      });
+
       void (async () => {
         try {
-          let lat = interventionLatLng?.lat;
-          let lng = interventionLatLng?.lng;
-          if (lat === undefined || lng === undefined) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            try {
-              const geo = await fetchWithAuth(`/api/maps/geocode?q=${encodeURIComponent(interventionAddress.trim())}`, { signal: controller.signal });
-              const gj = (await geo.json()) as { location?: { lat: number; lng: number } };
-              lat = gj.location?.lat ?? 50.8466;
-              lng = gj.location?.lng ?? 4.3522;
-            } catch {
-              lat = 50.8466;
-              lng = 4.3522;
-            } finally {
-              clearTimeout(timeoutId);
-            }
-          }
-
-          const portalUser =
-            profile.type === "login" && auth?.currentUser && !auth.currentUser.isAnonymous
-              ? auth.currentUser
-              : null;
-          let clientFirstRaw = profile.firstName.trim();
-          let clientLastRaw = profile.lastName.trim();
-          if (portalUser && !clientFirstRaw && !clientLastRaw && portalUser.displayName?.trim()) {
-            const parts = portalUser.displayName.trim().split(/\s+/);
-            clientFirstRaw = parts[0] ?? "";
-            clientLastRaw = parts.slice(1).join(" ");
-          }
-          const clientPhoneRaw = (profile.phone.trim() || (portalUser?.phoneNumber ?? "").trim());
-
-          await setDoc(newDocRef, {
-            title,
-            address: interventionAddress.trim(),
-            time: hour,
-            status: "pending",
-            location: { lat, lng },
-            urgency,
-            problem: problemForDedupe,
-            category: "serrurerie",
-            createdAt: nowIso,
-            createdByUid: user.uid,
-            assignedTechnicianUid: null,
-            ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
-            ...(photoDataUrls.length ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) } : {}),
-            ...(clientFirstRaw ? { clientFirstName: capitalizeName(clientFirstRaw) } : {}),
-            ...(clientLastRaw ? { clientLastName: capitalizeName(clientLastRaw) } : {}),
-            ...(clientPhoneRaw ? { clientPhone: clientPhoneRaw } : {}),
-            ...(interventionDate ? { requestedDate: interventionDate } : {}),
-            ...(interventionTime ? { requestedTime: interventionTime } : {}),
-            ...(demoAudioUrlForDoc && isPersistableClientAudioUrl(demoAudioUrlForDoc)
-              ? { audioUrl: demoAudioUrlForDoc }
-              : {}),
-          });
-
           if (audioBlob && audioBlob.size > 0) {
             const mime = audioBlob.type || "audio/webm";
             const ext = mime.includes("mp4") ? "m4a" : "webm";
@@ -611,6 +654,9 @@ export default function RequesterInterventionPanel() {
           console.error("Background submission error:", bgErr);
         }
       })();
+
+      inboxIntent?.setPendingInboxId(newDocRef.id);
+      pager?.setPageIndex(0);
 
       setLastSubmittedRequest({
         problemTemplateId,
@@ -679,6 +725,7 @@ export default function RequesterInterventionPanel() {
                       <motion.button
                         key={tpl.id}
                         type="button"
+                        data-testid={`smart-form-template-${tpl.id}`}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.96 }}
                         onClick={() => handleProblemSelect(tpl)}
@@ -1015,6 +1062,7 @@ export default function RequesterInterventionPanel() {
                 <div className="mt-auto pt-4 pb-2">
                   <button
                     type="button"
+                    data-testid="intervention-submit-btn"
                     disabled={!canSubmit}
                     onClick={handleSubmit}
                     className="flex w-fit mx-auto min-w-[280px] px-8 items-center justify-center gap-2 rounded-[20px] bg-black py-4 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"

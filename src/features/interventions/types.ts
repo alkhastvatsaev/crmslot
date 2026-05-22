@@ -38,6 +38,7 @@ export interface Intervention {
   clientLastName?: string | null;
   clientCompanyName?: string | null;
   clientPhone?: string | null;
+  clientEmail?: string | null;
   urgency?: boolean;
   category?: 'serrurerie' | 'autre';
   problem?: string | null;
@@ -64,6 +65,9 @@ export interface Intervention {
   technicianAcceptedAt?: string | null;
   technicianDeclinedAt?: string | null;
   technicianDeclinedByUid?: string | null;
+  /** Retour file IVANA « Demandes » (refus terrain ou acceptation non confirmée). */
+  returnedToRequestsAt?: string | null;
+  returnedToRequestsReason?: "technician_declined" | "accept_failed" | null;
   /** Planification optionnelle (AAAA-MM-JJ + HH:mm), sinon repli sur createdAt. */
   scheduledDate?: string | null;
   scheduledTime?: string | null;
@@ -116,8 +120,6 @@ export interface Intervention {
   requiredSkills?: string[] | null;
   /** Géofencing — arrivée auto détectée (Phase 17). */
   autoArrivedAt?: string | null;
-  /** Email client — enregistré automatiquement lors d'un envoi via chatbot. */
-  clientEmail?: string | null;
   /** WhatsApp client (Phase 19). */
   clientWhatsapp?: string | null;
   /** Satisfaction client post-intervention (1–5 étoiles). */

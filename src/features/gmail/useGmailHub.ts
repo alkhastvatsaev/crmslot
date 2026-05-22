@@ -14,6 +14,8 @@ import type {
 type UseGmailHubOptions = {
   /** Dossier actif (INBOX, SENT, …) — recharge la liste quand il change. */
   labelId?: string;
+  /** false = pas d’appels API (page carrousel hors écran). */
+  enabled?: boolean;
 };
 
 function patchUnreadInList(
@@ -36,6 +38,7 @@ function patchUnreadInList(
 
 export function useGmailHub(options: UseGmailHubOptions = {}) {
   const labelId = options.labelId ?? "INBOX";
+  const enabled = options.enabled !== false;
   const inboxLoadedRef = useRef(false);
   const lastLabelRef = useRef<string | null>(null);
 
@@ -317,26 +320,33 @@ export function useGmailHub(options: UseGmailHubOptions = {}) {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     void refreshStatus();
-  }, [refreshStatus]);
+  }, [refreshStatus, enabled]);
 
   useEffect(() => {
-    if (!status?.oauthConfigured) return;
-    void refreshLabels();
-  }, [status?.oauthConfigured, refreshLabels]);
-
-  useEffect(() => {
+    if (!enabled) {
+      inboxLoadedRef.current = false;
+      lastLabelRef.current = null;
+      return;
+    }
     if (!status?.oauthConfigured) {
       inboxLoadedRef.current = false;
       lastLabelRef.current = null;
       return;
     }
-    if (lastLabelRef.current === labelId && inboxLoadedRef.current) return;
+    const firstInboxLoad = !inboxLoadedRef.current;
+    const labelChanged = lastLabelRef.current !== labelId;
+    if (!firstInboxLoad && !labelChanged) return;
+
     lastLabelRef.current = labelId;
     inboxLoadedRef.current = true;
     setNextPageToken(null);
-    void loadMessages({ labelId });
-  }, [status?.oauthConfigured, labelId, loadMessages]);
+
+    const tasks: Promise<unknown>[] = [loadMessages({ labelId })];
+    if (firstInboxLoad) tasks.push(refreshLabels());
+    void Promise.all(tasks);
+  }, [enabled, status?.oauthConfigured, labelId, loadMessages, refreshLabels]);
 
   return {
     status,

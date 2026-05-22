@@ -75,3 +75,4 @@ photos portes/
 # Données d'entraînement chatbot (générées localement — ne pas committer)
 data/chatbot-training/
 training-data/
+node_modules

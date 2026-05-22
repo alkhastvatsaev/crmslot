@@ -24,6 +24,10 @@ import type {
   GmailHubLabel,
   GmailHubMessageDetail,
 } from "@/features/gmail/gmailHubTypes";
+import type {
+  GmailLoadAttachmentFn,
+  GmailPdfAttachmentPreview,
+} from "@/features/gmail/useGmailPdfAttachmentPreviews";
 
 type ComposeState = {
   to: string;
@@ -56,7 +60,8 @@ type Props = {
   pdfPreviewError: string | null;
   pdfPreviewAttachmentId: string | null;
   pdfPreviewLoadingId: string | null;
-  onOpenPdf: (att: GmailHubAttachment) => void;
+  loadAttachment?: GmailLoadAttachmentFn;
+  onOpenPdf: (att: GmailHubAttachment, preview?: GmailPdfAttachmentPreview | null) => void;
   onClosePdf: () => void;
 };
 
@@ -85,6 +90,7 @@ export default function GmailHubReaderPane({
   pdfPreviewError,
   pdfPreviewAttachmentId,
   pdfPreviewLoadingId,
+  loadAttachment,
   onOpenPdf,
   onClosePdf,
 }: Props) {
@@ -360,9 +366,11 @@ export default function GmailHubReaderPane({
 
               {focused && (tm.attachments ?? []).length > 0 ? (
                 <GmailHubAttachments
+                  messageId={tm.id}
                   attachments={tm.attachments ?? []}
                   activeAttachmentId={pdfPreviewAttachmentId}
                   loadingId={pdfPreviewLoadingId}
+                  loadAttachment={loadAttachment}
                   onOpenPdf={onOpenPdf}
                 />
               ) : null}

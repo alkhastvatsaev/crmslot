@@ -99,8 +99,10 @@ export default function TechnicianBillingLinesForm({
     if (!listening && dictatedText.trim()) {
       const textToAnalyze = dictatedText;
       setDictatedText("");
-      handleDictationResult(textToAnalyze);
+      void handleDictationResult(textToAnalyze);
     }
+    // handleDictationResult is intentionally excluded: it only calls setLines which is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listening, dictatedText]);
 
   const handleLoadTemplate = (templateId: string) => {

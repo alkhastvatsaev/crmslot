@@ -7,6 +7,7 @@ import {
   newDownloadToken,
 } from "./buildInterventionInvoicePdf";
 import { runCommissionOnInvoiced } from "./commissionAutomation";
+import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivity";
 
 function completionPhotoUrls(data: admin.firestore.DocumentData): string[] {
   const structured = Array.isArray(data.completionPhotos)
@@ -95,6 +96,33 @@ export async function runAutoInvoiceGeneration(event: {
   const invoicedData = invoicedSnap.data();
   if (invoicedData) {
     await runCommissionOnInvoiced(interventionId, invoicedData);
+  }
+
+  const companyId =
+    typeof after.companyId === "string" && after.companyId.trim()
+      ? after.companyId.trim()
+      : typeof invoicedData?.companyId === "string"
+        ? invoicedData.companyId.trim()
+        : "";
+  if (companyId) {
+    const title = typeof after.title === "string" ? after.title : "Dossier";
+    const clientName =
+      typeof after.clientName === "string"
+        ? after.clientName
+        : [after.clientFirstName, after.clientLastName].filter(Boolean).join(" ").trim() || null;
+    await logCompanyCrmActivityAdmin(companyId, {
+      kind: "intervention_invoiced",
+      at: new Date().toISOString(),
+      actorUid: "system",
+      actorRole: "system",
+      interventionId,
+      interventionTitle: title,
+      clientName,
+      address: typeof after.address === "string" ? after.address : null,
+      statusBefore: "done",
+      statusAfter: "invoiced",
+      note: `Facture PDF générée (${Math.round(invoiceAmountCents) / 100} €)`,
+    }).catch((e) => logger.warn("CRM log invoice failed", e));
   }
 
   logger.info("Auto invoice generated", { interventionId, objectPath });

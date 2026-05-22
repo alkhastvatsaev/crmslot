@@ -65,7 +65,7 @@ export function FieldIconButtonRow({
   testId?: string;
 }) {
   return (
-    <div data-testid={testId} className={cn("flex items-center justify-center gap-3", className)}>
+    <div data-testid={testId} className={cn("flex flex-wrap items-center justify-center gap-3", className)}>
       {children}
     </div>
   );

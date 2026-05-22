@@ -138,6 +138,21 @@
         { "fieldPath": "isActive", "order": "ASCENDING" },
         { "fieldPath": "label", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "status_events",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "crm_activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "at", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

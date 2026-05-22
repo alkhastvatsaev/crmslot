@@ -7,6 +7,7 @@ import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { subscribeQuotes, updateQuoteStatus } from "../quoteFirestore";
 import QuoteStatusBadge from "./QuoteStatusBadge";
 import QuoteEditorPanel from "./QuoteEditorPanel";
@@ -46,7 +47,25 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
   const handleRespond = async (quote: Quote, accept: boolean) => {
     if (!firestore) return;
     try {
-      await updateQuoteStatus(firestore, companyId, quote.id, accept ? "accepted" : "declined");
+      const nextStatus = accept ? "accepted" : "declined";
+      await updateQuoteStatus(firestore, companyId, quote.id, nextStatus);
+      await logCrmCompanyAction({
+        companyId,
+        kind: "quote_status_changed",
+        actorUid: workspace?.firebaseUid ?? "system",
+        actorRole: "dispatcher",
+        statusBefore: quote.status as any,
+        statusAfter: nextStatus as any,
+        note: quote.notes || undefined,
+        intervention: {
+          id: quote.id,
+          title: `Devis ${quote.id.substring(0, 8)}`,
+          status: nextStatus,
+          clientName: quote.clientName || undefined,
+          clientCompanyName: quote.clientName || undefined,
+          address: "",
+        } as any,
+      });
       toast.success(accept ? String(t("quotes.toast_accepted")) : String(t("quotes.toast_declined")));
     } catch {
       toast.error(String(t("common.error")));

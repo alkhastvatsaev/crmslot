@@ -29,7 +29,11 @@ export function AllTheProviders({
 }: AllTheProvidersProps) {
   // Keep unit tests lightweight and deterministic.
   if (process.env.NODE_ENV === "test") {
-    return <I18nProvider>{children}</I18nProvider>;
+    return (
+      <I18nProvider>
+        <TechnicianQueryProvider>{children}</TechnicianQueryProvider>
+      </I18nProvider>
+    );
   }
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { DEMO_COMPANY_ID, devUiPreviewEnabled, stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
@@ -11,7 +11,7 @@ import { filterInterventionsByCompany } from "@/features/backoffice/filterInterv
 export function useBackOfficeInterventions(companyId: string | null) {
   const cidForEffect = (companyId ?? "").trim();
 
-  const isDemo = devUiPreviewEnabled && cidForEffect === DEMO_COMPANY_ID;
+  const isDemoCompany = devUiPreviewEnabled && cidForEffect === DEMO_COMPANY_ID;
   const noFirestore = !isConfigured || !firestore;
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
@@ -52,14 +52,15 @@ export function useBackOfficeInterventions(companyId: string | null) {
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
 
-  if (isDemo) {
-    return { interventions: demoInterventionsForCompany(cidForEffect), loading: false, error: null, firebaseUid };
-  }
+  const displayInterventions = useMemo(() => {
+    if (!isDemoCompany || interventions.length > 0) return interventions;
+    return demoInterventionsForCompany(cidForEffect);
+  }, [interventions, isDemoCompany, cidForEffect]);
 
   if (!cidForEffect || noFirestore) {
-    return { interventions, loading: false, error: null, firebaseUid };
+    return { interventions: displayInterventions, loading: false, error: null, firebaseUid };
   }
 
   const loading = loadedCid !== cidForEffect;
-  return { interventions, loading, error, firebaseUid };
+  return { interventions: displayInterventions, loading, error, firebaseUid };
 }

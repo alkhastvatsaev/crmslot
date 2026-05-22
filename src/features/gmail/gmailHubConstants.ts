@@ -1,5 +1,5 @@
 /** Index carrousel du hub Gmail PWA (6ᵉ page, index 0-based). */
-export const GMAIL_HUB_SLOT_INDEX = 5;
+export const GMAIL_HUB_SLOT_INDEX = 4;
 
 /** Libellés système Gmail affichés dans le rail gauche. */
 export const GMAIL_HUB_SYSTEM_LABELS = [

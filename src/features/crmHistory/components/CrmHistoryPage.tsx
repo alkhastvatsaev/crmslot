@@ -1,0 +1,100 @@
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import { useTranslation } from "@/core/i18n/I18nContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
+import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLayout";
+import { CRM_HISTORY_SLOT_INDEX } from "../crmHistoryConstants";
+import { useCrmActivityFeed } from "../hooks/useCrmActivityFeed";
+import { useCrmNewEventHighlight } from "../hooks/useCrmNewEventHighlight";
+import type { CrmActivityEvent } from "../crmActivityTypes";
+import CrmHistoryCenterFeed from "./CrmHistoryCenterFeed";
+
+type Props = { slotIndex?: number };
+
+const railShell = `flex min-h-0 flex-1 flex-col ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
+
+export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: Props) {
+  const humanPage = slotIndex + 1;
+  const { t } = useTranslation();
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId =
+    (workspace?.activeCompanyId ?? "").trim() ||
+    (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+
+  const pager = useDashboardPagerOptional();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const pageActive = pager == null || pager.pageIndex === slotIndex;
+
+  const { events, loading, refreshing, feedError } = useCrmActivityFeed(
+    companyId,
+    "all",
+    "all",
+    "",
+    { enabled: pageActive },
+  );
+
+  const newEventIds = useCrmNewEventHighlight(events, { enabled: pageActive });
+  const prevHighlightSizeRef = useRef(0);
+
+  useEffect(() => {
+    if (!pageActive) {
+      prevHighlightSizeRef.current = 0;
+      return;
+    }
+    if (newEventIds.size <= prevHighlightSizeRef.current) return;
+    const delta = newEventIds.size - prevHighlightSizeRef.current;
+    prevHighlightSizeRef.current = newEventIds.size;
+    toast.message(String(t("crmHistory.new_activity_toast")), {
+      description:
+        delta === 1
+          ? String(t("crmHistory.new_activity_one"))
+          : String(t("crmHistory.new_activity_many")).replace("{count}", String(delta)),
+      duration: 3500,
+    });
+  }, [newEventIds.size, pageActive, t]);
+
+  const handleEventClick = useCallback(
+    (event: CrmActivityEvent) => {
+      if (!event.interventionId) return;
+      inboxIntent?.setPendingInboxId(event.interventionId);
+      navigateBackOfficeHub(pager);
+    },
+    [inboxIntent, pager],
+  );
+
+  return (
+    <DashboardTriplePanelLayout
+      rootTestId={`dashboard-pager-slot-${slotIndex}`}
+      leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
+      centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
+      rightTestId={`dashboard-pager-slot-${slotIndex}-panel-right`}
+      leftAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.left")}`}
+      centerAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.center")}`}
+      rightAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.right")}`}
+      left={<section className={railShell} />}
+      center={
+        <section className={`${railShell} overflow-hidden`}>
+          <CrmHistoryCenterFeed
+            events={events}
+            loading={loading}
+            refreshing={refreshing}
+            live={pageActive}
+            newEventIds={newEventIds}
+            feedError={feedError}
+            onEventClick={handleEventClick}
+          />
+        </section>
+      }
+      centerPadding={false}
+      rightPadding={false}
+      right={<section className={railShell} />}
+    />
+  );
+}

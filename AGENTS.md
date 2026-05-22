@@ -16,6 +16,18 @@ This project follows a strict testing architecture to prevent regressions and as
 7. **Continuous Integration**: GitHub Actions runs `npm run typecheck` and `npm run test:coverage` on every push and PR to `main`. Ensure all code modifications pass `npm run test:ci` locally before considering a task complete. For a quick loop on one file or pattern, use `npx jest <path-or-pattern> --no-coverage` (Jest CLI args do not always pass through `npm run` the way you expect; `npx jest` is the reliable shortcut).
 8. **Chatbot (Codex / agents)**: Plan détaillé et checklist dans [`docs/TESTING.md`](docs/TESTING.md) §3. Fichiers source : `chatbot-tools.ts`, `chatbot-tool-executor.ts`, `chatbot-openai.ts`, `chatbot-route-handler.ts`, `chatbot-document-action-handler.ts`, `hooks/useChatbot.ts` — **jamais** les copies `* 2.ts` / `* 3.ts`. Après toute modif sous `src/features/chatbot/**` ou `src/app/api/ai/chatbot/**` : `npm run test:chatbot` puis `npm run test:ci` avant merge. Les PR qui touchent ce module déclenchent aussi le job CI `Chatbot tests` (`.github/workflows/chatbot-tests.yml`). Nouvel outil = définition + executor + test routing/executor (+ intent local si applicable). Routes API : logique dans les handlers, pas dans `route.ts`.
 
+## Patterns obligatoires pour les steppers (pages 2 & 3)
+
+Ces règles s'appliquent à tout composant à étapes multiples utilisant `AnimatePresence`.
+
+9. **Stepper invariants**: Tout wizard multi-étapes (`RequesterInterventionPanel`, `TechnicianFinishJobPanel`, etc.) doit avoir au minimum ces 3 tests : (a) indicateur d'étape actif sur la bonne étape à chaque transition, (b) bouton retour ramène à l'étape précédente, (c) soumission finale appelle le service métier avec les bons arguments. Utiliser `waitFor` après chaque `fireEvent.click` pour attendre la transition.
+
+10. **Context persistence**: Pour un context React qui persiste en `localStorage` (ex. `RequesterHubContext`), tester obligatoirement : (a) `persist → restore` — JSON sérialisé puis désérialisé conserve les données, (b) `resetAll` — l'état retourne aux valeurs par défaut, (c) toute migration de champ legacy (`societe → login`). Ne pas mocker `localStorage` — le vrai `localStorage` de jsdom est suffisant.
+
+11. **Form submit : 3 tests minimum**: Tout formulaire qui appelle un service réseau (Firestore, fetch, upload) doit avoir au moins : (a) soumission bloquée si champ obligatoire manquant, (b) soumission bloquée si utilisateur non authentifié, (c) soumission réussie vérifie les arguments passés au service. Penser à surcharger `@/core/config/firebase` dans le fichier de test si le composant vérifie `auth.currentUser` (le mock global met `currentUser: null`).
+
+12. **Panneaux vides = bug latent**: Si un `DashboardTriplePanelLayout` a un panneau gauche ou droit vide (`<section></section>`), c'est un indicateur que les sous-composants n'ont pas été câblés. Vérifier si des composants orphelins (non importés mais présents dans le dossier `components/`) doivent y être rendus. Ajouter un mock `jest.mock("@/features/featureHub/companyStockChatbot", ...)` si le sous-composant utilise `navigateToChatbotWithPrompt`.
+
 ## Glossaire UI — hub société (carrousel)
 
 - **Qui demande ?** : rail gauche (`CompanyHubPage`) — `RequesterProfilePanel` (`Particulier` / `Login`). Onglet Login : `ClientPortalAuthPanel` en `authRailMode` (`data-testid="requester-login-rail"`). Section `data-testid="company-hub-rail-demande"`. Ancre : `COMPANY_HUB_ANCHOR_WORKSPACE` (`company-hub-workspace`). `dashboard-secondary-panel-left`.

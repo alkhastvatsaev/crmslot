@@ -36,6 +36,8 @@ export function interventionSearchHaystack(row: Record<string, unknown>): string
     row.clientCompanyName,
     row.clientPhone,
     row.phone,
+    row.clientEmail,
+    row.email,
     row.title,
     row.problem,
     row.address,

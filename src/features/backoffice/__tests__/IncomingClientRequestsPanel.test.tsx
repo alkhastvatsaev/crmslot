@@ -1,13 +1,19 @@
 import { fireEvent, waitFor } from "@testing-library/react";
-import { updateDoc } from "firebase/firestore";
 import { render, screen } from "@/test-utils/render";
+import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Intervention } from "@/features/interventions/types";
 import IncomingClientRequestsPanel from "@/features/backoffice/components/IncomingClientRequestsPanel";
 
-const mockUpdateDoc = updateDoc as jest.MockedFunction<typeof updateDoc>;
+jest.mock("@/features/backoffice/assignInterventionFromBackoffice", () => ({
+  assignInterventionFromBackoffice: jest.fn(async () => undefined),
+}));
+
+const mockAssign = assignInterventionFromBackoffice as jest.MockedFunction<
+  typeof assignInterventionFromBackoffice
+>;
 const mockWorkspace = useCompanyWorkspaceOptional as jest.MockedFunction<
   typeof useCompanyWorkspaceOptional
 >;
@@ -31,9 +37,9 @@ jest.mock("@/features/technicians/hooks", () => ({
   useTechnicians: jest.fn(() => ({
     technicians: [
       {
-        id: "2",
-        name: "Thomas L.",
-        initial: "T",
+        id: "mansour",
+        name: "Mansour",
+        initial: "M",
         vehicle: "Van",
         status: "available",
         authUid: getDefaultAssignedTechnicianUid(),
@@ -74,8 +80,7 @@ function mockTenantWorkspace() {
 
 describe("IncomingClientRequestsPanel", () => {
   beforeEach(() => {
-    mockUpdateDoc.mockClear();
-    mockUpdateDoc.mockResolvedValue(undefined);
+    mockAssign.mockClear();
     mockTenantWorkspace();
     mockUseBackOffice.mockReturnValue({
       interventions: [pendingRequest],
@@ -112,11 +117,8 @@ describe("IncomingClientRequestsPanel", () => {
     await waitFor(() => expect(confirm).not.toBeDisabled());
     fireEvent.click(confirm);
 
-    await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalledTimes(1), { timeout: 3000 });
-    const patch = mockUpdateDoc.mock.calls[0]?.[1] as unknown as Record<string, unknown>;
-    expect(patch.status).toBe("assigned");
-    expect(patch.assignedTechnicianUid).toBe(getDefaultAssignedTechnicianUid());
-    expect(patch.scheduledDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(patch.scheduledTime).toMatch(/^\d{2}:\d{2}$/);
+    await waitFor(() => expect(mockAssign).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    expect(mockAssign.mock.calls[0]?.[0]).toBe("req-1");
+    expect(mockAssign.mock.calls[0]?.[2]).toBe(getDefaultAssignedTechnicianUid());
   });
 });

@@ -15,13 +15,13 @@ import {
   TECHNICIAN_HUB_ANCHOR_OFFLINE,
 } from "@/features/interventions/technicianHubNavigation";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
+import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechnicianMissionDayAnchor";
 import {
   interventionVisibleInTechnicianMissionList,
   sortInterventionsByScheduleAsc,
 } from "@/features/interventions/technicianSchedule";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
-import { AnimatePresence, motion } from "framer-motion";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import CompanyWorkspaceSwitcher from "@/features/company/components/CompanyWorkspaceSwitcher";
@@ -46,6 +46,19 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
+
+  const selectedFromList = useMemo(
+    () => (selectedCaseId ? interventions.find((x) => x.id === selectedCaseId) ?? null : null),
+    [selectedCaseId, interventions],
+  );
+
+  /** Pas de 2e listener doc si la mission est déjà dans la query assignée (réduit race Firestore ca9). */
+  const needsDocListener = Boolean(
+    selectedCaseId && !finishJobInterventionId && !selectedFromList,
+  );
+  const liveFromSnapshot = useInterventionLive(needsDocListener ? selectedCaseId : null);
+
+  const liveSelectedIntervention = selectedFromList ?? liveFromSnapshot;
 
   /** Même filtre « aujourd’hui » que la liste gauche (sélection auto du 1er dossier du jour). */
   const filteredSorted = useMemo(() => {
@@ -93,6 +106,16 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     });
   }, [pendingCaseId, setPendingCaseId, interventions, missionDayAnchor, activeTodaySorted, firebaseUid]);
 
+  /** Une seule vue centrale : détail mission OU clôture (pas d’overlay superposé). */
+  useEffect(() => {
+    if (!finishJobInterventionId) return;
+    if (finishJobInterventionId !== selectedCaseId) {
+      setFinishJobInterventionId(null);
+    }
+  }, [selectedCaseId, finishJobInterventionId, setFinishJobInterventionId]);
+
+  const centerView = finishJobInterventionId ? "finish" : "detail";
+
   return (
     <>
     {commandPaletteEnabled ? (
@@ -103,8 +126,8 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         selectedCaseId={selectedCaseId}
         onSelectCase={setSelectedCaseId}
         onFinishCase={(id) => {
+          setSelectedCaseId(id);
           setFinishJobInterventionId(id);
-          navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_FINISH);
         }}
       />
     ) : null}
@@ -128,24 +151,18 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       center={
         <section
           id={TECHNICIAN_HUB_ANCHOR_MISSIONS}
-          className="relative scroll-mt-2 flex min-h-0 flex-1 flex-col overflow-hidden"
+          data-technician-center-view={centerView}
+          className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
         >
-          <TechnicianDashboardDetailPanel caseId={selectedCaseId} />
-          <AnimatePresence>
-            {finishJobInterventionId ? (
-              <motion.div
-                key={finishJobInterventionId}
-                data-testid="technician-finish-job-layer"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ type: "spring", damping: 28, stiffness: 320 }}
-                className="absolute inset-0 z-20 flex min-h-0 flex-col overflow-hidden rounded-[18px] bg-white shadow-[inset_0_1px_0_rgba(0,0,0,0.05)]"
-              >
-                <TechnicianFinishJobPanel />
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          {finishJobInterventionId ? (
+            <TechnicianFinishJobPanel />
+          ) : (
+            <TechnicianDashboardDetailPanel
+              caseId={selectedCaseId}
+              liveIntervention={liveSelectedIntervention}
+              technicianUid={firebaseUid}
+            />
+          )}
         </section>
       }
       right={

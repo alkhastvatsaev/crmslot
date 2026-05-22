@@ -25,7 +25,7 @@ export type MissionActionBarConfig = {
 };
 
 export function resolveMissionActionBar(
-  iv: Pick<Intervention, "status" | "clientPhone" | "phone" | "address">,
+  iv: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">,
   opts?: { awaitingAssignment?: boolean },
 ): MissionActionBarConfig {
   const status = iv.status;

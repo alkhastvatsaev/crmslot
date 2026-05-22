@@ -3,9 +3,11 @@ import { DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import {
   acceptTechnicianAssignmentPatch,
+  acceptTechnicianAssignmentInProgressPatch,
   declineTechnicianAssignmentPatch,
   getTechnicianAssignmentUid,
   isTechnicianAssignmentAwaitingResponse,
+  isTechnicianActiveFieldMission,
   matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
 
@@ -114,6 +116,58 @@ describe("technicianAssignmentActions", () => {
         "tech-1",
       ),
     ).toBe(false);
+  });
+
+  it("isTechnicianActiveFieldMission correctly identifies active missions", () => {
+    // Should be false if not assigned
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "en_route", assignedTechnicianUid: "tech-2" }),
+        "tech-1",
+      ),
+    ).toBe(false);
+
+    // Should be true for en_route and waiting_material
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "en_route", assignedTechnicianUid: "tech-1" }),
+        "tech-1",
+      ),
+    ).toBe(true);
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "waiting_material", assignedTechnicianUid: "tech-1" }),
+        "tech-1",
+      ),
+    ).toBe(true);
+
+    // Should be true for in_progress ONLY if acceptedAt is present
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "in_progress", assignedTechnicianUid: "tech-1", technicianAcceptedAt: "2026-05-16T12:00:00Z" }),
+        "tech-1",
+      ),
+    ).toBe(true);
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "in_progress", assignedTechnicianUid: "tech-1", technicianAcceptedAt: null }),
+        "tech-1",
+      ),
+    ).toBe(false);
+
+    // Should be false for other statuses
+    expect(
+      isTechnicianActiveFieldMission(
+        iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
+        "tech-1",
+      ),
+    ).toBe(false);
+  });
+
+  it("acceptTechnicianAssignmentInProgressPatch updates status to en_route", () => {
+    const patch = acceptTechnicianAssignmentInProgressPatch(new Date("2026-05-16T12:00:00Z"));
+    expect(patch.status).toBe("en_route");
+    expect(patch.technicianAcceptedAt).toBe("2026-05-16T12:00:00.000Z");
   });
 
   it("getTechnicianAssignmentUid maps demo auth uid to default technician in dev preview", async () => {

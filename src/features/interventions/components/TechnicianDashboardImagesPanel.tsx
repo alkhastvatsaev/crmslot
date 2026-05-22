@@ -9,7 +9,8 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "sonner";
 import { storage, firestore } from "@/core/config/firebase";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { useInterventionLive } from "@/features/interventions/useInterventionLive";
+import { useInterventionLiveSource } from "@/features/interventions/useInterventionLive";
+import type { Intervention } from "@/features/interventions/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import QuickCameraUploader from "./QuickCameraUploader";
 
@@ -21,10 +22,12 @@ function generateId() {
 
 export default function TechnicianDashboardImagesPanel({
   caseId,
+  liveIntervention,
 }: {
   caseId: string | null;
+  liveIntervention?: Intervention | null;
 }) {
-  const liveIv = useInterventionLive(caseId);
+  const liveIv = useInterventionLiveSource(caseId, liveIntervention);
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);

@@ -3,6 +3,8 @@ import {
   matchInterventionInSnapshot,
   parseChatbotEuroAmount,
   resolveChatbotPwaIntent,
+  buildChatbotPwaDoneMessage,
+  isChatbotPwaPendingToolId,
 } from "@/features/chatbot/chatbot-pwa-intent";
 import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
 
@@ -91,5 +93,58 @@ describe("chatbot-pwa-intent", () => {
   it("resolveChatbotPwaIntent document_preview", () => {
     const intent = resolveChatbotPwaIntent("Affiche la facture de Vatsaev", snapshot);
     expect(intent?.kind).toBe("document_preview");
+  });
+
+  describe("Branch and edge case coverage", () => {
+    it("parseChatbotEuroAmount returns null for invalid amounts", () => {
+      expect(parseChatbotEuroAmount("pas de prix")).toBeNull();
+      expect(parseChatbotEuroAmount("0 €")).toBeNull();
+    });
+
+    it("extractChatbotClientQuery handles different patterns", () => {
+      expect(extractChatbotClientQuery("dossier de Dupont")).toMatch(/dupont/i);
+      expect(extractChatbotClientQuery("client Martin")).toMatch(/martin/i);
+      expect(extractChatbotClientQuery("facture")).toBeNull(); // too short or blacklisted
+    });
+
+    it("matchInterventionInSnapshot handles empty/null inputs", () => {
+      expect(matchInterventionInSnapshot(null, "Vatsaev")).toBeNull();
+      expect(matchInterventionInSnapshot(snapshot, "")).toBeNull();
+      expect(matchInterventionInSnapshot(snapshot, "x")).toBeNull(); // too short
+    });
+
+    it("matchInterventionInSnapshot handles partial matches", () => {
+      // Partial word match via splitting
+      const m = matchInterventionInSnapshot(snapshot, "monsieur toto vats");
+      expect(m?.interventionId).toBe("int-vatsaev");
+    });
+
+    it("resolveChatbotPwaIntent handles missing intervention", () => {
+      expect(resolveChatbotPwaIntent("facture inconnu à 500€", null)).toBeNull();
+    });
+
+    it("resolveChatbotPwaIntent handles line index", () => {
+      const intent = resolveChatbotPwaIntent("met la ligne 2 a 500€", snapshot, { focusInterventionId: "int-vatsaev" });
+      expect(intent?.kind).toBe("billing_patch");
+      if (intent?.kind === "billing_patch") {
+        expect(intent.lineIndex).toBe(1); // zero-indexed
+      }
+    });
+
+    it("isChatbotPwaPendingToolId", () => {
+      expect(isChatbotPwaPendingToolId("pwa_123")).toBe(true);
+      expect(isChatbotPwaPendingToolId("call_456")).toBe(false);
+    });
+
+    it("buildChatbotPwaDoneMessage formats messages correctly", () => {
+      const intentPatch = resolveChatbotPwaIntent("facture Vatsaev 500€", snapshot)!;
+      expect(buildChatbotPwaDoneMessage(intentPatch)).toContain("500 €");
+      
+      const intentPreview = resolveChatbotPwaIntent("affiche devis Vatsaev", snapshot)!;
+      expect(buildChatbotPwaDoneMessage(intentPreview)).toContain("Devis");
+
+      const intentAdd = resolveChatbotPwaIntent("ajoute serrure a 100€", snapshot, { focusInterventionId: "int-vatsaev" })!;
+      expect(buildChatbotPwaDoneMessage(intentAdd)).toContain("Lignes ajoutées");
+    });
   });
 });

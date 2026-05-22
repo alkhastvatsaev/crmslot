@@ -1,9 +1,9 @@
 import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, firestore, storage } from "@/core/config/firebase";
+import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { dataUrlToBlob } from "@/features/interventions/finishJobCapture";
-import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
-import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import type { Intervention } from "@/features/interventions/types";
 
 const UPLOAD_FILE_TIMEOUT_MS = 120_000;
@@ -67,9 +67,10 @@ export async function performCompletionUpload(params: {
   const data = snap.data() as Intervention | undefined;
   const fromStatus = data?.status ?? "in_progress";
 
+  const completedAt = devUiPreviewEnabled ? new Date().toISOString() : serverTimestamp();
+
   await withTimeout(
-    transitionInterventionStatus({
-      db: fs,
+    transitionInterventionFromTechnician({
       interventionId,
       iv: {
         status: fromStatus,
@@ -78,14 +79,14 @@ export async function performCompletionUpload(params: {
         companyId: data?.companyId ?? null,
       },
       toStatus: "done",
-      actor: technicianTransitionActor(uid),
       extraPatch: {
         completionPhotoUrls: photoUrls,
         completionSignatureUrl: sigUrl,
-        completedAt: serverTimestamp(),
+        completedAt,
         completedByUid: uid,
         billingLines: billingLines ?? undefined,
       },
+      writeInboxAlerts: false,
     }),
     FIRESTORE_UPDATE_TIMEOUT_MS,
     "Mise à jour du dossier",

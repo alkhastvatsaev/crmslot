@@ -49,8 +49,8 @@ describe("TechnicianDashboardListPanel", () => {
 
     expect(screen.getByTestId("technician-dashboard-list")).toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-offer-offer-42")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-accept")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-decline")).toBeInTheDocument();
+    expect(screen.queryByTestId("technician-assignment-accept")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("technician-assignment-decline")).not.toBeInTheDocument();
   });
 
   it("does not show offer UI when there are no released assignments", () => {

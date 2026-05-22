@@ -56,6 +56,7 @@ export function generateInterventionReport(iv: Intervention): void {
     ["Client",   clientName(iv)],
     ["Adresse",  iv.address || "—"],
     ["Téléphone", iv.phone || iv.clientPhone || "—"],
+    ["Mail", iv.clientEmail || "—"],
     ["Problème", iv.problem || iv.title || "—"],
   ];
 

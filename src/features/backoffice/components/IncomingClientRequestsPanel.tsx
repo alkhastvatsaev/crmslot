@@ -5,15 +5,17 @@ import { ClipboardList, ArrowLeft, Trash2, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
+import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
+import { isSyntheticInterventionId } from "@/core/config/devUiPreview";
 
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { cn } from "@/lib/utils";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import type { Intervention } from "@/features/interventions/types";
-import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
-import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
+import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
+import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
@@ -39,12 +41,28 @@ export default function IncomingClientRequestsPanel() {
 
 
   const pendingRequests = interventions
-    .filter((inv) => isInterventionPendingBackOfficeIntake(inv))
+    .filter((inv) => isInterventionInBackofficeRequestsQueue(inv))
     .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
   const handleDelete = async (id: string) => {
+    if (isSyntheticInterventionId(id)) {
+      toast.success(String(t("backoffice.toasts.request_deleted")));
+      setSelectedRequest(null);
+      return;
+    }
     if (!firestore) return;
+    const row = interventions.find((x) => x.id === id);
+    const actorUid = auth?.currentUser?.uid?.trim() || "system";
     try {
+      if (row) {
+        await logCrmInterventionAction({
+          kind: "intervention_deleted",
+          iv: row,
+          actorUid,
+          actorRole: "dispatcher",
+          note: "Suppression demande (file entrante)",
+        });
+      }
       await deleteDoc(doc(firestore, "interventions", id));
       toast.success(String(t("backoffice.toasts.request_deleted")));
       setSelectedRequest(null);
@@ -62,15 +80,26 @@ export default function IncomingClientRequestsPanel() {
     setIsAssigning(true);
     try {
       const row = interventions.find((x) => x.id === id);
-      await updateDoc(
-        doc(firestore, "interventions", id),
-        buildAssignInterventionToTechnicianUpdate(row, technicianUid, new Date(), schedule),
-      );
+      if (!row) {
+        toast.error(String(t("backoffice.toasts.assign_failed")));
+        return;
+      }
+      await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
       toast.success(String(t("backoffice.toasts.request_assigned")));
       setAssignPickerOpen(false);
       setSelectedRequest(null);
-    } catch {
-      toast.error(String(t("backoffice.toasts.assign_failed")));
+    } catch (e) {
+      const code =
+        typeof e === "object" && e !== null && "code" in e ? String((e as { code?: string }).code) : "";
+      const description =
+        code === "permission-denied"
+          ? String(t("backoffice.toasts.permission_denied_verify"))
+          : code === "admin-unavailable"
+            ? String(t("backoffice.toasts.admin_unavailable"))
+            : e instanceof Error
+              ? e.message
+              : String(t("backoffice.toasts.assign_failed"));
+      toast.error(description);
     } finally {
       setIsAssigning(false);
     }
@@ -79,9 +108,17 @@ export default function IncomingClientRequestsPanel() {
   const handleUpdateDateTime = async () => {
     if (!selectedRequest || !firestore) return;
     try {
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
       await updateDoc(doc(firestore, "interventions", selectedRequest.id), {
         requestedDate: editDate,
         requestedTime: editTime,
+      });
+      await logCrmInterventionAction({
+        kind: "intervention_schedule_updated",
+        iv: selectedRequest,
+        actorUid,
+        actorRole: "dispatcher",
+        note: `Souhait client ${editDate} ${editTime}`,
       });
       toast.success(String(t("backoffice.toasts.datetime_updated")));
       setSelectedRequest({
@@ -174,25 +211,31 @@ export default function IncomingClientRequestsPanel() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 z-20 flex flex-col bg-white/95 backdrop-blur-md rounded-[inherit] overflow-hidden shadow-2xl"
+            className="absolute inset-0 z-20 flex min-h-0 flex-col overflow-hidden bg-white/95 backdrop-blur-md rounded-[inherit] shadow-2xl"
           >
             {/* Header with Back button */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-100/50">
+            <div className="flex shrink-0 items-center justify-between p-4 border-b border-slate-100/50">
               <button 
                 onClick={() => {
                   setSelectedRequest(null);
                   setIsEditingDateTime(false);
+                  setAssignPickerOpen(false);
                 }}
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm font-semibold text-slate-800">{String(t("backoffice.incoming_requests.request_details"))}</span>
+              <span className="text-sm font-semibold text-slate-800">
+                {assignPickerOpen
+                  ? String(t("dispatch.assign_picker.title"))
+                  : String(t("backoffice.incoming_requests.request_details"))}
+              </span>
               <div className="w-8" />
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+            {!assignPickerOpen ? (
+            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 flex flex-col gap-6">
               {(() => {
                 let fName = selectedRequest.clientFirstName;
                 let lName = selectedRequest.clientLastName;
@@ -213,6 +256,13 @@ export default function IncomingClientRequestsPanel() {
                     </p>
                     {selectedRequest.clientPhone && (
                       <p className="text-[14px] font-bold text-black mt-0.5">{selectedRequest.clientPhone}</p>
+                    )}
+                    {selectedRequest.clientEmail && (
+                      <p className="text-[14px] font-medium text-slate-600 mt-0.5 break-all">
+                        <a href={`mailto:${selectedRequest.clientEmail}`} className="hover:underline">
+                          {selectedRequest.clientEmail}
+                        </a>
+                      </p>
                     )}
                   </div>
                 );
@@ -330,11 +380,18 @@ export default function IncomingClientRequestsPanel() {
                 </div>
               )}
             </div>
+            ) : null}
 
-            {/* Bottom Actions */}
-            <div className="border-t border-slate-100/50 bg-white p-4">
+            {/* Bottom Actions / picker plein cadre */}
+            <div
+              className={cn(
+                "shrink-0 border-t border-slate-100/50 bg-white",
+                assignPickerOpen ? "flex min-h-0 flex-1 flex-col p-3" : "p-4",
+              )}
+            >
               {assignPickerOpen ? (
                 <TechnicianAssignPicker
+                  className="min-h-0 flex-1"
                   intervention={selectedRequest}
                   peerInterventions={interventions}
                   isAssigning={isAssigning}

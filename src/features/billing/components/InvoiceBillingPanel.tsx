@@ -8,7 +8,8 @@ import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
 import InterventionPdfButton from "@/features/interventions/components/InterventionPdfButton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
+import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { BILLING_TEMPLATES } from "@/features/interventions/config/terrainTemplates";
@@ -62,6 +63,14 @@ export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: P
         paymentStatus: newStatus,
         ...(newStatus === "paid" ? { paidAt: new Date().toISOString() } : {}),
         updatedAt: new Date().toISOString(),
+      });
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
+      await logCrmInterventionAction({
+        kind: "intervention_payment_updated",
+        iv: intervention,
+        actorUid,
+        actorRole: "dispatcher",
+        note: `Paiement → ${newStatus}`,
       });
       toast.success(String(t("billing.toast_status_updated")));
     } catch {
