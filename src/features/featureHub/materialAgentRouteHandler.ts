@@ -1,28 +1,50 @@
+import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
+import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
+import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAgentSystemPrompt";
+import {
+  buildMaterialAgentClientNameRegisteredReply,
+  isAwaitingMaterialAgentClientName,
+  parseMaterialAgentClientNameFromUserText,
+  resolveMaterialAgentOrderClientName,
+  shouldResetMaterialOrderClientSession,
+} from "@/features/featureHub/materialAgentOrderClient";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
+import { MATERIAL_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
 
-/** Scope fixé côté serveur — le client ne peut pas l'étendre. */
-export const MATERIAL_AGENT_TOOL_SCOPE = [
-  "get_workspace_summary",
-  "list_stock_alerts",
-  "list_material_orders",
-  "search_lecot_products",
-  "order_lecot_parts",
-] as const;
+export { MATERIAL_AGENT_TOOL_SCOPE };
 
 export type MaterialAgentPostBody = {
   companyId?: string;
   companyName?: string;
   role?: CompanyRole | null;
   messages?: unknown[];
+  /** Nom client mémorisé pour cette session (obligatoire avant commande). */
+  orderClientName?: string | null;
   /** Snapshot JSON du stock courant pour enrichir le system prompt (optionnel). */
   stockSnapshot?: string | null;
 };
 
 export type MaterialAgentRouteAuth = { uid: string };
+
+function streamMaterialAgentClientNameRegistered(
+  messages: unknown[],
+  clientName: string,
+): Response {
+  return createChatbotSseResponse(async (enqueue) => {
+    const reply = buildMaterialAgentClientNameRegisteredReply(clientName);
+    const stored = normalizeStoredMessages(messages);
+    enqueue({ type: "material_order_client", clientName });
+    enqueue({ type: "text", delta: reply });
+    enqueue({
+      type: "done",
+      apiMessages: [...stored, { role: "assistant", content: reply }],
+    });
+  });
+}
 
 export async function handleMaterialAgentPost(
   body: MaterialAgentPostBody | null,
@@ -50,16 +72,49 @@ export async function handleMaterialAgentPost(
   const today = new Date().toISOString().slice(0, 10);
   const modelName = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
 
+  const conversationCtx = resolveChatbotConversationContext({
+    messages,
+    hasWorkspaceSnapshot: false,
+    explicitToolScope: [...MATERIAL_AGENT_TOOL_SCOPE],
+  });
+
+  const lastUser = (conversationCtx.lastUserText ?? lastUserMessageText(messages) ?? "").trim();
+
+  const resetClientSession = shouldResetMaterialOrderClientSession(lastUser);
+  const orderClientName = resolveMaterialAgentOrderClientName({
+    orderClientNameFromClient: resetClientSession ? null : body?.orderClientName,
+    messages,
+    lastUserText: lastUser,
+  });
+
   const system = buildMaterialAgentSystemPrompt({
     companyName,
     companyId,
     today,
     stockSnapshot: body?.stockSnapshot ?? null,
+    orderClientName,
   });
 
-  const toolCtx: ChatbotToolContext = { companyId, actorUid: auth.uid, role };
+  const toolCtx: ChatbotToolContext = {
+    companyId,
+    actorUid: auth.uid,
+    role,
+    lastUserText: lastUser,
+    materialOrderClientName: orderClientName,
+    requireMaterialOrderClientName: true,
+  };
+
+  const toolScope = [...MATERIAL_AGENT_TOOL_SCOPE];
+
+  const parsedClientReply = parseMaterialAgentClientNameFromUserText(lastUser, messages);
+  if (parsedClientReply && isAwaitingMaterialAgentClientName(messages)) {
+    return streamMaterialAgentClientNameRegistered(messages, parsedClientReply);
+  }
 
   return createChatbotSseResponse(async (enqueue) => {
+    if (resetClientSession) {
+      enqueue({ type: "material_order_client", clientName: "" });
+    }
     try {
       const result = await runChatbotOpenAI({
         apiKey,
@@ -67,7 +122,11 @@ export async function handleMaterialAgentPost(
         system,
         messages,
         toolCtx,
-        toolScope: [...MATERIAL_AGENT_TOOL_SCOPE],
+        toolScope,
+        conversationContext: { ...conversationCtx, toolScope },
+        hasWorkspaceSnapshot: false,
+        hubAgentMode: true,
+        temperature: 0.15,
         emit: enqueue,
       });
       if (result.status === "pending") {

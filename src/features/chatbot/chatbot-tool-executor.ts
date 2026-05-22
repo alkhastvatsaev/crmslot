@@ -37,6 +37,7 @@ import {
   suggestGmailInterventionLinksForChatbot,
 } from "@/features/chatbot/chatbot-gmail";
 import { logCrmFromChatbotTool } from "@/features/crmHistory/logCrmFromChatbotTool";
+import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 
 export type ChatbotToolContext = {
   companyId: string;
@@ -44,6 +45,10 @@ export type ChatbotToolContext = {
   role: "admin" | "collaborateur" | null;
   /** Dernier message utilisateur (routage PJ email). */
   lastUserText?: string | null;
+  /** Agent Matériel : nom client mémorisé pour les commandes (panneau Commandes). */
+  materialOrderClientName?: string | null;
+  /** Agent Matériel : refuser order_lecot sans clientName. */
+  requireMaterialOrderClientName?: boolean;
 };
 
 function db(): admin.firestore.Firestore {
@@ -82,6 +87,28 @@ function clientLabel(data: Record<string, unknown>): string {
     return data.clientCompanyName.trim();
   }
   return String(data.title || "Client");
+}
+
+/** Texte de commande / navigation — jamais un nom de client réel. */
+const LECOT_COMMAND_RE =
+  /\b(nouvelle?\s*commande|commander|lecot|catalogue|stock|mati[eè]riel|materiel|recherche|rupture|articles?|sugg[eè]re|propose|montre|liste)\b/i;
+
+function resolveOrderLecotClientName(
+  ctx: ChatbotToolContext,
+  input: Record<string, unknown>,
+): string {
+  const fromInputRaw = typeof input.clientName === "string" ? input.clientName.trim() : "";
+  // Rejette les hallucinations IA : textes de commande ne sont pas des noms clients.
+  const fromInput =
+    fromInputRaw && !LECOT_COMMAND_RE.test(fromInputRaw) && fromInputRaw.length <= 80
+      ? fromInputRaw
+      : "";
+  const fromCtx = ctx.materialOrderClientName?.trim() ?? "";
+  const name = fromInput || fromCtx;
+  if (ctx.requireMaterialOrderClientName) {
+    return requireMaterialOrderClientName(name);
+  }
+  return name;
 }
 
 function requireConfirmed(name: string, input: Record<string, unknown>): void {
@@ -139,13 +166,25 @@ async function executeChatbotToolImpl(
       return listStockAlerts(ctx.companyId);
     case "list_material_orders":
       return listMaterialOrders(String(input.interventionId || ""), input);
+    case "list_company_material_orders":
+      return listCompanyMaterialOrders(ctx.companyId, input);
+    case "approve_material_orders":
+      return approveMaterialOrders(ctx, input);
+    case "focus_stock_item":
+      return focusStockItemUi(input);
+    case "focus_billing_case":
+      return focusBillingCaseUi(input);
+    case "open_crm_dossier":
+      return openCrmDossierUi(input);
 
     case "search_lecot_products":
       return searchLecotProductsForChatbot(ctx.companyId, String(input.query || ""), Number(input.limit) || 8);
     case "list_supplier_orders":
       return listSupplierOrders(ctx.companyId, input);
-    case "order_lecot_parts":
-      return orderLecotPartsForChatbot(ctx, input);
+    case "order_lecot_parts": {
+      const clientName = resolveOrderLecotClientName(ctx, input);
+      return orderLecotPartsForChatbot(ctx, { ...input, clientName });
+    }
     case "list_inbox_notifications":
       return listInboxNotifications(ctx, input);
     case "list_gmail_inbox":
@@ -489,6 +528,118 @@ async function listMaterialOrders(interventionId: string, input: Record<string, 
     .limit(limit)
     .get();
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Record<string, unknown>));
+}
+
+async function listCompanyMaterialOrders(companyId: string, input: Record<string, unknown>) {
+  const limit = Math.min(40, Math.max(1, Number(input.limit) || 20));
+  const statusFilter =
+    typeof input.status === "string" && input.status.trim() ? input.status.trim() : null;
+  const snap = await db()
+    .collection("material_orders")
+    .where("companyId", "==", companyId)
+    .limit(80)
+    .get();
+  let rows = snap.docs.map((d) => {
+    const data = d.data();
+    const parts = Array.isArray(data.partsRequested) ? data.partsRequested : [];
+    const first = parts[0] as { description?: string } | undefined;
+    return {
+      id: d.id,
+      interventionId: data.interventionId ?? null,
+      status: data.status ?? null,
+      urgency: data.urgency ?? null,
+      summary: first?.description?.trim() || "Bon matériel",
+      createdAt: data.createdAt ?? null,
+    };
+  });
+  if (statusFilter) rows = rows.filter((r) => r.status === statusFilter);
+  rows.sort((a, b) => parseIsoMs(b.createdAt) - parseIsoMs(a.createdAt));
+  return { count: rows.length, orders: rows.slice(0, limit) };
+}
+
+async function approveMaterialOrders(ctx: ChatbotToolContext, input: Record<string, unknown>) {
+  const orderIds = Array.isArray(input.orderIds)
+    ? input.orderIds.map((id) => String(id).trim()).filter(Boolean)
+    : [];
+  const approveAll = input.approveAllPending === true;
+  const firestore = db();
+  const approved: string[] = [];
+  const skipped: string[] = [];
+
+  if (approveAll) {
+    const snap = await firestore
+      .collection("material_orders")
+      .where("companyId", "==", ctx.companyId)
+      .limit(60)
+      .get();
+    for (const doc of snap.docs) {
+      if (approved.length >= 15) break;
+      const data = doc.data();
+      if (data.status !== "pending") {
+        skipped.push(doc.id);
+        continue;
+      }
+      await doc.ref.update({ status: "ordered", updatedAt: new Date().toISOString() });
+      approved.push(doc.id);
+    }
+    return { ok: true, approved, skipped: skipped.length, message: `${approved.length} demande(s) validée(s).` };
+  }
+
+  for (const orderId of orderIds.slice(0, 15)) {
+    const ref = firestore.collection("material_orders").doc(orderId);
+    const doc = await ref.get();
+    if (!doc.exists) {
+      skipped.push(orderId);
+      continue;
+    }
+    const data = doc.data()!;
+    if (String(data.companyId || "") !== ctx.companyId) {
+      throw new Error("Bon matériel hors société active");
+    }
+    if (data.status !== "pending") {
+      skipped.push(orderId);
+      continue;
+    }
+    await ref.update({ status: "ordered", updatedAt: new Date().toISOString() });
+    approved.push(orderId);
+  }
+
+  return {
+    ok: true,
+    approved,
+    skipped,
+    message:
+      approved.length > 0
+        ? `${approved.length} demande(s) passée(s) en commandé.`
+        : "Aucune demande pending à valider.",
+  };
+}
+
+function focusStockItemUi(input: Record<string, unknown>) {
+  const filter = typeof input.filter === "string" ? input.filter.trim() : null;
+  return {
+    ok: true,
+    ui: "focus_stock",
+    stockItemId: typeof input.stockItemId === "string" ? input.stockItemId.trim() || null : null,
+    filter: filter || null,
+    searchQuery: typeof input.searchQuery === "string" ? input.searchQuery.trim() || null : null,
+  };
+}
+
+function focusBillingCaseUi(input: Record<string, unknown>) {
+  return {
+    ok: true,
+    ui: "focus_billing",
+    interventionId:
+      typeof input.interventionId === "string" ? input.interventionId.trim() || null : null,
+    filter: typeof input.filter === "string" ? input.filter.trim() || null : null,
+  };
+}
+
+function openCrmDossierUi(input: Record<string, unknown>) {
+  const interventionId = String(input.interventionId || "").trim();
+  if (!interventionId) throw new Error("interventionId requis");
+  return { ok: true, ui: "open_crm", interventionId };
 }
 
 async function listSupplierOrders(companyId: string, input: Record<string, unknown>) {

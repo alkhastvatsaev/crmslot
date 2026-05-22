@@ -20,6 +20,11 @@ const baseIntervention = {
   companyId: "co-1",
   assignedTechnicianUid: "tech-1",
   createdByUid: "client-1",
+  title: "Test intervention",
+  clientFirstName: null,
+  clientLastName: null,
+  clientName: "Client",
+  clientCompanyName: null,
 };
 
 describe("createMaterialOrder", () => {
@@ -45,6 +50,7 @@ describe("createMaterialOrder", () => {
     expect(mockCreateDoc).toHaveBeenCalledWith(db, {
       interventionId: "iv-1",
       companyId: "co-1",
+      clientName: "Client",
       technicianUid: "tech-1",
       partsRequested: [{ description: "Cylindre", quantity: 1 }],
       urgency: "normal",

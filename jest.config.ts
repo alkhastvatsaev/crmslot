@@ -12,7 +12,7 @@ const config: Config = {
   testEnvironment: 'jsdom',
   forceExit: true,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  testPathIgnorePatterns: ['<rootDir>/_prototype_backup/', '<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/'],
+  testPathIgnorePatterns: ['<rootDir>/_prototype_backup/', '<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/', '/__tests__/fixtures/'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',

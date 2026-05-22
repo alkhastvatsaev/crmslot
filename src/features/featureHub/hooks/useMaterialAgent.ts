@@ -1,14 +1,21 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
+import { useCompanyStockAgentBridgeOptional } from "@/context/CompanyStockAgentBridgeContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { isCompanyStockAgentInScope } from "@/features/featureHub/companyStockAgentScope";
 import type { CompanyStockAgentContext, CompanyStockAgentMessage } from "@/features/featureHub/companyStockAgentTypes";
+import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
 import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
+import {
+  isAwaitingMaterialAgentClientName,
+  shouldResetMaterialOrderClientSession,
+} from "@/features/featureHub/materialAgentOrderClient";
 
 // ── Suggestion tag extraction ────────────────────────────────────────────────
 
@@ -77,6 +84,29 @@ async function readStream(
 // ── Storage ──────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = "belmap-material-agent-v1";
+const CLIENT_NAME_STORAGE_SUFFIX = ":order-client";
+
+function loadOrderClientName(uid: string, companyId: string): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return (
+      localStorage.getItem(`${STORAGE_KEY}${CLIENT_NAME_STORAGE_SUFFIX}:${uid}:${companyId}`) ?? ""
+    ).trim();
+  } catch {
+    return "";
+  }
+}
+
+function saveOrderClientName(uid: string, companyId: string, name: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const key = `${STORAGE_KEY}${CLIENT_NAME_STORAGE_SUFFIX}:${uid}:${companyId}`;
+    if (name.trim()) localStorage.setItem(key, name.trim());
+    else localStorage.removeItem(key);
+  } catch {
+    /* quota */
+  }
+}
 
 function loadApiHistory(uid: string, companyId: string): unknown[] {
   if (typeof window === "undefined") return [];
@@ -156,6 +186,8 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
   const role = workspace?.activeRole ?? null;
 
   const agentEnabled = (options?.enabled !== false) && Boolean(companyId);
+  const handleHubStream = useHubAgentStreamHandler();
+  const materialBridge = useCompanyStockAgentBridgeOptional();
 
   const storageKey = useMemo(() => `${uid}:${companyId}`, [uid, companyId]);
   const prevKeyRef = useRef(storageKey);
@@ -167,12 +199,24 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
   const apiHistoryRef = useRef<unknown[]>(
     companyId ? loadApiHistory(uid, companyId) : [],
   );
+  const orderClientNameRef = useRef(companyId ? loadOrderClientName(uid, companyId) : "");
 
   // Reset on company change
   if (prevKeyRef.current !== storageKey) {
     prevKeyRef.current = storageKey;
     apiHistoryRef.current = companyId ? loadApiHistory(uid, companyId) : [];
+    orderClientNameRef.current = companyId ? loadOrderClientName(uid, companyId) : "";
+    materialBridge?.setOrderClientName(orderClientNameRef.current);
   }
+
+  useEffect(() => {
+    if (!companyId || !materialBridge) return;
+    const stored = loadOrderClientName(uid, companyId);
+    if (stored) {
+      orderClientNameRef.current = stored;
+      materialBridge.setOrderClientName(stored);
+    }
+  }, [companyId, uid, materialBridge]);
 
   const pushMsg = useCallback((msg: CompanyStockAgentMessage) => {
     setMessages((prev) => [...prev, msg]);
@@ -187,9 +231,14 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
   const resetConversation = useCallback(() => {
     setMessages([]);
     apiHistoryRef.current = [];
+    orderClientNameRef.current = "";
+    materialBridge?.setOrderClientName("");
     bootedRef.current = false;
-    if (companyId) saveApiHistory(uid, companyId, []);
-  }, [uid, companyId]);
+    if (companyId) {
+      saveApiHistory(uid, companyId, []);
+      saveOrderClientName(uid, companyId, "");
+    }
+  }, [uid, companyId, materialBridge]);
 
   const sendMessage = useCallback(
     async (raw: string) => {
@@ -198,8 +247,16 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
 
       pushMsg({ id: nextId(), role: "user", text });
 
+      if (shouldResetMaterialOrderClientSession(text)) {
+        orderClientNameRef.current = "";
+        materialBridge?.setOrderClientName("");
+        if (companyId) saveOrderClientName(uid, companyId, "");
+      }
+
+      // Si l'agent attend le nom du client, laisser passer sans filtre scope.
+      const awaitingClient = isAwaitingMaterialAgentClientName(apiHistoryRef.current);
       // Guard client : hors scope → réponse immédiate sans appel API
-      if (!isCompanyStockAgentInScope(text)) {
+      if (!awaitingClient && !isCompanyStockAgentInScope(text)) {
         pushMsg({
           id: nextId(),
           role: "assistant",
@@ -215,6 +272,7 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
       apiHistoryRef.current = nextApi;
 
       const accText = { v: "" };
+      const accQuickActions = { v: [] as ChatbotQuickAction[] };
       const finalApi = { v: nextApi as unknown[] };
 
       try {
@@ -226,17 +284,29 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
             companyName: companyName ?? companyId,
             role,
             messages: nextApi,
+            orderClientName: orderClientNameRef.current || null,
             stockSnapshot: buildStockSnapshot(ctx),
           }),
         });
 
         await readStream(res, (ev) => {
+          handleHubStream(ev);
           if (ev.type === "text") {
             accText.v += ev.delta;
+          }
+          if (ev.type === "quick_actions" && ev.actions.length > 0) {
+            accQuickActions.v = ev.actions;
+          }
+          if (ev.type === "material_order_client") {
+            const name = ev.clientName.trim();
+            orderClientNameRef.current = name;
+            materialBridge?.setOrderClientName(name);
+            if (companyId) saveOrderClientName(uid, companyId, name);
           }
           if (ev.type === "focus_stock_hub") {
             options?.onAction?.({
               focusStockItemId: ev.stockItemId ?? null,
+              searchQuery: ev.searchQuery ?? null,
             });
           }
           if (ev.type === "done" && ev.apiMessages) {
@@ -259,7 +329,8 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
           id: nextId(),
           role: "assistant",
           text: displayText,
-          ...(suggestions.length ? { suggestions } : {}),
+          ...(accQuickActions.v.length ? { quickActions: accQuickActions.v } : {}),
+          ...(suggestions.length && !accQuickActions.v.length ? { suggestions } : {}),
         });
       } catch (e) {
         pushMsg({
@@ -271,7 +342,7 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
         setThinking(false);
       }
     },
-    [agentEnabled, thinking, companyId, companyName, role, ctx, uid, options, pushMsg],
+    [agentEnabled, thinking, companyId, companyName, role, ctx, uid, options, pushMsg, handleHubStream],
   );
 
   return {

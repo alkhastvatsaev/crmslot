@@ -12,6 +12,7 @@ import {
   updateMaterialOrderStatus,
   type MaterialOrderDoc,
 } from "@/features/materials/materialOrderFirestore";
+import { displayMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import type { MaterialOrder } from "@/features/materials/types";
 import {
   SUPPLIER_ORDER_STATUS_LABELS,
@@ -40,22 +41,6 @@ function formatWhenShort(raw: unknown): string {
   const ms = parseOrderMs(raw);
   if (!ms) return "";
   return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
-}
-
-function materialOrderTitle(order: MaterialOrderDoc): string {
-  const parts = order.partsRequested ?? [];
-  const first = parts[0]?.description?.trim();
-  if (!first) return "Bon matériel";
-  if (parts.length === 1) return first;
-  return `${first} · ${parts.length} lignes`;
-}
-
-function supplierOrderTitle(order: SupplierOrder): string {
-  const lines = order.lines ?? [];
-  const first = lines[0]?.label?.trim();
-  if (!first) return "Commande";
-  if (lines.length === 1) return first;
-  return `${first} · ${lines.length} articles`;
 }
 
 function isOpenSupplierOrder(order: SupplierOrder): boolean {
@@ -169,7 +154,7 @@ export default function CompanyStockOrdersTrackPanel({
                     className="rounded-[12px] border border-slate-200/80 bg-slate-50/50 px-3 py-2.5"
                   >
                     <p className="truncate text-[12px] font-medium text-slate-900">
-                      {materialOrderTitle(order)}
+                      {displayMaterialOrderClientName(order)}
                     </p>
                     <p className="mt-0.5 truncate text-[10px] text-slate-400">
                       {order.interventionId}
@@ -222,7 +207,10 @@ export default function CompanyStockOrdersTrackPanel({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="min-w-0 flex-1 truncate text-[12px] font-medium text-slate-900">
-                      {supplierOrderTitle(order)}
+                      {displayMaterialOrderClientName({
+                        clientName: order.clientName,
+                        interventionId: order.interventionId ?? "",
+                      })}
                     </p>
                     <span
                       className={cn(
