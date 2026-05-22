@@ -24,6 +24,8 @@ import {
 import { buildLecotProductQuickActions } from "@/features/chatbot/chatbot-quick-actions";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import { lecotShopBaseUrl } from "@/features/catalog/lecotShopConfig";
+import { resolveInterventionClientNameFromRecord } from "@/features/interventions/resolveInterventionClientName";
+import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import { computeOrderTotal, type SupplierOrderLine } from "@/features/suppliers/types";
 
 export { extractLecotProductQueryFromFollowUp } from "@/features/chatbot/chatbot-lecot-follow-up";
@@ -53,10 +55,7 @@ async function enrichLecotOrderLinesWithCatalogPrices(
 
   const out: SupplierOrderLine[] = [];
   for (const line of lines) {
-    if (line.unitPriceCents > 0) {
-      out.push(line);
-      continue;
-    }
+    // Le prix catalogue prime toujours sur le prix fourni par l'IA (évite les hallucinations de prix).
     const skuHit = bySku.get(line.sku.trim().toUpperCase());
     if (skuHit && skuHit.unitPriceCents > 0) {
       out.push({ ...line, unitPriceCents: skuHit.unitPriceCents });
@@ -82,6 +81,7 @@ async function enrichLecotOrderLinesWithCatalogPrices(
         continue;
       }
     }
+    // Catalogue introuvable — utiliser le prix IA en dernier recours (peut être 0).
     out.push(line);
   }
   return out;
@@ -92,6 +92,10 @@ export const LECOT_CHATBOT_SUGGESTION_COUNT = 5;
 
 /** Enrichit les requêtes courtes (ex. « perceuse ») pour le scoring catalogue. */
 const LECOT_QUERY_ALIASES: Record<string, string> = {
+  lecot: "serrure cylindre verrou serrurerie",
+  catalogue: "serrure cylindre verrou serrurerie",
+  materiel: "serrure cylindre verrou serrurerie",
+  matériel: "serrure cylindre verrou serrurerie",
   perceuse: "perceuse visseuse outillage",
   visseuse: "perceuse visseuse outillage",
   perforateur: "perceuse percussion SDS outillage",
@@ -420,8 +424,18 @@ export async function orderLecotPartsForChatbot(
     typeof input.interventionId === "string" ? input.interventionId.trim() : "";
   const linkMaterialOrder = input.linkMaterialOrder !== false;
 
-  if (interventionId) {
-    await assertInterventionAccess(ctx.companyId, interventionId);
+  const explicitClient =
+    typeof input.clientName === "string" ? input.clientName.trim() : "";
+  let orderClientName: string | undefined;
+  if (explicitClient) {
+    orderClientName = requireMaterialOrderClientName(explicitClient);
+  } else if (interventionId) {
+    const ivData = await assertInterventionAccess(ctx.companyId, interventionId);
+    orderClientName = requireMaterialOrderClientName(
+      resolveInterventionClientNameFromRecord(ivData),
+    );
+  } else if (ctx.requireMaterialOrderClientName) {
+    orderClientName = requireMaterialOrderClientName("");
   }
 
   const totalCents = computeOrderTotal(lines);
@@ -443,6 +457,7 @@ export async function orderLecotPartsForChatbot(
     sentAt: null,
     deliveredAt: null,
     ...(interventionId ? { interventionId } : {}),
+    ...(orderClientName ? { clientName: orderClientName, nom: orderClientName } : {}),
   });
 
   const lineRows = lines.map((l) => ({
@@ -471,6 +486,7 @@ export async function orderLecotPartsForChatbot(
       const materialRef = await firestore.collection("material_orders").add({
         interventionId,
         companyId: ctx.companyId,
+        clientName: orderClientName,
         technicianUid: ctx.actorUid,
         partsRequested: lines.map((l) => ({
           description: l.label,
@@ -505,6 +521,7 @@ export async function orderLecotPartsForChatbot(
       ok: true,
       documentType: "material_order",
       supplierOrderId: orderRef.id,
+      clientName: orderClientName ?? null,
       status: "sent" as const,
       totalCents,
       totalEur: Math.round(totalCents) / 100,
@@ -556,6 +573,7 @@ export async function orderLecotPartsForChatbot(
     const materialRef = await firestore.collection("material_orders").add({
       interventionId,
       companyId: ctx.companyId,
+      clientName: orderClientName,
       technicianUid: ctx.actorUid,
       partsRequested: lines.map((l) => ({
         description: l.label,
@@ -603,6 +621,7 @@ export async function orderLecotPartsForChatbot(
     ok: true,
     documentType: "material_order",
     supplierOrderId: orderRef.id,
+    clientName: orderClientName ?? null,
     status,
     totalCents,
     totalEur: Math.round(totalCents) / 100,
