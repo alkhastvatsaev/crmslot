@@ -114,7 +114,7 @@ describe("materialAgentRouteHandler", () => {
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
   });
 
-  it("clears session client and delegates Lecot to OpenAI", async () => {
+  it("clears session client and streams instant Lecot catalogue for nouvelle commande lecot", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
@@ -127,10 +127,12 @@ describe("materialAgentRouteHandler", () => {
     expect(events).toContainEqual(
       expect.objectContaining({ type: "material_order_client", clientName: "" }),
     );
-    expect(mockRunChatbotOpenAI).toHaveBeenCalled();
+    // Instant shortcut — no OpenAI call
+    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+    expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 
-  it("delegates commande lecot to OpenAI (no instant catalogue shortcut)", async () => {
+  it("streams instant Lecot catalogue for commande lecot (no OpenAI call)", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
@@ -138,13 +140,9 @@ describe("materialAgentRouteHandler", () => {
       },
       auth,
     );
-    await readSseJsonLines(res);
-    expect(mockRunChatbotOpenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hubAgentMode: true,
-        toolCtx: expect.objectContaining({ materialOrderClientName: null }),
-      }),
-    );
+    const events = await readSseJsonLines(res);
+    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+    expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 
   it("streams error when OPENAI_API_KEY is missing", async () => {

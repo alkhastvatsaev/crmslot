@@ -3,7 +3,9 @@ import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
 import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
+import { streamInstantLecotCatalogResponse } from "@/features/chatbot/chatbot-lecot";
 import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAgentSystemPrompt";
+import { resolveMaterialAgentLecotSearchQuery } from "@/features/featureHub/materialAgentLecotQuery";
 import {
   buildMaterialAgentClientNameRegisteredReply,
   isAwaitingMaterialAgentClientName,
@@ -109,6 +111,23 @@ export async function handleMaterialAgentPost(
   const parsedClientReply = parseMaterialAgentClientNameFromUserText(lastUser, messages);
   if (parsedClientReply && isAwaitingMaterialAgentClientName(messages)) {
     return streamMaterialAgentClientNameRegistered(messages, parsedClientReply);
+  }
+
+  // Raccourci catalogue Lecot : réponse déterministe sans OpenAI.
+  // Couvre "commande lecot", "catalogue", "suggère des produits", "cylindre lecot", etc.
+  const lecotCatalogQuery = resolveMaterialAgentLecotSearchQuery(lastUser, messages);
+  if (lecotCatalogQuery) {
+    return createChatbotSseResponse(async (enqueue) => {
+      if (resetClientSession) {
+        enqueue({ type: "material_order_client", clientName: "" });
+      }
+      await streamInstantLecotCatalogResponse({
+        companyId,
+        query: lecotCatalogQuery,
+        messages,
+        enqueue,
+      });
+    });
   }
 
   return createChatbotSseResponse(async (enqueue) => {
