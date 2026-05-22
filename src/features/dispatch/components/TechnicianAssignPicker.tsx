@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { pickRecommendedSlot } from "@/features/scheduling/pickRecommendedSlot";
 import { Loader2, MapPin, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
+import { interventionLocationOrDefault } from "@/features/interventions/interventionLocation";
 import {
   buildAssignInterventionToTechnicianUpdate,
   type AssignScheduleOverride,
 } from "@/features/interventions/assignInterventionToTechnician";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
-import { rankTechniciansForIntervention } from "@/features/dispatch/rankTechniciansForIntervention";
+import {
+  prioritizeDefaultAssignTechnician,
+  rankTechniciansForIntervention,
+} from "@/features/dispatch/rankTechniciansForIntervention";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
 import {
   candidateRangeFromScheduleFields,
@@ -43,6 +47,8 @@ type Props = {
   onAssign: (technicianUid: string, schedule?: AssignScheduleOverride) => void | Promise<void>;
   onCancel: () => void;
   isAssigning?: boolean;
+  /** Permet au parent (tiroir inbox) de forcer la hauteur disponible. */
+  className?: string;
 };
 
 function formatDistanceKm(km: number): string {
@@ -62,6 +68,7 @@ export default function TechnicianAssignPicker({
   onAssign,
   onCancel,
   isAssigning = false,
+  className,
 }: Props) {
   const { t } = useTranslation();
   const { technicians, loading } = useTechnicians();
@@ -79,14 +86,21 @@ export default function TechnicianAssignPicker({
   });
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
 
+  const interventionCoords = useMemo(
+    () => interventionLocationOrDefault(intervention),
+    [intervention],
+  );
+
   const ranked = useMemo(
     () =>
-      rankTechniciansForIntervention(
-        technicians,
-        intervention.location.lat,
-        intervention.location.lng,
+      prioritizeDefaultAssignTechnician(
+        rankTechniciansForIntervention(
+          technicians,
+          interventionCoords.lat,
+          interventionCoords.lng,
+        ),
       ),
-    [technicians, intervention.location.lat, intervention.location.lng],
+    [technicians, interventionCoords.lat, interventionCoords.lng],
   );
 
   useEffect(() => {
@@ -96,17 +110,22 @@ export default function TechnicianAssignPicker({
     });
   }, [ranked]);
 
+  const techniciansRef = useRef(technicians);
+  techniciansRef.current = technicians;
+  const rankedLengthRef = useRef(ranked.length);
+  rankedLengthRef.current = ranked.length;
+
   useEffect(() => {
     let cancelled = false;
-    if (!intervention.location.lat || ranked.length === 0) return;
+    if (rankedLengthRef.current === 0) return;
 
     const calculateBest = async () => {
       setEtaLoading(true);
       try {
         const result = await findBestTechnician(
-          technicians,
-          intervention.location.lat,
-          intervention.location.lng,
+          techniciansRef.current,
+          interventionCoords.lat,
+          interventionCoords.lng,
           intervention.problem,
           intervention.address,
         );
@@ -130,7 +149,9 @@ export default function TechnicianAssignPicker({
     return () => {
       cancelled = true;
     };
-  }, [intervention.location.lat, intervention.location.lng, technicians, ranked.length]);
+    // technicians/ranked are accessed via ref — only re-run on stable intervention identity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interventionCoords.lat, interventionCoords.lng, intervention.problem, intervention.address]);
 
   const scheduleOverride = useMemo((): AssignScheduleOverride | undefined => {
     if (!selectedSlotTime?.trim()) return undefined;
@@ -195,12 +216,41 @@ export default function TechnicianAssignPicker({
     void onAssign(resolveTechnicianAssignUid(row.technician), scheduleOverride);
   };
 
+  const footerActions = (
+    <div className="flex shrink-0 gap-2 border-t border-slate-100 bg-slate-50/95 pt-3">
+      <button
+        type="button"
+        data-testid="technician-assign-picker-cancel-footer"
+        onClick={onCancel}
+        className="flex-1 rounded-[12px] border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+      >
+        {String(t("dispatch.assign_picker.cancel"))}
+      </button>
+      <button
+        type="button"
+        data-testid="technician-assign-confirm"
+        disabled={!selectedId || isAssigning || ranked.length === 0 || selectedConflicts.length > 0}
+        onClick={handleConfirm}
+        className="flex flex-1 items-center justify-center gap-2 rounded-[12px] bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+      >
+        {isAssigning ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+        {String(t("dispatch.assign_picker.confirm"))}
+        {etaLoading ? (
+          <span className="sr-only">{String(t("dispatch.assign_picker.eta_loading"))}</span>
+        ) : null}
+      </button>
+    </div>
+  );
+
   return (
     <div
       data-testid="technician-assign-picker"
-      className="rounded-[18px] border border-slate-200/80 bg-slate-50/90 p-4 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.18)]"
+      className={cn(
+        "flex min-h-0 flex-col rounded-[18px] border border-slate-200/80 bg-slate-50/90 p-4 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.18)]",
+        className,
+      )}
     >
-      <div className="mb-3 flex items-start justify-between gap-2">
+      <div className="mb-3 flex shrink-0 items-start justify-between gap-2">
         <div>
           <p className="text-sm font-semibold text-slate-900">
             {String(t("dispatch.assign_picker.title"))}
@@ -224,31 +274,37 @@ export default function TechnicianAssignPicker({
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center gap-2 py-6 text-sm text-slate-500">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {String(t("dispatch.assign_picker.loading"))}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex flex-1 items-center justify-center gap-2 py-6 text-sm text-slate-500">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {String(t("dispatch.assign_picker.loading"))}
+          </div>
+          {footerActions}
         </div>
       ) : ranked.length === 0 ? (
-        <p className="py-4 text-center text-sm text-slate-500">
-          {String(t("dispatch.assign_picker.no_technicians"))}
-        </p>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <p className="flex-1 py-4 text-center text-sm text-slate-500">
+            {String(t("dispatch.assign_picker.no_technicians"))}
+          </p>
+          {footerActions}
+        </div>
       ) : (
-        <>
-        <ScheduleConflictBanner conflicts={selectedConflicts} className="mb-3" />
-        {selectedId ? (
-          <ProposedScheduleSlots
-            className="mb-3"
-            dateYmd={scheduleDate}
-            onDateChange={(date) => {
-              setScheduleDate(date);
-              setSelectedSlotTime(null);
-            }}
-            slots={proposedSlots}
-            selectedTime={selectedSlotTime}
-            onSelectTime={setSelectedSlotTime}
-          />
-        ) : null}
-        <ul className="max-h-52 space-y-2 overflow-y-auto py-1">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          <div className="custom-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto pr-0.5">
+            <ScheduleConflictBanner conflicts={selectedConflicts} />
+            {selectedId ? (
+              <ProposedScheduleSlots
+                dateYmd={scheduleDate}
+                onDateChange={(date) => {
+                  setScheduleDate(date);
+                  setSelectedSlotTime(null);
+                }}
+                slots={proposedSlots}
+                selectedTime={selectedSlotTime}
+                onSelectTime={setSelectedSlotTime}
+              />
+            ) : null}
+            <ul className="space-y-2 py-0.5">
           {ranked.map(({ technician, distanceKm }) => {
             const isSelected = selectedId === technician.id;
             const isRecommended = recommendedId === technician.id;
@@ -303,33 +359,11 @@ export default function TechnicianAssignPicker({
               </li>
             );
           })}
-        </ul>
-        </>
+            </ul>
+          </div>
+          {footerActions}
+        </div>
       )}
-
-      <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
-        <button
-          type="button"
-          data-testid="technician-assign-picker-cancel-footer"
-          onClick={onCancel}
-          className="flex-1 rounded-[12px] border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
-        >
-          {String(t("dispatch.assign_picker.cancel"))}
-        </button>
-        <button
-          type="button"
-          data-testid="technician-assign-confirm"
-          disabled={!selectedId || isAssigning || ranked.length === 0 || selectedConflicts.length > 0}
-          onClick={handleConfirm}
-          className="flex flex-1 items-center justify-center gap-2 rounded-[12px] bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isAssigning ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {String(t("dispatch.assign_picker.confirm"))}
-          {etaLoading ? (
-            <span className="sr-only">{String(t("dispatch.assign_picker.eta_loading"))}</span>
-          ) : null}
-        </button>
-      </div>
     </div>
   );
 }

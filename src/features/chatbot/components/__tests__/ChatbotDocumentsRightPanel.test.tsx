@@ -6,6 +6,18 @@ const openDocumentPreview = jest.fn();
 const openSupplierOrderPdf = jest.fn();
 const closeDocumentPreview = jest.fn();
 
+jest.mock("@/features/chatbot/hooks/useChatbotDocumentTileThumbnails", () => ({
+  useChatbotDocumentTileThumbnails: () => ({
+    thumbnails: {
+      "invoice:iv-1": { thumbnailUrl: "data:image/jpeg;base64,mock-inv" },
+      "supplier:ord-1": { thumbnailUrl: "data:image/jpeg;base64,mock-ord" },
+    },
+    thumbnailLoading: {},
+  }),
+  invoiceTileKey: (id: string) => `invoice:${id}`,
+  supplierTileKey: (id: string) => `supplier:${id}`,
+}));
+
 jest.mock("@/features/chatbot/ChatbotContext", () => ({
   useChatbotContext: () => ({
     companyId: "co-1",
@@ -57,13 +69,21 @@ describe("ChatbotDocumentsRightPanel", () => {
     closeDocumentPreview.mockClear();
   });
 
-  it("renders full-height list with icon grids (2 columns)", () => {
+  it("renders full-height list with thumbnail grids (2 columns)", () => {
     render(<ChatbotDocumentsRightPanel />);
     expect(screen.getByTestId("chatbot-documents-right-panel")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-documents-grid-invoices")).toHaveClass("grid-cols-2");
     expect(screen.getByTestId("chatbot-documents-grid-orders")).toHaveClass("grid-cols-2");
     expect(screen.getByTestId("chatbot-document-invoice-iv-1")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-document-order-ord-1")).toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-document-invoice-iv-1-preview")).toHaveAttribute(
+      "src",
+      "data:image/jpeg;base64,mock-inv",
+    );
+    expect(screen.getByTestId("chatbot-document-order-ord-1-preview")).toHaveAttribute(
+      "src",
+      "data:image/jpeg;base64,mock-ord",
+    );
     expect(screen.getByText(/Dupont/)).toBeInTheDocument();
     expect(screen.getByText(/Cylindre/)).toBeInTheDocument();
   });

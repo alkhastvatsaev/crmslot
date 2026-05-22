@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { firestore } from "@/core/config/firebase";
+import { auth, firestore } from "@/core/config/firebase";
+import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
@@ -92,10 +93,21 @@ export default function MaterialOrderManagement({ companyId }: Props) {
     if (!firestore) return;
     setUpdatingId(orderId);
     try {
+      const order = orders.find((o) => o.id === orderId);
       await updateDoc(doc(firestore, "material_orders", orderId), {
         status: newStatus,
         updatedAt: new Date().toISOString(),
       });
+      if (activeCompanyId && order) {
+        await logCrmCompanyAction({
+          companyId: activeCompanyId,
+          kind: "material_order_status_changed",
+          actorUid: auth?.currentUser?.uid?.trim() || "system",
+          actorRole: "dispatcher",
+          interventionId: order.interventionId,
+          note: `Commande matériel → ${newStatus}`,
+        });
+      }
       toast.success("Statut mis à jour");
     } catch {
       toast.error(String(t("materials.toast_error")));

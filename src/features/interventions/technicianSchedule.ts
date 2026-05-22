@@ -1,5 +1,8 @@
 import type { Intervention } from "@/features/interventions/types";
-import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
+import {
+  isTechnicianActiveFieldMission,
+  isTechnicianAssignmentAwaitingResponse,
+} from "@/features/interventions/technicianAssignmentActions";
 
 export type TechnicianTabFilter = "today" | "week" | "all";
 
@@ -109,8 +112,9 @@ function endOfWeekSunday(ref: Date): Date {
 }
 
 /**
- * Liste missions technicien (panneau gauche) : les assignations en attente
- * d’acceptation sont toujours visibles, même si la date planifiée n’est pas « aujourd’hui ».
+ * Liste missions technicien (panneau gauche) :
+ * - assignations en attente d’acceptation (toute date) ;
+ * - missions acceptées en cours (`en_route`, etc.) — ne pas les faire disparaître après acceptation.
  */
 export function interventionVisibleInTechnicianMissionList(
   iv: Intervention,
@@ -119,6 +123,7 @@ export function interventionVisibleInTechnicianMissionList(
   now = new Date(),
 ): boolean {
   if (isTechnicianAssignmentAwaitingResponse(iv, technicianUid)) return true;
+  if (isTechnicianActiveFieldMission(iv, technicianUid)) return true;
   return interventionMatchesTab(iv, tab, now);
 }
 
@@ -199,6 +204,28 @@ export function isPendingIntakeStatus(status: Intervention["status"]): boolean {
 
 export function isInterventionPendingBackOfficeIntake(iv: Pick<Intervention, "status">): boolean {
   return isPendingIntakeStatus(iv.status);
+}
+
+/** Assignée au technicien mais pas encore acceptée (refus possible ou bug acceptation). */
+export function isInterventionAwaitingTechnicianAcceptance(
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+): boolean {
+  if (iv.status === "assigned") return true;
+  if (iv.status === "in_progress" && !(iv.technicianAcceptedAt ?? "").trim()) return true;
+  return false;
+}
+
+/**
+ * Onglet IVANA « Demandes » : nouvelles soumissions + dossiers revenus du terrain
+ * (refus technicien ou acceptation jamais confirmée).
+ */
+export function isInterventionInBackofficeRequestsQueue(
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+): boolean {
+  return (
+    isInterventionPendingBackOfficeIntake(iv) ||
+    isInterventionAwaitingTechnicianAcceptance(iv)
+  );
 }
 
 /** Visible sur le hub technicien (liste + offres) : après passage back-office (ex. statut ≠ pending). */

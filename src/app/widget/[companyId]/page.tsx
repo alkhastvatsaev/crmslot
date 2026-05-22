@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { addDoc, collection } from "firebase/firestore";
-import { firestore } from "@/core/config/firebase";
+import { signInAnonymously } from "firebase/auth";
+import { auth, firestore, isConfigured } from "@/core/config/firebase";
+import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
 import { CheckCircle2 } from "lucide-react";
 
 export default function WidgetPage() {
@@ -24,16 +26,34 @@ export default function WidgetPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firestore || !address || !problem) return;
+    if (!isConfigured || !firestore || !auth || !address || !problem) return;
     setSubmitting(true);
     try {
-      await addDoc(collection(firestore, "interventions"), {
+      let uid = auth.currentUser?.uid ?? "";
+      if (!uid) {
+        const cred = await signInAnonymously(auth);
+        uid = cred.user.uid;
+      }
+      const createdRef = await addDoc(collection(firestore, "interventions"), {
         companyId,
         address,
         problem,
         clientPhone: phone || null,
         status: "pending",
         createdAt: new Date().toISOString(),
+        createdByUid: uid,
+        source: "widget_qr",
+      });
+      void logCrmInterventionCreated({
+        intervention: {
+          id: createdRef.id,
+          title: problem.trim().slice(0, 140) || "Demande widget",
+          address: address.trim(),
+          status: "pending",
+          companyId,
+        },
+        actorUid: uid,
+        actorRole: "client",
         source: "widget_qr",
       });
       setDone(true);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Building2, MapPin, Phone, User, UserRound } from "lucide-react";
+import { Building2, Mail, Phone, User, UserRound } from "lucide-react";
 import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPanel";
 import { useRequesterHub, RequesterType } from "../context/RequesterHubContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
@@ -130,18 +130,18 @@ export default function RequesterProfilePanel() {
           </motion.div>
 
           <motion.div
-            animate={isInvalid(profile.defaultAddress) ? shakeControls : undefined}
-            className={cn(glassRow, isInvalid(profile.defaultAddress) && "ring-2 ring-red-500 bg-red-50/80")}
+            animate={isInvalid(profile.email) ? shakeControls : undefined}
+            className={cn(glassRow, isInvalid(profile.email) && "ring-2 ring-red-500 bg-red-50/80")}
           >
             <span className={iconRail}>
-              <MapPin className={cn("h-5 w-5 opacity-70", isInvalid(profile.defaultAddress) && "text-red-500 opacity-100")} />
+              <Mail className={cn("h-5 w-5 opacity-70", isInvalid(profile.email) && "text-red-500 opacity-100")} />
             </span>
             <input
-              type="text"
-              placeholder={t("requester.profile.usual_address")}
-              value={profile.defaultAddress}
-              onChange={(e) => setProfile((prev) => ({ ...prev, defaultAddress: e.target.value }))}
-              className={cn(inputClass, isInvalid(profile.defaultAddress) && "placeholder:text-red-300")}
+              type="email"
+              placeholder="Mail"
+              value={profile.email}
+              onChange={(e) => setProfile((prev) => ({ ...prev, email: e.target.value }))}
+              className={cn(inputClass, isInvalid(profile.email) && "placeholder:text-red-300")}
             />
           </motion.div>
         </div>

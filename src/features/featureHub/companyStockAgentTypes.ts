@@ -1,0 +1,45 @@
+import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
+import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { StockItem } from "@/features/materials/stockFirestore";
+
+export type CompanyStockAgentMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  suggestions?: string[];
+};
+
+export type CompanyStockAgentContext = {
+  companyId: string;
+  items: StockItem[];
+  orders: MaterialOrderDoc[];
+  metrics: CompanyStockDashboardMetrics;
+};
+
+export type CompanyStockAgentIntent =
+  | "greeting"
+  | "help"
+  | "off_topic"
+  | "summary"
+  | "list_out"
+  | "list_low"
+  | "list_alerts"
+  | "search"
+  | "pending_orders"
+  | "waiting_jobs"
+  | "lecot"
+  | "add_item"
+  | "autopilot";
+
+export type CompanyStockAgentAction = {
+  focusStockItemId?: string;
+  searchQuery?: string;
+};
+
+export type CompanyStockAgentTurnResult = {
+  intent: CompanyStockAgentIntent;
+  reply: string;
+  refused: boolean;
+  action?: CompanyStockAgentAction;
+  suggestions?: string[];
+};

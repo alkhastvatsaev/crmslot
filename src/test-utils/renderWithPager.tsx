@@ -3,18 +3,24 @@ import type { ReactElement, ReactNode } from "react";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { I18nProvider } from "@/core/i18n/I18nContext";
 
-type Options = Omit<RenderOptions, "wrapper">;
+type Options = Omit<RenderOptions, "wrapper"> & {
+  /** Page visible au montage (ex. index du hub testé). */
+  initialPageIndex?: number;
+};
 
 /**
  * Rend un composant sous `DashboardPagerProvider` (évite de dupliquer le boilerplate dans les tests).
  */
 export function renderWithPager(ui: ReactElement, pageCount = 6, options?: Options) {
+  const { initialPageIndex = 0, ...renderOptions } = options ?? {};
   function Wrapper({ children }: { children: ReactNode }) {
     return (
       <I18nProvider>
-        <DashboardPagerProvider pageCount={pageCount}>{children}</DashboardPagerProvider>
+        <DashboardPagerProvider pageCount={pageCount} initialPageIndex={initialPageIndex}>
+          {children}
+        </DashboardPagerProvider>
       </I18nProvider>
     );
   }
-  return render(ui, { wrapper: Wrapper, ...options });
+  return render(ui, { wrapper: Wrapper, ...renderOptions });
 }

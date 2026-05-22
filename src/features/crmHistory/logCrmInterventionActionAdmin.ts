@@ -1,0 +1,48 @@
+import { getAdminDb } from "@/core/config/firebase-admin";
+import type { Intervention } from "@/features/interventions/types";
+import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
+import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
+
+/** Journal CRM côté serveur (webhooks, Admin SDK). */
+export async function logCrmInterventionActionAdmin(params: {
+  kind: CompanyCrmActivityKind;
+  iv: Pick<
+    Intervention,
+    | "id"
+    | "title"
+    | "address"
+    | "status"
+    | "companyId"
+    | "clientName"
+    | "clientFirstName"
+    | "clientLastName"
+    | "clientCompanyName"
+  >;
+  actorUid: string;
+  actorRole: WorkflowOwnerRole;
+  note?: string;
+  statusBefore?: Intervention["status"];
+  statusAfter?: Intervention["status"];
+}): Promise<void> {
+  const companyId = (params.iv.companyId ?? "").trim();
+  if (!companyId) return;
+
+  const payload = buildCompanyCrmActivityPayload(
+    companyId,
+    params.kind,
+    { uid: params.actorUid, role: params.actorRole },
+    params.iv,
+    {
+      statusBefore: params.statusBefore ?? params.iv.status,
+      statusAfter: params.statusAfter,
+      note: params.note,
+    },
+  );
+
+  try {
+    await logCompanyCrmActivityAdmin(getAdminDb(), payload);
+  } catch (e) {
+    console.warn("[logCrmInterventionActionAdmin]", params.kind, e);
+  }
+}

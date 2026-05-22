@@ -4,7 +4,6 @@ import DashboardTriplePanelLayout from "@/features/dashboard/components/Dashboar
 import BackOfficeHubPanelShell from "@/features/backoffice/components/BackOfficeHubPanelShell";
 import {
   BackOfficeHubExampleBilling,
-  BackOfficeHubExampleEmails,
   BackOfficeHubExampleMaterials,
   BackOfficeHubExampleTimeline,
 } from "@/features/backoffice/components/BackOfficeHubExampleRails";
@@ -18,8 +17,6 @@ import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLay
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import InterventionCaseTimeline from "@/features/interventions/components/InterventionCaseTimeline";
-import InterventionEmailPanel from "@/features/emails/components/InterventionEmailPanel";
-import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
 import InterventionCommissionPanel from "@/features/commissions/components/InterventionCommissionPanel";
 import InterventionInvoiceAmountField from "@/features/commissions/components/InterventionInvoiceAmountField";
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
@@ -46,7 +43,7 @@ export default function BackOfficeHubPage({ slotIndex }: Props) {
       centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
       rightTestId={`dashboard-pager-slot-${slotIndex}-panel-right`}
       leftAriaLabel={`${t("backoffice.hub.aria.page")} ${humanPage} — ${t("intervention_drawer.tab_timeline")}`}
-      centerAriaLabel={`${t("backoffice.hub.aria.page")} ${humanPage} — ${t("intervention_drawer.tab_emails")}`}
+      centerAriaLabel={`${t("backoffice.hub.aria.page")} ${humanPage} — ${t("backoffice.hub.aria.center_slot")}`}
       rightAriaLabel={`${t("backoffice.hub.aria.page")} ${humanPage} — ${t("intervention_drawer.tab_materials")}`}
       left={
         <section id={BACKOFFICE_HUB_ANCHOR_DUPLICATES} className={railShell}>
@@ -69,38 +66,14 @@ export default function BackOfficeHubPage({ slotIndex }: Props) {
       }
       center={
         <section id={BACKOFFICE_HUB_ANCHOR_DASHBOARD} className={railShell}>
-          <BackOfficeHubPanelShell
-            title={t("intervention_drawer.tab_emails")}
-            testId="backoffice-hub-panel-emails"
-            badge={exampleBadge}
-          >
-            {isExample ? (
-              <BackOfficeHubExampleEmails />
-            ) : (
-              <InterventionEmailPanel interventionId={intervention.id} companyId={companyId} />
-            )}
+          <BackOfficeHubPanelShell testId="backoffice-hub-panel-center">
+            {isExample ? <BackOfficeHubExampleMaterials /> : null}
           </BackOfficeHubPanelShell>
         </section>
       }
       right={
         <section id={BACKOFFICE_HUB_ANCHOR_CALENDAR} className={railShell}>
-          <BackOfficeHubPanelShell
-            title={t("intervention_drawer.tab_materials")}
-            testId="backoffice-hub-panel-materials"
-            badge={exampleBadge}
-            className="min-h-0 shrink-0"
-          >
-            {isExample ? (
-              <BackOfficeHubExampleMaterials />
-            ) : (
-              <InterventionMaterialOrdersPanel
-                intervention={intervention}
-                technicianUid={technicianUid}
-                allowCreate={allowMaterialCreate}
-                allowStatusUpdate
-              />
-            )}
-          </BackOfficeHubPanelShell>
+
 
           <BackOfficeHubPanelShell
             title={t("intervention_drawer.tab_billing")}

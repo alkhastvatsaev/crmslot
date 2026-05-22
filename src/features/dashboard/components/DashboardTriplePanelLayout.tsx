@@ -34,6 +34,8 @@ type Props = {
   right?: ReactNode;
   centerPadding?: boolean;
   rightPadding?: boolean;
+  /** Override coque gauche (défaut : `dashboardTripleSideShellClass`). */
+  leftShellClassName?: string;
 };
 
 /** 3-column grid page — each rail is a direct grid child + `panel-glass` shell. */
@@ -50,6 +52,7 @@ export default function DashboardTriplePanelLayout({
   right,
   centerPadding = true,
   rightPadding = true,
+  leftShellClassName = dashboardTripleSideShellClass,
 }: Props) {
   return (
     <div data-testid={rootTestId} className={DASHBOARD_DESKTOP_ROOT_CLASS}>
@@ -59,7 +62,7 @@ export default function DashboardTriplePanelLayout({
           aria-label={leftAriaLabel}
           data-testid={leftTestId}
           className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left`}
-          shellClassName={dashboardTripleSideShellClass}
+          shellClassName={leftShellClassName}
           innerClassName={`${GLASS_PANEL_BODY_SCROLL} flex min-h-0 flex-col`}
         >
           {left ?? <DashboardTriplePanelSidePlaceholder />}

@@ -1,0 +1,52 @@
+"use client";
+
+import { screen } from "@testing-library/react";
+import { render } from "@/test-utils/render";
+import CompanyStockCenterPanel from "@/features/featureHub/components/CompanyStockCenterPanel";
+import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
+import type { StockItem } from "@/features/materials/stockFirestore";
+
+const items: StockItem[] = [
+  {
+    id: "s1",
+    companyId: "co",
+    reference: "REF-A",
+    description: "Gâche électrique",
+    quantity: 2,
+    alertThreshold: 5,
+    unit: "pcs",
+    updatedAt: "2026-05-01",
+  },
+];
+
+function renderPanel(overrideItems: StockItem[] = items) {
+  return render(
+    <CompanyStockIntentProvider>
+      <CompanyStockCenterPanel
+        items={overrideItems}
+        orders={[]}
+        category="all"
+        loading={false}
+      />
+    </CompanyStockIntentProvider>,
+  );
+}
+
+describe("CompanyStockCenterPanel", () => {
+  it("renders search and stock list only", () => {
+    renderPanel();
+    expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-search")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-pulse")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-filter-bar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-autopilot-primary")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-add")).not.toBeInTheDocument();
+  });
+
+  it("shows stock card for item", () => {
+    renderPanel();
+    expect(screen.getByTestId("company-stock-card-s1")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-card-s1")).toHaveAttribute("data-health", "low");
+  });
+});

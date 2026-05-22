@@ -85,6 +85,7 @@ export default function ClientInterventionsPanel({ companyId, clientId }: Props)
                           JSON.stringify({
                             clientName: [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") || iv.clientName,
                             phone: iv.clientPhone,
+                            email: iv.clientEmail,
                             clientId,
                             parentInterventionId: iv.id,
                           }),

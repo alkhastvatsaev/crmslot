@@ -48,7 +48,8 @@ describe("BackOfficeHubPage panels", () => {
     render(<BackOfficeHubPage slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />, { pageCount: 4 });
     expect(screen.getByTestId("backoffice-hub-panel-timeline")).toBeInTheDocument();
     expect(screen.getByTestId("backoffice-hub-example-timeline")).toBeInTheDocument();
-    expect(screen.getByTestId("backoffice-hub-example-emails")).toBeInTheDocument();
+    expect(screen.getByTestId("backoffice-hub-panel-center")).toBeInTheDocument();
+    expect(screen.queryByTestId("backoffice-hub-example-emails")).not.toBeInTheDocument();
     expect(screen.getByTestId("backoffice-hub-example-materials")).toBeInTheDocument();
     expect(screen.getByTestId("backoffice-hub-example-billing")).toBeInTheDocument();
     expect(screen.getAllByText(/exemple|sample|voorbeeld/i).length).toBeGreaterThan(0);

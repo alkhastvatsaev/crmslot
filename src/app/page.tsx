@@ -9,10 +9,12 @@ import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndic
 import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
-import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
 import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
@@ -25,6 +27,9 @@ import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";
 import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
+import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
+import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
+import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
 import TechnicianConnectivityBar from "@/features/offline/components/TechnicianConnectivityBar";
@@ -59,11 +64,6 @@ const TechnicianHubPage = dynamic(
   { ssr: false, loading: () => null },
 );
 
-const BackOfficeHubPage = dynamic(
-  () => import("@/features/backoffice/components/BackOfficeHubPage"),
-  { ssr: false, loading: () => null },
-);
-
 const ChatbotPage = dynamic(() => import("@/features/chatbot/components/ChatbotPage"), {
   ssr: false,
   loading: () => null,
@@ -74,7 +74,22 @@ const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubP
   loading: () => null,
 });
 
-/** Écran d’accueil — **6 pages** : carte · société · technicien · back-office · Chatbot · Gmail (lab page 6 archivé). */
+const FeatureHubPage = dynamic(() => import("@/features/featureHub/components/FeatureHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const CrmHistoryPage = dynamic(
+  () => import("@/features/crmHistory/components/CrmHistoryPage"),
+  { ssr: false, loading: () => null },
+);
+
+const BillingHubPage = dynamic(() => import("@/features/billingHub/components/BillingHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/** Écran d’accueil — **8 pages** : carte · société · technicien · Chatbot · Gmail · Matériel · CRM · Facturation. */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -85,9 +100,11 @@ export default function Dashboard() {
       </>,
       <DashboardSecondaryPlaceholder key="secondary" />,
       <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
-      <BackOfficeHubPage key="backoffice-hub" slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />,
       <ChatbotPage key="chatbot" slotIndex={AI_ASSISTANT_SLOT_INDEX} />,
       <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
+      <FeatureHubPage key="feature-hub" slotIndex={FEATURE_HUB_SLOT_INDEX} />,
+      <CrmHistoryPage key="crm-history" slotIndex={CRM_HISTORY_SLOT_INDEX} />,
+      <BillingHubPage key="billing-hub" slotIndex={BILLING_HUB_SLOT_INDEX} />,
     ],
     [],
   );
@@ -107,6 +124,9 @@ export default function Dashboard() {
                     <OfflineSyncProvider>
                       <TechnicianCaseIntentProvider>
                         <BackofficeInboxIntentProvider>
+                        <CompanyStockIntentProvider>
+                        <CompanyStockAgentBridgeProvider>
+                        <BillingHubIntentProvider>
                         <TechnicianBackofficeReportBridgeProvider>
                           <TechnicianFinishJobProvider>
                             <TechnicianConnectivityBar />
@@ -144,6 +164,9 @@ export default function Dashboard() {
                             />
                           </TechnicianFinishJobProvider>
                         </TechnicianBackofficeReportBridgeProvider>
+                        </BillingHubIntentProvider>
+                        </CompanyStockAgentBridgeProvider>
+                        </CompanyStockIntentProvider>
                         </BackofficeInboxIntentProvider>
                       </TechnicianCaseIntentProvider>
                     </OfflineSyncProvider>

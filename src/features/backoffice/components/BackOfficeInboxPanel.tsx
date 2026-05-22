@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
+import { isSyntheticInterventionId } from "@/core/config/devUiPreview";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
@@ -26,7 +27,8 @@ import { cn } from "@/lib/utils";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
 import type { Intervention } from "@/features/interventions/types";
-import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
+import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
+import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { canTransitionInterventionStatus } from "@/features/interventions/workflow/interventionWorkflow";
 import { updateInterventionSchedule } from "@/features/scheduling/updateInterventionSchedule";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
@@ -50,6 +52,8 @@ import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import {
   coerceFirestoreLikeDate,
   interventionClientLabel,
+  isInterventionAwaitingTechnicianAcceptance,
+  isInterventionInBackofficeRequestsQueue,
   isInterventionPendingBackOfficeIntake,
   isInterventionReleasedToTechnicianField,
   interventionMatchesTab,
@@ -302,7 +306,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
 
   const selectedReportCompletion = useMemo(() => {
     if (!selectedItem) return { photoUrls: [] as string[], signatureUrl: null as string | null };
-    if (isInterventionPendingBackOfficeIntake(selectedItem)) {
+    if (isInterventionInBackofficeRequestsQueue(selectedItem)) {
       return { photoUrls: [], signatureUrl: null };
     }
     const bridged = pickLatestBridgedReportForIntervention(bridgedTerrainReports, selectedItem.id);
@@ -384,7 +388,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
 
   const pendingRequests = useMemo(() => 
     interventions
-      .filter((inv) => isInterventionPendingBackOfficeIntake(inv))
+      .filter((inv) => isInterventionInBackofficeRequestsQueue(inv))
       .sort((a, b) => {
         const timeA = coerceFirestoreLikeDate(a.createdAt)?.getTime() ?? 0;
         const timeB = coerceFirestoreLikeDate(b.createdAt)?.getTime() ?? 0;
@@ -425,8 +429,24 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   const bridgedTerrainCount = bridgedTerrainVisible.length;
 
   const handleDelete = async (id: string) => {
+    if (isSyntheticInterventionId(id)) {
+      toast.success(t("backoffice.toasts.request_deleted"));
+      setSelectedItemId(null);
+      return;
+    }
     if (!firestore) return;
+    const row = interventions.find((x) => x.id === id);
+    const actorUid = auth?.currentUser?.uid?.trim() || "system";
     try {
+      if (row) {
+        await logCrmInterventionAction({
+          kind: "intervention_deleted",
+          iv: row,
+          actorUid,
+          actorRole: "dispatcher",
+          note: "Suppression dossier (IVANA / back-office)",
+        });
+      }
       await deleteDoc(doc(firestore, "interventions", id));
       toast.success(t("backoffice.toasts.request_deleted"));
       setSelectedItemId(null);
@@ -456,27 +476,24 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
         return;
       }
-      const assignPatch = buildAssignInterventionToTechnicianUpdate(row, technicianUid, new Date(), schedule);
-      const actorUid = auth?.currentUser?.uid?.trim();
-      if (!actorUid) {
-        toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
-        return;
-      }
-      await transitionInterventionStatus({
-        db: firestore,
-        interventionId: id,
-        iv: row,
-        toStatus: "assigned",
-        actor: dispatcherTransitionActor(actorUid),
-        extraPatch: assignPatch,
-      });
+      await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
       toast.success(t("backoffice.toasts.request_assigned"));
       setAssignPickerOpen(false);
       setSelectedItemId(null);
       setPendingCaseId(id);
       navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-    } catch {
-      toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
+    } catch (e) {
+      const code =
+        typeof e === "object" && e !== null && "code" in e ? String((e as { code?: string }).code) : "";
+      const description =
+        code === "permission-denied"
+          ? t("backoffice.toasts.permission_denied_verify")
+          : code === "admin-unavailable"
+            ? t("backoffice.toasts.admin_unavailable")
+            : e instanceof Error
+              ? e.message
+              : t("backoffice.toasts.assign_failed");
+      toast.error(t("common.error"), { description });
     } finally {
       setIsAssigning(false);
     }
@@ -520,6 +537,16 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         iv: row,
         toStatus: "invoiced",
         actor: dispatcherTransitionActor(actorUid),
+        note: "Rapport validé — facturation",
+      });
+      await logCrmInterventionAction({
+        kind: "intervention_report_validated",
+        iv: row,
+        actorUid,
+        actorRole: "dispatcher",
+        statusBefore: row.status,
+        statusAfter: "invoiced",
+        note: "Validation rapport IVANA",
       });
       toast.success(t("backoffice.toasts.report_verified"));
       setSelectedItemId(null);
@@ -554,12 +581,14 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
     if (!row) return;
     if (row.assignedTechnicianUid?.trim()) {
       if (!firestore) return;
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
       const result = await updateInterventionSchedule({
         db: firestore,
         intervention: row,
         allInterventions: interventions,
         scheduledDate: dragBoardDate,
         scheduledTime: time,
+        audit: { actorUid, actorRole: "dispatcher" },
       });
       if (!result.ok) {
         toast.error(
@@ -578,12 +607,14 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   const handleUpdateDateTime = async () => {
     if (!selectedItem || !firestore) return;
     try {
+      const actorUid = auth?.currentUser?.uid?.trim() || "system";
       const result = await updateInterventionSchedule({
         db: firestore,
         intervention: selectedItem,
         allInterventions: interventions,
         requestedDate: editDate,
         requestedTime: editTime,
+        audit: { actorUid, actorRole: "dispatcher", note: `Souhait client ${editDate} ${editTime}` },
       });
       if (!result.ok) {
         if (result.reason === "conflict") {
@@ -940,43 +971,56 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
       <AnimatePresence>
         {selectedItem && (
           <motion.div
+            data-testid="backoffice-inbox-detail"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute inset-0 z-30 flex flex-col bg-white rounded-[inherit] shadow-2xl"
+            className="absolute inset-0 z-30 flex min-h-0 flex-col overflow-hidden bg-white rounded-[inherit] shadow-2xl"
           >
             {/* Detail Header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
+            <div className="flex shrink-0 items-center justify-between px-4 py-4 border-b border-slate-100">
               <button 
                 onClick={() => {
                   setSelectedItemId(null);
                   setIsEditingDateTime(false);
+                  setAssignPickerOpen(false);
                 }}
                 className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <h3 className="text-[15px] font-bold text-slate-800">
-                {isInterventionPendingBackOfficeIntake(selectedItem)
-                  ? t("backoffice.inbox.detail_title_request")
-                  : t("backoffice.inbox.detail_title_report")}
+                {assignPickerOpen
+                  ? t("dispatch.assign_picker.title")
+                  : isInterventionInBackofficeRequestsQueue(selectedItem)
+                    ? isInterventionAwaitingTechnicianAcceptance(selectedItem)
+                      ? t("backoffice.inbox.detail_title_returned")
+                      : t("backoffice.inbox.detail_title_request")
+                    : t("backoffice.inbox.detail_title_report")}
               </h3>
               <div className="w-9" />
             </div>
 
-            {/* Detail Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            {/* Detail Content — masqué quand le picker assignation occupe tout l’espace */}
+            {!assignPickerOpen ? (
+            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 space-y-8">
               {/* Header Info */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
                    <span className={cn(
                      "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                     isInterventionPendingBackOfficeIntake(selectedItem) ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                     isInterventionAwaitingTechnicianAcceptance(selectedItem)
+                       ? "bg-slate-200 text-slate-700"
+                       : isInterventionPendingBackOfficeIntake(selectedItem)
+                         ? "bg-blue-100 text-blue-700"
+                         : "bg-green-100 text-green-700",
                    )}>
-                     {isInterventionPendingBackOfficeIntake(selectedItem)
-                       ? t("backoffice.inbox.kind_request")
-                       : t("backoffice.inbox.kind_report")}{" "}
+                     {isInterventionAwaitingTechnicianAcceptance(selectedItem)
+                       ? t("backoffice.inbox.kind_returned")
+                       : isInterventionPendingBackOfficeIntake(selectedItem)
+                         ? t("backoffice.inbox.kind_request")
+                         : t("backoffice.inbox.kind_report")}{" "}
                      • ID: {selectedItem.id.slice(-6).toUpperCase()}
                    </span>
                 </div>
@@ -990,6 +1034,13 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                 <p className="text-[15px] font-medium text-slate-500 mt-1">
                   {selectedItem.clientPhone || t("backoffice.inbox.no_phone")}
                 </p>
+                {selectedItem.clientEmail && (
+                  <p className="text-[14px] font-medium text-slate-500 mt-0.5 break-all">
+                    <a href={`mailto:${selectedItem.clientEmail}`} className="hover:underline">
+                      {selectedItem.clientEmail}
+                    </a>
+                  </p>
+                )}
               </div>
 
               {/* Address */}
@@ -1003,7 +1054,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               {/* Problem / Report Description */}
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  {isInterventionPendingBackOfficeIntake(selectedItem)
+                  {isInterventionInBackofficeRequestsQueue(selectedItem)
                     ? t("backoffice.inbox.problem_label")
                     : t("backoffice.inbox.report_label")}
                 </span>
@@ -1035,7 +1086,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               ) : null}
 
               {/* Date & Time management for requests */}
-              {isInterventionPendingBackOfficeIntake(selectedItem) && (
+              {isInterventionInBackofficeRequestsQueue(selectedItem) && (
                 <div className="space-y-3">
                    <div className="flex justify-between items-center">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -1113,18 +1164,18 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               )}
 
               {/* Photos Grid */}
-              {((isInterventionPendingBackOfficeIntake(selectedItem) && selectedItem.attachmentThumbnails) ||
-                (!isInterventionPendingBackOfficeIntake(selectedItem) &&
+              {((isInterventionInBackofficeRequestsQueue(selectedItem) && selectedItem.attachmentThumbnails) ||
+                (!isInterventionInBackofficeRequestsQueue(selectedItem) &&
                   selectedReportCompletion.photoUrls.length > 0)) && (
                 <div className="space-y-3" data-testid="backoffice-report-detail-photos-section">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    {isInterventionPendingBackOfficeIntake(selectedItem)
+                    {isInterventionInBackofficeRequestsQueue(selectedItem)
                       ? t("backoffice.inbox.photos_client")
                       : t("backoffice.inbox.photos_completion")}
                   </span>
                   <div className="grid grid-cols-2 gap-2">
                     {(
-                      isInterventionPendingBackOfficeIntake(selectedItem)
+                      isInterventionInBackofficeRequestsQueue(selectedItem)
                         ? selectedItem.attachmentThumbnails
                         : selectedReportCompletion.photoUrls
                     )?.map((url, i) => (
@@ -1135,7 +1186,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                           alt="Intervention"
                           className={cn(
                             "w-full h-full object-cover",
-                            !isInterventionPendingBackOfficeIntake(selectedItem) &&
+                            !isInterventionInBackofficeRequestsQueue(selectedItem) &&
                               (PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled) &&
                               "blur-lg",
                           )}
@@ -1147,7 +1198,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               )}
 
               {/* Audio / Transcription for requests (under photos) */}
-              {isInterventionPendingBackOfficeIntake(selectedItem) ? (
+              {isInterventionInBackofficeRequestsQueue(selectedItem) ? (
                 <div className="space-y-3">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                     {t("backoffice.inbox.voice_message")}
@@ -1198,7 +1249,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               ) : null}
 
               {/* Signature for reports */}
-              {!isInterventionPendingBackOfficeIntake(selectedItem) &&
+              {!isInterventionInBackofficeRequestsQueue(selectedItem) &&
                 selectedReportCompletion.signatureUrl && (
                   <div className="space-y-3" data-testid="backoffice-report-detail-signature-section">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -1215,12 +1266,19 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                   </div>
                 )}
             </div>
+            ) : null}
 
-            {/* Sticky Actions */}
-            <div className="border-t border-slate-100 bg-white/80 p-6 backdrop-blur-md">
-              {isInterventionPendingBackOfficeIntake(selectedItem) ? (
+            {/* Sticky Actions / picker plein cadre */}
+            <div
+              className={cn(
+                "shrink-0 border-t border-slate-100 bg-white/80 backdrop-blur-md",
+                assignPickerOpen ? "flex min-h-0 flex-1 flex-col p-4" : "p-6",
+              )}
+            >
+              {isInterventionInBackofficeRequestsQueue(selectedItem) ? (
                 assignPickerOpen ? (
                   <TechnicianAssignPicker
+                    className="min-h-0 flex-1"
                     intervention={selectedItem}
                     peerInterventions={interventions}
                     isAssigning={isAssigning}
@@ -1310,6 +1368,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               const nameRaw = `${first} ${last}`.trim() || fallbackName;
               const displayName = nameRaw ? capitalizeName(nameRaw) : `Client · …${r.interventionId.slice(-8)}`;
               const phone = iv?.clientPhone ?? "";
+              const email = iv?.clientEmail ?? "";
               const address = iv?.address ? formatAddress(iv.address) : "";
               const description = iv?.problem || iv?.title || "";
               const isAlreadyValidated = iv?.status === "invoiced";
@@ -1329,6 +1388,16 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                     <button
                       type="button"
                       onClick={() => {
+                        const actorUid = auth?.currentUser?.uid?.trim() || "system";
+                        if (iv) {
+                          void logCrmInterventionAction({
+                            kind: "bridged_report_dismissed",
+                            iv,
+                            actorUid,
+                            actorRole: "dispatcher",
+                            note: "Rapport terrain masqué (non supprimé)",
+                          });
+                        }
                         terrainBridge?.dismissReport(r.localId);
                         setSelectedTerrainLocalId(null);
                       }}
@@ -1343,6 +1412,11 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                     <div className="rounded-[20px] bg-slate-50 p-4 border border-slate-100 space-y-2">
                       <p className="text-[14px] !font-extrabold text-slate-900">{displayName}</p>
                       {phone ? <p className="text-[12px] !font-bold text-slate-700">{phone}</p> : null}
+                      {email ? (
+                        <p className="text-[12px] !font-bold text-slate-700 break-all">
+                          <a href={`mailto:${email}`} className="hover:underline">{email}</a>
+                        </p>
+                      ) : null}
                       {address ? <p className="text-[12px] !font-bold text-slate-700">{address}</p> : null}
                       {description ? (
                         <p className="text-[13px] !font-bold text-slate-800 leading-relaxed">

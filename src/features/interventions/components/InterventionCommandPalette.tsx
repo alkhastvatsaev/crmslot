@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { Command } from "cmdk";
-import { Camera, MapPin, Phone, Search, Wrench, X } from "lucide-react";
+import { Camera, MapPin, Phone, Search, Wrench, X, Mail } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
@@ -138,6 +138,20 @@ export default function InterventionCommandPalette({
                       >
                         <Phone className="h-4 w-4 text-blue-600" />
                         <span className="text-[14px] font-semibold">{t("common.call")}</span>
+                      </Command.Item>
+                    ) : null}
+                    {selected.clientEmail ? (
+                      <Command.Item
+                        value="email client"
+                        data-testid="command-palette-action-email"
+                        onSelect={() => {
+                          window.location.href = `mailto:${selected.clientEmail}`;
+                          close();
+                        }}
+                        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 aria-selected:bg-slate-100"
+                      >
+                        <Mail className="h-4 w-4 text-orange-600" />
+                        <span className="text-[14px] font-semibold">Mail</span>
                       </Command.Item>
                     ) : null}
                     {selected.address ? (

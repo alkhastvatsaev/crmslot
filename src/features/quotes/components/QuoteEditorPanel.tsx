@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { createQuote, updateQuote, updateQuoteStatus } from "../quoteFirestore";
 import QuoteStatusBadge from "./QuoteStatusBadge";
 import type { Quote, QuoteLine } from "../types";
@@ -63,7 +64,26 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
           clientName: clientName.trim() || null,
           clientEmail: clientEmail.trim() || null,
         });
-        if (andSend) await updateQuoteStatus(firestore, companyId, quote.id, "sent");
+        if (andSend && quote.status !== "sent") {
+          await updateQuoteStatus(firestore, companyId, quote.id, "sent");
+          await logCrmCompanyAction({
+            companyId,
+            kind: "quote_status_changed",
+            actorUid: workspace?.firebaseUid ?? "system",
+            actorRole: "dispatcher",
+            statusBefore: quote.status as any,
+            statusAfter: "sent" as any,
+            note: notes.trim() || undefined,
+            intervention: {
+              id: quote.id,
+              title: `Devis ${quote.id.substring(0, 8)}`,
+              status: "sent",
+              clientName: clientName.trim() || undefined,
+              clientCompanyName: clientName.trim() || undefined,
+              address: "",
+            } as any,
+          });
+        }
         onSaved?.(quote.id);
       } else {
         const id = await createQuote(firestore, companyId, {
@@ -76,7 +96,42 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
           clientId: null,
           createdByUid: workspace?.firebaseUid ?? null,
         });
-        if (andSend) await updateQuoteStatus(firestore, companyId, id, "sent");
+        await logCrmCompanyAction({
+          companyId,
+          kind: "quote_created",
+          actorUid: workspace?.firebaseUid ?? "system",
+          actorRole: "dispatcher",
+          note: notes.trim() || undefined,
+          statusAfter: "draft" as any,
+          intervention: {
+            id: id,
+            title: `Devis ${id.substring(0, 8)}`,
+            status: "draft",
+            clientName: clientName.trim() || undefined,
+            clientCompanyName: clientName.trim() || undefined,
+            address: "",
+          } as any,
+        });
+        if (andSend) {
+          await updateQuoteStatus(firestore, companyId, id, "sent");
+          await logCrmCompanyAction({
+            companyId,
+            kind: "quote_status_changed",
+            actorUid: workspace?.firebaseUid ?? "system",
+            actorRole: "dispatcher",
+            statusBefore: "draft" as any,
+            statusAfter: "sent" as any,
+            note: notes.trim() || undefined,
+            intervention: {
+              id: id,
+              title: `Devis ${id.substring(0, 8)}`,
+              status: "sent",
+              clientName: clientName.trim() || undefined,
+              clientCompanyName: clientName.trim() || undefined,
+              address: "",
+            } as any,
+          });
+        }
         onSaved?.(id);
       }
       toast.success(andSend ? String(t("quotes.toast_sent")) : String(t("quotes.toast_saved")));

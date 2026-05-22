@@ -47,7 +47,6 @@ export default function GmailHubSidebar({
         <div className="flex items-center gap-3">
           <GmailHubAvatar seed={email} size="md" />
           <div className="min-w-0 flex-1">
-            <p className={gmailEyebrow}>Gmail</p>
             <p className="mt-0.5 truncate text-[13px] font-medium text-slate-800" title={email}>
               {email}
             </p>

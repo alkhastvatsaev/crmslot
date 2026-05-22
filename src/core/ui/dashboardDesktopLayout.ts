@@ -166,6 +166,14 @@ const dashboardGlassRailShell = (bg: string) =>
 
 export const dashboardTripleSideShellClass = dashboardGlassRailShell("bg-white/72");
 
+/** Panneau latéral opaque (ex. agent matériel) — fond blanc sans translucidité. */
+export const dashboardTripleSideOpaqueShellClass = glassPanelShellClass({
+  bg: "bg-white",
+  blur: false,
+  heightClass: DASHBOARD_DESKTOP_RAIL_HEIGHT_CLASS,
+  extra: "transition-all duration-500",
+});
+
 export const dashboardTripleCenterShellClass = dashboardGlassRailShell("bg-white/76");
 
 export const dashboardMapRightShellClass = dashboardGlassRailShell("bg-white/72");

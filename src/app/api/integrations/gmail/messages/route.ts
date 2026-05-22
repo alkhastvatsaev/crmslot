@@ -3,7 +3,7 @@ import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import { createGmailApiClient } from "@/core/services/email/gmailApiClient";
 import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
 import { sendGmailThreadReply } from "@/core/services/email/sendGmailThreadReply";
-import { mapGmailMessageSummary } from "@/features/gmail/gmailHubMappers";
+import { fetchGmailInboxSummaries } from "@/core/services/email/gmailFetchInboxSummaries";
 
 export const runtime = "nodejs";
 
@@ -45,17 +45,10 @@ export async function GET(req: NextRequest) {
       pageToken,
     });
 
-    const stubs = (listRes.data.messages ?? []).filter((s) => !!s.id);
-    const messages: ReturnType<typeof mapGmailMessageSummary>[] = [];
-    for (const stub of stubs) {
-      const msgRes = await gmail.users.messages.get({
-        userId: "me",
-        id: stub.id!,
-        format: "metadata",
-        metadataHeaders: ["From", "To", "Subject", "Date"],
-      });
-      messages.push(mapGmailMessageSummary(msgRes.data));
-    }
+    const ids = (listRes.data.messages ?? [])
+      .map((s) => s.id)
+      .filter((id): id is string => Boolean(id));
+    const messages = await fetchGmailInboxSummaries(gmail, ids);
 
     const result = { messages, nextPageToken: listRes.data.nextPageToken ?? null };
     msgCache.set(cacheKey, { data: result, ts: Date.now() });

@@ -36,6 +36,7 @@ import {
   sendGmailReplyFromChatbot,
   suggestGmailInterventionLinksForChatbot,
 } from "@/features/chatbot/chatbot-gmail";
+import { logCrmFromChatbotTool } from "@/features/crmHistory/logCrmFromChatbotTool";
 
 export type ChatbotToolContext = {
   companyId: string;
@@ -102,7 +103,16 @@ export async function executeChatbotTool(
 ): Promise<unknown> {
   const input = (rawInput && typeof rawInput === "object" ? rawInput : {}) as Record<string, unknown>;
   requireConfirmed(name, input);
+  const result = await executeChatbotToolImpl(name, input, ctx);
+  void logCrmFromChatbotTool(name, input, result, ctx);
+  return result;
+}
 
+async function executeChatbotToolImpl(
+  name: string,
+  input: Record<string, unknown>,
+  ctx: ChatbotToolContext,
+): Promise<unknown> {
   switch (name) {
     case "get_workspace_summary":
       return getWorkspaceSummary(ctx.companyId);

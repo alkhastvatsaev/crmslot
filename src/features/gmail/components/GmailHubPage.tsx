@@ -37,7 +37,10 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const companyId =
     (workspace?.activeCompanyId ?? "").trim() ||
     (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
-  const { interventions } = useBackOfficeInterventions(companyId);
+  /** Sans pager (tests) : chargement immédiat ; avec pager : uniquement quand la page est visible. */
+  const pageActive = pager == null || pager.pageIndex === slotIndex;
+  const [linkPanelOpen, setLinkPanelOpen] = useState(false);
+  const { interventions } = useBackOfficeInterventions(linkPanelOpen ? companyId : null);
   const {
     candidates: linkCandidates,
     loadingSuggestions: linkLoadingSuggestions,
@@ -50,7 +53,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const oauthReturnHandled = useRef(false);
   const [activeLabelId, setActiveLabelId] = useState("INBOX");
   const [searchQuery, setSearchQuery] = useState("");
-  const hub = useGmailHub({ labelId: activeLabelId });
+  const hub = useGmailHub({ labelId: activeLabelId, enabled: pageActive });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composing, setComposing] = useState(false);
   const [composeTo, setComposeTo] = useState("");
@@ -61,11 +64,13 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const [pdfPreviewAttachmentId, setPdfPreviewAttachmentId] = useState<string | null>(null);
   const [pdfPreviewLoadingId, setPdfPreviewLoadingId] = useState<string | null>(null);
   const [pdfPreviewError, setPdfPreviewError] = useState<string | null>(null);
-  const [linkPanelOpen, setLinkPanelOpen] = useState(false);
+
+  const pdfPreviewUrlOwnedRef = useRef(true);
 
   const closePdfPreview = useCallback(() => {
     setPdfPreviewUrl((prev) => {
-      revokeBlobUrl(prev);
+      if (pdfPreviewUrlOwnedRef.current) revokeBlobUrl(prev);
+      pdfPreviewUrlOwnedRef.current = true;
       return null;
     });
     setPdfPreviewAttachmentId(null);
@@ -121,17 +126,26 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   }, [hub, pager, t]);
 
   const handleOpenPdf = useCallback(
-    async (att: GmailHubAttachment) => {
+    async (att: GmailHubAttachment, cachedPreview?: { blobUrl: string } | null) => {
       const messageId = hub.selectedMessage?.id;
       if (!messageId) return;
       setPdfPreviewLoadingId(att.attachmentId);
       setPdfPreviewError(null);
-      revokeBlobUrl(pdfPreviewUrl);
-      setPdfPreviewUrl(null);
+      setPdfPreviewUrl((prev) => {
+        if (pdfPreviewUrlOwnedRef.current) revokeBlobUrl(prev);
+        return null;
+      });
       setPdfPreviewAttachmentId(null);
       try {
+        if (cachedPreview?.blobUrl) {
+          pdfPreviewUrlOwnedRef.current = false;
+          setPdfPreviewUrl(cachedPreview.blobUrl);
+          setPdfPreviewAttachmentId(att.attachmentId);
+          return;
+        }
         const data = await hub.loadAttachment(messageId, att);
         const url = base64ToBlobUrl(data.dataBase64, data.mimeType || "application/pdf");
+        pdfPreviewUrlOwnedRef.current = true;
         setPdfPreviewUrl(url);
         setPdfPreviewAttachmentId(att.attachmentId);
       } catch (e) {
@@ -143,14 +157,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         setPdfPreviewLoadingId(null);
       }
     },
-    [
-      hub.selectedMessage?.id,
-      hub.loadAttachment,
-      pdfPreviewAttachmentId,
-      pdfPreviewUrl,
-      closePdfPreview,
-      t,
-    ],
+    [hub.selectedMessage?.id, hub.loadAttachment, t],
   );
 
   const userLabels = useMemo(
@@ -531,7 +538,8 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             pdfPreviewError={pdfPreviewError}
             pdfPreviewAttachmentId={pdfPreviewAttachmentId}
             pdfPreviewLoadingId={pdfPreviewLoadingId}
-            onOpenPdf={(att) => void handleOpenPdf(att)}
+            loadAttachment={hub.loadAttachment}
+            onOpenPdf={(att, preview) => void handleOpenPdf(att, preview)}
             onClosePdf={closePdfPreview}
           />
         )

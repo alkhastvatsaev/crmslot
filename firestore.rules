@@ -139,6 +139,18 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      /** Journal d'activité CRM (refus technicien, suppression dossier, etc.). */
+      match /crm_activity/{activityId} {
+        allow read: if userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
+          || companyId == 'demo-local-company';
+        allow create: if isAuthed()
+          && request.resource.data.companyId == companyId
+          && request.resource.data.actorUid == request.auth.uid
+          && request.resource.data.keys().hasAll(['kind', 'at', 'actorRole']);
+        allow update, delete: if false;
+      }
+
       /** Logs Q/R chatbot (fine-tuning) — écriture Admin SDK ; lecture admin société uniquement. */
       match /chatbot_training_logs/{logId} {
         allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
@@ -298,6 +310,14 @@ service cloud.firestore {
         && interventionSensitiveBillingUnchanged();
     }
 
+    /** Dev / staging : IVANA anonyme peut assigner les demandes `demo-local-company`. */
+    function canUpdateInterventionDemoStaging() {
+      return isAuthed()
+        && interventionHasTenantScope(resource.data)
+        && resource.data.companyId == 'demo-local-company'
+        && interventionSensitiveBillingUnchanged();
+    }
+
     function canDeleteInterventionAsAdmin() {
       return interventionHasTenantScope(resource.data)
         && (
@@ -391,6 +411,7 @@ service cloud.firestore {
         || canUpdateInterventionViaMembershipStaff()
         || canUpdateInterventionAsAssignee()
         || canUpdateInterventionDemoAssignee()
+        || canUpdateInterventionDemoStaging()
       );
 
       allow delete: if isAuthed() && canDeleteInterventionAsAdmin();

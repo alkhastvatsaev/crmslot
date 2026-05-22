@@ -44,6 +44,8 @@ import {
   smartFormAddressEligibleForStep2,
 } from "@/features/interventions/smartInterventionConstants";
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
+import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
+import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
 import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
@@ -726,6 +728,23 @@ export default function SmartInterventionRequestForm() {
       const nowIso = new Date().toISOString();
       const hour = new Date().toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" });
 
+      const finalProblem = description.trim() || finalTranscription || "Demande d'intervention";
+
+      // DUPLICATE CHECK BEFORE SUBMISSION
+      if (interventionCompanyId) {
+        const qDup = query(collection(db, "interventions"), where("companyId", "==", interventionCompanyId));
+        const snapDup = await getDocs(qDup);
+        const existing = snapDup.docs.map(d => ({ id: d.id, ...d.data() } as any));
+        const matches = findPotentialDuplicates({ address: address.trim(), problem: finalProblem }, existing, 0.95);
+        if (matches.length > 0) {
+          toast.error("VOTRE ENTREPRISE A DEJA FAIT CETTE DEMANDE", {
+             description: "Une demande identique a déjà été soumise."
+          });
+          setBusy(false);
+          return;
+        }
+      }
+
       let lat = placeLatLng?.lat;
       let lng = placeLatLng?.lng;
       if (lat === undefined || lng === undefined) {
@@ -825,7 +844,6 @@ export default function SmartInterventionRequestForm() {
       }
 
       const finalTitle = (description.trim() || finalTranscription || "Demande d'intervention").slice(0, 140);
-      const finalProblem = description.trim() || finalTranscription || "Demande d'intervention";
 
       await setDoc(newDocRef, {
         title: finalTitle,
@@ -852,6 +870,23 @@ export default function SmartInterventionRequestForm() {
         ...(finalTranscription ? { transcription: finalTranscription } : {}),
         ...(parentInterventionId ? { parentInterventionId } : {}),
       });
+
+      if (interventionCompanyId) {
+        void logCrmInterventionCreated({
+          intervention: {
+            id: newDocRef.id,
+            title: finalTitle,
+            address: address.trim(),
+            status: "pending",
+            companyId: interventionCompanyId,
+            ...(firstName.trim() ? { clientFirstName: capitalizeName(firstName) } : {}),
+            ...(lastName.trim() ? { clientLastName: capitalizeName(lastName) } : {}),
+          },
+          actorUid: user.uid,
+          actorRole: "client",
+          source: "hub_smart_form",
+        });
+      }
 
       // BACKGROUND TASK (Ne pas attendre pour la transcription et les doublons)
       void (async () => {

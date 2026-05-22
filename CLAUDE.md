@@ -33,6 +33,22 @@ npm run ci               # lint:ci + test:ci + build (pipeline complet)
 ### Carrousel de pages (DashboardPager)
 L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerProvider`. Chaque "slot" est un index constant défini dans un fichier `*Constants.ts` du feature concerné. Les pages sont assemblées dans `src/app/page.tsx`.
 
+**8 pages actuelles (0-based)** :
+| Index | Constante | Feature |
+|-------|-----------|---------|
+| 0 | — | Carte (MapboxView) |
+| 1 | — | Espace société |
+| 2 | `TECHNICIAN_HUB_SLOT_INDEX` | Hub technicien |
+| 3 | `BACKOFFICE_HUB_SLOT_INDEX` | Back-office |
+| 4 | `AI_ASSISTANT_SLOT_INDEX` | Chatbot |
+| 5 | `GMAIL_HUB_SLOT_INDEX` | Gmail |
+| 6 | `FEATURE_HUB_SLOT_INDEX` | Matériel entreprise |
+| 7 | `NEW_HUB_SLOT_INDEX` | Nouvelle fonctionnalité |
+
+**Navigation inter-pages** : `pager.setPageIndex(N)` via `useDashboardPagerOptional()`. Pour pré-remplir le Chatbot depuis une autre page, dispatch les événements DOM `chatbot-draft-prompt` (pre-fill composer) ou `chatbot-quick-prompt` (envoi direct) — écoutés dans `ChatbotGalaxyComposer`. Pattern centralisé dans `src/features/featureHub/companyStockChatbot.ts`.
+
+**Intent contexts** (communication inter-pages) : chaque feature qui doit envoyer un focus/prompt au Chatbot ou à une autre page utilise un context léger dans `src/context/` (ex. `CompanyStockIntentContext`, `BackofficeInboxIntentContext`, `TechnicianCaseIntentContext`). Tous wrappés dans `src/app/page.tsx`.
+
 ### Auth & API routes
 - **Client → API** : `fetchWithAuth` (`src/core/api/fetchWithAuth.ts`) injecte le token Firebase Bearer.
 - **API routes** : `requireAuthenticatedUser` de `src/core/api/routeAuth.ts` vérifie le token via Firebase Admin. Toutes les routes sensibles exigent ce guard sauf exceptions documentées dans README.
@@ -41,7 +57,9 @@ L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerPr
 ### Firebase
 - **Client** : `src/core/config/firebase.ts` — Firestore avec `experimentalForceLongPolling` (Vercel/Node), Auth, Storage. RTDB optionnelle via `NEXT_PUBLIC_FIREBASE_DATABASE_URL`.
 - **Admin** : `src/core/config/firebase-admin.ts` — initialisé une seule fois, importé en tête de chaque route API qui en a besoin.
-- **Collections principales** : `interventions`, `clients`, `companies`, `stockItems` (ou `stock_items`), `material_orders`, `companies/{id}/supplierOrders`.
+- **Collections principales** : `interventions`, `clients`, `companies`, `stockItems`, `material_orders`, `companies/{id}/supplierOrders`, `companies/{id}/featureFlags`.
+- **Sous-collections** : `interventions/{id}/timeline` (événements CRM), `companies/{id}/supplierOrders`.
+- Jamais de fichiers `* 2.ts` / `* 2.tsx` — signe de doublon macOS à supprimer immédiatement.
 
 ### Chatbot (OpenAI + outils Firebase Admin)
 Pipeline SSE : `POST /api/ai/chatbot` → `runChatbotOpenAI` → stream d'événements `ChatbotStreamEvent`.

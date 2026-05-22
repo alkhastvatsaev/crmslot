@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { notifyClientPaymentReceived } from "@/core/services/notifications/clientPaymentPush";
+import { logCrmInterventionActionAdmin } from "@/features/crmHistory/logCrmInterventionActionAdmin";
+import type { Intervention } from "@/features/interventions/types";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,28 @@ async function markInterventionPaid(interventionId: string, paymentIntentId?: st
 
   const createdByUid = typeof data.createdByUid === "string" ? data.createdByUid : null;
   await notifyClientPaymentReceived(interventionId, createdByUid).catch(() => {});
+
+  if (companyId) {
+    await logCrmInterventionActionAdmin({
+      kind: "intervention_payment_updated",
+      iv: {
+        id: interventionId,
+        title: typeof data.title === "string" ? data.title : "Dossier",
+        address: typeof data.address === "string" ? data.address : "",
+        status: (data.status as Intervention["status"]) ?? "invoiced",
+        companyId,
+        clientName: typeof data.clientName === "string" ? data.clientName : undefined,
+        clientFirstName: typeof data.clientFirstName === "string" ? data.clientFirstName : null,
+        clientLastName: typeof data.clientLastName === "string" ? data.clientLastName : null,
+        clientCompanyName:
+          typeof data.clientCompanyName === "string" ? data.clientCompanyName : null,
+      },
+      actorUid: "stripe",
+      actorRole: "system",
+      note: "Paiement Stripe reçu",
+      statusAfter: "invoiced",
+    });
+  }
 }
 
 export async function POST(request: Request) {

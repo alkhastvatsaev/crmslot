@@ -8,6 +8,7 @@ import {
   Package,
   Phone,
   Play,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -25,6 +26,7 @@ type Props = {
     | "phone"
     | "address"
     | "assignedTechnicianUid"
+    | "clientEmail"
   >;
   awaitingAssignment?: boolean;
   isUpdating?: boolean;
@@ -33,6 +35,8 @@ type Props = {
   onWaitingMaterial?: () => void;
   onOpenMaterials?: () => void;
   onQuickPhoto?: () => void;
+  /** Panneau technicien : barre plus basse pour tenir sans scroll. */
+  compact?: boolean;
 };
 
 export default function MissionActionBar({
@@ -44,10 +48,12 @@ export default function MissionActionBar({
   onWaitingMaterial,
   onOpenMaterials,
   onQuickPhoto,
+  compact = false,
 }: Props) {
   const { t } = useTranslation();
   const config = resolveMissionActionBar(intervention, { awaitingAssignment });
   const phone = intervention.clientPhone || intervention.phone;
+  const email = intervention.clientEmail;
   const mapsUrl = intervention.address
     ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(intervention.address))}`
     : null;
@@ -84,6 +90,14 @@ export default function MissionActionBar({
               testId="mission-action-call"
               label={t("common.call")}
               icon={<Phone className="h-6 w-6" />}
+            />
+          ) : null}
+          {email ? (
+            <FieldIconButton
+              href={`mailto:${email}`}
+              testId="mission-action-email"
+              label="Mail"
+              icon={<Mail className="h-6 w-6" />}
             />
           ) : null}
           {mapsUrl ? (
@@ -142,6 +156,7 @@ export default function MissionActionBar({
           icon={slideIcon}
           disabled={isUpdating}
           variant="field"
+          compact={compact}
           onAction={handleTransition}
         />
       ) : null}

@@ -26,7 +26,9 @@ type Props = {
   technicianUid: string;
   allowCreate?: boolean;
   allowStatusUpdate?: boolean;
-  forceOpen?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (v: boolean) => void;
+  compact?: boolean;
 };
 
 const STATUS_KEYS: MaterialOrder["status"][] = ["pending", "ordered", "received", "cancelled"];
@@ -36,14 +38,24 @@ export default function InterventionMaterialOrdersPanel({
   technicianUid,
   allowCreate = true,
   allowStatusUpdate = false,
-  forceOpen,
+  expanded: controlledExpanded,
+  onExpandedChange,
+  compact = false,
 }: Props) {
   const { t } = useTranslation();
   const { orders, loading } = useMaterialOrders(intervention.id);
-  const [expanded, setExpanded] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  const panelExpanded = expanded || forceOpen;
+  const panelExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
+
+  const handleToggle = () => {
+    if (onExpandedChange) {
+      onExpandedChange(!panelExpanded);
+    } else {
+      setInternalExpanded(!panelExpanded);
+    }
+  };
 
   const handleSubmit = useCallback(
     async (parts: MaterialOrderPart[], urgency: MaterialOrder["urgency"]) => {
@@ -60,7 +72,8 @@ export default function InterventionMaterialOrdersPanel({
         setWaitingMaterial: !allowStatusUpdate,
       });
       setShowForm(false);
-      setExpanded(true);
+      if (onExpandedChange) onExpandedChange(true);
+      else setInternalExpanded(true);
       toast.success(String(t("materials.order_created")));
     },
     [intervention, technicianUid, allowStatusUpdate, t],
@@ -77,15 +90,30 @@ export default function InterventionMaterialOrdersPanel({
   };
 
   return (
-    <div id="technician-material-orders" style={outfit} data-testid="intervention-material-orders-panel" className="space-y-2">
+    <div
+      id="technician-material-orders"
+      style={outfit}
+      data-testid="intervention-material-orders-panel"
+      className={compact ? "space-y-1" : "space-y-2"}
+    >
       <button
         type="button"
         data-testid="material-orders-toggle"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between rounded-[14px] border border-slate-100 bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100/80"
+        onClick={handleToggle}
+        className={
+          compact
+            ? "flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 transition-colors hover:bg-slate-100/80"
+            : "flex w-full items-center justify-between rounded-[14px] border border-slate-100 bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100/80"
+        }
       >
-        <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-slate-700">
-          <Package className="h-4 w-4 text-slate-500" />
+        <span
+          className={
+            compact
+              ? "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-700"
+              : "flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-slate-700"
+          }
+        >
+          <Package className={compact ? "h-3.5 w-3.5 text-slate-500" : "h-4 w-4 text-slate-500"} />
           {t("materials.panel_title")}
           {orders.length > 0 ? (
             <span className="text-[10px] font-bold text-slate-400">{orders.length}</span>
@@ -95,7 +123,13 @@ export default function InterventionMaterialOrdersPanel({
       </button>
 
       {panelExpanded ? (
-        <div className="space-y-3 rounded-[18px] border border-slate-100 bg-white p-4">
+        <div
+          className={
+            compact
+              ? "space-y-2 rounded-lg border border-slate-100 bg-white p-2"
+              : "space-y-3 rounded-[18px] border border-slate-100 bg-white p-4"
+          }
+        >
           {loading && orders.length === 0 ? (
             <p className="text-center text-[12px] text-slate-400">{t("common.loading")}</p>
           ) : null}

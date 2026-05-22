@@ -20,6 +20,11 @@ class ResizeObserverMock {
 
 global.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
 
+/** jsdom : blob URLs pour aperçus PDF / pièces jointes Gmail */
+let jestBlobUrlCounter = 0;
+global.URL.createObjectURL = jest.fn(() => `blob:jest-${++jestBlobUrlCounter}`);
+global.URL.revokeObjectURL = jest.fn();
+
 // cmdk / chat panels call scrollIntoView / scrollTo — not available in jsdom (skip in node env)
 if (typeof Element !== "undefined") {
   Element.prototype.scrollIntoView = jest.fn();
@@ -203,6 +208,18 @@ jest.mock('firebase/auth', () => {
       }),
     ),
     sendSignInLinkToEmail: jest.fn(() => Promise.resolve()),
+    signInWithPopup: jest.fn(() =>
+      Promise.resolve({
+        user: {
+          uid: "google-user",
+          email: "google@test.example",
+          emailVerified: true,
+          displayName: "Google User",
+          photoURL: null,
+          providerData: [{ providerId: "google.com" }],
+        },
+      }),
+    ),
     signInWithRedirect: jest.fn(() => Promise.resolve()),
     signInWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({

@@ -17,6 +17,7 @@ import type {
   ChatbotUiMessage,
 } from "@/features/chatbot/chatbot-types";
 import type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-client-document";
+import { logCrmAfterDocumentBilling } from "@/features/crmHistory/logCrmAfterDocumentBilling";
 import { isChatbotZeroTokenUiTool } from "@/features/chatbot/chatbot-document-side-effect";
 import { useChatbotDocumentPreview } from "@/features/chatbot/hooks/useChatbotDocumentPreview";
 import { useChatbotSupplierOrdersPanel } from "@/features/chatbot/hooks/useChatbotSupplierOrdersPanel";
@@ -33,6 +34,9 @@ import {
   mergeQuickActions,
   type ChatbotQuickAction,
 } from "@/features/chatbot/chatbot-quick-actions";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { BELGMAP_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
 
 
 const STORAGE_PREFIX = "belmap-chatbot-v2";
@@ -112,6 +116,7 @@ function resolveCompanyId(workspace: ReturnType<typeof useCompanyWorkspaceOption
 }
 
 export function useChatbot() {
+  const pager = useDashboardPagerOptional();
   const documentPreviewApi = useChatbotDocumentPreview();
   const workspace = useCompanyWorkspaceOptional();
   const companyId = resolveCompanyId(workspace);
@@ -271,6 +276,19 @@ export function useChatbot() {
       if (ev.type === "registry_refresh") {
         void supplierOrdersPanelApi.refreshRegistry();
       }
+      if (ev.type === "focus_stock_hub") {
+        pager?.setPageIndex(FEATURE_HUB_SLOT_INDEX);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent(BELGMAP_FOCUS_STOCK_HUB_EVENT, {
+              detail: {
+                stockItemId: ev.stockItemId ?? null,
+                filter: ev.filter,
+              },
+            }),
+          );
+        }
+      }
       if (ev.type === "quick_actions" && ev.actions.length > 0) {
         streamQuickActionsRef.current = ev.actions;
       }
@@ -282,7 +300,7 @@ export function useChatbot() {
         setError(ev.message);
       }
     },
-    [documentPreviewApi, supplierOrdersPanelApi],
+    [documentPreviewApi, supplierOrdersPanelApi, pager],
   );
 
   const runStream = useCallback(
@@ -450,6 +468,10 @@ export function useChatbot() {
         await readChatbotStream(res, (ev) =>
           handleStreamEvent(ev, { accText, nextApi, streamError }),
         );
+
+        if (!streamError.v && (action.action === "patch" || action.action === "append_billing")) {
+          void logCrmAfterDocumentBilling(action, companyId);
+        }
 
         const finalText = (accText.v.trim() || streamError.v || "").trim();
         if (finalText && targetId) {

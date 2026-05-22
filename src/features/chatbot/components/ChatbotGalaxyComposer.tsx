@@ -35,8 +35,19 @@ export default function ChatbotGalaxyComposer() {
         navigateToChatbot();
       }
     };
+    const onDraft = (e: Event) => {
+      const text = (e as CustomEvent<{ text?: string }>).detail?.text;
+      if (text?.trim()) {
+        setInput(text.trim());
+        navigateToChatbot();
+      }
+    };
     window.addEventListener("chatbot-quick-prompt", onQuick);
-    return () => window.removeEventListener("chatbot-quick-prompt", onQuick);
+    window.addEventListener("chatbot-draft-prompt", onDraft);
+    return () => {
+      window.removeEventListener("chatbot-quick-prompt", onQuick);
+      window.removeEventListener("chatbot-draft-prompt", onDraft);
+    };
   }, [sendMessage, pager]);
 
   const handleSend = () => {

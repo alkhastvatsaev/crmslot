@@ -9,6 +9,12 @@ jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: (...args: unknown[]) => fetchMock(...args),
 }));
 
+jest.mock("@/features/gmail/renderPdfThumbnail", () => ({
+  renderPdfFirstPageThumbnail: jest.fn(() =>
+    Promise.resolve("data:image/jpeg;base64,mock-thumb"),
+  ),
+}));
+
 describe("GmailHubPage", () => {
   beforeEach(() => {
     fetchMock.mockReset();
@@ -111,7 +117,9 @@ describe("GmailHubPage", () => {
   });
 
   it("renders inbox list and auto-opens the latest message on slot 6", async () => {
-    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1);
+    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1, {
+      initialPageIndex: GMAIL_HUB_SLOT_INDEX,
+    });
     const pageRoot = screen.getByTestId(`dashboard-pager-slot-${GMAIL_HUB_SLOT_INDEX}`);
     expect(pageRoot).toBeInTheDocument();
     expect(pageRoot).toHaveClass("dashboard-desktop-page-root");
@@ -210,7 +218,9 @@ describe("GmailHubPage", () => {
     global.URL.createObjectURL = jest.fn(() => "blob:mock-facture");
     global.URL.revokeObjectURL = jest.fn();
 
-    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1);
+    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1, {
+      initialPageIndex: GMAIL_HUB_SLOT_INDEX,
+    });
     fireEvent.click(await screen.findByTestId("gmail-hub-row-m2"));
     await screen.findByTestId("gmail-hub-attachment-att-pdf");
     fireEvent.click(screen.getByTestId("gmail-hub-attachment-att-pdf"));
@@ -244,7 +254,9 @@ describe("GmailHubPage", () => {
       }
       return { ok: true, json: async () => ({}) };
     });
-    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1);
+    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1, {
+      initialPageIndex: GMAIL_HUB_SLOT_INDEX,
+    });
     expect(await screen.findByTestId("gmail-hub-connect-btn")).toBeInTheDocument();
     expect(screen.queryByTestId("gmail-hub-missing-client")).not.toBeInTheDocument();
   });
@@ -268,7 +280,9 @@ describe("GmailHubPage", () => {
       }
       return { ok: true, json: async () => ({}) };
     });
-    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1);
+    renderWithPager(<GmailHubPage />, GMAIL_HUB_SLOT_INDEX + 1, {
+      initialPageIndex: GMAIL_HUB_SLOT_INDEX,
+    });
     expect(await screen.findByTestId("gmail-hub-setup")).toBeInTheDocument();
     expect(screen.getByTestId("gmail-hub-connect-btn")).toBeInTheDocument();
   });

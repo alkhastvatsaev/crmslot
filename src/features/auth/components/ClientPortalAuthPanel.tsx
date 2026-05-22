@@ -26,6 +26,12 @@ import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { CLIENT_PORTAL_AUTH_SLOT_INDEX, EMAIL_LINK_STORAGE_KEY } from "@/features/auth/clientPortalConstants";
 import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
+import {
+  ClientPortalGoogleRedirectPending,
+  clientPortalGoogleSignInErrorFeedback,
+  signInClientPortalWithGoogle,
+} from "@/features/auth/clientPortalGoogleSignIn";
+import GmailGoogleConnectButton from "@/features/gmail/components/GmailGoogleConnectButton";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { Intervention } from "@/features/interventions/types";
 import { cn } from "@/lib/utils";
@@ -115,6 +121,7 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
   // Login State
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
   const [mfaHintIndex] = useState(0);
   const [phoneVerificationId, setPhoneVerificationId] = useState<string | null>(null);
@@ -151,6 +158,29 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
     if (!user || !auth) return;
     await syncClientPortalProfile(user);
     pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (!auth || googleBusy) return;
+    setGoogleBusy(true);
+    try {
+      const cred = await signInClientPortalWithGoogle(auth);
+      await syncClientPortalProfile(cred.user);
+      if (!authRailMode) {
+        pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
+      }
+      toast.success(String(t("auth.google_signin_success")));
+    } catch (e) {
+      if (e instanceof ClientPortalGoogleRedirectPending) {
+        toast.message(String(t("auth.google_redirect")));
+        return;
+      }
+      console.error("[ClientPortalAuthPanel] Google sign-in", e);
+      const { titleKey, descriptionKey } = clientPortalGoogleSignInErrorFeedback(e);
+      toast.error(String(t(titleKey)), descriptionKey ? { description: String(t(descriptionKey)) } : undefined);
+    } finally {
+      setGoogleBusy(false);
+    }
   };
 
   const sendMagicLink = async () => {
@@ -592,13 +622,33 @@ export default function ClientPortalAuthPanel({ authRailMode = false }: ClientPo
               <button
                 type="button"
                 data-testid="client-portal-magic-send"
-                disabled={sending || !email.trim()}
+                disabled={sending || googleBusy || !email.trim()}
                 onClick={() => void sendMagicLink()}
                 className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-slate-900 py-3.5 text-[14px] font-bold text-white shadow-[0_8px_16px_-6px_rgba(15,23,42,0.35)] disabled:opacity-45 hover:bg-black transition-colors"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Mail className="h-4 w-4" aria-hidden />}
                 Recevoir un Smart Link
               </button>
+
+              <div className="relative flex w-full items-center py-1" aria-hidden>
+                <div className="h-px flex-1 bg-black/[0.08]" />
+                <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  {t("auth.or_divider")}
+                </span>
+                <div className="h-px flex-1 bg-black/[0.08]" />
+              </div>
+
+              <div
+                className="flex w-full justify-center"
+                data-testid="client-portal-google-wrap"
+              >
+                <GmailGoogleConnectButton
+                  dataTestId="client-portal-google-signin"
+                  ariaLabel={String(t("auth.connect_with_google"))}
+                  disabled={sending || googleBusy}
+                  onClick={() => void handleGoogleSignIn()}
+                />
+              </div>
             </div>
 
           <div id="client-portal-recaptcha-container" className="sr-only" aria-hidden />

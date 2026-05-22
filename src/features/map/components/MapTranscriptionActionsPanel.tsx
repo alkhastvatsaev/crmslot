@@ -20,6 +20,7 @@ import {
 const MAP_TRANSCRIPTION_PANEL_SHELL =
   `pointer-events-auto absolute top-1/2 z-[9999] flex h-[min(70dvh,720px)] min-h-0 -translate-y-1/2 flex-col ${DASHBOARD_PANEL_CHROME_ROUNDED} ${DASHBOARD_PANEL_CHROME_BORDER} bg-white/85 ${DASHBOARD_PANEL_SHADOW_CLASS} ${DASHBOARD_PANEL_CHROME_BLUR}`;
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
+import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
@@ -349,6 +350,21 @@ export default function MapTranscriptionActionsPanel({
         };
 
         const createdRef = await addDoc(collection(firestore, "interventions"), doc);
+        if (fallbackTenantCompanyId) {
+          void logCrmInterventionCreated({
+            intervention: {
+              id: createdRef.id,
+              title: doc.title,
+              address: doc.address,
+              status: doc.status,
+              companyId: fallbackTenantCompanyId,
+              clientName: doc.clientName ?? undefined,
+            },
+            actorUid: uid || "system",
+            actorRole: "dispatcher",
+            source: "map_transcription",
+          });
+        }
         if (uid) {
           await recordDuplicateAlertIfNeeded({
             db: firestore,

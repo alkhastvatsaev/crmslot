@@ -4,21 +4,23 @@ import { devUiPreviewEnabled } from '@/core/config/devUiPreview';
 import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { Technician } from './types';
 import { withTechnicianAuthUid } from '@/features/technicians/withTechnicianAuthUid';
+import { DEMO_DISPATCH_TECHNICIANS } from '@/features/technicians/demoTechnicianCatalog';
 
-const MOCK_TECHNICIANS: Technician[] = [
-  withTechnicianAuthUid({ id: '1', name: 'Alexandre V.', initial: 'A', vehicle: 'Camionnette #01', status: 'on_site', location: { lat: 50.84655, lng: 4.35415 } }),
-  withTechnicianAuthUid({ id: '2', name: 'Thomas L.', initial: 'T', vehicle: 'Camionnette #03', status: 'available', location: { lat: 50.84800, lng: 4.35200 } }),
-  withTechnicianAuthUid({ id: '3', name: 'Boris K.', initial: 'B', vehicle: 'Camionnette #02', status: 'en_route', location: { lat: 50.84400, lng: 4.35000 } }),
-];
+async function seedDemoTechnicians(techRef: ReturnType<typeof collection>) {
+  await Promise.all(
+    DEMO_DISPATCH_TECHNICIANS.map((t) => setDoc(doc(techRef, t.id), t, { merge: true })),
+  );
+}
 
 export function useTechnicians() {
-  const [technicians, setTechnicians] = useState<Technician[]>(MOCK_TECHNICIANS);
+  const [technicians, setTechnicians] = useState<Technician[]>(DEMO_DISPATCH_TECHNICIANS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
     if (!isConfigured || !firestore || !auth) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTechnicians(DEMO_DISPATCH_TECHNICIANS);
       setLoading(false);
       const interval = setInterval(() => {
         setTechnicians(prev => prev.map(t => {
@@ -60,32 +62,47 @@ export function useTechnicians() {
             unsubscribeSnapshot = onSnapshot(techRef, (snapshot) => {
               if (!active) return;
 
+              if (devUiPreviewEnabled) {
+                // Only seed when the collection is empty to avoid snapshot → write → snapshot loop
+                if (snapshot.empty) {
+                  void seedDemoTechnicians(techRef).catch((e) =>
+                    console.error("Seed techniciens démo:", e),
+                  );
+                }
+                setTechnicians(DEMO_DISPATCH_TECHNICIANS);
+                setLoading(false);
+                return;
+              }
+
               if (!snapshot.empty) {
                 const parsed = snapshot.docs.map((d) =>
                   withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician),
                 );
                 setTechnicians(parsed);
 
-                if (devUiPreviewEnabled) {
-                  snapshot.docs.forEach((d) => {
-                    const row = d.data() as Technician;
-                    if (!(row.authUid ?? "").trim()) {
-                      void setDoc(d.ref, withTechnicianAuthUid({ ...row, id: d.id }), { merge: true });
-                    }
-                  });
-                }
-              } else {
-                MOCK_TECHNICIANS.forEach(async (t) => {
-                  await setDoc(doc(techRef, t.id), t);
+                snapshot.docs.forEach((d) => {
+                  const row = d.data() as Technician;
+                  if (!(row.authUid ?? "").trim()) {
+                    void setDoc(d.ref, withTechnicianAuthUid({ ...row, id: d.id }), { merge: true });
+                  }
                 });
+              } else {
+                void seedDemoTechnicians(techRef).catch((e) =>
+                  console.error("Seed techniciens:", e),
+                );
+                setTechnicians(DEMO_DISPATCH_TECHNICIANS);
               }
               setLoading(false);
             }, (error) => {
               console.error("Erreur lecture techniciens Firestore:", error);
-              if (active) setLoading(false);
+              if (active) {
+                setTechnicians(devUiPreviewEnabled ? DEMO_DISPATCH_TECHNICIANS : []);
+                setLoading(false);
+              }
             });
           } else {
             if (active) {
+              setTechnicians(devUiPreviewEnabled ? DEMO_DISPATCH_TECHNICIANS : []);
               setLoading(false);
               if (unsubscribeSnapshot) {
                 unsubscribeSnapshot();
@@ -96,7 +113,10 @@ export function useTechnicians() {
         });
       } catch (error) {
         console.error("Erreur initialisation Auth:", error);
-        if (active) setLoading(false);
+        if (active) {
+          setTechnicians(devUiPreviewEnabled ? DEMO_DISPATCH_TECHNICIANS : []);
+          setLoading(false);
+        }
       }
     };
 
