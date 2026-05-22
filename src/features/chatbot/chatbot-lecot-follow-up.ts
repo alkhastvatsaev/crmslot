@@ -14,10 +14,44 @@ const LECOT_PRODUCT_PATTERNS: Array<{ re: RegExp; query: string }> = [
   { re: /perceuses?/i, query: "perceuse" },
   { re: /verrous?/i, query: "verrou" },
   { re: /poignées?|poignees?/i, query: "poignée" },
+  /** Fautes courantes (poignet ≠ poignée mais même intention métier). */
+  { re: /poignets?/i, query: "poignée" },
   { re: /gâches?|gaches?/i, query: "gâche" },
   { re: /barillets?/i, query: "cylindre" },
   { re: /visseuses?/i, query: "perceuse" },
 ];
+
+function normalizeAccentsForLecot(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+/** Orthographe → requête catalogue (mot entier, insensible aux accents). */
+const LECOT_PRODUCT_TYPO_ALIASES: Record<string, string> = {
+  poignet: "poignée",
+  poignets: "poignée",
+  serure: "serrure",
+  serures: "serrure",
+  cylindre: "cylindre",
+  percuese: "perceuse",
+};
+
+/**
+ * Requête catalogue normalisée (mot-clé métier, correction typo légère).
+ * Utilisé par l'agent Matériel et search_lecot_products.
+ */
+export function normalizeLecotProductSearchQuery(text: string): string {
+  const t = text.trim();
+  if (!t) return t;
+  const fromKeyword = extractLecotProductKeyword(t);
+  if (fromKeyword) return fromKeyword;
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length === 1) {
+    const key = normalizeAccentsForLecot(words[0].toLowerCase());
+    const alias = LECOT_PRODUCT_TYPO_ALIASES[key];
+    if (alias) return alias;
+  }
+  return t;
+}
 
 /** Extrait le mot-clé produit d'une phrase (ex. « commander une serrure lecot » → serrure). */
 export function extractLecotProductKeyword(text: string): string | null {
@@ -91,14 +125,17 @@ export function resolveLecotCatalogSearchQuery(
   if (isChatbotEmailIntent(t) && !isChatbotLecotOrderIntent(t)) return null;
 
   const fromKeyword = extractLecotProductKeyword(t);
-  if (fromKeyword) return fromKeyword;
+  if (fromKeyword) return normalizeLecotProductSearchQuery(fromKeyword);
 
   if (/^(?:oui|yes|ok|d'accord|dac)\s*[!.?]*$/i.test(t)) {
     for (const prior of [...priorUserTexts(messages)].reverse()) {
       const kw = extractLecotProductKeyword(prior);
-      if (kw) return kw;
+      if (kw) return normalizeLecotProductSearchQuery(kw);
       const fu = extractLecotProductQueryFromFollowUp(prior);
-      if (fu) return extractLecotProductKeyword(fu) ?? fu;
+      if (fu) {
+        const fromFu = extractLecotProductKeyword(fu) ?? fu;
+        return normalizeLecotProductSearchQuery(fromFu);
+      }
     }
     return null;
   }
@@ -106,13 +143,13 @@ export function resolveLecotCatalogSearchQuery(
   const fromFollowUp = extractLecotProductQueryFromFollowUp(t);
   if (fromFollowUp) {
     const kw = extractLecotProductKeyword(fromFollowUp);
-    if (kw) return kw;
+    if (kw) return normalizeLecotProductSearchQuery(kw);
     const lecotCtx =
       LECOT_FLOW_CONTEXT_RE.test(t) ||
       isChatbotLecotOrderIntent(t) ||
       priorMessagesHaveLecotContext(messages);
     if (lecotCtx && fromFollowUp.length >= 2 && fromFollowUp.length <= 80) {
-      return fromFollowUp;
+      return normalizeLecotProductSearchQuery(fromFollowUp);
     }
     return null;
   }
@@ -127,7 +164,9 @@ export function resolveLecotCatalogSearchQuery(
       .trim();
     const kw = extractLecotProductKeyword(stripped);
     if (kw) return kw;
-    if (stripped.length >= 2 && stripped.length <= 80) return stripped;
+    if (stripped.length >= 2 && stripped.length <= 80) {
+      return normalizeLecotProductSearchQuery(stripped);
+    }
   }
 
   return null;
