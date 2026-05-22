@@ -139,6 +139,26 @@ describe("synthesizeSupplierOrderEvents", () => {
     expect(evts[0].orderTotalCents).toBe(4500);
     expect(evts[0].orderLabel).toContain("Lecot");
   });
+
+  it("uses sentAt when createdAt is pending (server timestamp)", () => {
+    const order: SupplierOrder = {
+      id: "so-ts",
+      companyId: "c1",
+      supplierId: "lecot",
+      supplierName: "Lecot",
+      status: "sent",
+      lines: [{ sku: "A", label: "Article", quantity: 1, unitPriceCents: 100 }],
+      totalCents: 100,
+      createdAt: "",
+      updatedAt: "",
+      sentAt: "2024-02-01T10:00:00Z",
+      clientName: "Martin",
+    };
+    const evts = synthesizeSupplierOrderEvents([order]);
+    expect(evts.length).toBeGreaterThan(0);
+    expect(evts[0].ts).toBeGreaterThan(0);
+    expect(evts[0].clientName).toBe("Martin");
+  });
 });
 
 describe("synthesizeEmailEvents", () => {

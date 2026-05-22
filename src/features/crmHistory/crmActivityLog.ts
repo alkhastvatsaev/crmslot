@@ -24,6 +24,7 @@ export type CompanyCrmActivityKind =
   | "intervention_terrain_report_received"
   | "bridged_report_dismissed"
   | "ivana_chat_message"
+  | "material_order_placed"
   | "material_order_status_changed"
   | "supplier_order_lecot"
   | "chatbot_intervention_status"
@@ -132,6 +133,7 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   intervention_terrain_report_received: "intervention_terrain_report_received",
   bridged_report_dismissed: "bridged_report_dismissed",
   ivana_chat_message: "ivana_chat_message",
+  material_order_placed: "material_ordered",
   material_order_status_changed: "material_order_status_changed",
   supplier_order_lecot: "supplier_order_lecot",
   chatbot_intervention_status: "chatbot_intervention_status",

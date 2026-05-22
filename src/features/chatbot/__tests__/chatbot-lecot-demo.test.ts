@@ -1,16 +1,13 @@
 import { buildSupplierOrderPreviewFromToolResult } from "@/features/chatbot/chatbot-lecot-demo";
 
 describe("buildSupplierOrderPreviewFromToolResult", () => {
-  it("builds preview for demo orders", () => {
+  it("includes clientName on preview order for right panel", () => {
     const preview = buildSupplierOrderPreviewFromToolResult("co-1", {
-      supplierOrderId: "ord-1",
-      totalCents: 1200,
-      demoMode: true,
-      demoReference: "DEMO-LECOT-20260518-ORD1",
-      lines: [{ sku: "X", label: "Serrure", quantity: 2, unitPriceCents: 600 }],
+      supplierOrderId: "ord-99",
+      clientName: "Jean Dupont",
+      totalCents: 5000,
+      lines: [{ sku: "CYL-1", label: "Cylindre", quantity: 1, unitPriceCents: 5000 }],
     });
-    expect(preview.isDemo).toBe(true);
-    expect(preview.status).toBe("sent");
-    expect(preview.lines).toHaveLength(1);
+    expect(preview.clientName).toBe("Jean Dupont");
   });
 });

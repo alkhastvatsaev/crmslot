@@ -30,7 +30,11 @@ export function isChatbotLecotOrderIntent(text: string): boolean {
   if (/\blecot\b/i.test(t)) return true;
   if (/commande\s+(?:mat|matériel|materiel|lecot|fournisseur|pièce|piece)/i.test(t)) return true;
   if (/fournisseur|catalogue\s+lecot/i.test(t)) return true;
-  if (/commander\s+(?:une?|un|des?)\s+(?:serrure|cylindre|perceuse|verrou|poign)/i.test(t)) {
+  if (
+    /commander\s+(?:une?|un|des?)\s+(?:serrure|cylindre|perceuse|verrou|poign|gâche|gache|barillet)/i.test(
+      t,
+    )
+  ) {
     return true;
   }
   return false;

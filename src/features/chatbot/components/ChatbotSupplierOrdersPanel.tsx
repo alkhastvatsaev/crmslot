@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
   buildInterventionClientLabelMap,
+  buildSupplierOrderClientNameByOrderId,
   buildSupplierOrderInterventionIdByOrderId,
-  resolveSupplierOrderClientLabel,
+  resolveMaterialOrderListClientLabel,
+  resolveSupplierOrderListClientLabel,
 } from "@/features/chatbot/chatbotOrderClientLabels";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
@@ -48,38 +50,10 @@ function formatWhenShort(raw: unknown): string {
   return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
 }
 
-function orderTitle(order: SupplierOrder): string {
-  const lines = order.lines ?? [];
-  const first = lines[0]?.label?.trim();
-  if (!first) return "Commande";
-  if (lines.length === 1) return first;
-  return `${first} · ${lines.length} articles`;
-}
-
-function OrderClientLine({ clientLabel }: { clientLabel: string | null }) {
-  if (!clientLabel) return null;
-  return (
-    <p
-      className="mt-0.5 truncate text-[12px] font-semibold text-slate-700"
-      data-testid="chatbot-order-client-label"
-    >
-      {capitalizeName(clientLabel)}
-    </p>
-  );
-}
-
 function OrderDateLine({ createdAt }: { createdAt: unknown }) {
   const date = formatWhenShort(createdAt);
   if (!date) return null;
   return <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p>;
-}
-
-function materialTitle(order: MaterialOrderDoc): string {
-  const parts = order.partsRequested ?? [];
-  const first = parts[0]?.description?.trim();
-  if (!first) return "Bon matériel";
-  if (parts.length === 1) return first;
-  return `${first} · ${parts.length} lignes`;
 }
 
 import type { SupplierOrderStatus } from "@/features/suppliers/types";
@@ -102,7 +76,7 @@ function SupplierOrderRow({
   onViewPdf,
 }: {
   order: SupplierOrder;
-  clientLabel: string | null;
+  clientLabel: string;
   highlighted: boolean;
   onViewPdf: () => void;
 }) {
@@ -135,10 +109,12 @@ function SupplierOrderRow({
               data-testid={`chatbot-supplier-order-pdf-${displayOrder.id}`}
               aria-label="Voir le bon de commande"
             >
-              <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
-                {orderTitle(displayOrder)}
+              <p
+                className="truncate text-[13px] font-medium leading-snug text-slate-900"
+                data-testid="chatbot-order-client-label"
+              >
+                {capitalizeName(clientLabel)}
               </p>
-              <OrderClientLine clientLabel={clientLabel} />
               <OrderDateLine createdAt={displayOrder.createdAt} />
             </button>
             <p className={cn("shrink-0 text-[13px] font-semibold tabular-nums ml-2", ACCENT.price)}>
@@ -162,7 +138,7 @@ function MaterialOrderRow({
   onViewPdf,
 }: {
   order: MaterialOrderDoc;
-  clientLabel: string | null;
+  clientLabel: string;
   highlighted: boolean;
   onViewPdf?: () => void;
 }) {
@@ -185,18 +161,22 @@ function MaterialOrderRow({
           data-testid={`chatbot-material-order-pdf-${order.id}`}
           aria-label="Voir le bon matériel"
         >
-          <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
-            {materialTitle(order)}
+          <p
+            className="truncate text-[13px] font-medium leading-snug text-slate-900"
+            data-testid="chatbot-order-client-label"
+          >
+            {capitalizeName(clientLabel)}
           </p>
-          <OrderClientLine clientLabel={clientLabel} />
           {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
         </button>
       ) : (
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium leading-snug text-slate-900">
-            {materialTitle(order)}
+          <p
+            className="truncate text-[13px] font-medium leading-snug text-slate-900"
+            data-testid="chatbot-order-client-label"
+          >
+            {capitalizeName(clientLabel)}
           </p>
-          <OrderClientLine clientLabel={clientLabel} />
           {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
         </div>
       )}
@@ -230,6 +210,7 @@ export default function ChatbotSupplierOrdersPanel({
   } = useChatbotContext();
 
   const workspace = useCompanyWorkspaceOptional();
+
   const interventionsCompanyId =
     (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
   const { interventions } = useBackOfficeInterventions(interventionsCompanyId);
@@ -242,6 +223,28 @@ export default function ChatbotSupplierOrdersPanel({
   const orderInterventionIdByOrderId = useMemo(
     () => buildSupplierOrderInterventionIdByOrderId(supplierOrders, materialOrders),
     [supplierOrders, materialOrders],
+  );
+
+  const clientNameBySupplierOrderId = useMemo(
+    () => buildSupplierOrderClientNameByOrderId(supplierOrders, materialOrders),
+    [supplierOrders, materialOrders],
+  );
+
+  const supplierOrderClientLabel = useCallback(
+    (order: SupplierOrder) =>
+      resolveSupplierOrderListClientLabel(
+        order,
+        clientNameBySupplierOrderId,
+        orderInterventionIdByOrderId,
+        clientLabelByInterventionId,
+      ),
+    [clientNameBySupplierOrderId, orderInterventionIdByOrderId, clientLabelByInterventionId],
+  );
+
+  const materialOrderClientLabel = useCallback(
+    (order: MaterialOrderDoc) =>
+      resolveMaterialOrderListClientLabel(order, clientLabelByInterventionId),
+    [clientLabelByInterventionId],
   );
 
   const isLeftRail = placement === "leftRail";
@@ -335,12 +338,7 @@ export default function ChatbotSupplierOrdersPanel({
             <SupplierOrderRow
               key={order.id}
               order={order}
-              clientLabel={resolveSupplierOrderClientLabel(
-                order.id,
-                order.interventionId,
-                orderInterventionIdByOrderId,
-                clientLabelByInterventionId,
-              )}
+              clientLabel={supplierOrderClientLabel(order)}
               highlighted={isSupplierHighlighted(order.id)}
               onViewPdf={() => {
                 if (!companyId) return;
@@ -364,12 +362,7 @@ export default function ChatbotSupplierOrdersPanel({
               <MaterialOrderRow
                 key={order.id}
                 order={order}
-                clientLabel={resolveSupplierOrderClientLabel(
-                  order.id,
-                  order.interventionId,
-                  orderInterventionIdByOrderId,
-                  clientLabelByInterventionId,
-                )}
+                clientLabel={materialOrderClientLabel(order)}
                 highlighted={isMaterialHighlighted(order.id)}
                 onViewPdf={
                   order.interventionId

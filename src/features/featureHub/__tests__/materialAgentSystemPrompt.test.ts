@@ -41,6 +41,17 @@ describe("buildMaterialAgentSystemPrompt", () => {
     expect(prompt).not.toMatch(/Aucun client enregistré/);
   });
 
+  it("includes lecot catalog hint when provided", () => {
+    const prompt = buildMaterialAgentSystemPrompt({
+      companyName: "X",
+      companyId: "y",
+      today: "2026-01-01",
+      lecotCatalogHint: "poignée",
+    });
+    expect(prompt).toMatch(/Indice catalogue/);
+    expect(prompt).toContain("poignée");
+  });
+
   it("shows no-client warning when orderClientName is null", () => {
     const prompt = buildMaterialAgentSystemPrompt({
       companyName: "X",

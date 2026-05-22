@@ -4,6 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 BELGMAP. Plan mode gros diff. @fichier:ligne. Tests → AGENTS.md si besoin.
 
+## Travail parallèle avec Cursor
+
+Si l’utilisateur a aussi **Cursor / l’Agent** ouvert sur ce repo :
+
+1. Lire **`docs/PARALLEL_WORK.md`** — zones, propriétaire de session, branche.
+2. Ne modifier que les chemins de **ta** zone ; un fichier = un outil à la fois.
+3. Branche conseillée : `claude/<sujet>` (pas `cursor/*`, pas force-push sur `main`).
+4. Début de session : `git status` + annoncer les dossiers visés.
+5. Pas de `git add .` ; commit seulement si l’utilisateur le demande.
+6. Hub partagé (`src/app/page.tsx`, `src/context/**`, i18n) → coordination obligatoire.
+
+Worktree pour deux clones physiques : voir PARALLEL_WORK.md.
+
 ## Commands
 
 ```bash
@@ -33,17 +46,16 @@ npm run ci               # lint:ci + test:ci + build (pipeline complet)
 ### Carrousel de pages (DashboardPager)
 L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerProvider`. Chaque "slot" est un index constant défini dans un fichier `*Constants.ts` du feature concerné. Les pages sont assemblées dans `src/app/page.tsx`.
 
-**8 pages actuelles (0-based)** :
+**7 pages actuelles (0-based)** :
 | Index | Constante | Feature |
 |-------|-----------|---------|
 | 0 | — | Carte (MapboxView) |
 | 1 | — | Espace société |
 | 2 | `TECHNICIAN_HUB_SLOT_INDEX` | Hub technicien |
-| 3 | `BACKOFFICE_HUB_SLOT_INDEX` | Back-office |
-| 4 | `AI_ASSISTANT_SLOT_INDEX` | Chatbot |
-| 5 | `GMAIL_HUB_SLOT_INDEX` | Gmail |
-| 6 | `FEATURE_HUB_SLOT_INDEX` | Matériel entreprise |
-| 7 | `NEW_HUB_SLOT_INDEX` | Nouvelle fonctionnalité |
+| 3 | `GMAIL_HUB_SLOT_INDEX` | Gmail |
+| 4 | `FEATURE_HUB_SLOT_INDEX` | Matériel entreprise |
+| 5 | `CRM_HISTORY_SLOT_INDEX` | Historique CRM |
+| 6 | `BILLING_HUB_SLOT_INDEX` | Facturation |
 
 **Navigation inter-pages** : `pager.setPageIndex(N)` via `useDashboardPagerOptional()`. Pour pré-remplir le Chatbot depuis une autre page, dispatch les événements DOM `chatbot-draft-prompt` (pre-fill composer) ou `chatbot-quick-prompt` (envoi direct) — écoutés dans `ChatbotGalaxyComposer`. Pattern centralisé dans `src/features/featureHub/companyStockChatbot.ts`.
 

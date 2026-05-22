@@ -33,6 +33,11 @@ jest.mock("@/features/billing/components/InvoiceBillingPanel", () => ({
   default: () => <div data-testid="invoice-billing-panel-mock" />,
 }));
 
+jest.mock("@/features/chatbot/components/ChatbotRightRail", () => ({
+  __esModule: true,
+  default: () => <div data-testid="chatbot-right-rail" />,
+}));
+
 function renderPage() {
   return renderWithPager(
     <BillingHubIntentProvider>
@@ -47,6 +52,12 @@ describe("BillingHubPage", () => {
     renderPage();
     expect(screen.getByTestId(`dashboard-pager-slot-${BILLING_HUB_SLOT_INDEX}`)).toBeInTheDocument();
     expect(screen.getByTestId("billing-hub-center")).toBeInTheDocument();
-    expect(screen.getByTestId("billing-hub-left-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("billing-hub-agent-panel")).toBeInTheDocument();
+  });
+
+  it("renders the same Documents right rail as the Chatbot page", () => {
+    renderPage();
+    expect(screen.getByTestId("billing-hub-documents-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-right-rail")).toBeInTheDocument();
   });
 });

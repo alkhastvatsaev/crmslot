@@ -186,7 +186,7 @@ export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Option
   const role = workspace?.activeRole ?? null;
 
   const agentEnabled = (options?.enabled !== false) && Boolean(companyId);
-  const handleHubStream = useHubAgentStreamHandler();
+  const handleHubStream = useHubAgentStreamHandler({ companyId });
   const materialBridge = useCompanyStockAgentBridgeOptional();
 
   const storageKey = useMemo(() => `${uid}:${companyId}`, [uid, companyId]);

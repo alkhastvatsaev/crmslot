@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BELGMAP_CRM_ORDERS_CHANGED_EVENT } from "../crmOrdersChangedEvent";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { useCompanyMaterialOrdersRecent } from "@/features/featureHub/hooks/useCompanyMaterialOrdersRecent";
 import { useCompanySupplierOrdersRecent } from "@/features/featureHub/hooks/useCompanySupplierOrdersRecent";
@@ -31,15 +32,25 @@ export function useCrmActivityFeed(
   period: CrmPeriodFilter,
   typeFilter: CrmTypeFilter,
   searchQuery: string,
-  options?: { enabled?: boolean },
 ) {
-  const feedCompanyId = options?.enabled === false ? null : companyId;
+  const [ordersRevision, setOrdersRevision] = useState(0);
+
+  useEffect(() => {
+    const onOrdersChanged = () => setOrdersRevision((n) => n + 1);
+    window.addEventListener(BELGMAP_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
+    return () => window.removeEventListener(BELGMAP_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
+  }, []);
+
+  const feedCompanyId = companyId;
 
   const { interventions, loading: ivLoading } = useBackOfficeInterventions(feedCompanyId);
   const { orders: materialOrders, loading: moLoading } =
     useCompanyMaterialOrdersRecent(feedCompanyId);
-  const { orders: supplierOrders, loading: soLoading } =
-    useCompanySupplierOrdersRecent(feedCompanyId);
+  const {
+    orders: supplierOrders,
+    loading: soLoading,
+    error: supplierOrdersError,
+  } = useCompanySupplierOrdersRecent(feedCompanyId);
   const { emails, loading: emailLoading } = useCompanyEmailsFeed(feedCompanyId);
   const { rows: commissions, loading: commLoading } = useCompanyCommissionsFeed(feedCompanyId);
   const { events: statusEvents, loading: statusLoading } =
@@ -92,6 +103,7 @@ export function useCrmActivityFeed(
       statusEvents,
       crmLogRows,
       ivanaMessages,
+      ordersRevision,
     ],
   );
 
@@ -111,6 +123,9 @@ export function useCrmActivityFeed(
     loading,
     refreshing,
     anySourceLoading,
-    feedError: crmLogError,
+    feedError:
+      allEvents.length === 0 && (crmLogError ?? supplierOrdersError)
+        ? (crmLogError ?? supplierOrdersError)
+        : null,
   };
 }

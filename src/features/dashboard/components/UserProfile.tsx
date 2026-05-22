@@ -5,24 +5,19 @@ import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerCo
 
 import { useTranslation } from '@/core/i18n/I18nContext';
 import {
+  DASHBOARD_CAROUSEL_PAGES,
+  clampDashboardCarouselPageIndex,
+} from '@/features/dashboard/dashboardCarouselRegistry';
+import {
   dashboardHeaderPanelShellClass,
   DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
 } from '@/core/ui/dashboardDesktopLayout';
 
-export const appProfiles = [
-  { name: "IVANA", roleKey: "back_office" },
-  { name: "SOCIÉTÉ BX", roleKey: "client" },
-  { name: "MANSOUR", roleKey: "technician" },
-  { name: "ASLANBECK", roleKey: "back_office" },
-  /** Aligné page 5 — hub Gmail. */
-  { name: "GMAIL", roleKey: "back_office" },
-  /** Aligné page 6 — hub Matériel entreprise. */
-  { name: "MATÉRIEL", roleKey: "admin" },
-  /** Aligné page 7 — historique CRM. */
-  { name: "HISTORIQUE", roleKey: "admin" },
-  /** Aligné page 8 — facturation. */
-  { name: "FACTURATION", roleKey: "back_office" },
-];
+/** 1 entrée par page carrousel — voir `dashboardCarouselRegistry.ts`. */
+export const appProfiles = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
+  name: page.profileName,
+  roleKey: page.profileRoleKey,
+}));
 
 export default function UserProfile() {
   const { t } = useTranslation();
@@ -33,10 +28,10 @@ export default function UserProfile() {
   // Synchronise le profil avec la page courante (1 profil par page carrousel).
   useEffect(() => {
     if (!pager) return;
-    const index = Math.min(Math.max(0, pager.pageIndex), profiles.length - 1);
+    const index = clampDashboardCarouselPageIndex(pager.pageIndex, pager.pageCount);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentIndex(index);
-  }, [pager, pager?.pageIndex, profiles.length]);
+  }, [pager, pager?.pageIndex, pager?.pageCount]);
 
   const safeIndex =
     currentIndex >= 0 && currentIndex < profiles.length ? currentIndex : 0;
@@ -44,20 +39,18 @@ export default function UserProfile() {
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newIndex = (currentIndex + 1) % profiles.length;
+    const max = pager ? Math.min(pager.pageCount, profiles.length) - 1 : profiles.length - 1;
+    const newIndex = currentIndex >= max ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
-    if (pager && newIndex < pager.pageCount) {
-      pager.setPageIndex(newIndex);
-    }
+    pager?.setPageIndex(newIndex);
   };
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newIndex = (currentIndex - 1 + profiles.length) % profiles.length;
+    const max = pager ? Math.min(pager.pageCount, profiles.length) - 1 : profiles.length - 1;
+    const newIndex = currentIndex <= 0 ? max : currentIndex - 1;
     setCurrentIndex(newIndex);
-    if (pager && newIndex < pager.pageCount) {
-      pager.setPageIndex(newIndex);
-    }
+    pager?.setPageIndex(newIndex);
   };
 
   return (

@@ -89,10 +89,12 @@ describe("applyTypeFilter", () => {
     expect(result.every((e) => e.type.startsWith("intervention_"))).toBe(true);
   });
 
-  it("filters materials — only material_ordered", () => {
-    const result = applyTypeFilter(EVENTS, "materials");
-    expect(result).toHaveLength(1);
-    expect(result[0].type).toBe("material_ordered");
+  it("filters materials — bons matériel et commandes Lecot", () => {
+    const withLecot = [...EVENTS, makeEvent({ id: "lecot1", type: "supplier_order_lecot" })];
+    const result = applyTypeFilter(withLecot, "materials");
+    expect(result.map((e) => e.type).sort()).toEqual(
+      ["material_ordered", "supplier_order_lecot", "supplier_ordered"].sort(),
+    );
   });
 
   it("filters suppliers — only supplier_ordered", () => {

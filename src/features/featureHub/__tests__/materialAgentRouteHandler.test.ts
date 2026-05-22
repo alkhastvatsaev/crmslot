@@ -114,7 +114,7 @@ describe("materialAgentRouteHandler", () => {
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
   });
 
-  it("clears session client and streams instant Lecot catalogue for nouvelle commande lecot", async () => {
+  it("clears session client and delegates nouvelle commande lecot to OpenAI", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
@@ -127,12 +127,11 @@ describe("materialAgentRouteHandler", () => {
     expect(events).toContainEqual(
       expect.objectContaining({ type: "material_order_client", clientName: "" }),
     );
-    // Instant shortcut — no OpenAI call
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 
-  it("streams instant Lecot catalogue for commande lecot (no OpenAI call)", async () => {
+  it("delegates commande lecot to OpenAI (catalogue via search_lecot_products)", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
@@ -141,7 +140,7 @@ describe("materialAgentRouteHandler", () => {
       auth,
     );
     const events = await readSseJsonLines(res);
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 

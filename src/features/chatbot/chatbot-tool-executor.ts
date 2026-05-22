@@ -37,6 +37,7 @@ import {
   suggestGmailInterventionLinksForChatbot,
 } from "@/features/chatbot/chatbot-gmail";
 import { logCrmFromChatbotTool } from "@/features/crmHistory/logCrmFromChatbotTool";
+import { logCrmMaterialOrderApprovedAdmin } from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
 import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 
 export type ChatbotToolContext = {
@@ -581,6 +582,14 @@ async function approveMaterialOrders(ctx: ChatbotToolContext, input: Record<stri
       }
       await doc.ref.update({ status: "ordered", updatedAt: new Date().toISOString() });
       approved.push(doc.id);
+      void logCrmMaterialOrderApprovedAdmin({
+        companyId: ctx.companyId,
+        actorUid: ctx.actorUid,
+        role: ctx.role,
+        materialOrderId: doc.id,
+        interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
+        clientName: typeof data.clientName === "string" ? data.clientName : null,
+      });
     }
     return { ok: true, approved, skipped: skipped.length, message: `${approved.length} demande(s) validée(s).` };
   }
@@ -602,6 +611,14 @@ async function approveMaterialOrders(ctx: ChatbotToolContext, input: Record<stri
     }
     await ref.update({ status: "ordered", updatedAt: new Date().toISOString() });
     approved.push(orderId);
+    void logCrmMaterialOrderApprovedAdmin({
+      companyId: ctx.companyId,
+      actorUid: ctx.actorUid,
+      role: ctx.role,
+      materialOrderId: orderId,
+      interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
+      clientName: typeof data.clientName === "string" ? data.clientName : null,
+    });
   }
 
   return {

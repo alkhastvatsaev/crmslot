@@ -52,8 +52,16 @@ export type ChatbotStreamEvent =
       companyId: string;
       stockItemId?: string | null;
       filter?: "all" | "low" | "orders" | "lecot";
+      searchQuery?: string | null;
     }
   | { type: "quick_actions"; actions: ChatbotQuickAction[] }
+  | {
+      type: "focus_billing_case";
+      interventionId: string | null;
+      filter?: "all" | "unpaid" | "pending" | "paid" | "to_bill";
+    }
+  | { type: "open_crm_dossier"; interventionId: string }
+  | { type: "material_order_client"; clientName: string }
   | { type: "done"; apiMessages?: unknown[] }
   | { type: "error"; message: string };
 

@@ -24,7 +24,6 @@ jest.mock("@/core/config/firebase", () => ({
 
 jest.mock("@/core/config/devUiPreview", () => ({
   DEMO_COMPANY_ID: "demo-local-company",
-  devUiPreviewEnabled: true,
 }));
 
 describe("useCompanyCrmActivityLog", () => {
@@ -33,16 +32,12 @@ describe("useCompanyCrmActivityLog", () => {
     mockOnSnapshot.mockReturnValue(jest.fn());
   });
 
-  it("does not subscribe to Firestore for demo company in dev preview", async () => {
-    const { result } = renderHook(() => useCompanyCrmActivityLog(DEMO_COMPANY_ID));
+  it("subscribes to crm_activity for demo company (journal commandes matériel)", async () => {
+    renderHook(() => useCompanyCrmActivityLog(DEMO_COMPANY_ID));
 
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+      expect(mockOnSnapshot).toHaveBeenCalled();
     });
-
-    expect(mockOnSnapshot).not.toHaveBeenCalled();
-    expect(result.current.error).toBeNull();
-    expect(result.current.rows).toEqual([]);
   });
 
   it("subscribes for a real company id", async () => {
@@ -50,6 +45,20 @@ describe("useCompanyCrmActivityLog", () => {
 
     await waitFor(() => {
       expect(mockOnSnapshot).toHaveBeenCalled();
+    });
+  });
+
+  it("does not surface permission-denied as blocking error", async () => {
+    mockOnSnapshot.mockImplementation((_q, _ok, onErr) => {
+      onErr?.({ code: "permission-denied", message: "Missing or insufficient permissions." });
+      return jest.fn();
+    });
+
+    const { result } = renderHook(() => useCompanyCrmActivityLog("acme-corp"));
+
+    await waitFor(() => {
+      expect(result.current.error).toBeNull();
+      expect(result.current.rows).toEqual([]);
     });
   });
 });

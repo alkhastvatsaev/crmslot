@@ -7,19 +7,18 @@ import {
   LECOT_FLOW_CONTEXT_RE,
   priorUserTexts,
 } from "@/features/chatbot/chatbot-lecot-follow-up";
+import {
+  parseLecotInstantOrderIntent,
+  type LecotInstantOrderIntent,
+} from "@/features/chatbot/chatbot-lecot-instant-order-intent";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
+
+export { parseLecotInstantOrderIntent, type LecotInstantOrderIntent };
 
 const LOCAL_CATALOG = mergeCatalogProducts(LECOT_CATALOG, STUB_CATALOG);
 
-const COMMANDER_SKU_LABEL_RE =
-  /^commander\s+([A-Z0-9][A-Z0-9-]*)\s*[—–-]\s*(.+)$/i;
-const COMMANDER_RANK_RE = /^commander\s+(\d{1,2})\s*\.?\s*$/i;
 const CATALOG_LINE_RE =
   /^(\d+)\.\s+\[([^\]]+)\]\([^)]+\)[^\n]*\(SKU\s+([A-Z0-9][A-Z0-9-]*)\)/gim;
-
-export type LecotInstantOrderIntent =
-  | { kind: "sku"; sku: string; label: string }
-  | { kind: "rank"; rank: number };
 
 export type LecotInstantOrderLine = {
   sku: string;
@@ -27,29 +26,6 @@ export type LecotInstantOrderLine = {
   quantity: 1;
   unitPriceEur: number;
 };
-
-/** Message utilisateur déclenchant une commande directe (bouton ou « Commander N »). */
-export function parseLecotInstantOrderIntent(lastUserText: string): LecotInstantOrderIntent | null {
-  const t = lastUserText.trim();
-  if (!t) return null;
-
-  const skuLabel = COMMANDER_SKU_LABEL_RE.exec(t);
-  if (skuLabel) {
-    return {
-      kind: "sku",
-      sku: skuLabel[1].trim().toUpperCase(),
-      label: skuLabel[2].trim(),
-    };
-  }
-
-  const rank = COMMANDER_RANK_RE.exec(t);
-  if (rank) {
-    const n = Number(rank[1]);
-    if (n >= 1 && n <= 9) return { kind: "rank", rank: n };
-  }
-
-  return null;
-}
 
 export function extractCatalogLinesFromAssistantText(
   text: string,

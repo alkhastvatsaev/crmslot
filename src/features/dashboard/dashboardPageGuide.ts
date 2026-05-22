@@ -1,24 +1,28 @@
 import { COMPANY_HUB_RAIL_DEMANDE_LABEL } from "@/features/company/companyHubConstants";
+import {
+  DASHBOARD_CAROUSEL_PAGES,
+  getDashboardCarouselPage,
+} from "@/features/dashboard/dashboardCarouselRegistry";
 
-/** Libellés pour les pages du carrousel (index 0 = carte, 1–2 = hubs société / technicien). */
+/** Libellés pour les pages du carrousel (index = pageIndex pager). */
 export type DashboardPageMeta = {
   title: string;
   hint: string;
 };
 
-export const DASHBOARD_PAGE_GUIDE: DashboardPageMeta[] = [
-  { title: "Carte", hint: "Galaxy, audio, recherche — vue opérationnelle principale." },
-  {
-    title: "Espace société",
-    hint: `Triptyque : ${COMPANY_HUB_RAIL_DEMANDE_LABEL} (gauche) · organisation & invitations (centre) · portail client (droite).`,
-  },
-  {
-    title: "Technicien",
-    hint: "Triptyque : espace libre (gauche) · missions (centre) · hors-ligne, clôture, push, facturation auto (droite).",
-  },
-];
+/** Dérivé du registre carrousel — garder en sync avec `dashboardCarouselRegistry.ts`. */
+export const DASHBOARD_PAGE_GUIDE: DashboardPageMeta[] = DASHBOARD_CAROUSEL_PAGES.map((page) => {
+  if (page.slotIndex === 1) {
+    return {
+      title: page.guideTitle,
+      hint: `Triptyque : ${COMPANY_HUB_RAIL_DEMANDE_LABEL} (gauche) · organisation & invitations (centre) · portail client (droite).`,
+    };
+  }
+  return { title: page.guideTitle, hint: page.guideHint };
+});
 
 export function getDashboardPageGuide(pageIndex: number): DashboardPageMeta | null {
-  if (pageIndex < 0 || pageIndex >= DASHBOARD_PAGE_GUIDE.length) return null;
+  const page = getDashboardCarouselPage(pageIndex);
+  if (!page) return null;
   return DASHBOARD_PAGE_GUIDE[pageIndex] ?? null;
 }

@@ -1,5 +1,4 @@
 import { MATERIAL_AGENT_CLIENT_NAME_MARKER } from "@/features/featureHub/materialAgentOrderClient";
-import { MATERIAL_AGENT_LECOT_DEFAULT_QUERY } from "@/features/featureHub/materialAgentLecotQuery";
 import type { CompanyStockAgentIntent } from "@/features/featureHub/companyStockAgentTypes";
 
 export const AWAITING_CLIENT_MESSAGES = [
@@ -220,19 +219,3 @@ export const MATERIAL_AGENT_USER_PHRASES: MaterialPhraseCase[] = [
   { id: "rst-05", phrase: "catalogue", kind: "reset_client" },
 ];
 
-export function expectedLecotQuery(query: MaterialPhraseCase & { kind: "lecot_catalog" }): string {
-  return query.query === "default" ? MATERIAL_AGENT_LECOT_DEFAULT_QUERY : query.query;
-}
-
-export function assertLecotQueryMatches(
-  actual: string | null,
-  expected: MaterialPhraseCase & { kind: "lecot_catalog" },
-): void {
-  const want = expectedLecotQuery(expected);
-  if (expected.query === "default") {
-    expect(actual).toBe(want);
-    return;
-  }
-  expect(actual).not.toBeNull();
-  expect(actual!.toLowerCase()).toContain(expected.query.toLowerCase());
-}

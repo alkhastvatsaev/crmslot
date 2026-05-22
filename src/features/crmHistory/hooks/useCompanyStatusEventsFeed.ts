@@ -10,6 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
+import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 
 const STATUS_EVENTS_LIMIT = 400;
@@ -48,8 +49,13 @@ export function useCompanyStatusEventsFeed(companyId: string | null) {
         setLoading(false);
       },
       (e) => {
-        console.warn("[useCompanyStatusEventsFeed]", e);
-        setError(e.message || "Erreur Firestore");
+        if (isFirestorePermissionDenied(e)) {
+          console.warn("[useCompanyStatusEventsFeed] permission denied — statuts ignorés", e);
+          setError(null);
+        } else {
+          console.warn("[useCompanyStatusEventsFeed]", e);
+          setError(e instanceof Error ? e.message : "Erreur Firestore");
+        }
         setEvents([]);
         setLoading(false);
       },

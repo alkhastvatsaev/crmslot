@@ -1,3 +1,4 @@
+import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import type { StockItem } from "@/features/materials/stockFirestore";
@@ -7,6 +8,8 @@ export type CompanyStockAgentMessage = {
   role: "user" | "assistant";
   text: string;
   suggestions?: string[];
+  /** Boutons Commander Lecot (stream catalogue instantané). */
+  quickActions?: ChatbotQuickAction[];
 };
 
 export type CompanyStockAgentContext = {

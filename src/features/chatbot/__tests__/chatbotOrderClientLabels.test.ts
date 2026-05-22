@@ -1,8 +1,12 @@
 import {
   buildInterventionClientLabelMap,
+  buildSupplierOrderClientNameByOrderId,
   buildSupplierOrderInterventionIdByOrderId,
+  resolveOrderListClientLabel,
   resolveSupplierOrderClientLabel,
+  resolveSupplierOrderListClientLabel,
 } from "@/features/chatbot/chatbotOrderClientLabels";
+import { MATERIAL_ORDER_CLIENT_FALLBACK } from "@/features/materials/materialOrderClientName";
 import type { Intervention } from "@/features/interventions/types";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import type { SupplierOrder } from "@/features/suppliers/types";
@@ -60,6 +64,39 @@ describe("chatbotOrderClientLabels", () => {
         labels,
       ),
     ).toMatch(/Dupont/i);
+  });
+
+  it("resolveSupplierOrderListClientLabel uses bon clientName and linked material order", () => {
+    const orderWithoutName: SupplierOrder = { ...order, clientName: undefined };
+    const material: MaterialOrderDoc = {
+      id: "mo-2",
+      interventionId: "iv-dupont-42",
+      technicianUid: "tech-1",
+      partsRequested: [],
+      urgency: "normal",
+      status: "ordered",
+      createdAt: "2026-05-19T10:00:00.000Z",
+      updatedAt: "2026-05-19T10:00:00.000Z",
+      supplierOrderId: "ord-lecot-1",
+      clientName: "Dupont depuis bon matériel",
+    };
+    const byId = buildSupplierOrderClientNameByOrderId([orderWithoutName], [material]);
+    const ivMap = buildInterventionClientLabelMap([], null, []);
+    const ivByOrder = buildSupplierOrderInterventionIdByOrderId([orderWithoutName], [material]);
+    expect(
+      resolveSupplierOrderListClientLabel(
+        orderWithoutName,
+        byId,
+        ivByOrder,
+        ivMap,
+      ),
+    ).toBe("Dupont depuis bon matériel");
+  });
+
+  it("resolveOrderListClientLabel prefers stored name then intervention then fallback", () => {
+    expect(resolveOrderListClientLabel("Dupont SA", null)).toBe("Dupont SA");
+    expect(resolveOrderListClientLabel(null, "Jean Dupont")).toBe("Jean Dupont");
+    expect(resolveOrderListClientLabel(null, null)).toBe(MATERIAL_ORDER_CLIENT_FALLBACK);
   });
 
   it("prefers invoice label over snapshot for same intervention", () => {

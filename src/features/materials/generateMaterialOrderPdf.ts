@@ -46,8 +46,10 @@ export function generateMaterialOrdersPdf(
     }
     doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
+    const orderClient = (order.clientName ?? clientLabel ?? "").trim();
+    const clientSuffix = orderClient ? ` — ${orderClient}` : "";
     doc.text(
-      `Bon #${order.id.slice(0, 10)} — ${STATUS_LABELS[order.status] ?? order.status} — ${formatWhen(order.createdAt)}`,
+      `Bon #${order.id.slice(0, 10)} — ${STATUS_LABELS[order.status] ?? order.status}${clientSuffix} — ${formatWhen(order.createdAt)}`,
       14,
       y,
     );

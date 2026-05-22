@@ -1,2 +1,2 @@
-/** Index carrousel — hub « Outils » (7ᵉ page, 0-based = 6). */
-export const FEATURE_HUB_SLOT_INDEX = 5;
+/** Index carrousel — hub Matériel (5ᵉ page, 0-based = 4). */
+export const FEATURE_HUB_SLOT_INDEX = 4;

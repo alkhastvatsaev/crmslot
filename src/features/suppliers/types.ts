@@ -22,6 +22,8 @@ export interface SupplierOrder {
   sentAt?: string | null;
   deliveredAt?: string | null;
   createdByUid?: string | null;
+  /** Nom client affiché dans les listes commandes. */
+  clientName?: string | null;
   /** Commande simulée (pas d'envoi Lecot réel). */
   isDemo?: boolean;
   interventionId?: string | null;

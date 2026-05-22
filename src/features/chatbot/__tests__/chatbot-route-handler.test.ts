@@ -204,7 +204,7 @@ describe("chatbot-route-handler", () => {
     expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
   });
 
-  it("returns instant Lecot catalogue for serrure without OpenAI", async () => {
+  it("delegates Lecot product requests to OpenAI (no instant catalogue shortcut)", async () => {
     const res = await handleChatbotPost(
       {
         companyId: "co-test",
@@ -214,20 +214,11 @@ describe("chatbot-route-handler", () => {
       auth,
     );
 
-    const events = (await readSseJsonLines(res)) as Array<{ type: string }>;
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "text")).toBe(true);
-    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "quick_actions")).toBe(true);
-    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
+    await readSseJsonLines(res);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalled();
   });
 
-  it("places instant Lecot order on Commander SKU without OpenAI", async () => {
-    mockExecuteChatbotTool.mockResolvedValue({
-      ok: true,
-      supplierOrderId: "ord-instant",
-      lines: [{ sku: "LEC-SER-1001", label: "Serrure", quantity: 1 }],
-    });
-
+  it("delegates Commander SKU follow-up to OpenAI", async () => {
     const assistant = `**Catalogue Lecot** :
 1. [Serrure multipoints Vachette Radialis 3 points](lecot:https://lecot.be) — 145,00 € HT (SKU LEC-SER-1001)`;
 
@@ -246,40 +237,15 @@ describe("chatbot-route-handler", () => {
       auth,
     );
 
-    const events = (await readSseJsonLines(res)) as Array<{ type: string }>;
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-    expect(mockExecuteChatbotTool).toHaveBeenCalledWith(
+    await readSseJsonLines(res);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalled();
+    expect(mockExecuteChatbotTool).not.toHaveBeenCalledWith(
       "order_lecot_parts",
-      expect.objectContaining({
-        lines: expect.arrayContaining([
-          expect.objectContaining({ sku: "LEC-SER-1001", quantity: 1 }),
-        ]),
-      }),
-      expect.objectContaining({ companyId: "co-test" }),
+      expect.anything(),
+      expect.anything(),
     );
-    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "tool_start")).toBe(true);
-    expect((events as ChatbotStreamEvent[]).some((e) => e.type === "done")).toBe(true);
   });
 
-  it("returns instant Lecot catalogue for commande serrure client", async () => {
-    const res = await handleChatbotPost(
-      {
-        companyId: "co-test",
-        messages: [
-          {
-            role: "user",
-            content: "tu peux commander pour le client vatsaev une serrure sur lecot",
-          },
-        ],
-      },
-      auth,
-    );
-
-    const events = (await readSseJsonLines(res)) as Array<Record<string, unknown>>;
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-    const textEv = events.find((e) => e.type === "text");
-    expect(String(textEv?.delta ?? "")).toMatch(/Catalogue Lecot/i);
-  });
   it("returns undefined to allow all tools when follow-up is only une serrure", async () => {
     const scope = resolveChatbotToolScopeFromBody(
       { toolScope: [] },

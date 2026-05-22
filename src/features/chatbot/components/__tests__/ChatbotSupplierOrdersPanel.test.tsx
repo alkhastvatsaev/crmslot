@@ -63,7 +63,7 @@ describe("ChatbotSupplierOrdersPanel", () => {
     render(<ChatbotSupplierOrdersPanel />);
     expect(screen.getByTestId("chatbot-supplier-orders-panel")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-supplier-order-ord-1")).toBeInTheDocument();
-    expect(screen.getByText(/Cylindre/)).toBeInTheDocument();
+    expect(screen.getByText("Client")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-supplier-order-pdf-ord-1")).toBeInTheDocument();
   });
 

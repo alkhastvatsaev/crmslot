@@ -18,21 +18,33 @@ function formatWhen(raw: unknown): string {
 
 export function generateSupplierOrderPdf(
   order: SupplierOrder,
-  opts?: { companyName?: string },
+  opts?: { companyName?: string; clientName?: string },
 ): Uint8Array {
   const doc = new jsPDF();
+  const clientLabel = (order.clientName ?? opts?.clientName ?? "").trim();
+
   doc.setFontSize(16);
   doc.text("Bon de commande fournisseur", 14, 18);
   doc.setFontSize(11);
-  doc.text(`Fournisseur : ${order.supplierName}`, 14, 28);
-  doc.text(`Réf. commande : ${order.id}`, 14, 35);
-  doc.text(`Date : ${formatWhen(order.createdAt)}`, 14, 42);
-  doc.text(`Statut : ${SUPPLIER_ORDER_STATUS_LABELS[order.status]}`, 14, 49);
+  let y = 28;
+  doc.text(`Fournisseur : ${order.supplierName}`, 14, y);
+  y += 7;
+  if (clientLabel) {
+    doc.text(`Nom : ${clientLabel}`, 14, y);
+    y += 7;
+  }
+  doc.text(`Réf. commande : ${order.id}`, 14, y);
+  y += 7;
+  doc.text(`Date : ${formatWhen(order.createdAt)}`, 14, y);
+  y += 7;
+  doc.text(`Statut : ${SUPPLIER_ORDER_STATUS_LABELS[order.status]}`, 14, y);
+  y += 7;
   if (opts?.companyName) {
-    doc.text(`Société : ${opts.companyName}`, 14, 56);
+    doc.text(`Société : ${opts.companyName}`, 14, y);
+    y += 7;
   }
 
-  const startY = opts?.companyName ? 64 : 57;
+  const startY = y + 5;
   autoTable(doc, {
     startY,
     head: [["Réf.", "Désignation", "Qté", "P.U. HT", "Total HT"]],

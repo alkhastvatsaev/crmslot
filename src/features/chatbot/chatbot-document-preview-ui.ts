@@ -1,6 +1,6 @@
 import type { ChatbotDocumentPreviewState } from "@/features/chatbot/hooks/useChatbotDocumentPreview";
 
-export type DocumentPreviewOverlayTarget = "left" | "right";
+export type DocumentPreviewOverlayTarget = "left" | "right" | "materialRight";
 
 export function isDocumentPreviewOpen(preview: {
   loading: boolean;

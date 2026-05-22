@@ -9,7 +9,6 @@ import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndic
 import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
-import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
@@ -29,6 +28,8 @@ import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentCont
 import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
 import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
+import { CrmHistoryAgentBridgeProvider } from "@/context/CrmHistoryAgentBridgeContext";
+import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeContext";
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
@@ -64,11 +65,6 @@ const TechnicianHubPage = dynamic(
   { ssr: false, loading: () => null },
 );
 
-const ChatbotPage = dynamic(() => import("@/features/chatbot/components/ChatbotPage"), {
-  ssr: false,
-  loading: () => null,
-});
-
 const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubPage"), {
   ssr: false,
   loading: () => null,
@@ -89,7 +85,7 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
   loading: () => null,
 });
 
-/** Écran d’accueil — **8 pages** : carte · société · technicien · Chatbot · Gmail · Matériel · CRM · Facturation. */
+/** Écran d’accueil — **7 pages** : carte · société · technicien · Gmail · Matériel · CRM · Facturation. */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -100,7 +96,6 @@ export default function Dashboard() {
       </>,
       <DashboardSecondaryPlaceholder key="secondary" />,
       <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
-      <ChatbotPage key="chatbot" slotIndex={AI_ASSISTANT_SLOT_INDEX} />,
       <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
       <FeatureHubPage key="feature-hub" slotIndex={FEATURE_HUB_SLOT_INDEX} />,
       <CrmHistoryPage key="crm-history" slotIndex={CRM_HISTORY_SLOT_INDEX} />,
@@ -126,6 +121,8 @@ export default function Dashboard() {
                         <BackofficeInboxIntentProvider>
                         <CompanyStockIntentProvider>
                         <CompanyStockAgentBridgeProvider>
+                        <CrmHistoryAgentBridgeProvider>
+                        <BillingHubAgentBridgeProvider>
                         <BillingHubIntentProvider>
                         <TechnicianBackofficeReportBridgeProvider>
                           <TechnicianFinishJobProvider>
@@ -165,6 +162,8 @@ export default function Dashboard() {
                           </TechnicianFinishJobProvider>
                         </TechnicianBackofficeReportBridgeProvider>
                         </BillingHubIntentProvider>
+                        </BillingHubAgentBridgeProvider>
+                        </CrmHistoryAgentBridgeProvider>
                         </CompanyStockAgentBridgeProvider>
                         </CompanyStockIntentProvider>
                         </BackofficeInboxIntentProvider>

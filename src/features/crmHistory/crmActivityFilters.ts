@@ -31,7 +31,9 @@ export function applyTypeFilter(
     return events.filter(
       (e) =>
         e.type === "material_ordered" ||
-        e.type === "material_order_status_changed",
+        e.type === "material_order_status_changed" ||
+        e.type === "supplier_ordered" ||
+        e.type === "supplier_order_lecot",
     );
   if (filter === "suppliers")
     return events.filter(

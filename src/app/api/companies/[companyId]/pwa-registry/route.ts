@@ -4,6 +4,7 @@ import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { isFirebaseAdminReady } from "@/core/config/firebase-admin";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import { readStoredOrderClientName } from "@/features/materials/materialOrderClientName";
 import type { SupplierOrder } from "@/features/suppliers/types";
 
 export const runtime = "nodejs";
@@ -81,7 +82,8 @@ export async function GET(request: Request, context: RouteContext) {
       createdByUid: data.createdByUid ?? null,
       isDemo: Boolean(data.isDemo),
       interventionId: data.interventionId ?? undefined,
-    } as SupplierOrder & { interventionId?: string };
+      clientName: readStoredOrderClientName(data as Record<string, unknown>) ?? undefined,
+    } as SupplierOrder;
   })
     .sort(
       (a, b) => Date.parse(String(b.createdAt)) - Date.parse(String(a.createdAt)),
@@ -90,9 +92,11 @@ export async function GET(request: Request, context: RouteContext) {
   const materialOrders: MaterialOrderDoc[] = (materialSnap?.docs ?? [])
     .map((d) => {
       const data = d.data();
+      const clientName = readStoredOrderClientName(data as Record<string, unknown>);
       return {
         id: d.id,
         ...(data as Omit<MaterialOrderDoc, "id">),
+        ...(clientName ? { clientName } : {}),
         createdAt: serializeTimestamp(data.createdAt),
         updatedAt: serializeTimestamp(data.updatedAt),
       };

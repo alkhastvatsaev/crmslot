@@ -27,6 +27,29 @@ export default function CompanyStockGalaxyComposer() {
     setInput("");
   }, [bridge?.handlers]);
 
+  useEffect(() => {
+    const onQuick = (e: Event) => {
+      const text = (e as CustomEvent<{ text?: string }>).detail?.text?.trim();
+      if (!text || !handlers || handlers.disabled) return;
+      handlers.sendMessage(text);
+      setInput("");
+    };
+    const onDraft = (e: Event) => {
+      const text = (e as CustomEvent<{ text?: string }>).detail?.text?.trim();
+      if (text) setInput(text);
+    };
+    window.addEventListener("material-agent-quick-prompt", onQuick);
+    window.addEventListener("material-agent-draft-prompt", onDraft);
+    window.addEventListener("chatbot-quick-prompt", onQuick);
+    window.addEventListener("chatbot-draft-prompt", onDraft);
+    return () => {
+      window.removeEventListener("material-agent-quick-prompt", onQuick);
+      window.removeEventListener("material-agent-draft-prompt", onDraft);
+      window.removeEventListener("chatbot-quick-prompt", onQuick);
+      window.removeEventListener("chatbot-draft-prompt", onDraft);
+    };
+  }, [handlers]);
+
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || disabled || !handlers) return;

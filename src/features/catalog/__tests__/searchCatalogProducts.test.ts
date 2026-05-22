@@ -20,6 +20,15 @@ describe("searchCatalogProducts", () => {
     ]);
   });
 
+  it("prefers poignée labels over serrure when query is poignée", () => {
+    const catalog = [
+      { sku: "S1", label: "Serrure 3 points", unitPriceCents: 200 },
+      { sku: "P1", label: "Poignée Hoppe Tokyo sur rosace", unitPriceCents: 4500 },
+    ];
+    const hits = searchCatalogProductsScored(catalog, "poignée", 5);
+    expect(hits[0]?.label.toLowerCase()).toContain("poign");
+  });
+
   it("matches long natural-language queries by tokens", () => {
     const hits = searchCatalogProductsScored(
       catalog,

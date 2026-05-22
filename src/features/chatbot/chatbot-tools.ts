@@ -462,6 +462,11 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
           description: "Ajouter les lignes à la facture dossier (défaut true si interventionId)",
         },
         notes: { type: "string", description: "Notes internes (optionnel)" },
+        clientName: {
+          type: "string",
+          description:
+            "Nom du client affiché dans le panneau Commandes (obligatoire sur la page Matériel avant toute commande Lecot)",
+        },
       },
       required: ["lines"],
     },
@@ -479,6 +484,76 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
         subject: { type: "string", description: "Sujet (optionnel, 'Re: <sujet original>' par défaut)" },
       },
       required: ["messageId", "bodyText"],
+    },
+  },
+  {
+    name: "list_company_material_orders",
+    description:
+      "Liste les bons matériel de la société (tous dossiers). Filtre optionnel status=pending|ordered|delivered|… — idéal pour valider en masse.",
+    input_schema: {
+      type: "object",
+      properties: {
+        status: { type: "string", description: "pending | approved | ordered | delivered | received | cancelled" },
+        limit: { type: "number", description: "Max 40, défaut 20" },
+      },
+    },
+  },
+  {
+    name: "approve_material_orders",
+    description:
+      "Valide des demandes matériel terrain (pending → ordered). orderIds OU approveAllPending=true. userConfirmed=true obligatoire.",
+    input_schema: {
+      type: "object",
+      properties: {
+        orderIds: {
+          type: "array",
+          items: { type: "string" },
+          description: "IDs bons matériel à approuver",
+        },
+        approveAllPending: {
+          type: "boolean",
+          description: "Approuver toutes les demandes pending de la société (max 15)",
+        },
+        userConfirmed: { type: "boolean" },
+      },
+      required: ["userConfirmed"],
+    },
+  },
+  {
+    name: "focus_stock_item",
+    description:
+      "Met en avant un article stock dans l'UI Matériel (sélection + filtre optionnel low|orders|lecot).",
+    input_schema: {
+      type: "object",
+      properties: {
+        stockItemId: { type: "string" },
+        filter: { type: "string", enum: ["all", "low", "orders", "lecot"] },
+        searchQuery: { type: "string", description: "Pré-remplit la recherche inventaire" },
+      },
+    },
+  },
+  {
+    name: "focus_billing_case",
+    description:
+      "Sélectionne un dossier dans la liste facturation et applique un filtre (unpaid, to_bill, paid, all).",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+        filter: { type: "string", enum: ["all", "unpaid", "pending", "paid", "to_bill"] },
+      },
+    },
+  },
+  {
+    name: "open_crm_dossier",
+    description:
+      "Ouvre le dossier dans le back-office (hub interventions) pour suivi détaillé après analyse historique.",
+    input_schema: {
+      type: "object",
+      properties: {
+        interventionId: { type: "string" },
+      },
+      required: ["interventionId"],
     },
   },
   {
@@ -506,6 +581,7 @@ export const CHATBOT_WRITE_TOOLS = new Set([
   "patch_intervention_billing",
   "update_intervention_billing",
   "order_lecot_parts",
+  "approve_material_orders",
   "send_gmail_reply",
   "link_gmail_to_intervention",
 ]);
