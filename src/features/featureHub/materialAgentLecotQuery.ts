@@ -58,7 +58,9 @@ function normalizeMaterialAgentLecotBaseQuery(
     return MATERIAL_AGENT_LECOT_DEFAULT_QUERY;
   }
 
-  return base;
+  // Don't route arbitrary strings (proper nouns, client names…) to the instant shortcut.
+  // Only known product keywords or catalog phrases qualify.
+  return null;
 }
 
 /**
