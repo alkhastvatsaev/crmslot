@@ -219,7 +219,7 @@ export default function TechnicianFinishJobPanel() {
       }
       void offlineSync?.refreshPendingCount();
 
-      if (liveIv && billingLines.length > 0 && result.outcome !== "error") {
+      if (liveIv && billingLines.length > 0) {
         const totalCents = billingLines.reduce(
           (s, l) => s + Math.round(l.unitPriceCents) * (l.quantity ?? 1),
           0,

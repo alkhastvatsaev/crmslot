@@ -11,6 +11,10 @@ const intervention: Intervention = {
   id: "iv-dupont-42",
   companyId: "co-1",
   status: "assigned",
+  title: "",
+  address: "",
+  time: "",
+  location: { lat: 0, lng: 0 },
   clientFirstName: "Jean",
   clientLastName: "Dupont",
 };

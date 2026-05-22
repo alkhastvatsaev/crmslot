@@ -2,8 +2,11 @@ import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import type { Intervention } from "@/features/interventions/types";
 
 /** Aperçu facturation quand aucune intervention facturable en Firestore. */
+const STUB = { title: "", time: "", location: { lat: 0, lng: 0 } } as const;
+
 export const DEMO_BILLING_INTERVENTIONS: Intervention[] = [
   {
+    ...STUB,
     id: "demo-bill-1",
     companyId: DEMO_COMPANY_ID,
     clientName: "Dupont — Ixelles",
@@ -16,6 +19,7 @@ export const DEMO_BILLING_INTERVENTIONS: Intervention[] = [
     ],
   },
   {
+    ...STUB,
     id: "demo-bill-2",
     companyId: DEMO_COMPANY_ID,
     clientName: "Martin SPRL",
@@ -29,6 +33,7 @@ export const DEMO_BILLING_INTERVENTIONS: Intervention[] = [
     invoicePdfUrl: "https://example.com/demo-invoice.pdf",
   },
   {
+    ...STUB,
     id: "demo-bill-3",
     companyId: DEMO_COMPANY_ID,
     clientName: "Clinique Saint-Jean",
@@ -39,6 +44,7 @@ export const DEMO_BILLING_INTERVENTIONS: Intervention[] = [
     billingLines: [{ description: "Contrôle accès badge", quantity: 1, unitPriceCents: 15000 }],
   },
   {
+    ...STUB,
     id: "demo-bill-4",
     companyId: DEMO_COMPANY_ID,
     clientName: "Garage Central",
@@ -48,6 +54,7 @@ export const DEMO_BILLING_INTERVENTIONS: Intervention[] = [
     billingLines: [],
   },
   {
+    ...STUB,
     id: "demo-bill-5",
     companyId: DEMO_COMPANY_ID,
     clientName: "Résidence Les Orchidées",

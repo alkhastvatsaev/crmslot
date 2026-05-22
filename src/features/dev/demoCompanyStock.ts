@@ -158,7 +158,7 @@ export const DEMO_COMPANY_MATERIAL_ORDERS: MaterialOrderDoc[] = [
       { description: "Cylindre européen 80 mm sécurité", quantity: 2, reference: "CYL-EURO-80" },
       { description: "Gâche électrique réversible", quantity: 1, reference: "GACH-ELEC" },
     ],
-    urgency: "urgent",
+    urgency: "high",
     status: "pending",
     createdAt: NOW,
     updatedAt: NOW,
