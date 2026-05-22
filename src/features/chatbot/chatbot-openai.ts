@@ -258,9 +258,17 @@ export async function runChatbotOpenAI(params: {
     );
   }
 
+  // Prevent order_lecot_parts from being auto-chained after search_lecot_products in the same session.
+  // Set to true once search runs; cleared by returning to text-only round so OpenAI summarizes results.
+  let searchedLecotInHub = false;
+
   for (let round = 0; round < MAX_ROUNDS; round += 1) {
+    const scopeForRound =
+      params.hubAgentMode && searchedLecotInHub
+        ? (effectiveToolScope ?? []).filter((t) => t !== "order_lecot_parts")
+        : effectiveToolScope;
     const resolvedTools =
-      round === 0 && skipToolsRound0 ? [] : openaiTools(effectiveToolScope);
+      round === 0 && skipToolsRound0 ? [] : openaiTools(scopeForRound);
     const maxTokens = round === 0 ? 640 : 480;
 
     const stream = await client.chat.completions.create({
@@ -483,6 +491,7 @@ export async function runChatbotOpenAI(params: {
           );
           if (actions.length > 0) {
             params.emit({ type: "quick_actions", actions });
+            if (params.hubAgentMode) searchedLecotInHub = true;
           }
         }
       }
