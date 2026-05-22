@@ -51,7 +51,34 @@ jest.mock("@/features/featureHub/hooks/useCompanyMaterialOrdersRecent", () => ({
       },
     ],
     loading: false,
-    dismissDemoOrder: jest.fn(),
+  }),
+}));
+
+jest.mock("@/features/chatbot/ChatbotContext", () => ({
+  useChatbotContext: () => ({
+    ensureRightPanelOpen: jest.fn(),
+    refreshRegistry: jest.fn(),
+    supplierOrdersPanel: { open: true, highlightOrderId: null, highlightMaterialOrderId: null },
+    supplierOrders: [],
+    materialOrders: [],
+    registryError: null,
+    closeSupplierOrdersPanel: jest.fn(),
+    companyId: "demo-local-company",
+    openSupplierOrderPdf: jest.fn(),
+    openDocumentPreview: jest.fn(),
+    documentPreview: {
+      interventionId: "",
+      kind: "material_order",
+      title: "",
+      blobUrl: null,
+      loading: false,
+      error: null,
+      supplierOrderId: null,
+      overlayTarget: null,
+    },
+    closeDocumentPreview: jest.fn(),
+    chatbotInvoices: [],
+    workspaceSnapshot: null,
   }),
 }));
 
@@ -64,7 +91,7 @@ jest.mock("@/features/backoffice/useBackOfficeInterventions", () => ({
 }));
 
 describe("FeatureHubPage", () => {
-  it("renders agent, center inventory, and orders track on the right", () => {
+  it("renders agent, center inventory, and Commandes panel on the right", () => {
     renderWithPager(
       <CompanyStockAgentBridgeProvider>
         <CompanyStockIntentProvider>
@@ -78,8 +105,9 @@ describe("FeatureHubPage", () => {
     expect(screen.getByTestId("company-stock-agent-panel")).toBeInTheDocument();
     expect(screen.getByTestId(`${slot}-panel-right`)).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-left-rail")).not.toBeInTheDocument();
-    expect(screen.getByTestId("company-stock-orders-track")).toBeInTheDocument();
-    expect(screen.getByText("Suivi commandes")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-orders-right-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-orders-panel")).toBeInTheDocument();
+    expect(screen.getByText("Commandes")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-pulse")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-filter-bar")).not.toBeInTheDocument();

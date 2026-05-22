@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import CompanyStockAgentPanel from "@/features/featureHub/components/CompanyStockAgentPanel";
 import CompanyStockCenterPanel from "@/features/featureHub/components/CompanyStockCenterPanel";
-import CompanyStockOrdersTrackPanel from "@/features/featureHub/components/CompanyStockOrdersTrackPanel";
+import CompanyStockOrdersRightRail from "@/features/featureHub/components/CompanyStockOrdersRightRail";
 import CompanyStockProWorkspace from "@/features/featureHub/components/CompanyStockProWorkspace";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { computeCompanyStockMetrics } from "@/features/featureHub/companyStockMetrics";
@@ -121,14 +121,7 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
       }
       right={
         <section className={sideShell}>
-          {companyId ? (
-            <CompanyStockOrdersTrackPanel
-              orders={orders}
-              supplierOrders={supplierOrders}
-              loading={ordersLoading || supplierLoading}
-              onDismissDemoOrder={dismissDemoOrder}
-            />
-          ) : null}
+          {companyId ? <CompanyStockOrdersRightRail /> : null}
         </section>
       }
     />

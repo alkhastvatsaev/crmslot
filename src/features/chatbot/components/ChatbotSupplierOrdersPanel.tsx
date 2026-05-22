@@ -205,7 +205,7 @@ function MaterialOrderRow({
 }
 
 type ChatbotSupplierOrdersPanelProps = {
-  placement?: "leftRail" | "embedded";
+  placement?: "leftRail" | "rightRail" | "embedded";
 };
 
 /** Liste commandes — présentation minimaliste. */
@@ -245,16 +245,20 @@ export default function ChatbotSupplierOrdersPanel({
   );
 
   const isLeftRail = placement === "leftRail";
+  const isRightRail = placement === "rightRail";
+  const isSideRail = isLeftRail || isRightRail;
+  const pdfOverlayTarget = isLeftRail ? "left" : isRightRail ? "materialRight" : "right";
   const highlightId = supplierOrdersPanel.highlightOrderId;
   const highlightMaterialId = supplierOrdersPanel.highlightMaterialOrderId;
   const totalCount = supplierOrders.length + materialOrders.length;
-  const previewOnLeft = isLeftRail && isPreviewOverlayForTarget(documentPreview, "left");
+  const previewOnSideRail =
+    isSideRail && isPreviewOverlayForTarget(documentPreview, pdfOverlayTarget);
 
   const isSupplierHighlighted = (orderId: string) =>
-    isLeftRail ? documentPreview.supplierOrderId === orderId : orderId === highlightId;
+    isSideRail ? documentPreview.supplierOrderId === orderId : orderId === highlightId;
 
   const isMaterialHighlighted = (orderId: string) =>
-    isLeftRail
+    isSideRail
       ? highlightMaterialId === orderId && documentPreview.kind === "material_order"
       : orderId === highlightMaterialId;
 
@@ -262,12 +266,18 @@ export default function ChatbotSupplierOrdersPanel({
     <div
       className={cn(
         "relative flex min-h-0 flex-1 flex-col overflow-hidden",
-        !isLeftRail && "bg-gradient-to-b from-blue-50/50 to-slate-50/90",
+        !isSideRail && "bg-gradient-to-b from-blue-50/50 to-slate-50/90",
       )}
-      data-testid={isLeftRail ? "chatbot-orders-left-panel" : "chatbot-supplier-orders-panel"}
-      style={isLeftRail ? outfit : undefined}
+      data-testid={
+        isLeftRail
+          ? "chatbot-orders-left-panel"
+          : isRightRail
+            ? "company-stock-orders-panel"
+            : "chatbot-supplier-orders-panel"
+      }
+      style={isSideRail ? outfit : undefined}
     >
-      {isLeftRail ? (
+      {isSideRail ? (
         <div className="shrink-0 px-4 pt-4 pb-3">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">Commandes</h2>
@@ -299,7 +309,7 @@ export default function ChatbotSupplierOrdersPanel({
       <div
         className={cn(
           "custom-scrollbar min-h-0 flex-1 overflow-y-auto",
-          isLeftRail ? "px-3 pb-4" : "px-2 pb-4",
+          isSideRail ? "px-3 pb-4" : "px-2 pb-4",
         )}
         data-testid="chatbot-orders-list"
       >
@@ -334,8 +344,8 @@ export default function ChatbotSupplierOrdersPanel({
               highlighted={isSupplierHighlighted(order.id)}
               onViewPdf={() => {
                 if (!companyId) return;
-                if (isLeftRail) {
-                  void openSupplierOrderPdf(companyId, order.id, false, "left");
+                if (isSideRail) {
+                  void openSupplierOrderPdf(companyId, order.id, false, pdfOverlayTarget);
                 } else {
                   ensureRightPanelOpen();
                   void openSupplierOrderPdf(companyId, order.id);
@@ -364,8 +374,13 @@ export default function ChatbotSupplierOrdersPanel({
                 onViewPdf={
                   order.interventionId
                     ? () => {
-                        if (isLeftRail) {
-                          openDocumentPreview(order.interventionId, "material_order", false, "left");
+                        if (isSideRail) {
+                          openDocumentPreview(
+                            order.interventionId,
+                            "material_order",
+                            false,
+                            pdfOverlayTarget,
+                          );
                         } else {
                           ensureRightPanelOpen();
                           openDocumentPreview(order.interventionId, "material_order");
@@ -379,14 +394,14 @@ export default function ChatbotSupplierOrdersPanel({
         ) : null}
       </div>
 
-      {previewOnLeft ? (
+      {previewOnSideRail ? (
         <ChatbotPdfPreviewOverlay
           title={documentPreview.title}
           loading={documentPreview.loading}
           error={documentPreview.error}
           blobUrl={documentPreview.blobUrl}
           onClose={closeDocumentPreview}
-          testIdPrefix="chatbot-orders"
+          testIdPrefix={isRightRail ? "company-stock-orders" : "chatbot-orders"}
         />
       ) : null}
     </div>
