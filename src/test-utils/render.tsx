@@ -23,7 +23,7 @@ interface AllTheProvidersProps {
  */
 export function AllTheProviders({ 
   children, 
-  pageCount = 6,
+  pageCount = 7,
   initialPageIndex = 0,
   activeCompanyId = null
 }: AllTheProvidersProps) {

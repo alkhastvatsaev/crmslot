@@ -151,27 +151,76 @@ export function synthesizeInterventionLifecycleEvents(
   return events;
 }
 
+function resolveOrderEventTs(...candidates: unknown[]): number {
+  for (const raw of candidates) {
+    const ts = parseTs(raw);
+    if (ts > 0) return ts;
+  }
+  return Date.now();
+}
+
 export function synthesizeMaterialOrderEvents(orders: MaterialOrderDoc[]): CrmActivityEvent[] {
-  return orders.map((o) => ({
-    id: `mo:${o.id}`,
-    type: "material_ordered" as const,
-    ts: parseTs(o.createdAt),
-    interventionId: o.interventionId,
-    orderId: o.id,
-    orderLabel:
-      o.partsRequested?.map((p) => `${p.quantity}× ${p.description}`).join(", ") ?? "",
-  }));
+  return orders.map((o) => {
+    const orderLabel =
+      o.partsRequested?.map((p) => `${p.quantity}× ${p.description}`).join(", ") ?? "";
+    const clientName =
+      typeof o.clientName === "string" && o.clientName.trim() ? o.clientName.trim() : undefined;
+    return {
+      id: `mo:${o.id}`,
+      type: "material_ordered" as const,
+      ts: resolveOrderEventTs(o.updatedAt, o.createdAt),
+      interventionId: o.interventionId,
+      orderId: o.id,
+      orderLabel,
+      clientName,
+      materialOrderStatus: o.status,
+      note: clientName ? `Client : ${clientName}` : undefined,
+    };
+  });
 }
 
 export function synthesizeSupplierOrderEvents(orders: SupplierOrder[]): CrmActivityEvent[] {
-  return orders.map((o) => ({
-    id: `so:${o.id}`,
-    type: "supplier_ordered" as const,
-    ts: parseTs(o.createdAt),
-    orderId: o.id,
-    orderLabel: `${o.supplierName} — ${o.lines.map((l) => `${l.quantity}× ${l.label}`).join(", ")}`,
-    orderTotalCents: o.totalCents,
-  }));
+  const events: CrmActivityEvent[] = [];
+  for (const o of orders) {
+    const clientName =
+      typeof o.clientName === "string" && o.clientName.trim()
+        ? o.clientName.trim()
+        : undefined;
+    const orderLabel = `${o.supplierName} — ${o.lines.map((l) => `${l.quantity}× ${l.label}`).join(", ")}`;
+    const baseTs = resolveOrderEventTs(o.sentAt, o.updatedAt, o.createdAt);
+    events.push({
+      id: `so:${o.id}`,
+      type: "supplier_ordered" as const,
+      ts: baseTs,
+      interventionId: o.interventionId ?? undefined,
+      orderId: o.id,
+      orderLabel,
+      orderTotalCents: o.totalCents,
+      clientName,
+      materialOrderStatus: o.status,
+      note: [
+        clientName ? `Client : ${clientName}` : null,
+        `Statut : ${o.status}`,
+        o.isDemo ? "(démo)" : null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    });
+    if (o.status === "sent" && o.sentAt && parseTs(o.sentAt) > 0 && parseTs(o.sentAt) !== baseTs) {
+      events.push({
+        id: `so:${o.id}:sent`,
+        type: "material_order_status_changed" as const,
+        ts: parseTs(o.sentAt),
+        interventionId: o.interventionId ?? undefined,
+        orderId: o.id,
+        orderLabel,
+        clientName,
+        note: `Commande ${o.supplierName} envoyée`,
+        materialOrderStatus: "sent",
+      });
+    }
+  }
+  return events;
 }
 
 export function synthesizeEmailEvents(

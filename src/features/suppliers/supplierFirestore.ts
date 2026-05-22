@@ -29,6 +29,7 @@ export function subscribeSupplierOrders(
   db: Firestore,
   companyId: string,
   onData: (orders: SupplierOrder[]) => void,
+  onError?: (message: string) => void,
 ): () => void {
   return onSnapshot(
     col(db, companyId),
@@ -40,7 +41,9 @@ export function subscribeSupplierOrders(
       onData(sortSupplierOrdersNewestFirst(rows));
     },
     (err) => {
+      const message = err instanceof Error ? err.message : "Erreur lecture commandes fournisseur";
       console.warn("[supplierOrders] onSnapshot error:", err);
+      onError?.(message);
       onData([]);
     },
   );

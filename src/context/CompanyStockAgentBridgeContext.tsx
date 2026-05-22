@@ -17,6 +17,9 @@ export type CompanyStockAgentBridgeHandlers = {
 
 type CompanyStockAgentBridgeApi = {
   handlers: CompanyStockAgentBridgeHandlers | null;
+  /** Nom client saisi dans l'agent Matériel (affichage panneau Commandes). */
+  orderClientName: string;
+  setOrderClientName: (name: string) => void;
   registerHandlers: (handlers: CompanyStockAgentBridgeHandlers | null) => void;
 };
 
@@ -24,6 +27,11 @@ const CompanyStockAgentBridgeContext = createContext<CompanyStockAgentBridgeApi 
 
 export function CompanyStockAgentBridgeProvider({ children }: { children: ReactNode }) {
   const [handlers, setHandlers] = useState<CompanyStockAgentBridgeHandlers | null>(null);
+  const [orderClientName, setOrderClientNameState] = useState("");
+
+  const setOrderClientName = useCallback((name: string) => {
+    setOrderClientNameState(name.trim());
+  }, []);
 
   const registerHandlers = useCallback((next: CompanyStockAgentBridgeHandlers | null) => {
     setHandlers((prev) => {
@@ -42,8 +50,13 @@ export function CompanyStockAgentBridgeProvider({ children }: { children: ReactN
   }, []);
 
   const value = useMemo(
-    () => ({ handlers, registerHandlers }),
-    [handlers, registerHandlers],
+    () => ({
+      handlers,
+      orderClientName,
+      setOrderClientName,
+      registerHandlers,
+    }),
+    [handlers, orderClientName, setOrderClientName, registerHandlers],
   );
 
   return (

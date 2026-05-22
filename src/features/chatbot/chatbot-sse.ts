@@ -104,9 +104,14 @@ export function streamLecotOrderToolOutcome(params: {
 }): Response {
   return createChatbotSseResponse(async (enqueue) => {
     enqueue({ type: "tool_start", tool: "order_lecot_parts", label: "Commande Lecot" });
+    const orderInput: Record<string, unknown> = { ...params.input, userConfirmed: true };
+    const sessionClient = params.toolCtx.materialOrderClientName?.trim();
+    if (!String(orderInput.clientName ?? "").trim() && sessionClient) {
+      orderInput.clientName = sessionClient;
+    }
     const result = await executeChatbotTool(
       "order_lecot_parts",
-      { ...params.input, userConfirmed: true },
+      orderInput,
       params.toolCtx,
     ).catch((err: unknown) => ({
       error: err instanceof Error ? err.message : "Erreur commande",

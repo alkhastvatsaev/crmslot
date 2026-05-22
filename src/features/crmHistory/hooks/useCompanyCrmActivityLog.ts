@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
+import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { CompanyCrmActivityDoc } from "../crmActivityLog";
 
 const CRM_ACTIVITY_LIMIT = 200;
@@ -15,8 +15,7 @@ export function useCompanyCrmActivityLog(companyId: string | null) {
 
   useEffect(() => {
     const cid = (companyId ?? "").trim();
-    const skipDemoPreview = devUiPreviewEnabled && cid === DEMO_COMPANY_ID;
-    if (!cid || !isConfigured || !firestore || skipDemoPreview) {
+    if (!cid || !isConfigured || !firestore) {
       setRows([]);
       setLoading(false);
       setError(null);
@@ -39,9 +38,15 @@ export function useCompanyCrmActivityLog(companyId: string | null) {
         setLoading(false);
       },
       (e) => {
-        console.warn("[useCompanyCrmActivityLog]", e);
-        setError(e.message || "Erreur journal CRM");
-        setRows([]);
+        if (isFirestorePermissionDenied(e)) {
+          console.warn("[useCompanyCrmActivityLog] permission denied — journal ignoré", e);
+          setError(null);
+          setRows([]);
+        } else {
+          console.warn("[useCompanyCrmActivityLog]", e);
+          setError(e instanceof Error ? e.message : "Erreur journal CRM");
+          setRows([]);
+        }
         setLoading(false);
       },
     );

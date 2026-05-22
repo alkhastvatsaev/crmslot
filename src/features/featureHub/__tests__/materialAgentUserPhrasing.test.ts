@@ -13,11 +13,6 @@ import {
   shouldResetMaterialOrderClientSession,
 } from "@/features/featureHub/materialAgentOrderClient";
 import {
-  MATERIAL_AGENT_LECOT_DEFAULT_QUERY,
-  resolveMaterialAgentLecotSearchQuery,
-} from "@/features/featureHub/materialAgentLecotQuery";
-import {
-  assertLecotQueryMatches,
   MATERIAL_AGENT_USER_PHRASES,
   type MaterialPhraseCase,
 } from "@/features/featureHub/__tests__/fixtures/materialAgentUserPhrases";
@@ -62,12 +57,12 @@ describe("agent Matériel — formulations utilisateurs (≈100 cas)", () => {
     },
   );
 
-  describe.each(lecot.map((c) => [c.id, c] as const))(
+  describe.each(lecot.map((c) => [c.id, c.phrase] as const))(
     "catalogue Lecot [%s]",
-    (_id, c) => {
-      it("résout une requête catalogue", () => {
-        const q = resolveMaterialAgentLecotSearchQuery(c.phrase, c.messages ?? []);
-        assertLecotQueryMatches(q, c);
+    (_id, phrase) => {
+      it("est dans le périmètre matériel (catalogue via OpenAI + search_lecot_products)", () => {
+        expect(isCompanyStockAgentInScope(phrase)).toBe(true);
+        expect(classifyCompanyStockAgentIntent(phrase, true)).not.toBe("off_topic");
       });
     },
   );

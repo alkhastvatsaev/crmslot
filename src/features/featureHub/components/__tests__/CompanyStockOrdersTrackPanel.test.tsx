@@ -46,6 +46,7 @@ describe("CompanyStockOrdersTrackPanel", () => {
     expect(screen.getByTestId("company-stock-orders-track")).toBeInTheDocument();
     expect(screen.getByText("Suivi commandes")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-field-order-demo-mo-1")).toBeInTheDocument();
+    expect(screen.getByText("Client")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-track-supplier-empty")).toBeInTheDocument();
   });
 

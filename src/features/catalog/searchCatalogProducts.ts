@@ -59,6 +59,11 @@ function scoreCatalogProduct(product: CatalogProduct, tokens: string[]): number 
   return score;
 }
 
+function primaryCatalogToken(tokens: string[]): string | null {
+  const long = tokens.filter((t) => t.length >= 4).sort((a, b) => b.length - a.length);
+  return long[0] ?? tokens[0] ?? null;
+}
+
 /** Recherche par mots-clés (meilleur pour descriptions longues). */
 export function searchCatalogProductsScored(
   products: CatalogProduct[],
@@ -79,12 +84,22 @@ export function searchCatalogProductsScored(
   const tokens = tokenizeCatalogQuery(q);
   if (tokens.length === 0) return [];
 
+  const primary = primaryCatalogToken(tokens);
+
   const ranked = products
-    .map((p) => ({ p, score: scoreCatalogProduct(p, tokens) }))
+    .map((p) => {
+      const hay = normalizeAccents(`${p.sku} ${p.label}`).toLowerCase();
+      let score = scoreCatalogProduct(p, tokens);
+      if (primary && hay.includes(primary)) score += 8;
+      return { p, score, primaryHit: Boolean(primary && hay.includes(primary)) };
+    })
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  if (ranked.length > 0) return ranked.slice(0, limit).map((row) => row.p);
+  const withPrimary = primary ? ranked.filter((row) => row.primaryHit) : ranked;
+  const pool = withPrimary.length > 0 ? withPrimary : ranked;
+
+  if (pool.length > 0) return pool.slice(0, limit).map((row) => row.p);
 
   return [];
 }

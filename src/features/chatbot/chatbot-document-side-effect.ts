@@ -1,4 +1,5 @@
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+import { HUB_AGENT_IMMEDIATE_UI_TOOLS } from "@/features/hubAgents/hubAgentToolScopes";
 
 /** Écriture facturation uniquement — pas de PDF côté IA. */
 export const CHATBOT_BILLING_WRITE_TOOLS = new Set([
@@ -14,6 +15,7 @@ export const CHATBOT_PWA_DOCUMENT_FOCUS_TOOLS = new Set(["focus_intervention_doc
 export const CHATBOT_ZERO_TOKEN_UI_TOOLS = new Set([
   ...CHATBOT_BILLING_WRITE_TOOLS,
   ...CHATBOT_PWA_DOCUMENT_FOCUS_TOOLS,
+  ...HUB_AGENT_IMMEDIATE_UI_TOOLS,
 ]);
 
 /** @deprecated Alias — préférer isChatbotZeroTokenUiTool */
@@ -61,6 +63,7 @@ export function documentToolSuccessMessage(toolName: string, result: unknown): s
   if (toolName === "order_lecot_parts" && result && typeof result === "object") {
     const o = result as {
       supplierOrderId?: string;
+      clientName?: string | null;
       totalEur?: number;
       demoMode?: boolean;
       demoReference?: string;
@@ -70,14 +73,18 @@ export function documentToolSuccessMessage(toolName: string, result: unknown): s
     if (o.supplierOrderId) {
       const total =
         typeof o.totalEur === "number" ? ` (${o.totalEur} € HT)` : "";
+      const client =
+        typeof o.clientName === "string" && o.clientName.trim()
+          ? ` Client : ${o.clientName.trim()}.`
+          : "";
       const synced = o.billingSynced
         ? " Facture dossier mise à jour ; PDF bon de commande et facture à droite."
         : " Voir onglets Commandes et Bon de commande à droite.";
       if (o.demoMode) {
         const ref = o.demoReference ?? o.supplierOrderId;
-        return `Commande Lecot simulée (démo)${total} — ${ref}.${synced} Enregistrée dans la PWA.`;
+        return `Commande Lecot simulée (démo)${total} — ${ref}.${client}${synced} Enregistrée dans la PWA.`;
       }
-      return `Commande Lecot enregistrée${total} — réf. ${o.supplierOrderId.slice(0, 10)}….${synced}`;
+      return `Commande Lecot enregistrée${total} — réf. ${o.supplierOrderId.slice(0, 10)}….${client}${synced}`;
     }
   }
 

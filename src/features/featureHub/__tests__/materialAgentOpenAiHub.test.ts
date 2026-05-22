@@ -163,19 +163,22 @@ describe("materialAgentOpenAiHub — runChatbotOpenAI + stream mocké", () => {
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 
-  it("commande lecot → raccourci catalogue instantané (sans OpenAI)", async () => {
+  it("commande lecot → passe par OpenAI (plus de raccourci catalogue)", async () => {
+    openAiRounds.push(
+      { tools: [{ name: "search_lecot_products", arguments: { query: "poignée", limit: 5 } }] },
+      { text: "Voici des poignées du catalogue Lecot." },
+    );
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-hub",
-        messages: [{ role: "user", content: "commande lecot" }],
+        messages: [{ role: "user", content: "commander une poignée lecot" }],
       },
       auth,
     );
     const events = await readSseJsonLines(res);
-    // Instant shortcut bypasses OpenAI and executeChatbotTool
-    expect(mockExecuteChatbotTool).not.toHaveBeenCalledWith(
+    expect(mockExecuteChatbotTool).toHaveBeenCalledWith(
       "search_lecot_products",
-      expect.anything(),
+      expect.objectContaining({ query: expect.stringMatching(/poign/i) }),
       expect.anything(),
     );
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);

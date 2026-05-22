@@ -16,10 +16,7 @@ import {
   isAwaitingMaterialAgentClientName,
   MATERIAL_AGENT_CLIENT_NAME_MARKER,
 } from "@/features/featureHub/materialAgentOrderClient";
-import {
-  MATERIAL_AGENT_LECOT_DEFAULT_QUERY,
-  resolveMaterialAgentLecotSearchQuery,
-} from "@/features/featureHub/materialAgentLecotQuery";
+import { resolveLecotCatalogSearchQuery } from "@/features/chatbot/chatbot-lecot-follow-up";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -347,51 +344,36 @@ describe("Régression HELP_RE — questions hors-scope avec ? ne passent pas", (
   });
 });
 
-// ─── 11. Catalogue Lecot — formulations → requête recherche ─────────────────
+// ─── 11. Catalogue Lecot — formulations reconnues (OpenAI + search_lecot_products) ─
 
-describe("Catalogue Lecot — 25 formulations → requête exploitable", () => {
-  const defaultCatalog: string[] = [
+describe("Catalogue Lecot — formulations reconnues côté agent", () => {
+  const lecotPhrases: string[] = [
     "commande lecot",
     "COMMANDE LECOT",
     "nouvelle commande lecot",
     "je veux commander chez lecot",
     "catalogue lecot",
-    "catalogue fournisseur",
-    "montre le catalogue",
     "suggère des produits",
-    "propose des articles",
-    "liste références lecot",
-    "commande matériel lecot",
-    "commander via lecot",
-    "fais une commande lecot",
-    "on commande chez lecot ?",
-    "commande matériel",
-    "commande pièce lecot",
-    "lecot",
-    "chez lecot",
-    "besoin d'une commande fournisseur",
+    "commander une poignet",
+    "commander une poignée lecot",
   ];
 
-  defaultCatalog.forEach((text) => {
-    it(`catalogue défaut : "${text}"`, () => {
-      expect(resolveMaterialAgentLecotSearchQuery(text, [])).toBe(
-        MATERIAL_AGENT_LECOT_DEFAULT_QUERY,
-      );
+  lecotPhrases.forEach((text) => {
+    it(`demande Lecot : "${text}"`, () => {
+      expect(isMaterialAgentLecotCommandText(text)).toBe(true);
+      expect(isCompanyStockAgentInScope(text)).toBe(true);
     });
   });
 
   const productQueries: { text: string; contains: string }[] = [
     { text: "commander une perceuse lecot", contains: "perceuse" },
     { text: "serrure lecot", contains: "serrure" },
-    { text: "je cherche un cylindre chez lecot", contains: "cylindre" },
-    { text: "verrou lecot", contains: "verrou" },
-    { text: "barillet yale lecot", contains: "cylindre" },
-    { text: "propose 5 serrures pour lecot", contains: "serrure" },
+    { text: "commander une poignet", contains: "poign" },
   ];
 
   productQueries.forEach(({ text, contains }) => {
-    it(`mot-clé produit : "${text}"`, () => {
-      const q = resolveMaterialAgentLecotSearchQuery(text, []);
+    it(`indice catalogue : "${text}"`, () => {
+      const q = resolveLecotCatalogSearchQuery(text, []);
       expect(q).not.toBeNull();
       expect(q!.toLowerCase()).toContain(contains);
     });

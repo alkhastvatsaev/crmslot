@@ -14,6 +14,7 @@ import type { CompanyStockFilter } from "@/features/featureHub/filterCompanyStoc
 export type CompanyStockFocusDetail = {
   stockItemId?: string | null;
   filter?: CompanyStockFilter;
+  searchQuery?: string | null;
 };
 
 type CompanyStockIntentApi = {
@@ -49,6 +50,8 @@ export function CompanyStockIntentProvider({ children }: { children: ReactNode }
 
   const applyFocus = useCallback((detail: CompanyStockFocusDetail) => {
     if (detail.stockItemId) setSelectedStockItemIdState(detail.stockItemId.trim());
+    if (detail.filter) setFilterState(detail.filter);
+    if (detail.searchQuery != null) setSearchState(detail.searchQuery.trim());
   }, []);
 
   useEffect(() => {

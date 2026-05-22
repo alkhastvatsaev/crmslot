@@ -440,7 +440,7 @@
   "crmHistory": {
     "aria": {
       "page": "Pagina",
-      "left": "CRM Geschiedenis Filters",
+      "left": "CRM-geschiedenisagent",
       "center": "CRM Activiteitsfeed",
       "right": "AI Copiloot"
     },
@@ -511,6 +511,11 @@
       "client": "Klant",
       "system": "Systeem"
     },
+    "agent_placeholder": "Activiteit, dossiers, samenvatting…",
+    "agent_reset": "Nieuw gesprek",
+    "agent_thinking": "Analyseren…",
+    "agent_no_company": "Selecteer een actief bedrijf.",
+    "agent_off_topic": "Ik ben de Geschiedenisagent — ik analyseer alleen CRM-activiteit en geschiedenis. Voor facturatie, stock of de volledige Chatbot, gebruik de juiste pagina.",
     "ai": {
       "title": "AI Copiloot",
       "subtitle": "Slimme analyse",
@@ -695,11 +700,17 @@
     "col_amount": "Bedrag excl. BTW",
     "col_status": "Status",
     "ask_chatbot": "Factureren via Chatbot",
+    "agent_placeholder": "Facturen, onbetaald, offertes…",
+    "agent_reset": "Nieuw gesprek",
+    "agent_thinking": "Analyseren…",
+    "agent_off_topic": "Ik ben de Facturatieagent — ik behandel alleen facturen en betalingen. Voor stock, CRM-geschiedenis of de volledige Chatbot, gebruik de juiste pagina.",
+    "agent_suggestion_unpaid": "Onbetaalde facturen",
+    "agent_suggestion_to_bill": "Te factureren dossiers",
     "aria": {
       "page": "Pagina",
-      "left": "snelkoppelingen",
+      "left": "Facturatieagent",
       "center": "facturen",
-      "right": "detail"
+      "right": "documents"
     }
   },
   "spotlight": {

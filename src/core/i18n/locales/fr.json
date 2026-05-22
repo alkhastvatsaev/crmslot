@@ -445,7 +445,7 @@
   "crmHistory": {
     "aria": {
       "page": "Page",
-      "left": "Filtres historique CRM",
+      "left": "Agent historique CRM",
       "center": "Flux d'activité CRM",
       "right": "Copilote IA"
     },
@@ -516,6 +516,11 @@
       "client": "Client",
       "system": "Système"
     },
+    "agent_placeholder": "Activité, dossiers, synthèse…",
+    "agent_reset": "Nouvelle conversation",
+    "agent_thinking": "Analyse…",
+    "agent_no_company": "Sélectionnez une société active.",
+    "agent_off_topic": "Je suis l'Agent Historique — j'analyse uniquement l'activité et l'historique CRM. Pour la facturation, le stock ou le Chatbot complet, utilisez la page dédiée.",
     "ai": {
       "title": "Copilote IA",
       "subtitle": "Analyse intelligente",
@@ -700,11 +705,17 @@
     "col_amount": "Montant HT",
     "col_status": "Statut",
     "ask_chatbot": "Facturer via Chatbot",
+    "agent_placeholder": "Factures, impayés, devis…",
+    "agent_reset": "Nouvelle conversation",
+    "agent_thinking": "Analyse…",
+    "agent_off_topic": "Je suis l'Agent Facturation — je traite uniquement les factures et paiements. Pour le stock, l'historique CRM ou le Chatbot complet, utilisez la page dédiée.",
+    "agent_suggestion_unpaid": "Lister les impayés",
+    "agent_suggestion_to_bill": "Dossiers à facturer",
     "aria": {
       "page": "Page",
-      "left": "raccourcis",
+      "left": "Agent facturation",
       "center": "factures",
-      "right": "détail"
+      "right": "documents"
     }
   },
   "spotlight": {

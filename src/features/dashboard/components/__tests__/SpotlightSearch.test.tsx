@@ -2,18 +2,13 @@ import React from 'react';
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderWithPager } from '@/test-utils/renderWithPager';
 import SpotlightSearch from '../SpotlightSearch';
-import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
-import { GMAIL_HUB_SLOT_INDEX } from '@/features/gmail/gmailHubConstants';
+import {
+  DASHBOARD_CAROUSEL_PAGE_COUNT,
+  DASHBOARD_CAROUSEL_PAGES,
+} from '@/features/dashboard/dashboardCarouselRegistry';
 
-/** Indices réels des entrées spotlight (Gmail = 5). */
-const SPOTLIGHT_NAV_INDICES = [
-  0,
-  1,
-  2,
-  AI_ASSISTANT_SLOT_INDEX,
-  GMAIL_HUB_SLOT_INDEX,
-];
-const SPOTLIGHT_PAGE_COUNT = GMAIL_HUB_SLOT_INDEX + 1;
+const SPOTLIGHT_NAV_INDICES = DASHBOARD_CAROUSEL_PAGES.map((p) => p.slotIndex);
+const SPOTLIGHT_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGE_COUNT;
 
 jest.mock('@/context/CompanyWorkspaceContext', () => ({
   useCompanyWorkspaceOptional: () => null,
@@ -34,7 +29,7 @@ describe('SpotlightSearch', () => {
     expect(screen.getByTestId('spotlight-trigger')).toBeInTheDocument();
   });
 
-  it('shows 6 nav items when open', () => {
+  it('shows 7 nav items when open', () => {
     renderWithPager(<SpotlightSearch />, SPOTLIGHT_PAGE_COUNT);
     fireEvent.click(screen.getByTestId('spotlight-trigger'));
     for (const index of SPOTLIGHT_NAV_INDICES) {

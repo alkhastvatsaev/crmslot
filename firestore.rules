@@ -92,6 +92,20 @@ service cloud.firestore {
         );
     }
 
+    /**
+     * Back-office / Historique CRM : membership, jetons bmTenants, ou société démo staging.
+     * Sous-collections `companies/{id}/…` : le `companyId` du chemin suffit pour la démo.
+     */
+    function canAccessCompanyHubData(companyId) {
+      return companyId is string
+        && companyId.size() > 0
+        && (
+          userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
+          || companyId == 'demo-local-company'
+        );
+    }
+
     function interventionHasTenantScope(data) {
       return data.keys().hasAny(['companyId'])
         && data.companyId is string
@@ -133,17 +147,13 @@ service cloud.firestore {
 
       /** Commandes fournisseur (Lecot, etc.) — créées via Admin SDK / Chatbot ; lecture back-office. */
       match /supplierOrders/{orderId} {
-        allow read: if userBelongsToCompany(companyId)
-          || tenantClaimsIncludeCompany(companyId)
-          || companyId == 'demo-local-company';
+        allow read: if canAccessCompanyHubData(companyId);
         allow write: if false;
       }
 
       /** Journal d'activité CRM (refus technicien, suppression dossier, etc.). */
       match /crm_activity/{activityId} {
-        allow read: if userBelongsToCompany(companyId)
-          || tenantClaimsIncludeCompany(companyId)
-          || companyId == 'demo-local-company';
+        allow read: if canAccessCompanyHubData(companyId);
         allow create: if isAuthed()
           && request.resource.data.companyId == companyId
           && request.resource.data.actorUid == request.auth.uid
@@ -389,6 +399,14 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    /**
+     * Requêtes collection group (`useCompanyStatusEventsFeed`) — même contrat que la sous-collection intervention.
+     */
+    match /{path=**}/status_events/{eventId} {
+      allow read: if isAuthed();
+      allow create, update, delete: if false;
+    }
+
     match /interventions/{docId} {
       /**
        * Plusieurs `allow read` → OU logique. Garder des règles **séparées** (pas un seul `||` géant)
@@ -584,16 +602,10 @@ service cloud.firestore {
     match /commission_audit/{auditId} {
       allow read: if isAuthed()
         && resource.data.companyId is string
-        && (
-          userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId)
-        );
+        && canAccessCompanyHubData(resource.data.companyId);
       allow create: if isAuthed()
         && request.resource.data.companyId is string
-        && (
-          userBelongsToCompany(request.resource.data.companyId)
-          || tenantClaimsIncludeCompany(request.resource.data.companyId)
-        );
+        && canAccessCompanyHubData(request.resource.data.companyId);
       allow update, delete: if false;
     }
 
@@ -626,8 +638,7 @@ service cloud.firestore {
           || (
             resource.data.companyId is string
             && (
-              userBelongsToCompany(resource.data.companyId)
-              || tenantClaimsIncludeCompany(resource.data.companyId)
+              canAccessCompanyHubData(resource.data.companyId)
             )
           )
           || resource.data.technicianUid == request.auth.uid
@@ -646,10 +657,7 @@ service cloud.firestore {
           resource.data.technicianUid == request.auth.uid
           || (
             resource.data.companyId is string
-            && (
-              userBelongsToCompany(resource.data.companyId)
-              || tenantClaimsIncludeCompany(resource.data.companyId)
-            )
+            && canAccessCompanyHubData(resource.data.companyId)
           )
         );
 
@@ -659,25 +667,16 @@ service cloud.firestore {
     match /intervention_emails/{emailId} {
       allow read: if isAuthed()
         && resource.data.companyId is string
-        && (
-          userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId)
-        );
+        && canAccessCompanyHubData(resource.data.companyId);
 
       allow create: if isAuthed()
         && request.resource.data.companyId is string
         && request.resource.data.companyId.size() > 0
-        && (
-          userBelongsToCompany(request.resource.data.companyId)
-          || tenantClaimsIncludeCompany(request.resource.data.companyId)
-        );
+        && canAccessCompanyHubData(request.resource.data.companyId);
 
       allow update: if isAuthed()
         && resource.data.companyId is string
-        && (
-          userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId)
-        )
+        && canAccessCompanyHubData(resource.data.companyId)
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['readAt']);
 
       allow delete: if false;

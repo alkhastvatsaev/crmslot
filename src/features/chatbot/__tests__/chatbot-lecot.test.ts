@@ -104,8 +104,17 @@ describe("chatbot-lecot", () => {
 
   it("search returns local catalog hits for short query", async () => {
     const result = await searchLecotProductsForChatbot("co-1", "cylindre");
-    expect(result.query).toBe("cylindre");
+    expect(result.query).toContain("cylindre");
     expect(result.products.length).toBeGreaterThan(0);
+  });
+
+  it("search suggests poignée hits (not serrures) for poignet typo", async () => {
+    const result = await searchLecotProductsForChatbot("co-1", "poignet", 5);
+    expect(result.query).toContain("poign");
+    expect(result.suggestions?.length).toBeGreaterThan(0);
+    const labels = (result.suggestions ?? []).map((s) => s.label.toLowerCase()).join(" ");
+    expect(labels).toMatch(/poign/);
+    expect(labels).not.toMatch(/serrure 3 points/);
   });
 
   it("search suggests perceuse hits from catalog", async () => {

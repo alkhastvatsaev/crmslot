@@ -1,5 +1,6 @@
 import {
   extractLecotProductKeyword,
+  normalizeLecotProductSearchQuery,
   resolveLecotCatalogSearchQuery,
 } from "@/features/chatbot/chatbot-lecot-follow-up";
 
@@ -7,6 +8,11 @@ describe("chatbot-lecot-follow-up", () => {
   it("extractLecotProductKeyword detects serrure and cylindre", () => {
     expect(extractLecotProductKeyword("propose 5 serrures")).toBe("serrure");
     expect(extractLecotProductKeyword("je veux un cylindre Yale")).toBe("cylindre");
+  });
+
+  it("extractLecotProductKeyword maps poignet typo to poignée", () => {
+    expect(extractLecotProductKeyword("commander une poignet")).toBe("poignée");
+    expect(normalizeLecotProductSearchQuery("poignet")).toBe("poignée");
   });
 
   it("resolveLecotCatalogSearchQuery from order phrase with client name", () => {

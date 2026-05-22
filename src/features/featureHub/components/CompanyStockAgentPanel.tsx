@@ -31,6 +31,7 @@ type BubbleProps = {
   role: "user" | "assistant";
   text: string;
   suggestions?: string[];
+  quickActions?: ChatbotQuickAction[];
   isLatest: boolean;
   onQuickAction: (text: string) => void;
   quickActionsDisabled: boolean;
@@ -40,15 +41,18 @@ function MaterialAgentBubble({
   role,
   text,
   suggestions,
+  quickActions,
   isLatest,
   onQuickAction,
   quickActionsDisabled,
 }: BubbleProps) {
   const isUser = role === "user";
   const actions =
-    !isUser && isLatest && suggestions?.length
-      ? suggestionsToActions(suggestions)
-      : [];
+    !isUser && isLatest && quickActions?.length
+      ? quickActions
+      : !isUser && isLatest && suggestions?.length
+        ? suggestionsToActions(suggestions)
+        : [];
 
   return (
     <motion.div
@@ -200,6 +204,7 @@ export default function CompanyStockAgentPanel({
             role={m.role}
             text={m.text}
             suggestions={m.suggestions}
+            quickActions={m.quickActions}
             isLatest={index === agent.messages.length - 1 && !agent.thinking}
             onQuickAction={(text) => void agent.sendMessage(text)}
             quickActionsDisabled={!agent.enabled || agent.thinking}

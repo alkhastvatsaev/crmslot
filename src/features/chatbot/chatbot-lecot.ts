@@ -18,6 +18,7 @@ import { isChatbotEmailIntent } from "@/features/chatbot/chatbot-email-intent";
 import {
   extractLecotProductQueryFromFollowUp,
   LECOT_FLOW_CONTEXT_RE,
+  normalizeLecotProductSearchQuery,
   priorUserTexts,
   resolveLecotCatalogSearchQuery,
 } from "@/features/chatbot/chatbot-lecot-follow-up";
@@ -27,6 +28,10 @@ import { lecotShopBaseUrl } from "@/features/catalog/lecotShopConfig";
 import { resolveInterventionClientNameFromRecord } from "@/features/interventions/resolveInterventionClientName";
 import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import { computeOrderTotal, type SupplierOrderLine } from "@/features/suppliers/types";
+import {
+  logCrmMaterialOrderPlacedAdmin,
+  logCrmSupplierOrderPlacedAdmin,
+} from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
 
 export { extractLecotProductQueryFromFollowUp } from "@/features/chatbot/chatbot-lecot-follow-up";
 
@@ -100,13 +105,21 @@ const LECOT_QUERY_ALIASES: Record<string, string> = {
   visseuse: "perceuse visseuse outillage",
   perforateur: "perceuse percussion SDS outillage",
   meuleuse: "meuleuse outillage",
-  serrure: "serrure cylindre verrou serrurerie",
-  verrou: "verrou serrure cylindre",
+  serrure: "serrure multipoints verrou",
+  verrou: "verrou serrure",
+  poignée: "poignée hoppe rosace plaque",
+  poignee: "poignée hoppe rosace plaque",
+  gâche: "gâche électrique fermeture",
+  gache: "gâche électrique fermeture",
+  cylindre: "cylindre européen profil",
 };
 
 function expandLecotSearchQuery(query: string): string {
-  const raw = query.trim();
-  const key = raw.toLowerCase();
+  const raw = normalizeLecotProductSearchQuery(query.trim());
+  const key = raw
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
   return LECOT_QUERY_ALIASES[key] ?? raw;
 }
 
@@ -199,7 +212,9 @@ export async function searchLecotProductsForChatbot(
 
   const remote = await searchLecotViaApi(q);
   if (remote && remote.length > 0) {
-    const products = remote.slice(0, limit).map(formatProduct);
+    const rankedRemote = searchCatalogProductsScored(remote, q, limit);
+    const picked = rankedRemote.length > 0 ? rankedRemote : remote.slice(0, limit);
+    const products = picked.map(formatProduct);
     const suggestions = buildLecotProductSuggestions(products);
     return {
       products,
@@ -208,7 +223,7 @@ export async function searchLecotProductsForChatbot(
       configured: true,
       query: q,
       instruction:
-        "Présente exactement les suggestions (markdownLink + prix). L'utilisateur choisit le n° — appelle order_lecot_parts aussitôt avec sku + label + unitPriceEur EXACT (quantity=1, ne pas demander).",
+        "Présente exactement les suggestions (markdownLink + prix) correspondant à la demande utilisateur — ne propose pas d'autres familles de produits (ex. pas de serrure si l'utilisateur a demandé une poignée). L'utilisateur choisit le n° — appelle order_lecot_parts aussitôt avec sku + label + unitPriceEur EXACT (quantity=1, ne pas demander).",
     };
   }
 
@@ -517,6 +532,29 @@ export async function orderLecotPartsForChatbot(
         ? " ⚠ Sync facturation échouée — vérifiez manuellement les lignes sur le dossier."
         : "";
 
+    await logCrmSupplierOrderPlacedAdmin({
+      ctx,
+      supplierOrderId: orderRef.id,
+      lines,
+      totalCents,
+      status: "sent",
+      interventionId: interventionId || null,
+      materialOrderId,
+      clientName: orderClientName ?? null,
+      demoMode: true,
+    });
+    if (materialOrderId && interventionId) {
+      await logCrmMaterialOrderPlacedAdmin({
+        ctx,
+        materialOrderId,
+        interventionId,
+        partsSummary: lines.map((l) => `${l.quantity}× ${l.label}`).join(", "),
+        status: "ordered",
+        clientName: orderClientName ?? null,
+        supplierOrderId: orderRef.id,
+      });
+    }
+
     return {
       ok: true,
       documentType: "material_order",
@@ -616,6 +654,29 @@ export async function orderLecotPartsForChatbot(
     : interventionId
       ? " ⚠ Sync facturation échouée — vérifiez manuellement les lignes sur le dossier."
       : "";
+
+  await logCrmSupplierOrderPlacedAdmin({
+    ctx,
+    supplierOrderId: orderRef.id,
+    lines,
+    totalCents,
+    status,
+    interventionId: interventionId || null,
+    materialOrderId,
+    clientName: orderClientName ?? null,
+  });
+  if (materialOrderId && interventionId) {
+    await logCrmMaterialOrderPlacedAdmin({
+      ctx,
+      materialOrderId,
+      interventionId,
+      partsSummary: lines.map((l) => `${l.quantity}× ${l.label}`).join(", "),
+      status:
+        lecot.ok && (lecot.source === "api" || lecot.source === "playwright") ? "ordered" : "pending",
+      clientName: orderClientName ?? null,
+      supplierOrderId: orderRef.id,
+    });
+  }
 
   return {
     ok: true,

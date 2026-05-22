@@ -20,6 +20,7 @@ const TOOL_KIND: Record<string, CompanyCrmActivityKind> = {
   update_intervention_billing: "intervention_billing_updated",
   append_intervention_billing_lines: "intervention_billing_updated",
   order_lecot_parts: "supplier_order_lecot",
+  approve_material_orders: "material_order_status_changed",
   update_intervention_status: "chatbot_intervention_status",
   assign_technician: "intervention_assigned",
   update_intervention_schedule: "intervention_schedule_updated",
@@ -34,6 +35,7 @@ const TOOL_LABELS: Record<string, string> = {
   update_intervention_billing: "Facturation (remplacement lignes)",
   append_intervention_billing_lines: "Facturation (lignes ajoutées)",
   order_lecot_parts: "Commande fournisseur Lecot",
+  approve_material_orders: "Validation demandes matériel",
   update_intervention_status: "Statut modifié (chatbot)",
   assign_technician: "Technicien assigné (chatbot)",
   update_intervention_schedule: "Planning modifié (chatbot)",
@@ -90,7 +92,15 @@ function buildNote(name: string, input: Record<string, unknown>, result: unknown
     const r = result as Record<string, unknown>;
     if (typeof r.totalEur === "number") parts.push(`${r.totalEur} € HT`);
     if (typeof r.supplierOrderId === "string") parts.push(`#${r.supplierOrderId.slice(0, 8)}`);
+    const cn = String(r.clientName || input.clientName || "").trim();
+    if (cn) parts.push(`client: ${cn}`);
     if (r.demoMode) parts.push("(démo)");
+  }
+
+  if (name === "approve_material_orders" && result && typeof result === "object") {
+    const r = result as Record<string, unknown>;
+    const approved = Array.isArray(r.approved) ? r.approved.length : 0;
+    if (approved > 0) parts.push(`${approved} bon(s) validé(s)`);
   }
 
   if (name === "update_intervention_status") {

@@ -7,6 +7,8 @@ export interface MaterialOrderPart {
 export interface MaterialOrder {
   id: string;
   interventionId: string;
+  /** Nom client affiché (obligatoire à la création). */
+  clientName?: string | null;
   technicianUid: string;
   partsRequested: MaterialOrderPart[];
   urgency: 'low' | 'normal' | 'high';

@@ -444,7 +444,7 @@
   "crmHistory": {
     "aria": {
       "page": "Page",
-      "left": "CRM History Filters",
+      "left": "CRM history agent",
       "center": "CRM Activity Feed",
       "right": "AI Copilot"
     },
@@ -515,6 +515,11 @@
       "client": "Client",
       "system": "System"
     },
+    "agent_placeholder": "Activity, cases, summary…",
+    "agent_reset": "New conversation",
+    "agent_thinking": "Analyzing…",
+    "agent_no_company": "Select an active company.",
+    "agent_off_topic": "I am the History Agent — I only analyze CRM activity and history. For billing, stock, or the full Chatbot, use the dedicated page.",
     "ai": {
       "title": "AI Copilot",
       "subtitle": "Smart analysis",
@@ -699,11 +704,17 @@
     "col_amount": "Amount excl. VAT",
     "col_status": "Status",
     "ask_chatbot": "Invoice via Chatbot",
+    "agent_placeholder": "Invoices, unpaid, quotes…",
+    "agent_reset": "New conversation",
+    "agent_thinking": "Analyzing…",
+    "agent_off_topic": "I am the Billing Agent — I only handle invoices and payments. For stock, CRM history, or the full Chatbot, use the dedicated page.",
+    "agent_suggestion_unpaid": "List unpaid invoices",
+    "agent_suggestion_to_bill": "Cases to invoice",
     "aria": {
       "page": "Page",
-      "left": "shortcuts",
+      "left": "Billing agent",
       "center": "invoices",
-      "right": "detail"
+      "right": "documents"
     }
   },
   "spotlight": {

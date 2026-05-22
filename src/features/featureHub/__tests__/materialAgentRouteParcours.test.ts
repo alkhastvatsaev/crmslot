@@ -99,7 +99,8 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
   describe.each(LECOT_PHRASES.map((p) => [p] as const))(
     "demande Lecot [%s]",
     (phrase) => {
-      it("utilise le raccourci catalogue instantané (sans OpenAI)", async () => {
+      it("délègue la demande Lecot à OpenAI", async () => {
+        await mockOpenAiDone(phrase);
         const res = await handleMaterialAgentPost(
           {
             companyId,
@@ -109,8 +110,7 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
           auth,
         );
         const events = await readSseJsonLines(res);
-        // Instant shortcut: no OpenAI call
-        expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+        expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
         expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
         // Session reset emitted when phrase triggers a new-order context
         if (/nouvelle|autre|changer|catalogue\s+lecot|commande\s+lecot/i.test(phrase)) {

@@ -38,6 +38,9 @@
   ],
   "exclude": [
     "node_modules",
-    "functions"
+    "functions",
+    ".next",
+    "out",
+    "coverage"
   ]
 }

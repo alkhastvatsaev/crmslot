@@ -5,8 +5,7 @@ import { Bot, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useBillingHubIntent } from "@/context/BillingHubIntentContext";
-import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
-import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockChatbot";
+import { navigateToBillingAgentWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -53,12 +52,11 @@ export default function BillingHubRightAssistPanel({ interventions, loading }: P
             data-testid="billing-hub-ask-chatbot"
             aria-label={t("billingHub.ask_chatbot")}
             onClick={() => {
-              navigateToChatbotWithPrompt(
+              navigateToBillingAgentWithPrompt(
                 pager,
                 `Facturation intervention ${selected.id} — ${selected.clientName ?? ""}. Résume HT/TTC et propose les prochaines actions.`,
                 "send",
               );
-              pager?.setPageIndex(AI_ASSISTANT_SLOT_INDEX);
             }}
             className="flex w-full items-center justify-center gap-2 rounded-[12px] bg-slate-900 py-2.5 text-[12px] font-semibold text-white hover:bg-slate-800"
           >

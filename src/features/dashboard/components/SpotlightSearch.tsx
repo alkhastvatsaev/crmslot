@@ -1,13 +1,9 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Command } from 'cmdk';
-import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, CloudOff, FileText, Phone, Navigation, ExternalLink, Download, BarChart3, Mail, Sparkles } from 'lucide-react';
-import { FEATURE_HUB_SLOT_INDEX } from '@/features/featureHub/featureHubConstants';
-import { CRM_HISTORY_SLOT_INDEX } from '@/features/crmHistory/crmHistoryConstants';
-import { BILLING_HUB_SLOT_INDEX } from '@/features/billingHub/billingHubConstants';
+import { X, Globe, Search, Map, Building2, Wrench, LayoutDashboard, FileText, Phone, Navigation, ExternalLink, Download, BarChart3, Mail, Sparkles } from 'lucide-react';
 import { Receipt } from 'lucide-react';
-import { AI_ASSISTANT_SLOT_INDEX } from '@/features/ai/aiAssistantConstants';
-import { GMAIL_HUB_SLOT_INDEX } from '@/features/gmail/gmailHubConstants';
+import { DASHBOARD_CAROUSEL_PAGES } from '@/features/dashboard/dashboardCarouselRegistry';
 import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -33,20 +29,29 @@ const languages: { code: Language; label: string }[] = [
   { code: 'nl', label: 'NL' },
 ];
 
+const SPOTLIGHT_NAV_ICONS = {
+  'spotlight.nav_map': Map,
+  'spotlight.nav_company': Building2,
+  'spotlight.nav_technician': Wrench,
+  'spotlight.nav_gmail': Mail,
+  'spotlight.nav_feature_hub': Sparkles,
+  'spotlight.nav_crm_history': Sparkles,
+  'spotlight.nav_billing_hub': Receipt,
+} as const;
+
 export default function SpotlightSearch() {
   const [open, setOpen] = useState(false);
   const { language, setLanguage, t } = useTranslation();
   const pager = useDashboardPagerOptional();
-  const navPages = useMemo(() => [
-    { index: 0, label: t('spotlight.nav_map'),        Icon: Map },
-    { index: 1, label: t('spotlight.nav_company'),    Icon: Building2 },
-    { index: 2, label: t('spotlight.nav_technician'), Icon: Wrench },
-    { index: AI_ASSISTANT_SLOT_INDEX, label: t('spotlight.nav_chatbot'), Icon: CloudOff },
-    { index: GMAIL_HUB_SLOT_INDEX, label: t('spotlight.nav_gmail'), Icon: Mail },
-    { index: FEATURE_HUB_SLOT_INDEX, label: t('spotlight.nav_feature_hub'), Icon: Sparkles },
-    { index: CRM_HISTORY_SLOT_INDEX, label: t('spotlight.nav_crm_history'), Icon: Sparkles },
-    { index: BILLING_HUB_SLOT_INDEX, label: t('spotlight.nav_billing_hub'), Icon: Receipt },
-  ], [t]);
+  const navPages = useMemo(
+    () =>
+      DASHBOARD_CAROUSEL_PAGES.map((page) => ({
+        index: page.slotIndex,
+        label: t(page.spotlightLabelKey),
+        Icon: SPOTLIGHT_NAV_ICONS[page.spotlightLabelKey],
+      })),
+    [t],
+  );
 
   const workspace = useCompanyWorkspaceOptional();
   const isDispatchMap = isCompanyDispatchViewer(workspace);

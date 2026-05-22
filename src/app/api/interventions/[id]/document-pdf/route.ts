@@ -51,11 +51,12 @@ export async function GET(request: Request, context: RouteContext) {
     const orders = ordersSnap.docs.map(
       (d) => ({ id: d.id, ...d.data() }) as MaterialOrderDoc,
     );
-    pdf = generateMaterialOrdersPdf(
-      interventionId,
-      orders,
-      String(iv.clientName ?? "").trim() || undefined,
-    );
+    const clientFromOrder = orders
+      .map((o) => (typeof o.clientName === "string" ? o.clientName.trim() : ""))
+      .find(Boolean);
+    const clientLabel =
+      clientFromOrder || String(iv.clientName ?? "").trim() || undefined;
+    pdf = generateMaterialOrdersPdf(interventionId, orders, clientLabel);
   } else {
     const branding =
       typeRaw !== "report" && companyId

@@ -15,9 +15,6 @@ import { appendChatbotTrainingLog } from "@/features/chatbot/training/appendChat
 import { extractChatbotTrainingTurn } from "@/features/chatbot/training/extractChatbotTrainingTurn";
 import { isChatbotGreetingMessage } from "@/features/chatbot/chatbot-greeting";
 import { normalizeSendInterventionEmailArguments } from "@/features/chatbot/chatbot-email-attach";
-import { shouldPreferChatbotEmailOverLecot } from "@/features/chatbot/chatbot-email-intent";
-import { streamInstantLecotCatalogResponse } from "@/features/chatbot/chatbot-lecot";
-import { buildInstantLecotOrderPayload } from "@/features/chatbot/chatbot-lecot-instant-order";
 import {
   createChatbotSseResponse,
   streamDocumentToolOutcome,
@@ -192,38 +189,6 @@ async function handleChatbotPostInner(
       billingCtx: { focusInterventionId },
     });
     if (pwaResponse) return pwaResponse;
-  }
-
-  const instantOrder = await buildInstantLecotOrderPayload(companyId, lastUser, messages, {
-    focusInterventionId,
-  });
-  if (instantOrder && !isChatbotGreetingMessage(lastUser)) {
-    return streamLecotOrderToolOutcome({
-      messages,
-      toolCallId: "instant-lecot-order",
-      companyId,
-      input: {
-        lines: instantOrder.lines,
-        ...(instantOrder.interventionId ? { interventionId: instantOrder.interventionId } : {}),
-        syncBilling: Boolean(instantOrder.interventionId),
-      },
-      toolCtx,
-    });
-  }
-
-  if (
-    conversationCtx.lecotSearchQuery &&
-    !isChatbotGreetingMessage(lastUser) &&
-    !shouldPreferChatbotEmailOverLecot(lastUser)
-  ) {
-    return createChatbotSseResponse(async (enqueue) => {
-      await streamInstantLecotCatalogResponse({
-        companyId,
-        query: conversationCtx.lecotSearchQuery!,
-        messages,
-        enqueue,
-      });
-    });
   }
 
   const openAIKey = resolveOpenAIApiKey();

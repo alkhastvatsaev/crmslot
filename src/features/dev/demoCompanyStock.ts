@@ -153,6 +153,7 @@ export const DEMO_COMPANY_MATERIAL_ORDERS: MaterialOrderDoc[] = [
     id: "demo-mo-1",
     companyId: DEMO_COMPANY_ID,
     interventionId: "INT-24051",
+    clientName: "M. Dupont",
     technicianUid: "demo-tech-local",
     partsRequested: [
       { description: "Cylindre européen 80 mm sécurité", quantity: 2, reference: "CYL-EURO-80" },
@@ -167,6 +168,7 @@ export const DEMO_COMPANY_MATERIAL_ORDERS: MaterialOrderDoc[] = [
     id: "demo-mo-2",
     companyId: DEMO_COMPANY_ID,
     interventionId: "INT-24048",
+    clientName: "Martin SPRL",
     technicianUid: "demo-tech-local",
     partsRequested: [
       { description: "Barillet A2P 5 goupilles", quantity: 1, reference: "BAR-A2P" },

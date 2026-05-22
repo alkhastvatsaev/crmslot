@@ -3,6 +3,14 @@ import { renderWithPager } from "@/test-utils/renderWithPager";
 import CrmHistoryPage from "@/features/crmHistory/components/CrmHistoryPage";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 
+jest.mock("@/context/CompanyWorkspaceContext", () => ({
+  useCompanyWorkspaceOptional: () => ({
+    activeCompanyId: "demo-local-company",
+    isTenantUser: true,
+    firebaseUid: "uid-test",
+  }),
+}));
+
 jest.mock("@/features/backoffice/useBackOfficeInterventions", () => ({
   useBackOfficeInterventions: () => ({ interventions: [], loading: false, error: null }),
 }));
@@ -17,7 +25,7 @@ jest.mock("@/features/featureHub/hooks/useCompanyMaterialOrdersRecent", () => ({
 }));
 
 jest.mock("@/features/featureHub/hooks/useCompanySupplierOrdersRecent", () => ({
-  useCompanySupplierOrdersRecent: () => ({ orders: [], loading: false }),
+  useCompanySupplierOrdersRecent: () => ({ orders: [], loading: false, error: null }),
 }));
 
 jest.mock("@/features/crmHistory/hooks/useCompanyEmailsFeed", () => ({
@@ -70,13 +78,14 @@ describe("CrmHistoryPage", () => {
     mockSetPendingInboxId.mockClear();
   });
 
-  it("renders empty side panels and center feed", () => {
+  it("renders history agent left rail and center feed", () => {
     renderCrmPage();
     const slot = `dashboard-pager-slot-${CRM_HISTORY_SLOT_INDEX}`;
     expect(screen.getByTestId(slot)).toBeInTheDocument();
     expect(screen.getByTestId(`${slot}-panel-left`)).toBeInTheDocument();
     expect(screen.getByTestId(`${slot}-panel-right`)).toBeInTheDocument();
     expect(screen.getByTestId(`${slot}-panel-center`)).toBeInTheDocument();
+    expect(screen.getByTestId("crm-history-agent-panel")).toBeInTheDocument();
     expect(screen.getByTestId("crm-center-empty")).toBeInTheDocument();
     expect(screen.queryByTestId("crm-search-input")).not.toBeInTheDocument();
   });

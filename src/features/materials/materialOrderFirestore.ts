@@ -11,6 +11,7 @@ import {
   where,
   type Firestore,
 } from "firebase/firestore";
+import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
 
 export const MATERIAL_ORDERS_COLLECTION = "material_orders";
@@ -51,12 +52,15 @@ export async function createMaterialOrderDoc(
     technicianUid: string;
     partsRequested: MaterialOrderPart[];
     urgency: MaterialOrder["urgency"];
+    clientName: string;
   },
 ): Promise<string> {
   const now = new Date().toISOString();
+  const clientName = requireMaterialOrderClientName(params.clientName);
   const ref = await addDoc(collection(db, MATERIAL_ORDERS_COLLECTION), {
     interventionId: params.interventionId.trim(),
     companyId: params.companyId,
+    clientName,
     technicianUid: params.technicianUid.trim(),
     partsRequested: params.partsRequested,
     urgency: params.urgency,

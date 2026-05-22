@@ -13,6 +13,8 @@ const mockClientDocGet = jest.fn();
 const mockClientDocUpdate = jest.fn();
 const mockInterventionDocGet = jest.fn();
 const mockMaterialOrdersGet = jest.fn();
+const mockMaterialOrderDocGet = jest.fn();
+const mockMaterialOrderDocUpdate = jest.fn();
 const mockTimelineGet = jest.fn();
 const mockTimelineAdd = jest.fn();
 const mockInterventionUpdate = jest.fn();
@@ -91,7 +93,15 @@ jest.mock("firebase-admin", () => ({
       }
       if (name === "technicians") return chainQuery(mockTechniciansGet);
       if (name === "stockItems" || name === "stock_items") return chainQuery(mockStockGet);
-      if (name === "material_orders") return chainQuery(mockMaterialOrdersGet);
+      if (name === "material_orders") {
+        return {
+          ...chainQuery(mockMaterialOrdersGet),
+          doc: (id: string) => ({
+            get: () => mockMaterialOrderDocGet(id),
+            update: (...args: unknown[]) => mockMaterialOrderDocUpdate(id, ...args),
+          }),
+        };
+      }
       if (name === "sites") return chainQuery(mockSitesGet);
       if (name === "companies") {
         return {
@@ -354,6 +364,85 @@ describe("executeChatbotTool", () => {
 
   it("list_material_orders requires interventionId", async () => {
     await expect(executeChatbotTool("list_material_orders", {}, ctx)).rejects.toThrow(/interventionId/i);
+  });
+
+  it("list_company_material_orders filters by company and status", async () => {
+    mockMaterialOrdersGet.mockResolvedValueOnce(
+      snapFrom([
+        {
+          id: "mo-pending",
+          data: {
+            companyId: "co-test",
+            status: "pending",
+            createdAt: "2026-05-20T10:00:00.000Z",
+            partsRequested: [{ description: "Joint" }],
+          },
+        },
+        {
+          id: "mo-done",
+          data: {
+            companyId: "co-test",
+            status: "ordered",
+            createdAt: "2026-05-21T10:00:00.000Z",
+            partsRequested: [],
+          },
+        },
+      ]),
+    );
+
+    const result = (await executeChatbotTool(
+      "list_company_material_orders",
+      { status: "pending" },
+      ctx,
+    )) as { count: number; orders: Array<{ id: string; status: string }> };
+
+    expect(result.count).toBe(1);
+    expect(result.orders[0]?.id).toBe("mo-pending");
+  });
+
+  it("approve_material_orders updates pending docs", async () => {
+    mockMaterialOrderDocGet.mockImplementation(async (id: string) => ({
+      exists: true,
+      data: () => ({
+        companyId: "co-test",
+        status: id === "mo-skip" ? "ordered" : "pending",
+      }),
+    }));
+
+    const result = await executeChatbotTool(
+      "approve_material_orders",
+      { ...confirmed, orderIds: ["mo-1", "mo-skip"] },
+      ctx,
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({ ok: true, approved: ["mo-1"], skipped: ["mo-skip"] }),
+    );
+    expect(mockMaterialOrderDocUpdate).toHaveBeenCalledWith(
+      "mo-1",
+      expect.objectContaining({ status: "ordered" }),
+    );
+  });
+
+  it("focus_stock_item returns UI payload", async () => {
+    const result = await executeChatbotTool(
+      "focus_stock_item",
+      { stockItemId: "sku-1", filter: "low", searchQuery: "joint" },
+      ctx,
+    );
+    expect(result).toEqual({
+      ok: true,
+      ui: "focus_stock",
+      stockItemId: "sku-1",
+      filter: "low",
+      searchQuery: "joint",
+    });
+  });
+
+  it("open_crm_dossier requires interventionId", async () => {
+    await expect(executeChatbotTool("open_crm_dossier", {}, ctx)).rejects.toThrow(/interventionId/i);
+    const ok = await executeChatbotTool("open_crm_dossier", { interventionId: "iv-fourche" }, ctx);
+    expect(ok).toEqual({ ok: true, ui: "open_crm", interventionId: "iv-fourche" });
   });
 
   it("blocks write tools without userConfirmed", async () => {

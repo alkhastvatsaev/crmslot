@@ -9,11 +9,15 @@ import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
-import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLayout";
+import {
+  DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
+  dashboardTripleSideOpaqueShellClass,
+} from "@/core/ui/dashboardDesktopLayout";
 import { CRM_HISTORY_SLOT_INDEX } from "../crmHistoryConstants";
 import { useCrmActivityFeed } from "../hooks/useCrmActivityFeed";
 import { useCrmNewEventHighlight } from "../hooks/useCrmNewEventHighlight";
 import type { CrmActivityEvent } from "../crmActivityTypes";
+import CrmHistoryAgentPanel from "./CrmHistoryAgentPanel";
 import CrmHistoryCenterFeed from "./CrmHistoryCenterFeed";
 
 type Props = { slotIndex?: number };
@@ -32,13 +36,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
 
-  const { events, loading, refreshing, feedError } = useCrmActivityFeed(
-    companyId,
-    "all",
-    "all",
-    "",
-    { enabled: pageActive },
-  );
+  const { events, loading, refreshing, feedError } = useCrmActivityFeed(companyId, "all", "all", "");
 
   const newEventIds = useCrmNewEventHighlight(events, { enabled: pageActive });
   const prevHighlightSizeRef = useRef(0);
@@ -78,7 +76,19 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
       leftAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.left")}`}
       centerAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.center")}`}
       rightAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.right")}`}
-      left={<section className={railShell} />}
+      leftShellClassName={dashboardTripleSideOpaqueShellClass}
+      left={
+        <section className={railShell}>
+          {companyId ? (
+            <CrmHistoryAgentPanel
+              companyId={companyId}
+              events={events}
+              loading={loading}
+              pageActive={pageActive}
+            />
+          ) : null}
+        </section>
+      }
       center={
         <section className={`${railShell} overflow-hidden`}>
           <CrmHistoryCenterFeed

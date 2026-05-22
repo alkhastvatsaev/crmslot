@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
-/** Aligné sur `AI_ASSISTANT_SLOT_INDEX` (page carrousel chatbot). */
-const CHATBOT_NAV_ITEM_INDEX = 4;
+/** Page Chatbot retirée du carrousel — tests désactivés. */
+const CHATBOT_NAV_ITEM_INDEX = -1;
 
 async function openChatbotPage(page: Page) {
   await page.goto("/");
@@ -15,7 +15,7 @@ async function openChatbotPage(page: Page) {
   });
 }
 
-test.describe("Chatbot smoke", () => {
+test.describe.skip("Chatbot smoke", () => {
   test("user message hits /api/ai/chatbot (SSE mock, no réponse locale)", async ({ page }) => {
     await page.route("**/api/ai/chatbot", async (route) => {
       if (route.request().method() !== "POST") {

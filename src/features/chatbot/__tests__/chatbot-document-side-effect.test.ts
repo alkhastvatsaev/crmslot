@@ -17,6 +17,16 @@ describe("chatbot-document-side-effect", () => {
     expect(isChatbotZeroTokenUiTool("order_lecot_parts")).toBe(false);
   });
 
+  it("lecot order success message includes client name when provided", () => {
+    expect(
+      documentToolSuccessMessage("order_lecot_parts", {
+        supplierOrderId: "ord-1",
+        clientName: "Dupont",
+        totalEur: 12,
+      }),
+    ).toContain("Dupont");
+  });
+
   it("lecot order success message does not require ok flag", () => {
     expect(
       documentToolSuccessMessage("order_lecot_parts", {

@@ -20,7 +20,10 @@ describe("generateSupplierOrderPdf", () => {
       createdAt: "2026-05-18T10:00:00.000Z",
       updatedAt: "2026-05-18T10:00:00.000Z",
     };
-    const pdf = generateSupplierOrderPdf(order, { companyName: "Test SRL" });
+    const pdf = generateSupplierOrderPdf(
+      { ...order, clientName: "Martin SPRL" },
+      { companyName: "Test SRL" },
+    );
     expect(pdf.byteLength).toBeGreaterThan(500);
     expect(String.fromCharCode(pdf[0], pdf[1], pdf[2], pdf[3])).toBe("%PDF");
   });
