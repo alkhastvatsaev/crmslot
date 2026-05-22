@@ -31,3 +31,26 @@ describe("resolveMaterialAgentLecotSearchQuery", () => {
     );
   });
 });
+
+describe("anti-hallucination: noms propres dans contexte Lecot → null", () => {
+  const lecotMessages = [
+    { role: "user", content: "commande lecot" },
+    { role: "assistant", content: "Voici le catalogue Lecot..." },
+  ];
+
+  it("Bach en contexte Lecot → null (va à OpenAI)", () => {
+    expect(resolveMaterialAgentLecotSearchQuery("Bach", lecotMessages)).toBeNull();
+  });
+
+  it("Dupont en contexte Lecot → null", () => {
+    expect(resolveMaterialAgentLecotSearchQuery("Dupont", lecotMessages)).toBeNull();
+  });
+
+  it("Martin SPRL en contexte Lecot → null", () => {
+    expect(resolveMaterialAgentLecotSearchQuery("Martin SPRL", lecotMessages)).toBeNull();
+  });
+
+  it("serrure en contexte Lecot → serrure", () => {
+    expect(resolveMaterialAgentLecotSearchQuery("serrure", lecotMessages)).toBe("serrure");
+  });
+});
