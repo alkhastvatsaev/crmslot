@@ -2,6 +2,7 @@ import { parseLecotInstantOrderIntent } from "@/features/chatbot/chatbot-lecot-i
 import { isChatbotLecotOrderIntent } from "@/features/chatbot/chatbot-email-intent";
 import {
   extractLecotProductKeyword,
+  normalizeLecotProductSearchQuery,
   priorMessagesHaveLecotContext,
   resolveLecotCatalogSearchQuery,
 } from "@/features/chatbot/chatbot-lecot-follow-up";
@@ -15,6 +16,15 @@ export const MATERIAL_AGENT_LECOT_DEFAULT_QUERY = "serrure cylindre";
 
 const SUGGEST_PRODUCTS_RE =
   /sugg[eè]re|propose|montre|liste|catalogue|produits?|articles?|références?|references?/i;
+
+/** Nom client seul (ex. Dupont) — pas une recherche catalogue instantanée. */
+function looksLikeClientNameCatalogReply(text: string): boolean {
+  const t = text.trim();
+  if (t.length < 2 || t.length > 48) return false;
+  if (extractLecotProductKeyword(t)) return false;
+  if (/^[a-zàâäéèêëïîôùûüç0-9]/i.test(t) && t === t.toLowerCase()) return false;
+  return /^[\p{L}][\p{L}\p{M}'.\-\s]{1,47}$/u.test(t);
+}
 
 function isBareLecotQuery(query: string): boolean {
   const q = query.trim().toLowerCase();
@@ -58,8 +68,15 @@ function normalizeMaterialAgentLecotBaseQuery(
     return MATERIAL_AGENT_LECOT_DEFAULT_QUERY;
   }
 
-  // Don't route arbitrary strings (proper nouns, client names…) to the instant shortcut.
-  // Only known product keywords or catalog phrases qualify.
+  if (
+    inLecotFlow &&
+    !isGenericLecotCatalogPhrase(base) &&
+    !looksLikeClientNameCatalogReply(base)
+  ) {
+    const normalized = normalizeLecotProductSearchQuery(base);
+    if (normalized.length >= 2 && normalized.length <= 80) return normalized;
+  }
+
   return null;
 }
 
@@ -81,7 +98,7 @@ export function resolveMaterialAgentLecotSearchQuery(
     isChatbotLecotOrderIntent(t) || priorMessagesHaveLecotContext(messages) || /\blecot\b/i.test(t);
 
   const productInMessage = extractLecotProductKeyword(t);
-  if (productInMessage) return productInMessage;
+  if (productInMessage) return normalizeLecotProductSearchQuery(productInMessage);
 
   const base = resolveLecotCatalogSearchQuery(lastUserText, messages);
 
