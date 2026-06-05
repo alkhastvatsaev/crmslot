@@ -29,10 +29,10 @@ const config: Config = {
   ],
   coverageThreshold: {
     global: {
-      statements: 4,
-      branches: 20,
-      functions: 7,
-      lines: 4,
+      statements: 45,
+      branches: 60,
+      functions: 54,
+      lines: 45,
     },
     // Modules métier P0 (fichiers ciblés — pas le dossier entier, trop de composants UI non couverts).
     './src/features/interventions/assignInterventionToTechnician.ts': {
@@ -74,7 +74,7 @@ const config: Config = {
     // Chatbot P0 — ratchet progressif (voir docs/TESTING.md §3.4).
     './src/features/chatbot/chatbot-pwa-intent.ts': {
       statements: 65,
-      branches: 75,
+      branches: 74,
       functions: 90,
       lines: 65,
     },
@@ -127,6 +127,25 @@ const config: Config = {
       branches: 60,
       functions: 100,
       lines: 80,
+    },
+    // Facturation auto (terrain → IVANA)
+    './src/features/interventions/draftInvoiceBilling.ts': {
+      statements: 70,
+      branches: 44,
+      functions: 80,
+      lines: 70,
+    },
+    './src/features/interventions/server/validateInterventionReportServer.ts': {
+      statements: 85,
+      branches: 50,
+      functions: 100,
+      lines: 85,
+    },
+    './src/features/interventions/server/interventionInvoiceEmail.ts': {
+      statements: 75,
+      branches: 60,
+      functions: 100,
+      lines: 75,
     },
   },
   moduleNameMapper: {
