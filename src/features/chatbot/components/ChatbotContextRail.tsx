@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Activity, AlertTriangle, CloudOff, Wallet } from "lucide-react";
 import { useWorkspaceCopilotSnapshot } from "@/features/copilot/hooks/useWorkspaceCopilotSnapshot";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 function KpiCard({
   label,
@@ -38,6 +39,7 @@ function KpiCard({
 
 /** Rail droit — KPI live alignés sur le tableau de bord. */
 export default function ChatbotContextRail() {
+  const { t } = useTranslation();
   const { snapshot, loading } = useWorkspaceCopilotSnapshot();
 
   if (loading && !snapshot) {
@@ -46,7 +48,7 @@ export default function ChatbotContextRail() {
         className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex min-h-0 flex-1 flex-col gap-2 px-2 pb-4`}
         data-testid="chatbot-context-rail"
       >
-        <p className="px-1 text-[11px] text-slate-400">Chargement du contexte…</p>
+        <p className="px-1 text-[11px] text-slate-400">{t("chatbot.context_loading")}</p>
       </motion.div>
     );
   }
@@ -57,7 +59,7 @@ export default function ChatbotContextRail() {
         className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex min-h-0 flex-1 flex-col gap-2 px-2 pb-4`}
         data-testid="chatbot-context-rail"
       >
-        <p className="px-1 text-[12px] text-slate-500">Sélectionnez une société pour voir les KPI.</p>
+        <p className="px-1 text-[12px] text-slate-500">{t("chatbot.context_no_company")}</p>
       </motion.div>
     );
   }
@@ -74,26 +76,26 @@ export default function ChatbotContextRail() {
       </p>
       <div className="grid grid-cols-1 gap-2">
         <KpiCard
-          label="Dossiers"
+          label={String(t("chatbot.kpi_cases"))}
           value={s.totalInterventions}
           tone="slate"
           icon={<Activity className="h-3.5 w-3.5" />}
         />
         <KpiCard
-          label="Urgences"
+          label={String(t("chatbot.kpi_urgent"))}
           value={s.urgentOpen}
           tone="rose"
           icon={<AlertTriangle className="h-3.5 w-3.5" />}
         />
         <KpiCard
-          label="Impayés"
+          label={String(t("chatbot.kpi_unpaid"))}
           value={s.unpaidCount}
           tone="amber"
           icon={<Wallet className="h-3.5 w-3.5" />}
         />
         {s.pendingOfflineQueue > 0 ? (
           <KpiCard
-            label="Offline"
+            label={String(t("chatbot.kpi_offline"))}
             value={s.pendingOfflineQueue}
             tone="indigo"
             icon={<CloudOff className="h-3.5 w-3.5" />}
@@ -101,7 +103,7 @@ export default function ChatbotContextRail() {
         ) : null}
       </div>
       <p className="px-1 text-[11px] leading-relaxed text-slate-500">
-        Le Chatbot reçoit ce snapshot à chaque message (+ outils Firestore).
+        {t("chatbot.context_snapshot_hint")}
       </p>
     </motion.div>
   );

@@ -447,7 +447,7 @@
       "page": "Page",
       "left": "Agent historique CRM",
       "center": "Flux d'activité CRM",
-      "right": "Copilote IA"
+      "right": "Détail de l'événement"
     },
     "left": {
       "filters": "Filtres",
@@ -515,6 +515,68 @@
       "technician": "Technicien",
       "client": "Client",
       "system": "Système"
+    },
+    "detail": {
+      "heading": "Détail",
+      "empty_title": "Aucun événement sélectionné",
+      "empty_hint": "Cliquez sur une ligne du flux pour afficher une explication détaillée.",
+      "open_dossier": "Ouvrir le dossier",
+      "status_transition": "Évolution du statut : {before} → {after}",
+      "label": {
+        "intervention": "Dossier",
+        "client": "Client",
+        "address": "Adresse",
+        "order": "Commande",
+        "order_amount": "Montant",
+        "order_id": "Référence commande",
+        "actor": "Par",
+        "status": "Statut",
+        "material_status": "Statut matériel",
+        "chat_role": "Canal",
+        "email_subject": "Objet",
+        "email_from": "De",
+        "email_to": "À",
+        "commission": "Commission",
+        "commission_action": "Type",
+        "technician": "Technicien (UID)",
+        "note": "Note"
+      },
+      "chat_role": {
+        "client": "Message client (portail)",
+        "staff": "Message équipe"
+      },
+      "body": {
+        "intervention_created": "Un nouveau dossier d'intervention a été enregistré. Il apparaît dans le suivi et peut être assigné à un technicien.",
+        "intervention_assigned": "Un technicien a accepté ou reçu l'assignation de ce dossier. La mission est planifiée ou en cours de prise en charge.",
+        "intervention_status": "Le statut opérationnel du dossier a changé (planning, route, travaux, clôture, etc.).",
+        "intervention_completed": "Les travaux sur site sont terminés côté technicien. Le dossier peut passer en validation ou facturation.",
+        "intervention_invoiced": "Le dossier est marqué comme facturé : la facture a été générée ou le statut commercial est passé à « facturé ».",
+        "intervention_technician_declined": "Le technicien assigné a refusé la mission. Le dossier retourne en file d'attente ou doit être réassigné.",
+        "intervention_returned_to_requests": "Le dossier a été renvoyé dans la file « Demandes » du back-office, sans technicien actif.",
+        "intervention_deleted": "Le dossier a été supprimé ou archivé de manière définitive dans l'espace société.",
+        "intervention_report_validated": "Le rapport terrain a été validé ; le dossier est prêt pour la facturation ou la clôture administrative.",
+        "intervention_cancelled": "L'intervention a été annulée : plus de passage terrain prévu pour ce dossier.",
+        "intervention_schedule_updated": "La date ou le créneau d'intervention a été modifié (planning client ou dispatch).",
+        "intervention_billing_updated": "Les lignes de facturation (HT/TVA, libellés) ou le montant du dossier ont été mis à jour.",
+        "intervention_payment_updated": "Le statut de paiement ou l'enregistrement d'un encaissement a été modifié sur ce dossier.",
+        "intervention_terrain_report_received": "Un rapport de fin de mission (texte, photos, signature) a été déposé par le technicien.",
+        "bridged_report_dismissed": "Un rapport terrain importé automatiquement a été ignoré ou masqué par le back-office.",
+        "ivana_chat_message": "Échange dans le chat Ivana lié au portail client ou au suivi du dossier.",
+        "material_order_status_changed": "Le statut d'une commande de matériel interne a évolué (brouillon, envoyée, reçue, etc.).",
+        "supplier_order_lecot": "Une commande fournisseur Lecot a été créée ou mise à jour via le chatbot ou le hub matériel.",
+        "chatbot_intervention_status": "Le chatbot a modifié le statut du dossier après confirmation utilisateur.",
+        "chatbot_timeline_comment": "Le chatbot a ajouté un commentaire dans la timeline CRM du dossier.",
+        "chatbot_email_sent": "Le chatbot a envoyé un e-mail lié au dossier (client, technicien ou fournisseur).",
+        "chatbot_gmail_action": "Une action Gmail (lecture, lien, réponse) a été effectuée via le chatbot sur un fil lié au dossier.",
+        "chatbot_write_action": "Le chatbot a exécuté une action d'écriture confirmée (données dossier, stock, etc.).",
+        "material_ordered": "Une demande de matériel a été passée pour soutenir l'intervention (stock interne ou préparation).",
+        "supplier_ordered": "Une commande fournisseur a été enregistrée (pièces, consommables) pour ce contexte.",
+        "email_sent": "Un e-mail sortant a été envoyé depuis la plateforme ou synchronisé avec le dossier.",
+        "email_received": "Un e-mail entrant a été reçu et rattaché à l'activité du dossier ou de la société.",
+        "commission_calculated": "Une commission commerciale a été calculée ou recalculée sur la base des règles société.",
+        "quote_created": "Un devis a été créé pour le client lié à ce dossier ou à cette demande.",
+        "quote_status_changed": "Le statut du devis a changé (brouillon, envoyé, accepté, refusé, etc.)."
+      }
     },
     "agent_placeholder": "Activité, dossiers, synthèse…",
     "agent_reset": "Nouvelle conversation",
@@ -862,6 +924,9 @@
         "job_title": "Intitulé",
         "gps_navigation": "Navigation GPS",
         "mission_completed": "Cette intervention est terminée et clôturée.",
+        "mission_done_badge": "Terminée",
+        "invoice_backoffice_pending": "Facture en préparation — validation et envoi par le back-office.",
+        "edit_report": "Modifier le rapport",
         "finish_job": "Terminer l'intervention",
         "updating": "Mise à jour...",
         "start_intervention": "Démarrer l'intervention",
@@ -884,6 +949,10 @@
       "mission_action": {
         "depart": "Je pars",
         "photo": "Photo"
+      },
+      "field_footer": {
+        "more": "Plus d'actions",
+        "less": "Moins"
       },
       "command_palette": {
         "title": "Actions mission",
@@ -919,7 +988,15 @@
         "archives": "Archives",
         "archive_word": "Archive",
         "archive_closed_one": "clôturée",
-        "archive_closed_other": "clôturées"
+        "archive_closed_other": "clôturées",
+        "reopen_mission": "Rouvrir la mission",
+        "reopen_confirm": "Rouvrir cette intervention terminée ? Vous pourrez compléter le rapport terrain.",
+        "reopen_success": "Intervention rouverte — vous pouvez compléter le dossier.",
+        "reopen_failed": "Impossible de rouvrir l'intervention",
+        "reopen_blocked_status": "Seules les interventions terminées (non facturées) peuvent être rouvertes.",
+        "reopen_blocked_invoiced": "Intervention déjà facturée — contactez le back-office.",
+        "reopen_blocked_invoice_pdf": "Une facture PDF existe déjà — réouverture impossible.",
+        "reopen_blocked_not_assigned": "Cette mission n'est pas assignée à votre compte."
       }
     },
     "day": {
@@ -970,7 +1047,9 @@
         "offline_queue": "File hors ligne",
         "offline_queue_desc": "Synchronisation automatique dès que le réseau est stable.",
         "report_sent": "Rapport transmis au back-office",
-        "report_sent_desc": "Photos et signature visibles sur la page carte (panneau droit). L'intervention est clôturée.",
+        "report_sent_desc": "Photos et signature transmises. La facture est préparée automatiquement ; IVANA valide et l’envoie au client.",
+        "report_updated": "Rapport mis à jour",
+        "report_updated_desc": "La mission reste terminée. Vos corrections sont enregistrées.",
         "presentation_mode": "Mode présentation",
         "presentation_mode_desc": "Sauvegarde cloud allégée. Le back-office voit le rapport via le mode démo.",
         "send_failed": "Envoi impossible"
@@ -1095,6 +1174,8 @@
       "hide_report": "Masquer ce rapport",
       "problem_prefix": "Problème",
       "photos": "Photos",
+      "draft_billing": "Brouillon facture (auto)",
+      "draft_billing_total": "Total estimé",
       "verify_terrain_report_aria": "Valider le rapport terrain",
       "already_verified": "Déjà validé",
       "now": "Maintenant"
@@ -1688,5 +1769,56 @@
     "prompt_urgent": "Résume les dossiers urgents encore ouverts.",
     "prompt_clients": "Quels clients ont le plus de dossiers actifs ?",
     "prompt_summary_day": "Fais un briefing opérationnel de la journée pour le back-office."
+  },
+  "chatbot": {
+    "no_company": "Connectez-vous avec une société active pour utiliser le Chatbot.",
+    "thinking": "Le Chatbot réfléchit…",
+    "confirm_required": "Confirmation requise",
+    "confirm_hint": "Cliquez Confirmer ou tapez oui dans le champ ci-dessous.",
+    "confirm": "Confirmer",
+    "open_intervention": "Ouvrir {id}",
+    "history_heading": "Historique",
+    "new_conversation": "Nouvelle conversation",
+    "new_conversation_short": "Nouveau",
+    "conversations_empty": "Aucune conversation. Démarrez un échange via le champ en bas.",
+    "conversation_empty_preview": "Conversation vide",
+    "conversation_untitled": "Sans titre",
+    "context_loading": "Chargement du contexte…",
+    "context_no_company": "Sélectionnez une société pour voir les KPI.",
+    "kpi_cases": "Dossiers",
+    "kpi_urgent": "Urgences",
+    "kpi_unpaid": "Impayés",
+    "kpi_offline": "Hors ligne",
+    "context_snapshot_hint": "Le Chatbot reçoit ce snapshot à chaque message (+ outils Firestore).",
+    "orders_heading": "Commandes",
+    "orders_and_slips_heading": "Commandes & bons",
+    "orders_empty": "Aucune commande pour le moment.",
+    "view_supplier_order_pdf": "Voir le bon de commande",
+    "view_material_order_pdf": "Voir le bon matériel",
+    "doc_badge_invoice": "Facture",
+    "doc_badge_order": "Bon",
+    "documents_heading": "Documents",
+    "documents_empty": "Aucun PDF pour l'instant.",
+    "invoices_heading": "Factures",
+    "pdf_preview_aria": "Aperçu document",
+    "pdf_document_fallback": "Document",
+    "close_preview": "Fermer l'aperçu",
+    "pdf_document_pdf_fallback": "Document PDF",
+    "select_company_placeholder": "Sélectionnez une société active…",
+    "input_aria": "Message Chatbot",
+    "demo_step_validated": "Validée",
+    "demo_step_preparing": "Préparation",
+    "demo_step_shipped": "Expédiée",
+    "demo_step_delivered": "Livrée",
+    "demo_order_cancelled": "Commande annulée",
+    "demo_order_progress_aria": "Progression commande démo",
+    "pdf_loading_aria": "Chargement du document",
+    "pdf_preview_panel_empty": "Les documents générés par le chatbot ou ouverts depuis Commandes s'affichent ici.",
+    "invoice_pdf_hint": "Sélectionnez une facture pour l'afficher ici.",
+    "aria": {
+      "left": "panneau gauche",
+      "center": "Chatbot",
+      "right": "bons de commande et factures"
+    }
   }
 }

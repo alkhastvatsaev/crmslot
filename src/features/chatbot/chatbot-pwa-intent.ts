@@ -67,8 +67,21 @@ export function parseChatbotEuroAmount(text: string): number | null {
 }
 
 /** Nom client / société cité dans la phrase (Vatsaev, Dupont, etc.). */
+/** « Fait une facture pour M. Dupont » — sans montant ni verbe afficher. */
+export function isCreateInvoiceRequest(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (/\bdevis\b/i.test(t) && !/\bfacture\b/i.test(t)) return false;
+  return (
+    /(?:fait|faire|cr[eé][eé]r|g[eé]n[eé]rer|pr[eé]parer|[eé]tablir)\s+(?:une?\s+)?facture\b/i.test(
+      t,
+    ) || /\bfacture\s+(?:pour|de)\s+(?:monsieur|madame|m\.|mme|mr|mrs)\b/i.test(t)
+  );
+}
+
 export function extractChatbotClientQuery(text: string): string | null {
   const patterns = [
+    /(?:fait|faire|cr[eé][eé]r|g[eé]n[eé]rer|pr[eé]parer)\s+(?:une?\s+)?(?:facture|devis)\s+(?:pour\s+)?(?:monsieur|madame|m\.|mme|mr|mrs)?\s*([a-zàâäéèêëïîôùûüç][\wàâäéèêëïîôùûüç\-']{2,40})/i,
     /(?:monsieur|madame|m\.|mme|mr|mrs)\s+([a-zàâäéèêëïîôùûüç][\wàâäéèêëïîôùûüç\-']{1,40})/i,
     /(?:facture|devis|dossier|client|pour)\s+(?:de\s+|du\s+|d[''])?([a-zàâäéèêëïîôùûüç][\wàâäéèêëïîôùûüç\-']{2,40})/i,
     /\b([A-ZÀÂÄÉÈÊËÏÎÔÙÛÜÇ][a-zàâäéèêëïîôùûüç\-']{2,40})\b/,
@@ -202,6 +215,14 @@ export function resolveChatbotPwaIntent(
       lineIndex: lineIndexFromText(trimmed),
       description,
       previewDocumentType,
+    };
+  }
+
+  if (isCreateInvoiceRequest(trimmed)) {
+    return {
+      kind: "document_preview",
+      intervention,
+      documentType: documentTypeFromText(trimmed),
     };
   }
 

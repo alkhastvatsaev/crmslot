@@ -12,7 +12,7 @@ export const INTERVENTION_STATUS_TRANSITIONS: Record<
   en_route: ["in_progress", "waiting_material", "cancelled"],
   in_progress: ["waiting_material", "done", "cancelled"],
   waiting_material: ["in_progress", "cancelled"],
-  done: ["invoiced"],
+  done: ["invoiced", "in_progress"],
   invoiced: [],
   cancelled: [],
 };
@@ -28,6 +28,7 @@ const TECHNICIAN_TRANSITION_KEYS = new Set<string>([
   TRANSITION_KEY("in_progress", "waiting_material"),
   TRANSITION_KEY("waiting_material", "in_progress"),
   TRANSITION_KEY("in_progress", "done"),
+  TRANSITION_KEY("done", "in_progress"),
 ]);
 
 /** Transitions back-office / dispatch. */

@@ -54,11 +54,12 @@ describe("TechnicianHubPage", () => {
     render(<TechnicianHubPage slotIndex={2} />);
 
     expect(screen.getByTestId("dashboard-pager-slot-2")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-dashboard-list")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-missions-empty-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-dashboard-detail-empty")).toBeInTheDocument();
     expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
       "data-technician-center-view",
       "detail",
     );
-    expect(screen.queryByTestId("technician-finish-job-layer")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
   });
 });

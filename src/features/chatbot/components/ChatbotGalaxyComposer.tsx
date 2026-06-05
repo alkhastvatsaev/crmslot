@@ -10,12 +10,14 @@ import {
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 /** Zone de saisie Chatbot dans le Galaxy dock (désormais cliquable depuis toutes les pages). */
 export default function ChatbotGalaxyComposer() {
   const { companyId, sendMessage, streaming, pendingTool, newConversation } = useChatbotContext();
+  const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const isChatbotPage = pager?.pageIndex === AI_ASSISTANT_SLOT_INDEX;
   const [input, setInput] = useState("");
@@ -95,10 +97,10 @@ export default function ChatbotGalaxyComposer() {
               }}
               rows={1}
               placeholder={
-                companyId ? "" : "Sélectionnez une société active…"
+                companyId ? "" : String(t("chatbot.select_company_placeholder"))
               }
               className="max-h-24 min-h-0 w-full min-w-0 flex-1 resize-none bg-transparent py-1 text-center text-[15px] leading-snug text-white placeholder:text-center placeholder:text-white/65 focus:outline-none disabled:opacity-50"
-              aria-label="Message Chatbot"
+              aria-label={String(t("chatbot.input_aria"))}
             />
             <AnimatePresence>
               {isChatbotPage && (
@@ -112,7 +114,7 @@ export default function ChatbotGalaxyComposer() {
                     e.stopPropagation();
                     newConversation();
                   }}
-                  title="Nouvelle conversation"
+                  title={String(t("chatbot.new_conversation"))}
                   className="absolute right-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none"
                 >
                   <svg

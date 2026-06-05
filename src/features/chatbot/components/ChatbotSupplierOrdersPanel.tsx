@@ -18,6 +18,7 @@ import type { SupplierOrder } from "@/features/suppliers/types";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import SupplierOrderDemoProgress from "@/features/chatbot/components/SupplierOrderDemoProgress";
 import { capitalizeName } from "@/utils/stringUtils";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -80,6 +81,7 @@ function SupplierOrderRow({
   highlighted: boolean;
   onViewPdf: () => void;
 }) {
+  const { t } = useTranslation();
   const displayOrder = order.isDemo
     ? { ...order, status: getDemoOrderStatus(order.id, order.status) }
     : order;
@@ -107,7 +109,7 @@ function SupplierOrderRow({
               className="text-left min-w-0 flex-1"
               onClick={onViewPdf}
               data-testid={`chatbot-supplier-order-pdf-${displayOrder.id}`}
-              aria-label="Voir le bon de commande"
+              aria-label={String(t("chatbot.view_supplier_order_pdf"))}
             >
               <p
                 className="truncate text-[13px] font-medium leading-snug text-slate-900"
@@ -142,6 +144,7 @@ function MaterialOrderRow({
   highlighted: boolean;
   onViewPdf?: () => void;
 }) {
+  const { t } = useTranslation();
   const date = formatWhenShort(order.createdAt);
 
   return (
@@ -159,7 +162,7 @@ function MaterialOrderRow({
           className="min-w-0 flex-1 text-left"
           onClick={onViewPdf}
           data-testid={`chatbot-material-order-pdf-${order.id}`}
-          aria-label="Voir le bon matériel"
+          aria-label={String(t("chatbot.view_material_order_pdf"))}
         >
           <p
             className="truncate text-[13px] font-medium leading-snug text-slate-900"
@@ -192,6 +195,7 @@ type ChatbotSupplierOrdersPanelProps = {
 export default function ChatbotSupplierOrdersPanel({
   placement = "embedded",
 }: ChatbotSupplierOrdersPanelProps) {
+  const { t } = useTranslation();
   const {
     companyId,
     supplierOrdersPanel,
@@ -283,7 +287,7 @@ export default function ChatbotSupplierOrdersPanel({
       {isSideRail ? (
         <div className="shrink-0 px-4 pt-4 pb-3">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">Commandes</h2>
+            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">{t("chatbot.orders_heading")}</h2>
             {totalCount > 0 ? (
               <span className="text-[10px] tabular-nums text-slate-400">{totalCount}</span>
             ) : null}
@@ -294,7 +298,7 @@ export default function ChatbotSupplierOrdersPanel({
           <div>
             <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-slate-900">
               <span className={cn("h-2 w-2 shrink-0 rounded-full", ACCENT.barActive)} aria-hidden />
-              Commandes & bons
+              {t("chatbot.orders_and_slips_heading")}
             </h2>
           </div>
           <button
@@ -302,7 +306,7 @@ export default function ChatbotSupplierOrdersPanel({
             data-testid="chatbot-supplier-orders-close"
             onClick={closeSupplierOrdersPanel}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100"
-            aria-label="Fermer"
+            aria-label={String(t("chatbot.close_preview"))}
           >
             <span className="text-lg leading-none">×</span>
           </button>
@@ -331,7 +335,7 @@ export default function ChatbotSupplierOrdersPanel({
               className="px-3 py-8 text-center text-[12px] leading-relaxed text-slate-400"
               data-testid="chatbot-supplier-orders-empty"
             >
-              Aucune commande pour le moment.
+              {t("chatbot.orders_empty")}
             </p>
           ) : null}
           {supplierOrders.slice(0, 15).map((order) => (

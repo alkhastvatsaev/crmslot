@@ -1,6 +1,7 @@
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildBillingHubAgentSystemPrompt } from "@/features/billingHub/billingHubAgentSystemPrompt";
+import { handleBillingHubPwaIntentRoute } from "@/features/billingHub/billingHubPwaRoute";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
 import { BILLING_HUB_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
@@ -13,6 +14,8 @@ export type BillingHubAgentPostBody = {
   role?: CompanyRole | null;
   messages?: unknown[];
   billingSnapshot?: string | null;
+  /** Dossier sélectionné dans la liste facturation (prioritaire pour « ce dossier »). */
+  focusInterventionId?: string | null;
 };
 
 export type BillingHubAgentRouteAuth = { uid: string };
@@ -51,6 +54,17 @@ export async function handleBillingHubAgentPost(
   });
 
   const toolCtx: ChatbotToolContext = { companyId, actorUid: auth.uid, role };
+  const focusInterventionId = (body?.focusInterventionId ?? "").trim() || null;
+
+  const pwaResponse = await handleBillingHubPwaIntentRoute({
+    messages,
+    companyId,
+    companyName,
+    role,
+    toolCtx,
+    focusInterventionId,
+  });
+  if (pwaResponse) return pwaResponse;
 
   return createChatbotSseResponse(async (enqueue) => {
     try {

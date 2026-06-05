@@ -10,16 +10,6 @@ import {
 const SPOTLIGHT_NAV_INDICES = DASHBOARD_CAROUSEL_PAGES.map((p) => p.slotIndex);
 const SPOTLIGHT_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGE_COUNT;
 
-jest.mock('@/context/CompanyWorkspaceContext', () => ({
-  useCompanyWorkspaceOptional: () => null,
-}));
-jest.mock('@/features/backoffice/useBackOfficeInterventions', () => ({
-  useBackOfficeInterventions: () => ({ interventions: [] }),
-}));
-jest.mock('@/features/interventions/useTechnicianAssignments', () => ({
-  useTechnicianAssignments: () => ({ interventions: [] }),
-}));
-
 // cmdk calls scrollIntoView on selected items — not available in jsdom
 Element.prototype.scrollIntoView = jest.fn();
 

@@ -692,3 +692,40 @@
 .crm-event-row--new {
   animation: crm-event-new-fade 8s ease-out forwards;
 }
+
+/* Hub technicien — annule le dégradé jaune global sur `h1` / le `p` léger global */
+.technician-detail-client-name {
+  margin: 0.25rem 0 0;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #171717 !important;
+  color: #171717 !important;
+}
+
+.technician-detail-description-text {
+  font-weight: 700 !important;
+  color: #171717 !important;
+}
+
+.technician-detail-description-text.technician-detail-description-text--accepted {
+  font-weight: 400 !important;
+  color: #262626 !important;
+}
+
+.technician-detail-awaiting-offer {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Panneau central technicien : pas de scroll, contenu centré dans la hauteur dispo */
+.technician-detail-body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+.technician-mission-brief--offer .technician-detail-description-text {
+  font-weight: 600 !important;
+}

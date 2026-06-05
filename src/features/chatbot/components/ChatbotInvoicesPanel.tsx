@@ -3,6 +3,7 @@
 import { FileText, Loader2, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 function formatEur(cents: number): string {
   return `${(cents / 100).toFixed(2).replace(".", ",")} €`;
@@ -21,6 +22,7 @@ function formatWhen(raw: string | null): string {
 
 /** Panneau droit — liste factures + aperçu PDF. */
 export default function ChatbotInvoicesPanel() {
+  const { t } = useTranslation();
   const {
     chatbotInvoices,
     chatbotInvoicesLoading,
@@ -112,7 +114,7 @@ export default function ChatbotInvoicesPanel() {
             ) : documentPreview.blobUrl ? (
               <iframe
                 data-testid="chatbot-invoice-pdf-iframe"
-                title="Facture"
+                title={String(t("chatbot.doc_badge_invoice"))}
                 src={documentPreview.blobUrl}
                 className="min-h-0 flex-1 w-full border-0 bg-white"
               />
@@ -123,7 +125,7 @@ export default function ChatbotInvoicesPanel() {
             className="flex flex-1 items-center justify-center px-4 text-center text-[12px] text-slate-500"
             data-testid="chatbot-invoices-pdf-hint"
           >
-            Sélectionnez une facture pour l&apos;afficher ici.
+            {t("chatbot.invoice_pdf_hint")}
           </p>
         )}
       </div>

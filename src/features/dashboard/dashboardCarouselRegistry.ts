@@ -10,6 +10,11 @@ export type DashboardCarouselRoleKey = "back_office" | "client" | "technician" |
 export type DashboardCarouselPageDef = {
   /** Index pager (doit égaler la position dans `dashboardPages` / `page.tsx`). */
   slotIndex: number;
+  /**
+   * Si `false`, la page n’est pas atteignable via les flèches carrousel (header / bords).
+   * Accès via Spotlight, liens métier (`setPageIndex`) ou actions rapides.
+   */
+  inCarouselNav?: boolean;
   profileName: string;
   profileRoleKey: DashboardCarouselRoleKey;
   /** Clé i18n `spotlight.*` pour la recherche rapide. */
@@ -40,6 +45,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   },
   {
     slotIndex: 1,
+    inCarouselNav: false,
     profileName: "SOCIÉTÉ BX",
     profileRoleKey: "client",
     spotlightLabelKey: "spotlight.nav_company",
@@ -48,6 +54,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   },
   {
     slotIndex: 2,
+    inCarouselNav: false,
     profileName: "MANSOUR",
     profileRoleKey: "technician",
     spotlightLabelKey: "spotlight.nav_technician",
@@ -56,14 +63,6 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   },
   {
     slotIndex: 3,
-    profileName: "GMAIL",
-    profileRoleKey: "back_office",
-    spotlightLabelKey: "spotlight.nav_gmail",
-    guideTitle: "Gmail",
-    guideHint: "Boîte mail PWA et pièces jointes.",
-  },
-  {
-    slotIndex: 4,
     profileName: "MATÉRIEL",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_feature_hub",
@@ -71,7 +70,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Stock, commandes Lecot et agent matériel.",
   },
   {
-    slotIndex: 5,
+    slotIndex: 4,
     profileName: "HISTORIQUE",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_crm_history",
@@ -79,16 +78,70 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Fil d’activité et agent historique.",
   },
   {
-    slotIndex: 6,
+    slotIndex: 5,
     profileName: "FACTURATION",
     profileRoleKey: "back_office",
     spotlightLabelKey: "spotlight.nav_billing_hub",
     guideTitle: "Facturation",
     guideHint: "Factures, impayés, documents et agent facturation.",
   },
+  {
+    slotIndex: 6,
+    inCarouselNav: false,
+    profileName: "GMAIL",
+    profileRoleKey: "back_office",
+    spotlightLabelKey: "spotlight.nav_gmail",
+    guideTitle: "Gmail",
+    guideHint: "Boîte mail PWA et pièces jointes.",
+  },
 ] as const;
 
 export const DASHBOARD_CAROUSEL_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGES.length;
+
+/** Indices accessibles par flèches carrousel (header + `DashboardPagerControls`). */
+export const DASHBOARD_CAROUSEL_NAV_SLOT_INDICES: readonly number[] = DASHBOARD_CAROUSEL_PAGES.filter(
+  (page) => page.inCarouselNav !== false,
+).map((page) => page.slotIndex);
+
+export function isDashboardCarouselNavSlot(pageIndex: number): boolean {
+  return DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.includes(pageIndex);
+}
+
+export function getNextDashboardCarouselNavIndex(pageIndex: number): number {
+  for (const slot of DASHBOARD_CAROUSEL_NAV_SLOT_INDICES) {
+    if (slot > pageIndex) return slot;
+  }
+  return DASHBOARD_CAROUSEL_NAV_SLOT_INDICES[DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.length - 1] ?? pageIndex;
+}
+
+export function getPrevDashboardCarouselNavIndex(pageIndex: number): number {
+  for (let i = DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.length - 1; i >= 0; i--) {
+    const slot = DASHBOARD_CAROUSEL_NAV_SLOT_INDICES[i];
+    if (slot !== undefined && slot < pageIndex) return slot;
+  }
+  return DASHBOARD_CAROUSEL_NAV_SLOT_INDICES[0] ?? pageIndex;
+}
+
+/** Pas suivant / précédent dans le carrousel (boucle sur les slots `inCarouselNav`). */
+export function stepDashboardCarouselNavIndex(
+  pageIndex: number,
+  direction: "next" | "prev",
+): number {
+  const nav = DASHBOARD_CAROUSEL_NAV_SLOT_INDICES;
+  if (nav.length === 0) return pageIndex;
+
+  const pos = nav.indexOf(pageIndex);
+  if (pos < 0) {
+    return direction === "next"
+      ? getNextDashboardCarouselNavIndex(pageIndex)
+      : getPrevDashboardCarouselNavIndex(pageIndex);
+  }
+
+  if (direction === "next") {
+    return nav[(pos + 1) % nav.length] ?? pageIndex;
+  }
+  return nav[(pos - 1 + nav.length) % nav.length] ?? pageIndex;
+}
 
 /** Vérifie que les constantes hub correspondent aux indices du registre. */
 export function assertDashboardCarouselSlotAlignment(): void {
@@ -96,10 +149,10 @@ export function assertDashboardCarouselSlotAlignment(): void {
     0,
     1,
     TECHNICIAN_HUB_SLOT_INDEX,
-    GMAIL_HUB_SLOT_INDEX,
     FEATURE_HUB_SLOT_INDEX,
     CRM_HISTORY_SLOT_INDEX,
     BILLING_HUB_SLOT_INDEX,
+    GMAIL_HUB_SLOT_INDEX,
   ];
   DASHBOARD_CAROUSEL_PAGES.forEach((page, i) => {
     if (page.slotIndex !== i) {

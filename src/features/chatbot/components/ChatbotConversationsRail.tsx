@@ -4,6 +4,7 @@ import { MessageSquarePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 function formatConversationWhen(ts: number): string {
   const d = new Date(ts);
@@ -20,6 +21,7 @@ function formatConversationWhen(ts: number): string {
 
 /** Rail gauche page 5 — historique des conversations Chatbot. */
 export default function ChatbotConversationsRail() {
+  const { t } = useTranslation();
   const { conversations, activeId, setActiveId, newConversation } = useChatbotContext();
 
   const sorted = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
@@ -34,17 +36,17 @@ export default function ChatbotConversationsRail() {
     >
       <div className="flex items-center justify-between gap-2 px-1 pt-1">
         <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-          Historique
+          {t("chatbot.history_heading")}
         </p>
         <button
           type="button"
           data-testid="chatbot-new-conversation"
           onClick={newConversation}
           className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-          aria-label="Nouvelle conversation"
+          aria-label={String(t("chatbot.new_conversation"))}
         >
           <MessageSquarePlus className="h-3.5 w-3.5" />
-          Nouveau
+          {t("chatbot.new_conversation_short")}
         </button>
       </div>
 
@@ -53,7 +55,7 @@ export default function ChatbotConversationsRail() {
           className="px-2 py-6 text-center text-[12px] leading-relaxed text-slate-500"
           data-testid="chatbot-conversations-empty"
         >
-          Aucune conversation. Démarrez un échange via le champ en bas.
+          {t("chatbot.conversations_empty")}
         </p>
       ) : (
         <ul className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto" role="list">
@@ -61,7 +63,7 @@ export default function ChatbotConversationsRail() {
             const active = c.id === activeId;
             const preview =
               c.messages[c.messages.length - 1]?.content?.slice(0, 60) ||
-              "Conversation vide";
+              String(t("chatbot.conversation_empty_preview"));
             return (
               <li key={c.id}>
                 <button
@@ -83,7 +85,7 @@ export default function ChatbotConversationsRail() {
                         active ? "text-indigo-900" : "text-slate-800",
                       )}
                     >
-                      {c.title || "Sans titre"}
+                      {c.title || String(t("chatbot.conversation_untitled"))}
                     </span>
                     <span className="shrink-0 text-[10px] tabular-nums text-slate-400">
                       {formatConversationWhen(c.updatedAt)}

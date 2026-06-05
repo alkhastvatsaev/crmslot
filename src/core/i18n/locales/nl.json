@@ -263,6 +263,10 @@
       "oauth_no_refresh": "Google heeft geen token teruggestuurd. Probeer opnieuw met alle machtigingen.",
       "oauth_failed": "Gmail-verbinding mislukt. Controleer GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET.",
       "connect_login_hint": "Klik hieronder — u keert automatisch terug naar deze pagina.",
+      "needs_login": "Meld u aan bij de PWA (rechtsboven), ga daarna terug naar deze pagina.",
+      "dev_local_badge": "Dev-lokale modus — geen login vereist voor Gmail.",
+      "needs_refresh_token": "Google-ID en -secret zijn OK. U heeft alleen GMAIL_REFRESH_TOKEN nog nodig — klik hieronder.",
+      "env_ok_hint": "GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET gedetecteerd door de server.",
       "missing_google_client": "Voeg GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET toe aan .env.local.",
       "connect_to_load": "Verbind Gmail om de inbox te laden.",
       "refresh": "Vernieuwen",
@@ -280,6 +284,7 @@
       "empty": "Geen berichten",
       "empty_hint": "Probeer een andere map of zoek op.",
       "no_subject": "geen onderwerp",
+      "message_count_suffix": "bericht(en)",
       "pick_message": "Selecteer een bericht",
       "pick_message_hint": "Het gesprek verschijnt hier — beantwoorden, ster of archiveren.",
       "from": "Van",
@@ -442,7 +447,7 @@
       "page": "Pagina",
       "left": "CRM-geschiedenisagent",
       "center": "CRM Activiteitsfeed",
-      "right": "AI Copiloot"
+      "right": "Gebeurtenisdetail"
     },
     "left": {
       "filters": "Filters",
@@ -510,6 +515,68 @@
       "technician": "Technicus",
       "client": "Klant",
       "system": "Systeem"
+    },
+    "detail": {
+      "heading": "Detail",
+      "empty_title": "Geen gebeurtenis geselecteerd",
+      "empty_hint": "Klik op een regel in de feed voor een uitgebreide uitleg.",
+      "open_dossier": "Dossier openen",
+      "status_transition": "Statuswijziging: {before} → {after}",
+      "label": {
+        "intervention": "Dossier",
+        "client": "Klant",
+        "address": "Adres",
+        "order": "Bestelling",
+        "order_amount": "Bedrag",
+        "order_id": "Bestelreferentie",
+        "actor": "Door",
+        "status": "Status",
+        "material_status": "Materiaalstatus",
+        "chat_role": "Kanaal",
+        "email_subject": "Onderwerp",
+        "email_from": "Van",
+        "email_to": "Aan",
+        "commission": "Commissie",
+        "commission_action": "Type",
+        "technician": "Technicus (UID)",
+        "note": "Notitie"
+      },
+      "chat_role": {
+        "client": "Klantbericht (portaal)",
+        "staff": "Teambericht"
+      },
+      "body": {
+        "intervention_created": "Een nieuw interventiedossier werd geregistreerd. Het verschijnt in de opvolging en kan aan een technicus worden toegewezen.",
+        "intervention_assigned": "Een technicus heeft de opdracht geaccepteerd of ontvangen. De missie is gepland of in behandeling.",
+        "intervention_status": "De operationele status van het dossier is gewijzigd (planning, onderweg, werken, afsluiting, enz.).",
+        "intervention_completed": "De werken ter plaatse zijn afgerond door de technicus. Het dossier kan naar validatie of facturatie.",
+        "intervention_invoiced": "Het dossier is als gefactureerd gemarkeerd: een factuur werd aangemaakt of de commerciële status is gefactureerd.",
+        "intervention_technician_declined": "De toegewezen technicus heeft de opdracht geweigerd. Het dossier keert terug naar de wachtrij of moet opnieuw worden toegewezen.",
+        "intervention_returned_to_requests": "Het dossier werd teruggestuurd naar de wachtrij Aanvragen van de back-office, zonder actieve technicus.",
+        "intervention_deleted": "Het dossier werd definitief verwijderd of gearchiveerd in de bedrijfsruimte.",
+        "intervention_report_validated": "Het veldrapport werd gevalideerd; het dossier is klaar voor facturatie of administratieve afsluiting.",
+        "intervention_cancelled": "De interventie werd geannuleerd: geen verdere terreinbezoeken gepland.",
+        "intervention_schedule_updated": "De datum of het tijdslot van de interventie werd gewijzigd (klant- of dispatchplanning).",
+        "intervention_billing_updated": "De factuurregels (excl. btw, omschrijvingen) of bedragen van het dossier werden bijgewerkt.",
+        "intervention_payment_updated": "De betalingsstatus of een geregistreerde betaling werd bijgewerkt op dit dossier.",
+        "intervention_terrain_report_received": "Een eindrapport (tekst, foto's, handtekening) werd ingediend door de technicus.",
+        "bridged_report_dismissed": "Een automatisch geïmporteerd veldrapport werd genegeerd of verborgen door de back-office.",
+        "ivana_chat_message": "Uitwisseling in de Ivana-chat gekoppeld aan het klantportaal of dossieropvolging.",
+        "material_order_status_changed": "De status van een interne materiaalbestelling is gewijzigd (concept, verzonden, ontvangen, enz.).",
+        "supplier_order_lecot": "Een Lecot-leveranciersbestelling werd aangemaakt of bijgewerkt via de chatbot of materiaalhub.",
+        "chatbot_intervention_status": "De chatbot heeft de dossierstatus gewijzigd na bevestiging door de gebruiker.",
+        "chatbot_timeline_comment": "De chatbot heeft een opmerking toegevoegd aan de CRM-timeline van het dossier.",
+        "chatbot_email_sent": "De chatbot heeft een e-mail verzonden in verband met het dossier (klant, technicus of leverancier).",
+        "chatbot_gmail_action": "Een Gmail-actie (lezen, koppelen, antwoorden) werd uitgevoerd via de chatbot op een gerelateerde thread.",
+        "chatbot_write_action": "De chatbot heeft een bevestigde schrijfactie uitgevoerd (dossiergegevens, stock, enz.).",
+        "material_ordered": "Een materiaalaanvraag werd geplaatst ter ondersteuning van de interventie (interne stock of voorbereiding).",
+        "supplier_ordered": "Een leveranciersbestelling werd geregistreerd (onderdelen, verbruik) voor deze context.",
+        "email_sent": "Een uitgaande e-mail werd verzonden vanaf het platform of gesynchroniseerd met het dossier.",
+        "email_received": "Een inkomende e-mail werd ontvangen en gekoppeld aan de activiteit van het dossier of bedrijf.",
+        "commission_calculated": "Een verkoopcommissie werd berekend of herberekend op basis van de bedrijfsregels.",
+        "quote_created": "Een offerte werd aangemaakt voor de klant gekoppeld aan dit dossier of deze aanvraag.",
+        "quote_status_changed": "De offertestatus is gewijzigd (concept, verzonden, geaccepteerd, geweigerd, enz.)."
+      }
     },
     "agent_placeholder": "Activiteit, dossiers, samenvatting…",
     "agent_reset": "Nieuw gesprek",
@@ -857,6 +924,9 @@
         "job_title": "Functietitel",
         "gps_navigation": "GPS-navigatie",
         "mission_completed": "Deze interventie is voltooid en gesloten.",
+        "mission_done_badge": "Voltooid",
+        "invoice_backoffice_pending": "Factuur wordt voorbereid — backoffice valideert en mailt de klant.",
+        "edit_report": "Rapport wijzigen",
         "finish_job": "Klus afronden",
         "updating": "Bijwerken...",
         "start_intervention": "Interventie starten",
@@ -866,11 +936,23 @@
         "waiting_material_banner": "Interventie gepauzeerd — wacht op materiaal.",
         "no_address": "Geen adres",
         "not_provided": "Niet opgegeven",
+        "new_assignment": "Nieuwe toewijzing",
+        "accept_assignment": "Accepteren",
+        "decline_assignment": "Weigeren",
+        "assignment_accepted": "Opdracht geaccepteerd",
+        "assignment_declined": "Opdracht geweigerd — teruggestuurd naar IVANA-aanvragen",
+        "assignment_action_failed": "Actie mislukt",
+        "update_failed": "Bijwerken mislukt",
+        "assignment_respond_in_list": "Accepteer of weiger deze opdracht via de lijst links.",
         "description_label": "Beschrijving"
       },
       "mission_action": {
         "depart": "Ik vertrek",
         "photo": "Foto"
+      },
+      "field_footer": {
+        "more": "Meer acties",
+        "less": "Minder"
       },
       "command_palette": {
         "title": "Missie-acties",
@@ -906,7 +988,15 @@
         "archives": "Archief",
         "archive_word": "Archief",
         "archive_closed_one": "afgesloten",
-        "archive_closed_other": "afgesloten"
+        "archive_closed_other": "afgesloten",
+        "reopen_mission": "Missie heropenen",
+        "reopen_confirm": "Deze afgeronde interventie heropenen? U kunt het veldrapport opnieuw aanvullen.",
+        "reopen_success": "Interventie heropend — u kunt het dossier aanvullen.",
+        "reopen_failed": "Heropenen van de interventie mislukt",
+        "reopen_blocked_status": "Alleen afgeronde (nog niet gefactureerde) interventies kunnen worden heropend.",
+        "reopen_blocked_invoiced": "Interventie al gefactureerd — neem contact op met back-office.",
+        "reopen_blocked_invoice_pdf": "Er bestaat al een factuur-PDF — heropenen niet mogelijk.",
+        "reopen_blocked_not_assigned": "Deze missie is niet aan uw account toegewezen."
       }
     },
     "day": {
@@ -957,7 +1047,9 @@
         "offline_queue": "Offline wachtrij",
         "offline_queue_desc": "Automatische synchronisatie zodra het netwerk stabiel is.",
         "report_sent": "Rapport naar back-office verzonden",
-        "report_sent_desc": "Foto’s en handtekening zijn zichtbaar op de kaartpagina (rechterpaneel). De interventie is afgesloten.",
+        "report_sent_desc": "Foto’s en handtekening verzonden. Factuur wordt automatisch voorbereid; backoffice valideert en mailt de klant.",
+        "report_updated": "Rapport bijgewerkt",
+        "report_updated_desc": "De missie blijft voltooid. Uw aanpassingen zijn opgeslagen.",
         "presentation_mode": "Presentatiemodus",
         "presentation_mode_desc": "Lichte cloudopslag. Back-office ziet het rapport via de demomodus.",
         "send_failed": "Verzenden niet mogelijk"
@@ -1013,6 +1105,10 @@
       "archive_aria": "Archiveren — deze missie verbergen op de kaart van vandaag op dit apparaat",
       "archive_label": "Archiveren",
       "archived_toast": "Missie verborgen op de kaart (lokaal archief). Ze blijft in het backoffice.",
+      "delete_aria": "Deze interventie definitief verwijderen",
+      "delete_label": "Verwijderen",
+      "deleted_toast": "Interventie definitief verwijderd.",
+      "delete_confirm": "Wil je deze interventie echt verwijderen?",
       "mission_actions_aria": "Acties voor deze missie"
     }
   },
@@ -1045,8 +1141,10 @@
       "empty_requests": "Geen nieuwe aanvragen",
       "empty_reports": "Geen rapporten om te verifiëren",
       "detail_title_request": "Aanvraagdetails",
+      "detail_title_returned": "Aanvraag opnieuw toewijzen",
       "detail_title_report": "Rapportverificatie",
       "kind_request": "Aanvraag",
+      "kind_returned": "Terug van terrein",
       "kind_report": "Rapport",
       "no_phone": "Geen telefoon",
       "location": "Locatie",
@@ -1076,6 +1174,8 @@
       "hide_report": "Dit rapport verbergen",
       "problem_prefix": "Probleem",
       "photos": "Foto's",
+      "draft_billing": "Conceptfactuur (auto)",
+      "draft_billing_total": "Geschat totaal",
       "verify_terrain_report_aria": "Veldrapport verifiëren",
       "already_verified": "Al geverifieerd",
       "now": "Nu"
@@ -1423,6 +1523,21 @@
       "admin": "ADMIN"
     }
   },
+  "dispatch": {
+    "assign_picker": {
+      "title": "Kies een technicus",
+      "cancel": "Annuleren",
+      "confirm": "Toewijzing bevestigen",
+      "loading": "Technici laden…",
+      "no_technicians": "Geen technici beschikbaar",
+      "recommended": "Aanbevolen",
+      "eta_loading": "ETA berekenen",
+      "status_available": "Beschikbaar",
+      "status_en_route": "Onderweg",
+      "status_on_site": "Ter plaatse",
+      "missing_auth_uid": "Deze technicus heeft geen gekoppeld Firebase-account (authUid ontbreekt)."
+    }
+  },
   "billing": {
     "panel_title": "Facturatie",
     "invoice_amount": "Factuurbedrag",
@@ -1654,5 +1769,56 @@
     "prompt_urgent": "Vat open urgente dossiers samen.",
     "prompt_clients": "Welke klanten hebben de meeste actieve dossiers?",
     "prompt_summary_day": "Geef een operationele briefing voor de back-office vandaag."
+  },
+  "chatbot": {
+    "no_company": "Verbind met een actief bedrijf om de Chatbot te gebruiken.",
+    "thinking": "De Chatbot denkt na…",
+    "confirm_required": "Bevestiging vereist",
+    "confirm_hint": "Klik op Bevestigen of typ ja in het veld hieronder.",
+    "confirm": "Bevestigen",
+    "open_intervention": "Openen {id}",
+    "history_heading": "Geschiedenis",
+    "new_conversation": "Nieuw gesprek",
+    "new_conversation_short": "Nieuw",
+    "conversations_empty": "Geen gesprekken. Start er een via het veld onderaan.",
+    "conversation_empty_preview": "Leeg gesprek",
+    "conversation_untitled": "Zonder titel",
+    "context_loading": "Context laden…",
+    "context_no_company": "Selecteer een bedrijf om KPI's te zien.",
+    "kpi_cases": "Dossiers",
+    "kpi_urgent": "Urgent",
+    "kpi_unpaid": "Onbetaald",
+    "kpi_offline": "Offline",
+    "context_snapshot_hint": "De Chatbot ontvangt deze snapshot bij elk bericht (+ Firestore-tools).",
+    "orders_heading": "Bestellingen",
+    "orders_and_slips_heading": "Bestellingen & bonnen",
+    "orders_empty": "Nog geen bestellingen.",
+    "view_supplier_order_pdf": "Bestelbon bekijken",
+    "view_material_order_pdf": "Materiaalbon bekijken",
+    "doc_badge_invoice": "Factuur",
+    "doc_badge_order": "Bon",
+    "documents_heading": "Documenten",
+    "documents_empty": "Nog geen PDF's.",
+    "invoices_heading": "Facturen",
+    "pdf_preview_aria": "Documentvoorbeeld",
+    "pdf_document_fallback": "Document",
+    "close_preview": "Voorbeeld sluiten",
+    "pdf_document_pdf_fallback": "PDF-document",
+    "select_company_placeholder": "Selecteer een actief bedrijf…",
+    "input_aria": "Chatbot-bericht",
+    "demo_step_validated": "Gevalideerd",
+    "demo_step_preparing": "Voorbereiden",
+    "demo_step_shipped": "Verzonden",
+    "demo_step_delivered": "Geleverd",
+    "demo_order_cancelled": "Bestelling geannuleerd",
+    "demo_order_progress_aria": "Voortgang demobestelling",
+    "pdf_loading_aria": "Document laden",
+    "pdf_preview_panel_empty": "Documenten gegenereerd door de chatbot of geopend via Bestellingen worden hier weergegeven.",
+    "invoice_pdf_hint": "Selecteer een factuur om deze hier weer te geven.",
+    "aria": {
+      "left": "linkerpaneel",
+      "center": "Chatbot",
+      "right": "bestellingen en facturen"
+    }
   }
 }

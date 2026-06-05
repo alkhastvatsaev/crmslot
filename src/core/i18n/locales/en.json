@@ -264,6 +264,7 @@
       "oauth_failed": "Gmail connection failed. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
       "connect_login_hint": "Click below to open Google — you will return here automatically.",
       "needs_login": "Log in to the PWA (top-right), then return to this page.",
+      "dev_local_badge": "Dev-local mode — no login required for Gmail.",
       "needs_refresh_token": "Google ID and secret are OK. You only need GMAIL_REFRESH_TOKEN — click below to get it.",
       "env_ok_hint": "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET detected by the server.",
       "missing_google_client": "Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env.local.",
@@ -446,7 +447,7 @@
       "page": "Page",
       "left": "CRM history agent",
       "center": "CRM Activity Feed",
-      "right": "AI Copilot"
+      "right": "Event detail"
     },
     "left": {
       "filters": "Filters",
@@ -514,6 +515,68 @@
       "technician": "Technician",
       "client": "Client",
       "system": "System"
+    },
+    "detail": {
+      "heading": "Detail",
+      "empty_title": "No event selected",
+      "empty_hint": "Click a row in the feed to see a detailed explanation.",
+      "open_dossier": "Open case",
+      "status_transition": "Status change: {before} → {after}",
+      "label": {
+        "intervention": "Case",
+        "client": "Client",
+        "address": "Address",
+        "order": "Order",
+        "order_amount": "Amount",
+        "order_id": "Order reference",
+        "actor": "By",
+        "status": "Status",
+        "material_status": "Material status",
+        "chat_role": "Channel",
+        "email_subject": "Subject",
+        "email_from": "From",
+        "email_to": "To",
+        "commission": "Commission",
+        "commission_action": "Type",
+        "technician": "Technician (UID)",
+        "note": "Note"
+      },
+      "chat_role": {
+        "client": "Client message (portal)",
+        "staff": "Staff message"
+      },
+      "body": {
+        "intervention_created": "A new intervention case was recorded. It appears in tracking and can be assigned to a technician.",
+        "intervention_assigned": "A technician accepted or received this assignment. The job is scheduled or being picked up.",
+        "intervention_status": "The operational status of the case changed (planning, en route, on site, closure, etc.).",
+        "intervention_completed": "Field work was completed by the technician. The case can move to validation or billing.",
+        "intervention_invoiced": "The case is marked as invoiced: an invoice was generated or the commercial status is now invoiced.",
+        "intervention_technician_declined": "The assigned technician declined the job. The case returns to the queue or must be reassigned.",
+        "intervention_returned_to_requests": "The case was sent back to the back-office Requests queue with no active technician.",
+        "intervention_deleted": "The case was permanently deleted or archived from the company workspace.",
+        "intervention_report_validated": "The field report was validated; the case is ready for billing or administrative closure.",
+        "intervention_cancelled": "The intervention was cancelled: no further field visit is planned.",
+        "intervention_schedule_updated": "The intervention date or time slot was updated (client or dispatch planning).",
+        "intervention_billing_updated": "Billing lines (excl. VAT, labels) or case amounts were updated.",
+        "intervention_payment_updated": "Payment status or a recorded payment was updated on this case.",
+        "intervention_terrain_report_received": "An end-of-job report (text, photos, signature) was submitted by the technician.",
+        "bridged_report_dismissed": "An automatically imported field report was dismissed or hidden by back-office.",
+        "ivana_chat_message": "A message in the Ivana chat linked to the client portal or case tracking.",
+        "material_order_status_changed": "An internal material order status changed (draft, sent, received, etc.).",
+        "supplier_order_lecot": "A Lecot supplier order was created or updated via the chatbot or materials hub.",
+        "chatbot_intervention_status": "The chatbot changed the case status after user confirmation.",
+        "chatbot_timeline_comment": "The chatbot added a comment to the case CRM timeline.",
+        "chatbot_email_sent": "The chatbot sent an email related to the case (client, technician, or supplier).",
+        "chatbot_gmail_action": "A Gmail action (read, link, reply) was performed via the chatbot on a related thread.",
+        "chatbot_write_action": "The chatbot ran a confirmed write action (case data, stock, etc.).",
+        "material_ordered": "A material request was placed to support the intervention (internal stock or preparation).",
+        "supplier_ordered": "A supplier order was recorded (parts, consumables) for this context.",
+        "email_sent": "An outbound email was sent from the platform or synced to the case.",
+        "email_received": "An inbound email was received and linked to case or company activity.",
+        "commission_calculated": "A sales commission was calculated or recalculated from company rules.",
+        "quote_created": "A quote was created for the client linked to this case or request.",
+        "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.)."
+      }
     },
     "agent_placeholder": "Activity, cases, summary…",
     "agent_reset": "New conversation",
@@ -861,6 +924,9 @@
         "job_title": "Title",
         "gps_navigation": "GPS Navigation",
         "mission_completed": "This intervention is finished and closed.",
+        "mission_done_badge": "Done",
+        "invoice_backoffice_pending": "Invoice being prepared — back office will validate and email the client.",
+        "edit_report": "Edit report",
         "finish_job": "Finish Job",
         "updating": "Updating...",
         "start_intervention": "Start intervention",
@@ -883,6 +949,10 @@
       "mission_action": {
         "depart": "I'm on my way",
         "photo": "Photo"
+      },
+      "field_footer": {
+        "more": "More actions",
+        "less": "Less"
       },
       "command_palette": {
         "title": "Mission actions",
@@ -918,7 +988,15 @@
         "archives": "Archives",
         "archive_word": "Archive",
         "archive_closed_one": "closed",
-        "archive_closed_other": "closed"
+        "archive_closed_other": "closed",
+        "reopen_mission": "Reopen mission",
+        "reopen_confirm": "Reopen this completed job? You can complete the field report again.",
+        "reopen_success": "Job reopened — you can update the case.",
+        "reopen_failed": "Could not reopen this job",
+        "reopen_blocked_status": "Only completed (not yet invoiced) jobs can be reopened.",
+        "reopen_blocked_invoiced": "This job is already invoiced — contact back-office.",
+        "reopen_blocked_invoice_pdf": "An invoice PDF already exists — cannot reopen.",
+        "reopen_blocked_not_assigned": "This job is not assigned to your account."
       }
     },
     "day": {
@@ -969,7 +1047,9 @@
         "offline_queue": "Offline queue",
         "offline_queue_desc": "Automatic sync as soon as the network is stable.",
         "report_sent": "Report sent to back-office",
-        "report_sent_desc": "Photos and signature are visible on the map page (right panel). The intervention is closed.",
+        "report_sent_desc": "Photos and signature sent. Invoice is prepared automatically; back office validates and emails the client.",
+        "report_updated": "Report updated",
+        "report_updated_desc": "The job stays marked done. Your changes are saved.",
         "presentation_mode": "Presentation mode",
         "presentation_mode_desc": "Lightweight cloud save. Back-office sees the report via demo mode.",
         "send_failed": "Unable to send"
@@ -1025,6 +1105,10 @@
       "archive_aria": "Archive — hide this mission from today’s map on this device",
       "archive_label": "Archive",
       "archived_toast": "Mission hidden on the map (local archive). It remains in the back office.",
+      "delete_aria": "Permanently delete this intervention",
+      "delete_label": "Delete",
+      "deleted_toast": "Intervention permanently deleted.",
+      "delete_confirm": "Do you really want to delete this intervention?",
       "mission_actions_aria": "Mission actions"
     }
   },
@@ -1090,6 +1174,8 @@
       "hide_report": "Hide this report",
       "problem_prefix": "Problem",
       "photos": "Photos",
+      "draft_billing": "Draft invoice (auto)",
+      "draft_billing_total": "Estimated total",
       "verify_terrain_report_aria": "Verify field report",
       "already_verified": "Already verified",
       "now": "Now"
@@ -1683,5 +1769,56 @@
     "prompt_urgent": "Summarize open urgent cases.",
     "prompt_clients": "Which clients have the most active cases?",
     "prompt_summary_day": "Give an operational briefing for the back office today."
+  },
+  "chatbot": {
+    "no_company": "Connect with an active company to use the Chatbot.",
+    "thinking": "The Chatbot is thinking…",
+    "confirm_required": "Confirmation required",
+    "confirm_hint": "Click Confirm or type yes in the field below.",
+    "confirm": "Confirm",
+    "open_intervention": "Open {id}",
+    "history_heading": "History",
+    "new_conversation": "New conversation",
+    "new_conversation_short": "New",
+    "conversations_empty": "No conversations yet. Start one using the field below.",
+    "conversation_empty_preview": "Empty conversation",
+    "conversation_untitled": "Untitled",
+    "context_loading": "Loading context…",
+    "context_no_company": "Select a company to see KPIs.",
+    "kpi_cases": "Cases",
+    "kpi_urgent": "Urgent",
+    "kpi_unpaid": "Unpaid",
+    "kpi_offline": "Offline",
+    "context_snapshot_hint": "The Chatbot receives this snapshot with each message (+ Firestore tools).",
+    "orders_heading": "Orders",
+    "orders_and_slips_heading": "Orders & slips",
+    "orders_empty": "No orders yet.",
+    "view_supplier_order_pdf": "View purchase order",
+    "view_material_order_pdf": "View material slip",
+    "doc_badge_invoice": "Invoice",
+    "doc_badge_order": "Order",
+    "documents_heading": "Documents",
+    "documents_empty": "No PDFs yet.",
+    "invoices_heading": "Invoices",
+    "pdf_preview_aria": "Document preview",
+    "pdf_document_fallback": "Document",
+    "close_preview": "Close preview",
+    "pdf_document_pdf_fallback": "PDF Document",
+    "select_company_placeholder": "Select an active company…",
+    "input_aria": "Chatbot message",
+    "demo_step_validated": "Validated",
+    "demo_step_preparing": "Preparing",
+    "demo_step_shipped": "Shipped",
+    "demo_step_delivered": "Delivered",
+    "demo_order_cancelled": "Order cancelled",
+    "demo_order_progress_aria": "Demo order progress",
+    "pdf_loading_aria": "Loading document",
+    "pdf_preview_panel_empty": "Documents generated by the chatbot or opened from Orders appear here.",
+    "invoice_pdf_hint": "Select an invoice to display it here.",
+    "aria": {
+      "left": "left panel",
+      "center": "Chatbot",
+      "right": "purchase orders and invoices"
+    }
   }
 }

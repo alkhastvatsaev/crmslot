@@ -37,7 +37,12 @@ export function mergeReportCompletionMedia(
   };
 }
 
-/** Retire le pont local seulement quand le serveur a les médias ou le dossier est déjà facturé / archivé. */
+/**
+ * Retire le pont local quand le rapport ne doit plus apparaître dans l’onglet Rapports :
+ * - dossier plus `done` (réouverture terrain) ;
+ * - facturé ;
+ * - ou médias déjà synchronisés sur Firestore (file « done » suffit).
+ */
 export function shouldDismissBridgedTerrainReport(
   intervention:
     | Pick<Intervention, "status" | "completionPhotoUrls" | "completionPhotos" | "completionSignatureUrl">
@@ -45,7 +50,7 @@ export function shouldDismissBridgedTerrainReport(
 ): boolean {
   if (!intervention) return false;
   if (intervention.status === "invoiced") return true;
-  if (intervention.status !== "done") return false;
+  if (intervention.status !== "done") return true;
   const photos = completionPhotoUrlsFromIntervention(intervention);
   const hasSig =
     typeof intervention.completionSignatureUrl === "string" &&

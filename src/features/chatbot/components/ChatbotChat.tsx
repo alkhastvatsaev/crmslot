@@ -17,6 +17,7 @@ import {
   type ChatbotQuickAction,
 } from "@/features/chatbot/chatbot-quick-actions";
 import ChatbotQuickActions from "@/features/chatbot/components/ChatbotQuickActions";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -139,6 +140,7 @@ function Bubble({
 }
 
 export default function ChatbotChat({ className }: { className?: string }) {
+  const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const openIntervention = (id: string) =>
@@ -177,7 +179,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
       >
         {!companyId ? (
           <p className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900">
-            Connectez-vous avec une société active pour utiliser le Chatbot.
+            {t("chatbot.no_company")}
           </p>
         ) : null}
 
@@ -249,7 +251,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
         {streaming && !streamingText && !activeTool ? (
           <motion.div className="flex items-center gap-2 text-[12px] text-slate-500" data-testid="chatbot-typing">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Le Chatbot réfléchit…
+            {t("chatbot.thinking")}
           </motion.div>
         ) : null}
 
@@ -267,11 +269,11 @@ export default function ChatbotChat({ className }: { className?: string }) {
           >
             <p className="mb-2 flex items-center gap-2 text-[12px] font-bold uppercase tracking-wide text-amber-900">
               <ShieldCheck className="h-4 w-4" />
-              Confirmation requise
+              {t("chatbot.confirm_required")}
             </p>
             <p className="mb-3 text-[13px] text-amber-950">{pendingTool.summary}</p>
             <p className="mb-3 text-[11px] text-amber-800">
-              Cliquez <strong>Confirmer</strong> ou tapez <strong>oui</strong> dans le champ ci-dessous.
+              {t("chatbot.confirm_hint")}
             </p>
             <motion.div className="flex gap-2">
               <button
@@ -280,7 +282,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
                 onClick={() => void confirmPendingTool()}
                 className="flex-1 rounded-[12px] bg-amber-700 py-2 text-[13px] font-bold text-white hover:bg-amber-800"
               >
-                Confirmer
+                {t("chatbot.confirm")}
               </button>
               <button
                 type="button"
@@ -288,7 +290,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
                 onClick={cancelPendingTool}
                 className="rounded-[12px] border border-amber-300 bg-white px-4 py-2 text-[13px] font-semibold text-amber-900"
               >
-                Annuler
+                {t("common.cancel")}
               </button>
             </motion.div>
           </motion.div>

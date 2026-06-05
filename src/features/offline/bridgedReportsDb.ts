@@ -37,3 +37,14 @@ export async function bridgedReportsGetAll(): Promise<BridgedTechnicianReport[]>
   return db.getAll(STORE);
 }
 
+/** Retire tous les rapports pontés pour un dossier (réouverture / remplacement). */
+export async function bridgedReportsDeleteForIntervention(interventionId: string): Promise<void> {
+  const db = await getDb();
+  const all = await db.getAll(STORE);
+  await Promise.all(
+    all
+      .filter((r) => r.interventionId === interventionId)
+      .map((r) => db.delete(STORE, r.localId)),
+  );
+}
+

@@ -31,6 +31,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { missionStableKey } from "@/features/map/missionStableKey";
+import { MAP_DEMO_TECHNICIAN_MARKERS } from "@/features/map/mapDemoTechnicianMarkers";
+import { createTechnicianVanMarkerElement } from "@/features/map/mapTechnicianMarkerDom";
 import { useMapArchivedMissions } from "@/features/map/useMapArchivedMissions";
 import {
   DASHBOARD_DESKTOP_COL_CLASS,
@@ -400,8 +402,16 @@ export default function MapboxView() {
       markersRef.current[markerKey] = marker;
     });
 
-
-  }, [visibleMissions, mapReady]);
+    if (isDispatchMap) {
+      for (const tech of MAP_DEMO_TECHNICIAN_MARKERS) {
+        const el = createTechnicianVanMarkerElement(tech.name);
+        const marker = new mapboxgl.Marker({ element: el, anchor: "bottom" })
+          .setLngLat(tech.coordinates)
+          .addTo(map);
+        markersRef.current[`technician-${tech.id}`] = marker;
+      }
+    }
+  }, [visibleMissions, mapReady, isDispatchMap]);
 
   const dashboardPageIndex = pager?.pageIndex ?? 0;
 

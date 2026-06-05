@@ -47,6 +47,18 @@ describe("interventionWorkflow", () => {
     expect(patch.technicianAcceptedAt).toBe("2026-05-17T10:00:00.000Z");
   });
 
+  it("allows technician to reopen done → in_progress", () => {
+    expect(canTransitionInterventionStatus("done", "in_progress")).toBe(true);
+    expect(
+      actorMayTransition({ uid: "t1", role: "technician" }, "done", "in_progress"),
+    ).toBe(true);
+    const owner = resolveOwnerAfterTransition("in_progress", {
+      assignedTechnicianUid: "tech-1",
+      createdByUid: "creator-1",
+    });
+    expect(owner).toEqual({ currentOwnerUid: "tech-1", currentOwnerRole: "technician" });
+  });
+
   it("restricts technician transitions", () => {
     expect(
       actorMayTransition(

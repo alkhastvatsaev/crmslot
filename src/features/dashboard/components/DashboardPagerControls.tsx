@@ -2,6 +2,10 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DASHBOARD_DESKTOP_PAGER_CONTROLS_CLASS } from "@/core/ui/dashboardDesktopLayout";
+import {
+  getNextDashboardCarouselNavIndex,
+  getPrevDashboardCarouselNavIndex,
+} from "@/features/dashboard/dashboardCarouselRegistry";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 const iconClass = "h-9 w-9 shrink-0";
@@ -13,9 +17,9 @@ export default function DashboardPagerControls() {
   const pager = useDashboardPagerOptional();
   if (!pager) return null;
 
-  const { pageIndex, pageCount, goNext, goPrev } = pager;
-  const atStart = pageIndex === 0;
-  const atEnd = pageIndex >= pageCount - 1;
+  const { pageIndex, goNext, goPrev } = pager;
+  const atStart = getPrevDashboardCarouselNavIndex(pageIndex) === pageIndex;
+  const atEnd = getNextDashboardCarouselNavIndex(pageIndex) === pageIndex;
   const human = pageIndex + 1;
 
   return (
@@ -41,9 +45,7 @@ export default function DashboardPagerControls() {
         aria-label={
           atEnd
             ? "Déjà sur la dernière page"
-            : pageCount === 2
-              ? "Aller à la deuxième page"
-              : `Aller à la page ${human + 1}`
+            : `Aller à la page ${getNextDashboardCarouselNavIndex(pageIndex) + 1}`
         }
         disabled={atEnd}
         onClick={goNext}

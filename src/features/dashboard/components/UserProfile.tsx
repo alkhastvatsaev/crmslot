@@ -7,6 +7,7 @@ import { useTranslation } from '@/core/i18n/I18nContext';
 import {
   DASHBOARD_CAROUSEL_PAGES,
   clampDashboardCarouselPageIndex,
+  stepDashboardCarouselNavIndex,
 } from '@/features/dashboard/dashboardCarouselRegistry';
 import {
   dashboardHeaderPanelShellClass,
@@ -39,16 +40,14 @@ export default function UserProfile() {
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const max = pager ? Math.min(pager.pageCount, profiles.length) - 1 : profiles.length - 1;
-    const newIndex = currentIndex >= max ? 0 : currentIndex + 1;
+    const newIndex = stepDashboardCarouselNavIndex(currentIndex, 'next');
     setCurrentIndex(newIndex);
     pager?.setPageIndex(newIndex);
   };
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const max = pager ? Math.min(pager.pageCount, profiles.length) - 1 : profiles.length - 1;
-    const newIndex = currentIndex <= 0 ? max : currentIndex - 1;
+    const newIndex = stepDashboardCarouselNavIndex(currentIndex, 'prev');
     setCurrentIndex(newIndex);
     pager?.setPageIndex(newIndex);
   };

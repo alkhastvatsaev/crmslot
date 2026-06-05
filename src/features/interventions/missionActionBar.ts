@@ -81,7 +81,8 @@ export function resolveMissionActionBar(
 
   return {
     primary,
-    showQuickRow: true,
+    /** Contacts dans la fiche mission ; pas de rangée d’actions en bas. */
+    showQuickRow: false,
     canMaterials,
     canFinish,
   };

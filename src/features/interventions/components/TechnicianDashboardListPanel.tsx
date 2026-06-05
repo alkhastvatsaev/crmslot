@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ChevronDown, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { fieldMissionStatusDotClass } from "@/core/ui/fieldMissionStatus";
 import { motion } from "framer-motion";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
@@ -17,12 +19,18 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import TechnicianAssignmentOfferCard from "@/features/interventions/components/TechnicianAssignmentOfferCard";
+import {
+  canTechnicianReopenCompletedIntervention,
+  reopenTechnicianCompletedIntervention,
+  TECHNICIAN_REOPEN_I18N_KEY,
+} from "@/features/interventions/technicianReopenCompletedIntervention";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 import { cn } from "@/lib/utils";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 
 function CaseCard({
   iv,
@@ -30,12 +38,18 @@ function CaseCard({
   isSelected,
   onOpen,
   isArchived,
+  canReopen,
+  reopenBusy,
+  onReopen,
 }: {
   iv: Intervention;
   index: number;
   isSelected: boolean;
   onOpen: () => void;
   isArchived?: boolean;
+  canReopen?: boolean;
+  reopenBusy?: boolean;
+  onReopen?: () => void;
 }) {
   const { t } = useTranslation();
   let firstName = iv.clientFirstName;
@@ -63,29 +77,46 @@ function CaseCard({
       : timeLabelRaw;
 
   return (
-    <motion.button
-      initial={{ opacity: 0, x: -6 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.15, delay: index * 0.03 }}
-      type="button"
-      data-testid={`technician-case-${iv.id}`}
-      aria-label={`${t("technician_hub.dashboard.list.dossier_aria")} ${iv.id} — ${displayLabel}`}
-      onClick={onOpen}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-2xl border px-3 py-3.5 text-left transition active:scale-[0.98]",
-        isArchived && "opacity-60",
-        isSelected
-          ? "border-neutral-900 bg-neutral-50"
-          : "border-neutral-200/80 bg-white hover:bg-neutral-50",
-      )}
-    >
-      <span className="w-11 shrink-0 text-[13px] font-bold tabular-nums text-neutral-600">{timeLabel}</span>
-      <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-neutral-900">{displayLabel}</span>
-      <span
-        className={cn("h-2.5 w-2.5 shrink-0 rounded-full", fieldMissionStatusDotClass(iv.status))}
-        aria-hidden
-      />
-    </motion.button>
+    <div className="flex flex-col gap-1">
+      <motion.button
+        initial={{ opacity: 0, x: -6 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.15, delay: index * 0.03 }}
+        type="button"
+        data-testid={`technician-case-${iv.id}`}
+        aria-label={`${t("technician_hub.dashboard.list.dossier_aria")} ${iv.id} — ${displayLabel}`}
+        onClick={onOpen}
+        className={cn(
+          "flex w-full items-center gap-3 rounded-2xl border px-3 py-3.5 text-left transition active:scale-[0.98]",
+          isArchived && "opacity-60",
+          isSelected
+            ? "border-neutral-900 bg-neutral-50"
+            : "border-neutral-200/80 bg-white hover:bg-neutral-50",
+        )}
+      >
+        <span className="w-11 shrink-0 text-[13px] font-bold tabular-nums text-neutral-600">{timeLabel}</span>
+        <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-neutral-900">{displayLabel}</span>
+        <span
+          className={cn("h-2.5 w-2.5 shrink-0 rounded-full", fieldMissionStatusDotClass(iv.status))}
+          aria-hidden
+        />
+      </motion.button>
+      {canReopen && onReopen ? (
+        <button
+          type="button"
+          data-testid={`technician-case-reopen-${iv.id}`}
+          disabled={reopenBusy}
+          onClick={(e) => {
+            e.stopPropagation();
+            onReopen();
+          }}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-neutral-300 bg-white px-2 py-2 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {reopenBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
+          {t("technician_hub.dashboard.list.reopen_mission")}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -97,10 +128,50 @@ export default function TechnicianDashboardListPanel({
   onSelect: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
   const { interventions, loading, error, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
   /** Replié par défaut, comme l’archive « Rapports » (page 1 / back-office). */
   const [missionsArchiveExpanded, setMissionsArchiveExpanded] = useState(false);
+  const [reopeningId, setReopeningId] = useState<string | null>(null);
+
+  const handleReopenArchived = async (iv: Intervention) => {
+    const technicianUid = (firebaseUid ?? "").trim();
+    const gate = canTechnicianReopenCompletedIntervention(iv, technicianUid);
+    if (!gate.allowed) {
+      toast.error(String(t(TECHNICIAN_REOPEN_I18N_KEY[gate.reason])));
+      return;
+    }
+    if (!window.confirm(String(t("technician_hub.dashboard.list.reopen_confirm")))) return;
+
+    setReopeningId(iv.id);
+    try {
+      await reopenTechnicianCompletedIntervention({ iv, technicianUid, queryClient });
+      terrainBridge?.withdrawReportsForIntervention(iv.id);
+      toast.success(String(t("technician_hub.dashboard.list.reopen_success")));
+      onSelect(iv.id);
+    } catch (err) {
+      console.error("reopenTechnicianCompletedIntervention", err);
+      const msg = err instanceof Error ? err.message : "";
+      const blocked = msg.match(/^REOPEN_BLOCKED:(\w+)$/);
+      if (blocked?.[1] && blocked[1] in TECHNICIAN_REOPEN_I18N_KEY) {
+        toast.error(
+          String(
+            t(
+              TECHNICIAN_REOPEN_I18N_KEY[
+                blocked[1] as keyof typeof TECHNICIAN_REOPEN_I18N_KEY
+              ],
+            ),
+          ),
+        );
+      } else {
+        toast.error(String(t("technician_hub.dashboard.list.reopen_failed")));
+      }
+    } finally {
+      setReopeningId(null);
+    }
+  };
 
   const filteredSorted = useMemo(() => {
     const rows = interventions.filter((iv) =>
@@ -248,6 +319,11 @@ export default function TechnicianDashboardListPanel({
                       isSelected={selectedCaseId === iv.id}
                       onOpen={() => onSelect(iv.id)}
                       isArchived
+                      canReopen={
+                        canTechnicianReopenCompletedIntervention(iv, firebaseUid).allowed
+                      }
+                      reopenBusy={reopeningId === iv.id}
+                      onReopen={() => void handleReopenArchived(iv)}
                     />
                   ))}
                 </div>
