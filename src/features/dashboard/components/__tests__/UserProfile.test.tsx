@@ -11,10 +11,10 @@ describe("UserProfile", () => {
       "IVANA",
       "SOCIÉTÉ BX",
       "MANSOUR",
-      "GMAIL",
       "MATÉRIEL",
       "HISTORIQUE",
       "FACTURATION",
+      "GMAIL",
     ]);
   });
 
@@ -25,10 +25,10 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("profile-name")).toHaveTextContent("GMAIL");
   });
 
-  it("syncs profile when pager page changes via next button", () => {
+  it("skips spotlight-only pages when using carousel next", () => {
     renderWithPager(<UserProfile />, DASHBOARD_CAROUSEL_PAGE_COUNT, { initialPageIndex: 0 });
     expect(screen.getByTestId("profile-name")).toHaveTextContent("IVANA");
     fireEvent.click(screen.getByTestId("next-profile-btn"));
-    expect(screen.getByTestId("profile-name")).toHaveTextContent("SOCIÉTÉ BX");
+    expect(screen.getByTestId("profile-name")).toHaveTextContent("MATÉRIEL");
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -19,6 +19,7 @@ import { useCrmNewEventHighlight } from "../hooks/useCrmNewEventHighlight";
 import type { CrmActivityEvent } from "../crmActivityTypes";
 import CrmHistoryAgentPanel from "./CrmHistoryAgentPanel";
 import CrmHistoryCenterFeed from "./CrmHistoryCenterFeed";
+import CrmHistoryEventDetailPanel from "./CrmHistoryEventDetailPanel";
 
 type Props = { slotIndex?: number };
 
@@ -37,6 +38,10 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const pageActive = pager == null || pager.pageIndex === slotIndex;
 
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(companyId, "all", "all", "");
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+
+  const selectedEvent =
+    events.find((event) => event.id === selectedEventId) ?? null;
 
   const newEventIds = useCrmNewEventHighlight(events, { enabled: pageActive });
   const prevHighlightSizeRef = useRef(0);
@@ -58,7 +63,11 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
     });
   }, [newEventIds.size, pageActive, t]);
 
-  const handleEventClick = useCallback(
+  const handleEventSelect = useCallback((event: CrmActivityEvent) => {
+    setSelectedEventId(event.id);
+  }, []);
+
+  const handleOpenIntervention = useCallback(
     (event: CrmActivityEvent) => {
       if (!event.interventionId) return;
       inboxIntent?.setPendingInboxId(event.interventionId);
@@ -98,13 +107,21 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
             live={pageActive}
             newEventIds={newEventIds}
             feedError={feedError}
-            onEventClick={handleEventClick}
+            selectedEventId={selectedEventId}
+            onEventSelect={handleEventSelect}
           />
         </section>
       }
       centerPadding={false}
       rightPadding={false}
-      right={<section className={railShell} />}
+      right={
+        <section className={railShell}>
+          <CrmHistoryEventDetailPanel
+            event={selectedEvent}
+            onOpenIntervention={handleOpenIntervention}
+          />
+        </section>
+      }
     />
   );
 }

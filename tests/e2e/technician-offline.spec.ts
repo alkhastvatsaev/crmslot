@@ -6,13 +6,8 @@ test.describe("Technician hub offline panel", () => {
 
     await expect(page.locator('[data-testid="dashboard-pager-root"]')).toBeVisible();
 
-    const next = page.locator('[data-testid="dashboard-pager-next"]');
-    await next.click();
-    await expect(page.locator('[data-testid="company-hub-rail-demande"]')).toBeVisible({
-      timeout: 20_000,
-    });
-
-    await next.click();
+    await page.locator('[data-testid="spotlight-trigger"]').click();
+    await page.locator('[data-testid="nav-item-2"]').click();
     await expect(page.locator('[data-testid="dashboard-pager-slot-2-panel-center"]')).toBeVisible({
       timeout: 20_000,
     });

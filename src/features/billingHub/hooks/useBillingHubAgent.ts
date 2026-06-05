@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
 import { useHubAgent } from "@/features/hubAgents/useHubAgent";
@@ -25,13 +26,20 @@ export function useBillingHubAgent({
   enabled = true,
 }: Options) {
   const { t } = useTranslation();
+  const billingIntent = useBillingHubIntentOptional();
 
   const billingSnapshot = useMemo(
     () => buildBillingHubSnapshot(interventions, metrics),
     [interventions, metrics],
   );
 
-  const onStreamEvent = useHubAgentStreamHandler({ documentPreviewTarget: "right" });
+  const focusInterventionId = billingIntent?.selectedInterventionId ?? null;
+
+  const onStreamEvent = useHubAgentStreamHandler({
+    documentPreviewTarget: "right",
+    billingDocumentOnBillingPage: true,
+    companyId,
+  });
 
   const offTopicSuggestions = useMemo(
     () => [
@@ -56,6 +64,7 @@ export function useBillingHubAgent({
       role,
       messages,
       billingSnapshot,
+      focusInterventionId,
     }),
     onStreamEvent,
   });

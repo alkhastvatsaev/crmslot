@@ -9,7 +9,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { bridgedReportsDelete, bridgedReportsGetAll, bridgedReportsPut } from "@/features/offline/bridgedReportsDb";
+import {
+  bridgedReportsDelete,
+  bridgedReportsDeleteForIntervention,
+  bridgedReportsGetAll,
+  bridgedReportsPut,
+} from "@/features/offline/bridgedReportsDb";
 
 const MAX_BRIDGE_REPORTS = 20;
 
@@ -31,6 +36,8 @@ export type TechnicianBackofficeReportBridgeApi = {
     billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
   }) => void;
   dismissReport: (localId: string) => void;
+  /** Réouverture terrain : retire le rapport de l’onglet Rapports IVANA. */
+  withdrawReportsForIntervention: (interventionId: string) => void;
 };
 
 const TechnicianBackofficeReportBridgeContext = createContext<TechnicianBackofficeReportBridgeApi | null>(null);
@@ -66,6 +73,11 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
     };
   }, []);
 
+  const withdrawReportsForIntervention = useCallback((interventionId: string) => {
+    void bridgedReportsDeleteForIntervention(interventionId);
+    setReports((prev) => prev.filter((r) => r.interventionId !== interventionId));
+  }, []);
+
   const pushReport = useCallback(
     (p: { interventionId: string; photoDataUrls: string[]; signaturePngDataUrl: string; billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[] }) => {
       const localId =
@@ -73,11 +85,13 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
           ? crypto.randomUUID()
           : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const record: BridgedTechnicianReport = { ...p, localId, receivedAt: Date.now() };
-      void bridgedReportsPut(record);
+
+      void bridgedReportsDeleteForIntervention(p.interventionId).then(() => bridgedReportsPut(record));
 
       setReports((prev) => {
-        const next = [record, ...prev].slice(0, MAX_BRIDGE_REPORTS);
-        const removed = prev.slice(MAX_BRIDGE_REPORTS - 1);
+        const withoutDup = prev.filter((r) => r.interventionId !== p.interventionId);
+        const next = [record, ...withoutDup].slice(0, MAX_BRIDGE_REPORTS);
+        const removed = withoutDup.slice(MAX_BRIDGE_REPORTS - 1);
         removed.forEach((r) => void bridgedReportsDelete(r.localId));
         return next;
       });
@@ -91,8 +105,8 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
   }, []);
 
   const value = useMemo(
-    () => ({ reports, pushReport, dismissReport }),
-    [reports, pushReport, dismissReport],
+    () => ({ reports, pushReport, dismissReport, withdrawReportsForIntervention }),
+    [reports, pushReport, dismissReport, withdrawReportsForIntervention],
   );
 
   return (

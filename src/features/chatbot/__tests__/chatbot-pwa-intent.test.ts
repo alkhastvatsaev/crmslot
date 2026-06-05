@@ -123,6 +123,15 @@ describe("chatbot-pwa-intent", () => {
       expect(resolveChatbotPwaIntent("facture inconnu à 500€", null)).toBeNull();
     });
 
+    it("resolveChatbotPwaIntent create-invoice phrase opens invoice PDF", () => {
+      const intent = resolveChatbotPwaIntent("Fait une facture pour monsieur Vatsaev", snapshot);
+      expect(intent?.kind).toBe("document_preview");
+      if (intent?.kind === "document_preview") {
+        expect(intent.documentType).toBe("invoice");
+        expect(intent.intervention.interventionId).toBe("int-vatsaev");
+      }
+    });
+
     it("resolveChatbotPwaIntent handles line index", () => {
       const intent = resolveChatbotPwaIntent("met la ligne 2 a 500€", snapshot, { focusInterventionId: "int-vatsaev" });
       expect(intent?.kind).toBe("billing_patch");

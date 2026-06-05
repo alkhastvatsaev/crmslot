@@ -22,10 +22,13 @@ export default function DashboardGalaxyLayer() {
   else if (pageIndex === CRM_HISTORY_SLOT_INDEX) composer = <CrmHistoryGalaxyComposer />;
   else if (pageIndex === BILLING_HUB_SLOT_INDEX) composer = <BillingHubGalaxyComposer />;
 
+  /** Carte (page 0) : dock Galaxy + transcription. Hub Matériel/CRM/Facturation : composer dédié sans doublon. */
+  const hideMapGalaxyDockStrip = composer != null;
+
   return (
     <>
       <MapGalaxyTranscriptionLayer
-        hideDockStrip
+        hideDockStrip={hideMapGalaxyDockStrip}
         transcriptionArmed={transcriptionArmed}
         onUserPressPlay={armTranscription}
         onInterventionCreated={emitInterventionCreated}

@@ -378,13 +378,11 @@ export default function IvanaClientChatPanel({
   const bubbleShellClass = (m: IvanaChatMessage) =>
     cn(
       "max-w-[92%] rounded-[20px] px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
-      m.role === "user"
+      m.role === "user" || m.role === "client"
         ? "rounded-br-md bg-blue-600 text-white"
-        : m.role === "client"
-          ? "rounded-br-md border border-emerald-200/90 bg-emerald-50 text-slate-900"
-          : m.role === "staff"
-            ? "rounded-bl-md border border-indigo-200/90 bg-indigo-50 text-slate-900"
-            : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800",
+        : m.role === "staff"
+          ? "rounded-bl-md border border-blue-200/90 bg-blue-50 text-slate-900"
+          : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800",
     );
 
   return (
@@ -405,12 +403,12 @@ export default function IvanaClientChatPanel({
           >
             <div className={bubbleShellClass(m)}>
               {m.role === "client" ? (
-                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-emerald-800/80">
+                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-blue-100/90">
                   {t("chat.role_client")}
                 </span>
               ) : null}
               {m.role === "staff" ? (
-                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-indigo-800/80">
+                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-blue-800/80">
                   {t("chat.role_staff")}
                 </span>
               ) : null}
@@ -422,11 +420,9 @@ export default function IvanaClientChatPanel({
                       key={`${m.id}-img-${idx}`}
                       className={cn(
                         "aspect-square overflow-hidden rounded-[12px] bg-black/5",
-                        m.role === "user"
+                        m.role === "user" || m.role === "client"
                           ? "border border-white/40"
-                          : m.role === "client"
-                            ? "border border-emerald-200/80"
-                            : "border border-black/10",
+                          : "border border-black/10",
                       )}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -500,7 +496,7 @@ export default function IvanaClientChatPanel({
               attachImagesBlocked
                 ? "cursor-not-allowed opacity-35"
                 : "hover:bg-slate-900/5 hover:text-slate-700",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
               "active:scale-[0.98]",
             )}
             aria-label={t("chat.attach_aria")}
@@ -510,7 +506,7 @@ export default function IvanaClientChatPanel({
           <label htmlFor="ivana-chat-input" className="sr-only">
             {t("chat.input_label")}
           </label>
-          <div className="flex min-w-0 flex-1 items-center rounded-[18px] border border-slate-200 bg-white shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20">
+          <div className="flex min-w-0 flex-1 items-center rounded-[18px] border border-slate-200 bg-white shadow-sm focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/20">
             <textarea
               id="ivana-chat-input"
               data-testid="ivana-chat-input"
@@ -535,11 +531,11 @@ export default function IvanaClientChatPanel({
             disabled={(!draft.trim() && pendingImages.length === 0) || ivanaTyping}
             className={cn(
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
               "active:scale-[0.98]",
               (!draft.trim() && pendingImages.length === 0) || ivanaTyping
                 ? "cursor-not-allowed text-slate-400 opacity-40"
-                : "text-indigo-600 hover:bg-indigo-500/10 hover:text-indigo-700",
+                : "text-blue-600 hover:bg-blue-500/10 hover:text-blue-700",
             )}
             aria-label={t("chat.send_aria")}
           >

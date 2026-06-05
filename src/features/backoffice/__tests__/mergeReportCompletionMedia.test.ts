@@ -86,6 +86,16 @@ describe("shouldDismissBridgedTerrainReport", () => {
     ).toBe(false);
   });
 
+  it("dismisses when mission was reopened (no longer done)", () => {
+    expect(
+      shouldDismissBridgedTerrainReport({
+        status: "in_progress",
+        completionPhotoUrls: ["https://x/1.jpg"],
+        completionSignatureUrl: "https://x/s.png",
+      }),
+    ).toBe(true);
+  });
+
   it("dismisses done when server has photos and signature", () => {
     expect(
       shouldDismissBridgedTerrainReport({

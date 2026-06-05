@@ -143,7 +143,9 @@ function BackOfficeInboxInterventionRow({
           ? "backoffice-report-archived-row"
           : variant === "request"
             ? `backoffice-inbox-request-row-${item.id}`
-            : undefined
+            : variant === "report-active"
+              ? `backoffice-inbox-report-row-${item.id}`
+              : undefined
       }
       onClick={() => onSelect(item.id)}
       initial={{ opacity: 0, scale: 0.98 }}
@@ -522,23 +524,28 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   };
 
   const handleVerify = async (id: string) => {
-    if (!firestore) {
-      toast.error(t("common.error"), { description: t("backoffice.toasts.firestore_unavailable") });
-      return;
-    }
     try {
       const row = interventions.find((x) => x.id === id);
       if (!row) return;
       const actorUid = auth?.currentUser?.uid?.trim();
       if (!actorUid) return;
-      await transitionInterventionStatus({
-        db: firestore,
-        interventionId: id,
-        iv: row,
-        toStatus: "invoiced",
-        actor: dispatcherTransitionActor(actorUid),
-        note: "Rapport validé — facturation",
-      });
+      const res = await fetchWithAuth(
+        `/api/interventions/${encodeURIComponent(id)}/validate-report`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sendEmail: true }),
+        },
+      );
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        emailSent?: boolean;
+        emailError?: string;
+      };
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || t("common.try_again"));
+      }
       await logCrmInterventionAction({
         kind: "intervention_report_validated",
         iv: row,
@@ -546,9 +553,17 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         actorRole: "dispatcher",
         statusBefore: row.status,
         statusAfter: "invoiced",
-        note: "Validation rapport IVANA",
+        note: data.emailSent
+          ? "Validation rapport IVANA — facture PDF + e-mail client"
+          : "Validation rapport IVANA — facture PDF",
       });
-      toast.success(t("backoffice.toasts.report_verified"));
+      if (data.emailError) {
+        toast.message(String(t("backoffice.toasts.report_verified")), {
+          description: data.emailError,
+        });
+      } else {
+        toast.success(t("backoffice.toasts.report_verified"));
+      }
       setSelectedItemId(null);
       if (terrainBridge) {
         const lids = terrainBridge.reports.filter((r) => r.interventionId === id).map((r) => r.localId);
@@ -646,6 +661,21 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   }, [bridgedTerrainReports, interventions, terrainBridge]);
 
   useEffect(() => {
+    if (!selectedTerrainLocalId) return;
+    if (!bridgedTerrainReports.some((r) => r.localId === selectedTerrainLocalId)) {
+      setSelectedTerrainLocalId(null);
+    }
+  }, [selectedTerrainLocalId, bridgedTerrainReports]);
+
+  useEffect(() => {
+    if (!selectedItemId || activeTab !== "reports") return;
+    const iv = interventions.find((x) => x.id === selectedItemId);
+    if (iv && iv.status !== "done") {
+      setSelectedItemId(null);
+    }
+  }, [selectedItemId, interventions, activeTab]);
+
+  useEffect(() => {
     if (!isTenant) return;
     const openChat = () => setActiveTab("chat");
     window.addEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
@@ -717,6 +747,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         </button>
         <button
           type="button"
+          data-testid="backoffice-inbox-tab-reports"
           onClick={() => setActiveTab("reports")}
           className={cn(
             "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
@@ -738,7 +769,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
           className={cn(
             "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
             activeTab === "chat"
-              ? "bg-white text-indigo-600 shadow-sm"
+              ? "bg-white text-blue-600 shadow-sm"
               : "text-slate-500 hover:bg-slate-300/30",
           )}
         >
@@ -1328,6 +1359,8 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                     {t("common.delete")}
                   </button>
                   <button
+                    type="button"
+                    data-testid="backoffice-inbox-verify-report"
                     disabled={selectedItem.status === "invoiced"}
                     onClick={() => handleVerify(selectedItem.id)}
                     className={cn(
@@ -1506,6 +1539,36 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                         <img src={r.signaturePngDataUrl} alt={t("backoffice.inbox.signature_alt")} className="max-h-32 object-contain" />
                       </div>
                     </div>
+
+                    {Array.isArray(iv?.billingLines) && iv.billingLines.length > 0 ? (
+                      <div className="space-y-3" data-testid="backoffice-terrain-draft-billing">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                          {t("backoffice.inbox.draft_billing")}
+                        </p>
+                        <ul className="rounded-[20px] border border-slate-100 bg-slate-50/80 divide-y divide-slate-100">
+                          {iv.billingLines.map((line, li) => (
+                            <li
+                              key={`${r.localId}-bill-${li}`}
+                              className="flex justify-between gap-3 px-4 py-3 text-[12px] font-semibold text-slate-800"
+                            >
+                              <span className="min-w-0 flex-1">
+                                {line.description}
+                                {line.quantity > 1 ? ` × ${line.quantity}` : ""}
+                              </span>
+                              <span className="tabular-nums text-slate-600">
+                                {((Math.round(line.unitPriceCents) * (line.quantity || 1)) / 100).toFixed(2)} €
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        {typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0 ? (
+                          <p className="text-[12px] font-bold text-slate-700 text-right">
+                            {t("backoffice.inbox.draft_billing_total")}{" "}
+                            {(iv.invoiceAmountCents / 100).toFixed(2)} € HT
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md flex gap-3">

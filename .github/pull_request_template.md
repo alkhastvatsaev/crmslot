@@ -27,9 +27,18 @@ Si cette PR touche `src/features/chatbot/**` ou `src/app/api/ai/chatbot/**` :
 
 Voir [`docs/TESTING.md`](../docs/TESTING.md).
 
+### Interventions / facturation
+
+Si cette PR touche `src/features/interventions/**` ou `src/app/api/interventions/**` :
+
+- [ ] `npm run test:interventions` (boucle rapide)
+- [ ] Logique serveur dans `src/features/interventions/server/` (routes = wrappers)
+- [ ] Nouveau flux facturation → tests `server/__tests__/` + `draftInvoiceBilling` si applicable
+
 ## E2E (si parcours UI critique)
 
 - [ ] `npm run test:e2e` (serveur `localhost:3000` requis)
+- [ ] Facturation / IVANA : `npm run test:e2e:invoice`
 - [ ] Non concerné
 
 ## Captures / notes

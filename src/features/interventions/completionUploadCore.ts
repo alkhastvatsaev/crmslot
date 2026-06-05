@@ -1,5 +1,6 @@
-import { doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { auth, firestore, storage } from "@/core/config/firebase";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { dataUrlToBlob } from "@/features/interventions/finishJobCapture";
@@ -18,27 +19,36 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   ]);
 }
 
-/** Upload Storage + mise à jour Firestore (réseau requis pour Storage). */
-export async function performCompletionUpload(params: {
+type CompletionUploadParams = {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
-}): Promise<void> {
-  const { interventionId, photoDataUrls, signaturePngDataUrl, billingLines } = params;
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
+};
+
+async function uploadCompletionAssets(
+  params: CompletionUploadParams,
+): Promise<{ photoUrls: string[]; sigUrl: string }> {
+  const { interventionId, photoDataUrls, signaturePngDataUrl } = params;
   const st = storage;
-  const fs = firestore;
   const user = auth?.currentUser;
-  if (!st || !fs || !user) {
+  if (!st || !user) {
     throw new Error("Firebase indisponible");
   }
   const uid = user.uid;
   const basePath = `interventions/${interventionId}/completion`;
   const ts = Date.now();
 
-  /** Uploads en parallèle, chaque fichier borné pour éviter un blocage infini (SDK sans rejet). */
   const photoUrls: string[] = await Promise.all(
     photoDataUrls.map(async (dataUrl, i) => {
+      if (/^https?:\/\//i.test(dataUrl)) {
+        return dataUrl;
+      }
       const blob = dataUrlToBlob(dataUrl);
       const r = ref(st, `${basePath}/${uid}_${ts}_${i}.jpg`);
       return withTimeout(
@@ -63,10 +73,76 @@ export async function performCompletionUpload(params: {
     "Envoi signature",
   );
 
+  return { photoUrls, sigUrl };
+}
+
+/** Met à jour photos / signature / facturation sans changer le statut `done`. */
+export async function performCompletionAmend(params: CompletionUploadParams): Promise<void> {
+  const { interventionId, billingLines } = params;
+  const fs = firestore;
+  const user = auth?.currentUser;
+  if (!fs || !user) {
+    throw new Error("Firebase indisponible");
+  }
+
+  const { photoUrls, sigUrl } = await uploadCompletionAssets(params);
+
+  const patch = {
+    completionPhotoUrls: photoUrls,
+    completionSignatureUrl: sigUrl,
+    billingLines: billingLines ?? undefined,
+    statusUpdatedAt: devUiPreviewEnabled ? new Date().toISOString() : serverTimestamp(),
+  };
+
+  if (devUiPreviewEnabled) {
+    const res = await fetchWithAuth(
+      `/api/interventions/${encodeURIComponent(interventionId)}/completion-amend`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      },
+    );
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+    if (!res.ok) {
+      throw new Error(data.error || "Mise à jour du rapport refusée");
+    }
+    return;
+  }
+
+  await withTimeout(
+    updateDoc(doc(fs, "interventions", interventionId), patch),
+    FIRESTORE_UPDATE_TIMEOUT_MS,
+    "Mise à jour du rapport",
+  );
+}
+
+/** Clôture initiale (`→ done`) ou amendement si le dossier est déjà `done`. */
+export async function performCompletionUpload(params: CompletionUploadParams): Promise<void> {
+  const { interventionId, photoDataUrls, signaturePngDataUrl, billingLines } = params;
+  const fs = firestore;
+  const user = auth?.currentUser;
+  if (!fs || !user) {
+    throw new Error("Firebase indisponible");
+  }
+
   const snap = await getDoc(doc(fs, "interventions", interventionId));
   const data = snap.data() as Intervention | undefined;
   const fromStatus = data?.status ?? "in_progress";
 
+  if (fromStatus === "done") {
+    await performCompletionAmend(params);
+    return;
+  }
+
+  const { photoUrls, sigUrl } = await uploadCompletionAssets({
+    interventionId,
+    photoDataUrls,
+    signaturePngDataUrl,
+    billingLines,
+  });
+
+  const uid = user.uid;
   const completedAt = devUiPreviewEnabled ? new Date().toISOString() : serverTimestamp();
 
   await withTimeout(
@@ -84,7 +160,6 @@ export async function performCompletionUpload(params: {
         completionSignatureUrl: sigUrl,
         completedAt,
         completedByUid: uid,
-        billingLines: billingLines ?? undefined,
       },
       writeInboxAlerts: false,
     }),

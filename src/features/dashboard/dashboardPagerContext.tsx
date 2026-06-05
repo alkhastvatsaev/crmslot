@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { stepDashboardCarouselNavIndex } from "@/features/dashboard/dashboardCarouselRegistry";
 
 export type DashboardPagerApi = {
   pageIndex: number;
@@ -40,11 +41,11 @@ export function DashboardPagerProvider({ children, pageCount, initialPageIndex =
   );
 
   const goNext = useCallback(() => {
-    setPageIndexState((p) => Math.min(p + 1, safeCount - 1));
-  }, [safeCount]);
+    setPageIndexState((p) => stepDashboardCarouselNavIndex(p, "next"));
+  }, []);
 
   const goPrev = useCallback(() => {
-    setPageIndexState((p) => Math.max(p - 1, 0));
+    setPageIndexState((p) => stepDashboardCarouselNavIndex(p, "prev"));
   }, []);
 
   const value = useMemo(

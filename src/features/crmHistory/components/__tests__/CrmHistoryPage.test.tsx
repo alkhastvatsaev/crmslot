@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { renderWithPager } from "@/test-utils/renderWithPager";
 import CrmHistoryPage from "@/features/crmHistory/components/CrmHistoryPage";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
@@ -48,6 +48,24 @@ jest.mock("@/features/crmHistory/hooks/useCompanyIvanaChatFeed", () => ({
   useCompanyIvanaChatFeed: () => ({ messages: [], loading: false }),
 }));
 
+jest.mock("@/features/crmHistory/hooks/useCrmActivityFeed", () => ({
+  useCrmActivityFeed: () => ({
+    events: [
+      {
+        id: "feed-e1",
+        type: "intervention_created",
+        ts: Date.now(),
+        interventionId: "iv-feed",
+        interventionTitle: "Test dossier",
+        clientName: "Client test",
+      },
+    ],
+    loading: false,
+    refreshing: false,
+    feedError: null,
+  }),
+}));
+
 const mockSetPendingInboxId = jest.fn();
 jest.mock("@/context/BackofficeInboxIntentContext", () => ({
   useBackofficeInboxIntentOptional: () => ({
@@ -86,7 +104,16 @@ describe("CrmHistoryPage", () => {
     expect(screen.getByTestId(`${slot}-panel-right`)).toBeInTheDocument();
     expect(screen.getByTestId(`${slot}-panel-center`)).toBeInTheDocument();
     expect(screen.getByTestId("crm-history-agent-panel")).toBeInTheDocument();
-    expect(screen.getByTestId("crm-center-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("crm-center-feed")).toBeInTheDocument();
+    expect(screen.getByTestId("crm-history-detail-empty")).toBeInTheDocument();
     expect(screen.queryByTestId("crm-search-input")).not.toBeInTheDocument();
+  });
+
+  it("shows event detail in right panel when a feed row is selected", () => {
+    renderCrmPage();
+    fireEvent.click(screen.getByTestId("crm-event-feed-e1"));
+    const panel = screen.getByTestId("crm-history-detail-panel");
+    expect(panel).toBeInTheDocument();
+    expect(screen.getByTestId("crm-history-detail-body")).toHaveTextContent(/Client test/);
   });
 });

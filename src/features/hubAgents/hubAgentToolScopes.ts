@@ -41,6 +41,7 @@ export const BILLING_HUB_AGENT_TOOL_SCOPE = [
   "get_intervention_detail",
   "get_intervention_billing",
   "patch_intervention_billing",
+  "append_intervention_billing_lines",
   "update_intervention_billing",
   "focus_intervention_document",
   "focus_billing_case",

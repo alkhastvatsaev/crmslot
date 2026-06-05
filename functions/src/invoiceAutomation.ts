@@ -9,25 +9,10 @@ import {
 import { runCommissionOnInvoiced } from "./commissionAutomation";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivity";
 
-function completionPhotoUrls(data: admin.firestore.DocumentData): string[] {
-  const structured = Array.isArray(data.completionPhotos)
-    ? (data.completionPhotos as { url?: string }[])
-        .map((p) => (typeof p?.url === "string" ? p.url.trim() : ""))
-        .filter((u) => u.length > 0)
-    : [];
-  if (structured.length > 0) return structured;
-  const legacy = Array.isArray(data.completionPhotoUrls) ? data.completionPhotoUrls : [];
-  return legacy.filter((u): u is string => typeof u === "string" && u.trim().length > 0);
-}
-
-function checklistComplete(data: admin.firestore.DocumentData | undefined): boolean {
-  if (!data) return false;
-  const photos = completionPhotoUrls(data);
-  const sig = data.completionSignatureUrl;
-  return photos.length > 0 && typeof sig === "string" && sig.trim().length > 0;
-}
-
-/** Déclenché à chaque écriture ; idempotent si déjà facturé ou checklist incomplète. */
+/**
+ * Génère le PDF uniquement quand IVANA valide (done → invoiced) et qu’aucun PDF n’existe encore.
+ * Plus de passage automatique done → invoiced à la clôture terrain.
+ */
 export async function runAutoInvoiceGeneration(event: {
   params: { interventionId: string };
   data?: {
@@ -36,20 +21,22 @@ export async function runAutoInvoiceGeneration(event: {
   };
 }): Promise<void> {
   const interventionId = event.params.interventionId;
+  const beforeSnap = event.data?.before;
   const afterSnap = event.data?.after;
   if (!afterSnap?.exists) return;
 
+  const before = beforeSnap?.data();
   const after = afterSnap.data();
   if (!after) return;
 
-  if (after.status === "invoiced") return;
+  if (after.status !== "invoiced") return;
+  if (before?.status !== "done") return;
   if (typeof after.invoicePdfUrl === "string" && after.invoicePdfUrl.length > 0) return;
-  if (after.status !== "done") return;
-  if (!checklistComplete(after)) return;
 
   const db = admin.firestore();
   const ref = db.collection("interventions").doc(interventionId);
 
+  const lines = Array.isArray(after.billingLines) ? after.billingLines : [];
   const invoiceAmountCents =
     typeof after.invoiceAmountCents === "number" && after.invoiceAmountCents > 0
       ? Math.round(after.invoiceAmountCents)
@@ -62,7 +49,7 @@ export async function runAutoInvoiceGeneration(event: {
     clientName: after.clientName ?? null,
     problem: typeof after.problem === "string" ? after.problem : null,
     invoiceAmountCents,
-    billingLines: Array.isArray(after.billingLines) ? after.billingLines : [],
+    billingLines: lines,
   });
 
   const bucket = admin.storage().bucket();
@@ -86,9 +73,8 @@ export async function runAutoInvoiceGeneration(event: {
   await ref.update({
     invoicePdfUrl,
     invoicePdfStoragePath: objectPath,
-    status: "invoiced",
-    invoicedAt: FieldValue.serverTimestamp(),
     invoiceAmountCents,
+    invoicedAt: FieldValue.serverTimestamp(),
     paymentStatus: after.paymentStatus === "paid" ? "paid" : "unpaid",
   });
 
@@ -125,5 +111,5 @@ export async function runAutoInvoiceGeneration(event: {
     }).catch((e) => logger.warn("CRM log invoice failed", e));
   }
 
-  logger.info("Auto invoice generated", { interventionId, objectPath });
+  logger.info("Invoice PDF generated after validation", { interventionId, objectPath });
 }

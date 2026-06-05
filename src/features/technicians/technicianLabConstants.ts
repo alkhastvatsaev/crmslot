@@ -2,8 +2,8 @@
  * Lab technicien (`/technician`) — **archivé du carrousel** pour l’instant.
  * Réintégration (3 étapes obligatoires, dans l’ordre) :
  *   1. Réinsérer `TechnicianLabCarouselPage` dans `src/app/page.tsx` à l’index 5
- *      (avant `GmailHubPage`) et incrémenter `pageCount` à 7.
- *   2. Passer `GMAIL_HUB_SLOT_INDEX` à 6 dans `gmailHubConstants.ts`.
+ *      (avant `GmailHubPage` en index 6) et incrémenter `pageCount` à 8.
+ *   2. `GMAIL_HUB_SLOT_INDEX` est déjà 6 — ne pas modifier.
  *   3. Passer `OFFLINE_HUB_SLOT_INDEX` à 7 dans `offlineHubConstants.ts`.
  * ⚠  Ne pas activer `TECHNICIAN_LAB_IN_CAROUSEL = true` sans faire les 3 étapes :
  *    Gmail et Offline seraient sur le mauvais index.

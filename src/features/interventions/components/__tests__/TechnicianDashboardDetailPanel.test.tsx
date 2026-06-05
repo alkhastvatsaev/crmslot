@@ -46,8 +46,11 @@ describe("TechnicianDashboardDetailPanel", () => {
     );
 
     expect(screen.getByTestId("technician-dashboard-detail")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-detail-scroll")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-detail-description")).toHaveTextContent("Cylindre cassé");
+    const body = screen.getByTestId("technician-detail-scroll");
+    expect(body).toBeInTheDocument();
+    expect(body).toHaveClass("overflow-hidden");
+    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent("Cylindre cassé");
+    expect(screen.getByTestId("technician-detail-client-name")).toBeInTheDocument();
     expect(screen.queryByTestId("technician-finish-job-layer")).not.toBeInTheDocument();
     expect(screen.getByTestId("mission-action-bar")).toBeInTheDocument();
   });
@@ -64,6 +67,27 @@ describe("TechnicianDashboardDetailPanel", () => {
     expect(screen.queryByTestId("technician-assignment-detail-banner")).not.toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-respond-bar")).toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-accept")).toBeInTheDocument();
+    expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
+    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent("Cylindre cassé");
+    expect(screen.getByTestId("technician-detail-client-name")).toHaveClass("technician-detail-client-name");
+    expect(screen.queryByText("Description")).not.toBeInTheDocument();
+  });
+
+  it("shows edit report CTA for done mission amendable by technician", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "done",
+          assignedTechnicianUid: "demo-tech-local",
+          completedAt: "2026-05-16T10:00:00.000Z",
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("technician-detail-done-badge")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-edit-completion-report")).toBeInTheDocument();
     expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
   });
 });

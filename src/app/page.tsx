@@ -85,7 +85,7 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
   loading: () => null,
 });
 
-/** Écran d’accueil — **7 pages** : carte · société · technicien · Gmail · Matériel · CRM · Facturation. */
+/** Écran d’accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
 export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
@@ -96,10 +96,10 @@ export default function Dashboard() {
       </>,
       <DashboardSecondaryPlaceholder key="secondary" />,
       <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
-      <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
       <FeatureHubPage key="feature-hub" slotIndex={FEATURE_HUB_SLOT_INDEX} />,
       <CrmHistoryPage key="crm-history" slotIndex={CRM_HISTORY_SLOT_INDEX} />,
       <BillingHubPage key="billing-hub" slotIndex={BILLING_HUB_SLOT_INDEX} />,
+      <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
     ],
     [],
   );

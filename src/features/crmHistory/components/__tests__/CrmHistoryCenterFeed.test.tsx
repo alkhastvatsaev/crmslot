@@ -49,27 +49,33 @@ describe("CrmHistoryCenterFeed", () => {
     expect(screen.getByTestId("crm-event-e2")).toBeInTheDocument();
   });
 
-  it("calls onEventClick when clicking an event with interventionId", () => {
+  it("calls onEventSelect when clicking an event row", () => {
     const event = makeEvent({ interventionId: "iv1" });
-    const onEventClick = jest.fn();
-    render(<CrmHistoryCenterFeed events={[event]} loading={false} onEventClick={onEventClick} />);
+    const onEventSelect = jest.fn();
+    render(
+      <CrmHistoryCenterFeed events={[event]} loading={false} onEventSelect={onEventSelect} />,
+    );
     fireEvent.click(screen.getByTestId("crm-event-e1"));
-    expect(onEventClick).toHaveBeenCalledTimes(1);
-    expect(onEventClick).toHaveBeenCalledWith(event);
+    expect(onEventSelect).toHaveBeenCalledTimes(1);
+    expect(onEventSelect).toHaveBeenCalledWith(event);
   });
 
-  it("does not call onEventClick when event has no interventionId", () => {
-    const event = makeEvent({ interventionId: undefined });
-    const onEventClick = jest.fn();
-    render(<CrmHistoryCenterFeed events={[event]} loading={false} onEventClick={onEventClick} />);
-    fireEvent.click(screen.getByTestId("crm-event-e1"));
-    expect(onEventClick).not.toHaveBeenCalled();
+  it("highlights selected event row", () => {
+    const event = makeEvent();
+    render(
+      <CrmHistoryCenterFeed
+        events={[event]}
+        loading={false}
+        selectedEventId="e1"
+        onEventSelect={jest.fn()}
+      />,
+    );
+    expect(screen.getByTestId("crm-event-e1")).toHaveClass("ring-2");
   });
 
-  it("does not call onEventClick when no handler provided", () => {
+  it("does not crash when clicking without select handler", () => {
     const event = makeEvent({ interventionId: "iv1" });
     render(<CrmHistoryCenterFeed events={[event]} loading={false} />);
-    // Just verify no crash when clicking without handler
     fireEvent.click(screen.getByTestId("crm-event-e1"));
   });
 

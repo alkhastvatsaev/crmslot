@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
-import TechnicianDashboardListPanel from "@/features/interventions/components/TechnicianDashboardListPanel";
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
-import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
+import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
+import DailyMissions from "@/features/dashboard/components/DailyMissions";
+import type { Mission } from "@/features/map/missionTypes";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -20,11 +21,13 @@ import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechn
 import {
   interventionVisibleInTechnicianMissionList,
   sortInterventionsByScheduleAsc,
+  interventionClientLabel,
+  statusLabelKey,
+  formatScheduledTimeOnly,
 } from "@/features/interventions/technicianSchedule";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import CompanyWorkspaceSwitcher from "@/features/company/components/CompanyWorkspaceSwitcher";
 import { navigateTechnicianHub } from "@/features/interventions/technicianHubNavigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
@@ -84,6 +87,24 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     [filteredSorted],
   );
 
+  const todayMissions = useMemo<Mission[]>(
+    () =>
+      sortInterventionsByScheduleAsc(filteredSorted).map((iv, index) => ({
+        id: index,
+        key: iv.id,
+        clientName: interventionClientLabel(iv) || String(t("common.client")),
+        coordinates: [0, 0] as [number, number],
+        time: formatScheduledTimeOnly(iv),
+        status: String(t(statusLabelKey(iv.status))),
+        statusCode: iv.status,
+      })),
+    [filteredSorted, t],
+  );
+
+  const handleMissionClick = (mission: Mission) => {
+    if (mission.key) setSelectedCaseId(mission.key);
+  };
+
   useEffect(() => {
     if (pendingCaseId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -140,11 +161,12 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       centerAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.center")}`}
       rightAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`}
       left={
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden pb-4">
-          <CompanyWorkspaceSwitcher className="shrink-0 mx-1" />
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <TechnicianDashboardListPanel selectedCaseId={selectedCaseId} onSelect={setSelectedCaseId} />
-          </div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <DailyMissions
+            missions={todayMissions}
+            onMissionClick={handleMissionClick}
+            isEmbedded
+          />
         </div>
       }
       centerPadding={false}

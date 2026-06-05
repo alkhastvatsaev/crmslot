@@ -9,9 +9,14 @@ jest.mock("@/features/map/GalaxyLayerBridgeContext", () => ({
   }),
 }));
 
+const mapGalaxyTranscriptionProps: { hideDockStrip?: boolean }[] = [];
+
 jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
-  default: () => <div data-testid="map-galaxy-transcription-mock" />,
+  default: (props: { hideDockStrip?: boolean }) => {
+    mapGalaxyTranscriptionProps.push(props);
+    return <div data-testid="map-galaxy-transcription-mock" />;
+  },
 }));
 
 jest.mock("@/features/chatbot/components/ChatbotGalaxyComposer", () => ({
@@ -43,6 +48,10 @@ import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstant
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 
 describe("DashboardGalaxyLayer", () => {
+  beforeEach(() => {
+    mapGalaxyTranscriptionProps.length = 0;
+  });
+
   it("shows stock composer on material page", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
@@ -82,5 +91,15 @@ describe("DashboardGalaxyLayer", () => {
     expect(screen.queryByTestId("chatbot-galaxy-composer")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-galaxy-composer")).not.toBeInTheDocument();
     expect(screen.queryByTestId("billing-hub-galaxy-composer")).not.toBeInTheDocument();
+    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
+  });
+
+  it("hides map dock strip when a page composer is shown", () => {
+    render(
+      <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
+        <DashboardGalaxyLayer />
+      </DashboardPagerProvider>,
+    );
+    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(true);
   });
 });

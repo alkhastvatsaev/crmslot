@@ -9,7 +9,6 @@ import {
   Check,
   CheckCircle2,
   ClipboardList,
-  FileSignature,
   Loader2,
   MoreHorizontal,
   Package,
@@ -21,7 +20,7 @@ import { toast } from "sonner";
 import type { Intervention } from "@/features/interventions/types";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { auth, firestore, isConfigured } from "@/core/config/firebase";
+import { auth, isConfigured } from "@/core/config/firebase";
 import { useOfflineSyncOptional } from "@/context/OfflineSyncContext";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
@@ -43,18 +42,22 @@ import TechnicianSignaturePad, {
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import TechnicianBillingLinesForm, { type BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
 import FinishJobStepIndicator from "@/features/interventions/components/FinishJobStepIndicator";
-import CategoryFinishChecklist from "@/features/interventions/components/CategoryFinishChecklist";
+import {
+  finishWizardPhotosFromIntervention,
+} from "@/features/interventions/technicianCompletionReport";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
+import { useQueryClient } from "@tanstack/react-query";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 const stepVariants = {
-  initial: { opacity: 0, x: 20, filter: "blur(4px)" },
-  animate: { opacity: 1, x: 0, filter: "blur(0px)" },
-  exit: { opacity: 0, x: -20, filter: "blur(4px)" },
+  initial: { opacity: 0, x: 16 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -16 },
 };
-const springTransition = { type: "spring", bounce: 0, duration: 0.4 } as const;
+const springTransition = { type: "spring", bounce: 0, duration: 0.35 } as const;
 
 const CATEGORY_ICONS = {
   panne: AlertTriangle,
@@ -63,32 +66,36 @@ const CATEGORY_ICONS = {
   autre: MoreHorizontal,
 } as const;
 
-type WizardStep = "photos" | "billing" | "signature";
+type WizardStep = "photos" | "signature";
+type PhotoCategory = "panne" | "materiel" | "preuve" | "autre";
+
+const STEP_SHELL =
+  "absolute inset-0 flex min-h-0 flex-col overflow-hidden px-3";
 
 export default function TechnicianFinishJobPanel() {
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
+  const queryClient = useQueryClient();
   const { finishJobInterventionId, setFinishJobInterventionId } = useTechnicianFinishJob();
   const offlineSync = useOfflineSyncOptional();
   const backofficeBridge = useTechnicianBackofficeReportBridgeOptional();
 
   const [step, setStep] = useState<WizardStep>("photos");
-  const [photos, setPhotos] = useState<{url: string; category: 'panne' | 'materiel' | 'preuve' | 'autre'}[]>([]);
-  const [currentCategory, setCurrentCategory] = useState<'panne' | 'materiel' | 'preuve' | 'autre'>('preuve');
-  const [billingLines, setBillingLines] = useState<BillingLine[]>([]);
+  const [photos, setPhotos] = useState<{ url: string; category: PhotoCategory }[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<PhotoCategory>("preuve");
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
 
   const [submitBusy, setSubmitBusy] = useState(false);
-  const [checklistComplete, setChecklistComplete] = useState(true);
-
   const submitInFlightRef = useRef(false);
+  const hydratedReportRef = useRef<string | null>(null);
 
   const interventionId = finishJobInterventionId;
   const liveIv = useInterventionLive(interventionId);
+  const isAmendMode = liveIv?.status === "done";
   const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     const v = videoRef.current;
     if (v) v.srcObject = null;
@@ -108,7 +115,7 @@ export default function TechnicianFinishJobPanel() {
       })
       .then((stream) => {
         if (cancelled) {
-          stream.getTracks().forEach((t) => t.stop());
+          stream.getTracks().forEach((track) => track.stop());
           return;
         }
         streamRef.current = stream;
@@ -135,7 +142,7 @@ export default function TechnicianFinishJobPanel() {
     if (!v || photos.length >= FINISH_JOB_MAX_PHOTOS) return;
     try {
       const url = capturePhotoFromVideo(v);
-      setPhotos((p) => [...p, {url, category: currentCategory}]);
+      setPhotos((p) => [...p, { url, category: currentCategory }]);
     } catch {
       toast.error(String(t("technician_hub.finish.toasts.photo_impossible")));
     }
@@ -148,15 +155,33 @@ export default function TechnicianFinishJobPanel() {
   const resetWizard = () => {
     stopCamera();
     setPhotos([]);
-    setBillingLines([]);
     sigRef.current?.clear();
     setStep("photos");
+    hydratedReportRef.current = null;
   };
+
+  useEffect(() => {
+    resetWizard();
+  }, [interventionId]);
+
+  useEffect(() => {
+    if (!liveIv || liveIv.status !== "done" || hydratedReportRef.current === liveIv.id) return;
+    hydratedReportRef.current = liveIv.id;
+    const existingPhotos = finishWizardPhotosFromIntervention(liveIv);
+    if (existingPhotos.length > 0) {
+      setPhotos(existingPhotos);
+    }
+  }, [liveIv]);
 
   const goDashboard = () => {
     setFinishJobInterventionId(null);
     resetWizard();
     navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+  };
+
+  const goToSignature = () => {
+    stopCamera();
+    setStep("signature");
   };
 
   const submitAll = async () => {
@@ -175,15 +200,13 @@ export default function TechnicianFinishJobPanel() {
     setSubmitBusy(true);
 
     try {
-      // Legacy compatibility: bridge expects array of strings, we'll map the URLs for now
-      const photoDataUrls = photos.map(p => p.url);
+      const photoDataUrls = photos.map((p) => p.url);
       const signaturePngDataUrl = sig;
 
       backofficeBridge?.pushReport({
         interventionId,
         photoDataUrls,
         signaturePngDataUrl,
-        billingLines: billingLines.length > 0 ? billingLines : undefined,
       });
 
       if (liveIv) {
@@ -193,7 +216,9 @@ export default function TechnicianFinishJobPanel() {
           iv: liveIv,
           actorUid,
           actorRole: "technician",
-          note: `Rapport terrain (${photoDataUrls.length} photo(s))`,
+          note: isAmendMode
+            ? `Rapport terrain modifié (${photoDataUrls.length} photo(s))`
+            : `Rapport terrain (${photoDataUrls.length} photo(s))`,
         });
       }
 
@@ -203,7 +228,6 @@ export default function TechnicianFinishJobPanel() {
         interventionId,
         photoDataUrls,
         signaturePngDataUrl,
-        billingLines: billingLines.length > 0 ? billingLines : undefined,
       });
       if (result.outcome === "error") {
         toast.error(String(t("technician_hub.finish.toasts.server_save_title")), {
@@ -219,23 +243,38 @@ export default function TechnicianFinishJobPanel() {
       }
       void offlineSync?.refreshPendingCount();
 
-      if (liveIv && billingLines.length > 0) {
-        const totalCents = billingLines.reduce(
-          (s, l) => s + Math.round(l.unitPriceCents) * (l.quantity ?? 1),
-          0,
-        );
-        void logCrmInterventionAction({
-          kind: "intervention_billing_updated",
-          iv: liveIv,
-          actorUid: auth?.currentUser?.uid?.trim() || "system",
-          actorRole: "technician",
-          note: `Lignes facturation terrain (${billingLines.length}) · ${Math.round(totalCents) / 100} €`,
+      const technicianUid = auth?.currentUser?.uid?.trim() || "";
+      if (isAmendMode && technicianUid) {
+        patchTechnicianAssignmentInCache(queryClient, technicianUid, interventionId, {
+          status: "done",
         });
       }
 
-      toast.success(String(t("technician_hub.finish.toasts.report_sent")), {
-        description: String(t("technician_hub.finish.toasts.report_sent_desc")),
-      });
+      if (!isAmendMode) {
+        void fetchWithAuth(
+          `/api/interventions/${encodeURIComponent(interventionId)}/prepare-draft-billing`,
+          { method: "POST" },
+        ).catch((err) => console.warn("[prepare-draft-billing]", err));
+      }
+
+      toast.success(
+        String(
+          t(
+            isAmendMode
+              ? "technician_hub.finish.toasts.report_updated"
+              : "technician_hub.finish.toasts.report_sent",
+          ),
+        ),
+        {
+          description: String(
+            t(
+              isAmendMode
+                ? "technician_hub.finish.toasts.report_updated_desc"
+                : "technician_hub.finish.toasts.report_sent_desc",
+            ),
+          ),
+        },
+      );
       if (PRESENTATION_PRIVACY_MODE) {
         toast.message(String(t("technician_hub.finish.toasts.presentation_mode")), {
           description: String(t("technician_hub.finish.toasts.presentation_mode_desc")),
@@ -244,7 +283,9 @@ export default function TechnicianFinishJobPanel() {
 
       resetWizard();
       setFinishJobInterventionId(null);
-      navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+      if (!isAmendMode) {
+        navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+      }
     } catch (e) {
       console.error(e);
       setStep("signature");
@@ -258,14 +299,13 @@ export default function TechnicianFinishJobPanel() {
   };
 
   const firebaseUnavailable = !isConfigured || !auth;
+  const photosReady = photos.length >= FINISH_JOB_MIN_PHOTOS;
 
   if (!interventionId) {
     return (
       <div data-testid="finish-job-empty" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex min-h-[260px] flex-col items-center justify-center gap-5 text-center`}>
-          <p className="sr-only">
-            {String(t("technician_hub.finish.no_mission"))}
-          </p>
+          <p className="sr-only">{String(t("technician_hub.finish.no_mission"))}</p>
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100/80 shadow-inner">
             <ClipboardList className="h-8 w-8 text-slate-400" aria-hidden />
           </div>
@@ -296,19 +336,17 @@ export default function TechnicianFinishJobPanel() {
 
   return (
     <div data-testid="finish-job-panel" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
-      {/* Top bar — cancel only */}
-      <div className="flex shrink-0 items-center justify-end px-4 py-2">
+      <div className="flex shrink-0 items-center justify-end px-3 py-1">
         <button
           type="button"
           onClick={goDashboard}
           aria-label={String(t("technician_hub.finish.cancel_close"))}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
         >
-          <X className="h-5 w-5" aria-hidden />
+          <X className="h-4 w-4" aria-hidden />
         </button>
       </div>
 
-      {/* Animated step area */}
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           {step === "photos" && (
@@ -319,44 +357,38 @@ export default function TechnicianFinishJobPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 overflow-y-auto overscroll-contain px-4 py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={STEP_SHELL}
+              data-testid="finish-job-step-photos"
             >
-              <div className="flex flex-col gap-4">
-                <div className="relative mt-2 overflow-hidden rounded-[28px] bg-slate-950 shadow-2xl ring-1 ring-black/10">
-                  <video
-                    ref={videoRef}
-                    className={cn(
-                      "aspect-[4/3] w-full object-cover opacity-95 transition-opacity duration-300",
-                      PRESENTATION_PRIVACY_MODE ? "blur-2xl" : null,
-                    )}
-                    muted
-                    playsInline
-                    autoPlay
-                    aria-label={String(t("technician_hub.finish.camera_done"))}
-                  />
-                  <div className="absolute inset-0 pointer-events-none rounded-[28px] ring-1 ring-inset ring-white/10" />
-                  <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center z-30">
-                    <button
-                      type="button"
-                      data-testid="finish-job-capture-btn"
-                      disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
-                      onClick={captureShot}
-                      aria-label={String(t("technician_hub.finish.capture_photo"))}
-                      className="flex h-16 w-16 items-center justify-center rounded-full bg-white border-[4px] border-slate-950/80 shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all hover:scale-105 active:scale-90 disabled:opacity-40 disabled:hover:scale-100"
-                    >
-                      <div className="h-10 w-10 rounded-full bg-slate-900 active:bg-slate-800 transition-colors" />
-                    </button>
-                  </div>
-                  {PRESENTATION_PRIVACY_MODE ? (
-                    <div className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
-                      {String(t("technician_hub.finish.presentation_mode"))}
-                    </div>
-                  ) : null}
+              <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl bg-slate-950 shadow-lg ring-1 ring-black/10">
+                <video
+                  ref={videoRef}
+                  className={cn(
+                    "h-full w-full object-cover",
+                    PRESENTATION_PRIVACY_MODE ? "blur-2xl" : null,
+                  )}
+                  muted
+                  playsInline
+                  autoPlay
+                  aria-label={String(t("technician_hub.finish.camera_done"))}
+                />
+                <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+
+                <div className="absolute bottom-3 left-0 right-0 z-20 flex justify-center">
+                  <button
+                    type="button"
+                    data-testid="finish-job-capture-btn"
+                    disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
+                    onClick={captureShot}
+                    aria-label={String(t("technician_hub.finish.capture_photo"))}
+                    className="flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/90 bg-white/95 shadow-lg transition active:scale-95 disabled:opacity-40"
+                  >
+                    <div className="h-9 w-9 rounded-full bg-slate-900" />
+                  </button>
                 </div>
 
-                {/* Category selector */}
-                <div className="flex justify-center items-center gap-4 bg-slate-50 rounded-[20px] p-2.5 border border-slate-100">
-                  {(['panne', 'materiel', 'preuve', 'autre'] as const).map(cat => {
+                <div className="absolute left-2 right-2 top-2 z-20 flex justify-center gap-2 rounded-full bg-black/45 p-1 backdrop-blur-sm">
+                  {(["panne", "materiel", "preuve", "autre"] as const).map((cat) => {
                     const IconComponent = CATEGORY_ICONS[cat];
                     const isActive = currentCategory === cat;
                     return (
@@ -364,103 +396,52 @@ export default function TechnicianFinishJobPanel() {
                         key={cat}
                         type="button"
                         onClick={() => setCurrentCategory(cat)}
-                        title={cat}
+                        aria-label={cat}
+                        aria-pressed={isActive}
                         className={cn(
-                          "flex h-12 w-12 items-center justify-center rounded-full transition-all active:scale-90",
-                          isActive
-                            ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
-                            : "bg-white text-slate-500 border border-slate-200/60 hover:text-slate-800"
+                          "flex h-9 w-9 items-center justify-center rounded-full transition",
+                          isActive ? "bg-white text-slate-900" : "text-white/80",
                         )}
                       >
-                        <IconComponent className="h-5 w-5 stroke-[2]" />
+                        <IconComponent className="h-4 w-4" strokeWidth={2.25} />
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Photo strip */}
-                <div data-testid="finish-job-photo-strip" className="flex flex-wrap gap-3 justify-center">
-                  {photos.map((photo, i) => (
-                    <div key={`${i}-${photo.url ? photo.url.slice(0, 24) : ''}`} className="relative h-20 w-20 overflow-hidden rounded-[16px] border border-black/5 bg-slate-100 shadow-sm transition-transform hover:scale-105">
-                      <div className="absolute top-0 left-0 w-full bg-black/60 text-white text-[10px] font-bold text-center py-0.5 capitalize z-10 backdrop-blur-sm">
-                        {photo.category}
-                      </div>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.url}
-                        alt=""
-                        className={cn("h-full w-full object-cover", PRESENTATION_PRIVACY_MODE ? "blur-lg" : null)}
-                      />
-                      <button
-                        type="button"
-                        data-testid={`finish-job-photo-remove-${i}`}
-                        aria-label={String(t("technician_hub.finish.delete_photo"))}
-                        onClick={() => removePhoto(i)}
-                        className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-red-500/90 z-20"
-                      >
-                        <Trash2 className="h-3 w-3" aria-hidden />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-2 flex justify-end">
-                  <button
-                    type="button"
-                    data-testid="finish-job-continue-photos"
-                    disabled={photos.length < FINISH_JOB_MIN_PHOTOS}
-                    onClick={() => {
-                      stopCamera();
-                      setStep("billing");
-                    }}
-                    aria-label={String(t("technician_hub.finish.continue_signature"))}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition-all hover:bg-slate-800 active:scale-[0.90] disabled:opacity-30 disabled:pointer-events-none"
-                  >
-                    <ArrowRight className="h-6 w-6 stroke-[2.5]" aria-hidden />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {step === "billing" && (
-            <motion.div
-              key="billing"
-              variants={stepVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={springTransition}
-              className="absolute inset-0 overflow-y-auto overscroll-contain px-4 py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-            >
-              <div className="flex flex-col gap-4">
-                {liveIv ? (
-                  <CategoryFinishChecklist
-                    intervention={liveIv}
-                    onCompleteChange={setChecklistComplete}
-                  />
+                {PRESENTATION_PRIVACY_MODE ? (
+                  <div className="absolute right-2 top-14 rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase text-white">
+                    {String(t("technician_hub.finish.presentation_mode"))}
+                  </div>
                 ) : null}
-                <TechnicianBillingLinesForm
-                  initialLines={billingLines}
-                  onConfirm={(confirmed) => {
-                    if (!checklistComplete) {
-                      toast.error(String(t("finish_checklist.incomplete")));
-                      return;
-                    }
-                    setBillingLines(confirmed);
-                    setStep("signature");
-                  }}
-                  onSkip={() => {
-                    setBillingLines([]);
-                    setStep("signature");
-                  }}
-                  onBack={() => setStep("photos")}
-                  intervention={
-                    liveIv
-                      ? { category: liveIv.category, problem: liveIv.problem }
-                      : undefined
-                  }
-                />
+              </div>
+
+              <div
+                data-testid="finish-job-photo-strip"
+                className="mt-2 flex h-14 shrink-0 items-center gap-2 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              >
+                {photos.map((photo, i) => (
+                  <div
+                    key={`${i}-${photo.url.slice(0, 24)}`}
+                    className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.url}
+                      alt=""
+                      className={cn("h-full w-full object-cover", PRESENTATION_PRIVACY_MODE ? "blur-lg" : null)}
+                    />
+                    <button
+                      type="button"
+                      data-testid={`finish-job-photo-remove-${i}`}
+                      aria-label={String(t("technician_hub.finish.delete_photo"))}
+                      onClick={() => removePhoto(i)}
+                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-white"
+                    >
+                      <Trash2 className="h-2.5 w-2.5" aria-hidden />
+                    </button>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}
@@ -473,65 +454,78 @@ export default function TechnicianFinishJobPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 overflow-y-auto overscroll-contain px-4 py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={STEP_SHELL}
+              data-testid="finish-job-step-signature"
             >
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center gap-2 px-1">
-                  <FileSignature className="h-5 w-5 text-slate-800" aria-hidden />
-                  <h2 className="text-[15px] font-semibold text-slate-800">{String(t("technician_hub.finish.client_signature"))}</h2>
-                </div>
-
-                <div className="relative overflow-hidden rounded-[24px] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] ring-1 ring-black/5">
-                  <TechnicianSignaturePad ref={sigRef} />
-                </div>
-
-                <div className="flex gap-4 justify-center">
-                  <button
-                    type="button"
-                    data-testid="finish-job-back-billing"
-                    onClick={() => setStep("billing")}
-                    aria-label={String(t("technician_hub.finish.back_photos"))}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-all active:scale-[0.90]"
-                  >
-                    <ArrowLeft className="h-5 w-5 stroke-[2.5]" aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="finish-job-clear-signature"
-                    onClick={() => sigRef.current?.clear()}
-                    aria-label={String(t("technician_hub.finish.clear_signature"))}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm ring-1 ring-slate-200 hover:bg-rose-50 hover:ring-rose-200 transition-all active:scale-[0.90]"
-                  >
-                    <RotateCcw className="h-5 w-5 stroke-[2.5]" aria-hidden />
-                  </button>
-                </div>
-
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    data-testid="finish-job-submit"
-                    disabled={submitBusy}
-                    onClick={() => void submitAll()}
-                    aria-label={String(t("technician_hub.finish.send_closure"))}
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_8px_24px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-600 active:scale-[0.90] disabled:pointer-events-none disabled:opacity-70"
-                  >
-                    {submitBusy ? (
-                      <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
-                    ) : (
-                      <Check className="h-8 w-8 stroke-[3]" aria-hidden />
-                    )}
-                  </button>
-                </div>
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <TechnicianSignaturePad ref={sigRef} fillHeight className="min-h-0 flex-1" />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Step indicator — bottom */}
-      <div className="shrink-0 border-t border-neutral-100 px-4 pb-3 pt-2">
-        <FinishJobStepIndicator current={step} />
-      </div>
+      <footer className="shrink-0 border-t border-slate-100 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        {step === "photos" ? (
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-[11px] font-semibold tabular-nums text-slate-500" aria-live="polite">
+              {photos.length}/{FINISH_JOB_MAX_PHOTOS}
+              {!photosReady ? (
+                <span className="text-slate-400"> · min {FINISH_JOB_MIN_PHOTOS}</span>
+              ) : null}
+            </span>
+            <button
+              type="button"
+              data-testid="finish-job-continue-photos"
+              disabled={!photosReady}
+              onClick={goToSignature}
+              aria-label={String(t("technician_hub.finish.continue_signature"))}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white shadow-md transition active:scale-95 disabled:opacity-30"
+            >
+              <ArrowRight className="h-5 w-5" strokeWidth={2.5} aria-hidden />
+            </button>
+          </div>
+        ) : null}
+
+        {step === "signature" ? (
+          <div className="mb-2 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              data-testid="finish-job-back-photos"
+              onClick={() => setStep("photos")}
+              aria-label={String(t("technician_hub.finish.back_photos"))}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition active:scale-95"
+            >
+              <ArrowLeft className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              data-testid="finish-job-clear-signature"
+              onClick={() => sigRef.current?.clear()}
+              aria-label={String(t("technician_hub.finish.clear_signature"))}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-rose-600 transition active:scale-95"
+            >
+              <RotateCcw className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              data-testid="finish-job-submit"
+              disabled={submitBusy}
+              onClick={() => void submitAll()}
+              aria-label={String(t("technician_hub.finish.send_closure"))}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md transition active:scale-95 disabled:opacity-60"
+            >
+              {submitBusy ? (
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+              ) : (
+                <Check className="h-6 w-6 stroke-[3]" aria-hidden />
+              )}
+            </button>
+          </div>
+        ) : null}
+
+        <FinishJobStepIndicator current={step} compact />
+      </footer>
     </div>
   );
 }

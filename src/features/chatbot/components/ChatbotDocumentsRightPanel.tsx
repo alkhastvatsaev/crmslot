@@ -95,6 +95,7 @@ function DocumentTile({
   thumbnailLoading,
   onClick,
 }: DocumentTileProps) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -144,7 +145,7 @@ function DocumentTile({
             active && "text-slate-600",
           )}
         >
-          {kind === "invoice" ? "Facture" : "Bon"}
+          {kind === "invoice" ? String(t("chatbot.doc_badge_invoice")) : String(t("chatbot.doc_badge_order"))}
         </span>
       </div>
 
@@ -231,7 +232,7 @@ export default function ChatbotDocumentsRightPanel() {
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="shrink-0 space-y-3 px-4 pt-4 pb-3">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">Documents</h2>
+            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">{t("chatbot.documents_heading")}</h2>
             {hasLibrary ? (
               <span className="text-[10px] tabular-nums text-slate-400" data-testid="chatbot-documents-count">
                 {parsedSearch.hasQuery ? `${docCount}/${libraryCount}` : libraryCount}
@@ -285,13 +286,13 @@ export default function ChatbotDocumentsRightPanel() {
               className="py-12 text-center text-[12px] leading-relaxed text-slate-400"
               data-testid="chatbot-documents-empty"
             >
-              Aucun PDF pour l&apos;instant.
+              {t("chatbot.documents_empty")}
             </p>
           ) : (
             <div className="space-y-5">
               {filteredInvoices.length > 0 ? (
                 <section data-testid="chatbot-documents-section-invoices">
-                  <SectionLabel>Factures</SectionLabel>
+                  <SectionLabel>{String(t("chatbot.invoices_heading"))}</SectionLabel>
                   <ul className="grid grid-cols-2 gap-2.5" data-testid="chatbot-documents-grid-invoices">
                     {filteredInvoices.map((row) => {
                       const key = `invoice:${row.interventionId}`;

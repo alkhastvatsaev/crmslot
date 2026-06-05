@@ -9,21 +9,15 @@ Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichi
 
 | Indicateur | Valeur |
 |------------|--------|
-| Suites Jest | **158** (~473 tests) |
+| Suites Jest | **~260** (~1 300 tests) |
 | CI unitaire | `npm run test:ci` (= typecheck + coverage) dans [`.github/workflows/test.yml`](../.github/workflows/test.yml) |
 | E2E | **9** specs Playwright dans `tests/e2e/` (job séparé) |
 | Seuils coverage globaux | Faibles (~4 % statements) + **planchers par fichier P0** dispatch/interventions |
 | Chatbot | **28 suites / 78 tests** — **100 % verts** en isolation |
 
-### CI pas entièrement verte
+### CI
 
-3 suites hors chatbot en échec (à corriger en **Phase 0**) :
-
-- `src/features/catalog/__tests__/lecotOrderFlags.test.ts`
-- `src/features/offline/components/__tests__/TechnicianOfflineHubPage.test.tsx`
-- `src/features/dashboard/components/__tests__/SpotlightSearch.test.tsx`
-
-Tant que `npm run test:ci` échoue, les agents ne peuvent pas valider un merge en confiance.
+`npm run test:ci` doit rester **verte** avant tout merge. En cas d’échec : corriger en priorité (Phase 0).
 
 ### Ce qui fonctionne déjà bien
 
@@ -238,6 +232,35 @@ Voir `docs/TESTING.md` §3. Après toute modif chatbot : `npx jest src/features/
 
 - [x] `.github/pull_request_template.md` : checklist tests + section chatbot/Codex.
 
+### Phase 7 — Pipeline facturation (1–2 j)
+
+- [x] `draftInvoiceBilling.test.ts` — templates, OpenAI mock, réutilisation lignes existantes.
+- [x] `server/__tests__/prepareDraftBillingOnIntervention.test.ts`
+- [x] `server/__tests__/validateInterventionReportServer.test.ts`
+- [x] `server/__tests__/interventionInvoiceEmail.test.ts`
+- [x] `server/__tests__/finalizeInterventionInvoiceAdmin.test.ts`
+- [x] Seuils Jest : `draftInvoiceBilling`, `validateInterventionReportServer`, `interventionInvoiceEmail`.
+
+### Phase 8 — CI interventions (½ j)
+
+- [x] Script `npm run test:interventions`
+- [x] Workflow `.github/workflows/interventions-tests.yml` (PR touchant `src/features/interventions/**`)
+- [x] Règle agents §9 dans `AGENTS.md`
+
+### Phase 9 — E2E fumée facturation
+
+- [x] `tests/e2e/invoice-validation.spec.ts` — sécurité API + onglet Rapports IVANA.
+- [x] `npm run test:e2e:invoice` — boucle locale (`npm run dev` + Firebase Admin).
+- [x] `POST /api/e2e/seed-done-intervention` — seed dossier `done` (`e2e-invoice-validation`, dev uniquement).
+- [x] Parcours intégré **serveur réel** : validation IVANA → `validate-report` → PDF + `invoiced` (Firebase Admin + Storage requis).
+- [x] `data-testid` : `backoffice-inbox-tab-reports`, `backoffice-inbox-report-row-{id}`, `backoffice-inbox-verify-report`.
+- Option manuelle : `E2E_DONE_INTERVENTION_ID=<id>` si pas de seed auto.
+
+### Phase 10 — Ratchet global (continu)
+
+- [ ] Remonter `coverageThreshold.global` par +2 % / trimestre.
+- [ ] Planchers sur autres modules `server/` interventions au fil de l’eau.
+
 ---
 
 ## 6. E2E existants (ne pas surcharger)
@@ -253,8 +276,10 @@ Parcours déjà couverts : dispatch, assignation back-office, hub technicien, pa
 | Action | Commande |
 |--------|----------|
 | Tout le chatbot | `npm run test:chatbot` |
+| Tout interventions | `npm run test:interventions` |
 | Chatbot + coverage | `npm run test:chatbot:coverage` (seuils chatbot : lancer `npm run test:coverage` en CI) |
 | E2E chatbot | `npm run test:e2e:chatbot` |
+| E2E facturation | `npm run test:e2e:invoice` |
 | Un fichier | `npx jest src/features/chatbot/__tests__/chatbot-local-intent.test.ts --no-coverage` |
 | CI locale | `npm run test:ci` |
 | Coverage | `npm run test:coverage` |
@@ -268,10 +293,11 @@ Parcours déjà couverts : dispatch, assignation back-office, hub technicien, pa
 Une tâche est **terminée** quand :
 
 1. `npm run typecheck` passe.
-2. `npm run test:ci` passe (ou au minimum les suites touchées + chatbot si concerné).
+2. `npm run test:ci` passe (ou au minimum les suites touchées + `test:chatbot` / `test:interventions` si concerné).
 3. Tout nouveau module **pur** dans `src/features/*` a un test colocalisé.
 4. Tout nouveau **outil chatbot** a un test executor (+ routing).
-5. Tout composant interactif nouveau a un `data-testid` + test RTL si logique non triviale.
+5. Tout flux **interventions / facturation** serveur a un test dans `server/__tests__/`.
+6. Tout composant interactif nouveau a un `data-testid` + test RTL si logique non triviale.
 
 ---
 

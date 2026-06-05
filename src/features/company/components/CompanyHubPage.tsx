@@ -115,7 +115,7 @@ export default function CompanyHubPage() {
               className={cn(
                 "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
                 rightCategory === "chat"
-                  ? "bg-white text-indigo-600 shadow-sm"
+                  ? "bg-white text-blue-600 shadow-sm"
                   : "text-slate-500 hover:bg-slate-300/30",
               )}
             >

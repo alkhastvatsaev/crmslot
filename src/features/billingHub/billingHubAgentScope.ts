@@ -1,5 +1,9 @@
 const BILLING_PATTERNS: { re: RegExp; weight: number }[] = [
   { re: /facture|devis|facturation|billing|paiement|encaissement|impayé|impaye/i, weight: 4 },
+  {
+    re: /fait\s+(?:une?\s+)?facture|faire\s+(?:une?\s+)?facture|cr[eé][eé]r\s+(?:une?\s+)?facture|facture\s+pour/i,
+    weight: 5,
+  },
   { re: /montant|€|eur\b|euro|ht\b|ttc|ligne.*facture/i, weight: 3 },
   { re: /client.*facture|dossier.*facture/i, weight: 2 },
   { re: /résumé|resume|encours|à\s+facturer|a\s+facturer/i, weight: 2 },

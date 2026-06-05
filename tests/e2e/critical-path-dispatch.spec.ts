@@ -8,9 +8,9 @@ test.describe("Dispatch Critical Path", () => {
     // Attendre que l'interface soit chargée
     await expect(page.locator('[data-testid="dashboard-pager-root"]')).toBeVisible({ timeout: 15_000 });
 
-    // Naviguer vers la page 2 (Company Hub)
-    const nextPagerBtn = page.locator('[data-testid="dashboard-pager-next"]');
-    await nextPagerBtn.click();
+    // Naviguer vers l’espace société (Spotlight — hors carrousel)
+    await page.locator('[data-testid="spotlight-trigger"]').click();
+    await page.locator('[data-testid="nav-item-1"]').click();
 
     // Attendre le chargement du Company Hub
     await expect(page.locator('[data-testid="requester-intervention-panel"]')).toBeVisible({ timeout: 15_000 });

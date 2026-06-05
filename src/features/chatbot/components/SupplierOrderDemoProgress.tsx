@@ -6,6 +6,7 @@ import {
   resolveDemoSupplierOrderProgress,
 } from "@/features/chatbot/supplierOrderDemoProgress";
 import type { SupplierOrderStatus } from "@/features/suppliers/types";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 type Props = {
   orderId: string;
@@ -14,6 +15,7 @@ type Props = {
 
 /** Barre + étapes — mode démonstration uniquement. */
 export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
+  const { t } = useTranslation();
   const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress(status);
 
   if (cancelled) {
@@ -21,10 +23,10 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
       <div
         className="mt-2.5"
         data-testid={`chatbot-supplier-order-demo-progress-${orderId}`}
-        aria-label="Commande annulée"
+        aria-label={String(t("chatbot.demo_order_cancelled"))}
       >
         <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">
-          Commande annulée
+          {t("chatbot.demo_order_cancelled")}
         </span>
       </div>
     );
@@ -34,7 +36,7 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
     <div
       className="mt-2.5 pr-1"
       data-testid={`chatbot-supplier-order-demo-progress-${orderId}`}
-      aria-label="Progression commande démo"
+      aria-label={String(t("chatbot.demo_order_progress_aria"))}
     >
       <div className="flex items-center gap-0" role="list">
         {DEMO_SUPPLIER_ORDER_STEPS.map((step, idx) => {
@@ -82,7 +84,7 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
                       : "text-slate-300",
                 )}
               >
-                {step.label}
+                {t(`chatbot.demo_step_${step.key}`)}
               </span>
             </div>
           );

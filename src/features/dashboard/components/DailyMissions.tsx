@@ -79,9 +79,7 @@ export default function DailyMissions({
                 
             const textGradient = isDone
               ? 'from-green-500 via-emerald-600 to-teal-800'
-              : inProgress
-                ? 'from-amber-400 via-orange-500 to-rose-600'
-                : 'from-slate-600 via-slate-800 to-black';
+              : 'from-slate-700 via-slate-900 to-black';
             
             return (
               <motion.div

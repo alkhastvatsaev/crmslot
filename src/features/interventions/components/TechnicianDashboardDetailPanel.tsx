@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Play, CheckCircle2, Pause, Loader2 } from "lucide-react";
-import MissionActionBar from "@/features/interventions/components/MissionActionBar";
+import { Play, CheckCircle2, Pause, Pencil } from "lucide-react";
+import MissionFieldFooter from "@/features/interventions/components/MissionFieldFooter";
+import MissionContactRail from "@/features/interventions/components/MissionContactRail";
+import TechnicianMissionBrief from "@/features/interventions/components/TechnicianMissionBrief";
+import { buildMissionContactActions } from "@/features/interventions/buildMissionContactActions";
 import TechnicianAssignmentRespondBar from "@/features/interventions/components/TechnicianAssignmentRespondBar";
 import {
   getTechnicianAssignmentUid,
   isTechnicianAssignmentAwaitingResponse,
 } from "@/features/interventions/technicianAssignmentActions";
 import { auth } from "@/core/config/firebase";
-import InterventionMaterialOrdersPanel from "@/features/materials/components/InterventionMaterialOrdersPanel";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
 import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import { toast } from "sonner";
@@ -20,12 +22,9 @@ import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { interventionDescriptionText } from "@/features/interventions/interventionDescriptionText";
 import { formatScheduledTimeOnly } from "@/features/interventions/technicianSchedule";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import {
-  navigateTechnicianHub,
-  TECHNICIAN_HUB_ANCHOR_FINISH,
-} from "@/features/interventions/technicianHubNavigation";
+import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
+import { cn } from "@/lib/utils";
 
 const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
@@ -118,14 +117,8 @@ export default function TechnicianDashboardDetailPanel({
   const liveIv = useInterventionLiveSource(caseId, liveIntervention);
   const queryClient = useQueryClient();
   const { setFinishJobInterventionId } = useTechnicianFinishJob();
-  const pager = useDashboardPagerOptional();
   const [isUpdating, setIsUpdating] = useState(false);
-  const [materialsPanelOpen, setMaterialsPanelOpen] = useState(false);
   const { t } = useTranslation();
-
-  useEffect(() => {
-    setMaterialsPanelOpen(false);
-  }, [caseId]);
 
   if (!caseId) {
     return (
@@ -226,12 +219,24 @@ export default function TechnicianDashboardDetailPanel({
 
   const descriptionText = interventionDescriptionText(liveIv);
   const hasAudioBlock = Boolean(liveIv.audioUrl || liveIv.transcription?.trim());
-  const showMaterials =
-    Boolean(technicianUid) &&
-    (liveIv.status === "in_progress" || liveIv.status === "waiting_material");
-  const isTerminal =
-    liveIv.status === "done" || liveIv.status === "invoiced" || liveIv.status === "cancelled";
-  const showActionBar = !awaitingAssignment && liveIv.status !== "assigned" && !isTerminal;
+  const isInvoicedOrCancelled =
+    liveIv.status === "invoiced" || liveIv.status === "cancelled";
+  const isDoneAmendable =
+    liveIv.status === "done" &&
+    canTechnicianAmendCompletionReport(liveIv, technicianUid).allowed;
+  const showActionBar =
+    !awaitingAssignment &&
+    liveIv.status !== "assigned" &&
+    !isInvoicedOrCancelled &&
+    !isDoneAmendable;
+  const primaryContactActions =
+    showActionBar || isDoneAmendable
+      ? buildMissionContactActions({
+          intervention: liveIv,
+          t,
+          primaryOnly: true,
+        })
+      : [];
 
   return (
     <div
@@ -239,7 +244,7 @@ export default function TechnicianDashboardDetailPanel({
       style={outfit}
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      {isTerminal ? (
+      {isInvoicedOrCancelled ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4">
           <div className="flex flex-col items-center rounded-xl border border-emerald-100/80 bg-emerald-50/40 px-6 py-8">
             <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
@@ -250,68 +255,103 @@ export default function TechnicianDashboardDetailPanel({
             </p>
           </div>
         </div>
+      ) : isDoneAmendable ? (
+        <>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div
+              className="technician-detail-body flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-emerald-50/40 via-white to-white px-4 py-2"
+              data-testid="technician-detail-scroll"
+            >
+              <div className="flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-2">
+                <span
+                  data-testid="technician-detail-done-badge"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                  {t("technician_hub.dashboard.detail.mission_done_badge")}
+                </span>
+                <p
+                  data-testid="technician-detail-invoice-pending"
+                  className="max-w-[18rem] text-center text-[11px] font-medium leading-snug text-slate-500"
+                >
+                  {t("technician_hub.dashboard.detail.invoice_backoffice_pending")}
+                </p>
+                <div className="flex min-h-0 w-full max-w-[20.5rem] shrink flex-col overflow-hidden rounded-[1.5rem] border border-white/90 bg-white/95 px-5 py-5 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+                  <TechnicianMissionBrief
+                    timeLabel={formatScheduledTimeOnly(liveIv)}
+                    clientDisplayName={clientDisplayName}
+                    address={liveIv.address ? formatAddress(liveIv.address) : null}
+                    descriptionText={descriptionText}
+                    contactRail={
+                      primaryContactActions.length > 0 ? (
+                        <MissionContactRail variant="compact" actions={primaryContactActions} />
+                      ) : null
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <footer className="shrink-0 border-t border-slate-200/50 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <button
+              type="button"
+              data-testid="technician-edit-completion-report"
+              onClick={onStartFinishJob}
+              className="flex h-14 w-full max-w-[20.5rem] mx-auto items-center justify-center gap-2 rounded-full bg-slate-900 text-[15px] font-semibold text-white shadow-lg transition active:scale-[0.98]"
+            >
+              <Pencil className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
+              {t("technician_hub.dashboard.detail.edit_report")}
+            </button>
+          </footer>
+        </>
       ) : (
         <>
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-neutral-200/80 bg-white mx-3 mt-2"
+            className={cn(
+              "flex min-h-0 flex-1 flex-col overflow-hidden",
+              awaitingAssignment && "technician-detail-awaiting-offer",
+            )}
             data-testid={
               liveIv.status === "waiting_material" ? "technician-detail-waiting-material" : undefined
             }
           >
-            <header className="shrink-0 border-b border-neutral-100 px-3 py-2">
-              <p className="text-[11px] font-semibold tabular-nums text-neutral-500">
-                {formatScheduledTimeOnly(liveIv)}
-              </p>
-              <h1 className="text-[16px] font-bold leading-tight text-neutral-900">{clientDisplayName}</h1>
-              {liveIv.address ? (
-                <p className="text-[12px] leading-snug text-neutral-600">{formatAddress(liveIv.address)}</p>
-              ) : null}
-            </header>
-
             <div
-              className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2"
+              className="technician-detail-body flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50/50 via-white to-white px-4 py-2"
               data-testid="technician-detail-scroll"
             >
-              <div className="flex flex-col gap-2.5">
+              <div className="flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-2">
+                <div className="flex min-h-0 w-full max-w-[20.5rem] shrink flex-col overflow-hidden rounded-[1.5rem] border border-white/90 bg-white/95 px-5 py-5 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+                  <TechnicianMissionBrief
+                    timeLabel={formatScheduledTimeOnly(liveIv)}
+                    clientDisplayName={clientDisplayName}
+                    address={liveIv.address ? formatAddress(liveIv.address) : null}
+                    descriptionText={descriptionText}
+                    awaitingAssignment={awaitingAssignment}
+                    contactRail={
+                      primaryContactActions.length > 0 ? (
+                        <MissionContactRail variant="compact" actions={primaryContactActions} />
+                      ) : null
+                    }
+                  />
+                </div>
+
                 {liveIv.status === "waiting_material" ? (
-                  <p className="rounded-lg border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-center text-[11px] font-semibold text-neutral-700">
+                  <p className="!m-0 w-full max-w-[20.5rem] shrink-0 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] font-semibold leading-snug text-amber-900 line-clamp-2">
                     {t("technician_hub.dashboard.detail.waiting_material_banner")}
                   </p>
                 ) : null}
 
-                {descriptionText ? (
-                  <div data-testid="technician-detail-description">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                      {t("technician_hub.dashboard.detail.description_label")}
-                    </p>
-                    <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-neutral-800">
-                      {descriptionText}
-                    </p>
-                  </div>
-                ) : null}
-
                 {hasAudioBlock ? (
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex w-full max-w-[20.5rem] shrink-0 flex-col items-center gap-1">
                     {liveIv.audioUrl ? <AudioUrlPlayer url={liveIv.audioUrl} t={t} /> : null}
                     {liveIv.transcription?.trim() ? (
-                      <p className="rounded-lg bg-neutral-50 px-2.5 py-1.5 text-[12px] leading-relaxed text-neutral-700">
+                      <p className="line-clamp-2 rounded-lg bg-neutral-50 px-2.5 py-1 text-[12px] font-semibold leading-snug text-neutral-800">
                         {liveIv.transcription.trim()}
                       </p>
                     ) : null}
                   </div>
                 ) : null}
 
-                {showMaterials ? (
-                  <InterventionMaterialOrdersPanel
-                    intervention={liveIv}
-                    technicianUid={technicianUid}
-                    allowCreate
-                    allowStatusUpdate={false}
-                    expanded={materialsPanelOpen}
-                    onExpandedChange={setMaterialsPanelOpen}
-                    compact
-                  />
-                ) : null}
               </div>
             </div>
           </div>
@@ -321,16 +361,12 @@ export default function TechnicianDashboardDetailPanel({
           ) : null}
 
           {showActionBar ? (
-            <MissionActionBar
-              compact
+            <MissionFieldFooter
               intervention={liveIv}
-              awaitingAssignment={false}
               isUpdating={isUpdating}
               onPrimaryTransition={(toStatus) => void handleUpdateStatus(toStatus)}
               onFinish={onStartFinishJob}
               onWaitingMaterial={() => void handleUpdateStatus("waiting_material")}
-              onOpenMaterials={() => setMaterialsPanelOpen(true)}
-              onQuickPhoto={() => navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_FINISH)}
             />
           ) : null}
         </>

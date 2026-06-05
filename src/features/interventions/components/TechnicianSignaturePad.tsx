@@ -1,14 +1,21 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export type TechnicianSignaturePadHandle = {
   clear: () => void;
   getPngDataUrl: () => string | null;
 };
 
-const TechnicianSignaturePad = forwardRef<TechnicianSignaturePadHandle>(function TechnicianSignaturePad(
-  _props,
+type Props = {
+  /** Remplit la hauteur du conteneur parent (wizard clôture). */
+  fillHeight?: boolean;
+  className?: string;
+};
+
+const TechnicianSignaturePad = forwardRef<TechnicianSignaturePadHandle, Props>(function TechnicianSignaturePad(
+  { fillHeight = false, className },
   ref,
 ) {
   const [mounted, setMounted] = useState(false);
@@ -118,7 +125,11 @@ const TechnicianSignaturePad = forwardRef<TechnicianSignaturePadHandle>(function
     return (
       <div
         data-testid="technician-signature-pad"
-        className="h-[200px] animate-pulse rounded-[18px] bg-slate-100"
+        className={cn(
+          "animate-pulse rounded-2xl bg-slate-100",
+          fillHeight ? "min-h-[120px] flex-1" : "h-[200px]",
+          className,
+        )}
         aria-hidden
       />
     );
@@ -127,7 +138,11 @@ const TechnicianSignaturePad = forwardRef<TechnicianSignaturePadHandle>(function
   return (
     <div
       data-testid="technician-signature-pad"
-      className="touch-none overflow-hidden rounded-[18px] border border-black/[0.08] bg-white shadow-inner"
+      className={cn(
+        "touch-none overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-inner",
+        fillHeight && "flex min-h-0 flex-1 flex-col",
+        className,
+      )}
     >
       <canvas
         ref={canvasRef}
@@ -136,7 +151,10 @@ const TechnicianSignaturePad = forwardRef<TechnicianSignaturePadHandle>(function
         onPointerUp={stopDrawing}
         onPointerOut={stopDrawing}
         onPointerCancel={stopDrawing}
-        className="h-[200px] w-full touch-none"
+        className={cn(
+          "w-full touch-none",
+          fillHeight ? "min-h-[120px] flex-1" : "h-[200px]",
+        )}
         aria-label="Signature client"
         style={{ touchAction: "none" }}
       />

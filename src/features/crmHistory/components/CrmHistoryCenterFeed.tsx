@@ -213,17 +213,19 @@ function groupByDate(events: CrmActivityEvent[]): Map<string, CrmActivityEvent[]
 
 function EventRow({
   event,
-  onClick,
+  onSelect,
   isNew,
+  isSelected,
 }: {
   event: CrmActivityEvent;
-  onClick?: (e: CrmActivityEvent) => void;
+  onSelect?: (e: CrmActivityEvent) => void;
   isNew?: boolean;
+  isSelected?: boolean;
 }) {
   const { t } = useTranslation();
   const meta = EVENT_META[event.type];
   const { Icon, colorClass, dotClass } = meta;
-  const isClickable = Boolean(event.interventionId && onClick);
+  const isClickable = Boolean(onSelect);
 
   const subtitle =
     event.emailSubject ??
@@ -269,11 +271,11 @@ function EventRow({
       data-testid={`crm-event-${event.id}`}
       role={isClickable ? "button" : undefined}
       tabIndex={isClickable ? 0 : undefined}
-      onClick={isClickable ? () => onClick!(event) : undefined}
+      onClick={isClickable ? () => onSelect!(event) : undefined}
       onKeyDown={
         isClickable
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") onClick!(event);
+              if (e.key === "Enter" || e.key === " ") onSelect!(event);
             }
           : undefined
       }
@@ -281,6 +283,7 @@ function EventRow({
         "group relative flex items-start gap-3 rounded-xl px-3 py-2.5 transition-all hover:bg-white/80 crm-animate-item",
         isClickable && "cursor-pointer hover:shadow-sm",
         isNew && "crm-event-row--new bg-blue-50/90 ring-1 ring-blue-200/80 shadow-sm",
+        isSelected && "bg-white ring-2 ring-blue-400/70 shadow-sm",
       )}
     >
       {/* dot */}
@@ -351,7 +354,8 @@ type Props = {
   live?: boolean;
   newEventIds?: Set<string>;
   feedError?: string | null;
-  onEventClick?: (event: CrmActivityEvent) => void;
+  selectedEventId?: string | null;
+  onEventSelect?: (event: CrmActivityEvent) => void;
 };
 
 export default function CrmHistoryCenterFeed({
@@ -361,7 +365,8 @@ export default function CrmHistoryCenterFeed({
   live = false,
   newEventIds,
   feedError,
-  onEventClick,
+  selectedEventId,
+  onEventSelect,
 }: Props) {
   const { t } = useTranslation();
 
@@ -443,8 +448,9 @@ export default function CrmHistoryCenterFeed({
               <EventRow
                 key={e.id}
                 event={e}
-                onClick={onEventClick}
+                onSelect={onEventSelect}
                 isNew={newEventIds?.has(e.id)}
+                isSelected={selectedEventId === e.id}
               />
             ))}
           </div>
