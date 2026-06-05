@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { TextDecoder, TextEncoder } from 'util';
 import { mockState } from './src/test-utils/mockState';
+import { resetFactorySequence } from './src/test-utils/factories';
 
 if (typeof global.TextDecoder === 'undefined') {
   global.TextDecoder = TextDecoder as typeof global.TextDecoder;
@@ -9,6 +10,7 @@ if (typeof global.TextDecoder === 'undefined') {
 
 afterEach(() => {
   mockState.reset();
+  resetFactorySequence();
   jest.clearAllMocks();
 });
 
@@ -356,6 +358,72 @@ jest.mock('@/core/config/firebase', () => ({
   storage: {},
   isConfigured: true,
 }));
+
+// ---------------------------------------------------------------------------
+// Firebase Admin SDK — available for server-side unit tests (jest-environment node).
+// Individual tests can override specific methods via jest.spyOn or jest.mock.
+// ---------------------------------------------------------------------------
+jest.mock('firebase-admin/firestore', () => ({
+  getFirestore: jest.fn(() => ({
+    collection: jest.fn(() => ({
+      doc: jest.fn(() => ({
+        get: jest.fn(async () => ({ exists: false, data: () => undefined, id: 'mock-doc' })),
+        set: jest.fn(async () => undefined),
+        update: jest.fn(async () => undefined),
+        delete: jest.fn(async () => undefined),
+      })),
+      add: jest.fn(async (data: unknown) => ({ id: 'mock-new-id', ...((data as object) ?? {}) })),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      get: jest.fn(async () => ({ docs: [], empty: true, forEach: jest.fn() })),
+    })),
+    batch: jest.fn(() => ({
+      set: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      commit: jest.fn(async () => undefined),
+    })),
+    runTransaction: jest.fn(async (fn: (t: unknown) => Promise<unknown>) => fn({})),
+  })),
+  FieldValue: {
+    serverTimestamp: jest.fn(() => ({ _seconds: 0, _nanoseconds: 0 })),
+    increment: jest.fn((n: number) => ({ _increment: n })),
+    arrayUnion: jest.fn((...items: unknown[]) => ({ _arrayUnion: items })),
+    arrayRemove: jest.fn((...items: unknown[]) => ({ _arrayRemove: items })),
+    delete: jest.fn(() => ({ _delete: true })),
+  },
+  Timestamp: {
+    now: jest.fn(() => ({ toDate: () => new Date(), seconds: 0, nanoseconds: 0 })),
+    fromDate: jest.fn((d: Date) => ({ toDate: () => d, seconds: Math.floor(d.getTime() / 1000), nanoseconds: 0 })),
+    fromMillis: jest.fn((ms: number) => ({ toDate: () => new Date(ms), seconds: Math.floor(ms / 1000), nanoseconds: 0 })),
+  },
+}), { virtual: true });
+
+// ---------------------------------------------------------------------------
+// OpenAI — mock the SDK to avoid real API calls in unit tests.
+// Tests that need specific responses can override with jest.spyOn.
+// ---------------------------------------------------------------------------
+jest.mock('openai', () => {
+  const mockStream = {
+    [Symbol.asyncIterator]: jest.fn(async function* () {
+      yield { choices: [{ delta: { content: 'mock response' }, finish_reason: null }] };
+      yield { choices: [{ delta: {}, finish_reason: 'stop' }] };
+    }),
+    controller: { abort: jest.fn() },
+  };
+
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      chat: {
+        completions: {
+          create: jest.fn(async () => mockStream),
+        },
+      },
+    })),
+  };
+}, { virtual: true });
 
 // JSDOM has no Web Speech API; dictation hook checks `window.SpeechRecognition`.
 if (typeof window !== "undefined") {
