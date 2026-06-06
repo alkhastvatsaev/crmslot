@@ -43,9 +43,7 @@ jest.mock("@/context/TechnicianBackofficeReportBridgeContext", () => ({
 }));
 
 jest.mock("@/features/interventions/completionUpload", () => ({
-  finalizeCompletionOfflineAware: jest.fn(() =>
-    Promise.resolve({ outcome: "saved" as const }),
-  ),
+  finalizeCompletionOfflineAware: jest.fn(() => Promise.resolve({ outcome: "saved" as const })),
 }));
 
 jest.mock("@/features/interventions/finishJobCapture", () => ({
@@ -60,6 +58,7 @@ jest.mock("@/features/interventions/technicianHubNavigation", () => ({
 const mockGetPngDataUrl = jest.fn(() => "data:image/png;base64,signature");
 const mockClear = jest.fn();
 jest.mock("@/features/interventions/components/TechnicianSignaturePad", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- jest mock factory
   const React = require("react");
   const Pad = React.forwardRef((_props: unknown, ref: React.Ref<unknown>) => {
     React.useImperativeHandle(ref, () => ({
@@ -81,8 +80,12 @@ Object.defineProperty(global.navigator, "mediaDevices", {
   configurable: true,
 });
 
-const mockUseFinishJob = useTechnicianFinishJob as jest.MockedFunction<typeof useTechnicianFinishJob>;
-const mockUseInterventionLive = useInterventionLive as jest.MockedFunction<typeof useInterventionLive>;
+const mockUseFinishJob = useTechnicianFinishJob as jest.MockedFunction<
+  typeof useTechnicianFinishJob
+>;
+const mockUseInterventionLive = useInterventionLive as jest.MockedFunction<
+  typeof useInterventionLive
+>;
 
 const MOCK_IV = {
   id: "iv-001",
@@ -105,9 +108,7 @@ async function goToSignatureStep() {
   for (let i = 0; i < FINISH_JOB_MIN_PHOTOS; i++) {
     fireEvent.click(captureBtn);
   }
-  await waitFor(() =>
-    expect(screen.getByTestId("finish-job-continue-photos")).not.toBeDisabled(),
-  );
+  await waitFor(() => expect(screen.getByTestId("finish-job-continue-photos")).not.toBeDisabled());
   fireEvent.click(screen.getByTestId("finish-job-continue-photos"));
   await waitFor(() => expect(screen.getByTestId("signature-pad-mock")).toBeInTheDocument());
 }
@@ -167,7 +168,7 @@ describe("TechnicianFinishJobPanel", () => {
     });
 
     const { finalizeCompletionOfflineAware } = jest.requireMock(
-      "@/features/interventions/completionUpload",
+      "@/features/interventions/completionUpload"
     ) as { finalizeCompletionOfflineAware: jest.Mock };
     const { fetchWithAuth } = jest.requireMock("@/core/api/fetchWithAuth") as {
       fetchWithAuth: jest.Mock;
@@ -179,11 +180,11 @@ describe("TechnicianFinishJobPanel", () => {
           interventionId: "iv-001",
           signaturePngDataUrl: "data:image/png;base64,signature",
           photoDataUrls: expect.arrayContaining(["data:image/jpeg;base64,mockphoto"]),
-        }),
+        })
       );
       expect(fetchWithAuth).toHaveBeenCalledWith(
         "/api/interventions/iv-001/prepare-draft-billing",
-        expect.objectContaining({ method: "POST" }),
+        expect.objectContaining({ method: "POST" })
       );
     });
   });

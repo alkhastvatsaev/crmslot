@@ -1,7 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
 import RequesterInterventionPanel from "@/features/interventions/components/RequesterInterventionPanel";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import {
+  RequesterHubProvider,
+  useRequesterHub,
+  type InterventionRequestData,
+} from "@/features/interventions/context/RequesterHubContext";
 import { mockState } from "@/test-utils/mockState";
 
 // ── External deps ────────────────────────────────────────────────────────────
@@ -19,7 +23,10 @@ jest.mock("@/features/interventions/recordDuplicateAlertIfNeeded", () => ({
 
 jest.mock("@/features/interventions/smartFormReverseGeocode", () => ({
   resolveInterventionAddressFromCoords: jest.fn(() =>
-    Promise.resolve({ formatted: "Rue de la Loi 1, 1000 Bruxelles", location: { lat: 50.84, lng: 4.35 } }),
+    Promise.resolve({
+      formatted: "Rue de la Loi 1, 1000 Bruxelles",
+      location: { lat: 50.84, lng: 4.35 },
+    })
   ),
 }));
 
@@ -80,7 +87,7 @@ function renderPanel() {
   return render(
     <RequesterHubProvider>
       <RequesterInterventionPanel />
-    </RequesterHubProvider>,
+    </RequesterHubProvider>
   );
 }
 
@@ -104,7 +111,7 @@ describe("RequesterInterventionPanel", () => {
     expect(screen.queryByTestId("smart-form-template-blocked")).not.toBeInTheDocument();
     // Mic button accessible label from step 1
     expect(
-      screen.getByRole("button", { name: /press to speak|parler|spreken/i }),
+      screen.getByRole("button", { name: /press to speak|parler|spreken/i })
     ).toBeInTheDocument();
   });
 
@@ -117,7 +124,7 @@ describe("RequesterInterventionPanel", () => {
     render(
       <RequesterHubProvider>
         <Step4Driver address="" problem="Porte bloquée" />
-      </RequesterHubProvider>,
+      </RequesterHubProvider>
     );
     const btn = await screen.findByTestId("intervention-submit-btn");
     expect(btn).toBeDisabled();
@@ -138,7 +145,7 @@ describe("RequesterInterventionPanel", () => {
     render(
       <RequesterHubProvider>
         <Step4Driver address="Rue de la Loi 1, 1000 Bruxelles" problem="Porte bloquée" />
-      </RequesterHubProvider>,
+      </RequesterHubProvider>
     );
 
     const btn = await screen.findByTestId("intervention-submit-btn");
@@ -152,17 +159,16 @@ describe("RequesterInterventionPanel", () => {
 
 // ── Inner component that drives the hub context to step 4 then renders panel ─
 function Step4Driver({ address, problem }: { address: string; problem: string }) {
-  const { setCurrentStep, setRequestData } =
-    require("@/features/interventions/context/RequesterHubContext").useRequesterHub();
+  const { setCurrentStep, setRequestData } = useRequesterHub();
 
   React.useEffect(() => {
-    setRequestData((prev: Record<string, unknown>) => ({
+    setRequestData((prev: InterventionRequestData) => ({
       ...prev,
       interventionAddress: address,
       problemLabel: problem,
     }));
     setCurrentStep(4);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <RequesterInterventionPanel />;
