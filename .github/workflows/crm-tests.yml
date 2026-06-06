@@ -1,0 +1,31 @@
+# Tests historique CRM quand le module change.
+name: CRM tests
+
+on:
+  pull_request:
+    paths:
+      - "src/features/crmHistory/**"
+      - "src/app/api/ai/crm-history-agent/**"
+      - "jest.config.ts"
+      - "jest.setup.ts"
+      - ".github/workflows/crm-tests.yml"
+
+jobs:
+  crm-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CRM history unit tests
+        run: npm run test:crm
