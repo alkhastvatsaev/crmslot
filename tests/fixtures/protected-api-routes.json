@@ -1,0 +1,278 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/ai/assistant",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/audio-decision",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/ai/audio-for-url"
+  },
+  {
+    "method": "GET",
+    "path": "/api/ai/audios"
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/billing-hub-agent",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/chatbot",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/chatbot/document-action",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/crm-history-agent",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/intervention-problem-suggestions",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/ai/latest-audio"
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/material-agent",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/parse-billing",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/ai/resolve-audio-url"
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/smart-dispatch",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/transcribe",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/transcribe-blob",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/workspace-copilot",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/ip"
+  },
+  {
+    "method": "POST",
+    "path": "/api/catalog/lecot-images",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/catalog/lecot-search"
+  },
+  {
+    "method": "GET",
+    "path": "/api/companies/fixture/pwa-registry"
+  },
+  {
+    "method": "GET",
+    "path": "/api/companies/fixture/supplier-orders/fixture/pdf"
+  },
+  {
+    "method": "GET",
+    "path": "/api/demo/client-audio"
+  },
+  {
+    "method": "POST",
+    "path": "/api/demo/client-audio",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/demo/client-audio/file/fixture"
+  },
+  {
+    "method": "POST",
+    "path": "/api/email",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/email/send",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/auth-url"
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/connect"
+  },
+  {
+    "method": "POST",
+    "path": "/api/integrations/gmail/disconnect",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/labels"
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/messages"
+  },
+  {
+    "method": "POST",
+    "path": "/api/integrations/gmail/messages",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/messages/fixture"
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/messages/fixture/attachments/fixture"
+  },
+  {
+    "method": "POST",
+    "path": "/api/integrations/gmail/messages/fixture/link-intervention",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/messages/fixture/link-suggestions"
+  },
+  {
+    "method": "POST",
+    "path": "/api/integrations/gmail/messages/fixture/modify",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/integrations/gmail/messages/fixture/trash",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/status"
+  },
+  {
+    "method": "GET",
+    "path": "/api/integrations/gmail/threads/fixture"
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/assign",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/completion-amend",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/interventions/fixture/document-pdf"
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/prepare-draft-billing",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/interventions/fixture/quote-pdf"
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/send-client-invoice",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/technician-response",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/transition",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/validate-report",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/from-audio",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/interventions/local"
+  },
+  {
+    "method": "POST",
+    "path": "/api/maintenance/generate-due",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/maps/distance",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/maps/geocode"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notifications/whatsapp",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/sms",
+    "body": {}
+  },
+  {
+    "method": "GET",
+    "path": "/api/stripe/balance"
+  },
+  {
+    "method": "POST",
+    "path": "/api/stripe/create-payment-link",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/suppliers/order",
+    "body": {}
+  }
+]
