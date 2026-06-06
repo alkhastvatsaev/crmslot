@@ -578,22 +578,22 @@
         "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.)."
       }
     },
-    "agent_placeholder": "Activity, cases, summary…",
+    "agent_placeholder": "KPIs, performance, quality analysis…",
     "agent_reset": "New conversation",
     "agent_thinking": "Analyzing…",
     "agent_no_company": "Select an active company.",
-    "agent_off_topic": "I am the History Agent — I only analyze CRM activity and history. For billing, stock, or the full Chatbot, use the dedicated page.",
+    "agent_off_topic": "I am the QM Agent — I analyze operational performance and quality. For stock, Lecot orders, or accounting, use the dedicated page.",
     "ai": {
-      "title": "AI Copilot",
-      "subtitle": "Smart analysis",
+      "title": "Quality Management Agent",
+      "subtitle": "Performance & quality",
       "shortcuts_label": "Shortcuts",
       "shortcuts": {
-        "summary_week": "Summarize this week's activity",
-        "materials_ordered": "What materials were ordered?",
-        "unresolved": "Which interventions are pending?",
-        "tech_performance": "Analyze technician performance"
+        "closure_rate": "Explain today's closure rate",
+        "why_cancelled": "Why were interventions cancelled?",
+        "tech_performance": "Analyze technician performance",
+        "summary_week": "Summarize this week's activity"
       },
-      "info": "AI analyses your entire CRM history to give you actionable insights."
+      "info": "The QM Agent analyzes your KPIs in real time and identifies quality issues."
     }
   },
   "companyStock": {

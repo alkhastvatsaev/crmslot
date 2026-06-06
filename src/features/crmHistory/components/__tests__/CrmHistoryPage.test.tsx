@@ -78,6 +78,10 @@ jest.mock("@/context/BackofficeInboxIntentContext", () => ({
   }),
 }));
 
+jest.mock("@/context/DateContext", () => ({
+  useDateContext: () => ({ selectedDate: new Date("2026-06-06") }),
+}));
+
 jest.mock("@/features/backoffice/backofficeHubNavigation", () => ({
   navigateBackOfficeHub: jest.fn(),
   BACKOFFICE_HUB_ANCHOR_DUPLICATES: "backoffice-hub-duplicates",
@@ -109,7 +113,7 @@ describe("CrmHistoryPage", () => {
     expect(screen.queryByTestId("crm-search-input")).not.toBeInTheDocument();
   });
 
-  it("shows event detail in right panel when a feed row is selected", () => {
+  it("shows event detail in center panel when a feed card is selected", () => {
     renderCrmPage();
     fireEvent.click(screen.getByTestId("crm-event-feed-e1"));
     const panel = screen.getByTestId("crm-history-detail-panel");

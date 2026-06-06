@@ -578,22 +578,22 @@
         "quote_status_changed": "Le statut du devis a changé (brouillon, envoyé, accepté, refusé, etc.)."
       }
     },
-    "agent_placeholder": "Activité, dossiers, synthèse…",
+    "agent_placeholder": "KPIs, performance, analyse qualité…",
     "agent_reset": "Nouvelle conversation",
     "agent_thinking": "Analyse…",
     "agent_no_company": "Sélectionnez une société active.",
-    "agent_off_topic": "Je suis l'Agent Historique — j'analyse uniquement l'activité et l'historique CRM. Pour la facturation, le stock ou le Chatbot complet, utilisez la page dédiée.",
+    "agent_off_topic": "Je suis l'Agent QM — j'analyse la performance et la qualité opérationnelle. Pour le stock, les commandes Lecot ou la comptabilité, utilisez la page dédiée.",
     "ai": {
-      "title": "Copilote IA",
-      "subtitle": "Analyse intelligente",
+      "title": "Agent Quality Management",
+      "subtitle": "Performance & qualité",
       "shortcuts_label": "Raccourcis",
       "shortcuts": {
-        "summary_week": "Résume l'activité de cette semaine",
-        "materials_ordered": "Quels matériaux ont été commandés ?",
-        "unresolved": "Quelles interventions sont en attente ?",
-        "tech_performance": "Analyse la performance des techniciens"
+        "closure_rate": "Explique le taux de clôture d'aujourd'hui",
+        "why_cancelled": "Pourquoi des interventions ont été annulées ?",
+        "tech_performance": "Analyse la performance des techniciens",
+        "summary_week": "Résume l'activité de cette semaine"
       },
-      "info": "L'IA analyse l'ensemble de votre historique CRM pour vous donner des insights actionnables."
+      "info": "L'Agent QM analyse vos KPIs en temps réel et identifie les points d'attention qualité."
     }
   },
   "companyStock": {

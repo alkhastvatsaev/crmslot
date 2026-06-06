@@ -1,6 +1,7 @@
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildCrmHistoryAgentSystemPrompt } from "@/features/crmHistory/crmHistoryAgentSystemPrompt";
+import type { QmKpiSnapshot } from "@/features/crmHistory/crmHistoryAgentSystemPrompt";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
 import { CRM_HISTORY_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
@@ -13,13 +14,14 @@ export type CrmHistoryAgentPostBody = {
   role?: CompanyRole | null;
   messages?: unknown[];
   activitySnapshot?: string | null;
+  kpiSnapshot?: QmKpiSnapshot | null;
 };
 
 export type CrmHistoryAgentRouteAuth = { uid: string };
 
 export async function handleCrmHistoryAgentPost(
   body: CrmHistoryAgentPostBody | null,
-  auth: CrmHistoryAgentRouteAuth,
+  auth: CrmHistoryAgentRouteAuth
 ): Promise<Response> {
   const companyId = (body?.companyId ?? "").trim();
   if (!companyId) {
@@ -48,6 +50,7 @@ export async function handleCrmHistoryAgentPost(
     companyId,
     today,
     activitySnapshot: body?.activitySnapshot ?? null,
+    kpiSnapshot: body?.kpiSnapshot ?? null,
   });
 
   const toolCtx: ChatbotToolContext = { companyId, actorUid: auth.uid, role };
