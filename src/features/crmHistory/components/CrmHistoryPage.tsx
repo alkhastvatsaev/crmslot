@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CrmPeriodFilter } from "../crmActivityTypes";
+import { useDateContext } from "@/context/DateContext";
 import { toast } from "sonner";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -37,12 +38,13 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
 
-  const [period, setPeriod] = useState<CrmPeriodFilter>("week");
+  const { selectedDate } = useDateContext();
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(
     companyId,
-    period,
     "all",
-    ""
+    "all",
+    "",
+    selectedDate
   );
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
@@ -114,8 +116,9 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
             feedError={feedError}
             selectedEventId={selectedEventId}
             onEventSelect={handleEventSelect}
-            period={period}
-            onPeriodChange={setPeriod}
+            selectedEvent={selectedEvent}
+            onClearSelection={() => setSelectedEventId(null)}
+            onOpenIntervention={handleOpenIntervention}
           />
         </section>
       }
@@ -123,12 +126,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
       rightPadding={false}
       right={
         <section className={railShell}>
-          <CrmHistoryEventDetailPanel
-            event={selectedEvent}
-            onOpenIntervention={handleOpenIntervention}
-            allEvents={events}
-            period={period}
-          />
+          <CrmHistoryEventDetailPanel event={null} allEvents={events} selectedDate={selectedDate} />
         </section>
       }
     />

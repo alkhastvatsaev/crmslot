@@ -578,22 +578,22 @@
         "quote_status_changed": "De offertestatus is gewijzigd (concept, verzonden, geaccepteerd, geweigerd, enz.)."
       }
     },
-    "agent_placeholder": "Activiteit, dossiers, samenvatting…",
+    "agent_placeholder": "KPI's, prestaties, kwaliteitsanalyse…",
     "agent_reset": "Nieuw gesprek",
     "agent_thinking": "Analyseren…",
     "agent_no_company": "Selecteer een actief bedrijf.",
-    "agent_off_topic": "Ik ben de Geschiedenisagent — ik analyseer alleen CRM-activiteit en geschiedenis. Voor facturatie, stock of de volledige Chatbot, gebruik de juiste pagina.",
+    "agent_off_topic": "Ik ben de QM-agent — ik analyseer operationele prestaties en kwaliteit. Voor stock, Lecot-bestellingen of boekhouding, gebruik de juiste pagina.",
     "ai": {
-      "title": "AI Copiloot",
-      "subtitle": "Slimme analyse",
+      "title": "Quality Management Agent",
+      "subtitle": "Prestaties & kwaliteit",
       "shortcuts_label": "Snelkoppelingen",
       "shortcuts": {
-        "summary_week": "Vat de activiteit van deze week samen",
-        "materials_ordered": "Welke materialen zijn besteld?",
-        "unresolved": "Welke interventies zijn in behandeling?",
-        "tech_performance": "Analyseer de prestaties van technici"
+        "closure_rate": "Verklaar het afsluitpercentage van vandaag",
+        "why_cancelled": "Waarom zijn interventies geannuleerd?",
+        "tech_performance": "Analyseer de prestaties van technici",
+        "summary_week": "Vat de activiteit van deze week samen"
       },
-      "info": "AI analyseert uw volledige CRM-geschiedenis voor bruikbare inzichten."
+      "info": "De QM-agent analyseert uw KPI's in realtime en identificeert kwaliteitsproblemen."
     }
   },
   "companyStock": {
