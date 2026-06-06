@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import React, { useRef, useState } from "react";
 import { Camera, Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,16 +67,18 @@ export default function QuickCameraUploader({
         ctx.drawImage(bitmap, 0, 0, width, height);
         const dataUrl = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
         setPreview(dataUrl);
-        
+
         // Convertir le dataUrl en fichier (optionnel, selon l'implémentation de l'upload Firebase)
         const response = await fetch(dataUrl);
         const blob = await response.blob();
         const compressedFile = new File([blob], file.name, { type: "image/jpeg" });
-        
+
         onPhotoTaken(compressedFile, dataUrl);
       }
     } catch (err) {
-      console.error("Erreur de compression :", err);
+      logger.error("Erreur de compression :", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       // Fallback
       const fallbackUrl = URL.createObjectURL(file);
       setPreview(fallbackUrl);
@@ -116,18 +120,14 @@ export default function QuickCameraUploader({
         </Button>
       ) : (
         <div className="relative w-full h-48 rounded-xl overflow-hidden border bg-slate-100">
-          <img
-            src={preview}
-            alt="Aperçu"
-            className="w-full h-full object-cover"
-          />
+          <img src={preview} alt="Aperçu" className="w-full h-full object-cover" />
           <button
             onClick={clearPreview}
             className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1.5 hover:bg-black/70 backdrop-blur-sm"
           >
             <X className="w-4 h-4" />
           </button>
-          
+
           {isUploading && (
             <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
               <div className="flex flex-col items-center">

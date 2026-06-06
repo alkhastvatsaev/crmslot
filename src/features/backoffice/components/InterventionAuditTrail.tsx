@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { Clock, ArrowRight, User, MessageSquare } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-slate-100 text-slate-600",
@@ -51,7 +44,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
     scheduleEffectUpdate(() => setLoading(true));
     const q = query(
       collection(firestore, "interventions", activeId, "status_events"),
-      orderBy("at", "desc"),
+      orderBy("at", "desc")
     );
 
     const unsub = onSnapshot(
@@ -64,7 +57,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
         setEvents(docs);
         setLoading(false);
       },
-      () => setLoading(false),
+      () => setLoading(false)
     );
 
     return unsub;
@@ -74,7 +67,6 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
     return (
       <div
         data-testid="audit-trail-empty"
-        style={outfit}
         className="py-6 text-center text-[13px] text-slate-400 font-medium"
       >
         {String(t("audit.no_events"))}
@@ -84,11 +76,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
 
   if (loading) {
     return (
-      <div
-        data-testid="audit-trail-loading"
-        style={outfit}
-        className="flex items-center justify-center py-8"
-      >
+      <div data-testid="audit-trail-loading" className="flex items-center justify-center py-8">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600" />
       </div>
     );
@@ -98,7 +86,6 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
     return (
       <div
         data-testid="audit-trail-empty"
-        style={outfit}
         className="py-6 text-center text-[13px] text-slate-400 font-medium"
       >
         {String(t("audit.no_events"))}
@@ -125,11 +112,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
   };
 
   return (
-    <div
-      data-testid="audit-trail"
-      style={outfit}
-      className="space-y-1"
-    >
+    <div data-testid="audit-trail" className="space-y-1">
       <div className="flex items-center gap-2 px-1 pb-2">
         <Clock className="h-4 w-4 text-slate-500" />
         <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">
@@ -189,9 +172,7 @@ export default function InterventionAuditTrail({ interventionId }: Props) {
 
               <div className="mt-1 flex items-center gap-2 text-[11px] text-slate-400">
                 <User className="h-3 w-3" />
-                <span className="font-medium">
-                  {ROLE_LABELS[evt.actorRole] ?? evt.actorRole}
-                </span>
+                <span className="font-medium">{ROLE_LABELS[evt.actorRole] ?? evt.actorRole}</span>
                 <span>·</span>
                 <span>{formatTime(evt.at)}</span>
               </div>

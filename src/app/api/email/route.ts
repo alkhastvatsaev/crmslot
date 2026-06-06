@@ -1,21 +1,22 @@
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { requireAuthenticatedUser } from '@/core/api/routeAuth';
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 
 export async function POST(req: Request) {
   const auth = await requireAuthenticatedUser(req);
-  if ('response' in auth) return auth.response;
+  if ("response" in auth) return auth.response;
 
   try {
     const { clientName, message, pdfBase64 } = await req.json();
 
     if (!clientName || !pdfBase64) {
-      return NextResponse.json({ success: false, error: 'Paramètres manquants.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Paramètres manquants." }, { status: 400 });
     }
 
     // Configuration de Nodemailer avec Gmail
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
 
     const mailOptions = {
       from: `"MAP BELGIQUE" <${process.env.GMAIL_USER}>`,
-      to: 'testbelgiqueserrure@gmail.com', // Adresse de réception
+      to: "testbelgiqueserrure@gmail.com", // Adresse de réception
       subject: `MAP BELGIQUE - Devis d'intervention pour ${clientName}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px; border-radius: 8px;">
@@ -40,9 +41,9 @@ export async function POST(req: Request) {
       `,
       attachments: [
         {
-          filename: `Devis_${clientName.replace(/\s+/g, '_')}.pdf`,
+          filename: `Devis_${clientName.replace(/\s+/g, "_")}.pdf`,
           content: pdfBase64,
-          encoding: 'base64'
+          encoding: "base64",
         },
       ],
     };
@@ -52,10 +53,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, messageId: info.messageId }, { status: 200 });
   } catch (error) {
-    console.error("Erreur lors de l'envoi de l'e-mail avec Gmail :", error);
+    logger.error("Erreur lors de l'envoi de l'e-mail avec Gmail :", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     const message = error instanceof Error ? error.message : "Échec de l'envoi de l'e-mail.";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
-
-

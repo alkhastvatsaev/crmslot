@@ -17,13 +17,12 @@ export default function DashboardGalaxyLayer() {
   const pager = useDashboardPagerOptional();
   const pageIndex = pager?.pageIndex;
 
-  let composer: ReactNode = null;
-  if (pageIndex === FEATURE_HUB_SLOT_INDEX) composer = <CompanyStockGalaxyComposer />;
-  else if (pageIndex === CRM_HISTORY_SLOT_INDEX) composer = <CrmHistoryGalaxyComposer />;
-  else if (pageIndex === BILLING_HUB_SLOT_INDEX) composer = <BillingHubGalaxyComposer />;
+  let hubComposer: ReactNode = null;
+  if (pageIndex === FEATURE_HUB_SLOT_INDEX) hubComposer = <CompanyStockGalaxyComposer />;
+  else if (pageIndex === CRM_HISTORY_SLOT_INDEX) hubComposer = <CrmHistoryGalaxyComposer />;
+  else if (pageIndex === BILLING_HUB_SLOT_INDEX) hubComposer = <BillingHubGalaxyComposer />;
 
-  /** Carte (page 0) : dock Galaxy + transcription. Hub Matériel/CRM/Facturation : composer dédié sans doublon. */
-  const hideMapGalaxyDockStrip = composer != null;
+  const hideMapGalaxyDockStrip = hubComposer != null;
 
   return (
     <>
@@ -33,7 +32,7 @@ export default function DashboardGalaxyLayer() {
         onUserPressPlay={armTranscription}
         onInterventionCreated={emitInterventionCreated}
       />
-      {composer}
+      {hubComposer}
     </>
   );
 }

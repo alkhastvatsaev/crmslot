@@ -1,0 +1,54 @@
+name: Lecot images refresh
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  refresh-lecot-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Probe Lecot access paths
+        run: npm run probe:lecot-images
+        continue-on-error: true
+
+      - name: Crawl full Lecot catalog images
+        run: npm run fetch:lecot-images:full
+        env:
+          LECOT_IMAGE_CONCURRENCY: "20"
+          LECOT_API_URL: ${{ secrets.LECOT_API_URL }}
+
+      - name: Report coverage
+        run: npm run fetch:lecot-images:report
+
+      - name: Fail if miss rate above threshold
+        run: |
+          MISS=$(node -e "const r=require('./data/catalog/lecot/crawl-report.json'); process.stdout.write(String(r.miss));")
+          TOTAL=$(node -e "const r=require('./data/catalog/lecot/crawl-report.json'); process.stdout.write(String(r.total));")
+          THRESHOLD_PCT=${LECOT_IMAGE_MISS_THRESHOLD_PCT:-15}
+          MISS_PCT=$(( MISS * 100 / TOTAL ))
+          echo "Miss ${MISS}/${TOTAL} (${MISS_PCT}%) threshold ${THRESHOLD_PCT}%"
+          if [ "$MISS_PCT" -gt "$THRESHOLD_PCT" ]; then
+            echo "::error::Lecot image miss rate ${MISS_PCT}% exceeds ${THRESHOLD_PCT}%"
+            exit 1
+          fi
+        env:
+          LECOT_IMAGE_MISS_THRESHOLD_PCT: "15"
+
+      - name: Verify sample URLs
+        run: npm run fetch:lecot-images:verify
+        continue-on-error: true
+
+      - name: Catalog image tests
+        run: npx jest src/features/catalog/__tests__/lecotProductImageIndex --no-coverage

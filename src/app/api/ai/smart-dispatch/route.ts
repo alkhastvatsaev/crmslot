@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Authentification
     const authResult = await requireAuthenticatedUser(req);
-    if ('response' in authResult) return authResult.response;
+    if ("response" in authResult) return authResult.response;
 
     const body = await req.json();
     const { problem, address, technicians } = body;
@@ -23,7 +24,8 @@ export async function POST(req: NextRequest) {
       // Fallback si pas de clé API (pour éviter de casser l'app)
       return NextResponse.json({
         bestTechnicianId: technicians[0].id,
-        reasoning: "API OpenAI non configurée. Recommandation basée sur le temps de trajet estimé par défaut.",
+        reasoning:
+          "API OpenAI non configurée. Recommandation basée sur le temps de trajet estimé par défaut.",
       });
     }
 
@@ -69,7 +71,7 @@ ${JSON.stringify(techList, null, 2)}`;
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
+        { role: "user", content: userPrompt },
       ],
       response_format: { type: "json_object" },
       temperature: 0.2,
@@ -82,7 +84,7 @@ ${JSON.stringify(techList, null, 2)}`;
     }
 
     const result = JSON.parse(content);
-    
+
     // Vérifier que le technicien choisi fait bien partie de la liste
     const chosen = (technicians as DispatchTech[]).find((t) => t.id === result.bestTechnicianId);
     if (!chosen) {
@@ -91,13 +93,11 @@ ${JSON.stringify(techList, null, 2)}`;
     }
 
     return NextResponse.json(result);
-
   } catch (error: unknown) {
-    console.error("[smart-dispatch]", error);
+    logger.error("[smart-dispatch]", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
-      { error: "Erreur interne", details: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur interne", details: message }, { status: 500 });
   }
 }

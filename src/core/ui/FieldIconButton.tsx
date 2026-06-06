@@ -14,7 +14,7 @@ type Props = {
 };
 
 const baseClass =
-  "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-neutral-900 transition active:scale-95 hover:bg-white disabled:pointer-events-none disabled:opacity-40";
+  "flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] border border-slate-200 bg-slate-50 text-slate-900 transition active:scale-95 hover:bg-white disabled:pointer-events-none disabled:opacity-40";
 
 /** Cible tactile 56px — icône seule, label en aria. */
 export default function FieldIconButton({
@@ -65,7 +65,10 @@ export function FieldIconButtonRow({
   testId?: string;
 }) {
   return (
-    <div data-testid={testId} className={cn("flex flex-wrap items-center justify-center gap-3", className)}>
+    <div
+      data-testid={testId}
+      className={cn("flex flex-wrap items-center justify-center gap-3", className)}
+    >
       {children}
     </div>
   );

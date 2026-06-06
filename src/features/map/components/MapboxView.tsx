@@ -1,24 +1,25 @@
 "use client";
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import mapboxgl from 'mapbox-gl';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import mapboxgl from "mapbox-gl";
+import { motion, AnimatePresence } from "framer-motion";
 import { Archive, Trash2 } from "lucide-react";
-import { doc, deleteDoc } from 'firebase/firestore';
-import { firestore } from '@/core/config/firebase';
+import { doc, deleteDoc } from "firebase/firestore";
+import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { toast } from "sonner";
-import DailyMissions from '@/features/dashboard/components/DailyMissions';
-import BackOfficeInboxPanel from '@/features/backoffice/components/BackOfficeInboxPanel';
-import RequesterTrackingPanel from '@/features/interventions/components/RequesterTrackingPanel';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { useDateContext } from '@/context/DateContext';
-import type { Mission } from '@/features/map/missionTypes';
-import { useDashboardPagerOptional } from '@/features/dashboard/dashboardPagerContext';
-import { useGalaxyLayerBridgeOptional } from '@/features/map/GalaxyLayerBridgeContext';
-import { useCompanyWorkspaceOptional } from '@/context/CompanyWorkspaceContext';
-import { useBackofficeInboxIntentOptional } from '@/context/BackofficeInboxIntentContext';
-import { isCompanyDispatchViewer } from '@/features/company/isCompanyDispatchViewer';
-import { useBackOfficeInterventions } from '@/features/backoffice/useBackOfficeInterventions';
-import { useTechnicianAssignments } from '@/features/interventions/useTechnicianAssignments';
+import DailyMissions from "@/features/dashboard/components/DailyMissions";
+import BackOfficeInboxPanel from "@/features/backoffice/components/BackOfficeInboxPanel";
+import RequesterTrackingPanel from "@/features/interventions/components/RequesterTrackingPanel";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { useDateContext } from "@/context/DateContext";
+import type { Mission } from "@/features/map/missionTypes";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
+import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import {
   interventionClientLabel,
   statusLabelKey,
@@ -27,8 +28,8 @@ import {
   interventionMatchesTab,
   isInterventionReleasedToTechnicianField,
   isInterventionVisibleOnTechnicianMap,
-} from '@/features/interventions/technicianSchedule';
-import { cn } from '@/lib/utils';
+} from "@/features/interventions/technicianSchedule";
+import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { missionStableKey } from "@/features/map/missionStableKey";
 import { MAP_DEMO_TECHNICIAN_MARKERS } from "@/features/map/mapDemoTechnicianMarkers";
@@ -68,17 +69,19 @@ export default function MapboxView() {
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
-  
+
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
-  
+
   // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
   const isDispatchMap = isCompanyDispatchViewer(workspace);
   const { interventions: boInterventions } = useBackOfficeInterventions(
-    isDispatchMap ? workspace?.activeCompanyId ?? null : null,
+    isDispatchMap ? (workspace?.activeCompanyId ?? null) : null
   );
-  const { interventions: techInterventions } = useTechnicianAssignments({ enabled: !isDispatchMap });
+  const { interventions: techInterventions } = useTechnicianAssignments({
+    enabled: !isDispatchMap,
+  });
 
   const firestoreInterventions = isDispatchMap ? boInterventions : techInterventions;
 
@@ -86,23 +89,23 @@ export default function MapboxView() {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [mapBootError, setMapBootError] = useState<"token" | "load" | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString('en-CA'), [selectedDate]);
+  const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString("en-CA"), [selectedDate]);
 
   const allMissions = useMemo(() => {
     const liveForDay = liveMissions.filter((m) => !m.date || m.date === selectedDateStr);
-    
+
     const realMissions: Mission[] = firestoreInterventions
       .filter((iv) =>
         isDispatchMap
           ? isInterventionReleasedToTechnicianField(iv)
-          : isInterventionVisibleOnTechnicianMap(iv),
+          : isInterventionVisibleOnTechnicianMap(iv)
       )
       .filter((iv) => interventionMatchesTab(iv, "today", selectedDate))
       .filter(interventionHasMapCoordinates)
-      .map(iv => {
+      .map((iv) => {
         let numericId = 0;
         for (let i = 0; i < iv.id.length; i++) {
-          numericId = ((numericId << 5) - numericId) + iv.id.charCodeAt(i);
+          numericId = (numericId << 5) - numericId + iv.id.charCodeAt(i);
           numericId |= 0;
         }
         return {
@@ -122,12 +125,12 @@ export default function MapboxView() {
       });
 
     const all = [...realMissions, ...liveForDay];
-    
+
     // Deduplicate by key or id
     const unique = new Map<string | number, Mission>();
-    all.forEach(m => {
-       const key = m.key ?? m.id;
-       if (!unique.has(key)) unique.set(key, m);
+    all.forEach((m) => {
+      const key = m.key ?? m.id;
+      if (!unique.has(key)) unique.set(key, m);
     });
     const deduped = Array.from(unique.values());
 
@@ -145,24 +148,33 @@ export default function MapboxView() {
 
   const visibleMissions = useMemo(
     () => allMissions.filter((m) => !archivedKeys.has(missionStableKey(m))),
-    [allMissions, archivedKeys],
+    [allMissions, archivedKeys]
   );
 
-  const kpiCounts = useMemo(() => ({
-    pending:    visibleMissions.filter(m => ['pending','assigned','pending_needs_address'].includes(m.statusCode ?? '')).length,
-    inProgress: visibleMissions.filter(m => ['en_route','in_progress'].includes(m.statusCode ?? '')).length,
-    done:       visibleMissions.filter(m => ['done','invoiced'].includes(m.statusCode ?? '')).length,
-  }), [visibleMissions]);
+  const kpiCounts = useMemo(
+    () => ({
+      pending: visibleMissions.filter((m) =>
+        ["pending", "assigned", "pending_needs_address"].includes(m.statusCode ?? "")
+      ).length,
+      inProgress: visibleMissions.filter((m) =>
+        ["en_route", "in_progress"].includes(m.statusCode ?? "")
+      ).length,
+      done: visibleMissions.filter((m) => ["done", "invoiced"].includes(m.statusCode ?? "")).length,
+    }),
+    [visibleMissions]
+  );
 
   const handleArchiveMission = React.useCallback(
     (mission: Mission) => {
       archiveKey(missionStableKey(mission));
-      setSelectedMission((prev) => (prev && missionStableKey(prev) === missionStableKey(mission) ? null : prev));
+      setSelectedMission((prev) =>
+        prev && missionStableKey(prev) === missionStableKey(mission) ? null : prev
+      );
       toast.success(String(t("map.daily_missions.archived_toast")));
     },
-    [archiveKey, t],
+    [archiveKey, t]
   );
-  
+
   const handleDeleteMission = React.useCallback(
     async (mission: Mission) => {
       const ok = window.confirm(String(t("map.daily_missions.delete_confirm")));
@@ -182,7 +194,7 @@ export default function MapboxView() {
         toast.success(String(t("map.daily_missions.deleted_toast")));
       }
     },
-    [archiveKey, t],
+    [archiveKey, t]
   );
 
   useEffect(() => {
@@ -259,7 +271,7 @@ export default function MapboxView() {
       });
 
       map.on("error", (ev) => {
-        console.error("[mapbox]", ev);
+        logger.error("[mapbox]", { error: ev instanceof Error ? ev.message : String(ev) });
         if (!cancelled) setMapBootError("load");
       });
 
@@ -325,10 +337,9 @@ export default function MapboxView() {
       bounds.extend(coords);
 
       const isLive = mission.source === "live";
-      const tone =
-        mission.statusCode
-          ? dailyMissionCardToneFromStatus(mission.statusCode)
-          : "upcoming";
+      const tone = mission.statusCode
+        ? dailyMissionCardToneFromStatus(mission.statusCode)
+        : "upcoming";
       const isDone = tone === "done";
       const inProgress = tone === "active";
 
@@ -339,56 +350,57 @@ export default function MapboxView() {
           : isLive
             ? "shadow-[0_0_12px_rgba(59,130,246,0.70),0_8px_26px_rgba(59,130,246,0.65)]"
             : "shadow-[0_0_10px_rgba(255,59,48,0.65),0_6px_20px_rgba(255,59,48,0.75)]";
-          
+
       const textGradient = isDone
-        ? 'from-green-500 via-emerald-600 to-teal-800'
+        ? "from-green-500 via-emerald-600 to-teal-800"
         : inProgress
-          ? 'from-amber-400 via-orange-500 to-rose-600'
+          ? "from-amber-400 via-orange-500 to-rose-600"
           : isLive
-            ? 'from-sky-400 via-blue-600 to-indigo-800'
-            : 'from-red-500 via-rose-600 to-red-800';
+            ? "from-sky-400 via-blue-600 to-indigo-800"
+            : "from-red-500 via-rose-600 to-red-800";
 
       const borderClass = isDone
-        ? 'border-[1.5px] border-solid border-emerald-500'
+        ? "border-[1.5px] border-solid border-emerald-500"
         : inProgress
-          ? 'border-[1.5px] border-solid border-orange-500'
+          ? "border-[1.5px] border-solid border-orange-500"
           : isLive
-            ? 'border-[1.5px] border-solid border-blue-500'
-            : 'border-[1.5px] border-solid border-red-500';
+            ? "border-[1.5px] border-solid border-blue-500"
+            : "border-[1.5px] border-solid border-red-500";
 
-      const el = document.createElement('div');
-      el.className = 'custom-marker-container relative';
+      const el = document.createElement("div");
+      el.className = "custom-marker-container relative";
 
-      const glow = document.createElement('div');
+      const glow = document.createElement("div");
       const glowColor = isDone
-        ? 'rgba(40,224,90,0.45)'
+        ? "rgba(40,224,90,0.45)"
         : inProgress
-          ? 'rgba(255,149,0,0.45)'
+          ? "rgba(255,149,0,0.45)"
           : isLive
-            ? 'rgba(59,130,246,0.50)'
-            : 'rgba(255,59,48,0.45)';
-      glow.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full blur-xl transition-all duration-500';
+            ? "rgba(59,130,246,0.50)"
+            : "rgba(255,59,48,0.45)";
+      glow.className =
+        "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full blur-xl transition-all duration-500";
       glow.style.backgroundColor = glowColor;
       el.appendChild(glow);
 
-      const inner = document.createElement('div');
+      const inner = document.createElement("div");
       inner.className = `relative flex items-center justify-center w-5 h-5 rounded-[6px] bg-white/95 backdrop-blur-xl transition-transform duration-[400ms] ease-out cursor-pointer ${shadowClass} ${borderClass}`;
-      
-      const textSpan = document.createElement('span');
+
+      const textSpan = document.createElement("span");
       textSpan.className = `text-[10px] font-bold bg-gradient-to-br ${textGradient} bg-clip-text text-transparent leading-none`;
       textSpan.innerText = (index + 1).toString();
-      
+
       inner.appendChild(textSpan);
       el.appendChild(inner);
 
-      el.addEventListener('mouseenter', () => {
-        inner.style.transform = 'scale(1.15)';
+      el.addEventListener("mouseenter", () => {
+        inner.style.transform = "scale(1.15)";
       });
-      el.addEventListener('mouseleave', () => {
-        inner.style.transform = 'scale(1)';
+      el.addEventListener("mouseleave", () => {
+        inner.style.transform = "scale(1)";
       });
 
-      el.addEventListener('click', (e) => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelectedMission(mission);
         map.flyTo({ center: mission.coordinates as [number, number], zoom: 17, pitch: 0 });
@@ -397,7 +409,7 @@ export default function MapboxView() {
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat(mission.coordinates as [number, number])
         .addTo(map);
-        
+
       const markerKey = mission.key ?? String(mission.id);
       markersRef.current[markerKey] = marker;
     });
@@ -441,15 +453,14 @@ export default function MapboxView() {
         center: mission.coordinates,
         zoom: 17,
         pitch: 0,
-        duration: 1500
+        duration: 1500,
       });
     }
   };
 
-
   const handleRecenter = () => {
     if (!mapRef.current) return;
-    
+
     // Recentrer directement sur Bruxelles avec un zoom global
     mapRef.current.flyTo({
       center: [4.3522, 50.8466], // Coordonnées de Bruxelles
@@ -457,10 +468,9 @@ export default function MapboxView() {
       pitch: 0,
       bearing: 0,
       duration: 2000,
-      essential: true
+      essential: true,
     });
   };
-
 
   return (
     <div className={DASHBOARD_DESKTOP_ROOT_CLASS}>
@@ -486,149 +496,178 @@ export default function MapboxView() {
           shellClassName={dashboardMapCenterSquareClass}
           innerClassName="relative min-h-0 flex-1 p-0"
         >
-            <div
-              className="relative flex min-h-0 flex-1 flex-col"
-              style={{ userSelect: "none", WebkitUserSelect: "none", background: "#f8fafc" }}
-            >
-          <div ref={mapContainerRef} id="map" className="absolute inset-0 h-full w-full min-h-[240px]" />
-          {mapBootError ? (
-            <div
-              data-testid="map-boot-error"
-              className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 bg-slate-50/95 px-6 text-center"
-            >
-              <p className="text-[14px] font-medium text-slate-800">
-                {mapBootError === "token"
-                  ? t("map.boot_error_token")
-                  : t("map.boot_error_load")}
-              </p>
-              {mapBootError === "token" ? (
-                <p className="max-w-sm text-[12px] text-slate-500">{t("map.boot_error_token_hint")}</p>
-              ) : null}
-            </div>
-          ) : null}
-      
-      {/* Premium Recenter Button */}
-      <button
-        onClick={handleRecenter}
-        className={`group absolute z-[1] flex h-[46px] w-[46px] cursor-pointer items-center justify-center rounded-[14px] border border-white/75 bg-white/95 opacity-80 hover:opacity-100 shadow-[0_8px_30px_rgba(0,0,0,0.076),0_2px_10px_rgba(0,0,0,0.038)] backdrop-blur-2xl backdrop-saturate-[180%] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_40px_rgba(0,0,0,0.11)] active:translate-y-0 active:scale-95 ${DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS} ${DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS}`}
-        title="Recentrer la carte"
-      >
-        <svg
-          className="h-5 w-5 text-slate-600 transition-colors group-hover:text-slate-900"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-        </svg>
-      </button>
-
-      {/* Overlay Description Mission */}
-      <AnimatePresence>
-        {selectedMission && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex min-h-0 items-start justify-center overflow-y-auto overscroll-y-contain bg-gradient-to-b from-transparent to-black/60 p-3 pb-8 pt-[max(0.75rem,env(safe-area-inset-top))] pointer-events-auto sm:p-5 sm:pb-10"
+          <div
+            className="relative flex min-h-0 flex-1 flex-col"
+            style={{ userSelect: "none", WebkitUserSelect: "none", background: "#f8fafc" }}
           >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative mx-auto mb-6 mt-1 w-full max-w-2xl shrink-0 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 shadow-lg backdrop-blur-md sm:mb-10 sm:mt-2 sm:px-8 sm:py-8"
-            >
-              <button
-                type="button"
-                onClick={() => setSelectedMission(null)}
-                className="absolute right-1 top-1 z-50 rounded-full p-2 !text-white hover:bg-white/10 hover:opacity-90 sm:right-2 sm:top-2"
-                aria-label={String(t("common.close"))}
+            <div
+              ref={mapContainerRef}
+              id="map"
+              className="absolute inset-0 h-full w-full min-h-[240px]"
+            />
+            {mapBootError ? (
+              <div
+                data-testid="map-boot-error"
+                className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 bg-slate-50/95 px-6 text-center"
               >
-                <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="#ffffff" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <div className="w-full pt-1 pr-10 text-center text-white sm:pr-12 sm:pt-2">
-                <h2 className="break-words text-2xl font-bold leading-snug tracking-tight text-white sm:text-4xl md:text-5xl">
-                  {selectedMission.clientName}
-                </h2>
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-base text-white/90 sm:mt-5 sm:gap-4 sm:text-lg">
-                  <span className="px-3 py-1 font-semibold rounded-full bg-white/20 sm:px-4 sm:py-1.5">
-                    {selectedMission.status}
-                  </span>
-                  <span className="hidden text-white/40 sm:inline">•</span>
-                  <span className="font-medium">{selectedMission.time}</span>
-                </div>
-
-                <div className="mt-6 flex w-full max-w-lg flex-col gap-5 text-left sm:mt-8 sm:gap-7 mx-auto">
-                  {selectedMission.phone && (
-                    <div className="flex min-w-0 flex-col">
-                      <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1 sm:text-sm">
-                        {t("map.mission_overlay.phone")}
-                      </span>
-                      <a href={`tel:${selectedMission.phone}`} className="break-all text-lg font-medium text-white hover:text-blue-400 transition-colors sm:text-2xl">
-                        {selectedMission.phone}
-                      </a>
-                    </div>
-                  )}
-                  {selectedMission.address && (
-                    <div className="flex min-w-0 flex-col">
-                      <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1 sm:text-sm">
-                        {t("map.mission_overlay.address")}
-                      </span>
-                      <a 
-                        href={`https://maps.google.com/?q=${encodeURIComponent(selectedMission.address)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-lg font-medium text-white hover:text-blue-400 transition-colors sm:text-2xl flex flex-wrap items-start gap-2"
-                      >
-                        <span className="min-w-0 break-words">{selectedMission.address}</span>
-                        <svg className="mt-0.5 h-4 w-4 shrink-0 text-white/50 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-                    </div>
-                  )}
-                  {selectedMission.description && (
-                    <div className="flex min-w-0 flex-col">
-                      <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1.5 sm:text-sm sm:mb-2">
-                        {t("map.mission_overlay.problem_description")}
-                      </span>
-                      <p className="break-words text-base !text-white font-medium leading-relaxed rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm sm:p-5 sm:text-lg">
-                        {selectedMission.description}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-6 flex justify-center gap-4 sm:mt-8">
-                  <button
-                    type="button"
-                    onClick={() => handleArchiveMission(selectedMission)}
-                    aria-label={String(t("map.daily_missions.archive_aria"))}
-                    title={String(t("map.daily_missions.archive_aria"))}
-                    className="rounded-full border border-white/20 bg-white/[0.06] p-2.5 text-white/50 shadow-sm transition hover:border-white/35 hover:bg-white/10 hover:text-white/85"
-                  >
-                    <Archive className="h-4 w-4" strokeWidth={2} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteMission(selectedMission)}
-                    aria-label={String(t("map.daily_missions.delete_aria"))}
-                    title={String(t("map.daily_missions.delete_aria"))}
-                    className="rounded-full border border-red-500/30 bg-red-500/10 p-2.5 text-red-400/70 shadow-sm transition hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
-                  >
-                    <Trash2 className="h-4 w-4" strokeWidth={2} aria-hidden />
-                  </button>
-                </div>
+                <p className="text-[14px] font-medium text-slate-800">
+                  {mapBootError === "token" ? t("map.boot_error_token") : t("map.boot_error_load")}
+                </p>
+                {mapBootError === "token" ? (
+                  <p className="max-w-sm text-[12px] text-slate-500">
+                    {t("map.boot_error_token_hint")}
+                  </p>
+                ) : null}
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ) : null}
+
+            {/* Premium Recenter Button */}
+            <button
+              onClick={handleRecenter}
+              className={`group absolute z-[1] flex h-[46px] w-[46px] cursor-pointer items-center justify-center rounded-[14px] border border-white/75 bg-white/95 opacity-80 hover:opacity-100 shadow-[0_8px_30px_rgba(0,0,0,0.076),0_2px_10px_rgba(0,0,0,0.038)] backdrop-blur-2xl backdrop-saturate-[180%] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_40px_rgba(0,0,0,0.11)] active:translate-y-0 active:scale-95 ${DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS} ${DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS}`}
+              title="Recentrer la carte"
+            >
+              <svg
+                className="h-5 w-5 text-slate-600 transition-colors group-hover:text-slate-900"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </button>
+
+            {/* Overlay Description Mission */}
+            <AnimatePresence>
+              {selectedMission && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-50 flex min-h-0 items-start justify-center overflow-y-auto overscroll-y-contain bg-gradient-to-b from-transparent to-black/60 p-3 pb-8 pt-[max(0.75rem,env(safe-area-inset-top))] pointer-events-auto sm:p-5 sm:pb-10"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    className="relative mx-auto mb-6 mt-1 w-full max-w-2xl shrink-0 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 shadow-lg backdrop-blur-md sm:mb-10 sm:mt-2 sm:px-8 sm:py-8"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMission(null)}
+                      className="absolute right-1 top-1 z-50 rounded-full p-2 !text-white hover:bg-white/10 hover:opacity-90 sm:right-2 sm:top-2"
+                      aria-label={String(t("common.close"))}
+                    >
+                      <svg
+                        className="h-6 w-6 sm:h-8 sm:w-8"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="#ffffff"
+                        aria-hidden
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+
+                    <div className="w-full pt-1 pr-10 text-center text-white sm:pr-12 sm:pt-2">
+                      <h2 className="break-words text-2xl font-bold leading-snug tracking-tight text-white sm:text-4xl md:text-5xl">
+                        {selectedMission.clientName}
+                      </h2>
+                      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-base text-white/90 sm:mt-5 sm:gap-4 sm:text-lg">
+                        <span className="px-3 py-1 font-semibold rounded-full bg-white/20 sm:px-4 sm:py-1.5">
+                          {selectedMission.status}
+                        </span>
+                        <span className="hidden text-white/40 sm:inline">•</span>
+                        <span className="font-medium">{selectedMission.time}</span>
+                      </div>
+
+                      <div className="mt-6 flex w-full max-w-lg flex-col gap-5 text-left sm:mt-8 sm:gap-7 mx-auto">
+                        {selectedMission.phone && (
+                          <div className="flex min-w-0 flex-col">
+                            <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1 sm:text-sm">
+                              {t("map.mission_overlay.phone")}
+                            </span>
+                            <a
+                              href={`tel:${selectedMission.phone}`}
+                              className="break-all text-lg font-medium text-white hover:text-blue-400 transition-colors sm:text-2xl"
+                            >
+                              {selectedMission.phone}
+                            </a>
+                          </div>
+                        )}
+                        {selectedMission.address && (
+                          <div className="flex min-w-0 flex-col">
+                            <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1 sm:text-sm">
+                              {t("map.mission_overlay.address")}
+                            </span>
+                            <a
+                              href={`https://maps.google.com/?q=${encodeURIComponent(selectedMission.address)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-lg font-medium text-white hover:text-blue-400 transition-colors sm:text-2xl flex flex-wrap items-start gap-2"
+                            >
+                              <span className="min-w-0 break-words">{selectedMission.address}</span>
+                              <svg
+                                className="mt-0.5 h-4 w-4 shrink-0 text-white/50 sm:h-5 sm:w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                aria-hidden
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                            </a>
+                          </div>
+                        )}
+                        {selectedMission.description && (
+                          <div className="flex min-w-0 flex-col">
+                            <span className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1.5 sm:text-sm sm:mb-2">
+                              {t("map.mission_overlay.problem_description")}
+                            </span>
+                            <p className="break-words text-base !text-white font-medium leading-relaxed rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm sm:p-5 sm:text-lg">
+                              {selectedMission.description}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-6 flex justify-center gap-4 sm:mt-8">
+                        <button
+                          type="button"
+                          onClick={() => handleArchiveMission(selectedMission)}
+                          aria-label={String(t("map.daily_missions.archive_aria"))}
+                          title={String(t("map.daily_missions.archive_aria"))}
+                          className="rounded-full border border-white/20 bg-white/[0.06] p-2.5 text-white/50 shadow-sm transition hover:border-white/35 hover:bg-white/10 hover:text-white/85"
+                        >
+                          <Archive className="h-4 w-4" strokeWidth={2} aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMission(selectedMission)}
+                          aria-label={String(t("map.daily_missions.delete_aria"))}
+                          title={String(t("map.daily_missions.delete_aria"))}
+                          className="rounded-full border border-red-500/30 bg-red-500/10 p-2.5 text-red-400/70 shadow-sm transition hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
+                        >
+                          <Trash2 className="h-4 w-4" strokeWidth={2} aria-hidden />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </GlassPanel>
 
@@ -649,4 +688,3 @@ export default function MapboxView() {
     </div>
   );
 }
-

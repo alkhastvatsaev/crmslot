@@ -8,8 +8,6 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { CopilotChatMessage, WorkspaceCopilotSnapshot } from "@/features/copilot/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   snapshot: WorkspaceCopilotSnapshot | null;
   loadingSnapshot?: boolean;
@@ -118,7 +116,7 @@ export default function PwaCopilotChatPanel({
         setTyping(false);
       }
     },
-    [messages, snapshot, t, typing],
+    [messages, snapshot, t, typing]
   );
 
   const send = useCallback(() => void sendText(draft), [draft, sendText]);
@@ -134,7 +132,6 @@ export default function PwaCopilotChatPanel({
   return (
     <div
       data-testid="pwa-copilot-chat-panel"
-      style={outfit}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-md">
@@ -162,27 +159,35 @@ export default function PwaCopilotChatPanel({
       </div>
 
       {error ? (
-        <p className="shrink-0 bg-amber-50 px-4 py-2 text-[12px] text-amber-900" data-testid="pwa-copilot-error">
+        <p
+          className="shrink-0 bg-amber-50 px-4 py-2 text-[12px] text-amber-900"
+          data-testid="pwa-copilot-error"
+        >
           {error}
         </p>
       ) : null}
 
       <div
         ref={listRef}
-        className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4")}
+        className={cn(
+          GLASS_PANEL_BODY_SCROLL_COMPACT,
+          "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4"
+        )}
       >
         {messages.map((m) => (
           <div
             key={m.id}
-            data-testid={m.role === "user" ? "pwa-copilot-bubble-user" : "pwa-copilot-bubble-assistant"}
+            data-testid={
+              m.role === "user" ? "pwa-copilot-bubble-user" : "pwa-copilot-bubble-assistant"
+            }
             className={cn("flex w-full", m.role === "user" ? "justify-end" : "justify-start")}
           >
             <div
               className={cn(
-                "max-w-[92%] whitespace-pre-wrap rounded-[20px] px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
+                "max-w-[92%] whitespace-pre-wrap rounded-[16px] px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
                 m.role === "user"
                   ? "rounded-br-md bg-indigo-600 text-white"
-                  : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800",
+                  : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800"
               )}
             >
               {m.content}
@@ -191,7 +196,7 @@ export default function PwaCopilotChatPanel({
         ))}
         {typing ? (
           <div className="flex justify-start" data-testid="pwa-copilot-typing">
-            <div className="rounded-[20px] rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 text-[12px] font-medium text-slate-500 shadow-sm">
+            <div className="rounded-[16px] rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 text-[12px] font-medium text-slate-500 shadow-sm">
               {t("copilot.typing")}
             </div>
           </div>
@@ -230,7 +235,7 @@ export default function PwaCopilotChatPanel({
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition",
               !draft.trim() || disabledInput
                 ? "cursor-not-allowed text-slate-400 opacity-40"
-                : "text-indigo-600 hover:bg-indigo-500/10",
+                : "text-indigo-600 hover:bg-indigo-500/10"
             )}
             aria-label={t("copilot.send_aria")}
           >

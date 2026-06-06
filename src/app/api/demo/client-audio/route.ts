@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { blockIfProduction, requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -35,13 +36,13 @@ export async function GET(request: Request) {
             } catch {
               return null;
             }
-          }),
+          })
       )
     ).filter(Boolean);
 
     return NextResponse.json({ dir: absDir, files });
   } catch (e) {
-    console.error(e);
+    logger.error("Failed to list audios", { error: e instanceof Error ? e.message : String(e) });
     return NextResponse.json({ error: "Failed to list audios" }, { status: 500 });
   }
 }
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
           message:
             "Le stockage vocal fichier local n'existe pas sur Vercel. Utilisez Firebase Storage (upload côté client).",
         },
-        { status: 503 },
+        { status: 503 }
       );
     }
     const form = await req.formData();
@@ -70,7 +71,13 @@ export async function POST(req: Request) {
     }
 
     const mime = file.type || "audio/webm";
-    const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : mime.includes("webm") ? "webm" : "bin";
+    const ext = mime.includes("mp4")
+      ? "m4a"
+      : mime.includes("ogg")
+        ? "ogg"
+        : mime.includes("webm")
+          ? "webm"
+          : "bin";
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const relName = `${id}.${ext}`;
     const absDir = getDemoAudioAbsDir();
@@ -93,8 +100,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (e) {
-    console.error(e);
+    logger.error("Failed to save audio", { error: e instanceof Error ? e.message : String(e) });
     return NextResponse.json({ error: "Failed to save audio" }, { status: 500 });
   }
 }
-

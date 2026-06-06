@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { logger } from "@/core/logger";
 import { toast } from "sonner";
 import { useBrowserSpeechDictation } from "./useBrowserSpeechDictation";
 
@@ -30,9 +31,13 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
     toggleListening,
     stop: stopDictation,
     interimTranscript,
-  } = useBrowserSpeechDictation((text) => {
-    setTranscription((prev) => (prev ? prev + " " + text : text));
-  }, undefined, { locale: uiLanguageToLocale(opts?.language ?? "fr") });
+  } = useBrowserSpeechDictation(
+    (text) => {
+      setTranscription((prev) => (prev ? prev + " " + text : text));
+    },
+    undefined,
+    { locale: uiLanguageToLocale(opts?.language ?? "fr") }
+  );
 
   const startRecording = async () => {
     try {
@@ -47,7 +52,7 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
       ];
       const chosenMime =
         typeof MediaRecorder !== "undefined" && typeof MediaRecorder.isTypeSupported === "function"
-          ? supportedTypes.find((t) => MediaRecorder.isTypeSupported(t)) ?? ""
+          ? (supportedTypes.find((t) => MediaRecorder.isTypeSupported(t)) ?? "")
           : "";
 
       const mediaRecorder = chosenMime
@@ -71,32 +76,38 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
         const generatedBlob = new Blob(audioChunksRef.current, { type: mimeType });
         setAudioBlob(generatedBlob);
         setIsRecording(false); // Set to false only when blob is ready
-        
+
         // Use OpenAI Whisper for highly accurate transcription
         setIsTranscribing(true);
         const promise = (async () => {
           try {
             const formData = new FormData();
-            const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm";
+            const ext = mimeType.includes("mp4")
+              ? "mp4"
+              : mimeType.includes("ogg")
+                ? "ogg"
+                : "webm";
             formData.append("audio", generatedBlob, `audio.${ext}`);
             formData.append("language", String(opts?.language ?? "fr"));
-            
+
             const { fetchWithAuth } = await import("@/core/api/fetchWithAuth");
             const res = await fetchWithAuth("/api/ai/transcribe-blob", {
               method: "POST",
               body: formData,
             });
-            
+
             const data = await res.json();
             if (data.success && data.text) {
               setTranscription(data.text);
               return data.text as string;
             } else {
-              console.error("Erreur de transcription serveur:", data.error);
+              logger.error("Erreur de transcription serveur:", { error: data.error });
               return "";
             }
           } catch (error) {
-            console.error("Failed to transcribe via API:", error);
+            logger.error("Failed to transcribe via API:", {
+              error: error instanceof Error ? error.message : String(error),
+            });
             return "";
           } finally {
             setIsTranscribing(false);
@@ -128,7 +139,9 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
         toggleListening();
       }
     } catch (error) {
-      console.error("Error accessing microphone:", error);
+      logger.error("Error accessing microphone:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error("Accès au microphone refusé", {
         description: "Veuillez autoriser l'accès au microphone pour enregistrer un message vocal.",
       });
@@ -169,6 +182,6 @@ export function useAudioRecorder(opts?: { language?: UiLanguage }) {
     resetRecording,
     isDictationSupported,
     interimTranscript,
-    setTranscription // Optional if they want to edit it
+    setTranscription, // Optional if they want to edit it
   };
 }

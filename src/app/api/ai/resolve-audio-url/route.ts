@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { findUploadedAudioRelativePath } from "@/core/services/audio/resolve-upload-by-basename";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ url: `/uploads/${rel}` });
   } catch (e) {
-    console.error("[resolve-audio-url]", e);
+    logger.error("[resolve-audio-url]", { error: e instanceof Error ? e.message : String(e) });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

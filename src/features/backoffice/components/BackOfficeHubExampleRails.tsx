@@ -13,8 +13,6 @@ import {
   BACK_OFFICE_HUB_EXAMPLE_TIMELINE_EVENTS,
 } from "@/features/backoffice/backOfficeHubExample";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function formatEur(cents: number): string {
   return `${(cents / 100).toFixed(2).replace(".", ",")} €`;
 }
@@ -33,7 +31,6 @@ export function BackOfficeHubExampleEmails() {
   return (
     <div
       data-testid="backoffice-hub-example-emails"
-      style={outfit}
       className="space-y-3 rounded-[18px] border border-slate-100 bg-white p-4"
     >
       {BACK_OFFICE_HUB_EXAMPLE_EMAILS.map((email) => (
@@ -44,12 +41,14 @@ export function BackOfficeHubExampleEmails() {
             "rounded-[16px] border px-3 py-2.5",
             email.direction === "inbound"
               ? "border-slate-100 bg-slate-50"
-              : "ml-6 border-blue-100 bg-blue-50/80",
+              : "ml-6 border-blue-100 bg-blue-50/80"
           )}
         >
           <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
             <Mail className="h-3.5 w-3.5" aria-hidden />
-            {email.direction === "inbound" ? t("backoffice.hub.example_email_in") : t("backoffice.hub.example_email_out")}
+            {email.direction === "inbound"
+              ? t("backoffice.hub.example_email_in")
+              : t("backoffice.hub.example_email_out")}
             <span className="ml-auto font-normal normal-case tracking-normal text-slate-400">
               {format(new Date(email.at), "dd MMM HH:mm", { locale: fr })}
             </span>
@@ -68,7 +67,6 @@ export function BackOfficeHubExampleMaterials() {
   return (
     <div
       data-testid="backoffice-hub-example-materials"
-      style={outfit}
       className="space-y-2 rounded-[18px] border border-slate-100 bg-white p-4"
     >
       {BACK_OFFICE_HUB_EXAMPLE_MATERIAL_ORDERS.map((order) => (
@@ -104,7 +102,6 @@ export function BackOfficeHubExampleBilling() {
   return (
     <div
       data-testid="backoffice-hub-example-billing"
-      style={outfit}
       className="space-y-3 rounded-[18px] border border-slate-100 bg-white p-4"
     >
       <div className="flex items-center justify-between gap-2">

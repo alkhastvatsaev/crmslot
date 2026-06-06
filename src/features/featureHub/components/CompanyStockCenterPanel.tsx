@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
-import { Loader2, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useTranslation } from "@/core/i18n/I18nContext";
+import { useCallback, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import CompanyStockItemList from "@/features/featureHub/components/CompanyStockItemList";
+import CompanyStockOrderModal from "@/features/featureHub/components/CompanyStockOrderModal";
+import { useCompanyStockImages } from "@/features/featureHub/hooks/useCompanyStockImages";
 import type { StockCategoryId } from "@/features/featureHub/companyStockCategories";
 import {
   applyStockListFilters,
@@ -13,8 +14,7 @@ import {
 } from "@/features/featureHub/filterCompanyStock";
 import type { StockItem } from "@/features/materials/stockFirestore";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+import { dispatchMaterialAgentQuickPrompt } from "@/features/featureHub/companyStockChatbot";
 
 type Props = {
   items: StockItem[];
@@ -23,16 +23,12 @@ type Props = {
   loading: boolean;
 };
 
-/** Panneau central Matériel — recherche + liste stock uniquement. */
-export default function CompanyStockCenterPanel({
-  items,
-  orders,
-  category,
-  loading,
-}: Props) {
-  const { t } = useTranslation();
-  const { search, setSearch, selectedStockItemId, setSelectedStockItemId } =
-    useCompanyStockIntent();
+/** Panneau central Matériel — grille stock (tuiles carrées). */
+export default function CompanyStockCenterPanel({ items, orders, category, loading }: Props) {
+  const { selectedStockItemId, setSelectedStockItemId } = useCompanyStockIntent();
+  const workspace = useCompanyWorkspaceOptional();
+
+  const [orderingItem, setOrderingItem] = useState<StockItem | null>(null);
 
   const openOrderRefs = useMemo(() => buildOpenOrderReferenceSet(orders), [orders]);
 
@@ -41,10 +37,39 @@ export default function CompanyStockCenterPanel({
       applyStockListFilters(items, {
         filter: "all",
         category,
-        search,
+        search: "",
         openOrderRefs,
       }),
-    [items, category, search, openOrderRefs],
+    [items, category, openOrderRefs]
+  );
+
+  const imageUrls = useCompanyStockImages(listRows);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedStockItemId(id);
+      const item = listRows.find((i) => i.id === id);
+      if (item) setOrderingItem(item);
+    },
+    [setSelectedStockItemId, listRows]
+  );
+
+  const handleConfirmOrder = useCallback(
+    (qty: number) => {
+      if (!orderingItem) return;
+      const ref = orderingItem.reference?.trim();
+      const companyName =
+        workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId)
+          ?.companyName ?? "";
+      const parts = [
+        `Commander ${qty}×`,
+        `"${orderingItem.description}"`,
+        ref ? `(réf. ${ref})` : null,
+        companyName ? `— société : ${companyName}` : null,
+      ].filter(Boolean);
+      dispatchMaterialAgentQuickPrompt(parts.join(" "));
+    },
+    [orderingItem, workspace]
   );
 
   if (loading) {
@@ -52,7 +77,6 @@ export default function CompanyStockCenterPanel({
       <div
         data-testid="company-stock-center"
         className="flex min-h-0 flex-1 items-center justify-center"
-        style={outfit}
       >
         <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
       </div>
@@ -60,33 +84,31 @@ export default function CompanyStockCenterPanel({
   }
 
   return (
-    <div
-      data-testid="company-stock-center"
-      className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden"
-      style={outfit}
-    >
-      <div className="relative shrink-0" data-testid="company-stock-search">
-        <Search
-          className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-          aria-hidden
-        />
-        <Input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label={String(t("companyStock.search_placeholder"))}
-          placeholder="…"
-          className="h-10 rounded-[14px] border-slate-200/80 bg-white pl-9 text-[12px] shadow-none focus-visible:border-slate-200/80 focus-visible:ring-0 focus-visible:ring-transparent"
-        />
+    <>
+      <div
+        data-testid="company-stock-center"
+        className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      >
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
+          <CompanyStockItemList
+            items={listRows}
+            selectedId={selectedStockItemId}
+            onSelect={handleSelect}
+            imageUrls={imageUrls}
+          />
+        </div>
       </div>
 
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto rounded-[16px] border border-slate-200/70 bg-white/60">
-        <CompanyStockItemList
-          items={listRows}
-          selectedId={selectedStockItemId}
-          onSelect={setSelectedStockItemId}
-        />
-      </div>
-    </div>
+      <CompanyStockOrderModal
+        item={orderingItem}
+        imageUrl={
+          orderingItem
+            ? orderingItem.imageUrl?.trim() || imageUrls?.[orderingItem.id] || null
+            : null
+        }
+        onClose={() => setOrderingItem(null)}
+        onConfirm={handleConfirmOrder}
+      />
+    </>
   );
 }

@@ -1,10 +1,14 @@
-import type { gmail_v1 } from "googleapis";
+import type { gmail_v1 } from "@googleapis/gmail";
 import {
   extractMessageAttachments,
   extractMessageBodies,
   getMessageHeader,
 } from "@/core/services/email/gmailMessageBody";
-import type { GmailHubLabel, GmailHubMessageDetail, GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
+import type {
+  GmailHubLabel,
+  GmailHubMessageDetail,
+  GmailHubMessageSummary,
+} from "@/features/gmail/gmailHubTypes";
 
 export function mapGmailLabel(label: gmail_v1.Schema$Label): GmailHubLabel {
   return {

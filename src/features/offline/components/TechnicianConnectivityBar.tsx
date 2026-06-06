@@ -3,8 +3,6 @@
 import { CloudOff } from "lucide-react";
 import { useOfflineSync } from "@/context/OfflineSyncContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 /**
  * Bandeau discret : hors ligne uniquement (la synchro reste silencieuse — toasts côté contexte).
  */
@@ -18,7 +16,6 @@ export default function TechnicianConnectivityBar() {
   return (
     <div
       data-testid="technician-connectivity-bar"
-      style={outfit}
       className="pointer-events-none fixed left-4 top-[92px] z-[60] flex max-w-[min(420px,calc(100vw-2rem))] flex-col gap-2"
     >
       {showOffline ? (

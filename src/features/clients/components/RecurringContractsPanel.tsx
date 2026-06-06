@@ -16,9 +16,9 @@ import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 
 const INTERVALS: { value: RecurrenceInterval; label: string }[] = [
-  { value: "weekly",    label: "Chaque semaine" },
-  { value: "biweekly",  label: "Toutes les 2 semaines" },
-  { value: "monthly",   label: "Chaque mois" },
+  { value: "weekly", label: "Chaque semaine" },
+  { value: "biweekly", label: "Toutes les 2 semaines" },
+  { value: "monthly", label: "Chaque mois" },
   { value: "quarterly", label: "Chaque trimestre" },
 ];
 
@@ -53,7 +53,13 @@ export default function RecurringContractsPanel() {
   const handleCreate = async () => {
     if (!form.clientName || !form.address) return;
     await createRecurringContract({ ...form, companyId, active: true });
-    setForm({ clientName: "", address: "", problemDescription: "", interval: "monthly", nextDueDate: new Date().toISOString().slice(0, 10) });
+    setForm({
+      clientName: "",
+      address: "",
+      problemDescription: "",
+      interval: "monthly",
+      nextDueDate: new Date().toISOString().slice(0, 10),
+    });
     setShowForm(false);
   };
 
@@ -81,8 +87,7 @@ export default function RecurringContractsPanel() {
     }
   };
 
-  const isDue = (contract: RecurringContract) =>
-    new Date(contract.nextDueDate) <= new Date();
+  const isDue = (contract: RecurringContract) => new Date(contract.nextDueDate) <= new Date();
 
   return (
     <div data-testid="recurring-contracts-panel" className="flex flex-col gap-4">
@@ -98,7 +103,7 @@ export default function RecurringContractsPanel() {
       </div>
 
       {showForm && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-black/5 bg-[#FAFAFA] p-4">
+        <div className="flex flex-col gap-3 rounded-[16px] border border-black/5 bg-slate-50 p-4">
           <input
             placeholder="Nom client"
             value={form.clientName}
@@ -120,11 +125,15 @@ export default function RecurringContractsPanel() {
           <div className="flex gap-2">
             <select
               value={form.interval}
-              onChange={(e) => setForm((f) => ({ ...f, interval: e.target.value as RecurrenceInterval }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, interval: e.target.value as RecurrenceInterval }))
+              }
               className="flex-1 rounded-xl border border-black/8 bg-white px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-black/10"
             >
               {INTERVALS.map((i) => (
-                <option key={i.value} value={i.value}>{i.label}</option>
+                <option key={i.value} value={i.value}>
+                  {i.label}
+                </option>
               ))}
             </select>
             <input
@@ -161,14 +170,19 @@ export default function RecurringContractsPanel() {
               className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 ${due ? "border-amber-200 bg-amber-50" : "border-black/5 bg-white"}`}
             >
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-[14px] font-bold text-slate-800">{c.clientName}</span>
+                <span className="truncate text-[14px] font-bold text-slate-800">
+                  {c.clientName}
+                </span>
                 <span className="truncate text-[11px] text-slate-500">{c.address}</span>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                     {INTERVAL_LABELS[c.interval]}
                   </span>
-                  <span className={`text-[11px] font-semibold ${due ? "text-amber-700" : "text-slate-500"}`}>
-                    {due ? "⚠ Dû le " : "Prochain : "}{c.nextDueDate}
+                  <span
+                    className={`text-[11px] font-semibold ${due ? "text-amber-700" : "text-slate-500"}`}
+                  >
+                    {due ? "⚠ Dû le " : "Prochain : "}
+                    {c.nextDueDate}
                   </span>
                 </div>
               </div>

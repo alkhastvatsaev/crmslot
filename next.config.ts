@@ -42,10 +42,10 @@ const withPWA = withPWAInit({
       // File d'attente hors-ligne pour toutes les requêtes d'API (SMS, OpenAI, Google)
       {
         urlPattern: /^\/api\/.*/i,
-        handler: 'NetworkOnly',
+        handler: "NetworkOnly",
         options: {
           backgroundSync: {
-            name: 'api-queue',
+            name: "api-queue",
             options: {
               maxRetentionTime: 24 * 60, // Conserve les requêtes en échec pendant 24h
             },
@@ -57,7 +57,13 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["fluent-ffmpeg", "playwright", "playwright-core"],
+  serverExternalPackages: [
+    "fluent-ffmpeg",
+    "playwright",
+    "playwright-core",
+    "@googleapis/gmail",
+    "google-auth-library",
+  ],
   env: {
     NEXT_PUBLIC_APP_GIT_SHA: resolveGitShaForBuild(),
     /** false en `npm run dev` sans ENABLE_PWA_IN_DEV — FCM ne tente pas le SW. */

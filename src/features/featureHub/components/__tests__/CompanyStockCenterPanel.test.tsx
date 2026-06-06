@@ -6,6 +6,13 @@ import CompanyStockCenterPanel from "@/features/featureHub/components/CompanySto
 import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
 import type { StockItem } from "@/features/materials/stockFirestore";
 
+jest.mock("@/core/api/fetchWithAuth", () => ({
+  fetchWithAuth: jest.fn(async () => ({
+    ok: true,
+    json: async () => ({ images: {} }),
+  })),
+}));
+
 const items: StockItem[] = [
   {
     id: "s1",
@@ -22,21 +29,16 @@ const items: StockItem[] = [
 function renderPanel(overrideItems: StockItem[] = items) {
   return render(
     <CompanyStockIntentProvider>
-      <CompanyStockCenterPanel
-        items={overrideItems}
-        orders={[]}
-        category="all"
-        loading={false}
-      />
-    </CompanyStockIntentProvider>,
+      <CompanyStockCenterPanel items={overrideItems} orders={[]} category="all" loading={false} />
+    </CompanyStockIntentProvider>
   );
 }
 
 describe("CompanyStockCenterPanel", () => {
-  it("renders search and stock list only", () => {
+  it("renders stock list only", () => {
     renderPanel();
     expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
-    expect(screen.getByTestId("company-stock-search")).toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-search")).not.toBeInTheDocument();
     expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-pulse")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-filter-bar")).not.toBeInTheDocument();
@@ -44,8 +46,11 @@ describe("CompanyStockCenterPanel", () => {
     expect(screen.queryByTestId("company-stock-add")).not.toBeInTheDocument();
   });
 
-  it("shows stock card for item", () => {
+  it("shows stock card for item in grid layout", () => {
     renderPanel();
+    const list = screen.getByTestId("company-stock-list");
+    expect(list).toHaveAttribute("data-layout", "grid-3");
+    expect(list.className).toMatch(/grid/);
     expect(screen.getByTestId("company-stock-card-s1")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-card-s1")).toHaveAttribute("data-health", "low");
   });

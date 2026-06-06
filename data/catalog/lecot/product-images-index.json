@@ -1,0 +1,3880 @@
+{
+  "badge-125": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/3/2302493-foto_226012510_002.jpg",
+    "label": "badge-125",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "bar-a2p": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/3/2304939-fth_dubbele_cilinder_met_sleutel.jpg",
+    "label": "bar-a2p",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "crem-3pt": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/0/2038597-036353012_foto_01.jpg",
+    "label": "crem-3pt",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "cyl-euro-70": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2730149-130012585_foto_01.jpg",
+    "label": "cyl-euro-70",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "cyl-euro-80": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2730149-130012585_foto_01.jpg",
+    "label": "cyl-euro-80",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "gach-elec": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1834602-032070973_foto_01.jpg",
+    "label": "gach-elec",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "gant-nit": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3100748-a51068764_foto_01.jpg",
+    "label": "gant-nit",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "gond-ren": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1845887-200401102_foto_01.jpg",
+    "label": "gond-ren",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "joint-epdm": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1868341-a50575953_foto_01.jpg",
+    "label": "joint-epdm",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "lec-bli-5001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-effraction Vachette 2m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.827Z"
+  },
+  "lec-bli-5002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-effraction Picard 2m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.966Z"
+  },
+  "lec-bli-5003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-pince Heracles 2m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.094Z"
+  },
+  "lec-bli-5004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-dégondage 2m droite",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.538Z"
+  },
+  "lec-bli-5005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Feuillard renforcement de porte 1m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.903Z"
+  },
+  "lec-bli-5006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque de blindage serrure Vachette",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.953Z"
+  },
+  "lec-bli-5007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pêne anti-dégondage Vachette x4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.051Z"
+  },
+  "lec-bli-5008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pêne anti-dégondage Bricard x4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.805Z"
+  },
+  "lec-bli-5009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cache cylindre Vachette anti-arrachement",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.444Z"
+  },
+  "lec-bli-5010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cache cylindre Mul-T-Lock CPS",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.242Z"
+  },
+  "lec-bli-5011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Rosace de sécurité Bricard",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.589Z"
+  },
+  "lec-bli-5012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Rosace haute sécurité Heracles",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.307Z"
+  },
+  "lec-bli-5013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Huisserie blindée Picard largeur 90",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.053Z"
+  },
+  "lec-bli-5014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Kit blindage de porte Heracles 950mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.132Z"
+  },
+  "lec-bli-5015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque pare-balle niveau FB3",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.317Z"
+  },
+  "lec-bli-5016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Renfort serrure carénée Vachette",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.723Z"
+  },
+  "lec-bli-5017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Barre de sûreté transversale 1m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.436Z"
+  },
+  "lec-bli-5018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou rotatif sol Vachette",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.900Z"
+  },
+  "lec-bli-5019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Boulon Pollux anti-soulèvement",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.979Z"
+  },
+  "lec-bli-5020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-pince Pollux laquée blanc",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.911Z"
+  },
+  "lec-bli-5021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque entrée cylindre haute sécurité",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.127Z"
+  },
+  "lec-bli-5022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Kit anti-dégondage Vachette 3 paumelles",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.736Z"
+  },
+  "lec-bli-5023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-pince Vachette laquée noire",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.227Z"
+  },
+  "lec-bli-5024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Feuillard inox renfort multipoints 1.5m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.680Z"
+  },
+  "lec-bli-5025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque blindée serrure 1 point Heracles",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.434Z"
+  },
+  "lec-bli-5026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bloc-porte blindé Fichet Forstyl S",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.587Z"
+  },
+  "lec-bli-5027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Kit cornières + plaque Picard",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.161Z"
+  },
+  "lec-bli-5028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cornière anti-effraction Yale 2.1m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.051Z"
+  },
+  "lec-bli-5029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Anti-dégondage tige acier Bricard",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.281Z"
+  },
+  "lec-cns-6001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 4x40 (boîte 500)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.267Z"
+  },
+  "lec-cns-6002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 4x50 (boîte 500)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.241Z"
+  },
+  "lec-cns-6003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 5x60 (boîte 200)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.413Z"
+  },
+  "lec-cns-6004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 5x80 (boîte 200)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.376Z"
+  },
+  "lec-cns-6005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 6x100 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.867Z"
+  },
+  "lec-cns-6006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis bois agglo 6x120 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:54.543Z"
+  },
+  "lec-cns-6007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis métal tête fraisée 3.9x13 (boîte 500)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.187Z"
+  },
+  "lec-cns-6008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis métal tête fraisée 4.8x16 (boîte 500)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.245Z"
+  },
+  "lec-cns-6009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis Tapcon béton 6x60 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.665Z"
+  },
+  "lec-cns-6010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis Tapcon béton 7.5x80 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.040Z"
+  },
+  "lec-cns-6011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis Tapcon béton 7.5x110 (boîte 25)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.848Z"
+  },
+  "lec-cns-6012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville Fischer SX 6x30 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:55.484Z"
+  },
+  "lec-cns-6013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville Fischer SX 8x40 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.442Z"
+  },
+  "lec-cns-6014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville Fischer SX 10x50 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.518Z"
+  },
+  "lec-cns-6015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville Fischer DUOPOWER 8x40 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.712Z"
+  },
+  "lec-cns-6016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville Fischer DUOPOWER 10x50 (boîte 25)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.462Z"
+  },
+  "lec-cns-6017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville métallique Fischer FMD M8 (boîte 50)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.167Z"
+  },
+  "lec-cns-6018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville à frapper Fischer N 6x60 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.133Z"
+  },
+  "lec-cns-6019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville chimique Fischer 300T 300ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.394Z"
+  },
+  "lec-cns-6020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cheville chimique Hilti HIT-HY 200 330ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.233Z"
+  },
+  "lec-cns-6021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Goujon d'ancrage Fischer FAZ II M10 (10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.051Z"
+  },
+  "lec-cns-6022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Silicone neutre Sika Sanisil 300ml transparent",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.744Z"
+  },
+  "lec-cns-6023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Silicone neutre Sika Sanisil 300ml blanc",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.311Z"
+  },
+  "lec-cns-6024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Silicone acétique Den Braven 300ml transparent",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.717Z"
+  },
+  "lec-cns-6025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Silicone Soudal Silirub 2 300ml noir",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.980Z"
+  },
+  "lec-cns-6026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mastic colle Soudal Fix All 290ml blanc",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.123Z"
+  },
+  "lec-cns-6027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mastic colle Sika SikaBond AT-Universal 300ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.229Z"
+  },
+  "lec-cns-6028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mousse expansive Soudal Soudafoam 750ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:05.288Z"
+  },
+  "lec-cns-6029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mousse PU pistolable Soudal 750ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.260Z"
+  },
+  "lec-cns-6030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mousse PU coupe-feu B1 750ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.787Z"
+  },
+  "lec-cns-6031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Colle néoprène Sader 750ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.143Z"
+  },
+  "lec-cns-6032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Colle cyanoacrylate Loctite 401 20g",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.934Z"
+  },
+  "lec-cns-6033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Frein-filet Loctite 243 50ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.551Z"
+  },
+  "lec-cns-6034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lubrifiant serrure Loctite WD-Specialist 200ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.322Z"
+  },
+  "lec-cns-6035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lubrifiant graphite Tri-Flow 60ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:57.807Z"
+  },
+  "lec-cns-6036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "WD-40 multifonction 400ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.495Z"
+  },
+  "lec-cns-6037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2737520-a51085649_foto_001.jpg",
+    "label": "WD-40 Specialist serrures 100ml",
+    "pageUrl": "https://lecot.be/fr-be/wd40/2737510-wd-40-specialist-lubrifiant-serrures",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:56.546Z"
+  },
+  "lec-cns-6038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "WD-40 Specialist longue durée 400ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.633Z"
+  },
+  "lec-cns-6039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Dégrippant Liqui Moly LM 40 400ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.565Z"
+  },
+  "lec-cns-6040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Graisse silicone Molykote 111 100g",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.643Z"
+  },
+  "lec-cns-6041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Nettoyant contact Kontakt 60 200ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.007Z"
+  },
+  "lec-cns-6042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ruban masquage 30mm x 50m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.741Z"
+  },
+  "lec-cns-6043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ruban adhésif toilé 50mm x 50m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.351Z"
+  },
+  "lec-cns-6044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Joint silicone porte coupe-feu 5m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.622Z"
+  },
+  "lec-cns-6045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pâte à colmater serrure spéciale",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.611Z"
+  },
+  "lec-cns-6046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Boulons traversants M8x100 (lot 10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.159Z"
+  },
+  "lec-cns-6047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Boulons traversants M10x120 (lot 10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.359Z"
+  },
+  "lec-cns-6048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Écrous M8 inox (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.180Z"
+  },
+  "lec-cns-6049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Rondelles plates M8 inox (boîte 200)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.916Z"
+  },
+  "lec-cns-6050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis sécurité Torx Pin 5x40 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.657Z"
+  },
+  "lec-cns-6051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/0/3001145-a55640757_foto_001.jpg",
+    "label": "Vis sécurité Snake-Eye M6x20 (boîte 50)",
+    "pageUrl": "https://lecot.be/fr-be/hdd/2949598-vis-halleine-m6-noir",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:58.120Z"
+  },
+  "lec-cns-6052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sika MS Polymer Premium 290ml gris",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:59.865Z"
+  },
+  "lec-cns-6053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Soudal Fix All Crystal 290ml transparent",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.497Z"
+  },
+  "lec-cns-6054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Loctite 270 frein-filet fort 50ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.841Z"
+  },
+  "lec-cns-6055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sika Boom 750ml mousse PU",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.233Z"
+  },
+  "lec-cns-6056": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis spéciale charnière 4.5x50 inox (100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.882Z"
+  },
+  "lec-cns-6057": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis cylindre tête fendue inox (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.742Z"
+  },
+  "lec-ctl-4000": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique réversible 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.950Z"
+  },
+  "lec-ctl-4000b": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique réversible 24V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.466Z"
+  },
+  "lec-ctl-4001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Fermod 41N 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.147Z"
+  },
+  "lec-ctl-4002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Fermod 41N 24V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.679Z"
+  },
+  "lec-ctl-4003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1834602-032070973_foto_01.jpg",
+    "label": "Gâche électrique Fermod 41N RR 12V",
+    "pageUrl": "https://lecot.be/fr-be/eff-eff/1621273-gache-electrique-eff-eff-331-kl-rr-ak-rr-est",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.659Z"
+  },
+  "lec-ctl-4004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Fermod 21N rupture 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.110Z"
+  },
+  "lec-ctl-4005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Fermod 31N émission 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.096Z"
+  },
+  "lec-ctl-4006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Effeff 118 universelle 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.487Z"
+  },
+  "lec-ctl-4007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Effeff 118 universelle 24V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.409Z"
+  },
+  "lec-ctl-4008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique Effeff 142 anti-panique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.810Z"
+  },
+  "lec-ctl-4009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique BFT M75 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.145Z"
+  },
+  "lec-ctl-4010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique CDVI ECO 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.586Z"
+  },
+  "lec-ctl-4011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique CDVI ECO 24V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.664Z"
+  },
+  "lec-ctl-4012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique CDVI EHX800 anti-panique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.264Z"
+  },
+  "lec-ctl-4013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche électrique haute sécurité Mottura",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.891Z"
+  },
+  "lec-ctl-4014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clavier à codes CDVI Krypto KCPEM",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.667Z"
+  },
+  "lec-ctl-4015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clavier à codes CDVI Galeo encastré",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.843Z"
+  },
+  "lec-ctl-4016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clavier à codes CDVI Solar autonome",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.864Z"
+  },
+  "lec-ctl-4017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clavier à codes Daitem D14102 sans-fil",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.872Z"
+  },
+  "lec-ctl-4018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clavier Hikvision DS-K1108MK lecteur badges",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.030Z"
+  },
+  "lec-ctl-4019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lecteur de badges Mifare CDVI 26 bits",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.175Z"
+  },
+  "lec-ctl-4020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lecteur Mifare Desfire CDVI DG29S",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.460Z"
+  },
+  "lec-ctl-4021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lecteur HID iCLASS R10 multitech",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.323Z"
+  },
+  "lec-ctl-4022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lecteur biométrique Suprema BioStation A2",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:46.890Z"
+  },
+  "lec-ctl-4023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lecteur biométrique ZKTeco SF400",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.738Z"
+  },
+  "lec-ctl-4023b": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Badge RFID 125 kHz",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.150Z"
+  },
+  "lec-ctl-4023c": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Badge RFID 125 kHz EM4100 (lot de 10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.722Z"
+  },
+  "lec-ctl-4024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/3/2302493-foto_226012510_002.jpg",
+    "label": "Badge RFID Mifare 1K bleu (lot de 25)",
+    "pageUrl": "https://lecot.be/fr-be/smartair/1628797-carte-d-utilisateur-neutrale-smartair",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.796Z"
+  },
+  "lec-ctl-4025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Badge porte-clés Mifare (lot de 25)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:47.939Z"
+  },
+  "lec-ctl-4026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Centrale contrôle d'accès CDVI ATRIUM A22",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.997Z"
+  },
+  "lec-ctl-4027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Centrale contrôle d'accès Paxton Net2 Plus",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.107Z"
+  },
+  "lec-ctl-4028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Interphone Aiphone JOS-1F kit",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.983Z"
+  },
+  "lec-ctl-4029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Visiophone Aiphone JOS-1V kit",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.449Z"
+  },
+  "lec-ctl-4030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Visiophone Comelit Ultra Mini",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.791Z"
+  },
+  "lec-ctl-4031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Visiophone Legrand 369220 kit",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.246Z"
+  },
+  "lec-ctl-4032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Visiophone Bticino Classe 100X16E",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.498Z"
+  },
+  "lec-ctl-4033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Platine de rue Comelit Ikall audio",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.666Z"
+  },
+  "lec-ctl-4034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Platine de rue Comelit Ikall vidéo",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.870Z"
+  },
+  "lec-ctl-4035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton-poussoir CDVI BPL-50 inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.534Z"
+  },
+  "lec-ctl-4036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton-poussoir CDVI BPK-INOX",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.755Z"
+  },
+  "lec-ctl-4037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton-poussoir lumineux DORMA",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.908Z"
+  },
+  "lec-ctl-4038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton-poussoir sans contact Vinci",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.937Z"
+  },
+  "lec-ctl-4039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton-poussoir d'urgence brise-glace",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.538Z"
+  },
+  "lec-ctl-4040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Détecteur d'ouverture filaire NO/NC",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.134Z"
+  },
+  "lec-ctl-4041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Détecteur d'ouverture sans-fil Daitem",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.348Z"
+  },
+  "lec-ctl-4042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Alimentation 12V 5A boîtier métal",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.311Z"
+  },
+  "lec-ctl-4043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Alimentation 24V 3A boîtier métal",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.375Z"
+  },
+  "lec-ctl-4044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ventouse 280kg DORMA EM280",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.191Z"
+  },
+  "lec-ctl-4045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ventouse 540kg DORMA EM540",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.690Z"
+  },
+  "lec-ctl-4046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure motorisée Dictamat 350",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:49.823Z"
+  },
+  "lec-ctl-4047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Récepteur radio universel 4 canaux",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.111Z"
+  },
+  "lec-ctl-4048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/9/2960020-220145412_foto_01.jpg",
+    "label": "Télécommande 4 boutons 433MHz",
+    "pageUrl": "https://lecot.be/fr-be/lecot-raedschelders/2960017-emetteur-mural-6-canaux-433mhz-avec-horloge-nextmode",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:48.390Z"
+  },
+  "lec-ctl-4049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Caméra IP Hikvision dôme 4MP",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.182Z"
+  },
+  "lec-ctl-4050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Caméra IP Hikvision bullet 4MP",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:52.390Z"
+  },
+  "lec-ctl-4051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "NVR Hikvision 8 canaux 2TB",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.326Z"
+  },
+  "lec-ctl-4052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sirène d'alarme intérieure 105dB",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:51.315Z"
+  },
+  "lec-ctl-4053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sirène extérieure autoalimentée 110dB",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.860Z"
+  },
+  "lec-ctl-4054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Centrale d'alarme Daitem D8000",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:53.087Z"
+  },
+  "lec-ctl-4055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gâche en applique électrique 12V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:50.908Z"
+  },
+  "lec-cyl-2001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.131Z"
+  },
+  "lec-cyl-2002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.348Z"
+  },
+  "lec-cyl-2003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 30x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.779Z"
+  },
+  "lec-cyl-2004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.407Z"
+  },
+  "lec-cyl-2005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 35x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.729Z"
+  },
+  "lec-cyl-2006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.140Z"
+  },
+  "lec-cyl-2007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 40x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.514Z"
+  },
+  "lec-cyl-2008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2730149-130012585_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 40x50",
+    "pageUrl": "https://lecot.be/fr-be/yale/2730148-cylindre-adjustable-de-30-30-jusqu-a-60-65-yale-linus",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.543Z"
+  },
+  "lec-cyl-2009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 40x60",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.621Z"
+  },
+  "lec-cyl-2010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.928Z"
+  },
+  "lec-cyl-2011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 50x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.919Z"
+  },
+  "lec-cyl-2012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2730149-130012585_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis 60x60",
+    "pageUrl": "https://lecot.be/fr-be/yale/2730148-cylindre-adjustable-de-30-30-jusqu-a-60-65-yale-linus",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.582Z"
+  },
+  "lec-cyl-2013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/3/2304939-fth_dubbele_cilinder_met_sleutel.jpg",
+    "label": "Cylindre Vachette Radialis débrayable 30x40",
+    "pageUrl": "https://lecot.be/fr-be/thirard/2304829-cylindre-double-de-chantier-fth-sur-code",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.884Z"
+  },
+  "lec-cyl-2014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis débrayable 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.796Z"
+  },
+  "lec-cyl-2015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Radialis bouton 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.681Z"
+  },
+  "lec-cyl-2016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.380Z"
+  },
+  "lec-cyl-2017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.098Z"
+  },
+  "lec-cyl-2018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.874Z"
+  },
+  "lec-cyl-2019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.044Z"
+  },
+  "lec-cyl-2020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 40x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.449Z"
+  },
+  "lec-cyl-2021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 40x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.903Z"
+  },
+  "lec-cyl-2022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.869Z"
+  },
+  "lec-cyl-2023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette V5 standard 50x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.693Z"
+  },
+  "lec-cyl-2024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.526Z"
+  },
+  "lec-cyl-2025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.319Z"
+  },
+  "lec-cyl-2026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.243Z"
+  },
+  "lec-cyl-2027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.914Z"
+  },
+  "lec-cyl-2028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 40x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.677Z"
+  },
+  "lec-cyl-2029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 40x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.080Z"
+  },
+  "lec-cyl-2030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.931Z"
+  },
+  "lec-cyl-2031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock MT5+ 50x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:24.967Z"
+  },
+  "lec-cyl-2032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock Interactive+ 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.218Z"
+  },
+  "lec-cyl-2033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock Junior 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.346Z"
+  },
+  "lec-cyl-2034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock Junior 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.614Z"
+  },
+  "lec-cyl-2035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Mul-T-Lock Junior 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.631Z"
+  },
+  "lec-cyl-2036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.989Z"
+  },
+  "lec-cyl-2037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.947Z"
+  },
+  "lec-cyl-2038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:25.749Z"
+  },
+  "lec-cyl-2039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.663Z"
+  },
+  "lec-cyl-2040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 40x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.858Z"
+  },
+  "lec-cyl-2041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 40x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.808Z"
+  },
+  "lec-cyl-2042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.749Z"
+  },
+  "lec-cyl-2043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Protec2 50x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.093Z"
+  },
+  "lec-cyl-2044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Sentry 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.320Z"
+  },
+  "lec-cyl-2045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Abloy Sentry 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.076Z"
+  },
+  "lec-cyl-2046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Platinum 3 Star 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.290Z"
+  },
+  "lec-cyl-2047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Platinum 3 Star 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:26.779Z"
+  },
+  "lec-cyl-2048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Platinum 3 Star 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.069Z"
+  },
+  "lec-cyl-2049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Platinum 3 Star 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.541Z"
+  },
+  "lec-cyl-2050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Standard 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.779Z"
+  },
+  "lec-cyl-2051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Standard 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.433Z"
+  },
+  "lec-cyl-2052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Standard 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.757Z"
+  },
+  "lec-cyl-2053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Yale Standard 40x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.409Z"
+  },
+  "lec-cyl-2054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM IX Twido 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.589Z"
+  },
+  "lec-cyl-2055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM IX Twido 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:27.725Z"
+  },
+  "lec-cyl-2056": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM IX Twido 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.256Z"
+  },
+  "lec-cyl-2057": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM IX Twido 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.112Z"
+  },
+  "lec-cyl-2058": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM Plura 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.809Z"
+  },
+  "lec-cyl-2059": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM Plura 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.142Z"
+  },
+  "lec-cyl-2060": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre DOM Sigma 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.052Z"
+  },
+  "lec-cyl-2061": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Iseo R6 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.345Z"
+  },
+  "lec-cyl-2062": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Iseo R6 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.789Z"
+  },
+  "lec-cyl-2063": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Iseo R6 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.160Z"
+  },
+  "lec-cyl-2064": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Iseo F6 Extra Profile 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:28.659Z"
+  },
+  "lec-cyl-2065": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Iseo F6 Extra Profile 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.145Z"
+  },
+  "lec-cyl-2066": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Cisa AP4S 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.632Z"
+  },
+  "lec-cyl-2067": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Cisa AP4S 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.924Z"
+  },
+  "lec-cyl-2068": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Cisa AP4S 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.300Z"
+  },
+  "lec-cyl-2069": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Bloctout 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.961Z"
+  },
+  "lec-cyl-2070": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Bloctout 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.652Z"
+  },
+  "lec-cyl-2071": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Bloctout 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.752Z"
+  },
+  "lec-cyl-2072": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Chifral S2 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.839Z"
+  },
+  "lec-cyl-2073": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Chifral S2 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.823Z"
+  },
+  "lec-cyl-2074": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Chifral S2 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:29.709Z"
+  },
+  "lec-cyl-2075": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Bricard Chifral S2 45x45",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.386Z"
+  },
+  "lec-cyl-2076": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Thirard Trafic 6 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.473Z"
+  },
+  "lec-cyl-2077": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Thirard Trafic 6 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.583Z"
+  },
+  "lec-cyl-2078": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Thirard Trafic 6 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:30.861Z"
+  },
+  "lec-cyl-2079": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Thirard Trafic 12 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.424Z"
+  },
+  "lec-cyl-2080": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Thirard Trafic 12 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.933Z"
+  },
+  "lec-cyl-2081": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre JPM Excellium 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.373Z"
+  },
+  "lec-cyl-2082": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre JPM Excellium 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.325Z"
+  },
+  "lec-cyl-2083": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre JPM Excellium 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.725Z"
+  },
+  "lec-cyl-2084": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre demi Vachette V5 30x10",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.598Z"
+  },
+  "lec-cyl-2085": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre demi Vachette V5 40x10",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.980Z"
+  },
+  "lec-cyl-2086": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre demi Mul-T-Lock MT5+ 40x10",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.363Z"
+  },
+  "lec-cyl-2087": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre à bouton Vachette V5 30Bx40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.328Z"
+  },
+  "lec-cyl-2088": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre à bouton Vachette V5 40Bx40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.076Z"
+  },
+  "lec-cyl-2089": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre à bouton Mul-T-Lock 30Bx40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.395Z"
+  },
+  "lec-cyl-2090": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier FTH Vachette 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:31.864Z"
+  },
+  "lec-cyl-2091": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier FTH Vachette 40x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.098Z"
+  },
+  "lec-cyl-2092": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier FTH Vachette 30x60",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.825Z"
+  },
+  "lec-cyl-2093": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier FTH Vachette 60x60",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.382Z"
+  },
+  "lec-cyl-2094": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier JPM 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.654Z"
+  },
+  "lec-cyl-2095": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier JPM 40x60",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.431Z"
+  },
+  "lec-cyl-2096": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier Iseo F5 35x35",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.313Z"
+  },
+  "lec-cyl-2097": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre chantier Iseo F5 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:32.546Z"
+  },
+  "lec-cyl-2098": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre rond Yale 1109 26x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.219Z"
+  },
+  "lec-cyl-2099": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre rond Yale 1109 26x50",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.284Z"
+  },
+  "lec-cyl-2100": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre rond Vachette VR26 26x32",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.545Z"
+  },
+  "lec-cyl-2101": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Axxis 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.385Z"
+  },
+  "lec-cyl-2102": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Axxis 30x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.093Z"
+  },
+  "lec-cyl-2103": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Vachette Axxis 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.097Z"
+  },
+  "lec-cyl-2104": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre EVVA 4KS 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.955Z"
+  },
+  "lec-cyl-2105": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre EVVA 4KS 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.881Z"
+  },
+  "lec-cyl-2106": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre EVVA MCS 40x40 magnetique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.425Z"
+  },
+  "lec-cyl-2107": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Kaba expert plus 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.933Z"
+  },
+  "lec-cyl-2108": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Kaba expert plus 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.190Z"
+  },
+  "lec-cyl-2109": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Pollux PR-300 30x30",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.087Z"
+  },
+  "lec-cyl-2110": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre Pollux PR-300 40x40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.470Z"
+  },
+  "lec-cyl-2111": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre européen 70 mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.654Z"
+  },
+  "lec-cyl-2112": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre européen 80 mm sécurité",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.366Z"
+  },
+  "lec-cyl-2113": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Barillet A2P 5 goupilles",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.078Z"
+  },
+  "lec-out-7001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Perceuse Makita HP488DWE 18V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.426Z"
+  },
+  "lec-out-7002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Perceuse Makita DDF485 18V LXT 2x5Ah",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.923Z"
+  },
+  "lec-out-7003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Perforateur Makita DHR242 SDS+",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:00.854Z"
+  },
+  "lec-out-7004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Visseuse à chocs Makita DTD157 18V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.617Z"
+  },
+  "lec-out-7005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Scie sabre Makita DJR187 18V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.484Z"
+  },
+  "lec-out-7006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Meuleuse Makita DGA504 125mm 18V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.873Z"
+  },
+  "lec-out-7007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Perceuse Bosch GSR 18V-55 Professional",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:03.218Z"
+  },
+  "lec-out-7008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Perforateur Hilti TE 6-A22",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.385Z"
+  },
+  "lec-out-7009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Coffret embouts Wera Bit-Check 30 BTH",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:01.974Z"
+  },
+  "lec-out-7010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Coffret forets HSS Bosch 19 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.588Z"
+  },
+  "lec-out-7011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Coffret forets béton SDS+ Bosch 5 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.581Z"
+  },
+  "lec-out-7012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Foret carbure béton 14x300mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:03.400Z"
+  },
+  "lec-out-7013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Foret HSS-Co cobalt 6mm (lot 5)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.949Z"
+  },
+  "lec-out-7014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Trépan diamant 65mm cylindre",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.487Z"
+  },
+  "lec-out-7015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Trépan bimétal 25mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:02.971Z"
+  },
+  "lec-out-7016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Jeu trépans bimétal coffret 11 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:05.425Z"
+  },
+  "lec-out-7017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Fraise à serrure type 22 axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:06.191Z"
+  },
+  "lec-out-7018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gabarit perçage cylindre universel",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.038Z"
+  },
+  "lec-out-7019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Kit crochets crochetage 30 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.148Z"
+  },
+  "lec-out-7020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cylindre transparent d'entraînement",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:03.757Z"
+  },
+  "lec-out-7021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pistolet à bumping serrurerie",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.197Z"
+  },
+  "lec-out-7022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince à riveter manuelle",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.601Z"
+  },
+  "lec-out-7023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince universelle Knipex 200mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.466Z"
+  },
+  "lec-out-7024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince coupante Knipex 160mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.227Z"
+  },
+  "lec-out-7025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince multiprise Knipex Cobra 250mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.070Z"
+  },
+  "lec-out-7026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Jeu tournevis Wera Kraftform 6 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.978Z"
+  },
+  "lec-out-7027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Jeu tournevis Torx Wera 6 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:05.700Z"
+  },
+  "lec-out-7028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Tournevis dynamometrique Wera 0.3-1.2 Nm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:05.985Z"
+  },
+  "lec-out-7029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Marteau de serrurier 500g manche fibre",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.580Z"
+  },
+  "lec-out-7030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Marteau arrache-clou 600g",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.621Z"
+  },
+  "lec-out-7031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Burin SDS+ plat 250x20mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.843Z"
+  },
+  "lec-out-7032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Burin SDS+ pointu 250mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.052Z"
+  },
+  "lec-out-7033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cisaille à tôle Bessey 250mm droite",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.045Z"
+  },
+  "lec-out-7034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mètre Stanley FatMax 5m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:06.888Z"
+  },
+  "lec-out-7035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mètre Stanley FatMax 8m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:05.495Z"
+  },
+  "lec-out-7036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Niveau à bulle Stabila 60cm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:06.533Z"
+  },
+  "lec-out-7037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Niveau laser Bosch GLL 2-15 G",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.113Z"
+  },
+  "lec-out-7038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Télémètre laser Leica Disto D2",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:06.335Z"
+  },
+  "lec-out-7039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Détecteur multifonction Bosch GMS 120",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.783Z"
+  },
+  "lec-out-7040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Caisse à outils Stanley FatMax 26 pouces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:06.660Z"
+  },
+  "lec-out-7041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Servante d'atelier 7 tiroirs",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.243Z"
+  },
+  "lec-out-7042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lampe frontale Petzl Tikka 350lm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.786Z"
+  },
+  "lec-out-7043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lampe LED Ledlenser P7R rechargeable",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:07.847Z"
+  },
+  "lec-out-7044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3100748-a51068764_foto_01.jpg",
+    "label": "Gants de protection Mapa Ultrane 526",
+    "pageUrl": "https://lecot.be/fr-be/deltaplus/2652945-gants-delta-plus-vecutf01",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:04.740Z"
+  },
+  "lec-out-7045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gants anti-coupure Showa S-Tex 376",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.002Z"
+  },
+  "lec-out-7046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gants cuir manutention",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.656Z"
+  },
+  "lec-out-7047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lunettes de protection 3M SecureFit",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.693Z"
+  },
+  "lec-out-7048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Casque chantier 3M G3000",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.412Z"
+  },
+  "lec-out-7049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouchons d'oreilles 3M EAR Classic (200)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.944Z"
+  },
+  "lec-out-7050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Masque FFP3 3M Aura 9332+ (10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.722Z"
+  },
+  "lec-out-7051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Chaussures de sécurité S3 Puma 42",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.369Z"
+  },
+  "lec-out-7052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cutter Stanley 99E + 5 lames",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.239Z"
+  },
+  "lec-out-7053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Scie à métaux Bahco 325mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:08.869Z"
+  },
+  "lec-out-7054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lime triangulaire 200mm bâtarde",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.137Z"
+  },
+  "lec-out-7055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Jeu de limes serrurier 5 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.763Z"
+  },
+  "lec-out-7056": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Extracteur de cylindre cassé Souber",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.002Z"
+  },
+  "lec-out-7057": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Reproductrice clé Silca Idea",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.147Z"
+  },
+  "lec-out-7058": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ébauche clé Vachette V5 (lot 10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.650Z"
+  },
+  "lec-out-7059": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ébauche clé Yale (lot 10)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.308Z"
+  },
+  "lec-out-7060": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis pilote autoperceuse Bosch 25 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.590Z"
+  },
+  "lec-out-7061": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Aspirateur Karcher WD3 chantier",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.646Z"
+  },
+  "lec-out-7062": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pistolet à colle chaude 230V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.665Z"
+  },
+  "lec-out-7063": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pistolet à mastic Cox 310ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:09.846Z"
+  },
+  "lec-out-7064": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pistolet à mousse Soudal Click & Fix",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.742Z"
+  },
+  "lec-out-7065": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pied-de-biche 600mm Bahco",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.294Z"
+  },
+  "lec-out-7066": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Étau d'établi 125mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:10.725Z"
+  },
+  "lec-out-7067": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clé dynamométrique 5-25 Nm Wera",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.066Z"
+  },
+  "lec-out-7068": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Jeu clés à pipe 6-19mm Stanley",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.210Z"
+  },
+  "lec-out-7069": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clé Allen Wera Hex-Plus 9 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.009Z"
+  },
+  "lec-out-7070": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince à dénuder automatique Knipex",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.428Z"
+  },
+  "lec-out-7071": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Multimètre Fluke 117",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:11.838Z"
+  },
+  "lec-out-7072": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Testeur de tension sans contact Fluke",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.109Z"
+  },
+  "lec-out-7073": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Tournevis testeur 100-500V",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.766Z"
+  },
+  "lec-out-7074": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sangle à cliquet 5m 25mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.636Z"
+  },
+  "lec-out-7075": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Échelle aluminium 3x9 marches Hailo",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.335Z"
+  },
+  "lec-out-7076": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Marchepied 2 marches alu",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.449Z"
+  },
+  "lec-out-7077": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sangle élingue 2m 1t",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.674Z"
+  },
+  "lec-out-7078": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Casquette de sécurité légère",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.892Z"
+  },
+  "lec-out-7079": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gilet haute visibilité jaune EN20471",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.355Z"
+  },
+  "lec-out-7080": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Genouillères gel professionnelles",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:12.988Z"
+  },
+  "lec-out-7081": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Coffret cliquet 1/2 + douilles 24 pièces",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:14.296Z"
+  },
+  "lec-out-7082": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pince crocodile Knipex 250mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.512Z"
+  },
+  "lec-out-7083": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Clé à griffe 10 pouces Bahco",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:14.219Z"
+  },
+  "lec-out-7084": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Foret HSS Bosch 8mm (lot 2)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.959Z"
+  },
+  "lec-out-7085": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Foret HSS Bosch 10mm (lot 2)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:14.094Z"
+  },
+  "lec-out-7086": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mèche serrurier acier rapide 4.5mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.170Z"
+  },
+  "lec-out-7087": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Mallette serrurier Knipex 25 outils",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:22:13.854Z"
+  },
+  "lec-qui-3001": {
+    "imageUrl": "https://cdn.lecot.be/articles/058431016-PrimaryProductImage-IMG-7066653-1920px.webp?ts=1779940972",
+    "label": "Poignée Hoppe Tokyo sur rosace inox",
+    "pageUrl": "https://shop.lecot.be/fr-be/tonic-line-paire-de-poignees-curve-tl-oe19mm-sur-rosace-ronde-tl3110-inox",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:33.539Z"
+  },
+  "lec-qui-3002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Paris sur plaque",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.196Z"
+  },
+  "lec-qui-3003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Amsterdam sur rosace",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.517Z"
+  },
+  "lec-qui-3004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Atlanta sur plaque",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:34.610Z"
+  },
+  "lec-qui-3005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Birmingham sur rosace inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.110Z"
+  },
+  "lec-qui-3006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Verona sur plaque entraxe 72",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.711Z"
+  },
+  "lec-qui-3007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille double Hoppe Bonn carré 8",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.326Z"
+  },
+  "lec-qui-3008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille double Hoppe Stockholm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.221Z"
+  },
+  "lec-qui-3009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Vachette Atlantic sur rosace",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.159Z"
+  },
+  "lec-qui-3010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Vachette Pacific sur plaque",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.429Z"
+  },
+  "lec-qui-3011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille de tirage Hoppe 200mm inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.673Z"
+  },
+  "lec-qui-3012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille de tirage Hoppe 300mm inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.296Z"
+  },
+  "lec-qui-3013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée de tirage Yale 25x600mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.672Z"
+  },
+  "lec-qui-3014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière à souder Damir 100x80mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:35.592Z"
+  },
+  "lec-qui-3015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière à souder Damir 140x100mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.532Z"
+  },
+  "lec-qui-3016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière entrefilée Damir 140mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.106Z"
+  },
+  "lec-qui-3017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Paumelle inox Anuba 14x65mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.496Z"
+  },
+  "lec-qui-3018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Paumelle inox Anuba 16x75mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.485Z"
+  },
+  "lec-qui-3019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Paumelle inox Anuba 19x80mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.397Z"
+  },
+  "lec-qui-3020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière 3D Simonswerk Tectus TE340",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.195Z"
+  },
+  "lec-qui-3021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière 3D Simonswerk Tectus TE540",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.873Z"
+  },
+  "lec-qui-3022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière 3D Simonswerk Tectus TE640",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:36.863Z"
+  },
+  "lec-qui-3023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière piano laiton 1.5m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.763Z"
+  },
+  "lec-qui-3024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière piano inox 2m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.275Z"
+  },
+  "lec-qui-3025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte DORMA TS68 force 2-4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.214Z"
+  },
+  "lec-qui-3026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte DORMA TS73V force 2-5",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.214Z"
+  },
+  "lec-qui-3027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte DORMA TS83 force 1-6",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.601Z"
+  },
+  "lec-qui-3028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte DORMA TS93 EN1-7",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.218Z"
+  },
+  "lec-qui-3029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte GEZE TS2000V force 2-4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.341Z"
+  },
+  "lec-qui-3030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte GEZE TS3000V force 1-4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.782Z"
+  },
+  "lec-qui-3031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte GEZE TS5000R force 2-6",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.733Z"
+  },
+  "lec-qui-3032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte GEZE Boxer encastré force 3-6",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.187Z"
+  },
+  "lec-qui-3033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte Vachette V160 force 2-4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.158Z"
+  },
+  "lec-qui-3034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ferme-porte Yale 400 série force 2-5",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.157Z"
+  },
+  "lec-qui-3035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pivot de sol DORMA BTS80 force 4",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.688Z"
+  },
+  "lec-qui-3036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pivot de sol DORMA BTS84 force 6",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.520Z"
+  },
+  "lec-qui-3037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Seuil de porte automatique Athmer 730mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.965Z"
+  },
+  "lec-qui-3038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Seuil de porte automatique Athmer 930mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.383Z"
+  },
+  "lec-qui-3039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Seuil aluminium plat 1m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.063Z"
+  },
+  "lec-qui-3040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Seuil de porte coupe-froid alu 1m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.579Z"
+  },
+  "lec-qui-3041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Joint d'étanchéité porte mousse 6m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.608Z"
+  },
+  "lec-qui-3042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1868341-a50575953_foto_01.jpg",
+    "label": "Joint d'étanchéité porte caoutchouc 6m",
+    "pageUrl": "https://lecot.be/fr-be/barbier/1638465-plinthe-automatique-barbier-type-isolporte-euro",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:37.408Z"
+  },
+  "lec-qui-3043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Joint silicone porte coupe-feu 5m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.589Z"
+  },
+  "lec-qui-3044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Heurtoir laiton tête de lion",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.481Z"
+  },
+  "lec-qui-3045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Heurtoir inox marteau moderne",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.889Z"
+  },
+  "lec-qui-3046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Butoir de porte sol inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.763Z"
+  },
+  "lec-qui-3047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Butoir de porte mural caoutchouc",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.381Z"
+  },
+  "lec-qui-3048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Œilleton de porte angulaire 200°",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:39.695Z"
+  },
+  "lec-qui-3049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Œilleton de porte numérique LCD",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.989Z"
+  },
+  "lec-qui-3050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Entrée de boîte aux lettres laiton",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.216Z"
+  },
+  "lec-qui-3051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Entrée de boîte aux lettres inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.663Z"
+  },
+  "lec-qui-3052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque de propreté inox 800x80mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.775Z"
+  },
+  "lec-qui-3053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque de propreté laiton 800x80mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.431Z"
+  },
+  "lec-qui-3054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Numéro de porte inox 100mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.667Z"
+  },
+  "lec-qui-3055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Targette laiton verrou WC 60mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.507Z"
+  },
+  "lec-qui-3056": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou WC condamnation Hoppe",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:40.708Z"
+  },
+  "lec-qui-3057": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille condamnation Hoppe rosace inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.881Z"
+  },
+  "lec-qui-3058": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pommeau fixe Hoppe sphérique inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.206Z"
+  },
+  "lec-qui-3059": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton fixe central porte d'entrée",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.030Z"
+  },
+  "lec-qui-3060": {
+    "imageUrl": "https://lecot.be/media/catalog/product/1/8/1845887-200401102_foto_01.jpg",
+    "label": "Gond à visser pour volet 14x140mm",
+    "pageUrl": "https://lecot.be/fr-be/rob/1639279-141-140-attache-murale",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:38.904Z"
+  },
+  "lec-qui-3061": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gond à sceller 16x160mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.646Z"
+  },
+  "lec-qui-3062": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Penture queue de carpe 400mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.300Z"
+  },
+  "lec-qui-3063": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Espagnolette à 2 tringles 2m",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.809Z"
+  },
+  "lec-qui-3064": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Crémone pour fenêtre PVC blanche",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.981Z"
+  },
+  "lec-qui-3065": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée fenêtre Hoppe Atlanta blanche",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.432Z"
+  },
+  "lec-qui-3066": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée fenêtre Hoppe Tokyo F9",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.612Z"
+  },
+  "lec-qui-3067": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée fenêtre verrouillable Hoppe",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.487Z"
+  },
+  "lec-qui-3068": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Crochet de volet inox S 100mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.388Z"
+  },
+  "lec-qui-3069": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Arrêt de volet bergère 90mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.030Z"
+  },
+  "lec-qui-3070": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cale de porte caoutchouc lourd",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:41.708Z"
+  },
+  "lec-qui-3071": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou de sûreté Vachette VR2 30mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.513Z"
+  },
+  "lec-qui-3072": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Targette ronde laiton 60mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.371Z"
+  },
+  "lec-qui-3073": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou de sécurité rosace Iseo",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.095Z"
+  },
+  "lec-qui-3074": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Bouton fixe alu pour cylindre",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.567Z"
+  },
+  "lec-qui-3075": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Garniture WC condamnation Vachette",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.374Z"
+  },
+  "lec-qui-3076": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée Hoppe Verona finition blanche",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:42.778Z"
+  },
+  "lec-qui-3077": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille Hoppe Atlanta finition noire",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.006Z"
+  },
+  "lec-qui-3078": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Béquille pivotante Hoppe Boston",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.552Z"
+  },
+  "lec-qui-3079": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Pommeau Hoppe Athinai rosace fixe",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.376Z"
+  },
+  "lec-qui-3080": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Plaque entrée de cylindre Hoppe",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.591Z"
+  },
+  "lec-qui-3081": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Trou-bouché plaque carré inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.495Z"
+  },
+  "lec-qui-3082": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière à billes inox 100x70",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.152Z"
+  },
+  "lec-qui-3083": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière à billes inox 120x80",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:43.811Z"
+  },
+  "lec-qui-3084": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Charnière invisible Soss 100",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.089Z"
+  },
+  "lec-qui-3085": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Sélecteur de fermeture DORMA TS83",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.020Z"
+  },
+  "lec-qui-3086": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ventouse magnétique 100kg DORMA",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.758Z"
+  },
+  "lec-qui-3087": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Ventouse magnétique 300kg DORMA",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.331Z"
+  },
+  "lec-qui-3088": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Crémone multipoint 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.803Z"
+  },
+  "lec-qui-3089": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gond renforcé paumelle lourde",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.583Z"
+  },
+  "lec-qui-3090": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Joint EPDM porte blindée",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.439Z"
+  },
+  "lec-qui-3091": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Vis inox M6 × 40 (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.362Z"
+  },
+  "lec-qui-3092": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Télécommande portail 4 canaux 433MHz",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.558Z"
+  },
+  "lec-qui-3093": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Poignée de porte Lecot inox",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:45.545Z"
+  },
+  "lec-qui-3094": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Lubrifiant cylindre 400 ml",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.690Z"
+  },
+  "lec-qui-3095": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Gants nitrile (boîte 100)",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:44.971Z"
+  },
+  "lec-ser-1001": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/0/2038597-036353012_foto_01.jpg",
+    "label": "Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm",
+    "pageUrl": "https://lecot.be/fr-be/ferco/1591289-serrure-multi-points-actionee-par-poignee-ferco-2783",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:09.078Z"
+  },
+  "lec-ser-1002": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.487Z"
+  },
+  "lec-ser-1003": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Mul-T-Lock Matrix 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.729Z"
+  },
+  "lec-ser-1004": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Mul-T-Lock Matrix 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.509Z"
+  },
+  "lec-ser-1005": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Bricard Chifral S2 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.430Z"
+  },
+  "lec-ser-1006": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Bricard Chifral S2 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.492Z"
+  },
+  "lec-ser-1007": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Fichet Vertipoint 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.584Z"
+  },
+  "lec-ser-1008": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Yale Doormaster 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.506Z"
+  },
+  "lec-ser-1009": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Yale Doormaster 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.493Z"
+  },
+  "lec-ser-1010": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Thirard Trafic 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.499Z"
+  },
+  "lec-ser-1011": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Thirard Trafic 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.738Z"
+  },
+  "lec-ser-1012": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints JPM Voltige 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.477Z"
+  },
+  "lec-ser-1013": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints JPM Voltige 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.489Z"
+  },
+  "lec-ser-1014": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/9/2988900-a55732900_foto_001.jpg",
+    "label": "Serrure multipoints Pollux 3 points en applique",
+    "pageUrl": "https://lecot.be/fr-be/abus/2983524-serrure-en-applique-abus-2110-w-cl-dfnli",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:09.180Z"
+  },
+  "lec-ser-1015": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Pollux 5 points en applique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.495Z"
+  },
+  "lec-ser-1016": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Heracles HS3 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.470Z"
+  },
+  "lec-ser-1017": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Heracles HS5 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.480Z"
+  },
+  "lec-ser-1018": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Picard Diamant 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.505Z"
+  },
+  "lec-ser-1019": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Picard Diamant 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.733Z"
+  },
+  "lec-ser-1020": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints Vachette V3P 3 points en applique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.736Z"
+  },
+  "lec-ser-1021": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints DOM RX 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.373Z"
+  },
+  "lec-ser-1022": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure multipoints DOM RX 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.503Z"
+  },
+  "lec-ser-1023": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette V136 encastrable axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.478Z"
+  },
+  "lec-ser-1024": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette V136 axe 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.491Z"
+  },
+  "lec-ser-1025": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette V136 axe 60mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.467Z"
+  },
+  "lec-ser-1026": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette V136 axe 70mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.398Z"
+  },
+  "lec-ser-1027": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Bricard Major axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:13.448Z"
+  },
+  "lec-ser-1028": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Bricard Major axe 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.609Z"
+  },
+  "lec-ser-1029": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint JPM Penne axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.349Z"
+  },
+  "lec-ser-1030": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint JPM Penne axe 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.289Z"
+  },
+  "lec-ser-1031": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Yale Y100 axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.367Z"
+  },
+  "lec-ser-1032": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Thirard Trafic axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.245Z"
+  },
+  "lec-ser-1033": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette à crochet axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.542Z"
+  },
+  "lec-ser-1034": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure monopoint Vachette à rouleau axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.199Z"
+  },
+  "lec-ser-1035": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de sécurité Mul-T-Lock Hercular monopoint",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.824Z"
+  },
+  "lec-ser-1036": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de sécurité Abloy LC202 monopoint",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.379Z"
+  },
+  "lec-ser-1037": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure en applique Vachette VR2 horizontale",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.081Z"
+  },
+  "lec-ser-1038": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure en applique JPM Hera 2 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.103Z"
+  },
+  "lec-ser-1039": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure tubulaire Vachette axe 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.473Z"
+  },
+  "lec-ser-1040": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure tubulaire Yale axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.637Z"
+  },
+  "lec-ser-1041": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de meuble Vachette à pêne dormant",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.345Z"
+  },
+  "lec-ser-1042": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de meuble Yale à mentonnet",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.413Z"
+  },
+  "lec-ser-1043": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure rim Yale n°1 entrée principale",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.756Z"
+  },
+  "lec-ser-1044": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure rim Vachette VS22 entrée",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.156Z"
+  },
+  "lec-ser-1045": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure 3 points en applique Pollux verticale haute",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.342Z"
+  },
+  "lec-ser-1046": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure carénée Vachette Mascot 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:15.526Z"
+  },
+  "lec-ser-1047": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure carénée Vachette Mascot 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.595Z"
+  },
+  "lec-ser-1048": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure encastrable JPM Magasin 1 point",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.461Z"
+  },
+  "lec-ser-1049": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure anti-panique DORMA PHA 2000",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.247Z"
+  },
+  "lec-ser-1050": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure anti-panique GEZE TS5000",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.650Z"
+  },
+  "lec-ser-1051": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de garage Vachette à crémone",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.816Z"
+  },
+  "lec-ser-1052": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure pour porte coulissante Yale à crochet",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.017Z"
+  },
+  "lec-ser-1053": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou de sûreté Vachette VR60 30mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.023Z"
+  },
+  "lec-ser-1054": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou de sûreté Vachette VR60 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.810Z"
+  },
+  "lec-ser-1055": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou de sûreté Vachette VR60 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.173Z"
+  },
+  "lec-ser-1056": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou Bricard Surf à bouton 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:16.921Z"
+  },
+  "lec-ser-1057": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou Bricard Surf à bouton 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.756Z"
+  },
+  "lec-ser-1058": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou double entrée Yale 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.325Z"
+  },
+  "lec-ser-1059": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou double entrée Yale 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:17.930Z"
+  },
+  "lec-ser-1060": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou haute sécurité Mul-T-Lock 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.436Z"
+  },
+  "lec-ser-1061": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Verrou haute sécurité Mul-T-Lock 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.688Z"
+  },
+  "lec-ser-1062": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Abus 70/40 anse standard",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.425Z"
+  },
+  "lec-ser-1063": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Abus 70/50 anse standard",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.526Z"
+  },
+  "lec-ser-1064": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Abus 88/50 anse longue",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.289Z"
+  },
+  "lec-ser-1065": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Abus Granit 37RK 80mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.280Z"
+  },
+  "lec-ser-1066": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Master Lock M1 40mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.606Z"
+  },
+  "lec-ser-1067": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Master Lock 410 consignation",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.713Z"
+  },
+  "lec-ser-1068": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Burg-Wächter 116 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.583Z"
+  },
+  "lec-ser-1069": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas Burg-Wächter Octa Plus 75mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.726Z"
+  },
+  "lec-ser-1070": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Cadenas combinaison Abus 145/40",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:18.907Z"
+  },
+  "lec-ser-1071": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure boîte aux lettres Decayeux 1 point",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.939Z"
+  },
+  "lec-ser-1072": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure de coffre Burg-Wächter à clé",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.205Z"
+  },
+  "lec-ser-1073": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure batteuse Ronis universelle 20mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.870Z"
+  },
+  "lec-ser-1074": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure batteuse Ronis universelle 25mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.412Z"
+  },
+  "lec-ser-1075": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure batteuse Ronis universelle 30mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.529Z"
+  },
+  "lec-ser-1076": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure encastrable Tesa pour porte vitrée",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:19.899Z"
+  },
+  "lec-ser-1077": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure pour porte palière Vachette V3P-S",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.565Z"
+  },
+  "lec-ser-1078": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure encastrable Vachette V19 axe 30mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.485Z"
+  },
+  "lec-ser-1079": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure encastrable Vachette V19 axe 35mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.732Z"
+  },
+  "lec-ser-1080": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure DORMA M100 anti-panique 1 point",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.402Z"
+  },
+  "lec-ser-1081": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure ABLOY 4190 norme nordique",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.026Z"
+  },
+  "lec-ser-1082": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Iseo Cisa Dual 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.043Z"
+  },
+  "lec-ser-1083": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure motorisée Cisa eLine 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.581Z"
+  },
+  "lec-ser-1084": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Picard Diamant Vigie 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.311Z"
+  },
+  "lec-ser-1085": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Cavers Heracles 7 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.491Z"
+  },
+  "lec-ser-1086": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Reelax 3 points carénée",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:20.531Z"
+  },
+  "lec-ser-1087": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Ferco Tirard 3 points pour PVC",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.117Z"
+  },
+  "lec-ser-1088": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Ferco Tirard 5 points pour PVC",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.106Z"
+  },
+  "lec-ser-1089": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure GU Secury 3 points alu",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.387Z"
+  },
+  "lec-ser-1090": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure GU Secury 5 points alu",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.738Z"
+  },
+  "lec-ser-1091": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Roto Safe NT 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.889Z"
+  },
+  "lec-ser-1092": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Maco Z-TF 4 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.030Z"
+  },
+  "lec-ser-1093": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Winkhaus AV2 5 points auto",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.520Z"
+  },
+  "lec-ser-1094": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure KFV AS2300 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.649Z"
+  },
+  "lec-ser-1095": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure encastrable Tesa 2240 axe 50mm",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:21.718Z"
+  },
+  "lec-ser-1096": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure 3 points carénée Reelax noire",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.488Z"
+  },
+  "lec-ser-1097": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Mottura 89.794 3 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.160Z"
+  },
+  "lec-ser-1098": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure Mottura 89.795 5 points",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.731Z"
+  },
+  "lec-ser-1099": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure motorisée Nuki Smart Lock 3.0",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:22.822Z"
+  },
+  "lec-ser-1100": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/1/3117307-a65770696_foto_01.jpg",
+    "label": "Serrure connectée Yale Linus Smart Lock",
+    "pageUrl": "https://lecot.be/nl-be/3116432-vloerveer-met-steekas-dormakaba-bts-80-v",
+    "source": "product_page",
+    "fetchedAt": "2026-06-06T09:21:23.013Z"
+  },
+  "lecot-poig": {
+    "imageUrl": "https://cdn.lecot.be/articles/058431016-PrimaryProductImage-IMG-7066653-1920px.webp?ts=1779940972",
+    "label": "lecot-poig",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "lub-cyl": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/7/2737520-a51085649_foto_001.jpg",
+    "label": "lub-cyl",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "serr-apl": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/9/2988900-a55732900_foto_001.jpg",
+    "label": "serr-apl",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "tele-4ch": {
+    "imageUrl": "https://lecot.be/media/catalog/product/2/9/2960020-220145412_foto_01.jpg",
+    "label": "tele-4ch",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "vis-inox-6": {
+    "imageUrl": "https://lecot.be/media/catalog/product/3/0/3001145-a55640757_foto_001.jpg",
+    "label": "vis-inox-6",
+    "pageUrl": null,
+    "source": "legacy",
+    "fetchedAt": "1970-01-01T00:00:00.000Z"
+  }
+}

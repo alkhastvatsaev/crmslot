@@ -1,4 +1,5 @@
-import { pickLargestUploadBlobFromFormData } from '@/core/services/audio/pick-upload-blob-from-form-data';
+import { pickLargestUploadBlobFromFormData } from "@/core/services/audio/pick-upload-blob-from-form-data";
+import { logger } from "@/core/logger";
 
 export type ReadAudioUploadBodyResult =
   | { ok: true; buffer: Buffer; fileName: string }
@@ -7,7 +8,7 @@ export type ReadAudioUploadBodyResult =
 /** Corps trop petit + préfixe chemin Android → souvent "Texte" avec le path au lieu de "Fichier" dans MacroDroid. */
 export function bodyLooksLikeAndroidPathText(buffer: Buffer): boolean {
   if (buffer.length === 0 || buffer.length > 4096) return false;
-  const t = buffer.toString('utf8').trim();
+  const t = buffer.toString("utf8").trim();
   if (t.length < 12) return false;
   if (!/^(\/storage\/|\/sdcard\/|\/data\/|content:\/\/)/i.test(t)) return false;
   const bad = [...t].some((c) => {
@@ -32,23 +33,27 @@ function cancelUnreadClone(fallback: Request) {
  *   via une copie de la requête (clone faite avant toute lecture).
  */
 export async function readAudioUploadBody(request: Request): Promise<ReadAudioUploadBodyResult> {
-  const ct = (request.headers.get('content-type') || '').toLowerCase();
+  const ct = (request.headers.get("content-type") || "").toLowerCase();
 
-  if (ct.includes('multipart/form-data')) {
+  if (ct.includes("multipart/form-data")) {
     const rawFallback = request.clone();
     try {
       const formData = await request.formData();
       const file = pickLargestUploadBlobFromFormData(formData);
       if (file && file.size > 0) {
-        const fileName = (file as File).name || 'audio.m4a';
+        const fileName = (file as File).name || "audio.m4a";
         const buffer = Buffer.from(await file.arrayBuffer());
         cancelUnreadClone(rawFallback);
         return { ok: true, buffer, fileName };
       }
       const keys = [...new Set([...formData.keys()])];
-      console.warn('[readAudioUploadBody] multipart sans Blob utilisable, champs:', keys.join(', ') || '(aucun)');
+      logger.warn("[readAudioUploadBody] multipart sans Blob utilisable, champs:", {
+        fields: keys.join(", ") || "(aucun)",
+      });
     } catch (e) {
-      console.warn('[readAudioUploadBody] formData erreur:', e);
+      logger.warn("[readAudioUploadBody] formData erreur:", {
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
 
     const ab = await rawFallback.arrayBuffer();
@@ -56,15 +61,15 @@ export async function readAudioUploadBody(request: Request): Promise<ReadAudioUp
     if (buffer.length === 0) {
       return {
         ok: false,
-        error: 'Aucun fichier audio exploitable (multipart vide ou illisible).',
+        error: "Aucun fichier audio exploitable (multipart vide ou illisible).",
         status: 400,
         hint: HINT_EMPTY,
       };
     }
-    console.warn(
-      '[readAudioUploadBody] repli corps brut après multipart — vérifiez les réglages MacroDroid (fichier réel, pas seulement le chemin en texte).'
+    logger.warn(
+      "[readAudioUploadBody] repli corps brut après multipart — vérifiez les réglages MacroDroid (fichier réel, pas seulement le chemin en texte)."
     );
-    return { ok: true, buffer, fileName: 'audio.m4a' };
+    return { ok: true, buffer, fileName: "audio.m4a" };
   }
 
   const ab = await request.arrayBuffer();
@@ -72,7 +77,7 @@ export async function readAudioUploadBody(request: Request): Promise<ReadAudioUp
   if (buffer.length === 0) {
     return {
       ok: false,
-      error: 'Le corps de la requête est vide.',
+      error: "Le corps de la requête est vide.",
       status: 400,
       hint: HINT_EMPTY,
     };
@@ -81,11 +86,11 @@ export async function readAudioUploadBody(request: Request): Promise<ReadAudioUp
   if (bodyLooksLikeAndroidPathText(buffer)) {
     return {
       ok: false,
-      error: 'Corps = chemin fichier en texte, pas les données audio.',
+      error: "Corps = chemin fichier en texte, pas les données audio.",
       status: 400,
       hint: HINT_PATH_AS_TEXT,
     };
   }
 
-  return { ok: true, buffer, fileName: 'audio.m4a' };
+  return { ok: true, buffer, fileName: "audio.m4a" };
 }

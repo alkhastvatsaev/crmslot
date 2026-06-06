@@ -1,11 +1,9 @@
 import * as admin from "firebase-admin";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import { isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import {
-  buildCompanyCrmActivityPayload,
-  type CompanyCrmActivityKind,
-} from "./crmActivityLog";
+import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 
@@ -63,10 +61,7 @@ function toolSucceeded(result: unknown): boolean {
   return true;
 }
 
-function extractInterventionId(
-  input: Record<string, unknown>,
-  result: unknown,
-): string {
+function extractInterventionId(input: Record<string, unknown>, result: unknown): string {
   const fromInput = String(input.interventionId || "").trim();
   if (fromInput) return fromInput;
   if (result && typeof result === "object") {
@@ -136,7 +131,7 @@ function buildNote(name: string, input: Record<string, unknown>, result: unknown
 
 async function interventionPickForLog(
   companyId: string,
-  interventionId: string,
+  interventionId: string
 ): Promise<{
   id: string;
   title?: string;
@@ -159,8 +154,7 @@ async function interventionPickForLog(
     clientName: typeof data.clientName === "string" ? data.clientName : undefined,
     clientFirstName: typeof data.clientFirstName === "string" ? data.clientFirstName : null,
     clientLastName: typeof data.clientLastName === "string" ? data.clientLastName : null,
-    clientCompanyName:
-      typeof data.clientCompanyName === "string" ? data.clientCompanyName : null,
+    clientCompanyName: typeof data.clientCompanyName === "string" ? data.clientCompanyName : null,
   };
 }
 
@@ -169,7 +163,7 @@ export async function logCrmFromChatbotTool(
   name: string,
   input: Record<string, unknown>,
   result: unknown,
-  ctx: ChatbotToolContext,
+  ctx: ChatbotToolContext
 ): Promise<void> {
   const isBillingAppend = name === "append_intervention_billing_lines";
   if (!isChatbotWriteTool(name) && !isBillingAppend) return;
@@ -179,9 +173,7 @@ export async function logCrmFromChatbotTool(
   const interventionId = extractInterventionId(input, result);
   const note = buildNote(name, input, result);
 
-  const iv = interventionId
-    ? await interventionPickForLog(ctx.companyId, interventionId)
-    : null;
+  const iv = interventionId ? await interventionPickForLog(ctx.companyId, interventionId) : null;
 
   const statusAfter =
     name === "update_intervention_status"
@@ -212,12 +204,15 @@ export async function logCrmFromChatbotTool(
     {
       statusAfter,
       note,
-    },
+    }
   );
 
   try {
     await logCompanyCrmActivityAdmin(db(), payload);
   } catch (e) {
-    console.warn("[logCrmFromChatbotTool]", name, e);
+    logger.warn("[logCrmFromChatbotTool]", {
+      name,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

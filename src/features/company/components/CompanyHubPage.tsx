@@ -14,11 +14,11 @@ import {
   COMPANY_HUB_ANCHOR_WORKSPACE,
 } from "@/features/company/companyHubNavigation";
 import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLayout";
-import { cn } from "@/lib/utils";
+import { HUB_RAIL_BODY_CLASS, HubSegmentedControl } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 /** Même pas que la grille desktop (`DASHBOARD_DESKTOP_PANEL_GAP_CLASS`) — rythme équidistant. */
-const railGap = `flex min-h-0 flex-1 flex-col ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
+const railGap = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
 
 import { CompanyHubTimelineTab } from "@/features/company/components/CompanyHubTimelineTab";
 import { CompanyHubDocumentsTab } from "@/features/company/components/CompanyHubDocumentsTab";
@@ -86,72 +86,38 @@ export default function CompanyHubPage() {
           data-testid="company-hub-rail-portail"
           className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
         >
-          <div
-            role="tablist"
-            aria-label={t("company_hub.right_tabs.aria")}
-            className="mx-4 mt-4 flex shrink-0 gap-1 rounded-[20px] border border-slate-300/30 bg-slate-200/50 p-1.5"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={rightCategory === "tracking"}
-              data-testid="company-hub-right-tab-tracking"
-              onClick={() => setRightCategory("tracking")}
-              className={cn(
-                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
-                rightCategory === "tracking"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-slate-500 hover:bg-slate-300/30",
-              )}
-            >
-              {t("company_hub.right_tabs.tracking")}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={rightCategory === "chat"}
-              data-testid="company-hub-right-tab-chat"
-              onClick={() => setRightCategory("chat")}
-              className={cn(
-                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
-                rightCategory === "chat"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-slate-500 hover:bg-slate-300/30",
-              )}
-            >
-              {t("company_hub.right_tabs.chat")}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={rightCategory === "documents"}
-              data-testid="company-hub-right-tab-documents"
-              onClick={() => setRightCategory("documents")}
-              className={cn(
-                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
-                rightCategory === "documents"
-                  ? "bg-white text-rose-600 shadow-sm"
-                  : "text-slate-500 hover:bg-slate-300/30",
-              )}
-            >
-              Documents
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={rightCategory === "timeline"}
-              data-testid="company-hub-right-tab-timeline"
-              onClick={() => setRightCategory("timeline")}
-              className={cn(
-                "flex min-h-[44px] flex-1 items-center justify-center rounded-[16px] px-2 py-2 text-center text-[11px] font-bold transition-all sm:text-[12px]",
-                rightCategory === "timeline"
-                  ? "bg-white text-emerald-600 shadow-sm"
-                  : "text-slate-500 hover:bg-slate-300/30",
-              )}
-            >
-              Historique
-            </button>
-          </div>
+          <HubSegmentedControl
+            value={rightCategory}
+            onChange={(id) => setRightCategory(id as CompanyHubRightCategory)}
+            ariaLabel={t("company_hub.right_tabs.aria")}
+            className="mx-4 mt-4 shrink-0"
+            options={[
+              {
+                id: "tracking",
+                label: t("company_hub.right_tabs.tracking"),
+                testId: "company-hub-right-tab-tracking",
+                activeAccent: "blue",
+              },
+              {
+                id: "chat",
+                label: t("company_hub.right_tabs.chat"),
+                testId: "company-hub-right-tab-chat",
+                activeAccent: "blue",
+              },
+              {
+                id: "documents",
+                label: "Documents",
+                testId: "company-hub-right-tab-documents",
+                activeAccent: "rose",
+              },
+              {
+                id: "timeline",
+                label: "Historique",
+                testId: "company-hub-right-tab-timeline",
+                activeAccent: "emerald",
+              },
+            ]}
+          />
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden" role="tabpanel">
             {rightCategory === "tracking" ? (
               <RequesterTrackingPanel />
@@ -168,10 +134,7 @@ export default function CompanyHubPage() {
                 companyId={ivanaChatCompanyId}
               />
             ) : (
-              <CompanyHubTimelineTab
-                interventionId={portalCaseId}
-                companyId={ivanaChatCompanyId}
-              />
+              <CompanyHubTimelineTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
             )}
           </div>
         </section>

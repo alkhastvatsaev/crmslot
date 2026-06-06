@@ -6,9 +6,8 @@ import { formatScheduledTimeOnly } from "@/features/interventions/technicianSche
 import { capitalizeName } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { cn } from "@/lib/utils";
+import { HUB_FONT_OUTFIT, HUB_MISSION_CASE } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 type Props = {
   iv: Intervention;
@@ -18,12 +17,7 @@ type Props = {
 };
 
 /** Entrée liste gauche pour une assignation en attente (actions dans le panneau central). */
-export default function TechnicianAssignmentOfferCard({
-  iv,
-  index,
-  isSelected,
-  onSelect,
-}: Props) {
+export default function TechnicianAssignmentOfferCard({ iv, index, isSelected, onSelect }: Props) {
   const { t } = useTranslation();
 
   let firstName = iv.clientFirstName;
@@ -50,13 +44,10 @@ export default function TechnicianAssignmentOfferCard({
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      style={outfit}
       data-testid={`technician-assignment-offer-${iv.id}`}
       className={cn(
-        "w-full rounded-[20px] border px-3 py-2.5 transition-all",
-        isSelected
-          ? "border-neutral-900 bg-neutral-50"
-          : "border-neutral-200/80 bg-white hover:bg-neutral-50",
+        HUB_MISSION_CASE.offerBase,
+        isSelected ? HUB_MISSION_CASE.offerSelected : HUB_MISSION_CASE.offerDefault
       )}
       onClick={onSelect}
       onKeyDown={(e) => {
@@ -70,10 +61,12 @@ export default function TechnicianAssignmentOfferCard({
     >
       <div className="mb-1 flex items-center gap-2">
         <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-blue-500" aria-hidden />
-        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">
+        <span className={cn("text-[10px] font-black uppercase tracking-widest text-slate-500")}>
           {t("technician_hub.dashboard.detail.new_assignment")}
         </span>
-        <span className="ml-auto text-[13px] font-bold tabular-nums text-neutral-600">{timeLabel}</span>
+        <span className="ml-auto text-[13px] font-bold tabular-nums text-slate-600">
+          {timeLabel}
+        </span>
       </div>
       <p className="truncate text-[15px] font-bold text-slate-900">{displayLabel}</p>
     </motion.div>

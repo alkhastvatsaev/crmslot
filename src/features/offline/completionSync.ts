@@ -1,5 +1,6 @@
 import { doc, getDoc, type Timestamp } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { remoteCompletionIsNewerThanQueued } from "@/features/offline/completionConflict";
 import {
   completionQueueDelete,
@@ -38,7 +39,9 @@ export async function getCompletionQueueLength(): Promise<number> {
 
 const IDB_PUT_TIMEOUT_MS = 15_000;
 
-export async function enqueueCompletionRecord(payload: Omit<CompletionQueueRecord, "localId" | "queuedAtMs">): Promise<void> {
+export async function enqueueCompletionRecord(
+  payload: Omit<CompletionQueueRecord, "localId" | "queuedAtMs">
+): Promise<void> {
   const localId =
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
       ? crypto.randomUUID()
@@ -53,7 +56,10 @@ export async function enqueueCompletionRecord(payload: Omit<CompletionQueueRecor
   await Promise.race([
     completionQueuePut(record),
     new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("IndexedDB indisponible (navigateur privé, quota, ou blocage)")), IDB_PUT_TIMEOUT_MS),
+      setTimeout(
+        () => reject(new Error("IndexedDB indisponible (navigateur privé, quota, ou blocage)")),
+        IDB_PUT_TIMEOUT_MS
+      )
     ),
   ]);
   notifyCompletionQueueChanged();
@@ -72,7 +78,12 @@ async function enqueueCompletionPayload(params: {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
 }): Promise<{ outcome: "queued" } | { outcome: "error"; message: string }> {
   try {
     await enqueueCompletionRecord({
@@ -91,7 +102,12 @@ export async function finalizeCompletionOfflineAware(params: {
   interventionId: string;
   photoDataUrls: string[];
   signaturePngDataUrl: string;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
 }): Promise<{ outcome: "sent" } | { outcome: "queued" } | { outcome: "error"; message: string }> {
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     return enqueueCompletionPayload(params);
@@ -108,14 +124,17 @@ export async function finalizeCompletionOfflineAware(params: {
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
         () => reject(new Error("Délai d'attente dépassé (réseau lent)")),
-        ONLINE_COMPLETION_TIMEOUT_MS,
+        ONLINE_COMPLETION_TIMEOUT_MS
       );
     });
 
     await Promise.race([uploadPromise, timeoutPromise]);
     return { outcome: "sent" };
   } catch (e) {
-    if (isLikelyNetworkFailure(e) || (e instanceof Error && e.message.includes("Délai d'attente"))) {
+    if (
+      isLikelyNetworkFailure(e) ||
+      (e instanceof Error && e.message.includes("Délai d'attente"))
+    ) {
       return enqueueCompletionPayload(params);
     }
     return { outcome: "error", message: e instanceof Error ? e.message : String(e) };
@@ -131,7 +150,7 @@ export type FlushCompletionReport = {
 
 /** Vide la file (réseau requis pour Storage + lecture conflit Firestore). */
 export async function flushCompletionQueue(
-  onConflictSkip?: (interventionId: string) => void,
+  onConflictSkip?: (interventionId: string) => void
 ): Promise<FlushCompletionReport> {
   const report: FlushCompletionReport = { uploaded: 0, skippedConflict: 0, failed: 0 };
 
@@ -150,14 +169,18 @@ export async function flushCompletionQueue(
   for (const rec of sorted) {
     try {
       const timeoutPromise = new Promise<"timeout">((resolve) =>
-        setTimeout(() => resolve("timeout"), FLUSH_ITEM_TIMEOUT_MS),
+        setTimeout(() => resolve("timeout"), FLUSH_ITEM_TIMEOUT_MS)
       );
 
       const processItem = async (): Promise<"skipped" | "uploaded"> => {
         const snap = await getDoc(doc(db, "interventions", rec.interventionId));
         const d = snap.exists() ? snap.data() : null;
         const remoteStatus = d?.status as string | undefined;
-        const remoteCompletedAt = (d?.completedAt ?? undefined) as Timestamp | { toMillis?: () => number } | Date | undefined;
+        const remoteCompletedAt = (d?.completedAt ?? undefined) as
+          | Timestamp
+          | { toMillis?: () => number }
+          | Date
+          | undefined;
 
         if (remoteCompletionIsNewerThanQueued(remoteStatus, remoteCompletedAt, rec.queuedAtMs)) {
           onConflictSkip?.(rec.interventionId);
@@ -187,7 +210,9 @@ export async function flushCompletionQueue(
         report.uploaded += 1;
       }
     } catch (err: unknown) {
-      console.warn(`Failed to upload intervention ${rec.interventionId}:`, err);
+      logger.warn(`Failed to upload intervention ${rec.interventionId}:`, {
+        error: err instanceof Error ? err.message : String(err),
+      });
       report.failed += 1;
       report.lastError = err instanceof Error ? err.message : String(err);
     }

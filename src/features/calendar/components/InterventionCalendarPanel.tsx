@@ -1,8 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Building2, CalendarRange, CalendarDays, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import {
+  Building2,
+  CalendarRange,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+} from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { HUB_FONT_OUTFIT, HubPanelHeader, HubSegmentedControl } from "@/core/ui/hub";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +32,7 @@ import {
   localDayKeyFromParts,
 } from "@/features/calendar/calendarGrid";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function weekdaysShortForLocale(locale: string): string[] {
-
   const base = new Date(Date.UTC(2026, 0, 6)); // Monday
   const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" });
   const out: string[] = [];
@@ -85,10 +90,15 @@ export default function InterventionCalendarPanel() {
   }, []);
 
   const tenantReady = Boolean(workspace?.isTenantUser && companyFilterId.trim());
-  const { interventions, loading, error } = useBackOfficeInterventions(tenantReady ? companyFilterId : null);
+  const { interventions, loading, error } = useBackOfficeInterventions(
+    tenantReady ? companyFilterId : null
+  );
 
   const scheduledOnly = useMemo(() => filterScheduledInterventions(interventions), [interventions]);
-  const byDay = useMemo(() => groupScheduledInterventionsByLocalDay(scheduledOnly), [scheduledOnly]);
+  const byDay = useMemo(
+    () => groupScheduledInterventionsByLocalDay(scheduledOnly),
+    [scheduledOnly]
+  );
 
   const navigate = useMemo(() => {
     if (viewMode === "month") {
@@ -104,7 +114,9 @@ export default function InterventionCalendarPanel() {
   }, [viewMode]);
 
   const monthTitle = useMemo(() => {
-    const raw = new Intl.DateTimeFormat("fr-BE", { month: "long", year: "numeric" }).format(viewDate);
+    const raw = new Intl.DateTimeFormat("fr-BE", { month: "long", year: "numeric" }).format(
+      viewDate
+    );
     return raw.replace(/^\w/, (c) => c.toUpperCase());
   }, [viewDate]);
 
@@ -135,14 +147,18 @@ export default function InterventionCalendarPanel() {
   }, [viewDate]);
 
   const selectedItems = selectedDayKey ? (byDay.get(selectedDayKey) ?? []) : [];
-  
+
   const todayKey = calendarTodayKey();
 
   const selectedDayLabel = useMemo(() => {
     if (!selectedDayKey) return null;
     const d = parseLocalDayKey(selectedDayKey);
     if (!d) return null;
-    return new Intl.DateTimeFormat("fr-BE", { weekday: "long", day: "numeric", month: "long" }).format(d);
+    return new Intl.DateTimeFormat("fr-BE", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    }).format(d);
   }, [selectedDayKey]);
 
   const goToToday = useCallback(() => {
@@ -153,37 +169,44 @@ export default function InterventionCalendarPanel() {
 
   const offlineAuth = !isConfigured || !firestore;
 
-  const scheduleIvRow = useCallback((iv: Intervention) => {
-    return (
-      <li
-        key={iv.id}
-        data-testid={`calendar-slot-${iv.id}`}
-        title={`Dossier ${iv.id}`}
-        className="rounded-2xl border border-black/[0.05] bg-white/95 px-3 py-2.5 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.12)]"
-      >
-        <div className="flex items-start justify-between gap-2">
-          <p className="min-w-0 flex-1 leading-snug text-[14px] font-semibold tracking-tight text-slate-900">
-            {interventionClientLabel(iv)}
+  const scheduleIvRow = useCallback(
+    (iv: Intervention) => {
+      return (
+        <li
+          key={iv.id}
+          data-testid={`calendar-slot-${iv.id}`}
+          title={`Dossier ${iv.id}`}
+          className="rounded-2xl border border-black/[0.05] bg-white/95 px-3 py-2.5 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.12)]"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <p className="min-w-0 flex-1 leading-snug text-[14px] font-semibold tracking-tight text-slate-900">
+              {interventionClientLabel(iv)}
+            </p>
+            <Badge
+              variant="secondary"
+              className="max-w-[6.5rem] shrink-0 truncate text-[10px] font-semibold"
+            >
+              {String(t(statusLabelKey(iv.status)))}
+            </Badge>
+          </div>
+          <p className="mt-1.5 text-[12px] font-medium text-slate-500">
+            {formatScheduledLabel(iv)}
           </p>
-          <Badge variant="secondary" className="max-w-[6.5rem] shrink-0 truncate text-[10px] font-semibold">
-            {String(t(statusLabelKey(iv.status)))}
-          </Badge>
-        </div>
-        <p className="mt-1.5 text-[12px] font-medium text-slate-500">{formatScheduledLabel(iv)}</p>
-        <p className="sr-only">Dossier {iv.id}</p>
-      </li>
-    );
-  }, [t]);
+          <p className="sr-only">Dossier {iv.id}</p>
+        </li>
+      );
+    },
+    [t]
+  );
 
   if (!workspace || !workspace.isTenantUser || !workspace.memberships.length) {
     return (
       <div
         data-testid="calendar-integration-gate"
-        style={outfit}
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] px-4 py-6"
       >
         <div
-          className="mx-auto flex w-full max-w-md flex-col items-center justify-center gap-2 rounded-[20px] border border-sky-200/40 bg-gradient-to-b from-sky-50/90 to-white/80 px-4 py-8 text-[13px] shadow-[0_14px_36px_-18px_rgba(15,23,42,0.12)]"
+          className="mx-auto flex w-full max-w-md flex-col items-center justify-center gap-2 rounded-[16px] border border-sky-200/40 bg-gradient-to-b from-sky-50/90 to-white/80 px-4 py-8 text-[13px] shadow-[0_14px_36px_-18px_rgba(15,23,42,0.12)]"
           aria-labelledby="calendar-gate-title"
         >
           <p id="calendar-gate-title" className="sr-only">
@@ -202,60 +225,40 @@ export default function InterventionCalendarPanel() {
   return (
     <div
       data-testid="calendar-integration-panel"
-      style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
       aria-label="Planning des interventions"
     >
       <div className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex min-h-0 flex-1 flex-col gap-4")}>
         <header className="flex shrink-0 flex-col gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] bg-slate-900 text-white shadow-[0_8px_20px_-8px_rgba(15,23,42,0.45)]">
-              <CalendarDays className="h-[22px] w-[22px]" aria-hidden />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="truncate text-[17px] font-bold tracking-tight text-slate-900">Agenda</h2>
-              <p className="sr-only">Vue calendrier des interventions planifiées</p>
-            </div>
-          </div>
+          <HubPanelHeader
+            variant="page"
+            title="Agenda"
+            subtitle="Vue calendrier des interventions planifiées"
+            icon={<CalendarDays className="h-[22px] w-[22px]" aria-hidden />}
+          />
 
-          <div
-            className="flex w-full rounded-[14px] bg-slate-200/45 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
-            role="tablist"
-            aria-label="Type de vue"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === "month"}
-              data-testid="calendar-tab-month"
-              onClick={() => setViewMode("month")}
-              className={cn(
-                "flex min-h-[40px] flex-1 items-center justify-center gap-2 rounded-[11px] text-[13px] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20",
-                viewMode === "month"
-                  ? "bg-white text-slate-900 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.18)]"
-                  : "text-slate-600 hover:text-slate-800",
-              )}
-            >
-              <CalendarDays className="h-4 w-4 opacity-80" aria-hidden />
-              <span>Mois</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === "week"}
-              data-testid="calendar-tab-week"
-              onClick={() => setViewMode("week")}
-              className={cn(
-                "flex min-h-[40px] flex-1 items-center justify-center gap-2 rounded-[11px] text-[13px] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20",
-                viewMode === "week"
-                  ? "bg-white text-slate-900 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.18)]"
-                  : "text-slate-600 hover:text-slate-800",
-              )}
-            >
-              <CalendarRange className="h-4 w-4 opacity-80" aria-hidden />
-              <span>Semaine</span>
-            </button>
-          </div>
+          <HubSegmentedControl
+            value={viewMode}
+            onChange={(id) => setViewMode(id as "month" | "week")}
+            ariaLabel="Type de vue"
+            size="compact"
+            options={[
+              {
+                id: "month",
+                label: "Mois",
+                testId: "calendar-tab-month",
+                icon: <CalendarDays className="h-4 w-4 opacity-80" aria-hidden />,
+                activeAccent: "slate",
+              },
+              {
+                id: "week",
+                label: "Semaine",
+                testId: "calendar-tab-week",
+                icon: <CalendarRange className="h-4 w-4 opacity-80" aria-hidden />,
+                activeAccent: "slate",
+              },
+            ]}
+          />
 
           <div className="relative">
             <Building2
@@ -318,7 +321,10 @@ export default function InterventionCalendarPanel() {
             <ChevronLeft className="h-5 w-5" aria-hidden />
           </Button>
           <div className="flex min-w-0 flex-1 flex-col justify-center rounded-[13px] border border-black/[0.06] bg-white/90 px-2 py-1.5 text-center shadow-[0_2px_16px_-8px_rgba(15,23,42,0.12)]">
-            <p className="truncate text-[14px] font-bold leading-tight text-slate-900" data-testid="calendar-range-title">
+            <p
+              className="truncate text-[14px] font-bold leading-tight text-slate-900"
+              data-testid="calendar-range-title"
+            >
               {viewMode === "month" ? monthTitle : weekTitle}
             </p>
           </div>
@@ -361,7 +367,10 @@ export default function InterventionCalendarPanel() {
           >
             <div className="grid grid-cols-7 gap-0 border-b border-slate-100/90 bg-slate-50/60 px-1 pt-2">
               {weekdayLabels.map((w) => (
-                <div key={w} className="py-2 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                <div
+                  key={w}
+                  className="py-2 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400"
+                >
                   {w}
                 </div>
               ))}
@@ -392,7 +401,7 @@ export default function InterventionCalendarPanel() {
                     }
                     className={cn(
                       "relative flex min-h-[64px] flex-col items-center gap-1 rounded-[15px] border border-transparent px-0.5 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20",
-                      pressed ? "border-slate-900/14 bg-slate-900/[0.05]" : "hover:bg-slate-50",
+                      pressed ? "border-slate-900/14 bg-slate-900/[0.05]" : "hover:bg-slate-50"
                     )}
                   >
                     <span
@@ -402,13 +411,15 @@ export default function InterventionCalendarPanel() {
                           ? "bg-slate-900 text-white shadow-[0_4px_12px_-4px_rgba(15,23,42,0.45)]"
                           : isTodayCell
                             ? "text-sky-600 shadow-[inset_0_0_0_1.5px_rgba(56,189,248,0.55)]"
-                            : "text-slate-800",
+                            : "text-slate-800"
                       )}
                     >
                       {cell}
                     </span>
                     {count > 0 ? (
-                      <span className="min-h-[14px] text-[11px] font-bold tabular-nums text-slate-900">{count}</span>
+                      <span className="min-h-[14px] text-[11px] font-bold tabular-nums text-slate-900">
+                        {count}
+                      </span>
                     ) : (
                       <span className="min-h-[14px]" aria-hidden />
                     )}
@@ -432,9 +443,11 @@ export default function InterventionCalendarPanel() {
                   <div
                     key={key}
                     data-testid={`calendar-week-column-${key}`}
-                      className={cn(
-                        "flex min-w-[12rem] max-w-[16rem] shrink-0 snap-center flex-col rounded-[20px] border bg-white/95 p-3 shadow-[0_10px_36px_-20px_rgba(15,23,42,0.2)]",
-                      pressed ? "border-slate-900 border-opacity-95 ring-2 ring-slate-900/12" : "border-black/[0.05]",
+                    className={cn(
+                      "flex min-w-[12rem] max-w-[16rem] shrink-0 snap-center flex-col rounded-[16px] border bg-white/95 p-3 shadow-[0_10px_36px_-20px_rgba(15,23,42,0.2)]",
+                      pressed
+                        ? "border-slate-900 border-opacity-95 ring-2 ring-slate-900/12"
+                        : "border-black/[0.05]"
                     )}
                   >
                     <button
@@ -465,7 +478,9 @@ export default function InterventionCalendarPanel() {
                       ) : (
                         <div className="flex h-full min-h-[100px] flex-col items-center justify-center rounded-xl bg-slate-50/80 px-2 text-center">
                           <CalendarDays className="mb-1 h-8 w-8 text-slate-200" aria-hidden />
-                          <p className="text-[11px] font-semibold leading-snug text-slate-400">Libre</p>
+                          <p className="text-[11px] font-semibold leading-snug text-slate-400">
+                            Libre
+                          </p>
                           <p className="sr-only">Aucune intervention ce jour.</p>
                         </div>
                       )}
@@ -480,20 +495,28 @@ export default function InterventionCalendarPanel() {
         {!loading && tenantReady && viewMode === "month" ? (
           <section
             data-testid="calendar-day-detail"
-            className="overflow-hidden rounded-[20px] border border-black/[0.05] bg-gradient-to-b from-white to-slate-50/40 p-4 shadow-[0_8px_32px_-18px_rgba(15,23,42,0.15)]"
+            className="overflow-hidden rounded-[16px] border border-black/[0.05] bg-gradient-to-b from-white to-slate-50/40 p-4 shadow-[0_8px_32px_-18px_rgba(15,23,42,0.15)]"
             aria-labelledby="calendar-day-detail-heading"
           >
             <div className="mb-4 flex flex-col gap-0.5 border-b border-black/[0.06] pb-3">
-              <h3 id="calendar-day-detail-heading" className="text-[13px] font-bold uppercase tracking-[0.12em] text-slate-400">
+              <h3
+                id="calendar-day-detail-heading"
+                className="text-[13px] font-bold uppercase tracking-[0.12em] text-slate-400"
+              >
                 Journée
               </h3>
               {selectedDayLabel ? (
-                <p className="text-[17px] font-bold capitalize leading-snug tracking-tight text-slate-900">{selectedDayLabel}</p>
+                <p className="text-[17px] font-bold capitalize leading-snug tracking-tight text-slate-900">
+                  {selectedDayLabel}
+                </p>
               ) : (
                 <p className="text-[15px] font-semibold text-slate-500">Choisir un jour</p>
               )}
               {selectedDayKey ? (
-                <p className="text-[12px] font-semibold text-slate-500" data-testid="calendar-day-detail-count">
+                <p
+                  className="text-[12px] font-semibold text-slate-500"
+                  data-testid="calendar-day-detail-count"
+                >
                   {selectedItems.length === 0
                     ? "Aucune intervention"
                     : `${selectedItems.length} intervention${selectedItems.length > 1 ? "s" : ""}`}
@@ -516,7 +539,9 @@ export default function InterventionCalendarPanel() {
             ) : (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <CalendarDays className="h-10 w-10 text-slate-200/90" aria-hidden />
-                <p className="mt-3 text-[13px] font-medium text-slate-500">Touchez un jour dans la grille ci-dessus.</p>
+                <p className="mt-3 text-[13px] font-medium text-slate-500">
+                  Touchez un jour dans la grille ci-dessus.
+                </p>
                 <p className="sr-only">Sélectionner un jour dans le calendrier.</p>
               </div>
             )}

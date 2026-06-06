@@ -27,7 +27,7 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
 
   const [lines, setLines] = useState<QuoteLine[]>(
-    quote?.lines ?? [{ description: "", quantity: 1, unitPriceCents: 0 }],
+    quote?.lines ?? [{ description: "", quantity: 1, unitPriceCents: 0 }]
   );
   const [notes, setNotes] = useState(quote?.notes ?? "");
   const [validityDays, setValidityDays] = useState(quote?.validityDays ?? 30);
@@ -71,8 +71,8 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
             kind: "quote_status_changed",
             actorUid: workspace?.firebaseUid ?? "system",
             actorRole: "dispatcher",
-            statusBefore: quote.status as any,
-            statusAfter: "sent" as any,
+            statusBefore: quote.status,
+            statusAfter: "sent",
             note: notes.trim() || undefined,
             intervention: {
               id: quote.id,
@@ -81,7 +81,7 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
               clientName: clientName.trim() || undefined,
               clientCompanyName: clientName.trim() || undefined,
               address: "",
-            } as any,
+            },
           });
         }
         onSaved?.(quote.id);
@@ -102,7 +102,7 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
           actorUid: workspace?.firebaseUid ?? "system",
           actorRole: "dispatcher",
           note: notes.trim() || undefined,
-          statusAfter: "draft" as any,
+          statusAfter: "draft",
           intervention: {
             id: id,
             title: `Devis ${id.substring(0, 8)}`,
@@ -110,7 +110,7 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
             clientName: clientName.trim() || undefined,
             clientCompanyName: clientName.trim() || undefined,
             address: "",
-          } as any,
+          },
         });
         if (andSend) {
           await updateQuoteStatus(firestore, companyId, id, "sent");
@@ -119,8 +119,8 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
             kind: "quote_status_changed",
             actorUid: workspace?.firebaseUid ?? "system",
             actorRole: "dispatcher",
-            statusBefore: "draft" as any,
-            statusAfter: "sent" as any,
+            statusBefore: "draft",
+            statusAfter: "sent",
             note: notes.trim() || undefined,
             intervention: {
               id: id,
@@ -129,7 +129,7 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
               clientName: clientName.trim() || undefined,
               clientCompanyName: clientName.trim() || undefined,
               address: "",
-            } as any,
+            },
           });
         }
         onSaved?.(id);

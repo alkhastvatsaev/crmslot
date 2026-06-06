@@ -14,12 +14,7 @@ import {
 } from "@/features/materials/materialOrderFirestore";
 import { displayMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import type { MaterialOrder } from "@/features/materials/types";
-import {
-  SUPPLIER_ORDER_STATUS_LABELS,
-  type SupplierOrder,
-} from "@/features/suppliers/types";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrder } from "@/features/suppliers/types";
 
 type Props = {
   orders: MaterialOrderDoc[];
@@ -70,7 +65,7 @@ export default function CompanyStockOrdersTrackPanel({
       [...orders]
         .filter((o) => o.status === "pending")
         .sort((a, b) => parseOrderMs(b.createdAt) - parseOrderMs(a.createdAt)),
-    [orders],
+    [orders]
   );
 
   const openSupplier = useMemo(
@@ -78,7 +73,7 @@ export default function CompanyStockOrdersTrackPanel({
       [...supplierOrders]
         .filter(isOpenSupplierOrder)
         .sort((a, b) => parseOrderMs(b.createdAt) - parseOrderMs(a.createdAt)),
-    [supplierOrders],
+    [supplierOrders]
   );
 
   const handleApprove = useCallback(
@@ -88,11 +83,7 @@ export default function CompanyStockOrdersTrackPanel({
         if (isDemoMaterialOrderId(orderId)) {
           onDismissDemoOrder?.(orderId);
         } else if (firestore) {
-          await updateMaterialOrderStatus(
-            firestore,
-            orderId,
-            "ordered" as MaterialOrder["status"],
-          );
+          await updateMaterialOrderStatus(firestore, orderId, "ordered" as MaterialOrder["status"]);
         }
         toast.success(String(t("companyStock.order_approved")));
       } catch {
@@ -101,7 +92,7 @@ export default function CompanyStockOrdersTrackPanel({
         setApprovingId(null);
       }
     },
-    [onDismissDemoOrder, t],
+    [onDismissDemoOrder, t]
   );
 
   if (loading) {
@@ -109,7 +100,6 @@ export default function CompanyStockOrdersTrackPanel({
       <div
         data-testid="company-stock-orders-track"
         className="flex min-h-0 flex-1 items-center justify-center bg-white"
-        style={outfit}
       >
         <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
       </div>
@@ -120,7 +110,6 @@ export default function CompanyStockOrdersTrackPanel({
     <div
       data-testid="company-stock-orders-track"
       className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-hidden bg-white"
-      style={outfit}
     >
       <header className="shrink-0 border-b border-slate-100 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -146,7 +135,8 @@ export default function CompanyStockOrdersTrackPanel({
           ) : (
             <ul className="flex flex-col gap-2">
               {pendingField.map((order) => {
-                const statusKey = MATERIAL_STATUS_KEYS[order.status] ?? MATERIAL_STATUS_KEYS.pending;
+                const statusKey =
+                  MATERIAL_STATUS_KEYS[order.status] ?? MATERIAL_STATUS_KEYS.pending;
                 return (
                   <li
                     key={order.id}
@@ -158,7 +148,9 @@ export default function CompanyStockOrdersTrackPanel({
                     </p>
                     <p className="mt-0.5 truncate text-[10px] text-slate-400">
                       {order.interventionId}
-                      {formatWhenShort(order.createdAt) ? ` · ${formatWhenShort(order.createdAt)}` : ""}
+                      {formatWhenShort(order.createdAt)
+                        ? ` · ${formatWhenShort(order.createdAt)}`
+                        : ""}
                     </p>
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
@@ -217,7 +209,7 @@ export default function CompanyStockOrdersTrackPanel({
                         "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
                         order.status === "confirmed"
                           ? "bg-indigo-50 text-indigo-700"
-                          : "bg-blue-50 text-blue-700",
+                          : "bg-blue-50 text-blue-700"
                       )}
                     >
                       {SUPPLIER_ORDER_STATUS_LABELS[order.status]}
@@ -225,7 +217,9 @@ export default function CompanyStockOrdersTrackPanel({
                   </div>
                   <p className="mt-0.5 text-[10px] text-slate-400">
                     {order.supplierName}
-                    {formatWhenShort(order.createdAt) ? ` · ${formatWhenShort(order.createdAt)}` : ""}
+                    {formatWhenShort(order.createdAt)
+                      ? ` · ${formatWhenShort(order.createdAt)}`
+                      : ""}
                   </p>
                   {order.isDemo ? (
                     <SupplierOrderDemoProgress orderId={order.id} status={order.status} />

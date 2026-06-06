@@ -99,7 +99,7 @@ describe("FeatureHubPage", () => {
           <FeatureHubPage />
         </CompanyStockIntentProvider>
       </CompanyStockAgentBridgeProvider>,
-      FEATURE_HUB_SLOT_INDEX + 1,
+      FEATURE_HUB_SLOT_INDEX + 1
     );
     const slot = `dashboard-pager-slot-${FEATURE_HUB_SLOT_INDEX}`;
     expect(screen.getByTestId(slot)).toBeInTheDocument();
@@ -108,12 +108,12 @@ describe("FeatureHubPage", () => {
     expect(screen.queryByTestId("company-stock-left-rail")).not.toBeInTheDocument();
     expect(screen.getByTestId("company-stock-orders-right-rail")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-orders-panel")).toBeInTheDocument();
-    expect(screen.getByText("Commandes")).toBeInTheDocument();
+    expect(screen.queryByText("Commandes")).not.toBeInTheDocument();
     expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-pulse")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-filter-bar")).not.toBeInTheDocument();
     expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
-    expect(screen.getByTestId("company-stock-search")).toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-search")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-autopilot-primary")).not.toBeInTheDocument();
   });
 });

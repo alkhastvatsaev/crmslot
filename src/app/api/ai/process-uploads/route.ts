@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import '@/core/config/firebase-admin';
-import { authorizeProcessUploads } from '@/core/api/routeAuth';
-import { findPendingUploadJobs } from '@/core/services/audio/process-upload-jobs';
-import { runProcessUploadJob } from '@/core/services/audio/run-process-upload-job';
+import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+import "@/core/config/firebase-admin";
+import { authorizeProcessUploads } from "@/core/api/routeAuth";
+import { findPendingUploadJobs } from "@/core/services/audio/process-upload-jobs";
+import { runProcessUploadJob } from "@/core/services/audio/run-process-upload-job";
+import { logger } from "@/core/logger";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 /** Limite serveur (Vercel Pro+) — ajuste si besoin */
 export const maxDuration = 120;
@@ -19,10 +20,10 @@ export async function POST(request: Request) {
   try {
     const ok = await authorizeProcessUploads(request);
     if (!ok) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
     fs.mkdirSync(uploadsDir, { recursive: true });
 
     const pending = findPendingUploadJobs(uploadsDir);
@@ -31,13 +32,13 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         processed: 0,
-        message: 'Aucun fichier à traiter',
+        message: "Aucun fichier à traiter",
         pending: 0,
       });
     }
 
     const job = pending[0];
-    const out = await runProcessUploadJob({ uploadsDir, job, source: 'upload-auto' });
+    const out = await runProcessUploadJob({ uploadsDir, job, source: "upload-auto" });
 
     return NextResponse.json({
       success: true,
@@ -49,8 +50,10 @@ export async function POST(request: Request) {
       rawTranscript: out.rawTranscript,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Erreur serveur';
-    console.error('[process-uploads] Erreur globale:', error);
+    const message = error instanceof Error ? error.message : "Erreur serveur";
+    logger.error("[process-uploads] Erreur globale:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
@@ -59,9 +62,9 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const ok = await authorizeProcessUploads(request);
   if (!ok) {
-    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
   fs.mkdirSync(uploadsDir, { recursive: true });
   const pending = findPendingUploadJobs(uploadsDir);
   return NextResponse.json({ success: true, pending: pending.length });

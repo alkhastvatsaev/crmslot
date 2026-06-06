@@ -45,7 +45,6 @@ export type ChatbotConversationContext = {
   activeFlows: ChatbotFlowId[];
   toolScope: string[] | undefined;
   needsTools: boolean;
-  skipToolsRound0: boolean;
   forceToolName: string | null;
   lecotSearchQuery: string | null;
   isGreeting: boolean;
@@ -69,8 +68,7 @@ const FLOW_HINTS: Record<ChatbotFlowId, RegExp> = {
     /lecot|fournisseur|commande\s+(?:mat|matériel|materiel|lecot)|sku|référence|reference|perceuse|cylindre|serrure|catalogue|verrou|poignée|poignee|gâche|gache|barillet/i,
   billing: /facture|devis|prix|montant|€|eur\b|euro|facturer|billing|paiement|encaissement/i,
   email: /email|mail|courriel|envoyer.*(?:mail|email)|pièce jointe/i,
-  planning:
-    /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i,
+  planning: /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i,
   stats: /statistique|chiffre|ca\b|chiffre d'affaires|trimestre|mois|kpi/i,
   inbox: /inbox|notification|portail|chat client|ivana/i,
   gmail:
@@ -202,7 +200,7 @@ function detectFlowsFromToolHistory(messages: unknown[]): ChatbotFlowId[] {
   const stored = normalizeMessages(messages);
   const flows = new Set<ChatbotFlowId>();
   const answeredToolIds = new Set(
-    stored.filter((m) => m.role === "tool" && m.tool_call_id).map((m) => m.tool_call_id!),
+    stored.filter((m) => m.role === "tool" && m.tool_call_id).map((m) => m.tool_call_id!)
   );
 
   for (let i = stored.length - 1; i >= 0; i -= 1) {
@@ -228,10 +226,7 @@ export function mergeFlowScopes(flows: ChatbotFlowId[]): string[] {
 }
 
 /** Fils actifs pour CE tour (dernier message), pas tout l'historique. */
-export function resolveTurnFlows(
-  lastUserText: string,
-  messages: unknown[],
-): ChatbotFlowId[] {
+export function resolveTurnFlows(lastUserText: string, messages: unknown[]): ChatbotFlowId[] {
   const flows = [
     ...new Set([
       ...detectFlowsInText(lastUserText),
@@ -300,7 +295,7 @@ function lastUserTextFromMessages(messages: unknown[]): string {
 function resolveLecotSearchQuery(
   lastUserText: string,
   messages: unknown[],
-  turnFlows: ChatbotFlowId[],
+  turnFlows: ChatbotFlowId[]
 ): string | null {
   if (shouldPreferChatbotEmailOverLecot(lastUserText)) return null;
   if (parseLecotInstantOrderIntent(lastUserText)) return null;
@@ -322,7 +317,7 @@ export type ResolveChatbotConversationContextParams = {
  * Point unique : historique complet → scope outils, fils actifs, actions instantanées.
  */
 export function resolveChatbotConversationContext(
-  params: ResolveChatbotConversationContextParams,
+  params: ResolveChatbotConversationContextParams
 ): ChatbotConversationContext {
   const lastUserText = lastUserTextFromMessages(params.messages);
   const recentUserText = recentUserMessagesText(params.messages, 4);
@@ -330,12 +325,7 @@ export function resolveChatbotConversationContext(
   const isGreeting = Boolean(lastUserText && isChatbotGreetingMessage(lastUserText));
 
   const turnFlows = resolveTurnFlows(lastUserText, params.messages);
-  const activeFlows = [
-    ...new Set([
-      ...turnFlows,
-      ...detectFlowsFromToolHistory(params.messages),
-    ]),
-  ];
+  const activeFlows = [...new Set([...turnFlows, ...detectFlowsFromToolHistory(params.messages)])];
   const turnDirective = resolveChatbotTurnDirective(lastUserText);
 
   const needsTools =
@@ -355,8 +345,6 @@ export function resolveChatbotConversationContext(
     toolScope = [...CHATBOT_MINIMAL_SNAPSHOT_TOOLS];
   }
 
-  const skipToolsRound0 = false;
-
   const lecotSearchQuery = resolveLecotSearchQuery(lastUserText, params.messages, turnFlows);
   const forceToolName =
     lecotSearchQuery &&
@@ -372,7 +360,6 @@ export function resolveChatbotConversationContext(
     activeFlows,
     toolScope,
     needsTools,
-    skipToolsRound0,
     forceToolName,
     lecotSearchQuery,
     isGreeting,

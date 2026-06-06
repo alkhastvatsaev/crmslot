@@ -74,5 +74,12 @@ photos portes/
 
 # Données d'entraînement chatbot (générées localement — ne pas committer)
 data/chatbot-training/
+data/catalog/lecot/.crawl-progress.json
 training-data/
 node_modules
+
+# Fichiers utilisateur dans public/ (doivent rester dans Firebase Storage)
+public/uploads/*
+public/client-audios/*
+!public/uploads/.gitkeep
+!public/client-audios/.gitkeep

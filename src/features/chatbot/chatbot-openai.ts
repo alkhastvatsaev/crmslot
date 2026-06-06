@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { logger } from "@/core/logger";
 import type {
   ChatCompletionMessageParam,
   ChatCompletionTool,
@@ -30,7 +31,10 @@ import {
   hubUiToolSuccessMessage,
 } from "@/features/hubAgents/hubAgentSideEffects";
 import { HUB_AGENT_IMMEDIATE_UI_TOOLS } from "@/features/hubAgents/hubAgentToolScopes";
-import { executeChatbotTool, type ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import {
+  executeChatbotTool,
+  type ChatbotToolContext,
+} from "@/features/chatbot/chatbot-tool-executor";
 import {
   normalizeStoredMessages,
   type ChatbotStoredMessage,
@@ -108,7 +112,7 @@ export type OpenAIRunResult =
       };
     };
 
-const MAX_ROUNDS = 3;
+const MAX_ROUNDS = 5;
 
 function openaiTools(toolScope?: string[]): ChatCompletionTool[] {
   const defs = filterChatbotToolDefinitions(CHATBOT_TOOL_DEFINITIONS, toolScope);
@@ -135,7 +139,9 @@ function pendingSummary(name: string, input: Record<string, unknown>): string {
     case "send_intervention_email":
       return `Envoyer un email à ${input.to} — objet : « ${String(input.subject || "").slice(0, 80)} » (dossier ${input.interventionId})`;
     case "patch_intervention_billing": {
-      const eur = input.unitPriceEur ?? (input.unitPriceCents != null ? Number(input.unitPriceCents) / 100 : null);
+      const eur =
+        input.unitPriceEur ??
+        (input.unitPriceCents != null ? Number(input.unitPriceCents) / 100 : null);
       const bits = [
         eur != null ? `prix ${eur} €` : null,
         input.clientName ? `client « ${String(input.clientName).slice(0, 40)} »` : null,
@@ -215,7 +221,6 @@ export async function runChatbotOpenAI(params: {
     });
 
   const lastUserText = ctx.lastUserText || null;
-  const skipToolsRound0 = ctx.skipToolsRound0;
   const effectiveToolScope = params.toolScope ?? ctx.toolScope;
 
   const client = new OpenAI({ apiKey: params.apiKey });
@@ -228,19 +233,29 @@ export async function runChatbotOpenAI(params: {
   // Pré-exécution garantie : si le contexte détecte une requête Lecot, on appelle
   // search_lecot_products directement (sans passer par le modèle) et on injecte
   // le résultat dans l'historique. OpenAI génère ensuite la réponse textuelle.
-  if (ctx.forceToolName === "search_lecot_products" && ctx.lecotSearchQuery && !params.hubAgentMode) {
+  if (
+    ctx.forceToolName === "search_lecot_products" &&
+    ctx.lecotSearchQuery &&
+    !params.hubAgentMode
+  ) {
     const preCallId = `force_lecot_${Date.now()}`;
     const preArgs = { query: ctx.lecotSearchQuery, limit: 5 };
-    params.emit({ type: "tool_start", tool: "search_lecot_products", label: TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot" });
-    const preResult = await executeChatbotTool("search_lecot_products", preArgs, params.toolCtx).catch(
-      (err: unknown) => ({ error: err instanceof Error ? err.message : "Erreur outil" }),
-    );
+    params.emit({
+      type: "tool_start",
+      tool: "search_lecot_products",
+      label: TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot",
+    });
+    const preResult = await executeChatbotTool(
+      "search_lecot_products",
+      preArgs,
+      params.toolCtx
+    ).catch((err: unknown) => ({ error: err instanceof Error ? err.message : "Erreur outil" }));
     params.emit({ type: "tool_end", tool: "search_lecot_products" });
     if (preResult && typeof preResult === "object") {
       const suggestions = (preResult as { suggestions?: unknown }).suggestions;
       if (Array.isArray(suggestions) && suggestions.length > 0) {
         const actions = buildLecotProductQuickActions(
-          suggestions as Parameters<typeof buildLecotProductQuickActions>[0],
+          suggestions as Parameters<typeof buildLecotProductQuickActions>[0]
         );
         if (actions.length > 0) params.emit({ type: "quick_actions", actions });
       }
@@ -251,10 +266,24 @@ export async function runChatbotOpenAI(params: {
       content: null,
       tool_calls: [{ id: preCallId, name: "search_lecot_products", arguments: preArgs }],
     };
-    apiMessages = [...apiMessages, preTurn, { role: "tool", tool_call_id: preCallId, content: preContent }];
-    openaiMessages.push(
-      { role: "assistant", content: null, tool_calls: [{ id: preCallId, type: "function", function: { name: "search_lecot_products", arguments: JSON.stringify(preArgs) } }] },
+    apiMessages = [
+      ...apiMessages,
+      preTurn,
       { role: "tool", tool_call_id: preCallId, content: preContent },
+    ];
+    openaiMessages.push(
+      {
+        role: "assistant",
+        content: null,
+        tool_calls: [
+          {
+            id: preCallId,
+            type: "function",
+            function: { name: "search_lecot_products", arguments: JSON.stringify(preArgs) },
+          },
+        ],
+      },
+      { role: "tool", tool_call_id: preCallId, content: preContent }
     );
   }
 
@@ -267,16 +296,13 @@ export async function runChatbotOpenAI(params: {
       params.hubAgentMode && searchedLecotInHub
         ? (effectiveToolScope ?? []).filter((t) => t !== "order_lecot_parts")
         : effectiveToolScope;
-    const resolvedTools =
-      round === 0 && skipToolsRound0 ? [] : openaiTools(scopeForRound);
+    const resolvedTools = openaiTools(scopeForRound);
     const maxTokens = round === 0 ? 640 : 480;
 
     const stream = await client.chat.completions.create({
       model: params.modelName,
       messages: openaiMessages,
-      ...(resolvedTools.length > 0
-        ? { tools: resolvedTools, tool_choice: "auto" as const }
-        : {}),
+      ...(resolvedTools.length > 0 ? { tools: resolvedTools, tool_choice: "auto" as const } : {}),
       temperature: params.temperature ?? 0.25,
       max_tokens: maxTokens,
       stream: true,
@@ -338,7 +364,7 @@ export async function runChatbotOpenAI(params: {
         // Fallback sur le client enregistré en session si l'IA n'en fournit pas de valide.
         const effectiveClient = aiNameValid
           ? rawFromAI
-          : (params.toolCtx.materialOrderClientName?.trim() || "");
+          : params.toolCtx.materialOrderClientName?.trim() || "";
         if (!effectiveClient) {
           const ask = materialAgentAskClientNameAssistantContent();
           params.emit({ type: "text", delta: ask });
@@ -409,7 +435,11 @@ export async function runChatbotOpenAI(params: {
     }
 
     for (const call of parsedCalls) {
-      params.emit({ type: "tool_start", tool: call.name, label: TOOL_LABELS[call.name] ?? call.name });
+      params.emit({
+        type: "tool_start",
+        tool: call.name,
+        label: TOOL_LABELS[call.name] ?? call.name,
+      });
     }
 
     const executed = await Promise.all(
@@ -421,13 +451,15 @@ export async function runChatbotOpenAI(params: {
           });
           return { call, result };
         } catch (err) {
-          console.error(`[chatbot tool] ${call.name} failed:`, err);
+          logger.error(`[chatbot tool] ${call.name} failed:`, {
+            error: err instanceof Error ? err.message : String(err),
+          });
           return {
             call,
             result: { error: err instanceof Error ? err.message : "Erreur outil" },
           };
         }
-      }),
+      })
     );
 
     const toolResultMessages: ChatbotStoredMessage[] = [];
@@ -487,7 +519,7 @@ export async function runChatbotOpenAI(params: {
         const suggestions = (result as { suggestions?: unknown }).suggestions;
         if (Array.isArray(suggestions) && suggestions.length > 0) {
           const actions = buildLecotProductQuickActions(
-            suggestions as Parameters<typeof buildLecotProductQuickActions>[0],
+            suggestions as Parameters<typeof buildLecotProductQuickActions>[0]
           );
           if (actions.length > 0) {
             params.emit({ type: "quick_actions", actions });

@@ -30,8 +30,6 @@ import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 import type { CrmActivityEvent, CrmEventType } from "../crmActivityTypes";
 import type { Intervention } from "@/features/interventions/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 const EVENT_META: Record<
   CrmEventType,
   { Icon: React.FC<{ className?: string }>; colorClass: string; dotClass: string }
@@ -228,16 +226,12 @@ function EventRow({
   const isClickable = Boolean(onSelect);
 
   const subtitle =
-    event.emailSubject ??
-    event.clientName ??
-    event.address ??
-    event.orderLabel ??
-    null;
+    event.emailSubject ?? event.clientName ?? event.address ?? event.orderLabel ?? null;
 
   const statusLabel = (code: string | undefined) => {
     if (!code) return null;
     if (event.type === "quote_status_changed") {
-      return String(t(`quotes.status.${code}` as any)) || code;
+      return String(t(`quotes.status.${code}`)) || code;
     }
     const key = statusLabelKey(code as Intervention["status"]);
     return String(t(key));
@@ -283,7 +277,7 @@ function EventRow({
         "group relative flex items-start gap-3 rounded-xl px-3 py-2.5 transition-all hover:bg-white/80 crm-animate-item",
         isClickable && "cursor-pointer hover:shadow-sm",
         isNew && "crm-event-row--new bg-blue-50/90 ring-1 ring-blue-200/80 shadow-sm",
-        isSelected && "bg-white ring-2 ring-blue-400/70 shadow-sm",
+        isSelected && "bg-white ring-2 ring-blue-400/70 shadow-sm"
       )}
     >
       {/* dot */}
@@ -306,14 +300,10 @@ function EventRow({
           </span>
           {statusBadge}
           {event.interventionTitle && (
-            <span className="text-[12px] text-slate-500 truncate">
-              — {event.interventionTitle}
-            </span>
+            <span className="text-[12px] text-slate-500 truncate">— {event.interventionTitle}</span>
           )}
         </div>
-        {subtitle && (
-          <span className="mt-0.5 text-[11px] text-slate-400 truncate">{subtitle}</span>
-        )}
+        {subtitle && <span className="mt-0.5 text-[11px] text-slate-400 truncate">{subtitle}</span>}
         {actorLabel ? (
           <span className="mt-0.5 text-[10px] text-slate-500">
             {actorLabel}
@@ -329,7 +319,8 @@ function EventRow({
         )}
         {event.commissionAmountEuros != null && (
           <span className="mt-0.5 text-[11px] font-medium text-yellow-600">
-            {event.commissionAmountEuros.toFixed(2)} €{event.commissionAction ? ` — ${event.commissionAction}` : ""}
+            {event.commissionAmountEuros.toFixed(2)} €
+            {event.commissionAction ? ` — ${event.commissionAction}` : ""}
           </span>
         )}
         {(event.type === "email_sent" || event.type === "email_received") && event.emailFrom && (
@@ -370,11 +361,9 @@ export default function CrmHistoryCenterFeed({
 }: Props) {
   const { t } = useTranslation();
 
-
-
   if (loading) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden" style={outfit}>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div
           data-testid="crm-center-loading"
           className="flex flex-1 items-center justify-center gap-2 text-slate-400"
@@ -388,7 +377,7 @@ export default function CrmHistoryCenterFeed({
 
   if (events.length === 0) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden" style={outfit}>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div
           data-testid="crm-center-empty"
           className="flex flex-1 flex-col items-center justify-center gap-3 text-slate-400"
@@ -403,11 +392,7 @@ export default function CrmHistoryCenterFeed({
   const groups = groupByDate(events);
 
   return (
-    <div
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
-      data-testid="crm-center-feed"
-      style={outfit}
-    >
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="crm-center-feed">
       <style>{`
         @keyframes crmSlideIn {
           from {
@@ -433,29 +418,29 @@ export default function CrmHistoryCenterFeed({
         </p>
       ) : null}
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto gap-4 p-4">
-      {Array.from(groups.entries()).map(([date, evts]) => (
-        <section key={date}>
-          <div className="sticky top-0 z-10 mb-2 flex items-center gap-2 bg-white/60 py-1 backdrop-blur-sm rounded-lg px-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-              {date}
-            </span>
-            <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
-              {evts.length}
-            </span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            {evts.map((e) => (
-              <EventRow
-                key={e.id}
-                event={e}
-                onSelect={onEventSelect}
-                isNew={newEventIds?.has(e.id)}
-                isSelected={selectedEventId === e.id}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+        {Array.from(groups.entries()).map(([date, evts]) => (
+          <section key={date}>
+            <div className="sticky top-0 z-10 mb-2 flex items-center gap-2 bg-white/60 py-1 backdrop-blur-sm rounded-lg px-2">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                {date}
+              </span>
+              <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+                {evts.length}
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {evts.map((e) => (
+                <EventRow
+                  key={e.id}
+                  event={e}
+                  onSelect={onEventSelect}
+                  isNew={newEventIds?.has(e.id)}
+                  isSelected={selectedEventId === e.id}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );

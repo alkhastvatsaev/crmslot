@@ -17,8 +17,6 @@ import {
 } from "@/features/billingHub/billingHubMetrics";
 import type { Intervention } from "@/features/interventions/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 const STATUS_CLASS: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
   pending: "bg-amber-100 text-amber-800",
@@ -40,12 +38,18 @@ export default function BillingHubCenterPanel({
   loading,
 }: Props) {
   const { t } = useTranslation();
-  const { filter, setFilter, search, setSearch, selectedInterventionId, setSelectedInterventionId } =
-    useBillingHubIntent();
+  const {
+    filter,
+    setFilter,
+    search,
+    setSearch,
+    selectedInterventionId,
+    setSelectedInterventionId,
+  } = useBillingHubIntent();
 
   const tableRows = useMemo(
     () => applyBillingListFilters(interventions, { filter, search }),
-    [interventions, filter, search],
+    [interventions, filter, search]
   );
 
   useEffect(() => {
@@ -59,7 +63,6 @@ export default function BillingHubCenterPanel({
       <div
         data-testid="billing-hub-center"
         className="flex min-h-0 flex-1 items-center justify-center"
-        style={outfit}
       >
         <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
       </div>
@@ -70,7 +73,6 @@ export default function BillingHubCenterPanel({
     <div
       data-testid="billing-hub-center"
       className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden"
-      style={outfit}
     >
       <header className="flex shrink-0 items-center justify-between gap-2">
         <h2 className="text-[15px] font-semibold tracking-tight text-slate-900">
@@ -116,7 +118,9 @@ export default function BillingHubCenterPanel({
 
       <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto rounded-[12px] border border-black/[0.06] bg-white">
         {tableRows.length === 0 ? (
-          <p className="py-12 text-center text-[12px] text-slate-400">{t("billingHub.empty_filter")}</p>
+          <p className="py-12 text-center text-[12px] text-slate-400">
+            {t("billingHub.empty_filter")}
+          </p>
         ) : (
           <table className="w-full text-[11px]" data-testid="billing-hub-table">
             <thead className="sticky top-0 bg-slate-50 text-[9px] uppercase tracking-wide text-slate-400">
@@ -141,7 +145,7 @@ export default function BillingHubCenterPanel({
                     className={cn(
                       "cursor-pointer border-b border-black/[0.03] hover:bg-slate-50/90",
                       active && "bg-slate-100",
-                      st === "unpaid" && !active && "bg-red-50/30",
+                      st === "unpaid" && !active && "bg-red-50/30"
                     )}
                   >
                     <td className="px-2 py-2">
@@ -157,10 +161,12 @@ export default function BillingHubCenterPanel({
                       <span
                         className={cn(
                           "inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase",
-                          STATUS_CLASS[st] ?? STATUS_CLASS.unpaid,
+                          STATUS_CLASS[st] ?? STATUS_CLASS.unpaid
                         )}
                       >
-                        {t(`billing.status_${st === "paid" ? "paid" : st === "pending" ? "pending" : st === "refunded" ? "refunded" : "unpaid"}`)}
+                        {t(
+                          `billing.status_${st === "paid" ? "paid" : st === "pending" ? "pending" : st === "refunded" ? "refunded" : "unpaid"}`
+                        )}
                       </span>
                     </td>
                   </tr>

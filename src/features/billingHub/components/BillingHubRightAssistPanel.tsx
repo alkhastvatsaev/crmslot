@@ -9,8 +9,6 @@ import { navigateToBillingAgentWithPrompt } from "@/features/featureHub/companyS
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
 import type { Intervention } from "@/features/interventions/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   interventions: Intervention[];
   loading: boolean;
@@ -23,7 +21,7 @@ export default function BillingHubRightAssistPanel({ interventions, loading }: P
 
   const selected = useMemo(
     () => interventions.find((iv) => iv.id === selectedInterventionId) ?? null,
-    [interventions, selectedInterventionId],
+    [interventions, selectedInterventionId]
   );
 
   if (loading) {
@@ -31,7 +29,6 @@ export default function BillingHubRightAssistPanel({ interventions, loading }: P
       <div
         data-testid="billing-hub-right-assist"
         className="flex min-h-0 flex-1 items-center justify-center"
-        style={outfit}
       >
         <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
       </div>
@@ -42,7 +39,6 @@ export default function BillingHubRightAssistPanel({ interventions, loading }: P
     <div
       data-testid="billing-hub-right-assist"
       className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
-      style={outfit}
     >
       {selected ? (
         <>
@@ -55,7 +51,7 @@ export default function BillingHubRightAssistPanel({ interventions, loading }: P
               navigateToBillingAgentWithPrompt(
                 pager,
                 `Facturation intervention ${selected.id} — ${selected.clientName ?? ""}. Résume HT/TTC et propose les prochaines actions.`,
-                "send",
+                "send"
               );
             }}
             className="flex w-full items-center justify-center gap-2 rounded-[12px] bg-slate-900 py-2.5 text-[12px] font-semibold text-white hover:bg-slate-800"

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { logger } from "@/core/logger";
 
 /**
  * POST /api/notifications/send
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     if (!channel || !subjectKey || !bodyKey) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
       if (!gmailUser || !gmailPass) {
-        console.warn("[notifications] Gmail credentials not configured, skipping email.");
+        logger.warn("[notifications] Gmail credentials not configured, skipping email.");
         return NextResponse.json({ success: true, skipped: true });
       }
 
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
       // In production, this would look up the user's email from Firestore
       const recipientEmail = resolveRecipientEmail(recipientRole, variables);
       if (!recipientEmail) {
-        console.warn(`[notifications] No email for role=${recipientRole}, skipping.`);
+        logger.warn(`[notifications] No email for role=${recipientRole}, skipping.`);
         return NextResponse.json({ success: true, skipped: true });
       }
 
@@ -57,22 +58,27 @@ export async function POST(req: Request) {
 
     if (channel === "sms") {
       // Placeholder for Twilio integration
-      console.info("[notifications] SMS channel not yet configured:", subjectKey);
+      logger.info("[notifications] SMS channel not yet configured:", { subjectKey });
       return NextResponse.json({ success: true, skipped: true, channel: "sms" });
     }
 
     if (channel === "push") {
       // Placeholder for FCM integration
-      console.info("[notifications] Push channel not yet configured:", subjectKey);
+      logger.info("[notifications] Push channel not yet configured:", { subjectKey });
       return NextResponse.json({ success: true, skipped: true, channel: "push" });
     }
 
-    return NextResponse.json({ success: false, error: `Unknown channel: ${channel}` }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: `Unknown channel: ${channel}` },
+      { status: 400 }
+    );
   } catch (error) {
-    console.error("[notifications] Send failed:", error);
+    logger.error("[notifications] Send failed:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -81,10 +87,7 @@ export async function POST(req: Request) {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function resolveRecipientEmail(
-  role: string,
-  variables: Record<string, string>,
-): string | null {
+function resolveRecipientEmail(role: string, variables: Record<string, string>): string | null {
   // In a full implementation, we'd query Firestore for the user's email.
   // For now, dispatcher emails go to the configured company inbox.
   if (role === "dispatcher") {
@@ -103,18 +106,13 @@ function resolveRecipientEmail(
 function interpolateTemplate(key: string, vars: Record<string, string>): string {
   // Map i18n keys to French text templates
   const templates: Record<string, string> = {
-    "notifications.email.assigned.subject":
-      "Votre intervention est confirmée — {{clientName}}",
-    "notifications.email.en_route.subject":
-      "Votre technicien est en route — {{technicianName}}",
-    "notifications.email.done.subject":
-      "Intervention terminée — {{title}}",
-    "notifications.email.invoiced.subject":
-      "Votre facture est disponible — {{title}}",
+    "notifications.email.assigned.subject": "Votre intervention est confirmée — {{clientName}}",
+    "notifications.email.en_route.subject": "Votre technicien est en route — {{technicianName}}",
+    "notifications.email.done.subject": "Intervention terminée — {{title}}",
+    "notifications.email.invoiced.subject": "Votre facture est disponible — {{title}}",
     "notifications.email.waiting_material.subject":
       "Intervention en attente de matériel — {{title}}",
-    "notifications.email.cancelled.subject":
-      "Intervention annulée — {{title}}",
+    "notifications.email.cancelled.subject": "Intervention annulée — {{title}}",
   };
 
   let text = templates[key] || key;

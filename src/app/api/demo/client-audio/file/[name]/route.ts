@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { blockIfProduction, requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -21,10 +22,7 @@ function inferContentType(filename: string) {
   return "application/octet-stream";
 }
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ name: string }> },
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ name: string }> }) {
   const blocked = blockIfProduction();
   if (blocked) return blocked;
   const auth = await requireAuthenticatedUser(req);
@@ -44,8 +42,7 @@ export async function GET(
       },
     });
   } catch (e) {
-    console.error(e);
+    logger.error("Audio not found", { error: e instanceof Error ? e.message : String(e) });
     return NextResponse.json({ error: "Audio not found" }, { status: 404 });
   }
 }
-

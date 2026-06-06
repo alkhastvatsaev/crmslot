@@ -5,6 +5,7 @@ import { ArrowRight, ImagePlus, X } from "lucide-react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { toast } from "sonner";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { cn } from "@/lib/utils";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import {
@@ -19,8 +20,6 @@ import {
 import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaChatStorage";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 const STORAGE_PREFIX = "map-belgique-ivana-chat-v1";
 const CHAT_PERSISTENCE_ENABLED = false;
@@ -53,11 +52,11 @@ function welcomeMessage(t: (key: string) => string): IvanaChatMessage {
 
 type PanelProps = {
   className?: string;
-  
+
   publishAsPortal?: boolean;
-  
+
   acceptPortalMessages?: boolean;
-  
+
   chatCompanyId?: string | null;
   /** Dossier lié — messages tagués pour la timeline du dossier. */
   chatInterventionId?: string | null;
@@ -92,10 +91,7 @@ export default function IvanaClientChatPanel({
   const firestoreSyncEnabled = Boolean(companyIdTrimmed && isConfigured && firestore);
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
-  const storageKey = useMemo(
-    () => `${STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`,
-    [user?.uid],
-  );
+  const storageKey = useMemo(() => `${STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`, [user?.uid]);
 
   useEffect(() => {
     if (!auth) {
@@ -207,9 +203,11 @@ export default function IvanaClientChatPanel({
         setMessages(mapped.length === 0 ? [welcomeMessage(t)] : mapped);
       },
       (err) => {
-        console.error("[IvanaClientChatPanel] Firestore chat", err);
+        logger.error("[IvanaClientChatPanel] Firestore chat", {
+          error: err instanceof Error ? err.message : String(err),
+        });
         toast.error("Chat", { description: err.message });
-      },
+      }
     );
     return unsub;
   }, [firestoreSyncEnabled, companyIdTrimmed, onRemoteClientMessage]);
@@ -252,33 +250,36 @@ export default function IvanaClientChatPanel({
     return () => window.removeEventListener(IVANA_PORTAL_MESSAGE_EVENT, handler as EventListener);
   }, [acceptPortalMessages, firestoreSyncEnabled]);
 
-  const handlePickImages = useCallback(async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handlePickImages = useCallback(
+    async (files: FileList | null) => {
+      if (!files || files.length === 0) return;
 
-    const allowed = Array.from(files).filter((f) => f.type.startsWith("image/"));
-    if (allowed.length === 0) return;
+      const allowed = Array.from(files).filter((f) => f.type.startsWith("image/"));
+      if (allowed.length === 0) return;
 
-    const MAX_FILES = 6;
-    const MAX_TOTAL = 6;
-    const remaining = Math.max(0, MAX_TOTAL - pendingImages.length);
-    const sliced = allowed.slice(0, Math.min(MAX_FILES, remaining));
+      const MAX_FILES = 6;
+      const MAX_TOTAL = 6;
+      const remaining = Math.max(0, MAX_TOTAL - pendingImages.length);
+      const sliced = allowed.slice(0, Math.min(MAX_FILES, remaining));
 
-    const readOne = (file: File) =>
-      new Promise<string | null>((resolve) => {
-        const reader = new FileReader();
-        reader.onerror = () => resolve(null);
-        reader.onload = () => {
-          const v = reader.result;
-          resolve(typeof v === "string" ? v : null);
-        };
-        reader.readAsDataURL(file);
-      });
+      const readOne = (file: File) =>
+        new Promise<string | null>((resolve) => {
+          const reader = new FileReader();
+          reader.onerror = () => resolve(null);
+          reader.onload = () => {
+            const v = reader.result;
+            resolve(typeof v === "string" ? v : null);
+          };
+          reader.readAsDataURL(file);
+        });
 
-    const newUrls = (await Promise.all(sliced.map(readOne))).filter(Boolean) as string[];
-    if (newUrls.length > 0) setPendingImages((prev) => [...prev, ...newUrls]);
+      const newUrls = (await Promise.all(sliced.map(readOne))).filter(Boolean) as string[];
+      if (newUrls.length > 0) setPendingImages((prev) => [...prev, ...newUrls]);
 
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }, [pendingImages.length]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
+    [pendingImages.length]
+  );
 
   const send = useCallback(async () => {
     const text = draft.trim();
@@ -312,7 +313,9 @@ export default function IvanaClientChatPanel({
         setDraft("");
         setPendingImages([]);
       } catch (e) {
-        console.error(e);
+        logger.error("IvanaClientChatPanel send", {
+          error: e instanceof Error ? e.message : String(e),
+        });
         toast.error("Chat", {
           description: e instanceof Error ? e.message : t("chat.toast_send_failed"),
         });
@@ -321,7 +324,9 @@ export default function IvanaClientChatPanel({
     }
 
     if (firestoreSyncEnabled && !auth?.currentUser) {
-      toast.error(t("chat.toast_login_required"), { description: t("chat.toast_login_description") });
+      toast.error(t("chat.toast_login_required"), {
+        description: t("chat.toast_login_description"),
+      });
       return;
     }
 
@@ -356,14 +361,7 @@ export default function IvanaClientChatPanel({
       setMessages((prev) => [...prev, reply]);
       setIvanaTyping(false);
     }, delay);
-  }, [
-    draft,
-    ivanaTyping,
-    pendingImages,
-    publishAsPortal,
-    firestoreSyncEnabled,
-    companyIdTrimmed,
-  ]);
+  }, [draft, ivanaTyping, pendingImages, publishAsPortal, firestoreSyncEnabled, companyIdTrimmed]);
 
   const bubbleTestId = (m: IvanaChatMessage) => {
     if (m.role === "user") return "ivana-chat-bubble-user";
@@ -377,23 +375,25 @@ export default function IvanaClientChatPanel({
 
   const bubbleShellClass = (m: IvanaChatMessage) =>
     cn(
-      "max-w-[92%] rounded-[20px] px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
+      "max-w-[92%] rounded-[16px] px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
       m.role === "user" || m.role === "client"
         ? "rounded-br-md bg-blue-600 text-white"
         : m.role === "staff"
           ? "rounded-bl-md border border-blue-200/90 bg-blue-50 text-slate-900"
-          : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800",
+          : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800"
     );
 
   return (
     <div
       data-testid="ivana-client-chat-panel"
-      style={outfit}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
       <div
         ref={listRef}
-        className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4")}
+        className={cn(
+          GLASS_PANEL_BODY_SCROLL_COMPACT,
+          "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4"
+        )}
       >
         {messages.map((m) => (
           <div
@@ -414,7 +414,10 @@ export default function IvanaClientChatPanel({
               ) : null}
               {m.text}
               {m.images && m.images.length > 0 ? (
-                <div className="mt-2 grid grid-cols-3 gap-1.5" data-testid="ivana-chat-bubble-images">
+                <div
+                  className="mt-2 grid grid-cols-3 gap-1.5"
+                  data-testid="ivana-chat-bubble-images"
+                >
                   {m.images.map((url, idx) => (
                     <div
                       key={`${m.id}-img-${idx}`}
@@ -422,7 +425,7 @@ export default function IvanaClientChatPanel({
                         "aspect-square overflow-hidden rounded-[12px] bg-black/5",
                         m.role === "user" || m.role === "client"
                           ? "border border-white/40"
-                          : "border border-black/10",
+                          : "border border-black/10"
                       )}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -436,7 +439,7 @@ export default function IvanaClientChatPanel({
         ))}
         {ivanaTyping ? (
           <div className="flex justify-start" data-testid="ivana-chat-typing">
-            <div className="rounded-[20px] rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 text-[12px] font-medium text-slate-500 shadow-sm">
+            <div className="rounded-[16px] rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 text-[12px] font-medium text-slate-500 shadow-sm">
               {t("chat.typing")}
               <span className="inline-flex gap-0.5 pl-1">
                 <span className="animate-pulse">·</span>
@@ -485,11 +488,7 @@ export default function IvanaClientChatPanel({
             data-testid="ivana-chat-attach"
             onClick={() => fileInputRef.current?.click()}
             disabled={attachImagesBlocked}
-            title={
-              attachImagesBlocked
-                ? t("chat.attach_blocked_title")
-                : undefined
-            }
+            title={attachImagesBlocked ? t("chat.attach_blocked_title") : undefined}
             className={cn(
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
               "text-slate-500 transition",
@@ -497,7 +496,7 @@ export default function IvanaClientChatPanel({
                 ? "cursor-not-allowed opacity-35"
                 : "hover:bg-slate-900/5 hover:text-slate-700",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
-              "active:scale-[0.98]",
+              "active:scale-[0.98]"
             )}
             aria-label={t("chat.attach_aria")}
           >
@@ -535,7 +534,7 @@ export default function IvanaClientChatPanel({
               "active:scale-[0.98]",
               (!draft.trim() && pendingImages.length === 0) || ivanaTyping
                 ? "cursor-not-allowed text-slate-400 opacity-40"
-                : "text-blue-600 hover:bg-blue-500/10 hover:text-blue-700",
+                : "text-blue-600 hover:bg-blue-500/10 hover:text-blue-700"
             )}
             aria-label={t("chat.send_aria")}
           >

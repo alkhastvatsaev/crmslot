@@ -20,37 +20,74 @@ export default function ChatbotQuickActions({
 }: Props) {
   if (actions.length === 0) return null;
 
+  const orderActions = actions.filter((a) => a.variant === "primary" || a.variant === "secondary");
+  const utilityActions = actions.filter((a) => !a.variant || a.variant === "outline");
+
   return (
     <div
-      className={cn("mt-2 flex flex-wrap gap-2 border-t border-slate-100 pt-2", className)}
+      className={cn("mt-2.5 flex flex-col gap-1.5 border-t border-slate-100 pt-2.5", className)}
       data-testid={testId}
     >
-      {actions.map((action) => (
-        <button
-          key={action.id}
-          type="button"
-          disabled={disabled}
-          data-testid={`chatbot-quick-action-${action.id}`}
-          onClick={() => {
-            if (action.kind === "open_url") {
-              window.open(action.payload, "_blank", "noopener,noreferrer");
-              return;
-            }
-            onSendMessage(action.payload);
-          }}
-          className={cn(
-            "rounded-full px-3 py-1.5 text-[12px] font-semibold transition disabled:opacity-40",
-            action.variant === "primary" &&
-              "bg-indigo-600 text-white hover:bg-indigo-700",
-            action.variant === "secondary" &&
-              "border border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100",
-            (!action.variant || action.variant === "outline") &&
-              "border border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:text-indigo-700",
-          )}
-        >
-          {action.label}
-        </button>
-      ))}
+      {orderActions.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {orderActions.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              disabled={disabled}
+              data-testid={`chatbot-quick-action-${action.id}`}
+              onClick={() => {
+                if (action.kind === "open_url") {
+                  window.open(action.payload, "_blank", "noopener,noreferrer");
+                  return;
+                }
+                onSendMessage(action.payload);
+              }}
+              className={cn(
+                "flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-[12px] font-medium transition-all disabled:opacity-40",
+                action.variant === "primary"
+                  ? "bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-700"
+                  : "border border-zinc-200/80 bg-white text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50"
+              )}
+            >
+              <span className="min-w-0 leading-snug">{action.label}</span>
+              {action.meta && (
+                <span
+                  className={cn(
+                    "shrink-0 tabular-nums text-[11px]",
+                    action.variant === "primary" ? "text-white/50" : "text-zinc-400"
+                  )}
+                >
+                  {action.meta}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {utilityActions.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {utilityActions.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              disabled={disabled}
+              data-testid={`chatbot-quick-action-${action.id}`}
+              onClick={() => {
+                if (action.kind === "open_url") {
+                  window.open(action.payload, "_blank", "noopener,noreferrer");
+                  return;
+                }
+                onSendMessage(action.payload);
+              }}
+              className="rounded-lg border border-slate-200/80 bg-white/60 px-2.5 py-1 text-[11px] text-slate-600 transition-all hover:border-slate-300 hover:bg-white hover:text-slate-800 disabled:opacity-40"
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

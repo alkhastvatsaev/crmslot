@@ -1,4 +1,5 @@
-import { google } from "googleapis";
+import { gmail } from "@googleapis/gmail";
+import { OAuth2Client } from "google-auth-library";
 import { buildMimeMultipartEmail, type MimeAttachment } from "@/core/services/email/buildMimeEmail";
 import { resolveGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
 
@@ -53,16 +54,19 @@ function buildRfc822Raw(params: GmailApiSendParams, fromEmail: string, fromName:
 }
 
 export async function sendViaGmailApi(params: GmailApiSendParams): Promise<void> {
-  const { clientId, clientSecret, redirectUri, refreshToken, senderEmail } = await resolveGmailOAuthConfig();
+  const { clientId, clientSecret, redirectUri, refreshToken, senderEmail } =
+    await resolveGmailOAuthConfig();
   if (!clientId || !clientSecret || !refreshToken || !senderEmail) {
-    throw new Error("OAuth Gmail incomplet (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_USER).");
+    throw new Error(
+      "OAuth Gmail incomplet (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_USER)."
+    );
   }
 
   const fromName = process.env.EMAIL_FROM_NAME?.trim() || "MAP BELGIQUE";
-  const oauth2 = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  const oauth2 = new OAuth2Client(clientId, clientSecret, redirectUri);
   oauth2.setCredentials({ refresh_token: refreshToken });
 
-  const gmail = google.gmail({ version: "v1", auth: oauth2 });
+  const gmailClient = gmail({ version: "v1", auth: oauth2 });
   const raw = buildRfc822Raw(params, senderEmail, fromName);
   const encoded = Buffer.from(raw)
     .toString("base64")
@@ -70,7 +74,7 @@ export async function sendViaGmailApi(params: GmailApiSendParams): Promise<void>
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 
-  await gmail.users.messages.send({
+  await gmailClient.users.messages.send({
     userId: "me",
     requestBody: { raw: encoded },
   });

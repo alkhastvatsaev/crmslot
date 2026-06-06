@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { google } from "googleapis";
+import { gmail } from "@googleapis/gmail";
+import { OAuth2Client } from "google-auth-library";
 import {
   getGmailOAuthConfig,
   persistGmailOAuthFromCallback,
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     return redirectToHub({ gmail_error: "missing_client" });
   }
 
-  const oauth2 = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  const oauth2 = new OAuth2Client(clientId, clientSecret, redirectUri);
   try {
     const { tokens } = await oauth2.getToken(code);
     const existing = await getStoredGmailOAuth();
@@ -52,8 +53,8 @@ export async function GET(req: NextRequest) {
     }
 
     oauth2.setCredentials({ refresh_token: refreshToken, access_token: tokens.access_token });
-    const gmail = google.gmail({ version: "v1", auth: oauth2 });
-    const profile = await gmail.users.getProfile({ userId: "me" });
+    const gmailClient = gmail({ version: "v1", auth: oauth2 });
+    const profile = await gmailClient.users.getProfile({ userId: "me" });
     const email = profile.data.emailAddress?.trim() || existing?.email || "";
     if (!email) {
       return redirectToHub({ gmail_error: "no_email" });

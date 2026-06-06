@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -48,7 +49,9 @@ export async function GET(request: Request) {
     const interventions = relPaths
       .map((relFile) => {
         try {
-          const raw = JSON.parse(fs.readFileSync(path.join(uploadsDir, relFile), "utf8")) as LocalIntervention;
+          const raw = JSON.parse(
+            fs.readFileSync(path.join(uploadsDir, relFile), "utf8")
+          ) as LocalIntervention;
           const time = normalizeTime(raw.hour || raw.time);
           return {
             file: relFile,
@@ -67,8 +70,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ interventions });
   } catch (e) {
-    console.error("[interventions/local]", e);
+    logger.error("[interventions/local]", { error: e instanceof Error ? e.message : String(e) });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
-

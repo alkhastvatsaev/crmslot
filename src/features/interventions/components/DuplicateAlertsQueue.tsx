@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useCallback, useMemo, useState } from "react";
 import { AlertTriangle, GitMerge, Lock, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -7,7 +9,10 @@ import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { DuplicateAlertRow } from "@/features/interventions/duplicateAlertTypes";
-import { ignoreDuplicateAlert, mergeDuplicateAlert } from "@/features/interventions/duplicateAlertActions";
+import {
+  ignoreDuplicateAlert,
+  mergeDuplicateAlert,
+} from "@/features/interventions/duplicateAlertActions";
 import { formatDuplicateRelativeCreated } from "@/features/interventions/duplicateDetectionCore";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -28,7 +33,11 @@ export type DuplicateAlertsQueueProps = {
   variant?: "compact" | "full";
 };
 
-export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "compact" }: DuplicateAlertsQueueProps) {
+export default function DuplicateAlertsQueue({
+  openAlerts,
+  isAdmin,
+  variant = "compact",
+}: DuplicateAlertsQueueProps) {
   const { t } = useTranslation();
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -36,51 +45,45 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
     return [...openAlerts].sort((a, b) => Date.parse(b.detectedAt) - Date.parse(a.detectedAt));
   }, [openAlerts]);
 
-  const runMerge = useCallback(
-    async (alert: DuplicateAlertRow) => {
-      if (!firestore || !isConfigured) return;
-      const uid = auth?.currentUser?.uid;
-      if (!uid) {
-        toast.error(t("duplicate.auth_required"));
-        return;
-      }
-      const ok = window.confirm(t("duplicate.confirm_merge"));
-      if (!ok) return;
-      setBusyId(alert.id);
-      try {
-        await mergeDuplicateAlert(firestore, alert.id, alert.newInterventionId, uid);
-        toast.success(t("duplicate.merge_success"));
-      } catch (e) {
-        console.error(e);
-        toast.error(t("duplicate.merge_error"));
-      } finally {
-        setBusyId(null);
-      }
-    },
-    [],
-  );
+  const runMerge = useCallback(async (alert: DuplicateAlertRow) => {
+    if (!firestore || !isConfigured) return;
+    const uid = auth?.currentUser?.uid;
+    if (!uid) {
+      toast.error(t("duplicate.auth_required"));
+      return;
+    }
+    const ok = window.confirm(t("duplicate.confirm_merge"));
+    if (!ok) return;
+    setBusyId(alert.id);
+    try {
+      await mergeDuplicateAlert(firestore, alert.id, alert.newInterventionId, uid);
+      toast.success(t("duplicate.merge_success"));
+    } catch (e) {
+      logger.error("mergeDuplicateAlert", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("duplicate.merge_error"));
+    } finally {
+      setBusyId(null);
+    }
+  }, []);
 
-  const runIgnore = useCallback(
-    async (alert: DuplicateAlertRow) => {
-      if (!firestore || !isConfigured) return;
-      const uid = auth?.currentUser?.uid;
-      if (!uid) {
-        toast.error(t("duplicate.auth_required"));
-        return;
-      }
-      setBusyId(alert.id);
-      try {
-        await ignoreDuplicateAlert(firestore, alert.id, uid);
-        toast.message(t("duplicate.ignored"));
-      } catch (e) {
-        console.error(e);
-        toast.error(t("duplicate.ignore_error"));
-      } finally {
-        setBusyId(null);
-      }
-    },
-    [],
-  );
+  const runIgnore = useCallback(async (alert: DuplicateAlertRow) => {
+    if (!firestore || !isConfigured) return;
+    const uid = auth?.currentUser?.uid;
+    if (!uid) {
+      toast.error(t("duplicate.auth_required"));
+      return;
+    }
+    setBusyId(alert.id);
+    try {
+      await ignoreDuplicateAlert(firestore, alert.id, uid);
+      toast.message(t("duplicate.ignored"));
+    } catch (e) {
+      logger.error("ignoreDuplicateAlert", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("duplicate.ignore_error"));
+    } finally {
+      setBusyId(null);
+    }
+  }, []);
 
   if (!sorted.length) return null;
 
@@ -102,9 +105,7 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
             data-testid={`duplicate-alert-banner-${alert.id}`}
             className={cn(
               "flex flex-col gap-3 rounded-xl border border-amber-300/60 bg-amber-50/95 px-3 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between",
-              variant === "full"
-                ? "border-amber-200/75 bg-white/92 px-3 py-3 sm:items-start"
-                : "",
+              variant === "full" ? "border-amber-200/75 bg-white/92 px-3 py-3 sm:items-start" : ""
             )}
           >
             <div className="flex min-w-0 flex-1 gap-2.5">
@@ -112,13 +113,19 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
               <div className="min-w-0">
                 {variant === "full" ? (
                   <>
-                    <p className="text-[14px] font-bold leading-snug tracking-tight text-amber-950">{headlineFull}</p>
+                    <p className="text-[14px] font-bold leading-snug tracking-tight text-amber-950">
+                      {headlineFull}
+                    </p>
                     <p className="sr-only">{t("duplicate.possible_duplicate")}</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-[13px] font-bold text-amber-950">{t("duplicate.possible_duplicate")}</p>
-                    <p className="mt-1 text-[13px] font-medium leading-snug text-amber-950/90">{compactMsg}</p>
+                    <p className="text-[13px] font-bold text-amber-950">
+                      {t("duplicate.possible_duplicate")}
+                    </p>
+                    <p className="mt-1 text-[13px] font-medium leading-snug text-amber-950/90">
+                      {compactMsg}
+                    </p>
                     <p className="mt-1 truncate font-mono text-[11px] text-amber-900/70">
                       Nouveau #{alert.newInterventionId} · similaire #{alert.similarInterventionId}
                     </p>
@@ -127,7 +134,12 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
               </div>
             </div>
             {isAdmin ? (
-              <div className={cn("flex shrink-0 flex-wrap gap-2", variant === "full" ? "sm:pt-0.5" : "")}>
+              <div
+                className={cn(
+                  "flex shrink-0 flex-wrap gap-2",
+                  variant === "full" ? "sm:pt-0.5" : ""
+                )}
+              >
                 <Button
                   type="button"
                   size="sm"
@@ -137,14 +149,18 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                   className={cn(
                     controlsIconOnly
                       ? "h-11 w-11 min-w-[44px] rounded-[14px] bg-slate-900 p-0 shadow-sm"
-                      : "gap-1 bg-slate-900",
+                      : "gap-1 bg-slate-900"
                   )}
                   onClick={() => void runMerge(alert)}
                   aria-label={t("duplicate.merge_aria")}
                   title={t("duplicate.merge_label")}
                 >
                   <GitMerge className="h-4 w-4" aria-hidden />
-                  {controlsIconOnly ? <span className="sr-only">{t("duplicate.merge_label")}</span> : t("duplicate.merge_label")}
+                  {controlsIconOnly ? (
+                    <span className="sr-only">{t("duplicate.merge_label")}</span>
+                  ) : (
+                    t("duplicate.merge_label")
+                  )}
                 </Button>
                 <Button
                   type="button"
@@ -155,14 +171,18 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                   className={cn(
                     controlsIconOnly
                       ? "h-11 w-11 min-w-[44px] rounded-[14px] border-black/[0.08] p-0 shadow-sm"
-                      : "gap-1",
+                      : "gap-1"
                   )}
                   onClick={() => void runIgnore(alert)}
                   aria-label={t("duplicate.ignore_aria")}
                   title={t("duplicate.ignore_label")}
                 >
                   <XCircle className="h-4 w-4" aria-hidden />
-                  {controlsIconOnly ? <span className="sr-only">{t("duplicate.ignore_label")}</span> : t("duplicate.ignore_label")}
+                  {controlsIconOnly ? (
+                    <span className="sr-only">{t("duplicate.ignore_label")}</span>
+                  ) : (
+                    t("duplicate.ignore_label")
+                  )}
                 </Button>
               </div>
             ) : (
@@ -170,14 +190,18 @@ export default function DuplicateAlertsQueue({ openAlerts, isAdmin, variant = "c
                 data-testid="duplicate-alert-read-only"
                 className={cn(
                   "flex items-center gap-2 text-amber-900/85",
-                  variant === "full" ? "rounded-[14px] border border-black/[0.06] bg-white/85 px-2.5 py-2" : "",
+                  variant === "full"
+                    ? "rounded-[14px] border border-black/[0.06] bg-white/85 px-2.5 py-2"
+                    : ""
                 )}
                 title={t("duplicate.admin_reserved")}
               >
                 <Lock className="h-4 w-4 shrink-0 text-amber-800/80" aria-hidden />
                 <span className="sr-only">{t("duplicate.readonly_sr")}</span>
                 {variant === "compact" ? (
-                  <span className="text-[12px] font-semibold leading-tight">{t("duplicate.admin_only")}</span>
+                  <span className="text-[12px] font-semibold leading-tight">
+                    {t("duplicate.admin_only")}
+                  </span>
                 ) : null}
               </div>
             )}

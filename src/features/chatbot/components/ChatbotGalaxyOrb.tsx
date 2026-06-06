@@ -5,12 +5,20 @@ import { cn } from "@/lib/utils";
 import { startGalaxyStarsAnimation } from "@/core/ui/GalaxyButton/galaxyStarsAnimation";
 import "@/core/ui/GalaxyButton/GalaxyButton.css";
 
-const STAR_COUNT = 420;
+const STAR_COUNT_SM = 420;
+const STAR_COUNT_HERO = 720;
 
-/** Cercle avatar Chatbot 32×32 — même animation étoiles / fond bleu que GalaxyButton. */
-export default function ChatbotGalaxyOrb({ className }: { className?: string }) {
+type Props = {
+  className?: string;
+  /** `hero` = orbe vide au démarrage (~83 px) ; défaut = bulles (32 px). */
+  size?: "sm" | "hero";
+};
+
+/** Cercle avatar Chatbot — animation étoiles / fond bleu (GalaxyButton). */
+export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
   const surfaceRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isHero = size === "hero";
 
   useEffect(() => {
     const surface = surfaceRef.current;
@@ -20,7 +28,7 @@ export default function ChatbotGalaxyOrb({ className }: { className?: string }) 
     const start = () => {
       if (surface.offsetWidth < 2) return undefined;
       return startGalaxyStarsAnimation(canvas, surface, {
-        starCount: STAR_COUNT,
+        starCount: isHero ? STAR_COUNT_HERO : STAR_COUNT_SM,
         interactive: false,
         baseSpeed: 1.1,
         variant: "avatar",
@@ -37,13 +45,14 @@ export default function ChatbotGalaxyOrb({ className }: { className?: string }) 
       window.cancelAnimationFrame(id);
       cleanup?.();
     };
-  }, []);
+  }, [isHero]);
 
   return (
     <div
       ref={surfaceRef}
-      className={cn("chatbot-galaxy-orb shrink-0", className)}
+      className={cn("chatbot-galaxy-orb shrink-0", isHero && "chatbot-galaxy-orb--hero", className)}
       data-testid="chatbot-galaxy-orb"
+      data-size={size}
       aria-hidden
     >
       <canvas ref={canvasRef} className="chatbot-galaxy-orb__canvas" />

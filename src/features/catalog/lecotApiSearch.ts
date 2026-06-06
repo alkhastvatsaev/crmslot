@@ -1,3 +1,4 @@
+import { logger } from "@/core/logger";
 import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
 import { lecotPlaywrightSearchEnabled } from "@/features/catalog/lecotOrderFlags";
 import { searchLecotViaPlaywright } from "@/features/catalog/lecotPlaywrightScraper";
@@ -9,7 +10,18 @@ type LecotApiHit = {
   name?: string;
   unitPriceCents?: number;
   price?: number;
+  imageUrl?: string;
+  image_url?: string;
+  image?: string;
+  thumbnail?: string;
 };
+
+function pickImageUrl(raw: LecotApiHit): string | null {
+  for (const candidate of [raw.imageUrl, raw.image_url, raw.image, raw.thumbnail]) {
+    if (typeof candidate === "string" && candidate.trim()) return candidate.trim();
+  }
+  return null;
+}
 
 function mapHit(raw: LecotApiHit): CatalogProduct | null {
   const sku = String(raw.sku ?? raw.reference ?? "").trim();
@@ -19,15 +31,17 @@ function mapHit(raw: LecotApiHit): CatalogProduct | null {
   if (!unitPriceCents && typeof raw.price === "number") {
     unitPriceCents = Math.round(raw.price * 100);
   }
-  return { sku, label, unitPriceCents };
+  const imageUrl = pickImageUrl(raw);
+  return {
+    sku,
+    label,
+    unitPriceCents,
+    ...(imageUrl ? { imageUrl } : {}),
+  };
 }
 
 export function lecotApiBaseUrl(): string | null {
-  return (
-    process.env.LECOT_API_URL?.trim() ||
-    process.env.LECOT_API_BASE_URL?.trim() ||
-    null
-  );
+  return process.env.LECOT_API_URL?.trim() || process.env.LECOT_API_BASE_URL?.trim() || null;
 }
 
 export function lecotApiSearchPath(): string {
@@ -46,7 +60,9 @@ export async function searchLecotViaApi(query: string): Promise<CatalogProduct[]
       try {
         return await searchLecotViaPlaywright(query);
       } catch (err) {
-        console.warn("[lecot/search] Playwright échoué, fallback catalogue local.", err);
+        logger.warn("[lecot/search] Playwright échoué, fallback catalogue local.", {
+          error: err instanceof Error ? err.message : String(err),
+        });
         return null;
       }
     }
@@ -57,12 +73,10 @@ export async function searchLecotViaApi(query: string): Promise<CatalogProduct[]
   url.searchParams.set("q", query);
 
   const headers: Record<string, string> = { Accept: "application/json" };
-  const key =
-    process.env.LECOT_API_KEY?.trim() ||
-    process.env.LECOT_API_TOKEN?.trim();
+  const key = process.env.LECOT_API_KEY?.trim() || process.env.LECOT_API_TOKEN?.trim();
   if (key) headers.Authorization = `Bearer ${key}`;
 
-  const res = await fetch(url.toString(), { headers, next: { revalidate: 0 } });
+  const res = await fetch(url.toString(), { headers });
   if (!res.ok) return null;
 
   const data = (await res.json().catch(() => null)) as

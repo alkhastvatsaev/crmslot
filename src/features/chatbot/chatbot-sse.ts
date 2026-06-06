@@ -1,3 +1,4 @@
+import { logger } from "@/core/logger";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import { executeChatbotTool } from "@/features/chatbot/chatbot-tool-executor";
 import type { ChatbotStoredMessage } from "@/features/chatbot/chatbot-stored-messages";
@@ -36,7 +37,7 @@ export function streamChatbotInstantReply(params: {
 }
 
 export function createChatbotSseResponse(
-  run: (enqueue: (ev: unknown) => void) => Promise<void>,
+  run: (enqueue: (ev: unknown) => void) => Promise<void>
 ): Response {
   const encoder = new TextEncoder();
   const readable = new ReadableStream({
@@ -47,7 +48,9 @@ export function createChatbotSseResponse(
         controller.close();
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Erreur Chatbot";
-        console.error("[chatbot/sse]", error);
+        logger.error("[chatbot/sse]", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         enqueue({ type: "error", message });
         controller.close();
       }
@@ -67,14 +70,14 @@ export function buildApiMessagesAfterDocumentTool(
   messages: unknown[],
   toolCallId: string,
   toolName: string,
-  assistantText: string,
+  assistantText: string
 ): ChatbotStoredMessage[] {
   return appendChatbotToolRoundResult(
     normalizeStoredMessages(messages),
     toolCallId,
     toolName,
     MINIMAL_DOCUMENT_TOOL_RESULT_JSON,
-    assistantText,
+    assistantText
   );
 }
 
@@ -83,14 +86,14 @@ export function buildApiMessagesAfterLecotOrder(
   toolCallId: string,
   toolName: string,
   toolResultJson: string,
-  assistantText: string,
+  assistantText: string
 ): ChatbotStoredMessage[] {
   return appendChatbotToolRoundResult(
     normalizeStoredMessages(messages),
     toolCallId,
     toolName,
     toolResultJson,
-    assistantText,
+    assistantText
   );
 }
 
@@ -109,13 +112,11 @@ export function streamLecotOrderToolOutcome(params: {
     if (!String(orderInput.clientName ?? "").trim() && sessionClient) {
       orderInput.clientName = sessionClient;
     }
-    const result = await executeChatbotTool(
-      "order_lecot_parts",
-      orderInput,
-      params.toolCtx,
-    ).catch((err: unknown) => ({
-      error: err instanceof Error ? err.message : "Erreur commande",
-    }));
+    const result = await executeChatbotTool("order_lecot_parts", orderInput, params.toolCtx).catch(
+      (err: unknown) => ({
+        error: err instanceof Error ? err.message : "Erreur commande",
+      })
+    );
     enqueue({ type: "tool_end", tool: "order_lecot_parts" });
 
     if (result && typeof result === "object" && "error" in result) {
@@ -130,7 +131,7 @@ export function streamLecotOrderToolOutcome(params: {
           params.toolCallId,
           "order_lecot_parts",
           JSON.stringify(result),
-          String((result as { error?: string }).error),
+          String((result as { error?: string }).error)
         ),
       });
       return;
@@ -149,7 +150,7 @@ export function streamLecotOrderToolOutcome(params: {
         params.toolCallId,
         "order_lecot_parts",
         toolJson,
-        text,
+        text
       ),
     });
   });
@@ -175,7 +176,7 @@ export function streamDocumentToolOutcome(params: {
         params.messages,
         params.toolCallId,
         params.toolName,
-        text,
+        text
       );
     }
     enqueue(donePayload);
