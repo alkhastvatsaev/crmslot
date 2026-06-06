@@ -24,7 +24,8 @@ describe("e2eSeedAssignedInterventionAdmin", () => {
     expect(result.reset).toBe(false);
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
-        status: "assigned",
+        status: "in_progress",
+        technicianAcceptedAt: expect.any(String),
         companyId: "demo-local-company",
         assignedTechnicianUid: expect.any(String),
       })
