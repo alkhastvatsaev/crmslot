@@ -1,10 +1,141 @@
 "use client";
 
-import { ExternalLink, Inbox } from "lucide-react";
+import { useMemo } from "react";
+import { ExternalLink, AlertTriangle, TrendingUp, UserCheck, UserX, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildCrmActivityEventDetail } from "@/features/crmHistory/crmActivityEventDetail";
-import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
+import type { CrmActivityEvent, CrmPeriodFilter } from "@/features/crmHistory/crmActivityTypes";
+
+const PERIOD_LABEL: Record<CrmPeriodFilter, string> = {
+  today: "aujourd'hui",
+  week: "cette semaine",
+  month: "ce mois",
+  all: "sur toute la période",
+};
+
+function QmSnapshotPanel({
+  events,
+  period,
+}: {
+  events: CrmActivityEvent[];
+  period: CrmPeriodFilter;
+}) {
+  const snapshot = useMemo(() => {
+    const problems: { label: string; client: string | null }[] = [];
+    const techCompletions: Record<string, number> = {};
+    const techDeclines: Record<string, number> = {};
+
+    for (const e of events) {
+      if (
+        e.type === "intervention_cancelled" ||
+        e.type === "intervention_deleted" ||
+        e.type === "intervention_returned_to_requests"
+      ) {
+        problems.push({
+          label: e.interventionTitle ?? e.type.replace("intervention_", "").replace(/_/g, " "),
+          client: e.clientName ?? null,
+        });
+      }
+      if (e.type === "intervention_technician_declined" && e.technicianUid) {
+        techDeclines[e.technicianUid] = (techDeclines[e.technicianUid] ?? 0) + 1;
+      }
+      if (e.type === "intervention_completed" && e.technicianUid) {
+        techCompletions[e.technicianUid] = (techCompletions[e.technicianUid] ?? 0) + 1;
+      }
+    }
+
+    const topDeclines = Object.entries(techDeclines)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    const topCompletions = Object.entries(techCompletions)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    return { problems: problems.slice(0, 5), topDeclines, topCompletions };
+  }, [events]);
+
+  const hasProblems = snapshot.problems.length > 0;
+  const hasPerf = snapshot.topCompletions.length > 0 || snapshot.topDeclines.length > 0;
+
+  if (!hasProblems && !hasPerf) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center text-slate-400">
+        <TrendingUp className="h-8 w-8 opacity-20" />
+        <p className="text-[13px]">Aucune activité {PERIOD_LABEL[period]}.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-5 gap-6">
+      {hasProblems && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-3.5 w-3.5 text-rose-500" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Points d&apos;attention
+            </span>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {snapshot.problems.map((p, i) => (
+              <div key={i} className="rounded-xl border border-rose-100 bg-rose-50/60 px-3 py-2.5">
+                <p className="text-[13px] font-semibold text-slate-800 leading-snug capitalize">
+                  {p.label}
+                </p>
+                {p.client && <p className="text-[11px] text-slate-400 mt-0.5">{p.client}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {snapshot.topCompletions.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Top clôtures
+            </span>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {snapshot.topCompletions.map(([uid, count]) => (
+              <div
+                key={uid}
+                className="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50/60 border border-emerald-100"
+              >
+                <span className="text-[12px] font-medium text-slate-700 truncate">{uid}</span>
+                <span className="text-[13px] font-bold text-emerald-600 ml-2">{count}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {snapshot.topDeclines.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <UserX className="h-3.5 w-3.5 text-rose-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Refus technicien
+            </span>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {snapshot.topDeclines.map(([uid, count]) => (
+              <div
+                key={uid}
+                className="flex items-center justify-between px-3 py-2 rounded-xl bg-rose-50/60 border border-rose-100"
+              >
+                <span className="text-[12px] font-medium text-slate-700 truncate">{uid}</span>
+                <span className="text-[13px] font-bold text-rose-500 ml-2">{count}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
 
 function formatDateTime(ts: number): string {
   if (!ts) return "";
@@ -20,24 +151,32 @@ function formatDateTime(ts: number): string {
 type Props = {
   event: CrmActivityEvent | null;
   onOpenIntervention?: (event: CrmActivityEvent) => void;
+  allEvents?: CrmActivityEvent[];
+  period?: CrmPeriodFilter;
 };
 
-export default function CrmHistoryEventDetailPanel({ event, onOpenIntervention }: Props) {
+export default function CrmHistoryEventDetailPanel({
+  event,
+  onOpenIntervention,
+  allEvents = [],
+  period = "all",
+}: Props) {
   const { t } = useTranslation();
 
   if (!event) {
     return (
       <div
-        className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center text-slate-400"
+        className="flex min-h-0 flex-1 flex-col overflow-hidden"
         data-testid="crm-history-detail-empty"
       >
-        <Inbox className="h-10 w-10 opacity-30" aria-hidden />
-        <p className="text-[15px] font-semibold text-slate-600">
-          {t("crmHistory.detail.empty_title")}
-        </p>
-        <p className="max-w-[240px] text-[13px] leading-relaxed">
-          {t("crmHistory.detail.empty_hint")}
-        </p>
+        <header className="shrink-0 border-b border-black/5 px-5 py-4">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            Quality Snapshot
+          </p>
+          <h2 className="mt-1 text-[16px] font-semibold text-slate-900">Vue qualité</h2>
+          <p className="mt-0.5 text-[11px] text-slate-400 capitalize">{PERIOD_LABEL[period]}</p>
+        </header>
+        <QmSnapshotPanel events={allEvents} period={period} />
       </div>
     );
   }
