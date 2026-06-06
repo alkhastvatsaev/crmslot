@@ -58,8 +58,10 @@ describe("TechnicianHubPage", () => {
     expect(screen.getByTestId("technician-dashboard-detail-empty")).toBeInTheDocument();
     expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
       "data-technician-center-view",
-      "detail",
+      "detail"
     );
     expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
+    expect(screen.getByTestId("technician-offline-sync-panel")).toBeInTheDocument();
+    expect(document.getElementById("technician-hub-offline")).toBeTruthy();
   });
 });
