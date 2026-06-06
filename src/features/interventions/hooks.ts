@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { firestore, auth, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Intervention } from "./types";
@@ -41,15 +42,17 @@ export function useInterventions() {
         intRef,
         (snapshot) => {
           const parsed = stripKnownSyntheticInterventions(
-            snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
+            snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
           );
           setInterventions(parsed);
           setLoading(false);
         },
         (error) => {
-          console.error("Erreur lecture interventions Firestore (Offline mode actif ?):", error);
+          logger.error("Erreur lecture interventions Firestore (Offline mode actif ?):", {
+            error: error instanceof Error ? error.message : String(error),
+          });
           setLoading(false);
-        },
+        }
       );
     });
 

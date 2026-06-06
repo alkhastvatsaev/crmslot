@@ -5,6 +5,8 @@ export type ChatbotQuickActionKind = "send_message" | "open_url";
 export type ChatbotQuickAction = {
   id: string;
   label: string;
+  /** Prix ou sous-titre affiché à droite du bouton (ex. "42 €"). */
+  meta?: string;
   kind: ChatbotQuickActionKind;
   /** Texte envoyé comme message utilisateur, ou URL pour open_url. */
   payload: string;
@@ -17,31 +19,27 @@ function truncateLabel(text: string, max: number): string {
   return `${t.slice(0, max - 1)}…`;
 }
 
-/** Boutons « Commander · … » après une recherche catalogue Lecot. */
+/** Boutons de commande catalogue Lecot — label court + prix séparé. */
 export function buildLecotProductQuickActions(
-  suggestions: Pick<LecotProductSuggestion, "rank" | "sku" | "label" | "unitPriceEur">[],
+  suggestions: Pick<LecotProductSuggestion, "rank" | "sku" | "label" | "unitPriceEur">[]
 ): ChatbotQuickAction[] {
-  return suggestions.slice(0, 5).map((s) => {
-    const price =
-      s.unitPriceEur > 0 ? ` · ${s.unitPriceEur.toFixed(2).replace(".", ",")} € HT` : "";
-    return {
-      id: `lecot-order-${s.rank}-${s.sku}`,
-      label: truncateLabel(`Commander · ${s.label}${price}`, 52),
-      kind: "send_message",
-      payload: `Commander ${s.sku} — ${s.label}`,
-      variant: s.rank === 1 ? "primary" : "secondary",
-    };
-  });
+  return suggestions.slice(0, 5).map((s) => ({
+    id: `lecot-order-${s.rank}-${s.sku}`,
+    label: s.label.trim(),
+    meta: s.unitPriceEur > 0 ? `${Math.round(s.unitPriceEur)} €` : undefined,
+    kind: "send_message",
+    payload: `Commander ${s.sku} — ${s.label}`,
+    variant: s.rank === 1 ? "primary" : "secondary",
+  }));
 }
 
-const LECOT_LINE_RE =
-  /^\s*(\d+)\.\s+.*?\(SKU\s+([A-Z0-9][A-Z0-9-]*)\)/gim;
+const LECOT_LINE_RE = /^\s*(\d+)\.\s+.*?\(SKU\s+([A-Z0-9][A-Z0-9-]*)\)/gim;
 
 const LECOT_LINK_RE = /\[([^\]]+)\]\(lecot:([^)]+)\)/g;
 
 export function deriveChatbotQuickActions(
   content: string,
-  opts?: { suggestionLabels?: string[] },
+  opts?: { suggestionLabels?: string[] }
 ): ChatbotQuickAction[] {
   const text = content.trim();
 
@@ -65,13 +63,11 @@ export function deriveChatbotQuickActions(
     while ((m = re.exec(text)) !== null) {
       const rank = Number(m[1]);
       const sku = m[2];
-      const labelMatch = text
-        .slice(m.index, m.index + 200)
-        .match(/\[([^\]]+)\]\(lecot:/);
+      const labelMatch = text.slice(m.index, m.index + 200).match(/\[([^\]]+)\]\(lecot:/);
       const label = labelMatch?.[1]?.trim() || sku;
       fromLines.push({
         id: `lecot-derived-${rank}-${sku}`,
-        label: truncateLabel(`Commander · ${label}`, 48),
+        label: label.trim(),
         kind: "send_message",
         payload: `Commander ${sku} — ${label}`,
         variant: rank === 1 ? "primary" : "secondary",
@@ -82,7 +78,7 @@ export function deriveChatbotQuickActions(
 
   if (
     /(?:souhaitez-vous|pourriez-vous|quel(?:le)?\s+(?:produit|pièce|montant|n°|numéro)|répondez|confirmez|commander\s+le\s+n°)/i.test(
-      text,
+      text
     ) &&
     !/catalogue\s+lecot/i.test(text)
   ) {
@@ -143,7 +139,7 @@ export function deriveChatbotQuickActions(
 
 export function mergeQuickActions(
   primary: ChatbotQuickAction[],
-  fallback: ChatbotQuickAction[],
+  fallback: ChatbotQuickAction[]
 ): ChatbotQuickAction[] {
   const seen = new Set<string>();
   const out: ChatbotQuickAction[] = [];

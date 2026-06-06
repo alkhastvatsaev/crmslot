@@ -31,9 +31,14 @@ const COLORS = [
 const GALAXY_TILT = 1.1;
 const GALAXY_ANGLE = 0.3;
 
-function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number, isAvatar: boolean = false) {
+function paintGalaxyBackground(
+  surface: HTMLElement,
+  xPct: number,
+  yPct: number,
+  isAvatar: boolean = false
+) {
   if (isAvatar) {
-    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 120%)`;
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 38%, rgba(23, 37, 84, 0.35) 52%, rgba(23, 37, 84, 0.08) 62%, transparent 72%)`;
   } else {
     surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
   }
@@ -42,7 +47,7 @@ function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number,
 export function startGalaxyStarsAnimation(
   canvas: HTMLCanvasElement,
   surface: HTMLElement,
-  options: GalaxyStarsOptions = {},
+  options: GalaxyStarsOptions = {}
 ): () => void {
   const starCount = options.starCount ?? 6000;
   const interactive = options.interactive ?? true;
@@ -83,8 +88,8 @@ export function startGalaxyStarsAnimation(
     const mini = Math.min(width, height);
     const isAvatar = variant === "avatar";
 
-    const baseRadius = isAvatar ? mini * 0.55 : Math.max(width, height) * 0.75;
-    maxDrawRadius = isAvatar ? 0.6 : Infinity;
+    const baseRadius = isAvatar ? mini * 0.42 : Math.max(width, height) * 0.75;
+    maxDrawRadius = isAvatar ? 0.45 : Infinity;
     depthZScale = isAvatar ? mini * 1.8 : 150;
 
     for (let i = 0; i < starCount; i += 1) {
@@ -95,9 +100,7 @@ export function startGalaxyStarsAnimation(
       const angle = Math.random() * Math.PI * 2;
       const color = COLORS[Math.floor(Math.random() * COLORS.length)]!;
 
-      const size = isAvatar
-        ? Math.random() * 0.2 + 0.1
-        : Math.random() * 0.4 + 0.1;
+      const size = isAvatar ? Math.random() * 0.2 + 0.1 : Math.random() * 0.4 + 0.1;
 
       stars.push({
         radius,
@@ -189,9 +192,7 @@ export function startGalaxyStarsAnimation(
   window.addEventListener("resize", onResize);
 
   const resizeObserver =
-    typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => initCanvas())
-      : null;
+    typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => initCanvas()) : null;
   resizeObserver?.observe(surface);
 
   paintGalaxyBackground(surface, 50, 50, options.variant === "avatar");

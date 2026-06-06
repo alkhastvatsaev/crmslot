@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { logger } from "@/core/logger";
 
 function tryInitFirebaseAdmin(): void {
   if (admin.apps.length) return;
@@ -36,7 +37,9 @@ function tryInitFirebaseAdmin(): void {
       });
     }
   } catch (error) {
-    console.error("Firebase admin initialization error", error);
+    logger.error("Firebase admin initialization error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
@@ -50,7 +53,7 @@ export function isFirebaseAdminReady(): boolean {
 export function getAdminDb(): admin.firestore.Firestore {
   if (!admin.apps.length) {
     throw new Error(
-      "Firebase Admin non initialisé. Ajoutez dans .env.local : FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT_JSON).",
+      "Firebase Admin non initialisé. Ajoutez dans .env.local : FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT_JSON)."
     );
   }
   return admin.firestore();

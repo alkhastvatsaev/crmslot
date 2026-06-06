@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -7,6 +9,7 @@ import { toast } from "sonner";
 import { fieldMissionStatusDotClass } from "@/core/ui/fieldMissionStatus";
 import { motion } from "framer-motion";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { HUB_FONT_OUTFIT, HUB_MISSION_CASE, HUB_RADIUS, HubCard } from "@/core/ui/hub";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import { useTechnicianMissionDayAnchor } from "@/features/interventions/useTechnicianMissionDayAnchor";
@@ -24,8 +27,6 @@ import {
   reopenTechnicianCompletedIntervention,
   TECHNICIAN_REOPEN_I18N_KEY,
 } from "@/features/interventions/technicianReopenCompletedIntervention";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 import { cn } from "@/lib/utils";
 import { capitalizeName } from "@/utils/stringUtils";
@@ -87,15 +88,17 @@ function CaseCard({
         aria-label={`${t("technician_hub.dashboard.list.dossier_aria")} ${iv.id} — ${displayLabel}`}
         onClick={onOpen}
         className={cn(
-          "flex w-full items-center gap-3 rounded-2xl border px-3 py-3.5 text-left transition active:scale-[0.98]",
-          isArchived && "opacity-60",
-          isSelected
-            ? "border-neutral-900 bg-neutral-50"
-            : "border-neutral-200/80 bg-white hover:bg-neutral-50",
+          HUB_MISSION_CASE.base,
+          isArchived && HUB_MISSION_CASE.archived,
+          isSelected ? HUB_MISSION_CASE.selected : HUB_MISSION_CASE.default
         )}
       >
-        <span className="w-11 shrink-0 text-[13px] font-bold tabular-nums text-neutral-600">{timeLabel}</span>
-        <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-neutral-900">{displayLabel}</span>
+        <span className="w-11 shrink-0 text-[13px] font-bold tabular-nums text-slate-600">
+          {timeLabel}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-slate-900">
+          {displayLabel}
+        </span>
         <span
           className={cn("h-2.5 w-2.5 shrink-0 rounded-full", fieldMissionStatusDotClass(iv.status))}
           aria-hidden
@@ -110,7 +113,10 @@ function CaseCard({
             e.stopPropagation();
             onReopen();
           }}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-neutral-300 bg-white px-2 py-2 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+          className={cn(
+            "flex w-full items-center justify-center gap-1.5 border border-dashed border-slate-300 bg-white px-2 py-2 text-[12px] font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60",
+            HUB_RADIUS.control
+          )}
         >
           {reopenBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
           {t("technician_hub.dashboard.list.reopen_mission")}
@@ -152,18 +158,16 @@ export default function TechnicianDashboardListPanel({
       toast.success(String(t("technician_hub.dashboard.list.reopen_success")));
       onSelect(iv.id);
     } catch (err) {
-      console.error("reopenTechnicianCompletedIntervention", err);
+      logger.error("reopenTechnicianCompletedIntervention", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       const msg = err instanceof Error ? err.message : "";
       const blocked = msg.match(/^REOPEN_BLOCKED:(\w+)$/);
       if (blocked?.[1] && blocked[1] in TECHNICIAN_REOPEN_I18N_KEY) {
         toast.error(
           String(
-            t(
-              TECHNICIAN_REOPEN_I18N_KEY[
-                blocked[1] as keyof typeof TECHNICIAN_REOPEN_I18N_KEY
-              ],
-            ),
-          ),
+            t(TECHNICIAN_REOPEN_I18N_KEY[blocked[1] as keyof typeof TECHNICIAN_REOPEN_I18N_KEY])
+          )
         );
       } else {
         toast.error(String(t("technician_hub.dashboard.list.reopen_failed")));
@@ -175,23 +179,20 @@ export default function TechnicianDashboardListPanel({
 
   const filteredSorted = useMemo(() => {
     const rows = interventions.filter((iv) =>
-      interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor),
+      interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    const awaiting = rows.filter((iv) =>
-      isTechnicianAssignmentAwaitingResponse(iv, firebaseUid),
-    );
-    const rest = rows.filter(
-      (iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid),
-    );
-    return [
-      ...sortInterventionsByScheduleAsc(awaiting),
-      ...sortInterventionsByScheduleAsc(rest),
-    ];
+    const awaiting = rows.filter((iv) => isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
+    const rest = rows.filter((iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
+    return [...sortInterventionsByScheduleAsc(awaiting), ...sortInterventionsByScheduleAsc(rest)];
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   const { activeMissions, archivedMissions } = useMemo(() => {
-    const archived = filteredSorted.filter((iv) => iv.status === "done" || iv.status === "invoiced");
-    const active = filteredSorted.filter((iv) => !(iv.status === "done" || iv.status === "invoiced"));
+    const archived = filteredSorted.filter(
+      (iv) => iv.status === "done" || iv.status === "invoiced"
+    );
+    const active = filteredSorted.filter(
+      (iv) => !(iv.status === "done" || iv.status === "invoiced")
+    );
     return { activeMissions: active, archivedMissions: archived };
   }, [filteredSorted]);
 
@@ -200,7 +201,6 @@ export default function TechnicianDashboardListPanel({
   return (
     <div
       data-testid="technician-dashboard-list"
-      style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
       aria-label={t("technician_hub.dashboard.list.assigned_missions")}
     >
@@ -210,13 +210,21 @@ export default function TechnicianDashboardListPanel({
         <h2 className="sr-only">{t("technician_hub.dashboard.list.missions_title")}</h2>
 
         {offlineAuth ? (
-          <p className="rounded-[14px] border border-neutral-200 bg-neutral-50 px-3 py-2 text-[12px] font-medium text-neutral-700">
+          <p
+            className={cn(
+              "border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] font-medium text-slate-700",
+              HUB_RADIUS.input
+            )}
+          >
             {t("technician_hub.dashboard.list.offline_auth_warning")}
           </p>
         ) : null}
 
         {!offlineAuth && !firebaseUid ? (
-          <p data-testid="technician-dashboard-login-hint" className="text-[12px] font-medium text-slate-600">
+          <p
+            data-testid="technician-dashboard-login-hint"
+            className="text-[12px] font-medium text-slate-600"
+          >
             {t("technician_hub.dashboard.list.login_prompt")}
           </p>
         ) : null}
@@ -236,21 +244,28 @@ export default function TechnicianDashboardListPanel({
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="h-[68px] animate-pulse rounded-[20px] bg-slate-200/55"
+                  className="h-[68px] animate-pulse rounded-[16px] bg-slate-200/55"
                   aria-hidden
                 />
               ))}
             </div>
           ) : null}
 
-          {!loading && firebaseUid && activeMissions.length === 0 && archivedMissions.length === 0 ? (
-            <div
+          {!loading &&
+          firebaseUid &&
+          activeMissions.length === 0 &&
+          archivedMissions.length === 0 ? (
+            <HubCard
               data-testid="technician-dashboard-empty"
-              className="flex flex-1 flex-col items-center justify-center rounded-[22px] border border-dashed border-black/[0.08] bg-white/60 px-5 py-8 text-center"
+              tone="dashed"
+              padding="md"
+              className="flex flex-1 flex-col items-center justify-center bg-white/60 text-center"
             >
-              <p className="text-[14px] font-bold text-slate-800">{t("technician_hub.dashboard.list.no_mission")}</p>
+              <p className="text-[14px] font-bold text-slate-800">
+                {t("technician_hub.dashboard.list.no_mission")}
+              </p>
               <p className="sr-only">{t("technician_hub.dashboard.list.no_mission_today")}</p>
-            </div>
+            </HubCard>
           ) : null}
 
           {!loading && firebaseUid && activeMissions.length > 0 ? (
@@ -275,7 +290,7 @@ export default function TechnicianDashboardListPanel({
                     isSelected={selectedCaseId === iv.id}
                     onOpen={() => onSelect(iv.id)}
                   />
-                ),
+                )
               )}
             </div>
           ) : null}
@@ -295,12 +310,13 @@ export default function TechnicianDashboardListPanel({
                 <ChevronDown
                   className={cn(
                     "h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform duration-200",
-                    missionsArchiveExpanded && "rotate-180",
+                    missionsArchiveExpanded && "rotate-180"
                   )}
                   aria-hidden
                 />
                 <span>
-                  {String(t("technician_hub.dashboard.list.archive_word"))} · {archivedMissions.length}{" "}
+                  {String(t("technician_hub.dashboard.list.archive_word"))} ·{" "}
+                  {archivedMissions.length}{" "}
                   {archivedMissions.length > 1
                     ? String(t("technician_hub.dashboard.list.archive_closed_other"))
                     : String(t("technician_hub.dashboard.list.archive_closed_one"))}
@@ -319,9 +335,7 @@ export default function TechnicianDashboardListPanel({
                       isSelected={selectedCaseId === iv.id}
                       onOpen={() => onSelect(iv.id)}
                       isArchived
-                      canReopen={
-                        canTechnicianReopenCompletedIntervention(iv, firebaseUid).allowed
-                      }
+                      canReopen={canTechnicianReopenCompletedIntervention(iv, firebaseUid).allowed}
                       reopenBusy={reopeningId === iv.id}
                       onReopen={() => void handleReopenArchived(iv)}
                     />

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { logger } from "@/core/logger";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
 
 type Props = {
@@ -16,16 +17,13 @@ export default function DashboardPager({ pages }: Props) {
   const { pageIndex, pageCount } = useDashboardPager();
 
   if (pages.length !== pageCount) {
-    console.warn(
-      `[DashboardPager] pages.length (${pages.length}) !== pageCount du provider (${pageCount}).`,
+    logger.warn(
+      `[DashboardPager] pages.length (${pages.length}) !== pageCount du provider (${pageCount}).`
     );
   }
 
   return (
-    <div
-      className="absolute inset-0 z-0"
-      data-testid="dashboard-pager-root"
-    >
+    <div className="absolute inset-0 z-0" data-testid="dashboard-pager-root">
       <div
         className="flex h-full flex-row transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none"
         style={{
@@ -37,10 +35,12 @@ export default function DashboardPager({ pages }: Props) {
         {pages.map((node, i) => (
           <section
             key={i}
-            className={`relative h-full shrink-0 ${
-              pageIndex !== i ? "pointer-events-none" : ""
-            }`}
-            style={{ width: `${100 / pageCount}%`, transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+            className={`relative h-full shrink-0 ${pageIndex !== i ? "pointer-events-none" : ""}`}
+            style={{
+              width: `${100 / pageCount}%`,
+              transform: "translateZ(0)",
+              backfaceVisibility: "hidden",
+            }}
             aria-hidden={pageIndex !== i}
             data-testid={
               i === 0

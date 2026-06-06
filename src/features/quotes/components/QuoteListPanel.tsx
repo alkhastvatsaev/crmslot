@@ -54,8 +54,8 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
         kind: "quote_status_changed",
         actorUid: workspace?.firebaseUid ?? "system",
         actorRole: "dispatcher",
-        statusBefore: quote.status as any,
-        statusAfter: nextStatus as any,
+        statusBefore: quote.status,
+        statusAfter: nextStatus,
         note: quote.notes || undefined,
         intervention: {
           id: quote.id,
@@ -64,9 +64,11 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
           clientName: quote.clientName || undefined,
           clientCompanyName: quote.clientName || undefined,
           address: "",
-        } as any,
+        },
       });
-      toast.success(accept ? String(t("quotes.toast_accepted")) : String(t("quotes.toast_declined")));
+      toast.success(
+        accept ? String(t("quotes.toast_accepted")) : String(t("quotes.toast_declined"))
+      );
     } catch {
       toast.error(String(t("common.error")));
     }
@@ -84,7 +86,10 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
         <button
           type="button"
           data-testid="quote-new"
-          onClick={() => { setSelectedQuote(null); setShowEditor((v) => !v); }}
+          onClick={() => {
+            setSelectedQuote(null);
+            setShowEditor((v) => !v);
+          }}
           className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -93,10 +98,7 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
       </div>
 
       {showEditor && !selectedQuote && (
-        <QuoteEditorPanel
-          interventionId={interventionId}
-          onSaved={() => setShowEditor(false)}
-        />
+        <QuoteEditorPanel interventionId={interventionId} onSaved={() => setShowEditor(false)} />
       )}
 
       {filteredQuotes.length === 0 && !showEditor ? (
@@ -124,11 +126,15 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
                       </span>
                       <QuoteStatusBadge status={q.status} />
                     </div>
-                    <span className="text-sm font-bold text-blue-700">{formatEur(q.totalCents)}</span>
+                    <span className="text-sm font-bold text-blue-700">
+                      {formatEur(q.totalCents)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400">
                     <span>{formatDate(q.createdAt)}</span>
-                    <span>{q.lines.length} {t("quotes.lines_count")}</span>
+                    <span>
+                      {q.lines.length} {t("quotes.lines_count")}
+                    </span>
                   </div>
                   <div className="flex gap-2">
                     {q.status === "draft" || q.status === "sent" ? (

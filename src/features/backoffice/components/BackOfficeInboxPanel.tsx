@@ -1,223 +1,85 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import {
   ClipboardList,
-  ArrowLeft,
-  Trash2,
-  UserPlus,
+  FileCheck,
+  ChevronDown,
+  ChevronRight,
   CheckCircle2,
   Clock,
-  FileCheck,
-  ChevronRight,
-  ChevronDown,
-  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
-import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { auth, firestore } from "@/core/config/firebase";
-import { isSyntheticInterventionId } from "@/core/config/devUiPreview";
-import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
-import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { useDateContext } from "@/context/DateContext";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { HUB_FONT_OUTFIT, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
-import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";
+import { capitalizeName } from "@/utils/stringUtils";
+import { useTranslation } from "@/core/i18n/I18nContext";
+import type { Mission } from "@/features/map/missionTypes";
+import type { BridgedTechnicianReport } from "@/context/TechnicianBackofficeReportBridgeContext";
 import type { Intervention } from "@/features/interventions/types";
-import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
-import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import { canTransitionInterventionStatus } from "@/features/interventions/workflow/interventionWorkflow";
-import { updateInterventionSchedule } from "@/features/scheduling/updateInterventionSchedule";
-import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
-import {
-  candidateRangeFromScheduleFields,
-  findTechnicianScheduleConflicts,
-} from "@/features/scheduling/scheduleConflicts";
-import { capitalizeName, formatAddress } from "@/utils/stringUtils";
-import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
-import { IVANA_PORTAL_MESSAGE_EVENT } from "@/features/backoffice/ivanaChatPortalBridge";
-import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
-import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
-import {
-  mergeReportCompletionMedia,
-  pickLatestBridgedReportForIntervention,
-  shouldDismissBridgedTerrainReport,
-} from "@/features/backoffice/mergeReportCompletionMedia";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
-import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
-import {
-  coerceFirestoreLikeDate,
-  interventionClientLabel,
-  isInterventionAwaitingTechnicianAcceptance,
-  isInterventionInBackofficeRequestsQueue,
-  isInterventionPendingBackOfficeIntake,
-  isInterventionReleasedToTechnicianField,
-  interventionMatchesTab,
-} from "@/features/interventions/technicianSchedule";
-import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
-import {
-  interventionsToChatDayRows,
-  missionsToChatDayRows,
-} from "@/features/backoffice/chatDayMissionRow";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
 import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
-import type { Mission } from "@/features/map/missionTypes";
-import { useTranslation } from "@/core/i18n/I18nContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
-import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import InterventionRemindersPanel from "@/features/reminders/components/InterventionRemindersPanel";
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import { useFeatureFlag } from "@/core/useFeatureFlags";
-import SlaBadge from "@/features/interventions/components/SlaBadge";
-import DuplicateWarningBanner from "@/features/interventions/components/DuplicateWarningBanner";
-import {
-  navigateTechnicianHub,
-  TECHNICIAN_HUB_ANCHOR_MISSIONS,
-} from "@/features/interventions/technicianHubNavigation";
-import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
-import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";
-import { useBackofficeReminderPush } from "@/features/reminders/useBackofficeReminderPush";
-import {
-  proposeAvailableSlotsForTechnician,
-  proposeCompanyOpenSlots,
-} from "@/features/scheduling/proposeAvailableSlots";
+import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
+import { useBackOfficeInboxState } from "@/features/backoffice/hooks/useBackOfficeInboxState";
+import { BackOfficeInboxInterventionRow } from "@/features/backoffice/components/BackOfficeInboxInterventionRow";
+import InterventionDetailPanel from "@/features/backoffice/components/InterventionDetailPanel";
+import TerrainReportDetailPanel from "@/features/backoffice/components/TerrainReportDetailPanel";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
-function formatBackofficeRowTime(value: unknown): string {
-  const d = coerceFirestoreLikeDate(value);
-  if (!d || Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function readTranscription(inv: unknown): string | null {
-  if (!inv || typeof inv !== "object") return null;
-  const anyInv = inv as Record<string, unknown>;
-  const candidates = [
-    anyInv.transcription,
-    anyInv.audioTranscription,
-    anyInv.audio_transcription,
-  ];
-  const hit = candidates.find((v) => typeof v === "string" && v.trim().length > 0);
-  return typeof hit === "string" ? hit : null;
-}
-
-type InboxInterventionRowVariant = "request" | "report-active" | "report-archived";
-
-function BackOfficeInboxInterventionRow({
-  item,
-  index,
-  variant,
+/** Card row for a bridged terrain report (not yet synced to Firestore). */
+function BridgedTerrainReportCard({
+  r,
+  interventions,
   onSelect,
 }: {
-  item: Intervention;
-  index: number;
-  variant: InboxInterventionRowVariant;
-  onSelect: (id: string) => void;
+  r: BridgedTechnicianReport;
+  interventions: Intervention[];
+  onSelect: (localId: string) => void;
 }) {
   const { t } = useTranslation();
-  const isRequest = variant === "request";
-  const isUrgent = item.urgency;
-
-  let fName = item.clientFirstName;
-  let lName = item.clientLastName;
-  if (!fName && !lName && item.clientName) {
-    const parts = item.clientName.trim().split(" ");
-    fName = parts[0];
-    lName = parts.slice(1).join(" ");
-  }
-  const prefix = fName ? guessGenderPrefixFromName(fName) : "";
-  const displayLName = capitalizeName(lName || fName || "");
-  const clientName = `${prefix} ${displayLName}`.trim() || t("backoffice.inbox.anonymous_client");
+  const iv = interventions.find((x) => x.id === r.interventionId);
+  const nameRaw =
+    `${iv?.clientFirstName ?? ""} ${iv?.clientLastName ?? ""}`.trim() || (iv?.clientName ?? "");
+  const displayName = nameRaw ? capitalizeName(nameRaw) : `Client · …${r.interventionId.slice(-8)}`;
+  const description =
+    iv?.problem ||
+    iv?.title ||
+    `${String(t("backoffice.inbox.terrain_report"))} (${String(t("backoffice.inbox.photos"))} + ${String(t("backoffice.inbox.signature_client"))})`;
+  const addressShort = (iv?.address ?? "").split(",")[0] || (iv?.address ? iv.address : "");
+  const time = new Date(r.receivedAt).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <motion.div
-      data-testid={
-        variant === "report-archived"
-          ? "backoffice-report-archived-row"
-          : variant === "request"
-            ? `backoffice-inbox-request-row-${item.id}`
-            : variant === "report-active"
-              ? `backoffice-inbox-report-row-${item.id}`
-              : undefined
-      }
-      onClick={() => onSelect(item.id)}
+      data-testid="backoffice-bridged-report"
+      onClick={() => onSelect(r.localId)}
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.2, delay: index * 0.03 }}
-      className={cn(
-        "group relative cursor-pointer overflow-hidden rounded-[24px] border bg-white p-4 transition-all duration-300 hover:shadow-lg",
-        isRequest
-          ? isUrgent
-            ? "border-amber-200 bg-amber-50/30"
-            : "border-slate-100"
-          : variant === "report-archived"
-            ? "border-slate-200/70 bg-slate-50/50 opacity-85"
-            : item.status === "invoiced"
-              ? "border-green-100 opacity-70"
-              : "border-blue-100",
-      )}
+      transition={{ duration: 0.2 }}
+      className="group relative cursor-pointer overflow-hidden rounded-[24px] border bg-white p-4 transition-all duration-300 hover:shadow-lg border-emerald-100 bg-emerald-50/20"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            {isRequest ? (
-              <span
-                className={cn(
-                  "flex h-2 w-2 rounded-full",
-                  isUrgent ? "bg-amber-500 animate-pulse" : "bg-blue-500",
-                )}
-              />
-            ) : (
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
-            )}
-            <h4 className="text-[15px] font-bold text-slate-800 truncate">{clientName}</h4>
-            <SlaBadge intervention={item} />
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <h4 className="text-[15px] font-bold text-slate-800 truncate">{displayName}</h4>
           </div>
-          <p className="text-[13px] text-slate-500 truncate mb-2">
-            {item.problem || item.title || t("backoffice.inbox.no_description")}
-          </p>
-          <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400">
+          <p className="text-[13px] font-bold text-slate-700 truncate mb-2">{description}</p>
+          <div className="flex items-center gap-3 text-[11px] font-bold text-slate-500">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {isRequest
-                ? item.createdAt
-                  ? formatBackofficeRowTime(item.createdAt)
-                  : t("backoffice.inbox.now")
-                : item.completedAt
-                  ? formatBackofficeRowTime(item.completedAt)
-                  : ""}
+              {time}
             </span>
-            <span className="truncate max-w-[120px]">{(item.address ?? "").split(",")[0]?.trim() || "—"}</span>
+            {addressShort ? <span className="truncate max-w-[140px]">{addressShort}</span> : null}
           </div>
         </div>
-
         <div className="flex flex-col items-end gap-2">
-          <div
-            className={cn(
-              "rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight",
-              isRequest
-                ? isUrgent
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-blue-100 text-blue-700"
-                : item.status === "invoiced"
-                  ? "bg-slate-100 text-slate-500"
-                  : "bg-green-100 text-green-700",
-            )}
-          >
-            {isRequest
-              ? isUrgent
-                ? t("backoffice.inbox.tag_urgent")
-                : t("backoffice.inbox.tag_request")
-              : item.status === "invoiced"
-                ? t("backoffice.inbox.tag_verified")
-                : t("backoffice.inbox.tag_report")}
+          <div className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight bg-emerald-100 text-emerald-700">
+            {String(t("backoffice.inbox.tag_report"))}
           </div>
           <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" />
         </div>
@@ -233,467 +95,73 @@ type BackOfficeInboxPanelProps = {
 
 export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPanelProps) {
   const { t } = useTranslation();
-  const workspace = useCompanyWorkspaceOptional();
-  const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
-  const { interventions, loading } = useBackOfficeInterventions(cid);
-  const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
-  const bridgedTerrainReports = useMemo(() => terrainBridge?.reports ?? [], [terrainBridge?.reports]);
-  const pager = useDashboardPagerOptional();
-  const { setPendingCaseId } = useTechnicianCaseIntent();
-  const inboxIntent = useBackofficeInboxIntentOptional();
-  const pwaV2 = useFeatureFlag("pwaV2Bundle");
-  useBackofficeReminderPush(interventions);
-
-  const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
-  const [dragBoardTechUid, setDragBoardTechUid] = useState("");
-  const [dragBoardDate, setDragBoardDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [selectedItemId, setSelectedItemIdLocal] = useState<string | null>(null);
-  const setSelectedItemId = (id: string | null) => {
-    const next = id?.trim() ? id.trim() : null;
-    setSelectedItemIdLocal(next);
-    inboxIntent?.setSelectedInboxInterventionId(next);
-  };
-
-  const { selectedDate } = useDateContext();
-  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
-  
-  const chatDayRows = useMemo(() => {
-    if (dayMissions !== undefined) {
-      return missionsToChatDayRows(dayMissions);
-    }
-    const isDispatchMap = isCompanyDispatchViewer(workspace);
-    const ivs = interventions.filter((iv) => {
-      if (!interventionMatchesTab(iv, "today", selectedDate)) return false;
-      if (isDispatchMap && !isInterventionReleasedToTechnicianField(iv)) return false;
-      return iv.status !== "cancelled";
-    });
-    return interventionsToChatDayRows(ivs);
-  }, [dayMissions, interventions, selectedDate, workspace]);
-  const selectedItem = useMemo(
-    () => (selectedItemId ? interventions.find((x) => x.id === selectedItemId) ?? null : null),
-    [interventions, selectedItemId],
-  );
-
-  useEffect(() => {
-    const pending = inboxIntent?.pendingInboxId?.trim();
-    if (!pending) return;
-    setSelectedItemId(pending);
-    setActiveTab("requests");
-    inboxIntent?.setPendingInboxId(null);
-  }, [inboxIntent?.pendingInboxId, inboxIntent]);
-
-  useEffect(() => {
-    const pendingChat = inboxIntent?.pendingChatInterventionId?.trim();
-    if (!pendingChat) return;
-    setSelectedChatInterventionId(pendingChat);
-    setActiveTab("chat");
-    inboxIntent?.setPendingChatInterventionId(null);
-  }, [inboxIntent?.pendingChatInterventionId, inboxIntent]);
-
-  const handleDownloadQuotePdf = async (interventionId: string) => {
-    try {
-      const res = await fetchWithAuth(`/api/interventions/${encodeURIComponent(interventionId)}/quote-pdf`);
-      if (!res.ok) throw new Error("pdf failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `devis-${interventionId}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error(String(t("common.error")));
-    }
-  };
-
-  const selectedReportCompletion = useMemo(() => {
-    if (!selectedItem) return { photoUrls: [] as string[], signatureUrl: null as string | null };
-    if (isInterventionInBackofficeRequestsQueue(selectedItem)) {
-      return { photoUrls: [], signatureUrl: null };
-    }
-    const bridged = pickLatestBridgedReportForIntervention(bridgedTerrainReports, selectedItem.id);
-    return mergeReportCompletionMedia(selectedItem, bridged);
-  }, [selectedItem, bridgedTerrainReports]);
-  const [selectedTerrainLocalId, setSelectedTerrainLocalId] = useState<string | null>(null);
-  const [isEditingDateTime, setIsEditingDateTime] = useState(false);
-  const [editDate, setEditDate] = useState("");
-  const [editTime, setEditTime] = useState("");
-  const editScheduleConflicts = useMemo(() => {
-    if (!selectedItem || !isEditingDateTime) return [];
-    const tech = (selectedItem.assignedTechnicianUid ?? "").trim();
-    const range = candidateRangeFromScheduleFields(editDate, editTime);
-    if (!tech || !range) return [];
-    return findTechnicianScheduleConflicts({
-      interventions,
-      technicianUid: tech,
-      candidateRange: range,
-      excludeInterventionId: selectedItem.id,
-    });
-  }, [selectedItem, isEditingDateTime, editDate, editTime, interventions]);
-
-  const intakeProposedSlots = useMemo(() => {
-    if (!selectedItem || !isEditingDateTime) return [];
-    const dateYmd =
-      editDate.trim() ||
-      selectedItem.requestedDate?.trim() ||
-      new Date().toISOString().slice(0, 10);
-    const tech = (selectedItem.assignedTechnicianUid ?? "").trim();
-    if (tech) {
-      return proposeAvailableSlotsForTechnician({
-        interventions,
-        technicianUid: tech,
-        dateYmd,
-        excludeInterventionId: selectedItem.id,
-      });
-    }
-    return proposeCompanyOpenSlots({ interventions, dateYmd });
-  }, [selectedItem, isEditingDateTime, editDate, interventions]);
-
-  const intakeSlotsTitleKey = (selectedItem?.assignedTechnicianUid ?? "").trim()
-    ? "scheduling.proposed_slots.title"
-    : "scheduling.proposed_slots.company_title";
-
-  const [reportsArchiveExpanded, setReportsArchiveExpanded] = useState(false);
-  const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
-  if (prevActiveTab !== activeTab) {
-    setPrevActiveTab(activeTab);
-    if (activeTab !== "reports") setReportsArchiveExpanded(false);
-  }
-  const [assignPickerOpen, setAssignPickerOpen] = useState(false);
-  const [isAssigning, setIsAssigning] = useState(false);
-
-  const envDefaultCompanyId = useMemo(
-    () =>
-      typeof process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID === "string"
-        ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim()
-        : "",
-    [],
-  );
-  
-  const ivanaChatCompanyId = (cid ?? envDefaultCompanyId) || null;
-
-  const terrainIv = useMemo(() => {
-    if (!selectedTerrainLocalId) return null;
-    const r = bridgedTerrainReports.find((x) => x.localId === selectedTerrainLocalId);
-    if (!r) return null;
-    return interventions.find((x) => x.id === r.interventionId) ?? null;
-  }, [selectedTerrainLocalId, bridgedTerrainReports, interventions]);
-
-  const { resolvedAudioUrl, isResolvingAudio, audioStorageResolveFailed } =
-    useResolvedInterventionAudio(selectedItem);
   const {
-    resolvedAudioUrl: terrainResolvedAudioUrl,
-    isResolvingAudio: terrainAudioLoading,
-    audioStorageResolveFailed: terrainAudioFailed,
-  } = useResolvedInterventionAudio(selectedTerrainLocalId ? terrainIv : null);
-
-
-  const pendingRequests = useMemo(() => 
-    interventions
-      .filter((inv) => isInterventionInBackofficeRequestsQueue(inv))
-      .sort((a, b) => {
-        const timeA = coerceFirestoreLikeDate(a.createdAt)?.getTime() ?? 0;
-        const timeB = coerceFirestoreLikeDate(b.createdAt)?.getTime() ?? 0;
-        return timeB - timeA;
-      }),
-    [interventions]
-  );
-
-  const validationReports = useMemo(() => 
-    interventions
-      .filter((inv) => inv.status === "done" || inv.status === "invoiced")
-      .sort((a, b) => {
-        const timeA = coerceFirestoreLikeDate(a.completedAt)?.getTime() ?? 0;
-        const timeB = coerceFirestoreLikeDate(b.completedAt)?.getTime() ?? 0;
-        return timeB - timeA;
-      }),
-    [interventions]
-  );
-
-  
-  const reportsToValidateList = useMemo(
-    () => validationReports.filter((iv) => iv.status === "done"),
-    [validationReports],
-  );
-
-  
-  const reportsArchivedList = useMemo(
-    () => validationReports.filter((iv) => iv.status === "invoiced"),
-    [validationReports],
-  );
-
-  
-  const bridgedTerrainVisible = useMemo(() => {
-    const syncedIds = new Set(reportsToValidateList.map((iv) => iv.id));
-    return bridgedTerrainReports.filter((r) => !syncedIds.has(r.interventionId));
-  }, [bridgedTerrainReports, reportsToValidateList]);
-
-  const bridgedTerrainCount = bridgedTerrainVisible.length;
-
-  const handleDelete = async (id: string) => {
-    if (isSyntheticInterventionId(id)) {
-      toast.success(t("backoffice.toasts.request_deleted"));
-      setSelectedItemId(null);
-      return;
-    }
-    if (!firestore) return;
-    const row = interventions.find((x) => x.id === id);
-    const actorUid = auth?.currentUser?.uid?.trim() || "system";
-    try {
-      if (row) {
-        await logCrmInterventionAction({
-          kind: "intervention_deleted",
-          iv: row,
-          actorUid,
-          actorRole: "dispatcher",
-          note: "Suppression dossier (IVANA / back-office)",
-        });
-      }
-      await deleteDoc(doc(firestore, "interventions", id));
-      toast.success(t("backoffice.toasts.request_deleted"));
-      setSelectedItemId(null);
-    } catch {
-      toast.error(t("common.error"), { description: t("backoffice.toasts.delete_failed") });
-    }
-  };
-
-  const handleAssignToTechnician = async (
-    id: string,
-    technicianUid: string,
-    schedule?: { scheduledDate: string; scheduledTime: string },
-  ) => {
-    if (!firestore) return;
-    setIsAssigning(true);
-    try {
-      const row = interventions.find((x) => x.id === id);
-      if (id.startsWith("demo-")) {
-        toast.success(t("backoffice.toasts.request_assigned"));
-        setAssignPickerOpen(false);
-        setSelectedItemId(null);
-        setPendingCaseId(id);
-        navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-        return;
-      }
-      if (!row) {
-        toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
-        return;
-      }
-      await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
-      toast.success(t("backoffice.toasts.request_assigned"));
-      setAssignPickerOpen(false);
-      setSelectedItemId(null);
-      setPendingCaseId(id);
-      navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-    } catch (e) {
-      const code =
-        typeof e === "object" && e !== null && "code" in e ? String((e as { code?: string }).code) : "";
-      const description =
-        code === "permission-denied"
-          ? t("backoffice.toasts.permission_denied_verify")
-          : code === "admin-unavailable"
-            ? t("backoffice.toasts.admin_unavailable")
-            : e instanceof Error
-              ? e.message
-              : t("backoffice.toasts.assign_failed");
-      toast.error(t("common.error"), { description });
-    } finally {
-      setIsAssigning(false);
-    }
-  };
-
-  const handleCancelIntervention = async (id: string) => {
-    if (!firestore) return;
-    const row = interventions.find((x) => x.id === id);
-    if (!row) return;
-    const actorUid = auth?.currentUser?.uid?.trim();
-    if (!actorUid) return;
-    try {
-      await transitionInterventionStatus({
-        db: firestore,
-        interventionId: id,
-        iv: row,
-        toStatus: "cancelled",
-        actor: dispatcherTransitionActor(actorUid),
-        note: "Annulé depuis le back-office",
-      });
-      toast.success(t("backoffice.toasts.request_cancelled"));
-      setSelectedItemId(null);
-    } catch {
-      toast.error(t("common.error"), { description: t("backoffice.toasts.cancel_failed") });
-    }
-  };
-
-  const handleVerify = async (id: string) => {
-    try {
-      const row = interventions.find((x) => x.id === id);
-      if (!row) return;
-      const actorUid = auth?.currentUser?.uid?.trim();
-      if (!actorUid) return;
-      const res = await fetchWithAuth(
-        `/api/interventions/${encodeURIComponent(id)}/validate-report`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sendEmail: true }),
-        },
-      );
-      const data = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        error?: string;
-        emailSent?: boolean;
-        emailError?: string;
-      };
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || t("common.try_again"));
-      }
-      await logCrmInterventionAction({
-        kind: "intervention_report_validated",
-        iv: row,
-        actorUid,
-        actorRole: "dispatcher",
-        statusBefore: row.status,
-        statusAfter: "invoiced",
-        note: data.emailSent
-          ? "Validation rapport IVANA — facture PDF + e-mail client"
-          : "Validation rapport IVANA — facture PDF",
-      });
-      if (data.emailError) {
-        toast.message(String(t("backoffice.toasts.report_verified")), {
-          description: data.emailError,
-        });
-      } else {
-        toast.success(t("backoffice.toasts.report_verified"));
-      }
-      setSelectedItemId(null);
-      if (terrainBridge) {
-        const lids = terrainBridge.reports.filter((r) => r.interventionId === id).map((r) => r.localId);
-        lids.forEach((lid) => terrainBridge.dismissReport(lid));
-      }
-      setSelectedTerrainLocalId(null);
-    } catch (e) {
-      console.error("Validation rapport:", e);
-      const code =
-        typeof e === "object" && e !== null && "code" in e ? String((e as { code?: string }).code) : "";
-      toast.error(t("common.error"), {
-        description:
-          code === "permission-denied"
-            ? t("backoffice.toasts.permission_denied_verify")
-            : e instanceof Error
-              ? e.message
-              : t("common.try_again"),
-      });
-    }
-  };
-
-  const handleDragBoardSchedule = async (interventionId: string, time: string) => {
-    const techUid = dragBoardTechUid.trim();
-    if (!techUid) {
-      toast.error(String(t("scheduling.drag_board.pick_technician")));
-      return;
-    }
-    const schedule = { scheduledDate: dragBoardDate, scheduledTime: time };
-    const row = interventions.find((x) => x.id === interventionId);
-    if (!row) return;
-    if (row.assignedTechnicianUid?.trim()) {
-      if (!firestore) return;
-      const actorUid = auth?.currentUser?.uid?.trim() || "system";
-      const result = await updateInterventionSchedule({
-        db: firestore,
-        intervention: row,
-        allInterventions: interventions,
-        scheduledDate: dragBoardDate,
-        scheduledTime: time,
-        audit: { actorUid, actorRole: "dispatcher" },
-      });
-      if (!result.ok) {
-        toast.error(
-          result.reason === "conflict"
-            ? t("scheduling.conflict.block_save")
-            : t("common.error"),
-        );
-        return;
-      }
-      toast.success(t("backoffice.toasts.datetime_updated"));
-      return;
-    }
-    await handleAssignToTechnician(interventionId, techUid, schedule);
-  };
-
-  const handleUpdateDateTime = async () => {
-    if (!selectedItem || !firestore) return;
-    try {
-      const actorUid = auth?.currentUser?.uid?.trim() || "system";
-      const result = await updateInterventionSchedule({
-        db: firestore,
-        intervention: selectedItem,
-        allInterventions: interventions,
-        requestedDate: editDate,
-        requestedTime: editTime,
-        audit: { actorUid, actorRole: "dispatcher", note: `Souhait client ${editDate} ${editTime}` },
-      });
-      if (!result.ok) {
-        if (result.reason === "conflict") {
-          toast.error(t("scheduling.conflict.block_save"));
-        } else {
-          toast.error(t("common.error"), { description: t("backoffice.toasts.update_failed") });
-        }
-        return;
-      }
-      toast.success(t("backoffice.toasts.datetime_updated"));
-      setIsEditingDateTime(false);
-    } catch {
-      toast.error(t("common.error"), { description: t("backoffice.toasts.update_failed") });
-    }
-  };
-
-  const isTenant = !!workspace?.isTenantUser;
-
-
-  useEffect(() => {
-    if (!terrainBridge) return;
-
-    bridgedTerrainReports.forEach((r) => {
-      const iv = interventions.find((x) => x.id === r.interventionId);
-      if (shouldDismissBridgedTerrainReport(iv)) {
-        terrainBridge.dismissReport(r.localId);
-      }
-    });
-  }, [bridgedTerrainReports, interventions, terrainBridge]);
-
-  useEffect(() => {
-    if (!selectedTerrainLocalId) return;
-    if (!bridgedTerrainReports.some((r) => r.localId === selectedTerrainLocalId)) {
-      setSelectedTerrainLocalId(null);
-    }
-  }, [selectedTerrainLocalId, bridgedTerrainReports]);
-
-  useEffect(() => {
-    if (!selectedItemId || activeTab !== "reports") return;
-    const iv = interventions.find((x) => x.id === selectedItemId);
-    if (iv && iv.status !== "done") {
-      setSelectedItemId(null);
-    }
-  }, [selectedItemId, interventions, activeTab]);
-
-  useEffect(() => {
-    if (!isTenant) return;
-    const openChat = () => setActiveTab("chat");
-    window.addEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
-    return () => window.removeEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
-  }, [isTenant]);
-
-  const itemsToShow = activeTab === "requests" ? pendingRequests : reportsToValidateList;
-
-  const reportsTabBadgeCount = reportsToValidateList.length + bridgedTerrainCount;
-  const reportsNothingAtAll =
-    reportsToValidateList.length === 0 && bridgedTerrainCount === 0 && reportsArchivedList.length === 0;
+    cid,
+    isTenant,
+    ivanaChatCompanyId,
+    pwaV2,
+    interventions,
+    loading,
+    terrainBridge,
+    bridgedTerrainReports,
+    activeTab,
+    setActiveTab,
+    dragBoardTechUid,
+    setDragBoardTechUid,
+    dragBoardDate,
+    setDragBoardDate,
+    selectedItem,
+    setSelectedItemId,
+    selectedChatInterventionId,
+    setSelectedChatInterventionId,
+    chatDayRows,
+    isEditingDateTime,
+    setIsEditingDateTime,
+    editDate,
+    setEditDate,
+    editTime,
+    setEditTime,
+    editScheduleConflicts,
+    intakeProposedSlots,
+    intakeSlotsTitleKey,
+    reportsArchiveExpanded,
+    setReportsArchiveExpanded,
+    assignPickerOpen,
+    setAssignPickerOpen,
+    isAssigning,
+    selectedTerrainLocalId,
+    setSelectedTerrainLocalId,
+    terrainIv,
+    terrainResolvedAudioUrl,
+    terrainAudioLoading,
+    terrainAudioFailed,
+    resolvedAudioUrl,
+    isResolvingAudio,
+    audioStorageResolveFailed,
+    pendingRequests,
+    reportsArchivedList,
+    bridgedTerrainVisible,
+    reportsTabBadgeCount,
+    reportsNothingAtAll,
+    itemsToShow,
+    selectedReportCompletion,
+    handleDelete,
+    handleAssignToTechnician,
+    handleCancelIntervention,
+    handleVerify,
+    handleDragBoardSchedule,
+    handleUpdateDateTime,
+    handleDownloadQuotePdf,
+  } = useBackOfficeInboxState(dayMissions);
 
   if (!isTenant) {
     return (
       <div
         data-testid="backoffice-inbox-panel"
-        style={outfit}
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] bg-slate-50/30"
+        className={cn(
+          "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]",
+          HUB_SURFACE.muted
+        )}
       >
         <IvanaClientChatPanel
           className="min-h-0"
@@ -707,8 +175,10 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   return (
     <div
       data-testid="backoffice-inbox-panel"
-      style={outfit}
-      className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] bg-slate-50/30"
+      className={cn(
+        "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]",
+        HUB_SURFACE.muted
+      )}
     >
       {pwaV2 ? (
         <div className="mx-4 mt-2 space-y-2">
@@ -726,75 +196,45 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         </div>
       ) : null}
 
-      {/* Tab Switcher */}
-      <div className="flex p-1.5 gap-1 bg-slate-200/50 rounded-[20px] mx-4 my-4 border border-slate-300/30">
-        <button
-          type="button"
-          onClick={() => setActiveTab("requests")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
-            activeTab === "requests"
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-slate-500 hover:bg-slate-300/30",
-          )}
-        >
-          {t("backoffice.inbox.tabs.requests")}
-          {pendingRequests.length > 0 && (
-            <span className="flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-blue-100 text-[9px] text-blue-600 border border-blue-200">
-              {pendingRequests.length}
-            </span>
-          )}
-        </button>
-        <button
-          type="button"
-          data-testid="backoffice-inbox-tab-reports"
-          onClick={() => setActiveTab("reports")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
-            activeTab === "reports"
-              ? "bg-white text-green-600 shadow-sm"
-              : "text-slate-500 hover:bg-slate-300/30",
-          )}
-        >
-          {t("backoffice.inbox.tabs.reports")}
-          {reportsTabBadgeCount > 0 && (
-            <span className="flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-green-100 text-[9px] text-green-600 border border-green-200">
-              {reportsTabBadgeCount}
-            </span>
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("chat")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
-            activeTab === "chat"
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-slate-500 hover:bg-slate-300/30",
-          )}
-        >
-          {t("backoffice.inbox.tabs.chat")}
-        </button>
-        <button
-          type="button"
-          data-testid="backoffice-inbox-tab-documents"
-          onClick={() => setActiveTab("documents")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[16px] text-[12px] font-bold transition-all",
-            activeTab === "documents"
-              ? "bg-white text-slate-800 shadow-sm"
-              : "text-slate-500 hover:bg-slate-300/30",
-          )}
-        >
-          {t("backoffice.inbox.tabs.documents")}
-        </button>
-      </div>
+      <HubSegmentedControl
+        value={activeTab}
+        onChange={(id) => setActiveTab(id as "chat" | "requests" | "reports" | "documents")}
+        className="mx-4 my-4 shrink-0"
+        options={[
+          {
+            id: "requests",
+            label: t("backoffice.inbox.tabs.requests"),
+            activeAccent: "blue",
+            badge: pendingRequests.length,
+            badgeAccent: "blue",
+          },
+          {
+            id: "reports",
+            label: t("backoffice.inbox.tabs.reports"),
+            testId: "backoffice-inbox-tab-reports",
+            activeAccent: "emerald",
+            badge: reportsTabBadgeCount,
+            badgeAccent: "emerald",
+          },
+          {
+            id: "chat",
+            label: t("backoffice.inbox.tabs.chat"),
+            activeAccent: "blue",
+          },
+          {
+            id: "documents",
+            label: t("backoffice.inbox.tabs.documents"),
+            testId: "backoffice-inbox-tab-documents",
+            activeAccent: "slate",
+          },
+        ]}
+      />
 
-      {}
+      {/* Chat Tab */}
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-50/50",
-          activeTab !== "chat" && "hidden",
+          activeTab !== "chat" && "hidden"
         )}
         aria-hidden={activeTab !== "chat"}
       >
@@ -807,7 +247,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                 title={String(t("chat.back_to_list"))}
                 aria-label={String(t("chat.back_to_list"))}
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 rotate-180" />
               </button>
               <div className="flex flex-col min-w-0 flex-1 items-center justify-center text-center pr-8">
                 <span className="text-[14px] font-bold text-slate-800 truncate w-full text-center">
@@ -822,7 +262,9 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                 </span>
                 {selectedChatInterventionId !== "global" ? (
                   <span className="text-[11px] text-slate-500 truncate font-medium w-full text-center">
-                    {chatDayRows.find((r) => r.threadId === selectedChatInterventionId)?.address?.trim() ||
+                    {chatDayRows
+                      .find((r) => r.threadId === selectedChatInterventionId)
+                      ?.address?.trim() ||
                       interventions.find((x) => x.id === selectedChatInterventionId)?.address ||
                       ""}
                   </span>
@@ -833,7 +275,9 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               className="min-h-0 flex-1 px-0"
               acceptPortalMessages
               chatCompanyId={ivanaChatCompanyId}
-              chatInterventionId={selectedChatInterventionId === "global" ? null : selectedChatInterventionId}
+              chatInterventionId={
+                selectedChatInterventionId === "global" ? null : selectedChatInterventionId
+              }
               onRemoteClientMessage={ivanaChatCompanyId ? () => setActiveTab("chat") : undefined}
             />
           </div>
@@ -847,87 +291,45 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
           />
         )}
       </div>
+
+      {/* Documents Tab */}
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col overflow-hidden",
-          activeTab !== "documents" && "hidden",
+          activeTab !== "documents" && "hidden"
         )}
         aria-hidden={activeTab !== "documents"}
         data-testid="backoffice-inbox-documents-panel"
       >
         <ChatbotDocumentsRightPanel />
       </div>
+
+      {/* Requests / Reports list */}
       <div
         className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
           "flex min-h-0 flex-1 flex-col gap-3 px-4 pb-6",
-          (activeTab === "chat" || activeTab === "documents") && "hidden",
+          (activeTab === "chat" || activeTab === "documents") && "hidden"
         )}
         aria-hidden={activeTab === "chat" || activeTab === "documents"}
       >
         {activeTab === "reports" &&
           bridgedTerrainVisible.map((r) => (
-            (() => {
-              const iv = interventions.find((x) => x.id === r.interventionId);
-              const first = iv?.clientFirstName ?? "";
-              const last = iv?.clientLastName ?? "";
-              const fallbackName = iv?.clientName ?? "";
-              const nameRaw = `${first} ${last}`.trim() || fallbackName;
-              const displayName = nameRaw ? capitalizeName(nameRaw) : `Client · …${r.interventionId.slice(-8)}`;
-              const description =
-                iv?.problem ||
-                iv?.title ||
-                `${String(t("backoffice.inbox.terrain_report"))} (${String(t("backoffice.inbox.photos"))} + ${String(t("backoffice.inbox.signature_client"))})`;
-              const addressShort = (iv?.address ?? "").split(",")[0] || (iv?.address ? iv.address : "");
-              const time = new Date(r.receivedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-              return (
-                <motion.div
-                  key={r.localId}
-                  data-testid="backoffice-bridged-report"
-                  onClick={() => setSelectedTerrainLocalId(r.localId)}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className={cn(
-                    "group relative cursor-pointer overflow-hidden rounded-[24px] border bg-white p-4 transition-all duration-300 hover:shadow-lg",
-                    "border-emerald-100 bg-emerald-50/20",
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        <h4 className="text-[15px] font-bold text-slate-800 truncate">{displayName}</h4>
-                      </div>
-                      <p className="text-[13px] font-bold text-slate-700 truncate mb-2">{description}</p>
-                      <div className="flex items-center gap-3 text-[11px] font-bold text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {time}
-                        </span>
-                        {addressShort ? (
-                          <span className="truncate max-w-[140px]">{addressShort}</span>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight bg-emerald-100 text-emerald-700">
-                        {String(t("backoffice.inbox.tag_report"))}
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" />
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()
+            <BridgedTerrainReportCard
+              key={r.localId}
+              r={r}
+              interventions={interventions}
+              onSelect={setSelectedTerrainLocalId}
+            />
           ))}
 
         {loading ? (
           <div className="space-y-3 py-2">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-24 animate-pulse rounded-[24px] bg-white/50 border border-slate-200/50" />
+              <div
+                key={i}
+                className="h-24 animate-pulse rounded-[24px] bg-white/50 border border-slate-200/50"
+              />
             ))}
           </div>
         ) : null}
@@ -966,7 +368,10 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         ) : null}
 
         {!loading && activeTab === "reports" && reportsArchivedList.length > 0 ? (
-          <div className="mt-1 shrink-0 border-t border-slate-200/50 pt-1" data-testid="backoffice-reports-archive-section">
+          <div
+            className="mt-1 shrink-0 border-t border-slate-200/50 pt-1"
+            data-testid="backoffice-reports-archive-section"
+          >
             <button
               type="button"
               data-testid="backoffice-reports-archive-toggle"
@@ -975,15 +380,22 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
               className="flex w-full items-center justify-center gap-1 rounded-[10px] py-2 px-2 text-[11px] font-medium text-slate-400 transition-colors hover:bg-slate-100/70 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300/60"
             >
               <ChevronDown
-                className={cn("h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform duration-200", reportsArchiveExpanded && "rotate-180")}
+                className={cn(
+                  "h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform duration-200",
+                  reportsArchiveExpanded && "rotate-180"
+                )}
                 aria-hidden
               />
               <span>
-                Archive · {reportsArchivedList.length} validé{reportsArchivedList.length > 1 ? "s" : ""}
+                Archive · {reportsArchivedList.length} validé
+                {reportsArchivedList.length > 1 ? "s" : ""}
               </span>
             </button>
             {reportsArchiveExpanded ? (
-              <div className="grid grid-cols-1 gap-3 pt-2" data-testid="backoffice-reports-archive-list">
+              <div
+                className="grid grid-cols-1 gap-3 pt-2"
+                data-testid="backoffice-reports-archive-list"
+              >
                 {reportsArchivedList.map((item, index) => (
                   <BackOfficeInboxInterventionRow
                     key={item.id}
@@ -999,615 +411,62 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         ) : null}
       </div>
 
+      {/* Intervention detail slide-over */}
       <AnimatePresence>
         {selectedItem && (
-          <motion.div
-            data-testid="backoffice-inbox-detail"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute inset-0 z-30 flex min-h-0 flex-col overflow-hidden bg-white rounded-[inherit] shadow-2xl"
-          >
-            {/* Detail Header */}
-            <div className="flex shrink-0 items-center justify-between px-4 py-4 border-b border-slate-100">
-              <button 
-                onClick={() => {
-                  setSelectedItemId(null);
-                  setIsEditingDateTime(false);
-                  setAssignPickerOpen(false);
-                }}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h3 className="text-[15px] font-bold text-slate-800">
-                {assignPickerOpen
-                  ? t("dispatch.assign_picker.title")
-                  : isInterventionInBackofficeRequestsQueue(selectedItem)
-                    ? isInterventionAwaitingTechnicianAcceptance(selectedItem)
-                      ? t("backoffice.inbox.detail_title_returned")
-                      : t("backoffice.inbox.detail_title_request")
-                    : t("backoffice.inbox.detail_title_report")}
-              </h3>
-              <div className="w-9" />
-            </div>
-
-            {/* Detail Content — masqué quand le picker assignation occupe tout l’espace */}
-            {!assignPickerOpen ? (
-            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 space-y-8">
-              {/* Header Info */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                   <span className={cn(
-                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                     isInterventionAwaitingTechnicianAcceptance(selectedItem)
-                       ? "bg-slate-200 text-slate-700"
-                       : isInterventionPendingBackOfficeIntake(selectedItem)
-                         ? "bg-blue-100 text-blue-700"
-                         : "bg-green-100 text-green-700",
-                   )}>
-                     {isInterventionAwaitingTechnicianAcceptance(selectedItem)
-                       ? t("backoffice.inbox.kind_returned")
-                       : isInterventionPendingBackOfficeIntake(selectedItem)
-                         ? t("backoffice.inbox.kind_request")
-                         : t("backoffice.inbox.kind_report")}{" "}
-                     • ID: {selectedItem.id.slice(-6).toUpperCase()}
-                   </span>
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 leading-tight">
-                  {capitalizeName(
-                    selectedItem.clientLastName ||
-                      selectedItem.clientName ||
-                      t("backoffice.inbox.anonymous_client"),
-                  )}
-                </h2>
-                <p className="text-[15px] font-medium text-slate-500 mt-1">
-                  {selectedItem.clientPhone || t("backoffice.inbox.no_phone")}
-                </p>
-                {selectedItem.clientEmail && (
-                  <p className="text-[14px] font-medium text-slate-500 mt-0.5 break-all">
-                    <a href={`mailto:${selectedItem.clientEmail}`} className="hover:underline">
-                      {selectedItem.clientEmail}
-                    </a>
-                  </p>
-                )}
-              </div>
-
-              {/* Address */}
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  {t("backoffice.inbox.location")}
-                </span>
-                <p className="text-[15px] font-semibold text-slate-800">{formatAddress(selectedItem.address)}</p>
-              </div>
-
-              {/* Problem / Report Description */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  {isInterventionInBackofficeRequestsQueue(selectedItem)
-                    ? t("backoffice.inbox.problem_label")
-                    : t("backoffice.inbox.report_label")}
-                </span>
-                <div className="rounded-[20px] bg-slate-50 p-4 border border-slate-100">
-                  <p className="text-[15px] text-slate-800 leading-relaxed">
-                    {selectedItem.problem || t("backoffice.inbox.no_description_provided")}
-                  </p>
-                </div>
-              </div>
-
-              {cid && selectedItem.address && (selectedItem.problem || selectedItem.title) && (
-                <DuplicateWarningBanner
-                  interventionId={selectedItem.id}
-                  address={selectedItem.address}
-                  problem={selectedItem.problem ?? selectedItem.title ?? ""}
-                  companyId={cid}
-                />
-              )}
-
-              {pwaV2 ? (
-                <button
-                  type="button"
-                  data-testid="backoffice-download-quote-pdf"
-                  onClick={() => void handleDownloadQuotePdf(selectedItem.id)}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
-                >
-                  {t("quote_pdf.download")}
-                </button>
-              ) : null}
-
-              {/* Date & Time management for requests */}
-              {isInterventionInBackofficeRequestsQueue(selectedItem) && (
-                <div className="space-y-3">
-                   <div className="flex justify-between items-center">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      {t("backoffice.inbox.requested_schedule")}
-                    </span>
-                    {!isEditingDateTime && (
-                      <button 
-                        onClick={() => {
-                          setEditDate(selectedItem.requestedDate || "");
-                          setEditTime(selectedItem.requestedTime || "");
-                          setIsEditingDateTime(true);
-                        }}
-                        className="text-[11px] text-blue-600 font-bold hover:underline"
-                      >
-                        {t("backoffice.inbox.edit").toUpperCase()}
-                      </button>
-                    )}
-                  </div>
-                  
-                  {isEditingDateTime ? (
-                    <div className="space-y-2">
-                      <ScheduleConflictBanner conflicts={editScheduleConflicts} />
-                      <ProposedScheduleSlots
-                        titleKey={intakeSlotsTitleKey}
-                        dateYmd={
-                          editDate.trim() ||
-                          selectedItem.requestedDate?.trim() ||
-                          new Date().toISOString().slice(0, 10)
-                        }
-                        onDateChange={(date) => {
-                          setEditDate(date);
-                          setEditTime("");
-                        }}
-                        slots={intakeProposedSlots}
-                        selectedTime={editTime || null}
-                        onSelectTime={setEditTime}
-                      />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input 
-                        type="date" 
-                        value={editDate}
-                        onChange={(e) => setEditDate(e.target.value)}
-                        className="rounded-[12px] border border-slate-200 px-3 py-2 text-sm"
-                      />
-                      <input 
-                        type="time" 
-                        value={editTime}
-                        onChange={(e) => setEditTime(e.target.value)}
-                        className="rounded-[12px] border border-slate-200 px-3 py-2 text-sm"
-                      />
-                      <div className="col-span-2 flex justify-end gap-2 mt-1">
-                        <button onClick={() => setIsEditingDateTime(false)} className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-100">
-                          {t("common.cancel")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleUpdateDateTime()}
-                          disabled={editScheduleConflicts.length > 0}
-                          className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-900 text-white disabled:opacity-50"
-                        >
-                          {t("common.save")}
-                        </button>
-                      </div>
-                    </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-blue-900 font-bold">
-                      <Clock className="w-4 h-4" />
-                      {selectedItem.requestedDate 
-                        ? `${selectedItem.requestedDate} ${selectedItem.requestedTime ? `à ${selectedItem.requestedTime}` : ""}`
-                        : t("backoffice.inbox.asap")}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Photos Grid */}
-              {((isInterventionInBackofficeRequestsQueue(selectedItem) && selectedItem.attachmentThumbnails) ||
-                (!isInterventionInBackofficeRequestsQueue(selectedItem) &&
-                  selectedReportCompletion.photoUrls.length > 0)) && (
-                <div className="space-y-3" data-testid="backoffice-report-detail-photos-section">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    {isInterventionInBackofficeRequestsQueue(selectedItem)
-                      ? t("backoffice.inbox.photos_client")
-                      : t("backoffice.inbox.photos_completion")}
-                  </span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      isInterventionInBackofficeRequestsQueue(selectedItem)
-                        ? selectedItem.attachmentThumbnails
-                        : selectedReportCompletion.photoUrls
-                    )?.map((url, i) => (
-                      <div key={i} className="aspect-square relative rounded-[20px] overflow-hidden border border-slate-100 bg-slate-50 shadow-sm">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={url}
-                          alt="Intervention"
-                          className={cn(
-                            "w-full h-full object-cover",
-                            !isInterventionInBackofficeRequestsQueue(selectedItem) &&
-                              (PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled) &&
-                              "blur-lg",
-                          )}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Audio / Transcription for requests (under photos) */}
-              {isInterventionInBackofficeRequestsQueue(selectedItem) ? (
-                <div className="space-y-3">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    {t("backoffice.inbox.voice_message")}
-                  </span>
-                  {resolvedAudioUrl ? (
-                    <RequestDetailAudioPlayer
-                      key={`${selectedItem.id}-${resolvedAudioUrl}`}
-                      url={resolvedAudioUrl}
-                    />
-                  ) : isResolvingAudio ? (
-                    <div
-                      data-testid="backoffice-request-detail-audio-loading"
-                      className="flex w-full items-center gap-3 rounded-[20px] border border-dashed border-slate-200 bg-slate-50/70 px-4 py-4"
-                      aria-busy="true"
-                      aria-label={t("backoffice.inbox.voice_loading")}
-                    >
-                      <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200" aria-hidden />
-                      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-                        <div className="h-2 w-full animate-pulse rounded-full bg-slate-200" />
-                        <div className="flex justify-between gap-2">
-                          <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                          <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                        </div>
-                      </div>
-                      <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200/80" aria-hidden />
-                    </div>
-                  ) : audioStorageResolveFailed ? (
-                    <div
-                      data-testid="backoffice-request-detail-audio-storage-error"
-                      className="w-full rounded-[20px] border border-amber-200/90 bg-amber-50/80 px-4 py-4 text-center text-[13px] font-semibold leading-snug text-amber-950"
-                    >
-                      {t("backoffice.inbox.voice_storage_error")}
-                    </div>
-                  ) : (
-                    <div
-                      data-testid="backoffice-request-detail-audio-empty"
-                      className="w-full rounded-[20px] border border-dashed border-slate-200 bg-slate-50/60 px-4 py-4 text-center text-[13px] font-semibold text-slate-500"
-                    >
-                      {t("backoffice.inbox.voice_empty")}
-                    </div>
-                  )}
-                  {readTranscription(selectedItem) ? (
-                    <div className="rounded-[20px] border border-blue-100 bg-blue-50/50 p-4 text-sm italic text-blue-900">
-                      &quot;{readTranscription(selectedItem)}&quot;
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {/* Signature for reports */}
-              {!isInterventionInBackofficeRequestsQueue(selectedItem) &&
-                selectedReportCompletion.signatureUrl && (
-                  <div className="space-y-3" data-testid="backoffice-report-detail-signature-section">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      {t("backoffice.inbox.signature_client")}
-                    </span>
-                    <div className="rounded-[20px] bg-slate-50 p-4 border border-slate-100 flex items-center justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={selectedReportCompletion.signatureUrl}
-                        alt={t("backoffice.inbox.signature_alt")}
-                        className="max-h-32 object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
-            </div>
-            ) : null}
-
-            {/* Sticky Actions / picker plein cadre */}
-            <div
-              className={cn(
-                "shrink-0 border-t border-slate-100 bg-white/80 backdrop-blur-md",
-                assignPickerOpen ? "flex min-h-0 flex-1 flex-col p-4" : "p-6",
-              )}
-            >
-              {isInterventionInBackofficeRequestsQueue(selectedItem) ? (
-                assignPickerOpen ? (
-                  <TechnicianAssignPicker
-                    className="min-h-0 flex-1"
-                    intervention={selectedItem}
-                    peerInterventions={interventions}
-                    isAssigning={isAssigning}
-                    onCancel={() => setAssignPickerOpen(false)}
-                    onAssign={(technicianUid, schedule) =>
-                      handleAssignToTechnician(selectedItem.id, technicianUid, schedule)
-                    }
-                  />
-                ) : (
-                <div className="flex gap-3">
-                  {canTransitionInterventionStatus(selectedItem.status, "cancelled") ? (
-                    <button
-                      type="button"
-                      data-testid="backoffice-inbox-cancel"
-                      onClick={() => void handleCancelIntervention(selectedItem.id)}
-                      className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-slate-200 bg-slate-50 text-slate-700 font-bold text-[14px] hover:bg-slate-100 active:scale-95 transition-all"
-                    >
-                      <X className="w-4 h-4" />
-                      {t("status.cancelled")}
-                    </button>
-                  ) : null}
-                  <button
-                    onClick={() => handleDelete(selectedItem.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-red-100 bg-red-50 text-red-600 font-bold text-[14px] hover:bg-red-100 active:scale-95 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    {t("common.delete")}
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="backoffice-inbox-assign"
-                    onClick={() => setAssignPickerOpen(true)}
-                    className="flex-[1.5] flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] bg-blue-600 text-white font-bold text-[14px] shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:bg-blue-700 active:scale-95 transition-all"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    {t("backoffice.inbox.confirm_assign")}
-                  </button>
-                </div>
-                )
-              ) : (
-                <>
-                  <button
-                    onClick={() => handleDelete(selectedItem.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-red-100 bg-red-50 text-red-600 font-bold text-[14px] hover:bg-red-100 active:scale-95 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    {t("common.delete")}
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="backoffice-inbox-verify-report"
-                    disabled={selectedItem.status === "invoiced"}
-                    onClick={() => handleVerify(selectedItem.id)}
-                    className={cn(
-                      "flex-[1.5] flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] font-bold text-[14px] transition-all",
-                      selectedItem.status === "invoiced"
-                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                        : "bg-green-600 text-white shadow-[0_8px_20px_rgba(22,163,74,0.3)] hover:bg-green-700 active:scale-95"
-                    )}
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    {selectedItem.status === "invoiced"
-                      ? t("backoffice.inbox.report_already_verified")
-                      : t("backoffice.inbox.verify_report")}
-                  </button>
-                </>
-              )}
-            </div>
-          </motion.div>
+          <InterventionDetailPanel
+            selectedItem={selectedItem}
+            interventions={interventions}
+            cid={cid}
+            pwaV2={pwaV2}
+            resolvedAudioUrl={resolvedAudioUrl}
+            isResolvingAudio={isResolvingAudio}
+            audioStorageResolveFailed={audioStorageResolveFailed}
+            selectedReportCompletion={selectedReportCompletion}
+            isEditingDateTime={isEditingDateTime}
+            setIsEditingDateTime={setIsEditingDateTime}
+            editDate={editDate}
+            setEditDate={setEditDate}
+            editTime={editTime}
+            setEditTime={setEditTime}
+            editScheduleConflicts={editScheduleConflicts}
+            intakeProposedSlots={intakeProposedSlots}
+            intakeSlotsTitleKey={intakeSlotsTitleKey}
+            assignPickerOpen={assignPickerOpen}
+            setAssignPickerOpen={setAssignPickerOpen}
+            isAssigning={isAssigning}
+            onClose={() => setSelectedItemId(null)}
+            onDelete={handleDelete}
+            onCancelIntervention={handleCancelIntervention}
+            onVerify={handleVerify}
+            onAssign={handleAssignToTechnician}
+            onDownloadQuotePdf={handleDownloadQuotePdf}
+            onUpdateDateTime={handleUpdateDateTime}
+          />
         )}
       </AnimatePresence>
 
+      {/* Terrain report slide-over */}
       <AnimatePresence>
-        {selectedTerrainLocalId ? (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute inset-0 z-30 flex flex-col bg-white rounded-[inherit] shadow-2xl"
-          >
-            {(() => {
+        {selectedTerrainLocalId
+          ? (() => {
               const r = bridgedTerrainReports.find((x) => x.localId === selectedTerrainLocalId);
               if (!r) return null;
-              const iv = interventions.find((x) => x.id === r.interventionId);
-              const first = iv?.clientFirstName ?? "";
-              const last = iv?.clientLastName ?? "";
-              const fallbackName = iv?.clientName ?? "";
-              const nameRaw = `${first} ${last}`.trim() || fallbackName;
-              const displayName = nameRaw ? capitalizeName(nameRaw) : `Client · …${r.interventionId.slice(-8)}`;
-              const phone = iv?.clientPhone ?? "";
-              const email = iv?.clientEmail ?? "";
-              const address = iv?.address ? formatAddress(iv.address) : "";
-              const description = iv?.problem || iv?.title || "";
-              const isAlreadyValidated = iv?.status === "invoiced";
-
               return (
-                <>
-                  <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTerrainLocalId(null)}
-                      className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-                      aria-label={String(t("common.back"))}
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <h3 className="text-[15px] font-bold text-slate-800">{String(t("backoffice.inbox.terrain_report"))}</h3>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const actorUid = auth?.currentUser?.uid?.trim() || "system";
-                        if (iv) {
-                          void logCrmInterventionAction({
-                            kind: "bridged_report_dismissed",
-                            iv,
-                            actorUid,
-                            actorRole: "dispatcher",
-                            note: "Rapport terrain masqué (non supprimé)",
-                          });
-                        }
-                        terrainBridge?.dismissReport(r.localId);
-                        setSelectedTerrainLocalId(null);
-                      }}
-                      className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-                      aria-label={t("backoffice.inbox.hide_report")}
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <div className="rounded-[20px] bg-slate-50 p-4 border border-slate-100 space-y-2">
-                      <p className="text-[14px] !font-extrabold text-slate-900">{displayName}</p>
-                      {phone ? <p className="text-[12px] !font-bold text-slate-700">{phone}</p> : null}
-                      {email ? (
-                        <p className="text-[12px] !font-bold text-slate-700 break-all">
-                          <a href={`mailto:${email}`} className="hover:underline">{email}</a>
-                        </p>
-                      ) : null}
-                      {address ? <p className="text-[12px] !font-bold text-slate-700">{address}</p> : null}
-                      {description ? (
-                        <p className="text-[13px] !font-bold text-slate-800 leading-relaxed">
-                          {t("backoffice.inbox.problem_prefix")} · {description}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        {t("backoffice.inbox.voice_message")}
-                      </p>
-                      {terrainResolvedAudioUrl ? (
-                        <RequestDetailAudioPlayer
-                          key={`terrain-${r.interventionId}-${terrainResolvedAudioUrl}`}
-                          url={terrainResolvedAudioUrl}
-                        />
-                      ) : terrainAudioLoading ? (
-                        <div
-                          data-testid="backoffice-terrain-report-audio-loading"
-                          className="flex w-full items-center gap-3 rounded-[20px] border border-dashed border-slate-200 bg-slate-50/70 px-4 py-4"
-                          aria-busy="true"
-                          aria-label={t("backoffice.inbox.voice_loading")}
-                        >
-                          <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200" aria-hidden />
-                          <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-                            <div className="h-2 w-full animate-pulse rounded-full bg-slate-200" />
-                            <div className="flex justify-between gap-2">
-                              <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                              <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                            </div>
-                          </div>
-                          <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200/80" aria-hidden />
-                        </div>
-                      ) : terrainAudioFailed ? (
-                        <div
-                          data-testid="backoffice-terrain-report-audio-storage-error"
-                          className="w-full rounded-[20px] border border-amber-200/90 bg-amber-50/80 px-4 py-4 text-center text-[13px] font-semibold leading-snug text-amber-950"
-                        >
-                          {t("backoffice.inbox.voice_storage_error")}
-                        </div>
-                      ) : (
-                        <div
-                          data-testid="backoffice-terrain-report-audio-empty"
-                          className="w-full rounded-[20px] border border-dashed border-slate-200 bg-slate-50/60 px-4 py-4 text-center text-[13px] font-semibold text-slate-500"
-                        >
-                          {t("backoffice.inbox.voice_empty")}
-                        </div>
-                      )}
-                      {iv && readTranscription(iv) ? (
-                        <div className="rounded-[20px] border border-blue-100 bg-blue-50/50 p-4 text-sm italic text-blue-900">
-                          &quot;{readTranscription(iv)}&quot;
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        {t("backoffice.inbox.photos")}
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {r.photoDataUrls.map((url, i) => (
-                          <div
-                            key={`${r.localId}-detail-ph-${i}`}
-                            className="aspect-square relative rounded-[20px] overflow-hidden border border-slate-100 bg-slate-50 shadow-sm"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={url}
-                              alt=""
-                              className={cn(
-                                "w-full h-full object-cover",
-                                (PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled) ? "blur-lg" : null,
-                              )}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        {t("backoffice.inbox.signature_client")}
-                      </p>
-                      <div className="rounded-[20px] bg-slate-50 p-4 border border-slate-100 flex items-center justify-center">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={r.signaturePngDataUrl} alt={t("backoffice.inbox.signature_alt")} className="max-h-32 object-contain" />
-                      </div>
-                    </div>
-
-                    {Array.isArray(iv?.billingLines) && iv.billingLines.length > 0 ? (
-                      <div className="space-y-3" data-testid="backoffice-terrain-draft-billing">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                          {t("backoffice.inbox.draft_billing")}
-                        </p>
-                        <ul className="rounded-[20px] border border-slate-100 bg-slate-50/80 divide-y divide-slate-100">
-                          {iv.billingLines.map((line, li) => (
-                            <li
-                              key={`${r.localId}-bill-${li}`}
-                              className="flex justify-between gap-3 px-4 py-3 text-[12px] font-semibold text-slate-800"
-                            >
-                              <span className="min-w-0 flex-1">
-                                {line.description}
-                                {line.quantity > 1 ? ` × ${line.quantity}` : ""}
-                              </span>
-                              <span className="tabular-nums text-slate-600">
-                                {((Math.round(line.unitPriceCents) * (line.quantity || 1)) / 100).toFixed(2)} €
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                        {typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0 ? (
-                          <p className="text-[12px] font-bold text-slate-700 text-right">
-                            {t("backoffice.inbox.draft_billing_total")}{" "}
-                            {(iv.invoiceAmountCents / 100).toFixed(2)} € HT
-                          </p>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleDelete(r.interventionId);
-                        terrainBridge?.dismissReport(r.localId);
-                        setSelectedTerrainLocalId(null);
-                      }}
-                      className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] border border-red-100 bg-red-50 text-red-600 font-bold text-[14px] hover:bg-red-100 active:scale-95 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      {t("common.delete")}
-                    </button>
-                    <button
-                      type="button"
-                      data-testid={`backoffice-bridged-report-validate-${r.localId}`}
-                      disabled={!iv || isAlreadyValidated}
-                      onClick={() => void handleVerify(r.interventionId)}
-                      className={cn(
-                        "flex-[1.5] flex items-center justify-center gap-2 py-4 px-4 rounded-[20px] font-bold text-[14px] transition-all",
-                        !iv
-                          ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                          : isAlreadyValidated
-                            ? "bg-emerald-100 text-emerald-700 cursor-not-allowed opacity-70"
-                            : "bg-emerald-600 text-white shadow-[0_8px_20px_rgba(22,163,74,0.3)] hover:bg-emerald-700 active:scale-95",
-                      )}
-                      aria-label={t("backoffice.inbox.verify_terrain_report_aria")}
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      {isAlreadyValidated ? t("backoffice.inbox.already_verified") : t("backoffice.inbox.verify_report")}
-                    </button>
-                  </div>
-                </>
+                <TerrainReportDetailPanel
+                  report={r}
+                  iv={terrainIv}
+                  terrainBridge={terrainBridge}
+                  terrainResolvedAudioUrl={terrainResolvedAudioUrl}
+                  terrainAudioLoading={terrainAudioLoading}
+                  terrainAudioFailed={terrainAudioFailed}
+                  onClose={() => setSelectedTerrainLocalId(null)}
+                  onDelete={handleDelete}
+                  onVerify={handleVerify}
+                />
               );
-            })()}
-          </motion.div>
-        ) : null}
+            })()
+          : null}
       </AnimatePresence>
     </div>
   );

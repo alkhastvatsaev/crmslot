@@ -6,8 +6,6 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildCrmActivityEventDetail } from "@/features/crmHistory/crmActivityEventDetail";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function formatDateTime(ts: number): string {
   if (!ts) return "";
   return new Date(ts).toLocaleString("fr-BE", {
@@ -32,25 +30,27 @@ export default function CrmHistoryEventDetailPanel({ event, onOpenIntervention }
       <div
         className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center text-slate-400"
         data-testid="crm-history-detail-empty"
-        style={outfit}
       >
         <Inbox className="h-10 w-10 opacity-30" aria-hidden />
         <p className="text-[15px] font-semibold text-slate-600">
           {t("crmHistory.detail.empty_title")}
         </p>
-        <p className="max-w-[240px] text-[13px] leading-relaxed">{t("crmHistory.detail.empty_hint")}</p>
+        <p className="max-w-[240px] text-[13px] leading-relaxed">
+          {t("crmHistory.detail.empty_hint")}
+        </p>
       </div>
     );
   }
 
-  const detail = buildCrmActivityEventDetail(event, (key) => String(t(key as "crmHistory.detail.empty_title")));
+  const detail = buildCrmActivityEventDetail(event, (key) =>
+    String(t(key as "crmHistory.detail.empty_title"))
+  );
   const canOpenDossier = Boolean(event.interventionId && onOpenIntervention);
 
   return (
     <div
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
       data-testid="crm-history-detail-panel"
-      style={outfit}
     >
       <header className="shrink-0 border-b border-black/5 px-5 py-4">
         <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
@@ -78,7 +78,7 @@ export default function CrmHistoryEventDetailPanel({ event, onOpenIntervention }
               key={`${event.id}-line-${index}`}
               className={cn(
                 "text-[14px] leading-relaxed text-slate-700",
-                index === 0 && "text-[15px] font-medium text-slate-800",
+                index === 0 && "text-[15px] font-medium text-slate-800"
               )}
             >
               {line}

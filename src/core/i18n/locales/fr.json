@@ -1403,15 +1403,7 @@
     }
   },
   "calendar": {
-    "weekdays_initials": [
-      "L",
-      "M",
-      "M",
-      "J",
-      "V",
-      "S",
-      "D"
-    ]
+    "weekdays_initials": ["L", "M", "M", "J", "V", "S", "D"]
   },
   "smart_time_slot": {
     "next_availabilities": "Prochaines disponibilités",
@@ -1424,15 +1416,7 @@
     "today": "Aujourd'hui",
     "tomorrow": "Demain",
     "availabilities_on": "Disponibilités le {{date}}",
-    "days": [
-      "L",
-      "M",
-      "M",
-      "J",
-      "V",
-      "S",
-      "D"
-    ]
+    "days": ["L", "M", "M", "J", "V", "S", "D"]
   },
   "invoice_automation": {
     "title": "Facturation automatique",
@@ -1793,6 +1777,7 @@
     "orders_heading": "Commandes",
     "orders_and_slips_heading": "Commandes & bons",
     "orders_empty": "Aucune commande pour le moment.",
+    "order_untitled": "Commande sans libellé",
     "view_supplier_order_pdf": "Voir le bon de commande",
     "view_material_order_pdf": "Voir le bon matériel",
     "doc_badge_invoice": "Facture",
@@ -1806,6 +1791,7 @@
     "pdf_document_pdf_fallback": "Document PDF",
     "select_company_placeholder": "Sélectionnez une société active…",
     "input_aria": "Message Chatbot",
+    "send_aria": "Envoyer le message",
     "demo_step_validated": "Validée",
     "demo_step_preparing": "Préparation",
     "demo_step_shipped": "Expédiée",

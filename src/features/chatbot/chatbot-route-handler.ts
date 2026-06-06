@@ -1,3 +1,4 @@
+import { logger } from "@/core/logger";
 import { buildChatbotSystemPrompt } from "@/features/chatbot/chatbot-system-prompt";
 import { isWorkspaceCopilotSnapshot } from "@/features/chatbot/chatbot-snapshot-prompt";
 import { isChatbotZeroTokenUiTool } from "@/features/chatbot/chatbot-document-side-effect";
@@ -60,7 +61,7 @@ export function lastUserMessageText(messages: unknown[]): string | null {
 export function resolveChatbotToolScopeFromBody(
   body: ChatbotPostBody | null,
   _messages: unknown[],
-  _hasSnapshot: boolean,
+  _hasSnapshot: boolean
 ): string[] | undefined {
   if (Array.isArray(body?.toolScope) && body.toolScope.length > 0) {
     return body.toolScope;
@@ -72,15 +73,14 @@ function resolveOpenAIApiKey(): string {
   return process.env.OPENAI_API_KEY?.trim() || "";
 }
 
-
 export async function handleChatbotPost(
   body: ChatbotPostBody | null,
-  auth: ChatbotRouteAuth,
+  auth: ChatbotRouteAuth
 ): Promise<Response> {
   try {
     return await handleChatbotPostInner(body, auth);
   } catch (err: unknown) {
-    console.error("[chatbot/route]", err);
+    logger.error("[chatbot/route]", { error: err instanceof Error ? err.message : String(err) });
     const message = err instanceof Error ? err.message : "Erreur serveur chatbot";
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
@@ -91,7 +91,7 @@ export async function handleChatbotPost(
 
 async function handleChatbotPostInner(
   body: ChatbotPostBody | null,
-  auth: ChatbotRouteAuth,
+  auth: ChatbotRouteAuth
 ): Promise<Response> {
   const companyId = (body?.companyId ?? "").trim();
   const companyName = (body?.companyName ?? "Société").trim() || "Société";
@@ -120,7 +120,7 @@ async function handleChatbotPostInner(
     const result = await executeChatbotTool(body.confirmTool.name, input, toolCtx).catch(
       (err: unknown) => ({
         error: err instanceof Error ? err.message : "Erreur",
-      }),
+      })
     );
     return streamDocumentToolOutcome({
       messages,
@@ -147,7 +147,7 @@ async function handleChatbotPostInner(
       toolCallId,
       toolName,
       stringifyChatbotToolResult(toolName, result),
-      assistantText,
+      assistantText
     );
     return createChatbotSseResponse(async (enqueue) => {
       const preview = extractDocumentPreviewFromResult(result);

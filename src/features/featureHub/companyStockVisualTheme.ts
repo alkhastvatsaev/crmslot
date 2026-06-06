@@ -52,6 +52,19 @@ export const STOCK_HEALTH_CARD_BG: Record<StockHealth, string> = {
   ok: "bg-white",
 };
 
+/** Ombre colorée tuile Matériel — rouge / orange / vert (intérieur blanc). */
+export const STOCK_HEALTH_TILE_SHADOW: Record<StockHealth, string> = {
+  out: "shadow-[0_1px_14px_rgba(244,63,94,0.2),0_0_0_1px_rgba(244,63,94,0.06)]",
+  low: "shadow-[0_1px_14px_rgba(245,158,11,0.2),0_0_0_1px_rgba(245,158,11,0.06)]",
+  ok: "shadow-[0_1px_14px_rgba(16,185,129,0.17),0_0_0_1px_rgba(16,185,129,0.05)]",
+};
+
+export const STOCK_HEALTH_TILE_SHADOW_ACTIVE: Record<StockHealth, string> = {
+  out: "shadow-[0_3px_17px_rgba(244,63,94,0.25),0_0_0_1px_rgba(244,63,94,0.08)]",
+  low: "shadow-[0_3px_17px_rgba(245,158,11,0.25),0_0_0_1px_rgba(245,158,11,0.08)]",
+  ok: "shadow-[0_3px_17px_rgba(16,185,129,0.22),0_0_0_1px_rgba(16,185,129,0.07)]",
+};
+
 export const STOCK_PULSE_SEGMENT = {
   ok: "bg-teal-500/75",
   low: "bg-amber-400/85",

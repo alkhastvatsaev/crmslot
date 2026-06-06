@@ -1,4 +1,4 @@
-import type { gmail_v1 } from "googleapis";
+import type { gmail_v1 } from "@googleapis/gmail";
 import { mapGmailMessageSummary } from "@/features/gmail/gmailHubMappers";
 import type { GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
 
@@ -8,7 +8,7 @@ const METADATA_HEADERS = ["From", "To", "Subject", "Date"];
 export async function mapWithConcurrency<T, R>(
   items: readonly T[],
   concurrency: number,
-  fn: (item: T, index: number) => Promise<R>,
+  fn: (item: T, index: number) => Promise<R>
 ): Promise<R[]> {
   if (items.length === 0) return [];
   const limit = Math.max(1, Math.min(concurrency, items.length));
@@ -31,7 +31,7 @@ export async function mapWithConcurrency<T, R>(
 export async function fetchGmailInboxSummaries(
   gmail: gmail_v1.Gmail,
   messageIds: string[],
-  concurrency = 10,
+  concurrency = 10
 ): Promise<GmailHubMessageSummary[]> {
   const ids = messageIds.filter(Boolean);
   if (!ids.length) return [];

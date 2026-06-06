@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,9 +11,7 @@ import { DEMO_TECHNICIAN_UID, devUiPreviewEnabled } from "@/core/config/devUiPre
 import type { Intervention } from "@/features/interventions/types";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
 import { buildTechnicianInterventionList } from "@/features/interventions/technicianAssignmentsFilter";
-import {
-  getTechnicianAssignmentUid,
-} from "@/features/interventions/technicianAssignmentActions";
+import { getTechnicianAssignmentUid } from "@/features/interventions/technicianAssignmentActions";
 import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
 
 export type UseTechnicianAssignmentsResult = {
@@ -36,9 +36,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
 
   const [firebaseUid, setFirebaseUid] = useState<string | null>(() =>
-    noFirebaseAuth && devUiPreviewEnabled
-      ? getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID)
-      : null,
+    noFirebaseAuth && devUiPreviewEnabled ? getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID) : null
   );
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
@@ -54,7 +52,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
   const assignmentsQueryKey = useMemo(
     () => [TECHNICIAN_ASSIGNMENTS_QUERY_KEY, firebaseUid] as const,
-    [firebaseUid],
+    [firebaseUid]
   );
 
   const assignmentsQuery = useQuery({
@@ -68,7 +66,10 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       queryClient.getQueryData<Intervention[]>(assignmentsQueryKey as readonly unknown[]) ?? [],
   });
 
-  const firestoreInterventions = useMemo(() => assignmentsQuery.data ?? [], [assignmentsQuery.data]);
+  const firestoreInterventions = useMemo(
+    () => assignmentsQuery.data ?? [],
+    [assignmentsQuery.data]
+  );
 
   const interventions = useMemo(
     () =>
@@ -76,17 +77,17 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
         firestoreInterventions,
         technicianUid: firebaseUid,
       }),
-    [firestoreInterventions, firebaseUid],
+    [firestoreInterventions, firebaseUid]
   );
 
   const loading = Boolean(
     isConfigured &&
-      firestore &&
-      auth &&
-      firebaseUid &&
-      !snapshotReady &&
-      firestoreInterventions.length === 0 &&
-      !error,
+    firestore &&
+    auth &&
+    firebaseUid &&
+    !snapshotReady &&
+    firestoreInterventions.length === 0 &&
+    !error
   );
 
   useEffect(() => {
@@ -111,7 +112,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       const rawAuthUid =
         devUiPreviewEnabled && (!user || user.isAnonymous)
           ? DEMO_TECHNICIAN_UID
-          : user?.uid ?? null;
+          : (user?.uid ?? null);
       const technicianUid = getTechnicianAssignmentUid(rawAuthUid);
 
       queryClient.removeQueries({
@@ -136,24 +137,26 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
       const q = query(
         collection(db, "interventions"),
-        where("assignedTechnicianUid", "==", technicianUid),
+        where("assignedTechnicianUid", "==", technicianUid)
       );
 
       unsubSnap = onSnapshot(
         q,
         { includeMetadataChanges: false },
         (snapshot) => {
-          const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
+          const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
           queryClient.setQueryData([TECHNICIAN_ASSIGNMENTS_QUERY_KEY, technicianUid], data);
           writeTerrainMissionsCache(technicianUid, data);
           setSnapshotReady(true);
           setError(null);
         },
         (e) => {
-          console.error("[useTechnicianAssignments]", e);
+          logger.error("[useTechnicianAssignments]", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           setError(e.message || "Erreur Firestore");
           setSnapshotReady(true);
-        },
+        }
       );
     });
 

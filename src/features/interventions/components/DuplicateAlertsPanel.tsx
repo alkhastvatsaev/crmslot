@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils";
 import DuplicateAlertsQueue from "@/features/interventions/components/DuplicateAlertsQueue";
 import { useOpenDuplicateAlerts } from "@/features/interventions/useOpenDuplicateAlerts";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 /** Page 12 — centre sur les alertes (actions admin + même bandeau que le back-office). */
 export default function DuplicateAlertsPanel() {
   const workspace = useCompanyWorkspaceOptional();
@@ -18,7 +16,6 @@ export default function DuplicateAlertsPanel() {
     return (
       <div
         data-testid="duplicate-alerts-gate"
-        style={outfit}
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] px-4 py-6"
       >
         <div
@@ -40,7 +37,6 @@ export default function DuplicateAlertsPanel() {
   return (
     <div
       data-testid="duplicate-alerts-panel"
-      style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
       aria-label="Alertes — attention requise"
     >
@@ -50,7 +46,9 @@ export default function DuplicateAlertsPanel() {
             <Bell className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="truncate text-[15px] font-bold tracking-tight text-slate-900">Alertes</h2>
+            <h2 className="truncate text-[15px] font-bold tracking-tight text-slate-900">
+              Alertes
+            </h2>
             <p className="sr-only">Doublons, conflits et erreurs</p>
           </div>
         </div>
@@ -58,7 +56,11 @@ export default function DuplicateAlertsPanel() {
         {loading ? (
           <div data-testid="duplicate-alerts-loading" className="space-y-2 py-2">
             {[0, 1].map((i) => (
-              <div key={i} className="h-16 animate-pulse rounded-[22px] bg-slate-200/55" aria-hidden />
+              <div
+                key={i}
+                className="h-16 animate-pulse rounded-[22px] bg-slate-200/55"
+                aria-hidden
+              />
             ))}
           </div>
         ) : null}

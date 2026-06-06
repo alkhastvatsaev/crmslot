@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Camera, MapPin, Navigation2, Play } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
 import { resolveMissionActionBar } from "@/features/interventions/missionActionBar";
 import { SlideAction } from "@/components/ui/slide-action";
+import { HubButton } from "@/core/ui/hub";
 
 type Props = {
   intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
@@ -42,17 +42,14 @@ export default function MissionFieldFooter({
         ? MapPin
         : Play;
 
-  const slideLabel =
-    config.primary.kind === "transition" ? t(config.primary.labelKey) : "";
+  const slideLabel = config.primary.kind === "transition" ? t(config.primary.labelKey) : "";
 
-  const showMore =
-    intervention.status === "in_progress" &&
-    Boolean(onWaitingMaterial);
+  const showMore = intervention.status === "in_progress" && Boolean(onWaitingMaterial);
 
   return (
     <footer
       data-testid="mission-action-bar"
-      className="shrink-0 flex flex-col items-center border-t border-slate-200/50 bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      className="flex shrink-0 flex-col items-center border-t border-slate-200/50 bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
     >
       {showMore ? (
         <div className="mb-3 w-full max-w-[20.5rem]">
@@ -67,32 +64,33 @@ export default function MissionFieldFooter({
               : t("technician_hub.dashboard.field_footer.more")}
           </button>
           {moreOpen ? (
-            <button
+            <HubButton
               type="button"
+              variant="secondary"
+              fullWidth
               data-testid="technician-waiting-material-btn"
               disabled={isUpdating}
               onClick={onWaitingMaterial}
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+              className="mt-2 min-h-[42px] text-[13px] font-medium"
             >
               {t("technician_hub.dashboard.detail.waiting_material")}
-            </button>
+            </HubButton>
           ) : null}
         </div>
       ) : null}
 
       {config.primary.kind === "finish" ? (
-        <button
+        <HubButton
           type="button"
           data-testid="mission-action-primary-finish"
           disabled={isUpdating}
           onClick={onFinish}
-          className={cn(
-            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2.5 rounded-full bg-slate-900 text-[15px] font-semibold text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)] transition active:scale-[0.98] disabled:opacity-50",
-          )}
+          fullWidth
+          className="h-14 max-w-[20.5rem] rounded-full text-[15px] font-semibold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)]"
         >
           <Camera className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
           {t(config.primary.labelKey)}
-        </button>
+        </HubButton>
       ) : (
         <div className="w-full max-w-[20.5rem]">
           <SlideAction

@@ -16,8 +16,6 @@ import {
 import type { Intervention } from "@/features/interventions/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   interventions: Intervention[];
 };
@@ -35,7 +33,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
   const kpis = useMemo<KpiCard[]>(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayInterventions = interventions.filter(
-      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today),
+      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today)
     );
 
     const byStatus = (statuses: Intervention["status"][]) =>
@@ -51,15 +49,13 @@ export default function DailyOperationsKpi({ interventions }: Props) {
     });
 
     const durationIvs = todayInterventions.filter(
-      (iv) => iv.actualDurationMinutes != null && iv.actualDurationMinutes > 0,
+      (iv) => iv.actualDurationMinutes != null && iv.actualDurationMinutes > 0
     );
     const avgDuration =
       durationIvs.length > 0
         ? Math.round(
-            durationIvs.reduce(
-              (sum, iv) => sum + (iv.actualDurationMinutes || 0),
-              0,
-            ) / durationIvs.length,
+            durationIvs.reduce((sum, iv) => sum + (iv.actualDurationMinutes || 0), 0) /
+              durationIvs.length
           )
         : 0;
 
@@ -122,26 +118,24 @@ export default function DailyOperationsKpi({ interventions }: Props) {
   const completionRate = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayIvs = interventions.filter(
-      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today),
+      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today)
     );
     if (todayIvs.length === 0) return 0;
     const completed = todayIvs.filter(
-      (iv) => iv.status === "done" || iv.status === "invoiced",
+      (iv) => iv.status === "done" || iv.status === "invoiced"
     ).length;
     return Math.round((completed / todayIvs.length) * 100);
   }, [interventions]);
 
   return (
-    <div data-testid="daily-operations-kpi" style={outfit} className="space-y-4">
+    <div data-testid="daily-operations-kpi" className="space-y-4">
       {/* Completion rate bar */}
       <div className="rounded-2xl border border-slate-100 bg-white p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
             {t("backoffice.dashboard.kpi_completion_rate")}
           </span>
-          <span className="text-[18px] font-black text-slate-900">
-            {completionRate}%
-          </span>
+          <span className="text-[18px] font-black text-slate-900">{completionRate}%</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <div
@@ -158,13 +152,13 @@ export default function DailyOperationsKpi({ interventions }: Props) {
             key={kpi.label}
             className={`flex items-center gap-3 rounded-xl ${kpi.bgColor} px-3 py-3 transition-transform hover:scale-[1.02]`}
           >
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ${kpi.color}`}>
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ${kpi.color}`}
+            >
               <kpi.icon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <div className={`text-[18px] font-black leading-none ${kpi.color}`}>
-                {kpi.value}
-              </div>
+              <div className={`text-[18px] font-black leading-none ${kpi.color}`}>{kpi.value}</div>
               <div className="mt-0.5 text-[10px] font-bold text-slate-500 truncate">
                 {kpi.label}
               </div>

@@ -1,8 +1,31 @@
 import React, { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAvailableSlots } from "../hooks/useAvailableSlots";
-import { Loader2, Calendar as CalendarIcon, Clock, ChevronRight, ChevronLeft, ChevronDown, CalendarPlus } from "lucide-react";
-import { format, addDays, isSameDay, isBefore, startOfToday, parse, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, addMonths, subMonths, isSameMonth } from "date-fns";
+import {
+  Loader2,
+  Calendar as CalendarIcon,
+  Clock,
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  CalendarPlus,
+} from "lucide-react";
+import {
+  format,
+  addDays,
+  isSameDay,
+  isBefore,
+  startOfToday,
+  parse,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  addMonths,
+  subMonths,
+  isSameMonth,
+} from "date-fns";
 import { fr, enUS as en, nl as nlLocale } from "date-fns/locale";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -15,16 +38,33 @@ interface SmartTimeSlotPickerProps {
 }
 
 const WORKING_HOURS = [
-  "08:00", "09:00", "10:00", "11:00", "12:00", 
-  "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
 ];
 
-function PremiumCalendar({ selectedDate, onSelect }: { selectedDate: string, onSelect: (date: string) => void }) {
+function PremiumCalendar({
+  selectedDate,
+  onSelect,
+}: {
+  selectedDate: string;
+  onSelect: (date: string) => void;
+}) {
   const { tValue, language } = useTranslation();
   const localeMap = { fr, en, nl: nlLocale };
   const currentLocale = localeMap[language as keyof typeof localeMap] || fr;
 
-  const [currentMonth, setCurrentMonth] = useState(() => selectedDate ? parse(selectedDate, "yyyy-MM-dd", new Date()) : startOfToday());
+  const [currentMonth, setCurrentMonth] = useState(() =>
+    selectedDate ? parse(selectedDate, "yyyy-MM-dd", new Date()) : startOfToday()
+  );
   const today = startOfToday();
 
   const handlePrevMonth = () => {
@@ -52,10 +92,10 @@ function PremiumCalendar({ selectedDate, onSelect }: { selectedDate: string, onS
   return (
     <div className="w-full bg-white rounded-[24px] border border-black/[0.08] p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <button 
-          type="button" 
-          onClick={handlePrevMonth} 
-          className="flex items-center justify-center h-10 w-10 hover:bg-slate-100 rounded-full transition-colors active:scale-95 text-slate-600 disabled:opacity-30 disabled:pointer-events-none" 
+        <button
+          type="button"
+          onClick={handlePrevMonth}
+          className="flex items-center justify-center h-10 w-10 hover:bg-slate-100 rounded-full transition-colors active:scale-95 text-slate-600 disabled:opacity-30 disabled:pointer-events-none"
           disabled={isBefore(endOfMonth(subMonths(currentMonth, 1)), startOfMonth(today))}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -63,9 +103,9 @@ function PremiumCalendar({ selectedDate, onSelect }: { selectedDate: string, onS
         <span className="text-lg font-bold text-slate-800 capitalize tracking-tight">
           {format(currentMonth, "MMMM yyyy", { locale: currentLocale })}
         </span>
-        <button 
-          type="button" 
-          onClick={handleNextMonth} 
+        <button
+          type="button"
+          onClick={handleNextMonth}
           className="flex items-center justify-center h-10 w-10 hover:bg-slate-100 rounded-full transition-colors active:scale-95 text-slate-600"
         >
           <ChevronRight className="h-5 w-5" />
@@ -85,7 +125,7 @@ function PremiumCalendar({ selectedDate, onSelect }: { selectedDate: string, onS
           const isSelected = selectedDate === format(day, dateFormat);
           const isPast = isBefore(day, today);
           const isCurrentMonth = isSameMonth(day, monthStart);
-          
+
           return (
             <div key={i} className="flex items-center justify-center aspect-square">
               <button
@@ -94,19 +134,26 @@ function PremiumCalendar({ selectedDate, onSelect }: { selectedDate: string, onS
                 onClick={() => onSelect(format(day, dateFormat))}
                 className={cn(
                   "h-11 w-11 flex items-center justify-center rounded-full text-base font-bold transition-all",
-                  !isCurrentMonth ? "text-slate-300" : isPast ? "text-slate-300 cursor-not-allowed" : "text-slate-700 hover:bg-slate-100 active:scale-95",
+                  !isCurrentMonth
+                    ? "text-slate-300"
+                    : isPast
+                      ? "text-slate-300 cursor-not-allowed"
+                      : "text-slate-700 hover:bg-slate-100 active:scale-95",
                   isSelected && "bg-black text-white shadow-md hover:bg-slate-900",
-                  isSameDay(day, today) && !isSelected && !isPast && "border-2 border-slate-200 text-slate-800"
+                  isSameDay(day, today) &&
+                    !isSelected &&
+                    !isPast &&
+                    "border-2 border-slate-200 text-slate-800"
                 )}
               >
                 {format(day, "d")}
               </button>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
 export function SmartTimeSlotPicker({
@@ -124,17 +171,23 @@ export function SmartTimeSlotPicker({
 
   // Generate next available slots
   const nextAvailableSlots = useMemo(() => {
-    const slots: { date: string; time: string; dateObj: Date; isToday: boolean; isTomorrow: boolean }[] = [];
+    const slots: {
+      date: string;
+      time: string;
+      dateObj: Date;
+      isToday: boolean;
+      isTomorrow: boolean;
+    }[] = [];
     const now = new Date();
     const today = startOfToday();
     const tomorrow = addDays(today, 1);
-    
+
     for (let i = 0; i < 7; i++) {
       const day = addDays(today, i);
       const dateStr = format(day, "yyyy-MM-dd");
       const isToday = isSameDay(day, now);
       const isTom = isSameDay(day, tomorrow);
-      
+
       const bookedForDay = bookedSlotsByDate[dateStr] || [];
 
       for (const time of WORKING_HOURS) {
@@ -154,12 +207,12 @@ export function SmartTimeSlotPicker({
             time,
             dateObj: day,
             isToday,
-            isTomorrow: isTom
+            isTomorrow: isTom,
           });
         }
       }
     }
-    
+
     return slots; // Show all available slots
   }, [bookedSlotsByDate]);
 
@@ -214,7 +267,7 @@ export function SmartTimeSlotPicker({
             <>
               {nextAvailableSlots.slice(0, visibleSlotsCount).map((slot) => {
                 const isSelected = selectedDate === slot.date && selectedTime === slot.time;
-                
+
                 let dateLabel = format(slot.dateObj, "EEEE d MMMM", { locale: currentLocale });
                 if (slot.isToday) dateLabel = t("smart_time_slot.today");
                 else if (slot.isTomorrow) dateLabel = t("smart_time_slot.tomorrow");
@@ -238,7 +291,12 @@ export function SmartTimeSlotPicker({
                     )}
                   >
                     <div className="flex flex-col items-start gap-1">
-                      <span className={cn("text-base font-medium", isSelected ? "text-white/80" : "text-slate-500")}>
+                      <span
+                        className={cn(
+                          "text-base font-medium",
+                          isSelected ? "text-white/80" : "text-slate-500"
+                        )}
+                      >
                         {dateLabel}
                       </span>
                       <div className="flex items-center gap-2">
@@ -246,17 +304,19 @@ export function SmartTimeSlotPicker({
                         <span className="text-xl font-bold">{slot.time}</span>
                       </div>
                     </div>
-                    
-                    <div className={cn(
-                      "flex items-center justify-center h-8 w-8 rounded-full",
-                      isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400"
-                    )}>
+
+                    <div
+                      className={cn(
+                        "flex items-center justify-center h-8 w-8 rounded-full",
+                        isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400"
+                      )}
+                    >
                       <ChevronRight className="h-5 w-5" />
                     </div>
                   </button>
                 );
               })}
-              
+
               {visibleSlotsCount < nextAvailableSlots.length && (
                 <button
                   type="button"
@@ -277,7 +337,7 @@ export function SmartTimeSlotPicker({
           <div className="w-full border-t border-slate-200"></div>
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-[#FAFAFA] px-3 text-sm text-slate-400 uppercase font-bold tracking-wide">
+          <span className="bg-slate-50 px-3 text-sm font-bold uppercase tracking-wide text-slate-400">
             {t("smart_time_slot.or")}
           </span>
         </div>
@@ -289,44 +349,48 @@ export function SmartTimeSlotPicker({
           <CalendarPlus className="h-5 w-5 shrink-0" />
           {t("smart_time_slot.schedule_later")}
         </label>
-        
+
         <div className="flex flex-col gap-4">
-          <PremiumCalendar 
-            selectedDate={selectedDate} 
+          <PremiumCalendar
+            selectedDate={selectedDate}
             onSelect={(date) => {
               onDateSelect(date);
               onTimeSelect(""); // reset time when date changes
-            }} 
+            }}
           />
 
           {selectedDate && (
             <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
               <span className="text-base font-bold text-slate-500">
                 {t("smart_time_slot.availabilities_on")}{" "}
-                {format(parse(selectedDate, "yyyy-MM-dd", new Date()), "d MMMM", { locale: currentLocale })}
+                {format(parse(selectedDate, "yyyy-MM-dd", new Date()), "d MMMM", {
+                  locale: currentLocale,
+                })}
               </span>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                {specificDateSlots.filter(s => !s.disabled).map(({ time }) => {
-                  const isSelected = selectedTime === time;
+                {specificDateSlots
+                  .filter((s) => !s.disabled)
+                  .map(({ time }) => {
+                    const isSelected = selectedTime === time;
 
-                  return (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => onTimeSelect(time)}
-                      className={cn(
-                        "flex items-center justify-center rounded-[12px] border py-3.5 text-base font-bold transition-all",
-                        isSelected
-                          ? "border-black bg-black text-white shadow-md"
-                          : "border-black/[0.08] bg-white text-slate-700 hover:border-black/[0.2] hover:bg-slate-50 active:scale-95"
-                      )}
-                    >
-                      {time}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        onClick={() => onTimeSelect(time)}
+                        className={cn(
+                          "flex items-center justify-center rounded-[12px] border py-3.5 text-base font-bold transition-all",
+                          isSelected
+                            ? "border-black bg-black text-white shadow-md"
+                            : "border-black/[0.08] bg-white text-slate-700 hover:border-black/[0.2] hover:bg-slate-50 active:scale-95"
+                        )}
+                      >
+                        {time}
+                      </button>
+                    );
+                  })}
               </div>
-              {specificDateSlots.filter(s => !s.disabled).length === 0 && (
+              {specificDateSlots.filter((s) => !s.disabled).length === 0 && (
                 <div className="text-amber-600 font-medium bg-amber-50 p-4 rounded-xl text-base border border-amber-100 text-center">
                   {t("smart_time_slot.artisan_unavailable")}
                 </div>
@@ -338,4 +402,3 @@ export function SmartTimeSlotPicker({
     </div>
   );
 }
-

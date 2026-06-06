@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
@@ -29,9 +31,11 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
       );
       try {
         const snap = await getDocs(q);
-        setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as SupplierOrder)));
+        setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SupplierOrder));
       } catch (e) {
-        console.error("Error fetching supplier orders", e);
+        logger.error("Error fetching supplier orders", {
+          error: e instanceof Error ? e.message : String(e),
+        });
       }
     };
     fetchOrders();
@@ -70,8 +74,10 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-slate-50 p-4 sm:p-6">
-      <h3 className="mb-6 text-[15px] font-semibold text-slate-900">Documents liés à l&apos;intervention</h3>
-      
+      <h3 className="mb-6 text-[15px] font-semibold text-slate-900">
+        Documents liés à l&apos;intervention
+      </h3>
+
       <div className="flex flex-col gap-4">
         {/* Invoice */}
         <button
@@ -82,17 +88,23 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
             <Receipt className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <div className="text-[14px] font-semibold text-slate-900 transition-colors group-hover:text-blue-700">Facture de l&apos;intervention</div>
-            <div className="mt-0.5 text-[12px] text-slate-500">Visualiser ou générer la facture</div>
+            <div className="text-[14px] font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
+              Facture de l&apos;intervention
+            </div>
+            <div className="mt-0.5 text-[12px] text-slate-500">
+              Visualiser ou générer la facture
+            </div>
           </div>
         </button>
 
         {/* Supplier Orders */}
         {orders.length > 0 && (
           <div className="mt-4">
-            <h4 className="mb-3 pl-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">Bons de commande ({orders.length})</h4>
+            <h4 className="mb-3 pl-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Bons de commande ({orders.length})
+            </h4>
             <div className="flex flex-col gap-3">
-              {orders.map(order => (
+              {orders.map((order) => (
                 <button
                   key={order.id}
                   onClick={() => {
@@ -114,7 +126,9 @@ export function CompanyHubDocumentsTab({ interventionId, companyId }: Props) {
                       {order.totalCents ? (
                         <>
                           <span className="h-1 w-1 rounded-full bg-slate-300"></span>
-                          <span className="font-medium text-slate-700">{(order.totalCents / 100).toFixed(2)} €</span>
+                          <span className="font-medium text-slate-700">
+                            {(order.totalCents / 100).toFixed(2)} €
+                          </span>
                         </>
                       ) : null}
                     </div>

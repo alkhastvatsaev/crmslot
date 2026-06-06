@@ -4,6 +4,7 @@ import "@/core/config/firebase-admin";
 import { blockIfProduction } from "@/core/api/routeAuth";
 import { isServerDevUiPreview } from "@/features/backoffice/assignInterventionServerAuth";
 import { e2eSeedDoneInterventionAdmin } from "@/features/interventions/server/e2eSeedDoneIntervention";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
         ok: false,
         error: "Seed E2E indisponible (production, preview désactivé ou Firebase Admin absent).",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -41,7 +42,9 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
-    console.error("[e2e/seed-done-intervention]", e);
+    logger.error("[e2e/seed-done-intervention]", {
+      error: e instanceof Error ? e.message : String(e),
+    });
     const message = e instanceof Error ? e.message : "Erreur seed E2E";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

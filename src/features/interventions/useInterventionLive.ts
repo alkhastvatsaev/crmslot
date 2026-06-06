@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 
 /**
@@ -10,7 +11,10 @@ import type { Intervention } from "@/features/interventions/types";
  * Un seul listener par `interventionId` par composant — préférer passer `liveIntervention`
  * depuis un parent commun (ex. `TechnicianHubPage`) pour éviter les doublons.
  */
-export function useInterventionLive(interventionId: string | null, enabled = true): Intervention | null {
+export function useInterventionLive(
+  interventionId: string | null,
+  enabled = true
+): Intervention | null {
   const [data, setData] = useState<Intervention | null>(null);
 
   useEffect(() => {
@@ -40,9 +44,11 @@ export function useInterventionLive(interventionId: string | null, enabled = tru
         },
         (error) => {
           if (gen !== generation) return;
-          console.warn("[useInterventionLive] Firestore listener error:", error);
+          logger.warn("[useInterventionLive] Firestore listener error:", {
+            error: error instanceof Error ? error.message : String(error),
+          });
           setData(null);
-        },
+        }
       );
     };
 
@@ -66,11 +72,11 @@ export function useInterventionLive(interventionId: string | null, enabled = tru
 /** Utilise un snapshot parent si fourni, sinon ouvre un listener local. */
 export function useInterventionLiveSource(
   caseId: string | null,
-  liveIntervention?: Intervention | null,
+  liveIntervention?: Intervention | null
 ): Intervention | null {
   const fromHook = useInterventionLive(
     liveIntervention !== undefined ? null : caseId,
-    liveIntervention === undefined,
+    liveIntervention === undefined
   );
   return liveIntervention !== undefined ? liveIntervention : fromHook;
 }

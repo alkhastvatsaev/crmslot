@@ -6,20 +6,21 @@ import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interv
 import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { prepareDraftBillingOnIntervention } from "@/features/interventions/server/prepareDraftBillingOnIntervention";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
 
   const { id } = await context.params;
   const interventionId = id?.trim();
   if (!interventionId) {
-    return NextResponse.json({ ok: false, error: "Identifiant intervention manquant." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Identifiant intervention manquant." },
+      { status: 400 }
+    );
   }
 
   const db = admin.firestore();
@@ -32,8 +33,7 @@ export async function POST(
   const companyId = String(iv.companyId ?? "").trim();
   const isTechnician = assertTechnicianMayUpdateAssignedIntervention(iv, auth.uid);
   const isDispatcher =
-    companyId &&
-    (await assertCanAssignInterventionServer(db, auth.uid, companyId, auth.decoded));
+    companyId && (await assertCanAssignInterventionServer(db, auth.uid, companyId, auth.decoded));
 
   if (!isTechnician && !isDispatcher) {
     return NextResponse.json({ ok: false, error: "Accès refusé." }, { status: 403 });
@@ -43,7 +43,7 @@ export async function POST(
     const result = await prepareDraftBillingOnIntervention(db, interventionId);
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
-    console.error("[prepare-draft-billing]", e);
+    logger.error("[prepare-draft-billing]", { error: e instanceof Error ? e.message : String(e) });
     const message = e instanceof Error ? e.message : "Erreur préparation facture";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

@@ -1,4 +1,5 @@
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
@@ -37,12 +38,15 @@ export async function logCrmInterventionActionAdmin(params: {
       statusBefore: params.statusBefore ?? params.iv.status,
       statusAfter: params.statusAfter,
       note: params.note,
-    },
+    }
   );
 
   try {
     await logCompanyCrmActivityAdmin(getAdminDb(), payload);
   } catch (e) {
-    console.warn("[logCrmInterventionActionAdmin]", params.kind, e);
+    logger.warn("[logCrmInterventionActionAdmin]", {
+      kind: params.kind,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

@@ -20,6 +20,10 @@ export interface StockItem {
   alertThreshold: number;
   unit: string;
   updatedAt: string;
+  /** Vignette produit (Lecot ou manuelle). */
+  imageUrl?: string | null;
+  /** SKU catalogue Lecot pour résoudre la photo quand `reference` est interne. */
+  lecotSku?: string | null;
 }
 
 export type StockItemInput = Omit<StockItem, "id" | "updatedAt">;
@@ -41,7 +45,10 @@ export async function adjustStockQuantity(id: string, delta: number): Promise<vo
   });
 }
 
-export async function updateStockItem(id: string, patch: Partial<Omit<StockItemInput, "companyId">>): Promise<void> {
+export async function updateStockItem(
+  id: string,
+  patch: Partial<Omit<StockItemInput, "companyId">>
+): Promise<void> {
   if (!firestore) throw new Error("Firestore not configured");
   await updateDoc(doc(firestore, "stockItems", id), {
     ...patch,
@@ -51,13 +58,17 @@ export async function updateStockItem(id: string, patch: Partial<Omit<StockItemI
 
 export function subscribeStockItems(
   companyId: string,
-  onData: (items: StockItem[]) => void,
+  onData: (items: StockItem[]) => void
 ): Unsubscribe {
   if (!firestore) return () => {};
   const q = query(collection(firestore, "stockItems"), where("companyId", "==", companyId));
-  return onSnapshot(q, (snap) => {
-    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as StockItem));
-    items.sort((a, b) => a.description.localeCompare(b.description));
-    onData(items);
-  }, () => onData([]));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as StockItem);
+      items.sort((a, b) => a.description.localeCompare(b.description));
+      onData(items);
+    },
+    () => onData([])
+  );
 }

@@ -1403,15 +1403,7 @@
     }
   },
   "calendar": {
-    "weekdays_initials": [
-      "M",
-      "D",
-      "W",
-      "D",
-      "V",
-      "Z",
-      "Z"
-    ]
+    "weekdays_initials": ["M", "D", "W", "D", "V", "Z", "Z"]
   },
   "smart_time_slot": {
     "next_availabilities": "Volgende beschikbaarheden",
@@ -1424,15 +1416,7 @@
     "today": "Vandaag",
     "tomorrow": "Morgen",
     "availabilities_on": "Beschikbaarheid op {{date}}",
-    "days": [
-      "M",
-      "D",
-      "W",
-      "D",
-      "V",
-      "Z",
-      "Z"
-    ]
+    "days": ["M", "D", "W", "D", "V", "Z", "Z"]
   },
   "invoice_automation": {
     "title": "Automatische Facturatie",
@@ -1793,6 +1777,7 @@
     "orders_heading": "Bestellingen",
     "orders_and_slips_heading": "Bestellingen & bonnen",
     "orders_empty": "Nog geen bestellingen.",
+    "order_untitled": "Bestelling zonder titel",
     "view_supplier_order_pdf": "Bestelbon bekijken",
     "view_material_order_pdf": "Materiaalbon bekijken",
     "doc_badge_invoice": "Factuur",
@@ -1806,6 +1791,7 @@
     "pdf_document_pdf_fallback": "PDF-document",
     "select_company_placeholder": "Selecteer een actief bedrijf…",
     "input_aria": "Chatbot-bericht",
+    "send_aria": "Bericht verzenden",
     "demo_step_validated": "Gevalideerd",
     "demo_step_preparing": "Voorbereiden",
     "demo_step_shipped": "Verzonden",

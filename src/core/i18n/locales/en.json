@@ -1403,15 +1403,7 @@
     }
   },
   "calendar": {
-    "weekdays_initials": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
-    ]
+    "weekdays_initials": ["M", "T", "W", "T", "F", "S", "S"]
   },
   "smart_time_slot": {
     "next_availabilities": "Next availabilities",
@@ -1424,15 +1416,7 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "availabilities_on": "Availabilities on {{date}}",
-    "days": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
-    ]
+    "days": ["M", "T", "W", "T", "F", "S", "S"]
   },
   "invoice_automation": {
     "title": "Automatic Invoicing",
@@ -1793,6 +1777,7 @@
     "orders_heading": "Orders",
     "orders_and_slips_heading": "Orders & slips",
     "orders_empty": "No orders yet.",
+    "order_untitled": "Untitled order",
     "view_supplier_order_pdf": "View purchase order",
     "view_material_order_pdf": "View material slip",
     "doc_badge_invoice": "Invoice",
@@ -1806,6 +1791,7 @@
     "pdf_document_pdf_fallback": "PDF Document",
     "select_company_placeholder": "Select an active company…",
     "input_aria": "Chatbot message",
+    "send_aria": "Send message",
     "demo_step_validated": "Validated",
     "demo_step_preparing": "Preparing",
     "demo_step_shipped": "Shipped",

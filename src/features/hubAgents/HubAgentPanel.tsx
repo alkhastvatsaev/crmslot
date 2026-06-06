@@ -13,8 +13,6 @@ import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-action
 import type { HubAgentBridgeHandlers, HubAgentMessage } from "@/features/hubAgents/hubAgentTypes";
 import type { useHubAgent } from "@/features/hubAgents/useHubAgent";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function suggestionsToActions(suggestions: string[], idPrefix: string): ChatbotQuickAction[] {
   return suggestions.map((label, i) => ({
     id: `${idPrefix}-suggestion-${i}`,
@@ -59,7 +57,9 @@ function AgentBubble({
 }) {
   const isUser = role === "user";
   const actions =
-    !isUser && isLatest && suggestions?.length ? suggestionsToActions(suggestions, testIdPrefix) : [];
+    !isUser && isLatest && suggestions?.length
+      ? suggestionsToActions(suggestions, testIdPrefix)
+      : [];
 
   return (
     <motion.div
@@ -74,7 +74,7 @@ function AgentBubble({
           "max-w-[88%] whitespace-pre-wrap rounded-[18px] px-4 py-3 text-[14px] leading-relaxed",
           isUser
             ? "rounded-br-[6px] bg-slate-900 text-white"
-            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm",
+            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm"
         )}
       >
         {isUser ? text : renderChatbotMarkdownLite(text)}
@@ -150,7 +150,6 @@ export default function HubAgentPanel({
       <div
         data-testid={`${testIdPrefix}-panel`}
         className="flex min-h-0 flex-1 items-center justify-center bg-white"
-        style={outfit}
       >
         <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
       </div>
@@ -160,7 +159,6 @@ export default function HubAgentPanel({
   return (
     <motion.div
       data-testid={`${testIdPrefix}-panel`}
-      style={outfit}
       className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white"
     >
       <div
@@ -168,7 +166,7 @@ export default function HubAgentPanel({
         data-testid={`${testIdPrefix}-messages`}
         className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
-          "custom-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6",
+          "custom-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6"
         )}
       >
         <AnimatePresence>
@@ -181,7 +179,7 @@ export default function HubAgentPanel({
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
             >
-              <ChatbotGalaxyOrb className="scale-[2]" />
+              <ChatbotGalaxyOrb size="hero" />
             </motion.div>
           ) : null}
         </AnimatePresence>

@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { readAudioUploadSidecarIfPresent, readTranscriptSidecarIfPresent } from "@/core/services/audio/transcript-sidecar";
+import {
+  readAudioUploadSidecarIfPresent,
+  readTranscriptSidecarIfPresent,
+} from "@/core/services/audio/transcript-sidecar";
 import { readAudioDecisionForUpload } from "@/core/services/audio/audio-route-helpers";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -33,7 +37,12 @@ export async function GET(request: Request) {
     const audios = files
       .filter((file) => {
         const lower = file.toLowerCase();
-        return lower.endsWith(".amr") || lower.endsWith(".wav") || lower.endsWith(".mp3") || lower.endsWith(".m4a");
+        return (
+          lower.endsWith(".amr") ||
+          lower.endsWith(".wav") ||
+          lower.endsWith(".mp3") ||
+          lower.endsWith(".m4a")
+        );
       })
       .map((file) => {
         const stats = fs.statSync(path.join(uploadsDir, file));
@@ -58,8 +67,9 @@ export async function GET(request: Request) {
     const decision = await readAudioDecisionForUpload(audio.name);
     return NextResponse.json({ audio, decision });
   } catch (error) {
-    console.error("[latest-audio] error:", error);
+    logger.error("[latest-audio] error:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ error: "Impossible de lire le dossier" }, { status: 500 });
   }
 }
-

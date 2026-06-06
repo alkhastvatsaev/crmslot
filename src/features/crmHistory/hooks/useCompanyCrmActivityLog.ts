@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logger } from "@/core/logger";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
@@ -27,28 +28,36 @@ export function useCompanyCrmActivityLog(companyId: string | null) {
     const q = query(
       collection(firestore, "companies", cid, "crm_activity"),
       orderBy("at", "desc"),
-      limit(CRM_ACTIVITY_LIMIT),
+      limit(CRM_ACTIVITY_LIMIT)
     );
 
     const unsub = onSnapshot(
       q,
       (snap) => {
-        setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as CompanyCrmActivityDoc & { id: string })));
+        setRows(
+          snap.docs.map(
+            (d) => ({ id: d.id, ...d.data() }) as CompanyCrmActivityDoc & { id: string }
+          )
+        );
         setError(null);
         setLoading(false);
       },
       (e) => {
         if (isFirestorePermissionDenied(e)) {
-          console.warn("[useCompanyCrmActivityLog] permission denied — journal ignoré", e);
+          logger.warn("[useCompanyCrmActivityLog] permission denied — journal ignoré", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           setError(null);
           setRows([]);
         } else {
-          console.warn("[useCompanyCrmActivityLog]", e);
+          logger.warn("[useCompanyCrmActivityLog]", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           setError(e instanceof Error ? e.message : "Erreur journal CRM");
           setRows([]);
         }
         setLoading(false);
-      },
+      }
     );
 
     return () => unsub();

@@ -1,13 +1,9 @@
-import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
 import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAgentSystemPrompt";
 import {
-  buildMaterialAgentClientNameRegisteredReply,
-  isAwaitingMaterialAgentClientName,
-  parseMaterialAgentClientNameFromUserText,
   resolveMaterialAgentOrderClientName,
   shouldResetMaterialOrderClientSession,
 } from "@/features/featureHub/materialAgentOrderClient";
@@ -30,25 +26,9 @@ export type MaterialAgentPostBody = {
 
 export type MaterialAgentRouteAuth = { uid: string };
 
-function streamMaterialAgentClientNameRegistered(
-  messages: unknown[],
-  clientName: string,
-): Response {
-  return createChatbotSseResponse(async (enqueue) => {
-    const reply = buildMaterialAgentClientNameRegisteredReply(clientName);
-    const stored = normalizeStoredMessages(messages);
-    enqueue({ type: "material_order_client", clientName });
-    enqueue({ type: "text", delta: reply });
-    enqueue({
-      type: "done",
-      apiMessages: [...stored, { role: "assistant", content: reply }],
-    });
-  });
-}
-
 export async function handleMaterialAgentPost(
   body: MaterialAgentPostBody | null,
-  auth: MaterialAgentRouteAuth,
+  auth: MaterialAgentRouteAuth
 ): Promise<Response> {
   const companyId = (body?.companyId ?? "").trim();
   if (!companyId) {
@@ -106,11 +86,6 @@ export async function handleMaterialAgentPost(
   };
 
   const toolScope = [...MATERIAL_AGENT_TOOL_SCOPE];
-
-  const parsedClientReply = parseMaterialAgentClientNameFromUserText(lastUser, messages);
-  if (parsedClientReply && isAwaitingMaterialAgentClientName(messages)) {
-    return streamMaterialAgentClientNameRegistered(messages, parsedClientReply);
-  }
 
   return createChatbotSseResponse(async (enqueue) => {
     if (resetClientSession) {

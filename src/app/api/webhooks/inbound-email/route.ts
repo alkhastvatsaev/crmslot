@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { logger } from "@/core/logger";
 
 const COLLECTION = "intervention_emails";
 
@@ -23,12 +24,12 @@ export async function POST(req: Request) {
       text = formData.get("text")?.toString() || "";
       html = formData.get("html")?.toString() || "";
       const headers = formData.get("headers")?.toString() || "";
-      
+
       const msgIdMatch = headers.match(/Message-ID:\s*([^\r\n]+)/i);
       if (msgIdMatch && msgIdMatch[1]) {
         messageId = msgIdMatch[1].trim();
       }
-      
+
       const envelopeStr = formData.get("envelope")?.toString();
       if (envelopeStr) {
         try {
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
     const interventionId = match[1];
 
     const db = getAdminDb();
-    
+
     // Attempt to find companyId from intervention
     let companyId = "unknown";
     try {
@@ -94,7 +95,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[inbound-email] Error processing webhook:", err);
+    logger.error("[inbound-email] Error processing webhook:", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ ok: false, error: "Internal Server Error" }, { status: 500 });
   }
 }

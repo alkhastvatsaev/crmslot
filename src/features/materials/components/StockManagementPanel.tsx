@@ -10,6 +10,7 @@ import {
   type StockItem,
 } from "@/features/materials/stockFirestore";
 import { cn } from "@/lib/utils";
+import { HUB_FIELD_CLASS, HUB_RADIUS, HUB_TYPE, HubButton, HubCard } from "@/core/ui/hub";
 
 export default function StockManagementPanel() {
   const workspace = useCompanyWorkspaceOptional();
@@ -17,7 +18,13 @@ export default function StockManagementPanel() {
 
   const [items, setItems] = useState<StockItem[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ reference: "", description: "", quantity: 0, alertThreshold: 5, unit: "pcs" });
+  const [form, setForm] = useState({
+    reference: "",
+    description: "",
+    quantity: 0,
+    alertThreshold: 5,
+    unit: "pcs",
+  });
 
   useEffect(() => {
     if (!companyId) return;
@@ -36,14 +43,14 @@ export default function StockManagementPanel() {
   return (
     <div data-testid="stock-management-panel" className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-[15px] font-bold text-slate-800">Stock matériaux</h3>
-        <button
+        <h3 className={HUB_TYPE.title}>Stock matériaux</h3>
+        <HubButton
           type="button"
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 rounded-xl bg-black px-3 py-1.5 text-[12px] font-bold text-white hover:bg-black/80"
+          className="h-9 min-h-0 px-3 text-[12px] font-bold"
         >
           <Plus className="h-3.5 w-3.5" /> Ajouter
-        </button>
+        </HubButton>
       </div>
 
       {lowStock.length > 0 && (
@@ -56,7 +63,7 @@ export default function StockManagementPanel() {
       )}
 
       {showForm && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-black/5 bg-[#FAFAFA] p-4">
+        <HubCard tone="muted" padding="md" className="flex flex-col gap-3">
           <div className="flex gap-2">
             <input
               placeholder="Référence"
@@ -95,22 +102,27 @@ export default function StockManagementPanel() {
               className="w-20 rounded-xl border border-black/8 bg-white px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-black/10"
             />
           </div>
-          <button
+          <HubButton
             type="button"
             onClick={handleCreate}
             disabled={!form.description}
-            className="w-full rounded-xl bg-black py-2 text-[13px] font-bold text-white disabled:opacity-40"
+            fullWidth
+            className="min-h-[40px] text-[13px] font-bold"
           >
             Créer l&apos;article
-          </button>
-        </div>
+          </HubButton>
+        </HubCard>
       )}
 
       {items.length === 0 && !showForm && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 p-8 text-center">
+        <HubCard
+          tone="dashed"
+          padding="md"
+          className="flex flex-col items-center justify-center text-center"
+        >
           <PackageCheck className="mb-2 h-8 w-8 text-slate-300" />
           <p className="text-[13px] font-medium text-slate-500">Aucun article en stock</p>
-        </div>
+        </HubCard>
       )}
 
       <div className="flex flex-col gap-2">
@@ -120,8 +132,9 @@ export default function StockManagementPanel() {
             <div
               key={item.id}
               className={cn(
-                "flex items-center justify-between gap-3 rounded-2xl border px-4 py-3",
-                low ? "border-amber-200 bg-amber-50" : "border-black/5 bg-white",
+                "flex items-center justify-between gap-3 border px-4 py-3",
+                HUB_RADIUS.card,
+                low ? "border-amber-200 bg-amber-50" : "border-black/5 bg-white"
               )}
             >
               <div className="flex min-w-0 flex-col">
@@ -131,9 +144,16 @@ export default function StockManagementPanel() {
                       {item.reference}
                     </span>
                   )}
-                  <span className="truncate text-[13px] font-bold text-slate-800">{item.description}</span>
+                  <span className="truncate text-[13px] font-bold text-slate-800">
+                    {item.description}
+                  </span>
                 </div>
-                <span className={cn("mt-0.5 text-[11px] font-semibold", low ? "text-amber-700" : "text-slate-500")}>
+                <span
+                  className={cn(
+                    "mt-0.5 text-[11px] font-semibold",
+                    low ? "text-amber-700" : "text-slate-500"
+                  )}
+                >
                   {item.quantity} {item.unit} {low && `⚠ seuil: ${item.alertThreshold}`}
                 </span>
               </div>
@@ -146,7 +166,9 @@ export default function StockManagementPanel() {
                 >
                   <Minus className="h-3 w-3" />
                 </button>
-                <span className="w-8 text-center text-[13px] font-bold tabular-nums">{item.quantity}</span>
+                <span className="w-8 text-center text-[13px] font-bold tabular-nums">
+                  {item.quantity}
+                </span>
                 <button
                   type="button"
                   onClick={() => adjustStockQuantity(item.id, 1)}

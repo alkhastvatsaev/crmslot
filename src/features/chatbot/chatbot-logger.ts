@@ -1,4 +1,5 @@
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
+import { logger } from "@/core/logger";
 
 export type ChatbotLogEntry = {
   companyId: string;
@@ -12,17 +13,23 @@ export type ChatbotLogEntry = {
 
 export async function logChatbotTurn(entry: ChatbotLogEntry): Promise<void> {
   if (!isFirebaseAdminReady()) {
-    console.warn("[chatbot-logger] Firebase Admin non initialisé, log ignoré.");
+    logger.warn("[chatbot-logger] Firebase Admin non initialisé, log ignoré.");
     return;
   }
 
   try {
     const db = getAdminDb();
-    await db.collection("companies").doc(entry.companyId).collection("chatbot_training_logs").add({
-      ...entry,
-      createdAtIso: new Date(entry.createdAt).toISOString(),
-    });
+    await db
+      .collection("companies")
+      .doc(entry.companyId)
+      .collection("chatbot_training_logs")
+      .add({
+        ...entry,
+        createdAtIso: new Date(entry.createdAt).toISOString(),
+      });
   } catch (error) {
-    console.error("[chatbot-logger] Erreur lors de l'enregistrement du log", error);
+    logger.error("[chatbot-logger] Erreur lors de l'enregistrement du log", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }

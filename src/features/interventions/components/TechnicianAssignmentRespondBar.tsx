@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { logger } from "@/core/logger";
 import { toast } from "sonner";
 import type { Intervention } from "@/features/interventions/types";
 import {
@@ -9,8 +10,6 @@ import {
 } from "@/features/interventions/respondToTechnicianAssignment";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { BidirectionalSlideAction } from "@/components/ui/slide-action";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 type Props = {
   iv: Intervention;
@@ -29,7 +28,9 @@ export default function TechnicianAssignmentRespondBar({ iv, technicianUid }: Pr
       await acceptTechnicianAssignment(iv);
       toast.success(String(t("technician_hub.dashboard.detail.assignment_accepted")));
     } catch (err) {
-      console.error(err);
+      logger.error("acceptTechnicianAssignment", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       const message = err instanceof Error ? err.message : "";
       toast.error(String(t("technician_hub.dashboard.detail.assignment_action_failed")), {
         description: message || undefined,
@@ -47,7 +48,9 @@ export default function TechnicianAssignmentRespondBar({ iv, technicianUid }: Pr
       await declineTechnicianAssignment(iv, technicianUid);
       toast.success(String(t("technician_hub.dashboard.detail.assignment_declined")));
     } catch (err) {
-      console.error(err);
+      logger.error("declineTechnicianAssignment", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       const message = err instanceof Error ? err.message : "";
       toast.error(String(t("technician_hub.dashboard.detail.assignment_action_failed")), {
         description: message || undefined,
@@ -61,8 +64,7 @@ export default function TechnicianAssignmentRespondBar({ iv, technicianUid }: Pr
   return (
     <div
       data-testid="technician-assignment-respond-bar"
-      style={outfit}
-      className="shrink-0 border-t border-neutral-200/80 bg-white px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="shrink-0 border-t border-slate-200/50 bg-white px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       <BidirectionalSlideAction
         testId="technician-assignment-slide"

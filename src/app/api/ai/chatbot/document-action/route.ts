@@ -5,6 +5,7 @@ import {
   handleChatbotDocumentActionPost,
   type ChatbotDocumentActionBody,
 } from "@/features/chatbot/chatbot-document-action-handler";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -16,7 +17,9 @@ export async function POST(req: NextRequest) {
     const body = (await req.json().catch(() => null)) as ChatbotDocumentActionBody | null;
     return await handleChatbotDocumentActionPost(body, { uid: authResult.uid });
   } catch (err: unknown) {
-    console.error("[chatbot/document-action]", err);
+    logger.error("[chatbot/document-action]", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     const message = err instanceof Error ? err.message : "Erreur serveur";
     return new Response(JSON.stringify({ error: message }), {
       status: 500,

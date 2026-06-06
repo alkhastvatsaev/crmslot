@@ -1,5 +1,6 @@
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 
 export type FcmUiStatus =
   | "idle"
@@ -23,13 +24,15 @@ export function isPushServiceWorkerEnabled(): boolean {
 export class PushServiceWorkerUnavailableError extends Error {
   constructor() {
     super(
-      "Service worker indisponible. En local : lancez « npm run dev:pwa ». En production : build + start (HTTPS).",
+      "Service worker indisponible. En local : lancez « npm run dev:pwa ». En production : build + start (HTTPS)."
     );
     this.name = "PushServiceWorkerUnavailableError";
   }
 }
 
-export function isPushServiceWorkerUnavailableError(e: unknown): e is PushServiceWorkerUnavailableError {
+export function isPushServiceWorkerUnavailableError(
+  e: unknown
+): e is PushServiceWorkerUnavailableError {
   return e instanceof PushServiceWorkerUnavailableError;
 }
 
@@ -37,7 +40,7 @@ export function handleFcmSyncError(
   e: unknown,
   setStatus: (status: FcmUiStatus) => void,
   setLastError: (message: string | null) => void,
-  opts?: { logTag?: string; surfaceErrorInUi?: boolean },
+  opts?: { logTag?: string; surfaceErrorInUi?: boolean }
 ): void {
   if (isPushServiceWorkerUnavailableError(e)) {
     setStatus("idle");
@@ -45,7 +48,7 @@ export function handleFcmSyncError(
     return;
   }
   if (opts?.logTag) {
-    console.error(opts.logTag, e);
+    logger.error(opts.logTag, { error: e instanceof Error ? e.message : String(e) });
   }
   setStatus("error");
   setLastError(e instanceof Error ? e.message : String(e));
@@ -81,7 +84,11 @@ export function tokenDocId(token: string): string {
   return `w_${Math.abs(h).toString(36)}`;
 }
 
-export async function persistFcmToken(uid: string, token: string, audience: "technician" | "client"): Promise<void> {
+export async function persistFcmToken(
+  uid: string,
+  token: string,
+  audience: "technician" | "client"
+): Promise<void> {
   if (!firestore) throw new Error("Firestore indisponible");
   await setDoc(doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token)), {
     token,

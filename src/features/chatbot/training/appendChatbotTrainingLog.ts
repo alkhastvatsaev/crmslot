@@ -1,4 +1,5 @@
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
+import { logger } from "@/core/logger";
 import type { ChatbotTrainingTurnExtract } from "@/features/chatbot/training/extractChatbotTrainingTurn";
 import * as admin from "firebase-admin";
 
@@ -23,7 +24,9 @@ export type AppendChatbotTrainingLogParams = {
  * Écrit un document dans `companies/{companyId}/chatbot_training_logs` (Admin SDK uniquement).
  * Ne bloque pas le flux SSE en cas d’erreur.
  */
-export async function appendChatbotTrainingLog(params: AppendChatbotTrainingLogParams): Promise<void> {
+export async function appendChatbotTrainingLog(
+  params: AppendChatbotTrainingLogParams
+): Promise<void> {
   if (!isChatbotTrainingLogEnabled()) return;
   if (!isFirebaseAdminReady()) return;
 
@@ -48,6 +51,8 @@ export async function appendChatbotTrainingLog(params: AppendChatbotTrainingLogP
         source: "belgmap_openai_chatbot",
       });
   } catch (err) {
-    console.error("[chatbot/training] appendChatbotTrainingLog:", err);
+    logger.error("[chatbot/training] appendChatbotTrainingLog:", {
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
