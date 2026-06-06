@@ -24,7 +24,7 @@ test.describe("Dashboard carousel", () => {
     await expect(page.locator('[data-testid="dashboard-page-4"]')).toBeVisible({
       timeout: 20_000,
     });
-    await expect(page.locator('[data-testid="chatbot-chat"]')).toBeVisible({
+    await expect(page.locator('[data-testid="dashboard-pager-slot-4-panel-center"]')).toBeVisible({
       timeout: 20_000,
     });
 

@@ -143,7 +143,7 @@ function renderInbox(ui: React.ReactElement) {
   return render(
     <I18nProvider>
       <DateProvider>{ui}</DateProvider>
-    </I18nProvider>,
+    </I18nProvider>
   );
 }
 
@@ -161,8 +161,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
   });
 
   function openRequestsTab() {
-    const tab = screen.getByRole("button", { name: /Demandes|Requests/i });
-    fireEvent.click(tab);
+    fireEvent.click(screen.getByTestId("backoffice-inbox-tab-requests"));
   }
 
   it("affiche l’onglet Demandes et la carte pending", () => {
@@ -188,7 +187,9 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     });
     renderInbox(<BackOfficeInboxPanel />);
     openRequestsTab();
-    expect(screen.getByTestId("backoffice-inbox-request-row-req-assigned-stuck")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("backoffice-inbox-request-row-req-assigned-stuck")
+    ).toBeInTheDocument();
   });
 
   it("ouvre le détail puis assigne via transition workflow", async () => {
@@ -214,7 +215,13 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
 
   it("affiche le picker même si location absente (repli coordonnées)", async () => {
     mockUseBackOffice.mockReturnValue({
-      interventions: [{ ...pendingRequest, id: "req-no-loc", location: undefined as unknown as Intervention["location"] }],
+      interventions: [
+        {
+          ...pendingRequest,
+          id: "req-no-loc",
+          location: undefined as unknown as Intervention["location"],
+        },
+      ],
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
@@ -226,8 +233,6 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     fireEvent.click(screen.getByTestId("backoffice-inbox-assign"));
 
     expect(await screen.findByTestId("technician-assign-picker")).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.getByTestId("technician-assign-confirm")).not.toBeDisabled(),
-    );
+    await waitFor(() => expect(screen.getByTestId("technician-assign-confirm")).not.toBeDisabled());
   });
 });

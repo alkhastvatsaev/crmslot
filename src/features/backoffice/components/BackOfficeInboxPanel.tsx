@@ -204,6 +204,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
           {
             id: "requests",
             label: t("backoffice.inbox.tabs.requests"),
+            testId: "backoffice-inbox-tab-requests",
             activeAccent: "blue",
             badge: pendingRequests.length,
             badgeAccent: "blue",

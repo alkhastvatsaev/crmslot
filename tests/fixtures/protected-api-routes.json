@@ -126,64 +126,78 @@
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/auth-url"
+    "path": "/api/integrations/gmail/auth-url",
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/connect"
+    "path": "/api/integrations/gmail/connect",
+    "localDevBypass": true
   },
   {
     "method": "POST",
     "path": "/api/integrations/gmail/disconnect",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/labels"
+    "path": "/api/integrations/gmail/labels",
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/messages"
+    "path": "/api/integrations/gmail/messages",
+    "localDevBypass": true
   },
   {
     "method": "POST",
     "path": "/api/integrations/gmail/messages",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/messages/fixture"
+    "path": "/api/integrations/gmail/messages/fixture",
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/messages/fixture/attachments/fixture"
+    "path": "/api/integrations/gmail/messages/fixture/attachments/fixture",
+    "localDevBypass": true
   },
   {
     "method": "POST",
     "path": "/api/integrations/gmail/messages/fixture/link-intervention",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/messages/fixture/link-suggestions"
+    "path": "/api/integrations/gmail/messages/fixture/link-suggestions",
+    "localDevBypass": true
   },
   {
     "method": "POST",
     "path": "/api/integrations/gmail/messages/fixture/modify",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "POST",
     "path": "/api/integrations/gmail/messages/fixture/trash",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/status"
+    "path": "/api/integrations/gmail/status",
+    "localDevBypass": true
   },
   {
     "method": "GET",
-    "path": "/api/integrations/gmail/threads/fixture"
+    "path": "/api/integrations/gmail/threads/fixture",
+    "localDevBypass": true
   },
   {
     "method": "POST",
@@ -216,7 +230,8 @@
   {
     "method": "POST",
     "path": "/api/interventions/fixture/technician-response",
-    "body": {}
+    "body": {},
+    "localDevBypass": true
   },
   {
     "method": "POST",

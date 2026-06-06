@@ -62,6 +62,7 @@ for (const file of walk(API_ROOT)) {
   const hasAuthGuard =
     content.includes("requireAuthenticatedUser") ||
     content.includes("requireAuthenticatedUserOrLocalDev");
+  const localDevBypass = content.includes("requireAuthenticatedUserOrLocalDev");
 
   for (const method of methods) {
     const key = `${method} ${routePath}`;
@@ -71,6 +72,7 @@ for (const file of walk(API_ROOT)) {
       method,
       path: routePath,
       body: method === "GET" ? undefined : {},
+      ...(localDevBypass ? { localDevBypass: true } : {}),
     });
   }
 }
