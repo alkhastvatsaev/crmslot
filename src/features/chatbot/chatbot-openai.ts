@@ -503,7 +503,8 @@ export async function runChatbotOpenAI(params: {
           if (clientName) {
             params.emit({ type: "material_order_client", clientName });
           }
-        } else if (result && typeof result === "object" && !("error" in result)) {
+        }
+        if (result && typeof result === "object" && !("error" in result)) {
           const orderText = documentToolSuccessMessage("order_lecot_parts", result);
           params.emit({ type: "text", delta: orderText });
           apiMessages = [

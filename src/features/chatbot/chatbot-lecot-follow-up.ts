@@ -99,6 +99,13 @@ const PRODUCT_KEYWORD_NON_BLOCKING = new Set([
   "faut",
   "peux",
   "pouvez",
+  // Adjectifs et contractions courantes qui précèdent un nom de produit
+  "nouveau",
+  "nouvelle",
+  "nouvelles",
+  "nouveaux",
+  "dune", // contraction "d'une" normalisée
+  "dun", // contraction "d'un" normalisée
 ]);
 
 /**
@@ -196,9 +203,9 @@ export function resolveLecotCatalogSearchQuery(
   if (!t) return null;
   if (isChatbotEmailIntent(t) && !isChatbotLecotOrderIntent(t)) return null;
 
-  // Strip context noise (client name = 1 token, lecot URL ref) before keyword extraction
+  // Strip context noise (client name, lecot URL ref) before keyword extraction
   const tStripped = t
-    .replace(/\s+(?:pour\s+le|chez\s+le)\s+client\s+[\w.-]+/i, " ")
+    .replace(/(?:^|\s+)(?:pour\s+(?:le\s+)?|chez\s+(?:le\s+)?)client\s+[\w.-]+/i, " ")
     .replace(/\s+sur\s+lecot\b.*/i, "")
     .trim();
   const fromKeyword = extractLecotProductKeyword(tStripped);

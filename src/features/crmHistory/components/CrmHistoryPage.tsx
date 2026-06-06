@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CrmPeriodFilter } from "../crmActivityTypes";
 import { toast } from "sonner";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -30,18 +31,22 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const companyId =
-    (workspace?.activeCompanyId ?? "").trim() ||
-    (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
 
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
 
-  const { events, loading, refreshing, feedError } = useCrmActivityFeed(companyId, "all", "all", "");
+  const [period, setPeriod] = useState<CrmPeriodFilter>("week");
+  const { events, loading, refreshing, feedError } = useCrmActivityFeed(
+    companyId,
+    period,
+    "all",
+    ""
+  );
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
-  const selectedEvent =
-    events.find((event) => event.id === selectedEventId) ?? null;
+  const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null;
 
   const newEventIds = useCrmNewEventHighlight(events, { enabled: pageActive });
   const prevHighlightSizeRef = useRef(0);
@@ -73,7 +78,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
       inboxIntent?.setPendingInboxId(event.interventionId);
       navigateBackOfficeHub(pager);
     },
-    [inboxIntent, pager],
+    [inboxIntent, pager]
   );
 
   return (
@@ -109,6 +114,8 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
             feedError={feedError}
             selectedEventId={selectedEventId}
             onEventSelect={handleEventSelect}
+            period={period}
+            onPeriodChange={setPeriod}
           />
         </section>
       }
@@ -119,6 +126,8 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
           <CrmHistoryEventDetailPanel
             event={selectedEvent}
             onOpenIntervention={handleOpenIntervention}
+            allEvents={events}
+            period={period}
           />
         </section>
       }

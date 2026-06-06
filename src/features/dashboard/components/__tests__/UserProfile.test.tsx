@@ -12,7 +12,7 @@ describe("UserProfile", () => {
       "SOCIÉTÉ BX",
       "MANSOUR",
       "MATÉRIEL",
-      "HISTORIQUE",
+      "QUALITY MANAGEMENT",
       "FACTURATION",
       "GMAIL",
     ]);

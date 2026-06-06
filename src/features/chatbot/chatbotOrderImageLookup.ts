@@ -45,6 +45,15 @@ function buildLookupFromFields(
 
 export function buildSupplierOrderImageLookup(order: SupplierOrder): ChatbotOrderImageLookup {
   for (const line of order.lines) {
+    if (line.imageUrl?.trim()) {
+      return {
+        orderId: order.id,
+        reference: line.sku || line.label,
+        description: line.label?.trim() || undefined,
+        lecotSku: /^lec-/i.test(line.sku) ? line.sku : null,
+        imageUrl: line.imageUrl.trim(),
+      };
+    }
     const matched = matchStockCatalogImageLookup(lineLookupFields(line));
     if (matched) {
       return {

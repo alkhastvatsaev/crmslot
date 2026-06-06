@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   FilePlus,
   UserCheck,
@@ -27,8 +28,43 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
-import type { CrmActivityEvent, CrmEventType } from "../crmActivityTypes";
+import type { CrmActivityEvent, CrmEventType, CrmPeriodFilter } from "../crmActivityTypes";
 import type { Intervention } from "@/features/interventions/types";
+
+const PERIOD_TABS: { value: CrmPeriodFilter; label: string }[] = [
+  { value: "today", label: "Aujourd'hui" },
+  { value: "week", label: "Semaine" },
+  { value: "month", label: "Mois" },
+  { value: "all", label: "Tout" },
+];
+
+function PeriodTabs({
+  value,
+  onChange,
+}: {
+  value: CrmPeriodFilter;
+  onChange: (p: CrmPeriodFilter) => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-1 border-b border-black/5 bg-white/70 px-3 py-2 backdrop-blur-sm">
+      {PERIOD_TABS.map((tab) => (
+        <button
+          key={tab.value}
+          type="button"
+          onClick={() => onChange(tab.value)}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-all",
+            value === tab.value
+              ? "bg-slate-900 text-white shadow-sm"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+          )}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 const EVENT_META: Record<
   CrmEventType,
@@ -185,6 +221,65 @@ const EVENT_META: Record<
     dotClass: "bg-emerald-500",
   },
 };
+
+function QmStatsStrip({ events }: { events: CrmActivityEvent[] }) {
+  const stats = useMemo(() => {
+    let created = 0,
+      completed = 0,
+      problems = 0,
+      invoiced = 0;
+    for (const e of events) {
+      if (e.type === "intervention_created") created++;
+      else if (e.type === "intervention_completed") completed++;
+      else if (
+        e.type === "intervention_cancelled" ||
+        e.type === "intervention_deleted" ||
+        e.type === "intervention_technician_declined"
+      )
+        problems++;
+      else if (e.type === "intervention_invoiced") invoiced++;
+    }
+    const rate = created > 0 ? Math.round((completed / created) * 100) : null;
+    return { created, completed, problems, invoiced, rate };
+  }, [events]);
+
+  const items = [
+    { value: stats.created, label: "Créées", color: "text-blue-600" },
+    { value: stats.completed, label: "Clôturées", color: "text-emerald-600" },
+    {
+      value: stats.rate !== null ? `${stats.rate}%` : "—",
+      label: "Taux clôture",
+      color:
+        stats.rate === null
+          ? "text-slate-400"
+          : stats.rate >= 70
+            ? "text-emerald-600"
+            : stats.rate >= 40
+              ? "text-amber-500"
+              : "text-red-500",
+    },
+    {
+      value: stats.problems,
+      label: "Annul./Refus",
+      color: stats.problems > 0 ? "text-rose-500" : "text-slate-400",
+    },
+  ];
+
+  return (
+    <div className="flex shrink-0 items-stretch divide-x divide-black/5 border-b border-black/5 bg-white/50">
+      {items.map(({ value, label, color }) => (
+        <div key={label} className="flex flex-1 flex-col items-center justify-center py-3 gap-0.5">
+          <span className={`text-[22px] font-bold tabular-nums leading-none ${color}`}>
+            {value}
+          </span>
+          <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+            {label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function formatTime(ts: number): string {
   if (!ts) return "";
@@ -347,6 +442,8 @@ type Props = {
   feedError?: string | null;
   selectedEventId?: string | null;
   onEventSelect?: (event: CrmActivityEvent) => void;
+  period?: CrmPeriodFilter;
+  onPeriodChange?: (p: CrmPeriodFilter) => void;
 };
 
 export default function CrmHistoryCenterFeed({
@@ -358,12 +455,17 @@ export default function CrmHistoryCenterFeed({
   feedError,
   selectedEventId,
   onEventSelect,
+  period = "all",
+  onPeriodChange,
 }: Props) {
   const { t } = useTranslation();
+
+  const tabs = onPeriodChange ? <PeriodTabs value={period} onChange={onPeriodChange} /> : null;
 
   if (loading) {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {tabs}
         <div
           data-testid="crm-center-loading"
           className="flex flex-1 items-center justify-center gap-2 text-slate-400"
@@ -378,6 +480,7 @@ export default function CrmHistoryCenterFeed({
   if (events.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {tabs}
         <div
           data-testid="crm-center-empty"
           className="flex flex-1 flex-col items-center justify-center gap-3 text-slate-400"
@@ -393,6 +496,8 @@ export default function CrmHistoryCenterFeed({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="crm-center-feed">
+      {tabs}
+      <QmStatsStrip events={events} />
       <style>{`
         @keyframes crmSlideIn {
           from {

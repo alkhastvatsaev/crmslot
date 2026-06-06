@@ -49,7 +49,7 @@ describe("materialAgentRouteHandler", () => {
   it("returns 400 when companyId is missing", async () => {
     const res = await handleMaterialAgentPost(
       { messages: [{ role: "user", content: "ruptures" }] },
-      auth,
+      auth
     );
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual({ error: "companyId requis" });
@@ -70,7 +70,7 @@ describe("materialAgentRouteHandler", () => {
         messages: [{ role: "user", content: "état du stock" }],
         stockSnapshot: '{"totalSkus":3}',
       },
-      auth,
+      auth
     );
 
     const events = await readSseJsonLines(res);
@@ -82,7 +82,7 @@ describe("materialAgentRouteHandler", () => {
         hubAgentMode: true,
         conversationContext: expect.objectContaining({ toolScope: [...MATERIAL_AGENT_TOOL_SCOPE] }),
         toolCtx: expect.objectContaining({ companyId: "co-mat", actorUid: "uid-mat" }),
-      }),
+      })
     );
     const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
     expect(call?.system).toContain("Agent Matériel");
@@ -91,7 +91,7 @@ describe("materialAgentRouteHandler", () => {
     expect(call?.system).toMatch(/search_lecot_products/);
   });
 
-  it("registers client name reply without OpenAI when awaiting name", async () => {
+  it("delegates client name reply to OpenAI (no pre-interception)", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
@@ -105,13 +105,11 @@ describe("materialAgentRouteHandler", () => {
           { role: "user", content: "Dupont" },
         ],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
-    expect(events).toContainEqual(
-      expect.objectContaining({ type: "material_order_client", clientName: "Dupont" }),
-    );
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
+    expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
   });
 
   it("clears session client and delegates nouvelle commande lecot to OpenAI", async () => {
@@ -121,11 +119,11 @@ describe("materialAgentRouteHandler", () => {
         orderClientName: "Ancien Client",
         messages: [{ role: "user", content: "nouvelle commande lecot" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(events).toContainEqual(
-      expect.objectContaining({ type: "material_order_client", clientName: "" }),
+      expect.objectContaining({ type: "material_order_client", clientName: "" })
     );
     expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
@@ -137,7 +135,7 @@ describe("materialAgentRouteHandler", () => {
         companyId: "co-mat",
         messages: [{ role: "user", content: "commande lecot" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
@@ -148,11 +146,11 @@ describe("materialAgentRouteHandler", () => {
     delete process.env.OPENAI_API_KEY;
     const res = await handleMaterialAgentPost(
       { companyId: "co-mat", messages: [{ role: "user", content: "hi" }] },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(events).toContainEqual(
-      expect.objectContaining({ type: "error", message: "OPENAI_API_KEY manquante." }),
+      expect.objectContaining({ type: "error", message: "OPENAI_API_KEY manquante." })
     );
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
   });
