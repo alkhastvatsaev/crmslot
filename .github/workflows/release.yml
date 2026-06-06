@@ -80,6 +80,10 @@ jobs:
           vercel-args: "--prod"
           working-directory: ./
 
+      - name: Smoke deployed URL (auto)
+        if: steps.deploy.outputs.url != ''
+        run: node scripts/smoke-url.mjs "${{ steps.deploy.outputs.url }}"
+
   smoke-manual:
     name: Smoke URL (manuel)
     runs-on: ubuntu-latest
