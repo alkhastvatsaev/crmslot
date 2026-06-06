@@ -8,7 +8,11 @@ test.describe("Client portal deep links", () => {
       timeout: 30_000,
     });
     await expect(page).not.toHaveURL(/bmClientCase=/, { timeout: 15_000 });
-    await expect(page.locator('[data-testid="requester-tracking-panel"]')).toBeVisible({
+    await expect(
+      page.locator(
+        '[data-testid="company-hub-rail-portail"] [data-testid="requester-tracking-panel"]'
+      )
+    ).toBeVisible({
       timeout: 15_000,
     });
   });
@@ -21,7 +25,11 @@ test.describe("Client portal deep links", () => {
     });
     await expect(page).not.toHaveURL(/payment=success/, { timeout: 15_000 });
     await expect(page).not.toHaveURL(/interventionId=/, { timeout: 5_000 });
-    await expect(page.locator('[data-testid="requester-tracking-panel"]')).toBeVisible({
+    await expect(
+      page.locator(
+        '[data-testid="company-hub-rail-portail"] [data-testid="requester-tracking-panel"]'
+      )
+    ).toBeVisible({
       timeout: 15_000,
     });
   });

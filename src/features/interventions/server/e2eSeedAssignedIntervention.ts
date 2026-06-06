@@ -51,8 +51,19 @@ export async function e2eSeedAssignedInterventionAdmin(
   if (existing.exists) {
     await ref.update(payload);
   } else {
+    const {
+      completionPhotoUrls: _p,
+      completionSignatureUrl: _s,
+      completedAt: _c,
+      completedByUid: _u,
+      ...createPayload
+    } = payload;
+    void _p;
+    void _s;
+    void _c;
+    void _u;
     await ref.set({
-      ...payload,
+      ...createPayload,
       createdAt: FieldValue.serverTimestamp(),
     });
   }

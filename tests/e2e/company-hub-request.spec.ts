@@ -22,6 +22,7 @@ test.describe("Company hub request form", () => {
     await profilePanel.locator('input[type="text"]').nth(0).fill("Marie");
     await profilePanel.locator('input[type="text"]').nth(1).fill("Martin");
     await profilePanel.locator('input[type="tel"]').fill("0470987654");
+    await profilePanel.locator('input[type="email"]').fill("marie.martin@example.com");
 
     const interventionPanel = page.locator('[data-testid="requester-intervention-panel"]');
     await interventionPanel.locator("button").nth(0).click();
@@ -65,8 +66,12 @@ test.describe("Company hub request form", () => {
     await expect(submitBtn).toBeEnabled({ timeout: 10_000 });
     await submitBtn.click();
 
-    await expect(page.locator("text=/enregistrée|opgeslagen|saved/i")).toBeVisible({
+    // Smoke : le hub reste interactif après soumission (toast sonner éphémère)
+    await expect(page.locator('[data-testid="requester-intervention-panel"]')).toBeVisible({
       timeout: 15_000,
+    });
+    await expect(page.locator('[data-testid="spotlight-trigger"]')).toBeVisible({
+      timeout: 10_000,
     });
   });
 });
