@@ -22,6 +22,7 @@
     "test:webhooks": "jest src/app/api/webhooks --no-coverage",
     "test:ci": "npm run typecheck && npm run test:coverage",
     "test:e2e": "playwright test",
+    "test:e2e:ci": "CI=true playwright test",
     "test:e2e:chatbot": "playwright test tests/e2e/chatbot-local-intent.spec.ts",
     "test:e2e:invoice": "playwright test tests/e2e/invoice-validation.spec.ts",
     "test:e2e:company": "playwright test tests/e2e/company-hub-request.spec.ts",

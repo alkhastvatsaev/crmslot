@@ -1,11 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Technician hub offline panel", () => {
-  test.skip(
-    true,
-    "Panneau offline non monté dans TechnicianHubPage — à réactiver après re-câblage."
-  );
-
   test("offline sync panel is reachable from technician carousel page", async ({ page }) => {
     await page.goto("/");
 
@@ -22,7 +17,9 @@ test.describe("Technician hub offline panel", () => {
       await offlineAnchor.scrollIntoViewIfNeeded();
     }
 
-    const offlinePanel = page.locator('[data-testid="technician-offline-sync-panel"]');
+    const offlinePanel = page.locator(
+      '[data-testid="dashboard-pager-slot-2-panel-right"] [data-testid="technician-offline-sync-panel"]'
+    );
     await expect(offlinePanel).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('[data-testid="offline-sync-queue-count"]')).toBeVisible();
     await expect(page.locator('[data-testid="offline-sync-flush-btn"]')).toBeVisible();

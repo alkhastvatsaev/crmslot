@@ -1,0 +1,31 @@
+# Tests webhooks Stripe/Twilio quand le module change.
+name: Webhooks tests
+
+on:
+  pull_request:
+    paths:
+      - "src/app/api/webhooks/**"
+      - "src/core/api/twilioWebhook.ts"
+      - "jest.config.ts"
+      - "jest.setup.ts"
+      - ".github/workflows/webhooks-tests.yml"
+
+jobs:
+  webhooks-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run webhooks unit tests
+        run: npm run test:webhooks
