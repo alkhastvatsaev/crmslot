@@ -5,6 +5,7 @@ export interface SupplierOrderLine {
   label: string;
   quantity: number;
   unitPriceCents: number;
+  imageUrl?: string | null;
 }
 
 export interface SupplierOrder {

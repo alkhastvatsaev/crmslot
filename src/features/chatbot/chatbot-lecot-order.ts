@@ -111,7 +111,8 @@ function parseOrderLines(raw: unknown): SupplierOrderLine[] {
     if (!sku) {
       sku = syntheticLecotSku(label);
     }
-    lines.push({ sku, label, quantity, unitPriceCents });
+    const imageUrl = typeof o.imageUrl === "string" && o.imageUrl.trim() ? o.imageUrl.trim() : null;
+    lines.push({ sku, label, quantity, unitPriceCents, ...(imageUrl ? { imageUrl } : {}) });
   }
   if (lines.length === 0) {
     throw new Error("Aucune ligne valide dans lines");

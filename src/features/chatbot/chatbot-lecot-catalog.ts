@@ -58,6 +58,7 @@ export type LecotProductSuggestion = {
   unitPriceCents: number;
   lecotSearchUrl: string;
   markdownLink: string;
+  imageUrl?: string | null;
 };
 
 export function buildLecotProductSuggestions(
@@ -67,6 +68,7 @@ export function buildLecotProductSuggestions(
     unitPriceEur: number;
     unitPriceCents?: number;
     lecotSearchUrl: string;
+    imageUrl?: string | null;
   }>,
   max = LECOT_CHATBOT_SUGGESTION_COUNT
 ): LecotProductSuggestion[] {
@@ -80,6 +82,7 @@ export function buildLecotProductSuggestions(
       unitPriceCents,
       lecotSearchUrl: p.lecotSearchUrl,
       markdownLink: `[${p.label}](lecot:${p.lecotSearchUrl})`,
+      ...(p.imageUrl ? { imageUrl: p.imageUrl } : {}),
     };
   });
 }
