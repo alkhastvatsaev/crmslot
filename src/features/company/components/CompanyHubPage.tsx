@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
 import RequesterProfilePanel from "@/features/interventions/components/RequesterProfilePanel";
 import RequesterInterventionPanel from "@/features/interventions/components/RequesterInterventionPanel";
@@ -22,15 +22,18 @@ const railGap = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-
 
 import { CompanyHubTimelineTab } from "@/features/company/components/CompanyHubTimelineTab";
 import { CompanyHubDocumentsTab } from "@/features/company/components/CompanyHubDocumentsTab";
+import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
-type CompanyHubRightCategory = "tracking" | "chat" | "timeline" | "documents";
+type CompanyHubRightCategory = "tracking" | "chat" | "invoice" | "timeline" | "documents";
 
 /** Interface Demandeur (Page 2) — Qui demande, Que faut-il réparer, Où en est ma demande. */
 export default function CompanyHubPage() {
   const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("documents");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
+  const { logNote } = useActivityLog();
   const {
     lastSubmittedInterventionId,
     pendingTrackingInterventionId,
@@ -57,8 +60,92 @@ export default function CompanyHubPage() {
     return env || null;
   }, [workspace?.isTenantUser, workspace?.activeCompanyId]);
 
+  const leftPanel = (
+    <section
+      id={COMPANY_HUB_ANCHOR_WORKSPACE}
+      data-testid="company-hub-rail-demande"
+      className={`${railGap} scroll-mt-2`}
+    >
+      <RequesterProfilePanel />
+    </section>
+  );
+
+  const centerPanel = (
+    <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railGap} scroll-mt-2`}>
+      <RequesterInterventionPanel />
+    </section>
+  );
+
+  const rightPanel = (
+    <section
+      id={COMPANY_HUB_ANCHOR_CLIENT_PORTAL}
+      data-testid="company-hub-rail-portail"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
+    >
+      <HubSegmentedControl
+        value={rightCategory}
+        onChange={(id) => {
+          setRightCategory(id as CompanyHubRightCategory);
+          logNote(`Espace société / ${id}`);
+        }}
+        ariaLabel={t("company_hub.right_tabs.aria")}
+        className="mx-4 mt-4 shrink-0"
+        options={[
+          {
+            id: "tracking",
+            label: t("company_hub.right_tabs.tracking"),
+            testId: "company-hub-right-tab-tracking",
+            activeAccent: "blue",
+          },
+          {
+            id: "chat",
+            label: t("company_hub.right_tabs.chat"),
+            testId: "company-hub-right-tab-chat",
+            activeAccent: "blue",
+          },
+          {
+            id: "invoice",
+            label: t("company_hub.right_tabs.invoice"),
+            testId: "company-hub-right-tab-invoice",
+            activeAccent: "slate",
+          },
+          {
+            id: "documents",
+            label: t("company_hub.right_tabs.documents"),
+            testId: "company-hub-right-tab-documents",
+            activeAccent: "rose",
+          },
+          {
+            id: "timeline",
+            label: t("company_hub.right_tabs.timeline"),
+            testId: "company-hub-right-tab-timeline",
+            activeAccent: "emerald",
+          },
+        ]}
+      />
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden" role="tabpanel">
+        {rightCategory === "tracking" ? (
+          <RequesterTrackingPanel />
+        ) : rightCategory === "chat" ? (
+          <IvanaClientChatPanel
+            className="min-h-0 flex-1"
+            publishAsPortal
+            chatCompanyId={ivanaChatCompanyId}
+            chatInterventionId={portalCaseId}
+          />
+        ) : rightCategory === "invoice" ? (
+          <CompanyHubInvoiceTab interventionId={portalCaseId} />
+        ) : rightCategory === "documents" ? (
+          <CompanyHubDocumentsTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
+        ) : (
+          <CompanyHubTimelineTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
+        )}
+      </div>
+    </section>
+  );
+
   return (
-    <DashboardTriplePanelLayout
+    <AdaptiveTriplePanelLayout
       rootTestId="dashboard-secondary-placeholder"
       leftTestId="dashboard-secondary-panel-left"
       centerTestId="dashboard-secondary-panel-center"
@@ -66,79 +153,9 @@ export default function CompanyHubPage() {
       leftAriaLabel={t("company_hub.aria.left")}
       centerAriaLabel={t("company_hub.aria.center")}
       rightAriaLabel={t("company_hub.aria.right")}
-      left={
-        <section
-          id={COMPANY_HUB_ANCHOR_WORKSPACE}
-          data-testid="company-hub-rail-demande"
-          className={`${railGap} scroll-mt-2`}
-        >
-          <RequesterProfilePanel />
-        </section>
-      }
-      center={
-        <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railGap} scroll-mt-2`}>
-          <RequesterInterventionPanel />
-        </section>
-      }
-      right={
-        <section
-          id={COMPANY_HUB_ANCHOR_CLIENT_PORTAL}
-          data-testid="company-hub-rail-portail"
-          className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
-        >
-          <HubSegmentedControl
-            value={rightCategory}
-            onChange={(id) => setRightCategory(id as CompanyHubRightCategory)}
-            ariaLabel={t("company_hub.right_tabs.aria")}
-            className="mx-4 mt-4 shrink-0"
-            options={[
-              {
-                id: "tracking",
-                label: t("company_hub.right_tabs.tracking"),
-                testId: "company-hub-right-tab-tracking",
-                activeAccent: "blue",
-              },
-              {
-                id: "chat",
-                label: t("company_hub.right_tabs.chat"),
-                testId: "company-hub-right-tab-chat",
-                activeAccent: "blue",
-              },
-              {
-                id: "documents",
-                label: "Documents",
-                testId: "company-hub-right-tab-documents",
-                activeAccent: "rose",
-              },
-              {
-                id: "timeline",
-                label: "Historique",
-                testId: "company-hub-right-tab-timeline",
-                activeAccent: "emerald",
-              },
-            ]}
-          />
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden" role="tabpanel">
-            {rightCategory === "tracking" ? (
-              <RequesterTrackingPanel />
-            ) : rightCategory === "chat" ? (
-              <IvanaClientChatPanel
-                className="min-h-0 flex-1"
-                publishAsPortal
-                chatCompanyId={ivanaChatCompanyId}
-                chatInterventionId={portalCaseId}
-              />
-            ) : rightCategory === "documents" ? (
-              <CompanyHubDocumentsTab
-                interventionId={portalCaseId}
-                companyId={ivanaChatCompanyId}
-              />
-            ) : (
-              <CompanyHubTimelineTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
-            )}
-          </div>
-        </section>
-      }
+      left={leftPanel}
+      center={centerPanel}
+      right={rightPanel}
       centerPadding={false}
       rightPadding={false}
     />

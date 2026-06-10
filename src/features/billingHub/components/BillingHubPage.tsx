@@ -7,6 +7,7 @@ import BillingHubAgentPanel from "@/features/billingHub/components/BillingHubAge
 import ChatbotRightRail from "@/features/chatbot/components/ChatbotRightRail";
 import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
 import MaintenanceContractPanel from "@/features/maintenance/components/MaintenanceContractPanel";
+import AccountingExportButton from "@/features/billing/components/AccountingExportButton";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
@@ -74,6 +75,14 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
             />
           ) : null}
           <div className="custom-scrollbar overflow-y-auto space-y-4 pb-2">
+            {companyId ? (
+              <div data-testid="billing-hub-accounting-export">
+                <AccountingExportButton
+                  interventions={interventions}
+                  periodLabel={new Date().toISOString().slice(0, 7)}
+                />
+              </div>
+            ) : null}
             <QuoteListPanel />
             <MaintenanceContractPanel />
           </div>

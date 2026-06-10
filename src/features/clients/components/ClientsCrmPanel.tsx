@@ -20,14 +20,21 @@ import {
   updateClient,
 } from "@/features/clients/clientFirestore";
 import ClientInterventionsPanel from "@/features/clients/components/ClientInterventionsPanel";
+import EquipmentPanel from "@/features/equipment/components/EquipmentPanel";
+import MaintenanceContractPanel from "@/features/maintenance/components/MaintenanceContractPanel";
 import { downloadClientsCsv } from "@/features/clients/exportClientsCsv";
-import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/company/companyHubNavigation";
+import {
+  navigateCompanyHub,
+  COMPANY_HUB_ANCHOR_SMART_FORM,
+} from "@/features/company/companyHubNavigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 export default function ClientsCrmPanel() {
   const { t } = useTranslation();
   const crmEnabled = useFeatureFlag("crmContacts");
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
+  const equipmentEnabled = useFeatureFlag("equipmentInventory");
+  const maintenanceEnabled = useFeatureFlag("maintenanceContracts");
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
   const pager = useDashboardPagerOptional();
@@ -192,7 +199,7 @@ export default function ClientsCrmPanel() {
           companyName: r.companyName ?? null,
           phone: r.phone ?? null,
           email: r.email ?? null,
-        })),
+        }))
       );
       toast.success(String(t("crm.import_success")).replace("{{count}}", String(n)));
     } catch {
@@ -228,7 +235,10 @@ export default function ClientsCrmPanel() {
   };
 
   return (
-    <div data-testid="clients-crm-panel" className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div
+      data-testid="clients-crm-panel"
+      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+    >
       <div>
         <h2 className="text-lg font-bold text-slate-900">{t("crm.title")}</h2>
         <p className="text-sm text-slate-500">{t("crm.subtitle")}</p>
@@ -289,9 +299,13 @@ export default function ClientsCrmPanel() {
           </p>
           <ul className="max-h-64 overflow-y-auto p-2" data-testid="crm-clients-list">
             {loading ? (
-              <li className="px-2 py-4 text-center text-sm text-slate-400">{t("common.loading")}</li>
+              <li className="px-2 py-4 text-center text-sm text-slate-400">
+                {t("common.loading")}
+              </li>
             ) : filtered.length === 0 ? (
-              <li className="px-2 py-4 text-center text-sm text-slate-500">{t("crm.clients_empty")}</li>
+              <li className="px-2 py-4 text-center text-sm text-slate-500">
+                {t("crm.clients_empty")}
+              </li>
             ) : (
               filtered.map((c) => (
                 <li key={c.id}>
@@ -304,7 +318,9 @@ export default function ClientsCrmPanel() {
                     }`}
                   >
                     <User className="h-4 w-4 shrink-0" />
-                    <span className="truncate font-semibold">{buildClientDisplayName(c) || c.id}</span>
+                    <span className="truncate font-semibold">
+                      {buildClientDisplayName(c) || c.id}
+                    </span>
                   </button>
                 </li>
               ))
@@ -368,7 +384,9 @@ export default function ClientsCrmPanel() {
                 className="mb-3 space-y-2 border-b border-slate-100 pb-3"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase text-slate-400">{t("crm.edit_client")}</p>
+                  <p className="text-xs font-bold uppercase text-slate-400">
+                    {t("crm.edit_client")}
+                  </p>
                   <button
                     type="button"
                     data-testid="crm-delete-client-btn"
@@ -419,7 +437,9 @@ export default function ClientsCrmPanel() {
                   {t("crm.save_client")}
                 </button>
               </form>
-              <p className="mt-3 text-xs font-bold uppercase text-slate-400">{t("crm.sites_title")}</p>
+              <p className="mt-3 text-xs font-bold uppercase text-slate-400">
+                {t("crm.sites_title")}
+              </p>
               {sitesLoading ? (
                 <p className="text-sm text-slate-400">{t("common.loading")}</p>
               ) : sites.length === 0 ? (
@@ -427,7 +447,10 @@ export default function ClientsCrmPanel() {
               ) : (
                 <ul className="mt-1 space-y-1" data-testid="crm-sites-list">
                   {sites.map((s) => (
-                    <li key={s.id} className="flex gap-2 rounded-md bg-slate-50 px-2 py-1.5 text-sm">
+                    <li
+                      key={s.id}
+                      className="flex gap-2 rounded-md bg-slate-50 px-2 py-1.5 text-sm"
+                    >
                       <MapPin className="h-4 w-4 shrink-0 text-emerald-600" />
                       <span>
                         <span className="font-semibold">{s.label}</span>
@@ -479,7 +502,7 @@ export default function ClientsCrmPanel() {
                           clientName: buildClientDisplayName(selected),
                           phone: selected.phone,
                           email: selected.email,
-                        }),
+                        })
                       );
                     }
                     navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_SMART_FORM);
@@ -489,6 +512,16 @@ export default function ClientsCrmPanel() {
                 </button>
               ) : null}
               <ClientInterventionsPanel companyId={companyId} clientId={selected.id} />
+              {equipmentEnabled ? (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <EquipmentPanel clientId={selected.id} />
+                </div>
+              ) : null}
+              {maintenanceEnabled ? (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <MaintenanceContractPanel clientId={selected.id} />
+                </div>
+              ) : null}
             </div>
           ) : null}
         </section>
