@@ -49,6 +49,8 @@ type Props = {
   isAssigning?: boolean;
   /** Permet au parent (tiroir inbox) de forcer la hauteur disponible. */
   className?: string;
+  /** Créneaux gérés ailleurs (ex. « Modifier » back-office) — liste techniciens seule. */
+  techniciansOnly?: boolean;
 };
 
 function formatDistanceKm(km: number): string {
@@ -69,6 +71,7 @@ export default function TechnicianAssignPicker({
   onCancel,
   isAssigning = false,
   className,
+  techniciansOnly = false,
 }: Props) {
   const { t } = useTranslation();
   const { technicians, loading } = useTechnicians();
@@ -78,29 +81,22 @@ export default function TechnicianAssignPicker({
   const [aiReasoning, setAiReasoning] = useState<string | null>(null);
   const [etaByTechId, setEtaByTechId] = useState<Record<string, string>>({});
   const [scheduleDate, setScheduleDate] = useState(() => {
-    const fromIv =
-      intervention.scheduledDate?.trim() ||
-      intervention.requestedDate?.trim() ||
-      "";
+    const fromIv = intervention.scheduledDate?.trim() || intervention.requestedDate?.trim() || "";
     return fromIv || new Date().toISOString().slice(0, 10);
   });
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
 
   const interventionCoords = useMemo(
     () => interventionLocationOrDefault(intervention),
-    [intervention],
+    [intervention]
   );
 
   const ranked = useMemo(
     () =>
       prioritizeDefaultAssignTechnician(
-        rankTechniciansForIntervention(
-          technicians,
-          interventionCoords.lat,
-          interventionCoords.lng,
-        ),
+        rankTechniciansForIntervention(technicians, interventionCoords.lat, interventionCoords.lng)
       ),
-    [technicians, interventionCoords.lat, interventionCoords.lng],
+    [technicians, interventionCoords.lat, interventionCoords.lng]
   );
 
   useEffect(() => {
@@ -127,7 +123,7 @@ export default function TechnicianAssignPicker({
           interventionCoords.lat,
           interventionCoords.lng,
           intervention.problem,
-          intervention.address,
+          intervention.address
         );
         if (cancelled || !result) return;
         const best = result.technician;
@@ -154,12 +150,12 @@ export default function TechnicianAssignPicker({
   }, [interventionCoords.lat, interventionCoords.lng, intervention.problem, intervention.address]);
 
   const scheduleOverride = useMemo((): AssignScheduleOverride | undefined => {
-    if (!selectedSlotTime?.trim()) return undefined;
+    if (techniciansOnly || !selectedSlotTime?.trim()) return undefined;
     return { scheduledDate: scheduleDate, scheduledTime: selectedSlotTime };
-  }, [scheduleDate, selectedSlotTime]);
+  }, [techniciansOnly, scheduleDate, selectedSlotTime]);
 
   const proposedSlots = useMemo(() => {
-    if (!selectedId) return [];
+    if (techniciansOnly || !selectedId) return [];
     const tech = ranked.find((r) => r.technician.id === selectedId);
     if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
     return proposeAvailableSlotsForTechnician({
@@ -168,18 +164,19 @@ export default function TechnicianAssignPicker({
       dateYmd: scheduleDate,
       excludeInterventionId: intervention.id,
     });
-  }, [selectedId, ranked, peerInterventions, scheduleDate, intervention.id]);
+  }, [techniciansOnly, selectedId, ranked, peerInterventions, scheduleDate, intervention.id]);
 
   useEffect(() => {
-    if (!selectedId || proposedSlots.length === 0) return;
+    if (techniciansOnly || !selectedId || proposedSlots.length === 0) return;
     setSelectedSlotTime((prev) => {
       if (prev && proposedSlots.some((s) => s.time === prev)) return prev;
       return pickRecommendedSlot(
         proposedSlots,
-        intervention.requestedTime ?? intervention.scheduledTime,
+        intervention.requestedTime ?? intervention.scheduledTime
       );
     });
   }, [
+    techniciansOnly,
     selectedId,
     proposedSlots,
     intervention.requestedTime,
@@ -191,7 +188,12 @@ export default function TechnicianAssignPicker({
     const tech = ranked.find((r) => r.technician.id === selectedId);
     if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
     const uid = resolveTechnicianAssignUid(tech.technician);
-    const patch = buildAssignInterventionToTechnicianUpdate(intervention, uid, new Date(), scheduleOverride);
+    const patch = buildAssignInterventionToTechnicianUpdate(
+      intervention,
+      uid,
+      new Date(),
+      scheduleOverride
+    );
     const range = candidateRangeFromScheduleFields(patch.scheduledDate, patch.scheduledTime);
     if (!range) return [];
     return findTechnicianScheduleConflicts({
@@ -247,7 +249,7 @@ export default function TechnicianAssignPicker({
       data-testid="technician-assign-picker"
       className={cn(
         "flex min-h-0 flex-col rounded-[18px] border border-slate-200/80 bg-slate-50/90 p-4 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.18)]",
-        className,
+        className
       )}
     >
       <div className="mb-3 flex shrink-0 items-start justify-between gap-2">
@@ -292,7 +294,7 @@ export default function TechnicianAssignPicker({
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <div className="custom-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto pr-0.5">
             <ScheduleConflictBanner conflicts={selectedConflicts} />
-            {selectedId ? (
+            {!techniciansOnly && selectedId ? (
               <ProposedScheduleSlots
                 dateYmd={scheduleDate}
                 onDateChange={(date) => {
@@ -305,60 +307,62 @@ export default function TechnicianAssignPicker({
               />
             ) : null}
             <ul className="space-y-2 py-0.5">
-          {ranked.map(({ technician, distanceKm }) => {
-            const isSelected = selectedId === technician.id;
-            const isRecommended = recommendedId === technician.id;
-            const eta = etaByTechId[technician.id] ?? technician.realEta;
+              {ranked.map(({ technician, distanceKm }) => {
+                const isSelected = selectedId === technician.id;
+                const isRecommended = recommendedId === technician.id;
+                const eta = etaByTechId[technician.id] ?? technician.realEta;
 
-            return (
-              <li key={technician.id}>
-                <button
-                  type="button"
-                  data-testid={`technician-assign-option-${technician.id}`}
-                  onClick={() => setSelectedId(technician.id)}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-[14px] border px-3 py-2.5 text-left transition-colors",
-                    isSelected
-                      ? "border-slate-900 bg-slate-900/5 ring-1 ring-slate-900/20"
-                      : "border-slate-100 bg-white hover:border-slate-200",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
-                      isSelected ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700",
-                    )}
-                  >
-                    {technician.initial}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-sm font-semibold text-slate-900">{technician.name}</span>
-                      {isRecommended ? (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800">
-                          <Sparkles className="h-2.5 w-2.5" />
-                          {String(t("dispatch.assign_picker.recommended"))}
+                return (
+                  <li key={technician.id}>
+                    <button
+                      type="button"
+                      data-testid={`technician-assign-option-${technician.id}`}
+                      onClick={() => setSelectedId(technician.id)}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-[14px] border px-3 py-2.5 text-left transition-colors",
+                        isSelected
+                          ? "border-slate-900 bg-slate-900/5 ring-1 ring-slate-900/20"
+                          : "border-slate-100 bg-white hover:border-slate-200"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                          isSelected ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
+                        )}
+                      >
+                        {technician.initial}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-sm font-semibold text-slate-900">
+                            {technician.name}
+                          </span>
+                          {isRecommended ? (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800">
+                              <Sparkles className="h-2.5 w-2.5" />
+                              {String(t("dispatch.assign_picker.recommended"))}
+                            </span>
+                          ) : null}
                         </span>
-                      ) : null}
-                    </span>
-                    <span className="mt-0.5 flex flex-wrap gap-2 text-xs text-slate-500">
-                      <span>{formatDistanceKm(distanceKm)}</span>
-                      {eta ? <span>· ETA {eta}</span> : null}
-                      <span>· {String(t(statusLabelKey[technician.status]))}</span>
-                    </span>
-                    {isRecommended && aiReasoning ? (
-                      <div className="mt-2.5 rounded-[12px] bg-indigo-50/80 border border-indigo-100/50 p-2.5 flex items-start gap-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)]">
-                        <Sparkles className="h-4 w-4 shrink-0 text-indigo-500 mt-0.5" />
-                        <span className="text-[12px] text-indigo-900 font-medium leading-snug">
-                          {aiReasoning}
+                        <span className="mt-0.5 flex flex-wrap gap-2 text-xs text-slate-500">
+                          <span>{formatDistanceKm(distanceKm)}</span>
+                          {eta ? <span>· ETA {eta}</span> : null}
+                          <span>· {String(t(statusLabelKey[technician.status]))}</span>
                         </span>
-                      </div>
-                    ) : null}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
+                        {isRecommended && aiReasoning ? (
+                          <div className="mt-2.5 rounded-[12px] bg-indigo-50/80 border border-indigo-100/50 p-2.5 flex items-start gap-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)]">
+                            <Sparkles className="h-4 w-4 shrink-0 text-indigo-500 mt-0.5" />
+                            <span className="text-[12px] text-indigo-900 font-medium leading-snug">
+                              {aiReasoning}
+                            </span>
+                          </div>
+                        ) : null}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           {footerActions}

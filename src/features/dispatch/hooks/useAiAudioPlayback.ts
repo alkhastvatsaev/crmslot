@@ -34,6 +34,8 @@ export type UseAiAudioPlaybackOptions = {
   onPlaybackSync?: (sync: AiPlaybackSync) => void;
   onActiveClipUrlChange?: (clipPublicUrl: string | null) => void;
   onQueueChange?: (queue: QueuedClip[]) => void;
+  /** Firestore + polling disque — désactiver hors page carte mobile. */
+  backgroundTasksEnabled?: boolean;
 };
 
 export type UseAiAudioPlaybackReturn = {
@@ -49,6 +51,7 @@ export function useAiAudioPlayback({
   onPlaybackSync,
   onActiveClipUrlChange,
   onQueueChange,
+  backgroundTasksEnabled = true,
 }: UseAiAudioPlaybackOptions = {}): UseAiAudioPlaybackReturn {
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [queue, setQueue] = useState<QueuedClip[]>([]);
@@ -477,7 +480,7 @@ export function useAiAudioPlayback({
 
   // Firestore listener
   useEffect(() => {
-    if (!db) return;
+    if (!backgroundTasksEnabled || !db) return;
 
     const unsub = onSnapshot(doc(db, "ai_status", "macrodroid"), (docSnap) => {
       if (!docSnap.exists()) return;
@@ -530,10 +533,12 @@ export function useAiAudioPlayback({
     });
 
     return () => unsub();
-  }, []);
+  }, [backgroundTasksEnabled]);
 
   // Disk polling
   useEffect(() => {
+    if (!backgroundTasksEnabled) return;
+
     let cancelled = false;
 
     const poll = async () => {
@@ -606,7 +611,7 @@ export function useAiAudioPlayback({
       cancelled = true;
       clearInterval(iv);
     };
-  }, []);
+  }, [backgroundTasksEnabled]);
 
   // Auto-play when queue grows
   useEffect(() => {
