@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
-import { requireAuthenticatedUser } from '@/core/api/routeAuth';
-import { getClient } from '@/core/services/audio/transcription';
+import { NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { getClient } from "@/core/services/audio/transcription";
+import { logger } from "@/core/logger";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 const SYSTEM_PROMPT = `Tu es un assistant de facturation pour une entreprise de serrurerie.
 On te donne un rapport de fin d'intervention dicté par le technicien.
@@ -19,18 +20,18 @@ Si aucun montant n'est précisé, mets 0 pour unitPriceCents.`;
 
 export async function POST(request: Request) {
   const auth = await requireAuthenticatedUser(request);
-  if ('response' in auth) return auth.response;
+  if ("response" in auth) return auth.response;
 
   try {
     const body = await request.json();
     const { transcript } = body;
 
-    if (!transcript || typeof transcript !== 'string') {
-      return NextResponse.json({ error: 'Texte manquant' }, { status: 400 });
+    if (!transcript || typeof transcript !== "string") {
+      return NextResponse.json({ error: "Texte manquant" }, { status: 400 });
     }
 
     const client = getClient();
-    
+
     const model = process.env.OPENAI_DISPATCH_MODEL?.trim() || "gpt-4o-mini";
 
     const completion = await client.chat.completions.create({
@@ -49,16 +50,18 @@ export async function POST(request: Request) {
     const content = completion.choices[0]?.message?.content || '{"lines": []}';
     let lines = [];
     try {
-        const parsed = JSON.parse(content);
-        lines = parsed.lines || [];
+      const parsed = JSON.parse(content);
+      lines = parsed.lines || [];
     } catch (e) {
-        console.error("Erreur de parsing JSON", e);
+      logger.error("Erreur de parsing JSON", { error: e instanceof Error ? e.message : String(e) });
     }
 
     return NextResponse.json({ success: true, lines });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Erreur serveur';
-    console.error('[parse-billing]', error);
+    const message = error instanceof Error ? error.message : "Erreur serveur";
+    logger.error("[parse-billing]", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

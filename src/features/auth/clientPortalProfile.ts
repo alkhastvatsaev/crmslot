@@ -1,6 +1,7 @@
 import type { User } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
 
 const DEFAULT_COMPANY_ID =
@@ -9,7 +10,9 @@ const DEFAULT_COMPANY_ID =
     : null;
 
 /** Champs optionnels sur `allowed_users/{phone}` pour aligner le chat IVANA sur la société (prioritaire pour la synchro téléphone). */
-export function companyIdFromAllowedUsersDoc(data: Record<string, unknown> | undefined): string | null {
+export function companyIdFromAllowedUsersDoc(
+  data: Record<string, unknown> | undefined
+): string | null {
   if (!data) return null;
   const keys = ["portalCompanyId", "ivanaChatCompanyId", "companyId"] as const;
   for (const k of keys) {
@@ -30,9 +33,9 @@ export type SyncClientPortalProfileOptions = {
  */
 export async function syncClientPortalProfile(
   user: User,
-  options?: SyncClientPortalProfileOptions,
+  options?: SyncClientPortalProfileOptions
 ): Promise<void> {
-  if (!isConfigured || !firestore) return;
+  if (!isConfigured || !firestore || user.isAnonymous) return;
 
   const ref = doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid);
   let existingCompanyId: string | null = null;
@@ -42,7 +45,8 @@ export async function syncClientPortalProfile(
     const snap = await getDoc(ref);
     if (snap.exists()) {
       const d = snap.data() as { companyId?: unknown; role?: unknown };
-      if (typeof d.companyId === "string" && d.companyId.trim()) existingCompanyId = d.companyId.trim();
+      if (typeof d.companyId === "string" && d.companyId.trim())
+        existingCompanyId = d.companyId.trim();
       if (typeof d.role === "string" && d.role.trim()) existingRole = d.role.trim();
     }
   } catch {
@@ -51,22 +55,29 @@ export async function syncClientPortalProfile(
 
   const ws = options?.whitelistCompanyId?.trim() ?? "";
   const resolvedCompanyId =
-    (ws.length > 0 ? ws : existingCompanyId ?? DEFAULT_COMPANY_ID)?.trim() ?? "";
+    (ws.length > 0 ? ws : (existingCompanyId ?? DEFAULT_COMPANY_ID))?.trim() ?? "";
   /** Évite `companyId: null` (les règles chat exigent une chaîne). */
   const companyPayload =
     resolvedCompanyId.length > 0 ? { companyId: resolvedCompanyId } : ({} as Record<string, never>);
 
-  await setDoc(
-    ref,
-    {
+  try {
+    await setDoc(
+      ref,
+      {
+        uid: user.uid,
+        email: user.email ?? null,
+        displayName: user.displayName ?? user.email?.split("@")[0] ?? null,
+        photoURL: user.photoURL ?? null,
+        ...companyPayload,
+        role: existingRole,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    logger.error("[syncClientPortalProfile] Firestore write failed", {
+      error: e instanceof Error ? e.message : String(e),
       uid: user.uid,
-      email: user.email ?? null,
-      displayName: user.displayName ?? user.email?.split("@")[0] ?? null,
-      photoURL: user.photoURL ?? null,
-      ...companyPayload,
-      role: existingRole,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
+    });
+  }
 }

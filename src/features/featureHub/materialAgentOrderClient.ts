@@ -35,7 +35,7 @@ export function isMaterialAgentLecotCommandText(text: string): boolean {
   if (/\blecot\b/i.test(t)) return true;
   if (
     /\b(commande|catalogue|commander|nouvelle|sugg[eè]re|propose|recherche|rupture|stock|matériel|materiel|articles?)\b/i.test(
-      t,
+      t
     )
   ) {
     return true;
@@ -78,10 +78,20 @@ function looksLikeStandaloneClientName(text: string): boolean {
  */
 export function parseMaterialAgentClientNameFromUserText(
   text: string,
-  messages?: unknown[],
+  messages?: unknown[]
 ): string | null {
   const t = text.trim();
-  if (!t || isMaterialAgentLecotCommandText(t)) return null;
+  if (!t) return null;
+
+  // "Commander N× "…" (réf. SKU) — société : COMPANY" (format bouton modal stock)
+  // À vérifier en premier : le message entier ressemble à une commande mais contient le nom client.
+  const societeMatch = t.match(/[—–\-]\s*soci[eé]t[eé]\s*:\s*(.+)$/i);
+  if (societeMatch?.[1]?.trim()) {
+    const name = societeMatch[1].trim();
+    return isMaterialAgentLecotCommandText(name) ? null : name;
+  }
+
+  if (isMaterialAgentLecotCommandText(t)) return null;
 
   const explicitColon = t.match(/^(?:client|nom(?:\s+du\s+client)?)\s*[:—–-]\s*(.+)$/i);
   if (explicitColon?.[1]?.trim()) {
@@ -94,12 +104,13 @@ export function parseMaterialAgentClientNameFromUserText(
     return isMaterialAgentLecotCommandText(name) ? null : name;
   }
   // "c'est pour Dupont" / "pour le client Martin" / "commande pour SPRL X"
-  const pourMatch = t.match(/^(?:c'?est\s+pour|pour\s+(?:le\s+client\s+|la\s+soci[eé]t[eé]\s+)?|commande\s+pour\s+)(.+)$/i);
+  const pourMatch = t.match(
+    /^(?:c'?est\s+pour|pour\s+(?:le\s+client\s+|la\s+soci[eé]t[eé]\s+)?|commande\s+pour\s+)(.+)$/i
+  );
   if (pourMatch?.[1]?.trim()) {
     const name = pourMatch[1].trim();
     return isMaterialAgentLecotCommandText(name) ? null : name;
   }
-
   if (messages && isAwaitingMaterialAgentClientName(messages) && looksLikeStandaloneClientName(t)) {
     return t;
   }

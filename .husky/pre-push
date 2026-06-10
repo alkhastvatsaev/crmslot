@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+_common="$(dirname -- "$0")/common.sh"
+[ -f "$_common" ] && . "$_common"
+
+# Tests unitaires liés aux fichiers modifiés (rapide, avant push).
+CHANGED=$(git diff --name-only @{push}..HEAD 2>/dev/null || git diff --name-only HEAD~1..HEAD)
+TS_FILES=$(echo "$CHANGED" | grep -E '\.(ts|tsx)$' | grep -E '^src/' || true)
+
+if [ -z "$TS_FILES" ]; then
+  exit 0
+fi
+
+echo "pre-push: jest --findRelatedTests sur les fichiers modifiés…"
+npx jest --findRelatedTests $TS_FILES --passWithNoTests --no-coverage

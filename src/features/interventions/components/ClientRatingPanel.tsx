@@ -12,7 +12,11 @@ interface Props {
   existingComment?: string | null;
 }
 
-export default function ClientRatingPanel({ interventionId, existingRating, existingComment }: Props) {
+export default function ClientRatingPanel({
+  interventionId,
+  existingRating,
+  existingComment,
+}: Props) {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState(0);
   const [selected, setSelected] = useState(existingRating ?? 0);
@@ -30,7 +34,10 @@ export default function ClientRatingPanel({ interventionId, existingRating, exis
           {[1, 2, 3, 4, 5].map((s) => (
             <Star
               key={s}
-              className={cn("w-4 h-4", s <= selected ? "fill-amber-400 text-amber-400" : "text-slate-200")}
+              className={cn(
+                "w-4 h-4",
+                s <= selected ? "fill-amber-400 text-amber-400" : "text-slate-200"
+              )}
             />
           ))}
         </div>
@@ -55,7 +62,7 @@ export default function ClientRatingPanel({ interventionId, existingRating, exis
   return (
     <div
       data-testid="client-rating-panel"
-      className="mt-4 rounded-xl border border-black/5 bg-[#FAFAFA] px-4 py-4"
+      className="mt-4 rounded-xl border border-black/5 bg-slate-50 px-4 py-4"
     >
       <p className="text-[13px] font-bold text-black mb-3 text-center">
         {String(t("rating.title"))}
@@ -73,9 +80,7 @@ export default function ClientRatingPanel({ interventionId, existingRating, exis
             <Star
               className={cn(
                 "w-7 h-7 transition-colors",
-                s <= (hovered || selected)
-                  ? "fill-amber-400 text-amber-400"
-                  : "text-slate-300",
+                s <= (hovered || selected) ? "fill-amber-400 text-amber-400" : "text-slate-300"
               )}
             />
           </button>

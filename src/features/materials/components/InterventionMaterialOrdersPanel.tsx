@@ -16,8 +16,6 @@ import {
   technicianTransitionActor,
 } from "@/features/interventions/workflow/workflowActor";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   intervention: Pick<
     Intervention,
@@ -85,7 +83,7 @@ export default function InterventionMaterialOrdersPanel({
       else setInternalExpanded(true);
       toast.success(String(t("materials.order_created")));
     },
-    [intervention, technicianUid, allowStatusUpdate, t],
+    [intervention, technicianUid, allowStatusUpdate, t]
   );
 
   const handleStatus = async (orderId: string, status: MaterialOrder["status"]) => {
@@ -101,7 +99,6 @@ export default function InterventionMaterialOrdersPanel({
   return (
     <div
       id="technician-material-orders"
-      style={outfit}
       data-testid="intervention-material-orders-panel"
       className={compact ? "space-y-1" : "space-y-2"}
     >
@@ -128,7 +125,11 @@ export default function InterventionMaterialOrdersPanel({
             <span className="text-[10px] font-bold text-slate-400">{orders.length}</span>
           ) : null}
         </span>
-        {panelExpanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+        {panelExpanded ? (
+          <ChevronUp className="h-4 w-4 text-slate-400" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-slate-400" />
+        )}
       </button>
 
       {panelExpanded ? (
@@ -173,7 +174,9 @@ export default function InterventionMaterialOrdersPanel({
                     </li>
                   ))}
                 </ul>
-                {allowStatusUpdate && order.status !== "received" && order.status !== "cancelled" ? (
+                {allowStatusUpdate &&
+                order.status !== "received" &&
+                order.status !== "cancelled" ? (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {STATUS_KEYS.filter((s) => s !== order.status && s !== "pending").map((s) => (
                       <button

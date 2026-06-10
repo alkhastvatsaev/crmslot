@@ -10,11 +10,11 @@ export type ChatbotOrderToolResultShape = {
   lines?: unknown[];
 };
 
-/** Panneau commandes + PDF bon fournisseur + PDF dossier (matériel / facture). */
+/** Panneau commandes + PDF dossier (matériel / facture). */
 export function emitChatbotOrderRegisteredEvents(
   emit: ChatbotStreamEmit,
   companyId: string,
-  result: unknown,
+  result: unknown
 ): void {
   const panel = extractSupplierOrdersPanelFromResult(result, companyId);
   if (panel) {
@@ -24,10 +24,7 @@ export function emitChatbotOrderRegisteredEvents(
   const r = result as ChatbotOrderToolResultShape;
   if (!r?.ok || !String(r.supplierOrderId ?? "").trim()) return;
 
-  const orderId = String(r.supplierOrderId).trim();
   const interventionId = String(r.interventionId ?? "").trim();
-
-  emit({ type: "supplier_order_pdf", companyId, orderId });
 
   if (interventionId) {
     emit({

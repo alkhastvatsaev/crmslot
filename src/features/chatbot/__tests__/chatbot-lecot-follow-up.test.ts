@@ -10,6 +10,13 @@ describe("chatbot-lecot-follow-up", () => {
     expect(extractLecotProductKeyword("je veux un cylindre Yale")).toBe("cylindre");
   });
 
+  it("extractLecotProductKeyword does not extract when product word is a qualifier", () => {
+    // "cylindre" qualifie "lubrifiant" — ne doit pas extraire "cylindre"
+    expect(extractLecotProductKeyword("Lubrifiant cylindre 400 ml")).toBeNull();
+    expect(extractLecotProductKeyword("graisse pour serrure")).toBeNull();
+    expect(extractLecotProductKeyword("huile cylindre")).toBeNull();
+  });
+
   it("extractLecotProductKeyword maps poignet typo to poignée", () => {
     expect(extractLecotProductKeyword("commander une poignet")).toBe("poignée");
     expect(normalizeLecotProductSearchQuery("poignet")).toBe("poignée");
@@ -18,7 +25,7 @@ describe("chatbot-lecot-follow-up", () => {
   it("resolveLecotCatalogSearchQuery from order phrase with client name", () => {
     const q = resolveLecotCatalogSearchQuery(
       "tu peux commander pour le client vatsaev une serrure sur lecot",
-      [],
+      []
     );
     expect(q).toBe("serrure");
   });

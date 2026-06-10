@@ -15,7 +15,7 @@ export type E2eSeedDoneInterventionResult = {
  */
 export async function e2eSeedDoneInterventionAdmin(
   db: admin.firestore.Firestore,
-  opts?: { interventionId?: string },
+  opts?: { interventionId?: string }
 ): Promise<E2eSeedDoneInterventionResult> {
   const interventionId = (opts?.interventionId?.trim() || E2E_DONE_INTERVENTION_ID).slice(0, 128);
   const now = new Date().toISOString();
@@ -46,7 +46,12 @@ export async function e2eSeedDoneInterventionAdmin(
     completionSignatureUrl: "https://placehold.co/320x120/png?text=Signature",
     billingLines: [
       { description: "Déplacement urgence", quantity: 1, unitPriceCents: 4500, reference: "DEP" },
-      { description: "Ouverture porte blindée", quantity: 1, unitPriceCents: 12_500, reference: "OUV" },
+      {
+        description: "Ouverture porte blindée",
+        quantity: 1,
+        unitPriceCents: 12_500,
+        reference: "OUV",
+      },
     ],
     invoiceAmountCents: 17_000,
     draftBillingSource: "template",
@@ -61,8 +66,17 @@ export async function e2eSeedDoneInterventionAdmin(
   if (existing.exists) {
     await ref.update(payload);
   } else {
+    const {
+      invoicePdfUrl: _pdf,
+      invoicePdfStoragePath: _path,
+      invoicedAt: _inv,
+      ...createPayload
+    } = payload;
+    void _pdf;
+    void _path;
+    void _inv;
     await ref.set({
-      ...payload,
+      ...createPayload,
       createdAt: FieldValue.serverTimestamp(),
     });
   }

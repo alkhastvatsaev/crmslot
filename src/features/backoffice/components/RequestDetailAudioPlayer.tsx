@@ -17,7 +17,6 @@ function formatTime(time: number) {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-
 export default function RequestDetailAudioPlayer({ url, className }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -36,7 +35,7 @@ export default function RequestDetailAudioPlayer({ url, className }: Props) {
     }
     void el.play().then(
       () => setIsPlaying(true),
-      () => setIsPlaying(false),
+      () => setIsPlaying(false)
     );
   };
 
@@ -50,7 +49,7 @@ export default function RequestDetailAudioPlayer({ url, className }: Props) {
       el.currentTime = ratio * duration;
       setProgress(el.currentTime);
     },
-    [duration],
+    [duration]
   );
 
   const onBarPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -91,8 +90,8 @@ export default function RequestDetailAudioPlayer({ url, className }: Props) {
     <div
       data-testid="backoffice-request-detail-audio-player"
       className={cn(
-        "flex w-full touch-manipulation items-center gap-3 rounded-[20px] border border-slate-200/90 bg-white p-3 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)]",
-        className,
+        "flex w-full touch-manipulation items-center gap-3 rounded-[16px] border border-slate-200/90 bg-white p-3 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)]",
+        className
       )}
     >
       <audio

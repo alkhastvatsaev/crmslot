@@ -3,8 +3,6 @@
 import { Loader2, X } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   title: string;
   loading: boolean;
@@ -33,7 +31,6 @@ export default function ChatbotPdfPreviewOverlay({
       role="dialog"
       aria-modal="true"
       aria-label={title || String(t("chatbot.pdf_preview_aria"))}
-      style={outfit}
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-black/[0.05] px-3 py-2.5">
         <p className="min-w-0 flex-1 truncate text-[12px] font-medium tracking-[-0.02em] text-slate-700">

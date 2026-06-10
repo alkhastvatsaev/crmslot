@@ -1,10 +1,14 @@
 import nodemailer from "nodemailer";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { getGmailOAuthConfig, isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
+import {
+  getGmailOAuthConfig,
+  isGmailOAuthConfigured,
+} from "@/core/services/email/gmailOAuthConfig";
 import { parseAttachDocumentType } from "@/core/services/email/interventionEmailAttachOptions";
 import type { InterventionEmailPdfKind } from "@/core/services/email/interventionEmailPdfAttachment";
 import { sendViaGmailApi } from "@/core/services/email/sendViaGmailApi";
+import { logger } from "@/core/logger";
 
 const COLLECTION = "intervention_emails";
 
@@ -48,7 +52,7 @@ export function isGmailConfigured(): boolean {
  * Envoi email dossier : Gmail API (OAuth) si configuré, sinon SMTP (mot de passe d'application).
  */
 export async function sendInterventionEmail(
-  input: SendInterventionEmailInput,
+  input: SendInterventionEmailInput
 ): Promise<SendInterventionEmailResult> {
   const interventionId = input.interventionId.trim();
   const companyId = input.companyId.trim();
@@ -57,7 +61,10 @@ export async function sendInterventionEmail(
   const bodyText = input.bodyText.trim();
 
   if (!interventionId || !companyId || !to || !subject || !bodyText) {
-    return { ok: false, error: "Champs requis : interventionId, companyId, to, subject, bodyText." };
+    return {
+      ok: false,
+      error: "Champs requis : interventionId, companyId, to, subject, bodyText.",
+    };
   }
   if (!isValidRecipientEmail(to)) {
     return { ok: false, error: `Adresse destinataire invalide : ${to}` };
@@ -94,7 +101,9 @@ export async function sendInterventionEmail(
       attachmentFilename = att.filename;
     } catch (pdfErr) {
       const detail = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
-      console.error("[sendInterventionEmail] PDF attachment failed:", pdfErr);
+      logger.error("[sendInterventionEmail] PDF attachment failed:", {
+        error: pdfErr instanceof Error ? pdfErr.message : String(pdfErr),
+      });
       return {
         ok: false,
         error: `Impossible de joindre le PDF ${attachKind === "quote" ? "devis" : "facture"} : ${detail}`,
@@ -180,7 +189,9 @@ export async function sendInterventionEmail(
       readAt: new Date().toISOString(),
     });
   } catch (err) {
-    console.error("[sendInterventionEmail] Firestore write failed:", err);
+    logger.error("[sendInterventionEmail] Firestore write failed:", {
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 
   return { ok: true, messageId, attachmentFilename };

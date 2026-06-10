@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
-import {
-  readTwilioWebhookParams,
-  validateTwilioWebhookRequest,
-} from "@/core/api/twilioWebhook";
+import { readTwilioWebhookParams, validateTwilioWebhookRequest } from "@/core/api/twilioWebhook";
+import { logger } from "@/core/logger";
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +15,7 @@ export async function POST(req: Request) {
 
     twiml.say(
       { voice: "alice", language: "fr-FR" },
-      "Bienvenue chez Serrurier Express Belgique. Nous allons vous aider. Veuillez indiquer votre nom, votre adresse complète et décrire votre problème après le bip. Un technicien interviendra immédiatement.",
+      "Bienvenue chez Serrurier Express Belgique. Nous allons vous aider. Veuillez indiquer votre nom, votre adresse complète et décrire votre problème après le bip. Un technicien interviendra immédiatement."
     );
 
     twiml.record({
@@ -30,7 +28,7 @@ export async function POST(req: Request) {
 
     twiml.say(
       { voice: "alice", language: "fr-FR" },
-      "Nous n'avons pas reçu d'enregistrement. Au revoir.",
+      "Nous n'avons pas reçu d'enregistrement. Au revoir."
     );
 
     return new NextResponse(twiml.toString(), {
@@ -40,7 +38,9 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error generating TwiML:", error);
+    logger.error("Error generating TwiML:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   addDoc,
@@ -29,7 +31,10 @@ import { toast } from "sonner";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspace } from "@/context/CompanyWorkspaceContext";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
-import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/company/companyHubNavigation";
+import {
+  navigateCompanyHub,
+  COMPANY_HUB_ANCHOR_SMART_FORM,
+} from "@/features/company/companyHubNavigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
@@ -43,10 +48,8 @@ import CompanyKpiPanel from "@/features/dashboard/components/CompanyKpiPanel";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 const glassRow =
-  "flex items-center gap-3 rounded-[20px] bg-white/85 px-3 py-2.5 backdrop-blur-sm shadow-[0_6px_20px_-8px_rgba(15,23,42,0.12)]";
+  "flex items-center gap-3 rounded-[16px] bg-white/85 px-3 py-2.5 backdrop-blur-sm shadow-[0_6px_20px_-8px_rgba(15,23,42,0.12)]";
 
 const iconRail =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/95 text-slate-500 shadow-[0_4px_14px_-6px_rgba(15,23,42,0.1)]";
@@ -59,7 +62,7 @@ const selectClass =
 
 function PanelShell({ children }: { children: ReactNode }) {
   return (
-    <div data-testid="company-space-panel" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div data-testid="company-space-panel" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-3`}>{children}</div>
     </div>
   );
@@ -123,14 +126,19 @@ export default function CompanySpacePanel() {
 
     let unsub: (() => void) | undefined;
     const timeout = setTimeout(() => {
-      const q = query(collection(firestore!, "company_invites"), where("invitedByUid", "==", firebaseUid));
+      const q = query(
+        collection(firestore!, "company_invites"),
+        where("invitedByUid", "==", firebaseUid)
+      );
       unsub = onSnapshot(
         q,
         (snap) => {
-          const n = snap.docs.filter((d) => (d.data() as { companyId?: string }).companyId === activeCompanyId).length;
+          const n = snap.docs.filter(
+            (d) => (d.data() as { companyId?: string }).companyId === activeCompanyId
+          ).length;
           setInvitesCount(n);
         },
-        () => setInvitesCount(0),
+        () => setInvitesCount(0)
       );
     }, 10);
 
@@ -163,8 +171,10 @@ export default function CompanySpacePanel() {
       await refreshClaimsSilent();
       toast.success(t("company.toast.company_created"));
     } catch (e) {
-      console.error(e);
-      toast.error(t("company.toast.create_failed"), { description: e instanceof Error ? e.message : String(e) });
+      logger.error("createCompany", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.create_failed"), {
+        description: e instanceof Error ? e.message : String(e),
+      });
     } finally {
       setBusy(false);
     }
@@ -190,8 +200,10 @@ export default function CompanySpacePanel() {
       setInvitePhone("");
       toast.success(t("company.toast.invite_saved"));
     } catch (e) {
-      console.error(e);
-      toast.error(t("company.toast.invite_failed"), { description: e instanceof Error ? e.message : String(e) });
+      logger.error("submitInvite", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.invite_failed"), {
+        description: e instanceof Error ? e.message : String(e),
+      });
     } finally {
       setBusy(false);
     }
@@ -220,8 +232,10 @@ export default function CompanySpacePanel() {
       await refreshClaimsSilent();
       toast.success(t("company.toast.invite_accepted"));
     } catch (e) {
-      console.error(e);
-      toast.error(t("company.toast.accept_failed"), { description: e instanceof Error ? e.message : String(e) });
+      logger.error("acceptInvite", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.accept_failed"), {
+        description: e instanceof Error ? e.message : String(e),
+      });
     } finally {
       setBusy(false);
     }
@@ -250,8 +264,10 @@ export default function CompanySpacePanel() {
       await auth.currentUser.getIdToken(true);
       toast.success(t("company.toast.token_updated"));
     } catch (e) {
-      console.error(e);
-      toast.error(t("company.toast.sync_failed"), { description: e instanceof Error ? e.message : String(e) });
+      logger.error("syncClaims", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("company.toast.sync_failed"), {
+        description: e instanceof Error ? e.message : String(e),
+      });
     } finally {
       setBusy(false);
     }
@@ -264,7 +280,11 @@ export default function CompanySpacePanel() {
   if (!isConfigured && !devUiPreviewEnabled) {
     return (
       <PanelShell>
-        <OfflineGlyph testId="company-panel-offline" ariaLabel={t("company.aria.firebase_unconfigured")} overlay={CloudOff} />
+        <OfflineGlyph
+          testId="company-panel-offline"
+          ariaLabel={t("company.aria.firebase_unconfigured")}
+          overlay={CloudOff}
+        />
       </PanelShell>
     );
   }
@@ -272,7 +292,11 @@ export default function CompanySpacePanel() {
   if (!firebaseUid && memberships.length === 0) {
     return (
       <PanelShell>
-        <OfflineGlyph testId="company-panel-offline" ariaLabel={t("company.aria.login_required")} overlay={Lock} />
+        <OfflineGlyph
+          testId="company-panel-offline"
+          ariaLabel={t("company.aria.login_required")}
+          overlay={Lock}
+        />
       </PanelShell>
     );
   }
@@ -409,22 +433,22 @@ export default function CompanySpacePanel() {
 
       {isAdmin ? (
         <>
-        <div
-          data-testid="company-billing-strip"
-          className={`${glassRow} border-amber-200/40 bg-amber-50/50`}
-          aria-label={`${t("company.aria.billing_company")} ${activeCompanyLabel}`}
-        >
-          <span className={`${iconRail} border-amber-200/60 bg-white text-amber-900`}>
-            <CreditCard className="h-5 w-5" aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1 text-[12px] font-medium text-amber-950/90">
-            {t("company.billing_strip")}
+          <div
+            data-testid="company-billing-strip"
+            className={`${glassRow} border-amber-200/40 bg-amber-50/50`}
+            aria-label={`${t("company.aria.billing_company")} ${activeCompanyLabel}`}
+          >
+            <span className={`${iconRail} border-amber-200/60 bg-white text-amber-900`}>
+              <CreditCard className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1 text-[12px] font-medium text-amber-950/90">
+              {t("company.billing_strip")}
+            </div>
+            <Lock className="h-4 w-4 shrink-0 text-amber-800/50" aria-hidden />
           </div>
-          <Lock className="h-4 w-4 shrink-0 text-amber-800/50" aria-hidden />
-        </div>
-        <div data-testid="company-commission-dashboard" className="min-h-0 shrink-0">
-          <CommissionDashboard />
-        </div>
+          <div data-testid="company-commission-dashboard" className="min-h-0 shrink-0">
+            <CommissionDashboard />
+          </div>
         </>
       ) : null}
 

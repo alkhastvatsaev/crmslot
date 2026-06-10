@@ -1,32 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { lecotShopCatalogSearchUrl } from "@/features/catalog/lecotShopConfig";
-import {
-  Package,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  ExternalLink,
-  Loader2,
-} from "lucide-react";
+import { Package, CheckCircle2, Clock, XCircle, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { auth, firestore } from "@/core/config/firebase";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 interface MaterialOrder {
   id: string;
@@ -72,18 +55,16 @@ export default function MaterialOrderManagement({ companyId }: Props) {
     const q = query(
       collection(firestore, "material_orders"),
       where("companyId", "==", activeCompanyId),
-      orderBy("createdAt", "desc"),
+      orderBy("createdAt", "desc")
     );
 
     const unsub = onSnapshot(
       q,
       (snap) => {
-        setOrders(
-          snap.docs.map((d) => ({ id: d.id, ...d.data() } as MaterialOrder)),
-        );
+        setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as MaterialOrder));
         setLoading(false);
       },
-      () => setLoading(false),
+      () => setLoading(false)
     );
 
     return unsub;
@@ -122,11 +103,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
 
   if (loading) {
     return (
-      <div
-        data-testid="material-orders-loading"
-        style={outfit}
-        className="flex items-center justify-center py-8"
-      >
+      <div data-testid="material-orders-loading" className="flex items-center justify-center py-8">
         <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
       </div>
     );
@@ -135,7 +112,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
   const pendingCount = orders.filter((o) => o.status === "pending").length;
 
   return (
-    <div data-testid="material-order-management" style={outfit} className="space-y-3">
+    <div data-testid="material-order-management" className="space-y-3">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Package className="h-4 w-4 text-slate-500" />
@@ -174,7 +151,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                       className={cn(
                         "rounded-full px-2 py-0.5 text-[9px] font-bold uppercase",
                         style.bg,
-                        style.text,
+                        style.text
                       )}
                     >
                       {style.label}
@@ -182,7 +159,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                     <span
                       className={cn(
                         "rounded-full px-2 py-0.5 text-[9px] font-bold uppercase",
-                        urgencyStyle,
+                        urgencyStyle
                       )}
                     >
                       {order.urgency}
@@ -201,10 +178,7 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                 {/* Parts list */}
                 <div className="space-y-1">
                   {order.partsRequested.map((part, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between text-[12px]"
-                    >
+                    <div key={idx} className="flex items-center justify-between text-[12px]">
                       <span className="text-slate-700 font-medium truncate flex-1">
                         {part.description}
                       </span>
@@ -260,7 +234,11 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                     onClick={() => void updateStatus(order.id, "ordered")}
                     className="flex w-full items-center justify-center gap-1 rounded-lg bg-indigo-500 py-2 text-[11px] font-bold text-white transition hover:bg-indigo-600 disabled:opacity-50"
                   >
-                    {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Package className="h-3 w-3" />}
+                    {isUpdating ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Package className="h-3 w-3" />
+                    )}
                     Marquer commandé
                   </button>
                 )}
@@ -272,7 +250,11 @@ export default function MaterialOrderManagement({ companyId }: Props) {
                     onClick={() => void updateStatus(order.id, "delivered")}
                     className="flex w-full items-center justify-center gap-1 rounded-lg bg-emerald-500 py-2 text-[11px] font-bold text-white transition hover:bg-emerald-600 disabled:opacity-50"
                   >
-                    {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                    {isUpdating ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-3 w-3" />
+                    )}
                     Marquer livré
                   </button>
                 )}

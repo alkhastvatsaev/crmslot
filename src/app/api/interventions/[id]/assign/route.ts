@@ -8,6 +8,7 @@ import {
 } from "@/features/backoffice/assignInterventionServerAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/applyBackofficeTechnicianAssignmentAdmin";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -17,10 +18,7 @@ type AssignBody = {
   scheduledTime?: string;
 };
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
 
@@ -31,14 +29,17 @@ export async function POST(
         error:
           "Route réservée au mode développement local. En production, assignez via Firestore client + règles déployées.",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
   const { id } = await context.params;
   const interventionId = id?.trim();
   if (!interventionId) {
-    return NextResponse.json({ ok: false, error: "Identifiant intervention manquant." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Identifiant intervention manquant." },
+      { status: 400 }
+    );
   }
 
   let body: AssignBody = {};
@@ -67,7 +68,10 @@ export async function POST(
 
   const allowed = await assertCanAssignInterventionServer(db, auth.uid, companyId, auth.decoded);
   if (!allowed) {
-    return NextResponse.json({ ok: false, error: "Permission refusée pour cette société." }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, error: "Permission refusée pour cette société." },
+      { status: 403 }
+    );
   }
 
   const schedule =
@@ -86,7 +90,7 @@ export async function POST(
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error("[interventions/assign]", e);
+    logger.error("[interventions/assign]", { error: e instanceof Error ? e.message : String(e) });
     const message = e instanceof Error ? e.message : "Erreur assignation";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

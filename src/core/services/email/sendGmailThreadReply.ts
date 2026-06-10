@@ -1,9 +1,6 @@
-import type { gmail_v1 } from "googleapis";
+import type { gmail_v1 } from "@googleapis/gmail";
 import { createGmailApiClient } from "@/core/services/email/gmailApiClient";
-import {
-  encodeGmailRawMessage,
-  getMessageHeader,
-} from "@/core/services/email/gmailMessageBody";
+import { encodeGmailRawMessage, getMessageHeader } from "@/core/services/email/gmailMessageBody";
 import { resolveGmailOAuthConfig } from "@/core/services/email/gmailOAuthConfig";
 
 function encodeSubjectUtf8(subject: string): string {
@@ -30,7 +27,7 @@ export type SendGmailThreadReplyResult = {
 
 /** Envoi Gmail dans un fil (In-Reply-To / References + threadId si disponible). */
 export async function sendGmailThreadReply(
-  input: SendGmailThreadReplyInput,
+  input: SendGmailThreadReplyInput
 ): Promise<SendGmailThreadReplyResult> {
   const to = input.to.trim();
   const subject = input.subject.trim();
@@ -102,15 +99,12 @@ export async function sendGmailReplyToMessage(input: {
   const referencesHeader = getMessageHeader(orig.data, "References");
   const threadId = orig.data.threadId ?? undefined;
 
-  const to =
-    input.to?.trim() ||
-    from.match(/<([^>]+)>/)?.[1]?.trim() ||
-    from.trim();
+  const to = input.to?.trim() || from.match(/<([^>]+)>/)?.[1]?.trim() || from.trim();
   const subject =
-    input.subject?.trim() ||
-    (origSubject.startsWith("Re:") ? origSubject : `Re: ${origSubject}`);
+    input.subject?.trim() || (origSubject.startsWith("Re:") ? origSubject : `Re: ${origSubject}`);
 
-  const references = [referencesHeader, messageIdHeader].filter(Boolean).join(" ").trim() || undefined;
+  const references =
+    [referencesHeader, messageIdHeader].filter(Boolean).join(" ").trim() || undefined;
 
   return sendGmailThreadReply({
     to,

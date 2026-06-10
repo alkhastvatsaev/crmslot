@@ -71,10 +71,10 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   },
   {
     slotIndex: 4,
-    profileName: "HISTORIQUE",
+    profileName: "QUALITY MANAGEMENT",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_crm_history",
-    guideTitle: "CRM",
+    guideTitle: "Quality Management",
     guideHint: "Fil d’activité et agent historique.",
   },
   {
@@ -99,9 +99,10 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
 export const DASHBOARD_CAROUSEL_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGES.length;
 
 /** Indices accessibles par flèches carrousel (header + `DashboardPagerControls`). */
-export const DASHBOARD_CAROUSEL_NAV_SLOT_INDICES: readonly number[] = DASHBOARD_CAROUSEL_PAGES.filter(
-  (page) => page.inCarouselNav !== false,
-).map((page) => page.slotIndex);
+export const DASHBOARD_CAROUSEL_NAV_SLOT_INDICES: readonly number[] =
+  DASHBOARD_CAROUSEL_PAGES.filter((page) => page.inCarouselNav !== false).map(
+    (page) => page.slotIndex
+  );
 
 export function isDashboardCarouselNavSlot(pageIndex: number): boolean {
   return DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.includes(pageIndex);
@@ -111,7 +112,9 @@ export function getNextDashboardCarouselNavIndex(pageIndex: number): number {
   for (const slot of DASHBOARD_CAROUSEL_NAV_SLOT_INDICES) {
     if (slot > pageIndex) return slot;
   }
-  return DASHBOARD_CAROUSEL_NAV_SLOT_INDICES[DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.length - 1] ?? pageIndex;
+  return (
+    DASHBOARD_CAROUSEL_NAV_SLOT_INDICES[DASHBOARD_CAROUSEL_NAV_SLOT_INDICES.length - 1] ?? pageIndex
+  );
 }
 
 export function getPrevDashboardCarouselNavIndex(pageIndex: number): number {
@@ -125,7 +128,7 @@ export function getPrevDashboardCarouselNavIndex(pageIndex: number): number {
 /** Pas suivant / précédent dans le carrousel (boucle sur les slots `inCarouselNav`). */
 export function stepDashboardCarouselNavIndex(
   pageIndex: number,
-  direction: "next" | "prev",
+  direction: "next" | "prev"
 ): number {
   const nav = DASHBOARD_CAROUSEL_NAV_SLOT_INDICES;
   if (nav.length === 0) return pageIndex;
@@ -157,12 +160,12 @@ export function assertDashboardCarouselSlotAlignment(): void {
   DASHBOARD_CAROUSEL_PAGES.forEach((page, i) => {
     if (page.slotIndex !== i) {
       throw new Error(
-        `[dashboardCarouselRegistry] page ${i} slotIndex=${page.slotIndex} (attendu ${i})`,
+        `[dashboardCarouselRegistry] page ${i} slotIndex=${page.slotIndex} (attendu ${i})`
       );
     }
     if (page.slotIndex !== expected[i]) {
       throw new Error(
-        `[dashboardCarouselRegistry] constante hub désalignée à l’index ${i}: slot=${page.slotIndex} expected=${expected[i]}`,
+        `[dashboardCarouselRegistry] constante hub désalignée à l’index ${i}: slot=${page.slotIndex} expected=${expected[i]}`
       );
     }
   });
@@ -172,9 +175,7 @@ if (process.env.NODE_ENV !== "production") {
   assertDashboardCarouselSlotAlignment();
 }
 
-export function getDashboardCarouselPage(
-  pageIndex: number,
-): DashboardCarouselPageDef | null {
+export function getDashboardCarouselPage(pageIndex: number): DashboardCarouselPageDef | null {
   if (pageIndex < 0 || pageIndex >= DASHBOARD_CAROUSEL_PAGE_COUNT) return null;
   return DASHBOARD_CAROUSEL_PAGES[pageIndex] ?? null;
 }

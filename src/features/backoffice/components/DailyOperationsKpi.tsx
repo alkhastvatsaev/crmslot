@@ -16,7 +16,42 @@ import {
 import type { Intervention } from "@/features/interventions/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+function DonutChart({ slices }: { slices: { value: number; color: string; label: string }[] }) {
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  if (total === 0) return null;
+  const R = 18,
+    cx = 20,
+    cy = 20,
+    stroke = 8;
+  const circ = 2 * Math.PI * R;
+  const arcs = slices.reduce<{ dash: number; offset: number; color: string; label: string }[]>(
+    (acc, sl) => {
+      const dash = (sl.value / total) * circ;
+      const prevOffset = acc.length > 0 ? acc[acc.length - 1].offset + acc[acc.length - 1].dash : 0;
+      return [...acc, { dash, offset: prevOffset, color: sl.color, label: sl.label }];
+    },
+    []
+  );
+  return (
+    <svg width={40} height={40} viewBox="0 0 40 40" aria-label="Répartition statuts" role="img">
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke="#f1f5f9" strokeWidth={stroke} />
+      {arcs.map((arc) => (
+        <circle
+          key={arc.label}
+          cx={cx}
+          cy={cy}
+          r={R}
+          fill="none"
+          stroke={arc.color}
+          strokeWidth={stroke}
+          strokeDasharray={`${arc.dash.toFixed(2)} ${(circ - arc.dash).toFixed(2)}`}
+          strokeDashoffset={(-arc.offset + circ / 4).toFixed(2)}
+          strokeLinecap="butt"
+        />
+      ))}
+    </svg>
+  );
+}
 
 type Props = {
   interventions: Intervention[];
@@ -35,7 +70,7 @@ export default function DailyOperationsKpi({ interventions }: Props) {
   const kpis = useMemo<KpiCard[]>(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayInterventions = interventions.filter(
-      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today),
+      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today)
     );
 
     const byStatus = (statuses: Intervention["status"][]) =>
@@ -51,15 +86,13 @@ export default function DailyOperationsKpi({ interventions }: Props) {
     });
 
     const durationIvs = todayInterventions.filter(
-      (iv) => iv.actualDurationMinutes != null && iv.actualDurationMinutes > 0,
+      (iv) => iv.actualDurationMinutes != null && iv.actualDurationMinutes > 0
     );
     const avgDuration =
       durationIvs.length > 0
         ? Math.round(
-            durationIvs.reduce(
-              (sum, iv) => sum + (iv.actualDurationMinutes || 0),
-              0,
-            ) / durationIvs.length,
+            durationIvs.reduce((sum, iv) => sum + (iv.actualDurationMinutes || 0), 0) /
+              durationIvs.length
           )
         : 0;
 
@@ -122,26 +155,46 @@ export default function DailyOperationsKpi({ interventions }: Props) {
   const completionRate = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayIvs = interventions.filter(
-      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today),
+      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today)
     );
     if (todayIvs.length === 0) return 0;
     const completed = todayIvs.filter(
-      (iv) => iv.status === "done" || iv.status === "invoiced",
+      (iv) => iv.status === "done" || iv.status === "invoiced"
     ).length;
     return Math.round((completed / todayIvs.length) * 100);
   }, [interventions]);
 
+  const donutSlices = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const todayIvs = interventions.filter(
+      (iv) => iv.scheduledDate === today || iv.createdAt?.startsWith(today)
+    );
+    const done = todayIvs.filter((iv) => iv.status === "done" || iv.status === "invoiced").length;
+    const active = todayIvs.filter((iv) =>
+      ["assigned", "en_route", "in_progress", "waiting_material"].includes(iv.status)
+    ).length;
+    const pending = todayIvs.filter((iv) => iv.status === "pending").length;
+    const cancelled = todayIvs.filter((iv) => iv.status === "cancelled").length;
+    return [
+      { value: done, color: "#10b981", label: "done" },
+      { value: active, color: "#3b82f6", label: "active" },
+      { value: pending, color: "#f59e0b", label: "pending" },
+      { value: cancelled, color: "#ef4444", label: "cancelled" },
+    ];
+  }, [interventions]);
+
   return (
-    <div data-testid="daily-operations-kpi" style={outfit} className="space-y-4">
-      {/* Completion rate bar */}
+    <div data-testid="daily-operations-kpi" className="space-y-4">
+      {/* Completion rate bar + donut */}
       <div className="rounded-2xl border border-slate-100 bg-white p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
             {t("backoffice.dashboard.kpi_completion_rate")}
           </span>
-          <span className="text-[18px] font-black text-slate-900">
-            {completionRate}%
-          </span>
+          <div className="flex items-center gap-3">
+            <DonutChart slices={donutSlices} />
+            <span className="text-[18px] font-black text-slate-900">{completionRate}%</span>
+          </div>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <div
@@ -158,13 +211,13 @@ export default function DailyOperationsKpi({ interventions }: Props) {
             key={kpi.label}
             className={`flex items-center gap-3 rounded-xl ${kpi.bgColor} px-3 py-3 transition-transform hover:scale-[1.02]`}
           >
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ${kpi.color}`}>
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ${kpi.color}`}
+            >
               <kpi.icon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <div className={`text-[18px] font-black leading-none ${kpi.color}`}>
-                {kpi.value}
-              </div>
+              <div className={`text-[18px] font-black leading-none ${kpi.color}`}>{kpi.value}</div>
               <div className="mt-0.5 text-[10px] font-bold text-slate-500 truncate">
                 {kpi.label}
               </div>

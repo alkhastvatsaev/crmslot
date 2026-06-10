@@ -19,8 +19,6 @@ import {
 import ChatbotQuickActions from "@/features/chatbot/components/ChatbotQuickActions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function extractOpenInterventionIds(text: string): string[] {
   const ids = new Set<string>();
   const re = /\(ouvrir:([a-zA-Z0-9_-]+)\)/g;
@@ -90,8 +88,8 @@ function Bubble({
           actions ?? [],
           mergeQuickActions(
             deriveChatbotQuickActions(displayText),
-            suggestionTagsToActions(suggestionTags),
-          ),
+            suggestionTagsToActions(suggestionTags)
+          )
         )
       : [];
   return (
@@ -107,7 +105,7 @@ function Bubble({
           "max-w-[88%] whitespace-pre-wrap rounded-[18px] px-4 py-3 text-[14px] leading-relaxed",
           isUser
             ? "rounded-br-[6px] bg-slate-900 text-white"
-            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm",
+            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm"
         )}
       >
         {isUser ? displayText : renderChatbotMarkdownLite(displayText)}
@@ -168,13 +166,12 @@ export default function ChatbotChat({ className }: { className?: string }) {
   return (
     <motion.div
       data-testid="chatbot-chat"
-      style={outfit}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden bg-[#f8f9fc]", className)}
     >
       <motion.div
         className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
-          "flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6",
+          "flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6"
         )}
       >
         {!companyId ? (
@@ -203,7 +200,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
             >
-              <ChatbotGalaxyOrb className="scale-[2]" />
+              <ChatbotGalaxyOrb size="hero" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -249,7 +246,10 @@ export default function ChatbotChat({ className }: { className?: string }) {
         </AnimatePresence>
 
         {streaming && !streamingText && !activeTool ? (
-          <motion.div className="flex items-center gap-2 text-[12px] text-slate-500" data-testid="chatbot-typing">
+          <motion.div
+            className="flex items-center gap-2 text-[12px] text-slate-500"
+            data-testid="chatbot-typing"
+          >
             <Loader2 className="h-4 w-4 animate-spin" />
             {t("chatbot.thinking")}
           </motion.div>
@@ -272,9 +272,7 @@ export default function ChatbotChat({ className }: { className?: string }) {
               {t("chatbot.confirm_required")}
             </p>
             <p className="mb-3 text-[13px] text-amber-950">{pendingTool.summary}</p>
-            <p className="mb-3 text-[11px] text-amber-800">
-              {t("chatbot.confirm_hint")}
-            </p>
+            <p className="mb-3 text-[11px] text-amber-800">{t("chatbot.confirm_hint")}</p>
             <motion.div className="flex gap-2">
               <button
                 type="button"

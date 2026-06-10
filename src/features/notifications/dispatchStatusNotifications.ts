@@ -1,3 +1,6 @@
+import { logger } from "@/core/logger";
+import { featureFlagsFromEnv } from "@/core/featureFlags";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { findApplicableRules } from "@/features/notifications/statusNotificationRules";
 
@@ -39,7 +42,7 @@ export interface DispatchNotificationsParams {
  * à un Cloud Function ou à l'API `/api/notifications/send`.
  */
 export function buildNotificationPayloads(
-  params: DispatchNotificationsParams,
+  params: DispatchNotificationsParams
 ): NotificationPayload[] {
   const { fromStatus, toStatus, intervention, technicianName } = params;
   const rules = findApplicableRules(fromStatus, toStatus);
@@ -47,13 +50,14 @@ export function buildNotificationPayloads(
   if (rules.length === 0) return [];
 
   const clientName =
-    [intervention.clientFirstName, intervention.clientLastName]
-      .filter(Boolean)
-      .join(" ") || intervention.clientName || "Client";
+    [intervention.clientFirstName, intervention.clientLastName].filter(Boolean).join(" ") ||
+    intervention.clientName ||
+    "Client";
 
   const variables: Record<string, string> = {
     clientName,
     interventionId: intervention.id,
+    clientPhone: intervention.clientPhone || "",
     address: intervention.address || "",
     title: intervention.title || "",
     scheduledDate: intervention.scheduledDate || "",
@@ -89,14 +93,31 @@ export function buildNotificationPayloads(
  * Erreurs silencieuses (notifications ne doivent jamais bloquer le workflow).
  */
 export async function dispatchStatusNotifications(
-  params: DispatchNotificationsParams,
+  params: DispatchNotificationsParams
 ): Promise<void> {
   const payloads = buildNotificationPayloads(params);
   if (payloads.length === 0) return;
 
+  const whatsappEnabled = featureFlagsFromEnv().whatsappNotifications;
+
   // Fire-and-forget — ne jamais bloquer le workflow principal
   for (const payload of payloads) {
     try {
+      if (payload.channel === "whatsapp") {
+        const to = payload.variables.clientPhone;
+        if (!whatsappEnabled || !to) continue;
+        void fetchWithAuth("/api/notifications/whatsapp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to,
+            interventionStatus: payload.variables.newStatus,
+            address: payload.variables.address,
+            clientName: payload.variables.clientName,
+          }),
+        });
+        continue;
+      }
       void fetch("/api/notifications/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,7 +125,7 @@ export async function dispatchStatusNotifications(
       });
     } catch {
       // Silently ignore — notification failures must never break the UX
-      console.warn("[notifications] Failed to dispatch:", payload.subjectKey);
+      logger.warn("[notifications] Failed to dispatch:", { subjectKey: payload.subjectKey });
     }
   }
 }

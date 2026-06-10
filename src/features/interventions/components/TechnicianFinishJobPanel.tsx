@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -20,6 +22,7 @@ import { toast } from "sonner";
 import type { Intervention } from "@/features/interventions/types";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { HUB_FONT_OUTFIT, HubButton } from "@/core/ui/hub";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { useOfflineSyncOptional } from "@/context/OfflineSyncContext";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
@@ -43,14 +46,10 @@ import { useTechnicianBackofficeReportBridgeOptional } from "@/context/Technicia
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import FinishJobStepIndicator from "@/features/interventions/components/FinishJobStepIndicator";
-import {
-  finishWizardPhotosFromIntervention,
-} from "@/features/interventions/technicianCompletionReport";
+import { finishWizardPhotosFromIntervention } from "@/features/interventions/technicianCompletionReport";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
 import { useQueryClient } from "@tanstack/react-query";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 const stepVariants = {
   initial: { opacity: 0, x: 16 },
@@ -69,8 +68,7 @@ const CATEGORY_ICONS = {
 type WizardStep = "photos" | "signature";
 type PhotoCategory = "panne" | "materiel" | "preuve" | "autre";
 
-const STEP_SHELL =
-  "absolute inset-0 flex min-h-0 flex-col overflow-hidden px-3";
+const STEP_SHELL = "absolute inset-0 flex min-h-0 flex-col overflow-hidden px-3";
 
 export default function TechnicianFinishJobPanel() {
   const { t } = useTranslation();
@@ -253,8 +251,12 @@ export default function TechnicianFinishJobPanel() {
       if (!isAmendMode) {
         void fetchWithAuth(
           `/api/interventions/${encodeURIComponent(interventionId)}/prepare-draft-billing`,
-          { method: "POST" },
-        ).catch((err) => console.warn("[prepare-draft-billing]", err));
+          { method: "POST" }
+        ).catch((err) =>
+          logger.warn("[prepare-draft-billing]", {
+            error: err instanceof Error ? err.message : String(err),
+          })
+        );
       }
 
       toast.success(
@@ -262,18 +264,18 @@ export default function TechnicianFinishJobPanel() {
           t(
             isAmendMode
               ? "technician_hub.finish.toasts.report_updated"
-              : "technician_hub.finish.toasts.report_sent",
-          ),
+              : "technician_hub.finish.toasts.report_sent"
+          )
         ),
         {
           description: String(
             t(
               isAmendMode
                 ? "technician_hub.finish.toasts.report_updated_desc"
-                : "technician_hub.finish.toasts.report_sent_desc",
-            ),
+                : "technician_hub.finish.toasts.report_sent_desc"
+            )
           ),
-        },
+        }
       );
       if (PRESENTATION_PRIVACY_MODE) {
         toast.message(String(t("technician_hub.finish.toasts.presentation_mode")), {
@@ -287,7 +289,7 @@ export default function TechnicianFinishJobPanel() {
         navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e instanceof Error ? e.message : String(e));
       setStep("signature");
       toast.error(String(t("technician_hub.finish.toasts.send_failed")), {
         description: e instanceof Error ? e.message : String(e),
@@ -303,8 +305,10 @@ export default function TechnicianFinishJobPanel() {
 
   if (!interventionId) {
     return (
-      <div data-testid="finish-job-empty" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex min-h-[260px] flex-col items-center justify-center gap-5 text-center`}>
+      <div data-testid="finish-job-empty" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex min-h-[260px] flex-col items-center justify-center gap-5 text-center`}
+        >
           <p className="sr-only">{String(t("technician_hub.finish.no_mission"))}</p>
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100/80 shadow-inner">
             <ClipboardList className="h-8 w-8 text-slate-400" aria-hidden />
@@ -312,15 +316,15 @@ export default function TechnicianFinishJobPanel() {
           <p className="max-w-[200px] text-[14px] font-medium leading-relaxed text-slate-500">
             {String(t("technician_hub.finish.select_to_close"))}
           </p>
-          <button
+          <HubButton
             type="button"
             data-testid="finish-job-back-empty"
             onClick={() => navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS)}
             aria-label={String(t("technician_hub.finish.open_mission_list"))}
-            className="mt-2 flex min-h-[48px] items-center justify-center rounded-[16px] bg-slate-900 px-6 text-[14px] font-bold text-white shadow-lg transition hover:bg-slate-800"
+            className="mt-2"
           >
             {String(t("technician_hub.finish.see_missions"))}
-          </button>
+          </HubButton>
         </div>
       </div>
     );
@@ -328,14 +332,14 @@ export default function TechnicianFinishJobPanel() {
 
   if (firebaseUnavailable) {
     return (
-      <div data-testid="finish-job-offline" style={outfit} className="p-5 text-[13px] font-medium text-amber-900">
+      <div data-testid="finish-job-offline" className="p-5 text-[13px] font-medium text-amber-900">
         {String(t("technician_hub.finish.connection_unavailable"))}
       </div>
     );
   }
 
   return (
-    <div data-testid="finish-job-panel" style={outfit} className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+    <div data-testid="finish-job-panel" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center justify-end px-3 py-1">
         <button
           type="button"
@@ -365,7 +369,7 @@ export default function TechnicianFinishJobPanel() {
                   ref={videoRef}
                   className={cn(
                     "h-full w-full object-cover",
-                    PRESENTATION_PRIVACY_MODE ? "blur-2xl" : null,
+                    PRESENTATION_PRIVACY_MODE ? "blur-2xl" : null
                   )}
                   muted
                   playsInline
@@ -400,7 +404,7 @@ export default function TechnicianFinishJobPanel() {
                         aria-pressed={isActive}
                         className={cn(
                           "flex h-9 w-9 items-center justify-center rounded-full transition",
-                          isActive ? "bg-white text-slate-900" : "text-white/80",
+                          isActive ? "bg-white text-slate-900" : "text-white/80"
                         )}
                       >
                         <IconComponent className="h-4 w-4" strokeWidth={2.25} />
@@ -429,7 +433,10 @@ export default function TechnicianFinishJobPanel() {
                     <img
                       src={photo.url}
                       alt=""
-                      className={cn("h-full w-full object-cover", PRESENTATION_PRIVACY_MODE ? "blur-lg" : null)}
+                      className={cn(
+                        "h-full w-full object-cover",
+                        PRESENTATION_PRIVACY_MODE ? "blur-lg" : null
+                      )}
                     />
                     <button
                       type="button"
@@ -468,7 +475,10 @@ export default function TechnicianFinishJobPanel() {
       <footer className="shrink-0 border-t border-slate-100 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         {step === "photos" ? (
           <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="text-[11px] font-semibold tabular-nums text-slate-500" aria-live="polite">
+            <span
+              className="text-[11px] font-semibold tabular-nums text-slate-500"
+              aria-live="polite"
+            >
               {photos.length}/{FINISH_JOB_MAX_PHOTOS}
               {!photosReady ? (
                 <span className="text-slate-400"> · min {FINISH_JOB_MIN_PHOTOS}</span>

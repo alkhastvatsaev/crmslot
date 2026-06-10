@@ -53,12 +53,91 @@ export function normalizeLecotProductSearchQuery(text: string): string {
   return t;
 }
 
+/**
+ * Mots qui peuvent précéder un mot-clé produit sans bloquer l'extraction
+ * (verbes d'intention, articles, auxiliaires — accent-stripped).
+ */
+const PRODUCT_KEYWORD_NON_BLOCKING = new Set([
+  "un",
+  "une",
+  "des",
+  "de",
+  "du",
+  "la",
+  "le",
+  "les",
+  "propose",
+  "proposez",
+  "proposer",
+  "commander",
+  "commande",
+  "commandez",
+  "cherche",
+  "chercher",
+  "cherchez",
+  "trouver",
+  "trouve",
+  "trouvez",
+  "montrer",
+  "montrez",
+  "montre",
+  "lister",
+  "liste",
+  "listez",
+  "afficher",
+  "affiche",
+  "affichez",
+  "suggerer",
+  "suggere",
+  "suggerez",
+  "acheter",
+  "achete",
+  "achetez",
+  "vouloir",
+  "voudrais",
+  "besoin",
+  "faut",
+  "peux",
+  "pouvez",
+  // Adjectifs et contractions courantes qui précèdent un nom de produit
+  "nouveau",
+  "nouvelle",
+  "nouvelles",
+  "nouveaux",
+  "dune", // contraction "d'une" normalisée
+  "dun", // contraction "d'un" normalisée
+]);
+
+/**
+ * Retourne true si un nom de contenu significatif précède le match
+ * (ex. "Lubrifiant" dans "Lubrifiant cylindre 400 ml").
+ * Les mots courts (≤4 car.) — articles, pronoms, prépositions — ne bloquent pas.
+ */
+function hasPrecedingContentWord(text: string, matchIndex: number): boolean {
+  if (matchIndex === 0) return false;
+  return text
+    .slice(0, matchIndex)
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .some((w) => {
+      if (w.length < 5) return false;
+      const n = w
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z]/g, "");
+      return Boolean(n) && !PRODUCT_KEYWORD_NON_BLOCKING.has(n);
+    });
+}
+
 /** Extrait le mot-clé produit d'une phrase (ex. « commander une serrure lecot » → serrure). */
 export function extractLecotProductKeyword(text: string): string | null {
   const t = text.trim();
   if (!t) return null;
   for (const { re, query } of LECOT_PRODUCT_PATTERNS) {
-    if (re.test(t)) return query;
+    const match = re.exec(t);
+    if (match && !hasPrecedingContentWord(t, match.index)) return query;
   }
   return null;
 }
@@ -74,7 +153,7 @@ export function extractLecotProductQueryFromFollowUp(lastText: string): string |
   const query = t
     .replace(
       /^(?:je\s+veux?|je\s+voudrais|je\s+cherche|j'ai\s+besoin\s+(?:de\s+)?|il\s+me\s+faut|commande[zr]?-?moi|cherche[zr]?)\s+/i,
-      "",
+      ""
     )
     .replace(/^(?:une?|un|des?|la|le|les)\s+/i, "")
     .trim();
@@ -118,13 +197,18 @@ export function priorMessagesHaveLecotContext(messages: unknown[]): boolean {
  */
 export function resolveLecotCatalogSearchQuery(
   lastUserText: string,
-  messages: unknown[],
+  messages: unknown[]
 ): string | null {
   const t = lastUserText.trim();
   if (!t) return null;
   if (isChatbotEmailIntent(t) && !isChatbotLecotOrderIntent(t)) return null;
 
-  const fromKeyword = extractLecotProductKeyword(t);
+  // Strip context noise (client name, lecot URL ref) before keyword extraction
+  const tStripped = t
+    .replace(/(?:^|\s+)(?:pour\s+(?:le\s+)?|chez\s+(?:le\s+)?)client\s+[\w.-]+/i, " ")
+    .replace(/\s+sur\s+lecot\b.*/i, "")
+    .trim();
+  const fromKeyword = extractLecotProductKeyword(tStripped);
   if (fromKeyword) return normalizeLecotProductSearchQuery(fromKeyword);
 
   if (/^(?:oui|yes|ok|d'accord|dac)\s*[!.?]*$/i.test(t)) {
@@ -138,6 +222,16 @@ export function resolveLecotCatalogSearchQuery(
       }
     }
     return null;
+  }
+
+  // Format bouton modal stock : "Commander N× "label" (réf. SKU) — société : X"
+  const modalOrderMatch = t.match(
+    /^commander\s+\d+[×x]\s+"([^"]+)"\s*\(réf\.\s*([A-Z0-9][A-Z0-9-]*)\)/i
+  );
+  if (modalOrderMatch) {
+    const label = modalOrderMatch[1].trim();
+    const sku = modalOrderMatch[2].trim().toUpperCase();
+    return sku.length >= 2 ? sku : label;
   }
 
   const fromFollowUp = extractLecotProductQueryFromFollowUp(t);

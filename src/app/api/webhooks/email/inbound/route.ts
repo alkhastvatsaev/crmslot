@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { logger } from "@/core/logger";
 
 const COLLECTION = "intervention_emails";
 
@@ -19,9 +20,15 @@ async function parseSendGridPayload(req: Request) {
     subject: String(form.get("subject") ?? ""),
     bodyText: String(form.get("text") ?? ""),
     bodyHtml: form.get("html") ? String(form.get("html")) : undefined,
-    messageId: String(form.get("headers") ?? "").match(/Message-ID:\s*(<[^>]+>)/i)?.[1] ?? `<sg-${Date.now()}@inbound>`,
-    inReplyTo: String(form.get("headers") ?? "").match(/In-Reply-To:\s*(<[^>]+>)/i)?.[1] ?? undefined,
-    references: String(form.get("headers") ?? "").match(/References:\s*(.+?)(?:\r?\n\S|$)/i)?.[1]?.trim() ?? undefined,
+    messageId:
+      String(form.get("headers") ?? "").match(/Message-ID:\s*(<[^>]+>)/i)?.[1] ??
+      `<sg-${Date.now()}@inbound>`,
+    inReplyTo:
+      String(form.get("headers") ?? "").match(/In-Reply-To:\s*(<[^>]+>)/i)?.[1] ?? undefined,
+    references:
+      String(form.get("headers") ?? "")
+        .match(/References:\s*(.+?)(?:\r?\n\S|$)/i)?.[1]
+        ?.trim() ?? undefined,
   };
 }
 
@@ -59,7 +66,10 @@ export async function POST(req: Request) {
 
   const interventionId = extractInterventionId(payload.to);
   if (!interventionId) {
-    return NextResponse.json({ ok: false, error: "No interventionId in To address" }, { status: 422 });
+    return NextResponse.json(
+      { ok: false, error: "No interventionId in To address" },
+      { status: 422 }
+    );
   }
 
   let companyId = "unknown";
@@ -91,7 +101,9 @@ export async function POST(req: Request) {
       readAt: null,
     });
   } catch (err) {
-    console.error("[email/inbound] Firestore write failed:", err);
+    logger.error("[email/inbound] Firestore write failed:", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ ok: false, error: "Storage error" }, { status: 500 });
   }
 

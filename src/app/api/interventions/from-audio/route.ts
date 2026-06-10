@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import * as admin from "firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { logger } from "@/core/logger";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { readAudioUploadSidecarIfPresent } from "@/core/services/audio/transcript-sidecar";
 import { writeAudioDecisionToDisk } from "@/core/services/audio/audio-decision-store";
@@ -32,9 +33,9 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
 
   const res = await fetch(url);
   if (!res.ok) return null;
-  const data = (await res.json().catch(() => null)) as
-    | { features?: Array<{ center?: [number, number] }> }
-    | null;
+  const data = (await res.json().catch(() => null)) as {
+    features?: Array<{ center?: [number, number] }>;
+  } | null;
   const center = data?.features?.[0]?.center;
   if (!center || center.length !== 2) return null;
   const [lng, lat] = center;
@@ -53,21 +54,19 @@ export async function POST(request: Request) {
   if ("response" in authGuard) return authGuard.response;
 
   try {
-    const body = (await request.json().catch(() => null)) as
-      | {
-          fileName?: unknown;
-          companyId?: unknown;
-          override?: {
-            address?: unknown;
-            clientName?: unknown;
-            phone?: unknown;
-            problem?: unknown;
-            urgency?: unknown;
-            date?: unknown;
-            time?: unknown;
-          };
-        }
-      | null;
+    const body = (await request.json().catch(() => null)) as {
+      fileName?: unknown;
+      companyId?: unknown;
+      override?: {
+        address?: unknown;
+        clientName?: unknown;
+        phone?: unknown;
+        problem?: unknown;
+        urgency?: unknown;
+        date?: unknown;
+        time?: unknown;
+      };
+    } | null;
     const fileName = typeof body?.fileName === "string" ? body.fileName.trim() : "";
     if (!fileName) return NextResponse.json({ error: "fileName manquant" }, { status: 400 });
     if (!isSafeUploadsRelativePath(fileName.replace(/\\/g, "/"))) {
@@ -91,8 +90,7 @@ export async function POST(request: Request) {
     const address = overrideAddress || analysis.adresse?.trim() || null;
     const problem = overrideProblem || analysis.probleme?.trim() || null;
     const title = (problem || "Intervention serrurerie").slice(0, 140);
-    const urgency =
-      typeof o?.urgency === "boolean" ? o.urgency : Boolean(analysis.urgence);
+    const urgency = typeof o?.urgency === "boolean" ? o.urgency : Boolean(analysis.urgence);
     const category = analysis.est_serrurerie ? ("serrurerie" as const) : ("autre" as const);
     const transcription = analysis.transcription?.trim() || "";
 
@@ -100,8 +98,7 @@ export async function POST(request: Request) {
     const location = address ? await geocodeAddress(address) : null;
 
     const authHeader = request.headers.get("authorization");
-    const bearer =
-      authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+    const bearer = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
     const rawCompanyId = typeof body?.companyId === "string" ? body.companyId.trim() : "";
     let scopedCompanyId: string | null = null;
     let createdByUid: string | null = null;
@@ -130,7 +127,7 @@ export async function POST(request: Request) {
     if (rawCompanyId && db && !scopedCompanyId) {
       return NextResponse.json(
         { error: "companyId ou jeton invalide pour une intervention liée à une société." },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -139,10 +136,7 @@ export async function POST(request: Request) {
     const date = overrideDate || null;
     const hour = overrideTime || null;
     const scheduleFromForm =
-      date &&
-      /^\d{4}-\d{2}-\d{2}$/.test(date) &&
-      hour &&
-      /^\d{1,2}:\d{2}$/.test(hour.trim())
+      date && /^\d{4}-\d{2}-\d{2}$/.test(date) && hour && /^\d{1,2}:\d{2}$/.test(hour.trim())
         ? { scheduledDate: date, scheduledTime: hour.trim().slice(0, 5) }
         : {};
 
@@ -175,18 +169,15 @@ export async function POST(request: Request) {
     let wrote = false;
     if (db && ref) {
       try {
-        await db
-          .collection("ai_audio_decisions")
-          .doc(decisionDocIdForUploadFileName(fileName))
-          .set(
-            {
-              fileName,
-              status: "created",
-              updatedAt: nowIso,
-              interventionId: ref.id,
-            },
-            { merge: true }
-          );
+        await db.collection("ai_audio_decisions").doc(decisionDocIdForUploadFileName(fileName)).set(
+          {
+            fileName,
+            status: "created",
+            updatedAt: nowIso,
+            interventionId: ref.id,
+          },
+          { merge: true }
+        );
         wrote = true;
       } catch {
         // ignore
@@ -202,14 +193,30 @@ export async function POST(request: Request) {
 
     if (!ref) {
       const uploadsRoot = path.join(process.cwd(), "public", "uploads");
-      const diskUrl = writeInterventionDraftToDisk(uploadsRoot, fileName, { id: null, ...doc, storage: "disk" });
-      return NextResponse.json({ success: true, interventionId: null, intervention: doc, storage: "disk", url: diskUrl });
+      const diskUrl = writeInterventionDraftToDisk(uploadsRoot, fileName, {
+        id: null,
+        ...doc,
+        storage: "disk",
+      });
+      return NextResponse.json({
+        success: true,
+        interventionId: null,
+        intervention: doc,
+        storage: "disk",
+        url: diskUrl,
+      });
     }
 
-    return NextResponse.json({ success: true, interventionId: ref.id, intervention: doc, storage: "firestore" });
+    return NextResponse.json({
+      success: true,
+      interventionId: ref.id,
+      intervention: doc,
+      storage: "firestore",
+    });
   } catch (error) {
-    console.error("[interventions/from-audio] error:", error);
+    logger.error("[interventions/from-audio] error:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
-

@@ -12,8 +12,6 @@ import { useInterventionEmails } from "@/features/emails/useInterventionEmails";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function formatEmailTime(createdAt: unknown): string {
   const d = coerceFirestoreLikeDate(createdAt);
   if (!d || Number.isNaN(d.getTime())) return "—";
@@ -50,16 +48,23 @@ function EmailBubble({
           "max-w-[90%] rounded-[18px] px-3.5 py-3 text-[13px] leading-relaxed shadow-sm",
           isOutbound
             ? "rounded-br-md bg-blue-600 text-white"
-            : "rounded-bl-md border border-slate-200 bg-white text-slate-800",
+            : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
         )}
       >
-        <p className={cn("mb-1 text-[10px] font-bold uppercase tracking-wide", isOutbound ? "text-blue-200" : "text-slate-400")}>
+        <p
+          className={cn(
+            "mb-1 text-[10px] font-bold uppercase tracking-wide",
+            isOutbound ? "text-blue-200" : "text-slate-400"
+          )}
+        >
           {isOutbound ? `→ ${email.to}` : `← ${email.from}`}
         </p>
         <p className="font-semibold mb-0.5">{email.subject}</p>
         <p className="whitespace-pre-wrap">{email.bodyText}</p>
       </div>
-      <div className={cn("flex items-center gap-2 px-1", isOutbound ? "flex-row-reverse" : "flex-row")}>
+      <div
+        className={cn("flex items-center gap-2 px-1", isOutbound ? "flex-row-reverse" : "flex-row")}
+      >
         <span className="text-[10px] text-slate-400">{formatEmailTime(email.createdAt)}</span>
         {!isOutbound && (
           <button
@@ -72,9 +77,7 @@ function EmailBubble({
             {replyLabel}
           </button>
         )}
-        {isUnread && (
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-        )}
+        {isUnread && <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />}
       </div>
     </div>
   );
@@ -112,19 +115,22 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
     }
   }, [panelExpanded, emails]);
 
-  const handleMarkRead = useCallback(
-    (id: string) => {
-      if (!firestore) return;
-      markEmailRead(firestore, id).catch(() => {});
-    },
-    [],
-  );
+  const handleMarkRead = useCallback((id: string) => {
+    if (!firestore) return;
+    markEmailRead(firestore, id).catch(() => {});
+  }, []);
 
   const openReply = useCallback((email: InterventionEmailDoc) => {
     const fromEmail = email.from.match(/<([^>]+)>$/)?.[1] ?? email.from;
     const subject = email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`;
     const refs = email.references ? `${email.references} ${email.messageId}` : email.messageId;
-    setCompose({ to: fromEmail, subject, bodyText: "", inReplyTo: email.messageId, references: refs });
+    setCompose({
+      to: fromEmail,
+      subject,
+      bodyText: "",
+      inReplyTo: email.messageId,
+      references: refs,
+    });
     setComposing(true);
     setExpanded(true);
   }, []);
@@ -156,7 +162,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
         }),
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string };
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error ?? String(t("emails.toast_send_failed")));
       }
       toast.success(String(t("emails.toast_sent")));
@@ -172,7 +178,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
   }, [compose, interventionId, companyId, t]);
 
   return (
-    <div style={outfit} data-testid="intervention-email-panel" className="space-y-2">
+    <div data-testid="intervention-email-panel" className="space-y-2">
       <button
         type="button"
         data-testid="email-panel-toggle"
@@ -239,7 +245,10 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
           )}
 
           {composing ? (
-            <div className="border-t border-slate-100 p-4 space-y-3" data-testid="email-compose-form">
+            <div
+              className="border-t border-slate-100 p-4 space-y-3"
+              data-testid="email-compose-form"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   {compose.inReplyTo ? t("emails.compose_reply") : t("emails.compose_new")}
@@ -247,7 +256,10 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                 <button
                   type="button"
                   data-testid="email-compose-close"
-                  onClick={() => { setComposing(false); setCompose(EMPTY_COMPOSE); }}
+                  onClick={() => {
+                    setComposing(false);
+                    setCompose(EMPTY_COMPOSE);
+                  }}
                   className="flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:bg-slate-100"
                 >
                   <X className="w-4 h-4" />
@@ -281,7 +293,10 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                 <button
                   type="button"
                   data-testid="email-compose-cancel"
-                  onClick={() => { setComposing(false); setCompose(EMPTY_COMPOSE); }}
+                  onClick={() => {
+                    setComposing(false);
+                    setCompose(EMPTY_COMPOSE);
+                  }}
                   className="rounded-[10px] px-3 py-2 text-[12px] font-semibold text-slate-500 hover:bg-slate-100"
                 >
                   {t("common.cancel")}
@@ -295,7 +310,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                     "flex items-center gap-1.5 rounded-[10px] px-4 py-2 text-[12px] font-bold text-white transition-all",
                     sending
                       ? "bg-blue-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 active:scale-95",
+                      : "bg-blue-600 hover:bg-blue-700 active:scale-95"
                   )}
                 >
                   <Send className="w-3.5 h-3.5" />
@@ -308,7 +323,10 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
               <button
                 type="button"
                 data-testid="email-compose-open"
-                onClick={() => { setComposing(true); setCompose(EMPTY_COMPOSE); }}
+                onClick={() => {
+                  setComposing(true);
+                  setCompose(EMPTY_COMPOSE);
+                }}
                 className="flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 <Mail className="w-4 h-4" />

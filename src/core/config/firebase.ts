@@ -1,13 +1,14 @@
-import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getDatabase, type Database } from 'firebase/database';
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { logger } from "@/core/logger";
+import { getDatabase, type Database } from "firebase/database";
 import {
   enableMultiTabIndexedDbPersistence,
   getFirestore,
   initializeFirestore,
   type Firestore,
-} from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 /** RTDB uniquement si URL explicite : sans elle, `getDatabase(app)` peut lever au build SSR (Vercel) si la RTDB n’existe pas / URL dérivée invalide. */
 function readOptionalRealtimeDatabaseUrl(): string | undefined {
@@ -15,7 +16,7 @@ function readOptionalRealtimeDatabaseUrl(): string | undefined {
   if (!raw) return undefined;
   try {
     const u = new URL(raw);
-    if (u.protocol !== 'https:') return undefined;
+    if (u.protocol !== "https:") return undefined;
     return raw;
   } catch {
     return undefined;
@@ -36,12 +37,9 @@ const firebaseConfig = {
 
 const isConfigured = !!firebaseConfig.projectId;
 
-const app = isConfigured
-  ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig))
-  : null;
+const app = isConfigured ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)) : null;
 
-const db: Database | null =
-  app && realtimeDatabaseUrl ? getDatabase(app) : null;
+const db: Database | null = app && realtimeDatabaseUrl ? getDatabase(app) : null;
 
 /**
  * Une seule instance Firestore par app (évite INTERNAL ASSERTION sur HMR / double init).
@@ -49,8 +47,8 @@ const db: Database | null =
  */
 function getOrInitFirestore(firebaseApp: FirebaseApp): Firestore {
   const forceLongPolling =
-    typeof window === 'undefined' ||
-    process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === 'true';
+    typeof window === "undefined" ||
+    process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === "true";
 
   if (!forceLongPolling) {
     try {
@@ -74,12 +72,12 @@ const auth = app ? getAuth(app) : null;
 const storage = app ? getStorage(app) : null;
 
 /** Persistence IndexedDB : utile en prod PWA ; en dev/HMR elle amplifie les races listener (assertion ca9). */
-if (typeof window !== 'undefined' && firestore && process.env.NODE_ENV === 'production') {
+if (typeof window !== "undefined" && firestore && process.env.NODE_ENV === "production") {
   enableMultiTabIndexedDbPersistence(firestore).catch((err: { code?: string }) => {
-    if (err.code === 'failed-precondition') {
-      console.warn("Le mode hors-ligne ne peut être activé que sur un seul onglet à la fois.");
-    } else if (err.code === 'unimplemented') {
-      console.warn("Le navigateur actuel ne supporte pas le mode hors-ligne de Firebase.");
+    if (err.code === "failed-precondition") {
+      logger.warn("Le mode hors-ligne ne peut être activé que sur un seul onglet à la fois.");
+    } else if (err.code === "unimplemented") {
+      logger.warn("Le navigateur actuel ne supporte pas le mode hors-ligne de Firebase.");
     }
   });
 }

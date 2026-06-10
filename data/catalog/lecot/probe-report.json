@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-06-06T09:19:14.965Z",
+  "sampleSize": 5,
+  "sitemap": {
+    "ok": false,
+    "status": 404,
+    "productUrls": 0
+  },
+  "apiProbes": [
+    {
+      "sku": "LEC-SER-1001",
+      "configured": false,
+      "hitCount": 0,
+      "hasImageUrl": false,
+      "sampleImageUrl": null
+    },
+    {
+      "sku": "LEC-CYL-2012",
+      "configured": false,
+      "hitCount": 0,
+      "hasImageUrl": false,
+      "sampleImageUrl": null
+    },
+    {
+      "sku": "LEC-CTL-4003",
+      "configured": false,
+      "hitCount": 0,
+      "hasImageUrl": false,
+      "sampleImageUrl": null
+    },
+    {
+      "sku": "LEC-QUI-3001",
+      "configured": false,
+      "hitCount": 0,
+      "hasImageUrl": false,
+      "sampleImageUrl": null
+    },
+    {
+      "sku": "LEC-CNS-6051",
+      "configured": false,
+      "hitCount": 0,
+      "hasImageUrl": false,
+      "sampleImageUrl": null
+    }
+  ],
+  "pageProbes": [
+    {
+      "sku": "LEC-SER-1001",
+      "pageUrl": "https://lecot.be/fr-be/ferco/1591289-serrure-multi-points-actionee-par-poignee-ferco-2783",
+      "ok": true,
+      "imageUrl": "https://lecot.be/media/catalog/product/2/0/2038597-036353012_foto_01.jpg"
+    },
+    {
+      "sku": "LEC-CYL-2012",
+      "pageUrl": "https://lecot.be/fr-be/yale/2730148-cylindre-adjustable-de-30-30-jusqu-a-60-65-yale-linus",
+      "ok": true,
+      "imageUrl": "https://lecot.be/media/catalog/product/2/7/2730149-130012585_foto_01.jpg"
+    },
+    {
+      "sku": "LEC-CTL-4003",
+      "pageUrl": "https://lecot.be/fr-be/eff-eff/1621273-gache-electrique-eff-eff-331-kl-rr-ak-rr-est",
+      "ok": true,
+      "imageUrl": "https://lecot.be/media/catalog/product/1/8/1834602-032070973_foto_01.jpg"
+    },
+    {
+      "sku": "LEC-QUI-3001",
+      "pageUrl": "https://shop.lecot.be/fr-be/tonic-line-paire-de-poignees-curve-tl-oe19mm-sur-rosace-ronde-tl3110-inox",
+      "ok": true,
+      "imageUrl": "https://cdn.lecot.be/articles/058431016-PrimaryProductImage-IMG-7066653-1920px.webp?ts=1779940972"
+    },
+    {
+      "sku": "LEC-CNS-6051",
+      "pageUrl": "https://lecot.be/fr-be/hdd/2949598-vis-halleine-m6-noir",
+      "ok": true,
+      "imageUrl": "https://lecot.be/media/catalog/product/3/0/3001145-a55640757_foto_001.jpg"
+    }
+  ],
+  "crawlProbes": [
+    {
+      "sku": "LEC-SER-1001",
+      "ok": true,
+      "source": "product_page",
+      "error": null
+    },
+    {
+      "sku": "LEC-CYL-2012",
+      "ok": true,
+      "source": "product_page",
+      "error": null
+    },
+    {
+      "sku": "LEC-CTL-4003",
+      "ok": true,
+      "source": "product_page",
+      "error": null
+    },
+    {
+      "sku": "LEC-QUI-3001",
+      "ok": true,
+      "source": "product_page",
+      "error": null
+    },
+    {
+      "sku": "LEC-CNS-6051",
+      "ok": true,
+      "source": "product_page",
+      "error": null
+    }
+  ],
+  "recommendation": "product_page"
+}

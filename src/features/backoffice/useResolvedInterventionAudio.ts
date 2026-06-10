@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
 import { storage } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 
 export function readAudioUrl(inv: unknown): string | null {
@@ -26,7 +27,6 @@ export function readAudioStoragePath(inv: unknown): string | null {
   const hit = candidates.find((v) => typeof v === "string" && v.trim().length > 0);
   return typeof hit === "string" ? hit : null;
 }
-
 
 export function useResolvedInterventionAudio(inv: Intervention | null | undefined) {
   const [resolvedAudioUrl, setResolvedAudioUrl] = useState<string | null>(null);
@@ -63,7 +63,9 @@ export function useResolvedInterventionAudio(inv: Intervention | null | undefine
         if (!cancelled) setResolvedAudioUrl(url);
       })
       .catch((err) => {
-        console.warn("Back-office: impossible de résoudre l'audio Storage", err);
+        logger.warn("Back-office: impossible de résoudre l'audio Storage", {
+          error: err instanceof Error ? err.message : String(err),
+        });
         if (!cancelled) setAudioStorageResolveFailed(true);
       })
       .finally(() => {

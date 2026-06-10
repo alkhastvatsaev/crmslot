@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import HubPanelHeader from "@/core/ui/hub/HubPanelHeader";
 
 type Props = {
   title?: string;
@@ -19,26 +20,15 @@ export default function BackOfficeHubPanelShell({
   className,
   badge,
 }: Props) {
-  const showHeader = Boolean(title?.trim() || badge);
-
   return (
     <div
       data-testid={testId}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
-      {showHeader ? (
-        <div className="flex shrink-0 items-center gap-2 px-1 pb-3">
-          {title?.trim() ? (
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{title}</h2>
-          ) : null}
-          {badge ? (
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-800">
-              {badge}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">{children}</div>
+      <HubPanelHeader title={title} badge={badge} variant="eyebrow" />
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        {children}
+      </div>
     </div>
   );
 }

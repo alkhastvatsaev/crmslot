@@ -5,7 +5,6 @@ import { Inbox, Loader2, Search } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import GmailHubAvatar from "@/features/gmail/components/GmailHubAvatar";
-import { GMAIL_HUB_SEARCH_CHIPS } from "@/features/gmail/gmailHubConstants";
 import {
   formatMailDateShort,
   gmailDivider,
@@ -16,6 +15,7 @@ import {
   parseSenderName,
   snippetPreviewLines,
 } from "@/features/gmail/gmailHubUi";
+import { HUB_TYPE } from "@/core/ui/hub";
 import type { GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
 
 type RowMenu = { x: number; y: number; msg: GmailHubMessageSummary };
@@ -84,18 +84,11 @@ export default function GmailHubInboxList({
     };
   }, [rowMenu, closeMenu]);
 
-  const applyChip = (q: string) => {
-    onSearchChange(q);
-    onSearchSubmit();
-  };
-
   return (
     <div className={gmailShell} data-testid="gmail-hub-panel-center" style={gmailHubFont}>
       <header className={`shrink-0 border-b ${gmailDivider} px-4 pb-3 pt-3`}>
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="truncate text-[15px] font-medium tracking-tight text-slate-900">
-            {activeLabelKey}
-          </h2>
+          <h2 className={cn("truncate", HUB_TYPE.title)}>{activeLabelKey}</h2>
           {!loading && messages.length > 0 ? (
             <span
               className="shrink-0 rounded-full bg-black/[0.04] px-2 py-0.5 text-[11px] tabular-nums text-slate-500"
@@ -120,27 +113,6 @@ export default function GmailHubInboxList({
             placeholder={String(t("gmail.hub.search_placeholder"))}
             className={`${gmailFieldClass} pl-9`}
           />
-        </div>
-        <div
-          className="mt-2 flex flex-wrap gap-1.5"
-          data-testid="gmail-hub-search-chips"
-        >
-          {GMAIL_HUB_SEARCH_CHIPS.map((chip) => (
-            <button
-              key={chip.id}
-              type="button"
-              data-testid={`gmail-hub-chip-${chip.id}`}
-              onClick={() => applyChip(chip.q)}
-              className={cn(
-                "rounded-full border border-black/[0.08] bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors",
-                searchQuery === chip.q
-                  ? "border-slate-400 bg-slate-100 text-slate-900"
-                  : "hover:bg-black/[0.03]",
-              )}
-            >
-              {t(chip.labelKey)}
-            </button>
-          ))}
         </div>
       </header>
 
@@ -221,7 +193,7 @@ export default function GmailHubInboxList({
                   }}
                   className={cn(
                     "flex w-full gap-3 px-3 py-3 text-left transition-colors",
-                    selected ? "gmail-hub-row-selected" : "hover:bg-black/[0.02]",
+                    selected ? "gmail-hub-row-selected" : "hover:bg-black/[0.02]"
                   )}
                 >
                   <GmailHubAvatar seed={msg.from} />
@@ -230,7 +202,7 @@ export default function GmailHubInboxList({
                       <span
                         className={cn(
                           "truncate text-[13px]",
-                          msg.isUnread ? "font-semibold text-slate-900" : "text-slate-700",
+                          msg.isUnread ? "font-semibold text-slate-900" : "text-slate-700"
                         )}
                       >
                         {parseSenderName(msg.from)}
@@ -242,7 +214,7 @@ export default function GmailHubInboxList({
                     <span
                       className={cn(
                         "mt-0.5 block truncate text-[12px] leading-snug",
-                        msg.isUnread ? "font-medium text-slate-800" : "text-slate-600",
+                        msg.isUnread ? "font-medium text-slate-800" : "text-slate-600"
                       )}
                     >
                       {msg.subject || `(${t("gmail.hub.no_subject")})`}

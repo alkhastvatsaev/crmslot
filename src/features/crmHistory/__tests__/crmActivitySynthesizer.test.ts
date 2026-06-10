@@ -3,7 +3,6 @@ import {
   synthesizeCommissionEvents,
   synthesizeEmailEvents,
   synthesizeInterventionEvents,
-  synthesizeInterventionBillingEvents,
   synthesizeInterventionLifecycleEvents,
   synthesizeMaterialOrderEvents,
   synthesizeSupplierOrderEvents,
@@ -67,22 +66,6 @@ describe("synthesizeInterventionEvents", () => {
       },
     ]);
     expect(evts.find((e) => e.type === "intervention_invoiced")).toBeDefined();
-  });
-});
-
-describe("synthesizeInterventionBillingEvents", () => {
-  it("emits billing event when billingLines and statusUpdatedAt exist", () => {
-    const evts = synthesizeInterventionBillingEvents([
-      {
-        ...baseIntervention,
-        statusUpdatedAt: "2024-01-16T12:00:00Z",
-        billingLines: [{ description: "Main d'œuvre", quantity: 1, unitPriceCents: 12_000 }],
-        invoiceAmountCents: 12_000,
-      },
-    ]);
-    expect(evts).toHaveLength(1);
-    expect(evts[0].type).toBe("intervention_billing_updated");
-    expect(evts[0].note).toContain("Facture");
   });
 });
 

@@ -1,65 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   AlertCircle,
   Building2,
   CalendarClock,
-  CheckCircle2,
   Euro,
-  ExternalLink,
   LayoutDashboard,
   Sparkles,
-  Trash2,
   UserRound,
-  X,
 } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import { toast } from "sonner";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { Badge, badgeVariants } from "@/components/ui/badge";
-import { type VariantProps } from "class-variance-authority";
-
-type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
-
+import { auth, isConfigured, firestore } from "@/core/config/firebase";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { Intervention } from "@/features/interventions/types";
-import {
-  formatScheduledLabel,
-  interventionClientLabel,
-  statusLabelKey,
-} from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useTechnicians } from "@/features/technicians/hooks";
-import type { Technician } from "@/features/technicians/types";
-import { useInterventionLive } from "@/features/interventions/useInterventionLive";
-import {
-  type BackofficeBucket,
-  backofficeBucketLabel,
-  backofficeRowStatusLabel,
-  interventionBackofficeBucket,
-} from "@/features/backoffice/backofficeBuckets";
-import {
-  applyBackofficeFilters,
-  defaultBackofficeViewFilters,
-  sortBackofficeRowsDesc,
-  uniqueAssignedTechnicianUids,
-  type ActivityWindow,
-  type BackofficeViewFilters,
-} from "@/features/backoffice/backofficeFilters";
-import { buildInterventionHistory } from "@/features/backoffice/interventionHistory";
-import { computeTodayActivitySummary } from "@/features/backoffice/todayActivity";
-import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import { backofficeBucketLabel } from "@/features/backoffice/backofficeBuckets";
+import { type BackofficeViewFilters } from "@/features/backoffice/backofficeFilters";
 import DailyOperationsKpi from "@/features/backoffice/components/DailyOperationsKpi";
-
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+import BackOfficeDetailDrawer from "@/features/backoffice/components/BackOfficeDetailDrawer";
+import BackOfficeInterventionsTable from "@/features/backoffice/components/BackOfficeInterventionsTable";
+import { useBackOfficeDashboard } from "@/features/backoffice/hooks/useBackOfficeDashboard";
+import type { Technician } from "@/features/technicians/types";
 
 const selectClass =
   "flex h-10 w-full cursor-pointer appearance-none rounded-[14px] border border-black/[0.06] bg-white/95 py-2 pl-3 pr-3 text-sm font-medium text-slate-800 outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15";
@@ -67,277 +30,44 @@ const selectClass =
 const dateInputClass =
   "flex h-10 w-full rounded-[14px] border border-black/[0.06] bg-white/95 px-3 text-sm font-medium text-slate-800 outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15";
 
-const invoiceLinkClass =
-  "inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-[14px] border border-black/[0.06] bg-white/95 px-3 text-xs font-semibold text-slate-900 shadow-sm transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15";
-
-function bucketBadgeVariant(bucket: BackofficeBucket): BadgeVariant {
-  switch (bucket) {
-    case "pending":
-      return "warning";
-    case "in_progress":
-      return "info";
-    case "done":
-      return "success";
-    case "invoiced":
-      return "violet";
-    default:
-      return "secondary";
-  }
-}
-
 function technicianOptionLabel(uid: string, technicians: Technician[]): string {
-  const t = technicians.find((x) => x.id === uid);
-  return t?.name?.trim() ? `${t.name} (${uid.slice(0, 6)}…)` : uid;
+  const tech = technicians.find((x) => x.id === uid);
+  return tech?.name?.trim() ? `${tech.name} (${uid.slice(0, 6)}…)` : uid;
 }
 
 function formatEuro(n: number): string {
   return new Intl.NumberFormat("fr-BE", { style: "currency", currency: "EUR" }).format(n);
 }
 
-function BackOfficeDetailDrawer({
-  intervention,
-  technicians,
-  isAdmin: _isAdmin,
-  onClose,
-  onDelete,
-  onArchive,
-}: {
-  intervention: Intervention;
-  technicians: Technician[];
-  isAdmin: boolean;
-  onClose: () => void;
-  onDelete: (id: string) => Promise<void>;
-  onArchive: (id: string) => Promise<void>;
-}) {
-  const { t } = useTranslation();
-  const live = useInterventionLive(intervention.id, true);
-  const merged = live ?? intervention;
-  const client = interventionClientLabel(merged);
-  const history = useMemo(() => buildInterventionHistory(merged), [merged]);
-  const tech = (merged.assignedTechnicianUid ?? "").trim();
-  const techLabel = tech ? technicianOptionLabel(tech, technicians) : "—";
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="back-office-detail-title"
-      data-testid="back-office-detail-drawer"
-      className="absolute inset-0 z-30 flex min-h-0 flex-col rounded-[inherit] bg-[rgb(252,252,253)]/97 backdrop-blur-md"
-    >
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-black/[0.06] px-4 py-3">
-        <div className="min-w-0">
-          <p id="back-office-detail-title" className="truncate text-[17px] font-bold text-slate-900">
-            {client}
-          </p>
-          <p className="font-mono text-[11px] font-semibold text-slate-500">
-            Dossier <span className="text-slate-700">{merged.id}</span>
-          </p>
-        </div>
-        <button
-          type="button"
-          data-testid="back-office-detail-close"
-          aria-label="Fermer le détail"
-          onClick={onClose}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white shadow-md transition hover:bg-slate-800"
-        >
-          <X className="h-5 w-5" aria-hidden />
-        </button>
-      </div>
-
-      <div className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex flex-col gap-4 px-4 py-4")}>
-        <div className="rounded-[18px] border border-black/[0.06] bg-white/90 px-4 py-4 shadow-sm">
-          <h3 className="sr-only">Synthèse dossier</h3>
-          <div className="grid gap-3 text-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-medium text-slate-600">État</span>
-              <Badge variant={bucketBadgeVariant(interventionBackofficeBucket(merged.status))}>
-                {String(t(statusLabelKey(merged.status)))}
-              </Badge>
-            </div>
-            <div>
-              <span className="font-medium text-slate-600">Tech</span>
-              <p className="mt-1 font-semibold text-slate-900">{techLabel}</p>
-            </div>
-            <div>
-              <span className="font-medium text-slate-600">Quand</span>
-              <p className="mt-1 font-semibold text-slate-900">{formatScheduledLabel(merged)}</p>
-            </div>
-            <div>
-              <span className="font-medium text-slate-600">Lieu</span>
-              <p className="mt-1 leading-snug text-slate-800">{merged.address?.trim() || "—"}</p>
-            </div>
-            {merged.problem?.trim() ? (
-              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-center">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Problème</span>
-                <p className="mt-1.5 font-semibold leading-snug text-slate-800">{merged.problem}</p>
-              </div>
-            ) : null}
-            {merged.phone?.trim() ? (
-              <div>
-                <span className="font-medium text-slate-600">Tél.</span>
-                <p className="mt-1 font-semibold text-slate-900">{merged.phone}</p>
-              </div>
-            ) : null}
-            {merged.clientEmail?.trim() ? (
-              <div>
-                <span className="font-medium text-slate-600">Mail</span>
-                <p className="mt-1 font-semibold text-slate-900 break-all">
-                  <a href={`mailto:${merged.clientEmail}`} className="hover:underline">
-                    {merged.clientEmail}
-                  </a>
-                </p>
-              </div>
-            ) : null}
-            {merged.invoicePdfUrl?.trim() ? (
-              <a
-                href={merged.invoicePdfUrl}
-                target="_blank"
-                rel="noreferrer"
-                data-testid="back-office-invoice-link"
-                className={invoiceLinkClass}
-              >
-                Ouvrir la facture PDF
-                <ExternalLink className="h-4 w-4" aria-hidden />
-              </a>
-            ) : null}
-          </div>
-        </div>
-
-
-
-        <div className="rounded-[18px] border border-black/[0.06] bg-white/90 px-4 py-4 shadow-sm">
-          <h3 className="sr-only">Historique</h3>
-          <ul data-testid="back-office-history" className="flex flex-col gap-3" aria-label="Historique intervention">
-            {history.map((h) => (
-              <li
-                key={h.id}
-                data-testid={`back-office-history-${h.id}`}
-                className="rounded-lg border border-slate-100 bg-slate-50/80 px-3 py-2"
-              >
-                <p className="text-[13px] font-bold text-slate-900">{h.label}</p>
-                {h.detail ? <p className="mt-1 font-mono text-[12px] text-slate-600">{h.detail}</p> : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="flex shrink-0 gap-3 border-t border-black/[0.06] bg-white/50 p-4 backdrop-blur-md">
-        <button
-          type="button"
-          onClick={() => onDelete(merged.id)}
-          className="flex-1 flex items-center justify-center gap-2 rounded-[16px] border border-red-100 bg-red-50 py-3.5 text-[14px] font-bold text-red-600 transition-all hover:bg-red-100 active:scale-95"
-        >
-          <Trash2 className="h-4 w-4" aria-hidden />
-          {String(t("common.delete"))}
-        </button>
-
-        {merged.status !== "invoiced" && (
-          <button
-            type="button"
-            onClick={() => onArchive(merged.id)}
-            className="flex-[1.5] flex items-center justify-center gap-2 rounded-[16px] bg-emerald-600 py-3.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-700 active:scale-95"
-          >
-            <CheckCircle2 className="h-4 w-4" aria-hidden />
-            {String(t("backoffice.inbox.verify_report"))}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function BackOfficeDashboardPanel() {
   const { t } = useTranslation();
-  const workspace = useCompanyWorkspaceOptional();
-  const [filters, setFilters] = useState<BackofficeViewFilters>(() => defaultBackofficeViewFilters());
-  const [companyFilterId, setCompanyFilterId] = useState("");
-  const [detail, setDetail] = useState<Intervention | null>(null);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (workspace?.activeCompanyId) setCompanyFilterId(workspace.activeCompanyId);
-  }, [workspace?.activeCompanyId]);
-
-  const tenantReady = Boolean(workspace?.isTenantUser && companyFilterId.trim());
-  const { interventions, loading, error } = useBackOfficeInterventions(tenantReady ? companyFilterId : null);
-  const { technicians } = useTechnicians();
+  const {
+    workspace,
+    filters,
+    setFilters,
+    companyFilterId,
+    setCompanyFilterId,
+    detail,
+    setDetail,
+    tenantReady,
+    interventions,
+    loading,
+    error,
+    technicians,
+    summary,
+    filteredSorted,
+    techUids,
+    handleDelete,
+    handleArchive,
+    setWindow,
+  } = useBackOfficeDashboard();
 
   const offlineAuth = !isConfigured || !firestore;
-
-  const summary = useMemo(() => computeTodayActivitySummary(interventions), [interventions]);
-
-  const filteredSorted = useMemo(() => {
-    const f = applyBackofficeFilters(interventions, filters);
-    return sortBackofficeRowsDesc(f);
-  }, [interventions, filters]);
-
-  const handleDelete = async (id: string) => {
-    if (!firestore) return;
-    if (!window.confirm(String(t("common.confirm_delete")) || "Confirmer la suppression ?")) return;
-
-    try {
-      const row = interventions.find((x) => x.id === id);
-      const actorUid = auth?.currentUser?.uid?.trim() || "system";
-      if (row) {
-        await logCrmInterventionAction({
-          kind: "intervention_deleted",
-          iv: row,
-          actorUid,
-          actorRole: "dispatcher",
-          note: "Suppression depuis le tableau de bord",
-        });
-      }
-      await deleteDoc(doc(firestore, "interventions", id));
-      toast.success(String(t("backoffice.toasts.request_deleted")));
-      setDetail(null);
-    } catch (e) {
-      console.error("Delete failed:", e);
-      toast.error(String(t("common.error")));
-    }
-  };
-
-  const handleArchive = async (id: string) => {
-    if (!firestore) return;
-    try {
-      const row = interventions.find((x) => x.id === id);
-      const invoicedAt = new Date().toISOString();
-      const actorUid = auth?.currentUser?.uid?.trim() || "system";
-      await updateDoc(doc(firestore, "interventions", id), {
-        status: "invoiced",
-        invoicedAt,
-      });
-      if (row) {
-        await logCrmInterventionAction({
-          kind: "intervention_invoiced",
-          iv: { ...row, status: "invoiced", invoicedAt },
-          actorUid,
-          actorRole: "dispatcher",
-          statusBefore: row.status,
-          statusAfter: "invoiced",
-          note: "Marqué facturé (tableau de bord)",
-        });
-      }
-      toast.success(String(t("backoffice.toasts.status_updated")));
-      setDetail(null);
-    } catch (e) {
-      console.error("Archive failed:", e);
-      toast.error(String(t("common.error")));
-    }
-  };
-
-  const techUids = useMemo(() => uniqueAssignedTechnicianUids(interventions), [interventions]);
-
-  const setWindow = useCallback((activityWindow: ActivityWindow) => {
-    setFilters((prev) => ({ ...prev, activityWindow }));
-  }, []);
 
   if (!workspace || !workspace.isTenantUser || !workspace.memberships.length) {
     return (
       <div
         data-testid="back-office-gate"
-        style={outfit}
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit] px-4 py-6"
       >
         <div
@@ -358,17 +88,19 @@ export default function BackOfficeDashboardPanel() {
   return (
     <div
       data-testid="back-office-dashboard"
-      style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
     >
       <div className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex min-h-0 flex-1 flex-col gap-3")}>
+        {/* Header */}
         <div className="flex shrink-0 items-center justify-between gap-2">
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[16px] bg-slate-900 text-white shadow-md">
               <LayoutDashboard className="h-5 w-5" aria-hidden />
             </div>
             <div className="min-w-0">
-              <h2 className="truncate text-[15px] font-bold tracking-tight text-slate-900">Dossiers</h2>
+              <h2 className="truncate text-[15px] font-bold tracking-tight text-slate-900">
+                Dossiers
+              </h2>
               <p className="sr-only">Interventions société — tableau et filtres</p>
             </div>
           </div>
@@ -387,6 +119,7 @@ export default function BackOfficeDashboardPanel() {
           ) : null}
         </div>
 
+        {/* Status banners */}
         {offlineAuth ? (
           <div
             role="status"
@@ -396,13 +129,14 @@ export default function BackOfficeDashboardPanel() {
             <span>Connexion requise</span>
           </div>
         ) : null}
-
         {!offlineAuth && !auth?.currentUser ? (
-          <p data-testid="back-office-login-hint" className="text-[12px] font-medium text-slate-600">
+          <p
+            data-testid="back-office-login-hint"
+            className="text-[12px] font-medium text-slate-600"
+          >
             Connectez-vous.
           </p>
         ) : null}
-
         {error ? (
           <p
             data-testid="back-office-error"
@@ -412,11 +146,12 @@ export default function BackOfficeDashboardPanel() {
           </p>
         ) : null}
 
+        {/* KPI summary cards */}
         <div className="grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
           <div
             data-testid="back-office-summary-completed"
             className="rounded-[18px] border border-black/[0.06] bg-white/90 px-3 py-3 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"
-            title="Interventions terminées aujourd’hui"
+            title="Interventions terminées aujourd'hui"
           >
             <div className="flex items-start justify-between gap-2">
               <Sparkles className="mt-0.5 h-[18px] w-[18px] text-emerald-600" aria-hidden />
@@ -424,14 +159,15 @@ export default function BackOfficeDashboardPanel() {
                 {summary.completedCount}
               </p>
             </div>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Terminé</p>
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              Terminé
+            </p>
             <p className="sr-only">{summary.completedCount} terminées aujourd&apos;hui</p>
           </div>
-
           <div
             data-testid="back-office-summary-invoiced"
             className="rounded-[18px] border border-black/[0.06] bg-white/90 px-3 py-3 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"
-            title="Interventions facturées aujourd’hui"
+            title="Interventions facturées aujourd'hui"
           >
             <div className="flex items-start justify-between gap-2">
               <Euro className="mt-0.5 h-[18px] w-[18px] text-violet-600" aria-hidden />
@@ -439,14 +175,15 @@ export default function BackOfficeDashboardPanel() {
                 {summary.invoicedCount}
               </p>
             </div>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Facturé</p>
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              Facturé
+            </p>
             <p className="sr-only">{summary.invoicedCount} facturées aujourd&apos;hui</p>
           </div>
-
           <div
             data-testid="back-office-summary-revenue"
             className="rounded-[18px] border border-black/[0.06] bg-white/90 px-3 py-3 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"
-            title="Chiffre d’affaires estimé sur la journée"
+            title="Chiffre d'affaires estimé sur la journée"
           >
             <div className="flex items-start justify-between gap-2">
               <Activity className="mt-0.5 h-[18px] w-[18px] text-sky-600" aria-hidden />
@@ -454,12 +191,14 @@ export default function BackOfficeDashboardPanel() {
                 {formatEuro(summary.revenueEstimateEuros)}
               </p>
             </div>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">CA · jour</p>
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              CA · jour
+            </p>
             <p className="sr-only">
-              Chiffre d&apos;affaires estimé pour aujourd&apos;hui&nbsp;: {formatEuro(summary.revenueEstimateEuros)}
+              Chiffre d&apos;affaires estimé pour aujourd&apos;hui&nbsp;:{" "}
+              {formatEuro(summary.revenueEstimateEuros)}
             </p>
           </div>
-
           <div
             data-testid="back-office-summary-new"
             className="rounded-[18px] border border-black/[0.06] bg-white/90 px-3 py-3 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"
@@ -471,15 +210,16 @@ export default function BackOfficeDashboardPanel() {
                 {summary.newRequestsCount}
               </p>
             </div>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Nouveau</p>
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              Nouveau
+            </p>
             <p className="sr-only">{summary.newRequestsCount} nouvelles demandes</p>
           </div>
         </div>
 
-        {tenantReady && !loading ? (
-          <DailyOperationsKpi interventions={interventions} />
-        ) : null}
+        {tenantReady && !loading ? <DailyOperationsKpi interventions={interventions} /> : null}
 
+        {/* Filters */}
         <div
           className="shrink-0 rounded-[16px] border border-black/[0.06] bg-white/90 px-2 py-2 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]"
           aria-label="Filtres dossiers"
@@ -495,7 +235,9 @@ export default function BackOfficeDashboardPanel() {
                 data-testid="back-office-filter-window"
                 className={selectClass}
                 value={filters.activityWindow}
-                onChange={(e) => setWindow(e.target.value as ActivityWindow)}
+                onChange={(e) =>
+                  setWindow(e.target.value as BackofficeViewFilters["activityWindow"])
+                }
               >
                 <option value="all">Dates · tout</option>
                 <option value="today">Aujourd&apos;hui</option>
@@ -503,7 +245,6 @@ export default function BackOfficeDashboardPanel() {
                 <option value="custom">Plage</option>
               </select>
             </div>
-
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="back-office-filter-company" className="sr-only">
                 Société
@@ -526,7 +267,6 @@ export default function BackOfficeDashboardPanel() {
                 ))}
               </select>
             </div>
-
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="back-office-filter-tech" className="sr-only">
                 Technicien
@@ -546,7 +286,6 @@ export default function BackOfficeDashboardPanel() {
                 ))}
               </select>
             </div>
-
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="back-office-filter-status" className="sr-only">
                 Statut
@@ -571,7 +310,6 @@ export default function BackOfficeDashboardPanel() {
                 ))}
               </select>
             </div>
-
             {filters.activityWindow === "custom" ? (
               <>
                 <div className="flex flex-col gap-1.5">
@@ -605,15 +343,19 @@ export default function BackOfficeDashboardPanel() {
           </div>
         </div>
 
+        {/* Interventions table */}
         <div className="flex min-h-[200px] flex-1 flex-col overflow-hidden rounded-[22px] border border-black/[0.06] bg-white/90 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]">
           {loading && tenantReady ? (
             <div data-testid="back-office-loading" className="space-y-2 p-3">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-12 animate-pulse rounded-lg bg-slate-200/55" aria-hidden />
+                <div
+                  key={i}
+                  className="h-12 animate-pulse rounded-lg bg-slate-200/55"
+                  aria-hidden
+                />
               ))}
             </div>
           ) : null}
-
           {!loading && tenantReady && filteredSorted.length === 0 ? (
             <div
               data-testid="back-office-empty"
@@ -624,87 +366,16 @@ export default function BackOfficeDashboardPanel() {
               <p className="sr-only">Aucune intervention ne correspond aux filtres.</p>
             </div>
           ) : null}
-
           {!loading && filteredSorted.length > 0 ? (
             <div className="min-h-0 flex-1 overflow-auto">
-              <table className="w-full min-w-[640px] border-collapse text-left text-[13px]" aria-label="Liste des dossiers">
-                <thead className="sticky top-0 z-10 bg-slate-50/95 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 backdrop-blur-sm">
-                  <tr>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3" title="Client / dossier">
-                      Client
-                    </th>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3">État</th>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3" title="Technicien assigné">
-                      Tech
-                    </th>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3" title="Créneau planifié">
-                      Quand
-                    </th>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3" title="Adresse d’intervention">
-                      Lieu
-                    </th>
-                    <th className="border-b border-slate-100 px-2 py-2 sm:px-3 w-[50px]"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredSorted.map((iv) => {
-                    const bucket = interventionBackofficeBucket(iv.status);
-                    const uid = (iv.assignedTechnicianUid ?? "").trim();
-                    return (
-                      <tr
-                        key={iv.id}
-                        role="button"
-                        tabIndex={0}
-                        data-testid={`back-office-row-${iv.id}`}
-                        onClick={() => setDetail(iv)}
-                        onKeyDown={(ev) => {
-                          if (ev.key === "Enter" || ev.key === " ") {
-                            ev.preventDefault();
-                            setDetail(iv);
-                          }
-                        }}
-                        className="cursor-pointer border-b border-slate-50 transition hover:bg-slate-50/90 focus-visible:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-900/15"
-                      >
-                        <td className="max-w-[180px] px-3 py-2">
-                          <p className="truncate font-bold text-slate-900">{interventionClientLabel(iv)}</p>
-                          {(iv.clientPhone || iv.phone) && (
-                            <p className="font-bold text-slate-900 mt-0.5 text-[13px]">{iv.clientPhone || iv.phone}</p>
-                          )}
-                          {iv.clientEmail && (
-                            <p className="font-medium text-slate-600 mt-0.5 text-[13px] break-all">
-                              <a href={`mailto:${iv.clientEmail}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
-                                {iv.clientEmail}
-                              </a>
-                            </p>
-                          )}
-                        </td>
-                        <td className="px-3 py-2">
-                          <Badge variant={bucketBadgeVariant(bucket)}>{backofficeRowStatusLabel(iv.status)}</Badge>
-                        </td>
-                        <td className="max-w-[140px] truncate px-3 py-2 font-medium text-slate-700">
-                          {uid ? technicianOptionLabel(uid, technicians) : "—"}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-2 font-medium text-slate-700">{formatScheduledLabel(iv)}</td>
-                        <td className="max-w-[220px] truncate px-3 py-2 text-slate-600">{iv.address?.trim() || "—"}</td>
-                        <td className="px-3 py-2 text-right">
-                          <button
-                            type="button"
-                            data-testid={`back-office-delete-${iv.id}`}
-                            onClick={(ev) => {
-                              ev.stopPropagation();
-                              handleDelete(iv.id);
-                            }}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                            title={String(t("common.delete"))}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <BackOfficeInterventionsTable
+                rows={filteredSorted}
+                technicians={technicians}
+                onRowClick={setDetail}
+                onDelete={(id) => {
+                  void handleDelete(id);
+                }}
+              />
             </div>
           ) : null}
         </div>

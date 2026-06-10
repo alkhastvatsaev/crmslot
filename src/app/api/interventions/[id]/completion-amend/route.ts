@@ -7,19 +7,22 @@ import type { Intervention } from "@/features/interventions/types";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
 import { coerceAdminExtraPatch } from "@/features/interventions/workflow/coerceAdminExtraPatch";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
 type Body = {
   completionPhotoUrls?: string[];
   completionSignatureUrl?: string;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
 };
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
 
@@ -30,14 +33,17 @@ export async function POST(
         error:
           "Route réservée au mode développement local. En production, la mise à jour passe par Firestore client.",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
   const { id } = await context.params;
   const interventionId = id?.trim();
   if (!interventionId) {
-    return NextResponse.json({ ok: false, error: "Identifiant intervention manquant." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Identifiant intervention manquant." },
+      { status: 400 }
+    );
   }
 
   let body: Body = {};
@@ -55,12 +61,18 @@ export async function POST(
 
   const iv = { id: snap.id, ...snap.data() } as Intervention;
   if (!assertTechnicianMayUpdateAssignedIntervention(iv, auth.uid)) {
-    return NextResponse.json({ ok: false, error: "Mission non assignée à ce technicien." }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, error: "Mission non assignée à ce technicien." },
+      { status: 403 }
+    );
   }
 
   const gate = canTechnicianAmendCompletionReport(iv, auth.uid);
   if (!gate.allowed) {
-    return NextResponse.json({ ok: false, error: `Modification refusée (${gate.reason})` }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, error: `Modification refusée (${gate.reason})` },
+      { status: 403 }
+    );
   }
 
   const extraPatch = coerceAdminExtraPatch({
@@ -71,10 +83,15 @@ export async function POST(
   });
 
   try {
-    await db.collection("interventions").doc(interventionId).update(extraPatch ?? {});
+    await db
+      .collection("interventions")
+      .doc(interventionId)
+      .update(extraPatch ?? {});
     return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error("[interventions/completion-amend]", e);
+    logger.error("[interventions/completion-amend]", {
+      error: e instanceof Error ? e.message : String(e),
+    });
     const message = e instanceof Error ? e.message : "Erreur mise à jour";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

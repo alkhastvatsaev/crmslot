@@ -1260,6 +1260,24 @@
     "category": "cylindre"
   },
   {
+    "sku": "LEC-CYL-2111",
+    "label": "Cylindre européen 70 mm",
+    "unitPriceCents": 3200,
+    "category": "cylindre"
+  },
+  {
+    "sku": "LEC-CYL-2112",
+    "label": "Cylindre européen 80 mm sécurité",
+    "unitPriceCents": 4500,
+    "category": "cylindre"
+  },
+  {
+    "sku": "LEC-CYL-2113",
+    "label": "Barillet A2P 5 goupilles",
+    "unitPriceCents": 6800,
+    "category": "cylindre"
+  },
+  {
     "sku": "LEC-QUI-3001",
     "label": "Poignée Hoppe Tokyo sur rosace inox",
     "unitPriceCents": 3200,
@@ -1782,6 +1800,66 @@
     "category": "quincaillerie"
   },
   {
+    "sku": "LEC-QUI-3088",
+    "label": "Crémone multipoint 3 points",
+    "unitPriceCents": 4200,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3089",
+    "label": "Gond renforcé paumelle lourde",
+    "unitPriceCents": 1200,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3090",
+    "label": "Joint EPDM porte blindée",
+    "unitPriceCents": 850,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3091",
+    "label": "Vis inox M6 × 40 (boîte 100)",
+    "unitPriceCents": 1100,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3092",
+    "label": "Télécommande portail 4 canaux 433MHz",
+    "unitPriceCents": 3500,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3093",
+    "label": "Poignée de porte Lecot inox",
+    "unitPriceCents": 2800,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3094",
+    "label": "Lubrifiant cylindre 400 ml",
+    "unitPriceCents": 1400,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-QUI-3095",
+    "label": "Gants nitrile (boîte 100)",
+    "unitPriceCents": 950,
+    "category": "quincaillerie"
+  },
+  {
+    "sku": "LEC-CTL-4000",
+    "label": "Gâche électrique réversible 12V",
+    "unitPriceCents": 4200,
+    "category": "controle-acces"
+  },
+  {
+    "sku": "LEC-CTL-4000B",
+    "label": "Gâche électrique réversible 24V",
+    "unitPriceCents": 4500,
+    "category": "controle-acces"
+  },
+  {
     "sku": "LEC-CTL-4001",
     "label": "Gâche électrique Fermod 41N 12V",
     "unitPriceCents": 3500,
@@ -1917,6 +1995,18 @@
     "sku": "LEC-CTL-4023",
     "label": "Lecteur biométrique ZKTeco SF400",
     "unitPriceCents": 16500,
+    "category": "controle-acces"
+  },
+  {
+    "sku": "LEC-CTL-4023B",
+    "label": "Badge RFID 125 kHz",
+    "unitPriceCents": 350,
+    "category": "controle-acces"
+  },
+  {
+    "sku": "LEC-CTL-4023C",
+    "label": "Badge RFID 125 kHz EM4100 (lot de 10)",
+    "unitPriceCents": 2500,
     "category": "controle-acces"
   },
   {

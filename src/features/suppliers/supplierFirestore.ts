@@ -7,6 +7,7 @@ import {
   serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
+import { logger } from "@/core/logger";
 import type { SupplierOrder, SupplierOrderStatus } from "./types";
 import { computeOrderTotal } from "./types";
 
@@ -15,12 +16,14 @@ const col = (db: Firestore, companyId: string) =>
 
 function sortSupplierOrdersNewestFirst(rows: SupplierOrder[]): SupplierOrder[] {
   return [...rows].sort((a, b) => {
-    const ta = typeof a.createdAt === "object" && a.createdAt !== null && "seconds" in a.createdAt
-      ? (a.createdAt as { seconds: number }).seconds * 1000
-      : Date.parse(String(a.createdAt));
-    const tb = typeof b.createdAt === "object" && b.createdAt !== null && "seconds" in b.createdAt
-      ? (b.createdAt as { seconds: number }).seconds * 1000
-      : Date.parse(String(b.createdAt));
+    const ta =
+      typeof a.createdAt === "object" && a.createdAt !== null && "seconds" in a.createdAt
+        ? (a.createdAt as { seconds: number }).seconds * 1000
+        : Date.parse(String(a.createdAt));
+    const tb =
+      typeof b.createdAt === "object" && b.createdAt !== null && "seconds" in b.createdAt
+        ? (b.createdAt as { seconds: number }).seconds * 1000
+        : Date.parse(String(b.createdAt));
     return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0);
   });
 }
@@ -29,7 +32,7 @@ export function subscribeSupplierOrders(
   db: Firestore,
   companyId: string,
   onData: (orders: SupplierOrder[]) => void,
-  onError?: (message: string) => void,
+  onError?: (message: string) => void
 ): () => void {
   return onSnapshot(
     col(db, companyId),
@@ -42,17 +45,22 @@ export function subscribeSupplierOrders(
     },
     (err) => {
       const message = err instanceof Error ? err.message : "Erreur lecture commandes fournisseur";
-      console.warn("[supplierOrders] onSnapshot error:", err);
+      logger.warn("[supplierOrders] onSnapshot error:", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       onError?.(message);
       onData([]);
-    },
+    }
   );
 }
 
 export async function createSupplierOrder(
   db: Firestore,
   companyId: string,
-  data: Omit<SupplierOrder, "id" | "companyId" | "createdAt" | "updatedAt" | "totalCents" | "status">,
+  data: Omit<
+    SupplierOrder,
+    "id" | "companyId" | "createdAt" | "updatedAt" | "totalCents" | "status"
+  >
 ): Promise<string> {
   const ref = await addDoc(col(db, companyId), {
     ...data,
@@ -71,7 +79,7 @@ export async function updateSupplierOrderStatus(
   db: Firestore,
   companyId: string,
   orderId: string,
-  status: SupplierOrderStatus,
+  status: SupplierOrderStatus
 ): Promise<void> {
   const now = new Date().toISOString();
   await updateDoc(doc(db, "companies", companyId, "supplierOrders", orderId), {

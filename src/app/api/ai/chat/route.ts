@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import OpenAI from "openai";
+import { logger } from "@/core/logger";
 
 // Assurez-vous d'avoir OPENAI_API_KEY dans votre .env
 const openai = new OpenAI({
@@ -16,52 +17,67 @@ export async function POST(req: Request) {
     }
 
     const db = getAdminDb();
-    
+
     // 1. Fetch Company Context (RAG)
     const contextLines: string[] = [];
     contextLines.push(`Contexte de l'entreprise (ID: ${companyId}):`);
-    
+
     try {
       // Fetch recent interventions (last 10)
-      const interventionsSnap = await db.collection("interventions")
+      const interventionsSnap = await db
+        .collection("interventions")
         .where("companyId", "==", companyId)
         .orderBy("createdAt", "desc")
         .limit(10)
         .get();
-        
+
       contextLines.push(`\n[Interventions Récentes] (${interventionsSnap.size}):`);
-      interventionsSnap.forEach(doc => {
+      interventionsSnap.forEach((doc) => {
         const data = doc.data();
-        contextLines.push(`- ID: ${doc.id} | Titre: ${data.title || "N/A"} | Client: ${data.clientName || "N/A"} | Statut: ${data.status} | Urgence: ${data.urgency || "normale"} | Date: ${data.createdAt}`);
+        contextLines.push(
+          `- ID: ${doc.id} | Titre: ${data.title || "N/A"} | Client: ${data.clientName || "N/A"} | Statut: ${data.status} | Urgence: ${data.urgency || "normale"} | Date: ${data.createdAt}`
+        );
       });
 
       // Fetch recent clients
-      const clientsSnap = await db.collection("clients")
+      const clientsSnap = await db
+        .collection("clients")
         .where("companyId", "==", companyId)
         .orderBy("createdAt", "desc")
         .limit(5)
         .get();
-        
+
       contextLines.push(`\n[Clients Récents] (${clientsSnap.size}):`);
-      clientsSnap.forEach(doc => {
+      clientsSnap.forEach((doc) => {
         const data = doc.data();
-        contextLines.push(`- ID: ${doc.id} | Nom: ${data.name || data.email} | Téléphone: ${data.phone || "N/A"}`);
+        contextLines.push(
+          `- ID: ${doc.id} | Nom: ${data.name || data.email} | Téléphone: ${data.phone || "N/A"}`
+        );
       });
 
       // Fetch quotes
-      const quotesSnap = await db.collection("companies").doc(companyId).collection("quotes")
+      const quotesSnap = await db
+        .collection("companies")
+        .doc(companyId)
+        .collection("quotes")
         .orderBy("createdAt", "desc")
         .limit(5)
         .get();
-        
+
       contextLines.push(`\n[Devis Récents] (${quotesSnap.size}):`);
-      quotesSnap.forEach(doc => {
+      quotesSnap.forEach((doc) => {
         const data = doc.data();
-        contextLines.push(`- ID: ${doc.id} | Titre: ${data.title} | Montant: ${data.totalTTC || 0}€ | Statut: ${data.status}`);
+        contextLines.push(
+          `- ID: ${doc.id} | Titre: ${data.title} | Montant: ${data.totalTTC || 0}€ | Statut: ${data.status}`
+        );
       });
     } catch (dbErr) {
-      console.warn("Erreur RAG Firestore:", dbErr);
-      contextLines.push("\n[Avertissement: Impossible de récupérer toutes les données en temps réel]");
+      logger.warn("Erreur RAG Firestore:", {
+        error: dbErr instanceof Error ? dbErr.message : String(dbErr),
+      });
+      contextLines.push(
+        "\n[Avertissement: Impossible de récupérer toutes les données en temps réel]"
+      );
     }
 
     const systemPrompt = `Tu es l'assistant IA omniscient et expert de Belgmap pour la gestion de cette entreprise. 
@@ -104,11 +120,13 @@ ${contextLines.join("\n")}`;
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
       },
     });
   } catch (error: unknown) {
-    console.error("Erreur API Chat AI:", error);
+    logger.error("Erreur API Chat AI:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     const message = error instanceof Error ? error.message : "Erreur interne";
     return NextResponse.json({ error: message }, { status: 500 });
   }

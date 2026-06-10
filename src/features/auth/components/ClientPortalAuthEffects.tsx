@@ -6,8 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { auth, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { CLIENT_PORTAL_AUTH_SLOT_INDEX, EMAIL_LINK_STORAGE_KEY } from "@/features/auth/clientPortalConstants";
+import {
+  CLIENT_PORTAL_AUTH_SLOT_INDEX,
+  EMAIL_LINK_STORAGE_KEY,
+} from "@/features/auth/clientPortalConstants";
 import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
 
 /** OAuth redirect + finalisation magic link (doit vivre sous `DashboardPagerProvider`).
@@ -30,9 +34,14 @@ export default function ClientPortalAuthEffects() {
           return;
         }
       } catch (e) {
-        console.warn("[ClientPortalAuthEffects] getRedirectResult", e);
+        logger.warn("[ClientPortalAuthEffects] getRedirectResult", {
+          error: e instanceof Error ? e.message : String(e),
+        });
         const code =
-          e !== null && typeof e === "object" && "code" in e && typeof (e as { code: unknown }).code === "string"
+          e !== null &&
+          typeof e === "object" &&
+          "code" in e &&
+          typeof (e as { code: unknown }).code === "string"
             ? (e as { code: string }).code
             : "";
         if (code && code !== "auth/popup-closed-by-user") {
@@ -59,7 +68,9 @@ export default function ClientPortalAuthEffects() {
           setShowEmailModal(true);
         }
       } catch (e) {
-        console.error("[ClientPortalAuthEffects] email link", e);
+        logger.error("[ClientPortalAuthEffects] email link", {
+          error: e instanceof Error ? e.message : String(e),
+        });
       }
     })();
   }, [pager]);
@@ -74,7 +85,9 @@ export default function ClientPortalAuthEffects() {
       pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
       toast.success("Connexion réussie");
     } catch (e) {
-      console.error("[ClientPortalAuthEffects] confirm email", e);
+      logger.error("[ClientPortalAuthEffects] confirm email", {
+        error: e instanceof Error ? e.message : String(e),
+      });
       toast.error("E-mail invalide", { description: "Utilisez l'e-mail qui a reçu le lien." });
     } finally {
       setConfirming(false);
@@ -110,9 +123,7 @@ export default function ClientPortalAuthEffects() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
                   <Mail className="h-6 w-6" />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                  Confirmez votre e-mail
-                </h2>
+                <h2 className="text-lg font-bold text-slate-900">Confirmez votre e-mail</h2>
                 <p className="text-center text-sm text-slate-500">
                   Saisissez l&apos;adresse e-mail qui a reçu le lien de connexion.
                 </p>
@@ -133,11 +144,7 @@ export default function ClientPortalAuthEffects() {
                 onClick={() => void handleConfirmEmail()}
                 className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-slate-900 py-3 text-sm font-bold text-white transition-colors hover:bg-slate-800 disabled:opacity-45"
               >
-                {confirming ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Se connecter"
-                )}
+                {confirming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Se connecter"}
               </button>
             </motion.div>
           </motion.div>

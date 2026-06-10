@@ -4,6 +4,8 @@ import type { Intervention } from "@/features/interventions/types";
 import { prepareDraftBillingOnIntervention } from "@/features/interventions/server/prepareDraftBillingOnIntervention";
 import { FieldValue } from "firebase-admin/firestore";
 import { finalizeInterventionInvoiceAdmin } from "@/features/interventions/server/finalizeInterventionInvoiceAdmin";
+import { allocateInvoiceNumberAdmin } from "@/features/billing/server/allocateInvoiceNumberAdmin";
+import { isValidInvoiceNumber } from "@/features/billing/invoiceNumbering";
 import { sendInterventionInvoiceEmailToClient } from "@/features/interventions/server/interventionInvoiceEmail";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
@@ -49,6 +51,12 @@ export async function validateInterventionReportServer(params: {
   const refreshed = await db.collection("interventions").doc(interventionId).get();
   iv = { id: refreshed.id, ...refreshed.data() } as Intervention;
 
+  // Numérotation séquentielle légale : un numéro définitif par facture, jamais réalloué.
+  const invoiceNumber = isValidInvoiceNumber(iv.invoiceNumber)
+    ? iv.invoiceNumber.trim()
+    : await allocateInvoiceNumberAdmin(db, companyId);
+  iv = { ...iv, invoiceNumber };
+
   const invoicePatch = await finalizeInterventionInvoiceAdmin(iv, interventionId);
 
   const actor = dispatcherTransitionActor(actorUid);
@@ -63,6 +71,7 @@ export async function validateInterventionReportServer(params: {
       invoicePdfUrl: invoicePatch.invoicePdfUrl,
       invoicePdfStoragePath: invoicePatch.invoicePdfStoragePath,
       invoiceAmountCents: invoicePatch.invoiceAmountCents,
+      invoiceNumber,
       invoicedAt: FieldValue.serverTimestamp(),
       paymentStatus: iv.paymentStatus === "paid" ? "paid" : "unpaid",
     },

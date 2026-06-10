@@ -13,6 +13,7 @@ import {
   isTechnicianAssignmentAwaitingResponse,
 } from "@/features/interventions/technicianAssignmentActions";
 import { auth } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
 import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import { toast } from "sonner";
@@ -25,8 +26,7 @@ import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
 import { cn } from "@/lib/utils";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+import { HUB_FONT_OUTFIT, HUB_MISSION_BRIEF_CARD, HubButton } from "@/core/ui/hub";
 
 const AudioUrlPlayer = ({ url, t }: { url: string; t: (key: string) => string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,7 +42,7 @@ const AudioUrlPlayer = ({ url, t }: { url: string; t: (key: string) => string })
     } else {
       void audioRef.current.play().then(
         () => setIsPlaying(true),
-        () => setIsPlaying(false),
+        () => setIsPlaying(false)
       );
     }
   };
@@ -79,7 +79,9 @@ const AudioUrlPlayer = ({ url, t }: { url: string; t: (key: string) => string })
         type="button"
         onClick={togglePlay}
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition hover:bg-blue-700"
-        aria-label={isPlaying ? t("backoffice.audio_player.pause") : t("backoffice.audio_player.play")}
+        aria-label={
+          isPlaying ? t("backoffice.audio_player.pause") : t("backoffice.audio_player.play")
+        }
       >
         {isPlaying ? (
           <Pause className="h-3.5 w-3.5" fill="currentColor" />
@@ -124,7 +126,6 @@ export default function TechnicianDashboardDetailPanel({
     return (
       <div
         data-testid="technician-dashboard-detail-empty"
-        style={outfit}
         className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center"
       >
         <p className="text-[13px] font-bold text-slate-900">
@@ -138,7 +139,6 @@ export default function TechnicianDashboardDetailPanel({
     return (
       <div
         data-testid="technician-dashboard-detail-loading"
-        style={outfit}
         className="flex min-h-0 flex-1 flex-col gap-2 p-3"
       >
         <div className="h-8 w-2/3 animate-pulse rounded-md bg-slate-200/60" />
@@ -166,12 +166,7 @@ export default function TechnicianDashboardDetailPanel({
       statusUpdatedAt: nowIso,
     };
 
-    patchTechnicianAssignmentInCache(
-      queryClient,
-      technicianUid,
-      liveIv.id,
-      optimisticPatch,
-    );
+    patchTechnicianAssignmentInCache(queryClient, technicianUid, liveIv.id, optimisticPatch);
 
     setIsUpdating(true);
     try {
@@ -186,7 +181,9 @@ export default function TechnicianDashboardDetailPanel({
         status: liveIv.status,
         statusUpdatedAt: liveIv.statusUpdatedAt,
       });
-      console.error("Failed to update status", err);
+      logger.error("Failed to update status", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       toast.error(String(t("technician_hub.dashboard.detail.update_failed")));
     } finally {
       setIsUpdating(false);
@@ -219,11 +216,9 @@ export default function TechnicianDashboardDetailPanel({
 
   const descriptionText = interventionDescriptionText(liveIv);
   const hasAudioBlock = Boolean(liveIv.audioUrl || liveIv.transcription?.trim());
-  const isInvoicedOrCancelled =
-    liveIv.status === "invoiced" || liveIv.status === "cancelled";
+  const isInvoicedOrCancelled = liveIv.status === "invoiced" || liveIv.status === "cancelled";
   const isDoneAmendable =
-    liveIv.status === "done" &&
-    canTechnicianAmendCompletionReport(liveIv, technicianUid).allowed;
+    liveIv.status === "done" && canTechnicianAmendCompletionReport(liveIv, technicianUid).allowed;
   const showActionBar =
     !awaitingAssignment &&
     liveIv.status !== "assigned" &&
@@ -241,7 +236,6 @@ export default function TechnicianDashboardDetailPanel({
   return (
     <div
       data-testid="technician-dashboard-detail"
-      style={outfit}
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       {isInvoicedOrCancelled ? (
@@ -276,7 +270,7 @@ export default function TechnicianDashboardDetailPanel({
                 >
                   {t("technician_hub.dashboard.detail.invoice_backoffice_pending")}
                 </p>
-                <div className="flex min-h-0 w-full max-w-[20.5rem] shrink flex-col overflow-hidden rounded-[1.5rem] border border-white/90 bg-white/95 px-5 py-5 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+                <div className={HUB_MISSION_BRIEF_CARD}>
                   <TechnicianMissionBrief
                     timeLabel={formatScheduledTimeOnly(liveIv)}
                     clientDisplayName={clientDisplayName}
@@ -293,15 +287,16 @@ export default function TechnicianDashboardDetailPanel({
             </div>
           </div>
           <footer className="shrink-0 border-t border-slate-200/50 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <button
+            <HubButton
               type="button"
               data-testid="technician-edit-completion-report"
               onClick={onStartFinishJob}
-              className="flex h-14 w-full max-w-[20.5rem] mx-auto items-center justify-center gap-2 rounded-full bg-slate-900 text-[15px] font-semibold text-white shadow-lg transition active:scale-[0.98]"
+              fullWidth
+              className="mx-auto h-14 max-w-[20.5rem] rounded-full text-[15px] font-semibold"
             >
               <Pencil className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
               {t("technician_hub.dashboard.detail.edit_report")}
-            </button>
+            </HubButton>
           </footer>
         </>
       ) : (
@@ -309,10 +304,12 @@ export default function TechnicianDashboardDetailPanel({
           <div
             className={cn(
               "flex min-h-0 flex-1 flex-col overflow-hidden",
-              awaitingAssignment && "technician-detail-awaiting-offer",
+              awaitingAssignment && "technician-detail-awaiting-offer"
             )}
             data-testid={
-              liveIv.status === "waiting_material" ? "technician-detail-waiting-material" : undefined
+              liveIv.status === "waiting_material"
+                ? "technician-detail-waiting-material"
+                : undefined
             }
           >
             <div
@@ -320,7 +317,7 @@ export default function TechnicianDashboardDetailPanel({
               data-testid="technician-detail-scroll"
             >
               <div className="flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-2">
-                <div className="flex min-h-0 w-full max-w-[20.5rem] shrink flex-col overflow-hidden rounded-[1.5rem] border border-white/90 bg-white/95 px-5 py-5 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+                <div className={HUB_MISSION_BRIEF_CARD}>
                   <TechnicianMissionBrief
                     timeLabel={formatScheduledTimeOnly(liveIv)}
                     clientDisplayName={clientDisplayName}
@@ -345,13 +342,12 @@ export default function TechnicianDashboardDetailPanel({
                   <div className="flex w-full max-w-[20.5rem] shrink-0 flex-col items-center gap-1">
                     {liveIv.audioUrl ? <AudioUrlPlayer url={liveIv.audioUrl} t={t} /> : null}
                     {liveIv.transcription?.trim() ? (
-                      <p className="line-clamp-2 rounded-lg bg-neutral-50 px-2.5 py-1 text-[12px] font-semibold leading-snug text-neutral-800">
+                      <p className="line-clamp-2 rounded-lg bg-slate-50 px-2.5 py-1 text-[12px] font-semibold leading-snug text-slate-800">
                         {liveIv.transcription.trim()}
                       </p>
                     ) : null}
                   </div>
                 ) : null}
-
               </div>
             </div>
           </div>

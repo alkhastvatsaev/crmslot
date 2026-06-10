@@ -15,8 +15,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { Intervention } from "@/features/interventions/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   interventions: Intervention[];
   technicianUid: string;
@@ -37,26 +35,15 @@ interface TechMetrics {
   heatmap: { zone: string; count: number; revenueCents: number }[];
 }
 
-function computeMetrics(
-  interventions: Intervention[],
-  technicianUid: string,
-): TechMetrics {
-  const assigned = interventions.filter(
-    (iv) => iv.assignedTechnicianUid === technicianUid,
-  );
+function computeMetrics(interventions: Intervention[], technicianUid: string): TechMetrics {
+  const assigned = interventions.filter((iv) => iv.assignedTechnicianUid === technicianUid);
 
-  const completed = assigned.filter(
-    (iv) => iv.status === "done" || iv.status === "invoiced",
-  );
+  const completed = assigned.filter((iv) => iv.status === "done" || iv.status === "invoiced");
   const cancelled = assigned.filter((iv) => iv.status === "cancelled");
-  const waitingMaterial = assigned.filter(
-    (iv) => iv.status === "waiting_material",
-  );
+  const waitingMaterial = assigned.filter((iv) => iv.status === "waiting_material");
 
   const completionRate =
-    assigned.length > 0
-      ? Math.round((completed.length / assigned.length) * 100)
-      : 0;
+    assigned.length > 0 ? Math.round((completed.length / assigned.length) * 100) : 0;
 
   // Average response time: time from creation to technician acceptance
   const responseTimes: number[] = [];
@@ -71,27 +58,19 @@ function computeMetrics(
   }
   const avgResponseMinutes =
     responseTimes.length > 0
-      ? Math.round(
-          responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length,
-        )
+      ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
       : null;
 
   const today = new Date().toISOString().slice(0, 10);
   const todayCompleted = completed.filter(
-    (iv) =>
-      iv.completedAt &&
-      typeof iv.completedAt === "string" &&
-      iv.completedAt.startsWith(today),
+    (iv) => iv.completedAt && typeof iv.completedAt === "string" && iv.completedAt.startsWith(today)
   ).length;
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAgoIso = weekAgo.toISOString();
   const thisWeekCompleted = completed.filter(
-    (iv) =>
-      iv.completedAt &&
-      typeof iv.completedAt === "string" &&
-      iv.completedAt >= weekAgoIso,
+    (iv) => iv.completedAt && typeof iv.completedAt === "string" && iv.completedAt >= weekAgoIso
   ).length;
 
   const revenueCents = completed.reduce((acc, iv) => acc + (iv.invoiceAmountCents || 0), 0);
@@ -102,14 +81,14 @@ function computeMetrics(
   for (const iv of completed) {
     // Extract 4 digit postal code for BE or fallback to "Zone inconnue"
     const match = iv.address?.match(/\b(\d{4})\b/);
-    const zone = match ? `Code ${match[1]}` : (iv.address?.split(',')[0] || "Autre");
+    const zone = match ? `Code ${match[1]}` : iv.address?.split(",")[0] || "Autre";
     const normalizedZone = zone.length > 20 ? zone.slice(0, 20) + "..." : zone;
-    
+
     if (!zones[normalizedZone]) zones[normalizedZone] = { count: 0, revenueCents: 0 };
     zones[normalizedZone].count += 1;
-    zones[normalizedZone].revenueCents += (iv.invoiceAmountCents || 0);
+    zones[normalizedZone].revenueCents += iv.invoiceAmountCents || 0;
   }
-  
+
   const heatmap = Object.entries(zones)
     .map(([zone, stats]) => ({ zone, ...stats }))
     .sort((a, b) => b.revenueCents - a.revenueCents)
@@ -145,7 +124,7 @@ export default function TechnicianPerformanceDashboard({
 }: Props) {
   const metrics = useMemo(
     () => computeMetrics(interventions, technicianUid),
-    [interventions, technicianUid],
+    [interventions, technicianUid]
   );
 
   const cards = [
@@ -208,20 +187,12 @@ export default function TechnicianPerformanceDashboard({
   ];
 
   return (
-    <div
-      data-testid="technician-performance"
-      style={outfit}
-      className="space-y-4"
-    >
+    <div data-testid="technician-performance" className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-[14px] font-bold text-slate-800">
-            {technicianName}
-          </h3>
-          <p className="text-[11px] text-slate-400 font-medium">
-            Performance terrain
-          </p>
+          <h3 className="text-[14px] font-bold text-slate-800">{technicianName}</h3>
+          <p className="text-[11px] text-slate-400 font-medium">Performance terrain</p>
         </div>
         <div
           className={cn(
@@ -230,12 +201,10 @@ export default function TechnicianPerformanceDashboard({
               ? "bg-emerald-100 text-emerald-700"
               : metrics.completionRate >= 50
                 ? "bg-amber-100 text-amber-700"
-                : "bg-red-100 text-red-600",
+                : "bg-red-100 text-red-600"
           )}
         >
-          <span className="text-[16px] font-black">
-            {metrics.completionRate}%
-          </span>
+          <span className="text-[16px] font-black">{metrics.completionRate}%</span>
           <span className="text-[10px] font-bold">complétion</span>
         </div>
       </div>
@@ -249,7 +218,7 @@ export default function TechnicianPerformanceDashboard({
               ? "bg-emerald-500"
               : metrics.completionRate >= 50
                 ? "bg-amber-500"
-                : "bg-red-500",
+                : "bg-red-500"
           )}
           style={{ width: `${metrics.completionRate}%` }}
         />
@@ -263,12 +232,8 @@ export default function TechnicianPerformanceDashboard({
             className={`flex flex-col items-center gap-1 rounded-xl ${card.bg} px-2 py-3 text-center`}
           >
             <card.icon className={`h-4 w-4 ${card.color}`} />
-            <span className={`text-[16px] font-black ${card.color}`}>
-              {card.value}
-            </span>
-            <span className="text-[9px] font-bold text-slate-500 leading-tight">
-              {card.label}
-            </span>
+            <span className={`text-[16px] font-black ${card.color}`}>{card.value}</span>
+            <span className="text-[9px] font-bold text-slate-500 leading-tight">{card.label}</span>
           </div>
         ))}
       </div>
@@ -279,20 +244,16 @@ export default function TechnicianPerformanceDashboard({
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-rose-500" />
-              <h4 className="text-[13px] font-bold text-slate-800">
-                Heatmap (Top 4 Zones)
-              </h4>
+              <h4 className="text-[13px] font-bold text-slate-800">Heatmap (Top 4 Zones)</h4>
             </div>
-            <span className="text-[10px] font-bold text-slate-400">
-              BASÉ SUR LE C.A.
-            </span>
+            <span className="text-[10px] font-bold text-slate-400">BASÉ SUR LE C.A.</span>
           </div>
-          
+
           <div className="space-y-3">
             {metrics.heatmap.map((item, idx) => {
               const maxRev = metrics.heatmap[0].revenueCents || 1;
               const widthPct = Math.max(10, Math.round((item.revenueCents / maxRev) * 100));
-              
+
               return (
                 <div key={item.zone} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-[11px] font-bold">

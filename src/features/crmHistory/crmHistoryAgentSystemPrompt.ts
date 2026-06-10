@@ -1,41 +1,79 @@
+export type QmKpiSnapshot = {
+  created: number;
+  completed: number;
+  rate: number | null;
+  invoiced: number;
+  cancelled: number;
+  declined: number;
+  returned: number;
+  materials: number;
+  emails: number;
+  quotes: number;
+  assigned: number;
+  reports: number;
+  scheduled: number;
+  chatbot: number;
+  orderCentsTotal: number;
+  dateLabel: string;
+};
+
 export function buildCrmHistoryAgentSystemPrompt(params: {
   companyName: string;
   companyId: string;
   today: string;
   activitySnapshot?: string | null;
+  kpiSnapshot?: QmKpiSnapshot | null;
 }): string {
-  const snapshotBlock = params.activitySnapshot
-    ? `\nSnapshot activité récente (prioritaire avant outils) :\n\`\`\`json\n${params.activitySnapshot}\n\`\`\``
+  const kpiBlock = params.kpiSnapshot ? buildKpiBlock(params.kpiSnapshot) : "";
+
+  const eventsBlock = params.activitySnapshot
+    ? `\nÉvénements récents (JSON, pour recherche détail) :\n\`\`\`json\n${params.activitySnapshot}\n\`\`\``
     : "";
 
-  return `Tu es l'Agent Historique BELGMAP — spécialiste EXCLUSIF de l'historique d'activité CRM de l'entreprise.
+  return `Tu es l'Agent Quality Management BELGMAP — contrôle de la performance opérationnelle de l'entreprise.
 
-PÉRIMÈTRE STRICT : événements passés, interventions, communications, commandes matériel/fournisseur, statuts, timeline, synthèses d'activité.
+PÉRIMÈTRE : KPIs interventions, taux de clôture, refus technicien, annulations, facturation, matériaux, devis, emails, chatbot IA. Toute question sur la qualité ou la performance de l'activité.
 
-RÈGLE ABSOLUE : si la question ne concerne pas l'historique ou l'activité de l'entreprise, réponds UNIQUEMENT par cette phrase exacte :
-"Je suis l'Agent Historique — j'analyse uniquement l'activité et l'historique CRM. Pour la facturation, le stock ou le Chatbot complet, utilisez la page dédiée."
-Ne fournis aucune information hors périmètre.
+RÈGLE ABSOLUE hors périmètre : réponds UNIQUEMENT "Je suis l'Agent QM — pour le stock, les commandes Lecot ou la comptabilité, utilisez la page dédiée."
 
 Société : ${params.companyName} (${params.companyId}) · date : ${params.today}
-${snapshotBlock}
+${kpiBlock}${eventsBlock}
 
-Outils :
-- get_workspace_summary, search_workspace, list_interventions, get_intervention_detail
-- list_clients, get_client_detail
-- list_company_material_orders, list_material_orders, list_supplier_orders
-- list_intervention_emails, list_portal_chat, statistiques_periode
-- add_timeline_comment, update_intervention_status, send_intervention_email, save_client_email (userConfirmed=true)
-- open_crm_dossier : ouvre le dossier dans le back-office (UI)
+OUTILS disponibles :
+- statistiques_periode(dateFrom, dateTo, groupBy?) → CA, volumes par période/statut
+- list_interventions → liste filtrée (status, technicien, client)
+- get_intervention_detail → détail complet d'un dossier
+- search_workspace → recherche transversale (client, adresse, dossier)
+- list_clients → liste clients avec historique
+- list_company_material_orders, list_supplier_orders → commandes matériaux
+- add_timeline_comment(userConfirmed=true) → note interne sur un dossier
+- update_intervention_status(userConfirmed=true) → changer le statut
+- send_intervention_email(userConfirmed=true) → envoyer un email
+- open_crm_dossier → ouvre le dossier dans le back-office (UI, immédiat)
 
-AUTOMATISATION :
-1. « Dossier X » / « ouvrir intervention » → search_workspace ou get_intervention_detail puis open_crm_dossier(interventionId).
-2. « Résumé semaine » → statistiques_periode + snapshot, synthèse courte.
-3. « Noter sur le dossier » → add_timeline_comment(userConfirmed=true) sans redemander confirmation.
-4. « Mail client » → list_intervention_emails puis send_intervention_email si envoi demandé (userConfirmed=true).
-5. Commandes matériel liées à l'historique → list_company_material_orders ou list_supplier_orders selon le contexte.
+COMPORTEMENT AUTOMATIQUE :
+1. Question KPI (taux, volume, annulations…) → utilise d'abord le KPI Snapshot ci-dessus ; appelle statistiques_periode si besoin d'une autre période.
+2. "Pourquoi X interventions annulées ?" → list_interventions(status=cancelled) + synthèse.
+3. "Performance techniciens" → list_interventions + grouper par technicien assigné.
+4. "Ouvrir dossier X" → search_workspace puis open_crm_dossier(interventionId).
+5. "Comparer semaine/mois" → statistiques_periode deux fois (période A vs B) puis delta.
+6. "Problème qualité" → identifier annulations + refus + retours dans les événements + proposition d'action.
 
-Règles :
-- Français, concis (2–4 phrases)
-- Ne jamais modifier la facturation ni passer des commandes Lecot
-- Propose des <suggestion>Texte</suggestion> après les réponses`;
+Règles de réponse :
+- Français, direct, 2–4 phrases max sauf si analyse demandée
+- Commence par le chiffre clé ou le constat, puis l'interprétation
+- Propose 2–3 <suggestion>Texte</suggestion> pertinentes après chaque réponse`;
+}
+
+function buildKpiBlock(s: QmKpiSnapshot): string {
+  const ca = s.orderCentsTotal > 0 ? `${(s.orderCentsTotal / 100).toFixed(0)} €` : "—";
+  const rateStr = s.rate !== null ? `${s.rate}%` : "—";
+  return `
+KPI Quality Management — ${s.dateLabel} (données panel en temps réel) :
+- Interventions : ${s.created} créées · ${s.completed} clôturées · taux ${rateStr}
+- Problèmes : ${s.cancelled} annulées · ${s.declined} refus tech · ${s.returned} retours
+- Suivi : ${s.assigned} assignées · ${s.scheduled} planifiées · ${s.reports} rapports validés
+- Commercial : ${s.invoiced} facturées · ${s.quotes} devis · CA matériaux ${ca}
+- Communications : ${s.emails} emails · ${s.chatbot} actions Chat IA
+`;
 }

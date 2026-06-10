@@ -31,14 +31,15 @@ export default function TechnicianLabView({ embedInCarousel = false }: Props) {
           ? "flex h-full min-h-0 flex-col gap-4 overflow-y-auto overflow-x-hidden bg-slate-50 p-4"
           : "flex min-h-screen flex-col gap-6 bg-slate-50 p-6"
       }
-      style={{ fontFamily: "'Outfit', sans-serif" }}
       data-testid="technician-lab-view"
     >
       <p
         className="shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900"
         data-testid="technician-lab-banner"
       >
-        {embedInCarousel ? t("technician_lab.banner_carousel") : t("technician_lab.banner_standalone")}
+        {embedInCarousel
+          ? t("technician_lab.banner_carousel")
+          : t("technician_lab.banner_standalone")}
       </p>
 
       {showScanner ? <ARScanner onClose={() => setShowScanner(false)} /> : null}
@@ -83,7 +84,9 @@ export default function TechnicianLabView({ embedInCarousel = false }: Props) {
               <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-red-500">
                 {t("technician_lab.urgent_label")}
               </h2>
-              <h3 className="text-2xl font-black text-slate-900">{t("technician_lab.sample_mission_title")}</h3>
+              <h3 className="text-2xl font-black text-slate-900">
+                {t("technician_lab.sample_mission_title")}
+              </h3>
             </div>
           </div>
 

@@ -13,10 +13,3 @@ export const GMAIL_HUB_SYSTEM_LABELS = [
 
 /** Taille d’une page inbox (Gmail pageToken). */
 export const GMAIL_HUB_PAGE_SIZE = 20;
-
-/** Raccourcis de recherche Gmail (chips sous la barre). */
-export const GMAIL_HUB_SEARCH_CHIPS = [
-  { id: "unread", q: "is:unread", labelKey: "gmail.hub.chip_unread" },
-  { id: "attachment", q: "has:attachment", labelKey: "gmail.hub.chip_attachment" },
-  { id: "starred", q: "is:starred", labelKey: "gmail.hub.chip_starred" },
-] as const;

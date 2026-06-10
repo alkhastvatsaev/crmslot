@@ -41,9 +41,7 @@ export async function generateMetadata({
   return { title: "Suivi de votre intervention — BELGMAP" };
 }
 
-async function fetchPortalData(
-  token: string,
-): Promise<PortalInterventionSummary | null> {
+async function fetchPortalData(token: string): Promise<PortalInterventionSummary | null> {
   const base =
     process.env.NEXT_PUBLIC_BASE_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
@@ -73,7 +71,8 @@ export default async function PortalTrackingPage({
           <div className="text-4xl">🔗</div>
           <h1 className="text-xl font-bold text-slate-800">Lien invalide ou expiré</h1>
           <p className="text-sm text-slate-500">
-            Ce lien de suivi n&apos;est plus valide. Contactez l&apos;entreprise pour obtenir un nouveau lien.
+            Ce lien de suivi n&apos;est plus valide. Contactez l&apos;entreprise pour obtenir un
+            nouveau lien.
           </p>
         </div>
       </main>
@@ -82,7 +81,8 @@ export default async function PortalTrackingPage({
 
   const currentOrder = STATUS_ORDER[data.status] ?? 0;
   const isCancelled = data.status === "cancelled";
-  const clientName = [data.clientFirstName, data.clientLastName].filter(Boolean).join(" ") || "Client";
+  const clientName =
+    [data.clientFirstName, data.clientLastName].filter(Boolean).join(" ") || "Client";
   const scheduledLabel = formatDate(data.scheduledDate, data.scheduledTime);
 
   return (
@@ -90,7 +90,9 @@ export default async function PortalTrackingPage({
       <div className="w-full max-w-lg space-y-5">
         {/* Header */}
         <div className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5">
-          <p className="text-[12px] font-semibold uppercase tracking-widest text-slate-400 mb-1">BELGMAP</p>
+          <p className="text-[12px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
+            BELGMAP
+          </p>
           <h1 className="text-[22px] font-black text-slate-900">Suivi de votre intervention</h1>
           <p className="mt-1 text-[14px] text-slate-500">Bonjour {clientName}</p>
           {data.problem && (
@@ -104,11 +106,15 @@ export default async function PortalTrackingPage({
         {isCancelled ? (
           <div className="rounded-[24px] bg-red-50 p-6 ring-1 ring-red-100">
             <p className="text-[16px] font-bold text-red-700">Intervention annulée</p>
-            <p className="text-[13px] text-red-500 mt-1">Cette intervention a été annulée. Contactez-nous pour plus d&apos;informations.</p>
+            <p className="text-[13px] text-red-500 mt-1">
+              Cette intervention a été annulée. Contactez-nous pour plus d&apos;informations.
+            </p>
           </div>
         ) : (
           <div className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5 space-y-0">
-            <h2 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">Progression</h2>
+            <h2 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">
+              Progression
+            </h2>
             <ol className="space-y-0">
               {STATUS_STEPS.map((step, idx) => {
                 const stepOrder = idx;
@@ -120,17 +126,35 @@ export default async function PortalTrackingPage({
                       <div
                         className={[
                           "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold transition-colors",
-                          isDone ? "bg-emerald-500 text-white" : isCurrent ? "bg-blue-600 text-white ring-4 ring-blue-100" : "bg-slate-100 text-slate-400",
+                          isDone
+                            ? "bg-emerald-500 text-white"
+                            : isCurrent
+                              ? "bg-blue-600 text-white ring-4 ring-blue-100"
+                              : "bg-slate-100 text-slate-400",
                         ].join(" ")}
                       >
                         {isDone ? "✓" : idx + 1}
                       </div>
                       {idx < STATUS_STEPS.length - 1 && (
-                        <div className={["w-0.5 h-6 mt-0.5", isDone ? "bg-emerald-300" : "bg-slate-100"].join(" ")} />
+                        <div
+                          className={[
+                            "w-0.5 h-6 mt-0.5",
+                            isDone ? "bg-emerald-300" : "bg-slate-100",
+                          ].join(" ")}
+                        />
                       )}
                     </div>
                     <div className="pb-4 pt-1">
-                      <p className={["text-[14px] font-semibold leading-tight", isCurrent ? "text-blue-700" : isDone ? "text-emerald-700" : "text-slate-400"].join(" ")}>
+                      <p
+                        className={[
+                          "text-[14px] font-semibold leading-tight",
+                          isCurrent
+                            ? "text-blue-700"
+                            : isDone
+                              ? "text-emerald-700"
+                              : "text-slate-400",
+                        ].join(" ")}
+                      >
                         {step.label}
                       </p>
                       {isCurrent && data.status === "waiting_material" && (
@@ -144,13 +168,56 @@ export default async function PortalTrackingPage({
           </div>
         )}
 
+        {/* Payment card */}
+        {!isCancelled &&
+          data.paymentStatus !== "paid" &&
+          typeof data.invoiceAmountCents === "number" &&
+          data.invoiceAmountCents > 0 && (
+            <div
+              data-testid="portal-payment-card"
+              className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5 space-y-3"
+            >
+              <h2 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">
+                Paiement
+              </h2>
+              <div className="flex items-center justify-between">
+                <span className="text-[14px] text-slate-500">Montant à régler</span>
+                <span className="text-[18px] font-black text-slate-900">
+                  {(data.invoiceAmountCents / 100).toFixed(2).replace(".", ",")} €
+                </span>
+              </div>
+              {data.paymentLinkUrl ? (
+                <a
+                  href={data.paymentLinkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="portal-pay-button"
+                  className="block w-full rounded-xl bg-black px-5 py-3 text-center text-[14px] font-bold text-white transition hover:bg-black/85"
+                >
+                  Payer en ligne
+                </a>
+              ) : (
+                <p className="text-[12px] text-slate-400">
+                  Le lien de paiement vous sera communiqué par l&apos;entreprise.
+                </p>
+              )}
+              {data.paymentStatus === "pending" && (
+                <p className="text-[11px] text-slate-400 text-center">
+                  Paiement en cours de confirmation…
+                </p>
+              )}
+            </div>
+          )}
+
         {/* Details card */}
         <div className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5 space-y-3">
           <h2 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Détails</h2>
           <div className="space-y-2 text-[14px]">
             <div className="flex justify-between">
               <span className="text-slate-500">Adresse</span>
-              <span className="font-medium text-slate-800 text-right max-w-[60%]">{data.address}</span>
+              <span className="font-medium text-slate-800 text-right max-w-[60%]">
+                {data.address}
+              </span>
             </div>
             {scheduledLabel && (
               <div className="flex justify-between">

@@ -1,8 +1,23 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useEffect, useState } from "react";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
-import { Check, Clock, MapPin, User, Navigation, CheckCircle2, FileText, Search, X, ArrowRight, ChevronLeft, List } from "lucide-react";
+import {
+  Check,
+  Clock,
+  MapPin,
+  User,
+  Navigation,
+  CheckCircle2,
+  FileText,
+  Search,
+  X,
+  ArrowRight,
+  ChevronLeft,
+  List,
+} from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
@@ -54,11 +69,18 @@ function useMyInterventions(searchLastName: string, profileLastName: string) {
 
     const firebaseAuth = auth!;
     const unsubAuth = onAuthStateChanged(firebaseAuth, (user) => {
-      if (unsubSnap) { unsubSnap(); unsubSnap = undefined; }
+      if (unsubSnap) {
+        unsubSnap();
+        unsubSnap = undefined;
+      }
       if (timeout) clearTimeout(timeout);
       const db = firestore;
       if (!db) return;
-      if (!user) { setInterventions([]); setLoading(false); return; }
+      if (!user) {
+        setInterventions([]);
+        setLoading(false);
+        return;
+      }
 
       const q = query(collection(db, "interventions"), where("createdByUid", "==", user.uid));
       timeout = setTimeout(() => {
@@ -76,12 +98,16 @@ function useMyInterventions(searchLastName: string, profileLastName: string) {
                 return last.includes(s) || first.includes(s) || co.includes(s);
               });
             }
-            docs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            docs.sort(
+              (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+            );
             setInterventions(docs);
             setLoading(false);
           },
           (error) => {
-            console.warn("[RequesterTrackingPanel] Firestore listener error:", error);
+            logger.warn("[RequesterTrackingPanel] Firestore listener error:", {
+              error: error.message,
+            });
             setLoading(false);
           }
         );
@@ -131,7 +157,10 @@ export default function RequesterTrackingPanel() {
   const [syncOnNextLoad, setSyncOnNextLoad] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const { interventions, loading: interventionLoading } = useMyInterventions(searchQuery, profile.lastName);
+  const { interventions, loading: interventionLoading } = useMyInterventions(
+    searchQuery,
+    profile.lastName
+  );
   const latestIntervention = interventions[0] ?? null;
   const resolvedSelectedId = pendingTrackingInterventionId ?? selectedId;
   const selectedIntervention = resolvedSelectedId
@@ -173,7 +202,8 @@ export default function RequesterTrackingPanel() {
         }));
         resetRequestOnly();
         import("sonner").then(({ toast }) => {
-          const who = latestIntervention.clientLastName || String(t("requester.tracking.client_fallback"));
+          const who =
+            latestIntervention.clientLastName || String(t("requester.tracking.client_fallback"));
           toast.success(`${String(t("requester.tracking.switched_to_case_prefix"))} ${who}`);
         });
       }
@@ -187,11 +217,15 @@ export default function RequesterTrackingPanel() {
   const hasSubmitted = Boolean(latestIntervention || lastSubmittedRequest);
 
   const isSearching = searchQuery.trim().length > 0;
-  const hasActiveUI = isSearching ? Boolean(latestIntervention) : (hasDraft || isSubmitting || hasSubmitted);
+  const hasActiveUI = isSearching
+    ? Boolean(latestIntervention)
+    : hasDraft || isSubmitting || hasSubmitted;
 
   const showList = interventions.length > 1 && !selectedId;
 
-  const status = selectedIntervention?.status || (selectedIntervention || lastSubmittedRequest ? "pending" : "draft");
+  const status =
+    selectedIntervention?.status ||
+    (selectedIntervention || lastSubmittedRequest ? "pending" : "draft");
   const step0Done = Boolean(selectedIntervention || lastSubmittedRequest);
   const step1Done = step0Done;
   const step2Done = step1Done && !["pending", "pending_needs_address"].includes(status);
@@ -203,18 +237,20 @@ export default function RequesterTrackingPanel() {
     "done",
     "invoiced",
   ] as const;
-  const step3Done = step1Done && activeFieldStatuses.includes(status as (typeof activeFieldStatuses)[number]);
+  const step3Done =
+    step1Done && activeFieldStatuses.includes(status as (typeof activeFieldStatuses)[number]);
   const step4Done =
     step1Done &&
     (["en_route", "in_progress", "waiting_material", "done", "invoiced"] as const).includes(
-      status as "en_route" | "in_progress" | "waiting_material" | "done" | "invoiced",
+      status as "en_route" | "in_progress" | "waiting_material" | "done" | "invoiced"
     );
   const step5Done =
     step1Done &&
     (["in_progress", "waiting_material", "done", "invoiced"] as const).includes(
-      status as "in_progress" | "waiting_material" | "done" | "invoiced",
+      status as "in_progress" | "waiting_material" | "done" | "invoiced"
     );
-  const step6Done = step1Done && (["done", "invoiced"] as const).includes(status as "done" | "invoiced");
+  const step6Done =
+    step1Done && (["done", "invoiced"] as const).includes(status as "done" | "invoiced");
 
   const steps = [
     {
@@ -222,50 +258,50 @@ export default function RequesterTrackingPanel() {
       title: String(t("tracking.step0")),
       icon: step0Done ? Check : FileText,
       done: step0Done,
-      active: !step0Done && (isSubmitting || hasDraft)
+      active: !step0Done && (isSubmitting || hasDraft),
     },
     {
       id: "step1",
       title: String(t("tracking.step1")),
       icon: step1Done ? Check : Clock,
       done: step1Done,
-      active: step0Done && !step1Done
+      active: step0Done && !step1Done,
     },
     {
       id: "step2",
       title: String(t("tracking.step2")),
       icon: step2Done ? Check : Clock,
       done: step2Done,
-      active: step1Done && !step2Done
+      active: step1Done && !step2Done,
     },
     {
       id: "step3",
       title: String(t("tracking.step3")),
       icon: step3Done ? Check : User,
       done: step3Done,
-      active: step2Done && !step3Done
+      active: step2Done && !step3Done,
     },
     {
       id: "step4",
       title: String(t("tracking.step4")),
       icon: step4Done ? Check : Navigation,
       done: step4Done,
-      active: step3Done && !step4Done
+      active: step3Done && !step4Done,
     },
     {
       id: "step5",
       title: String(t("tracking.step5")),
       icon: step5Done ? Check : MapPin,
       done: step5Done,
-      active: step4Done && !step5Done
+      active: step4Done && !step5Done,
     },
     {
       id: "step6",
       title: String(t("tracking.step6")),
       icon: step6Done ? Check : CheckCircle2,
       done: step6Done,
-      active: step5Done && !step6Done
-    }
+      active: step5Done && !step6Done,
+    },
   ];
 
   const getDisplayName = (iv?: TrackedIntervention | null) => {
@@ -345,7 +381,10 @@ export default function RequesterTrackingPanel() {
       </div>
 
       <div className="relative flex-1 overflow-y-auto px-2 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {interventionLoading && interventions.length === 0 && !isSubmitting && requestData.description.trim().length === 0 ? (
+        {interventionLoading &&
+        interventions.length === 0 &&
+        !isSubmitting &&
+        requestData.description.trim().length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <motion.div
               animate={{ rotate: 360 }}
@@ -359,7 +398,7 @@ export default function RequesterTrackingPanel() {
             <div className="flex items-center gap-2 mb-4 px-1">
               <List className="w-4 h-4 text-slate-400" />
               <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                {t("tracking.all_cases") as string || "Mes dossiers"}
+                {(t("tracking.all_cases") as string) || "Mes dossiers"}
               </span>
               <span className="ml-auto text-[10px] text-slate-400">{interventions.length}</span>
             </div>
@@ -374,8 +413,13 @@ export default function RequesterTrackingPanel() {
                   <span className="text-[14px] font-bold text-black truncate">
                     {iv.title || iv.problem || getDisplayName(iv)}
                   </span>
-                  <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase", STATUS_PILL[iv.status ?? ""] ?? "bg-slate-100 text-slate-500")}>
-                    {t(`status.${iv.status ?? "pending"}`) as string || iv.status}
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase",
+                      STATUS_PILL[iv.status ?? ""] ?? "bg-slate-100 text-slate-500"
+                    )}
+                  >
+                    {(t(`status.${iv.status ?? "pending"}`) as string) || iv.status}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-slate-400">
@@ -395,7 +439,7 @@ export default function RequesterTrackingPanel() {
                 className="mb-4 flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 hover:text-black transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
-                {t("tracking.all_cases") as string || "Tous les dossiers"}
+                {(t("tracking.all_cases") as string) || "Tous les dossiers"}
               </button>
             )}
             <div className="mb-6 pb-6 border-b border-black/5 text-center">
@@ -406,7 +450,9 @@ export default function RequesterTrackingPanel() {
                 {getDisplayName()}
               </h2>
               {selectedIntervention?.title && (
-                <p className="mt-1 text-[13px] text-slate-500 font-medium">{selectedIntervention.title}</p>
+                <p className="mt-1 text-[13px] text-slate-500 font-medium">
+                  {selectedIntervention.title}
+                </p>
               )}
 
               {status === "waiting_material" && (
@@ -438,7 +484,8 @@ export default function RequesterTrackingPanel() {
                 </a>
               )}
               {selectedIntervention &&
-              (selectedIntervention.status === "invoiced" || selectedIntervention.status === "done") ? (
+              (selectedIntervention.status === "invoiced" ||
+                selectedIntervention.status === "done") ? (
                 <>
                   <RequesterPaymentPanel
                     interventionId={selectedIntervention.id}
@@ -457,19 +504,33 @@ export default function RequesterTrackingPanel() {
             <div className="relative flex flex-col gap-10 my-auto">
               {/* Ligne verticale subtile (fond) avec la ligne active à l'intérieur pour de vrais pourcentages */}
               <div className="absolute bottom-6 left-[23px] top-6 w-[2px] bg-black/[0.04] rounded-full overflow-hidden z-0">
-                <motion.div 
+                <motion.div
                   className="absolute left-0 top-0 w-full bg-black origin-top"
                   initial={{ height: 0 }}
-                  animate={{ height: step6Done ? '100%' : step5Done ? '83.33%' : step4Done ? '66.66%' : step3Done ? '50%' : step2Done ? '33.33%' : step1Done ? '16.66%' : '0%' }}
+                  animate={{
+                    height: step6Done
+                      ? "100%"
+                      : step5Done
+                        ? "83.33%"
+                        : step4Done
+                          ? "66.66%"
+                          : step3Done
+                            ? "50%"
+                            : step2Done
+                              ? "33.33%"
+                              : step1Done
+                                ? "16.66%"
+                                : "0%",
+                  }}
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                 />
               </div>
-              
+
               {steps.map((step, index) => {
                 const Icon = step.icon;
-                
+
                 return (
-                  <motion.div 
+                  <motion.div
                     key={step.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -479,23 +540,28 @@ export default function RequesterTrackingPanel() {
                       !step.done && !step.active ? "opacity-30 grayscale" : ""
                     )}
                   >
-                    <motion.div 
+                    <motion.div
                       layout
                       transition={springTransition}
                       className={cn(
                         "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all duration-500",
-                        step.done 
-                          ? "bg-black text-white shadow-[0_4px_16px_rgba(0,0,0,0.2)]" 
-                          : step.active 
-                            ? "bg-white text-black shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-black/5" 
-                            : "bg-[#FAFAFA] text-slate-400 border border-black/5"
+                        step.done
+                          ? "bg-black text-white shadow-[0_4px_16px_rgba(0,0,0,0.2)]"
+                          : step.active
+                            ? "bg-white text-black shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-black/5"
+                            : "border border-black/5 bg-slate-50 text-slate-400"
                       )}
                     >
-                      <Icon className={cn("h-[18px] w-[18px]", step.active && !step.done && "animate-pulse")} />
+                      <Icon
+                        className={cn(
+                          "h-[18px] w-[18px]",
+                          step.active && !step.done && "animate-pulse"
+                        )}
+                      />
                     </motion.div>
-                    
+
                     <div className="flex flex-col justify-center">
-                      <motion.span 
+                      <motion.span
                         layout="position"
                         className={cn(
                           "text-[17px] font-bold tracking-tight transition-colors duration-500",
@@ -520,7 +586,7 @@ export default function RequesterTrackingPanel() {
             </div>
           </div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={springTransition}
@@ -532,17 +598,20 @@ export default function RequesterTrackingPanel() {
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute inset-0 rounded-full bg-black"
               />
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-[24px] bg-[#FAFAFA] text-slate-400 shadow-sm border border-black/5">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-[24px] border border-black/5 bg-slate-50 text-slate-400 shadow-sm">
                 <Search className="h-6 w-6" />
               </div>
             </div>
             <h3 className="mb-2 text-[19px] font-bold text-black tracking-tight">
-              {isSearching ? `Aucune demande trouvée pour "${searchQuery}"` : (t("tracking.no_active_request") || "Aucune demande active")}
+              {isSearching
+                ? `Aucune demande trouvée pour "${searchQuery}"`
+                : t("tracking.no_active_request") || "Aucune demande active"}
             </h3>
             <p className="text-[15px] font-medium text-slate-500 max-w-[260px] leading-relaxed">
-              {isSearching 
-                ? "Vérifiez l'orthographe de votre nom ou créez une nouvelle demande." 
-                : (t("tracking.tracking_description") || "Le suivi en temps réel de votre intervention apparaîtra ici.")}
+              {isSearching
+                ? "Vérifiez l'orthographe de votre nom ou créez une nouvelle demande."
+                : t("tracking.tracking_description") ||
+                  "Le suivi en temps réel de votre intervention apparaîtra ici."}
             </p>
           </motion.div>
         )}
@@ -550,4 +619,3 @@ export default function RequesterTrackingPanel() {
     </div>
   );
 }
-

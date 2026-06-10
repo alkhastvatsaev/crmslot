@@ -3,6 +3,7 @@ import path from "path";
 import type { AudioUploadSidecar } from "./transcription.types";
 import { isSafeUploadsRelativePath } from "./intervention-json-path";
 import { findUploadedAudioRelativePath } from "./resolve-upload-by-basename";
+import { logger } from "@/core/logger";
 
 function normalizeUploadRelativePath(uploadPathOrPublicUrl: string): string | null {
   let relative = uploadPathOrPublicUrl;
@@ -14,7 +15,7 @@ function normalizeUploadRelativePath(uploadPathOrPublicUrl: string): string | nu
 
   relative = relative.replace(/\\/g, "/").trim();
   if (!relative || !isSafeUploadsRelativePath(relative)) {
-    console.warn("[transcript-sidecar] Refusing unsafe path:", uploadPathOrPublicUrl);
+    logger.warn("[transcript-sidecar] Refusing unsafe path:", { path: uploadPathOrPublicUrl });
     return null;
   }
   return relative;
@@ -76,7 +77,10 @@ export function audioJsonSidecarPathForPublicUpload(uploadsRelativeFileName: str
   return path.join(process.cwd(), "public", "uploads", dir, `${base}.audio.json`);
 }
 
-export function writeAudioUploadSidecar(uploadPathOrPublicUrl: string, payload: AudioUploadSidecar): void {
+export function writeAudioUploadSidecar(
+  uploadPathOrPublicUrl: string,
+  payload: AudioUploadSidecar
+): void {
   const relative = normalizeUploadRelativePath(uploadPathOrPublicUrl);
   if (!relative) return;
   const out = audioJsonSidecarPathForPublicUpload(relative);
@@ -84,7 +88,9 @@ export function writeAudioUploadSidecar(uploadPathOrPublicUrl: string, payload: 
   fs.writeFileSync(out, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
-export function readAudioUploadSidecarIfPresent(uploadsFileName: string): AudioUploadSidecar | null {
+export function readAudioUploadSidecarIfPresent(
+  uploadsFileName: string
+): AudioUploadSidecar | null {
   const resolved = resolveUploadsRelativeForSidecarRead(uploadsFileName);
   if (!isSafeUploadsRelativePath(resolved)) return null;
   return readAudioJsonAtRelative(resolved);
@@ -108,7 +114,10 @@ export function readTranscriptSidecarIfPresent(uploadsFileName: string): string 
 }
 
 /** Écrit seulement le fichier texte legacy (sans JSON). Éviter pour les nouveaux flux. */
-export function writeTranscriptSidecarFile(uploadPathOrPublicUrl: string, transcript: string): void {
+export function writeTranscriptSidecarFile(
+  uploadPathOrPublicUrl: string,
+  transcript: string
+): void {
   const trimmed = transcript.trim();
   if (!trimmed) return;
   const relative = normalizeUploadRelativePath(uploadPathOrPublicUrl);

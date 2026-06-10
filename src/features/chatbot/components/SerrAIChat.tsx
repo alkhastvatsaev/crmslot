@@ -4,10 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Bot, Loader2, MessageSquarePlus, Send, ShieldCheck, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useSerrAI } from "@/features/serrai/hooks/useSerrAI";
+import { useSerrAI } from "@/features/chatbot/hooks/useSerrAI";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
 
 const QUICK_PROMPTS = [
   "Briefing du jour",
@@ -50,7 +48,7 @@ function Bubble({ role, content }: { role: "user" | "assistant"; content: string
           "max-w-[88%] whitespace-pre-wrap rounded-[18px] px-4 py-3 text-[14px] leading-relaxed",
           isUser
             ? "rounded-br-[6px] bg-slate-900 text-white"
-            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm",
+            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm"
         )}
       >
         {isUser ? content : renderMarkdownLite(content)}
@@ -101,7 +99,6 @@ export default function SerrAIChat({ className }: { className?: string }) {
   return (
     <motion.div
       data-testid="serrai-chat"
-      style={outfit}
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden bg-[#f8f9fc]", className)}
     >
       <motion.div className="flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3">
@@ -138,7 +135,7 @@ export default function SerrAIChat({ className }: { className?: string }) {
                 "shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition",
                 c.id === activeId
                   ? "bg-indigo-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               )}
             >
               {c.title.slice(0, 28)}
@@ -147,7 +144,12 @@ export default function SerrAIChat({ className }: { className?: string }) {
         </motion.div>
       ) : null}
 
-      <motion.div className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "flex min-h-0 flex-1 flex-col gap-4 px-4 py-4")}>
+      <motion.div
+        className={cn(
+          GLASS_PANEL_BODY_SCROLL_COMPACT,
+          "flex min-h-0 flex-1 flex-col gap-4 px-4 py-4"
+        )}
+      >
         {!companyId ? (
           <p className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900">
             Connectez-vous avec une société active pour utiliser SerrAI.
@@ -166,7 +168,7 @@ export default function SerrAIChat({ className }: { className?: string }) {
 
         {(activeConversation?.messages.length ?? 0) === 0 && !streaming && (
           <motion.div className="flex flex-col items-center gap-3 py-8 text-center">
-            <motion.div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-slate-900 text-white">
+            <motion.div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-slate-900 text-white">
               <Bot className="h-7 w-7" />
             </motion.div>
             <p className="max-w-sm text-[14px] text-slate-600">
@@ -193,11 +195,12 @@ export default function SerrAIChat({ className }: { className?: string }) {
           <Bubble key={m.id} role={m.role} content={m.content} />
         ))}
 
-        {streaming && streamingText ? (
-          <Bubble role="assistant" content={streamingText} />
-        ) : null}
+        {streaming && streamingText ? <Bubble role="assistant" content={streamingText} /> : null}
         {streaming && !streamingText ? (
-          <motion.div className="flex items-center gap-2 text-[12px] text-slate-500" data-testid="serrai-typing">
+          <motion.div
+            className="flex items-center gap-2 text-[12px] text-slate-500"
+            data-testid="serrai-typing"
+          >
             <Loader2 className="h-4 w-4 animate-spin" />
             SerrAI réfléchit…
           </motion.div>
@@ -267,7 +270,11 @@ export default function SerrAIChat({ className }: { className?: string }) {
             onClick={handleSend}
             className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white disabled:opacity-30"
           >
-            {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {streaming ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </button>
         </motion.div>
         <p className="mt-1.5 text-center text-[10px] text-slate-400">

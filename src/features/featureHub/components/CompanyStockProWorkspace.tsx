@@ -10,8 +10,6 @@ import { seedCompanyStockCatalog } from "@/features/featureHub/seedCompanyStockC
 import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   companyId: string;
   metrics: CompanyStockDashboardMetrics;
@@ -47,7 +45,6 @@ export default function CompanyStockProWorkspace({
     <div
       data-testid="company-stock-pro-workspace"
       className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden"
-      style={outfit}
     >
       <CompanyStockPulseBar metrics={metrics} />
 
@@ -56,7 +53,9 @@ export default function CompanyStockProWorkspace({
           <Package className="h-8 w-8" strokeWidth={1.5} aria-hidden />
         </div>
         <p className="mt-4 max-w-[240px] text-center text-[13px] font-semibold text-slate-800">
-          {isPreviewCatalog ? t("companyStock.pro_preview_title") : t("companyStock.pro_empty_title")}
+          {isPreviewCatalog
+            ? t("companyStock.pro_preview_title")
+            : t("companyStock.pro_empty_title")}
         </p>
         {isPreviewCatalog ? (
           <p
@@ -91,7 +90,7 @@ export default function CompanyStockProWorkspace({
             navigateToChatbotWithPrompt(
               pager,
               String(t("companyStock.seed_chatbot_prompt")),
-              "send",
+              "send"
             )
           }
           className="flex items-center justify-center gap-2 rounded-[16px] border border-slate-200/90 bg-white py-3.5 text-slate-700 hover:bg-slate-50"

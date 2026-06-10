@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { subscribeSupplierOrders } from "@/features/suppliers/supplierFirestore";
 import type { SupplierOrder } from "@/features/suppliers/types";
 
@@ -32,15 +33,15 @@ export function useCompanySupplierOrdersRecent(companyId: string | null) {
         const permissionDenied =
           typeof message === "string" && /insufficient permissions/i.test(message);
         if (permissionDenied) {
-          console.warn("[useCompanySupplierOrdersRecent] permission denied — commandes ignorées");
+          logger.warn("[useCompanySupplierOrdersRecent] permission denied — commandes ignorées");
           setError(null);
         } else {
-          console.warn("[useCompanySupplierOrdersRecent]", message);
+          logger.warn("[useCompanySupplierOrdersRecent]", { error: message });
           setError(message);
         }
         setOrders([]);
         setLoading(false);
-      },
+      }
     );
   }, [companyId]);
 

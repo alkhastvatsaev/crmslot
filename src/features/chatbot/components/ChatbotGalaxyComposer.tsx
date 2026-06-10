@@ -1,48 +1,52 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import GalaxyButton from "@/core/ui/GalaxyButton/GalaxyButton";
 import {
   DASHBOARD_DESKTOP_GALAXY_STRIP_CLASS,
   DASHBOARD_DESKTOP_GALAXY_STRIP_INNER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
+import {
+  GalaxyComposerMicButton,
+  GalaxyComposerNewButton,
+  GalaxyComposerSendButton,
+} from "@/features/chatbot/components/GalaxyComposerControls";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { AI_ASSISTANT_SLOT_INDEX } from "@/features/ai/aiAssistantConstants";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useBrowserSpeechDictation } from "@/features/interventions/useBrowserSpeechDictation";
+import ChatbotImageUpload from "@/features/chatbot/components/ChatbotImageUpload";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
-/** Zone de saisie Chatbot dans le Galaxy dock (désormais cliquable depuis toutes les pages). */
+/** Zone de saisie Chatbot dans le Galaxy dock. */
 export default function ChatbotGalaxyComposer() {
   const { companyId, sendMessage, streaming, pendingTool, newConversation } = useChatbotContext();
   const { t } = useTranslation();
-  const pager = useDashboardPagerOptional();
-  const isChatbotPage = pager?.pageIndex === AI_ASSISTANT_SLOT_INDEX;
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const navigateToChatbot = () => {
-    if (pager && pager.pageIndex !== AI_ASSISTANT_SLOT_INDEX) {
-      pager.setPageIndex(AI_ASSISTANT_SLOT_INDEX);
-    }
-  };
+  const appendTranscript = useCallback((text: string) => {
+    setInput((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+  }, []);
+
+  const {
+    listening,
+    supported: micSupported,
+    toggleListening,
+    interimTranscript,
+  } = useBrowserSpeechDictation(appendTranscript);
+
+  const [selectedImage, setSelectedImage] = useState<{ dataUrl: string; mimeType: string } | null>(
+    null
+  );
 
   useEffect(() => {
     const onQuick = (e: Event) => {
       const text = (e as CustomEvent<{ text?: string }>).detail?.text;
-      if (text?.trim()) {
-        void sendMessage(text);
-        navigateToChatbot();
-      }
+      if (text?.trim()) void sendMessage(text);
     };
     const onDraft = (e: Event) => {
       const text = (e as CustomEvent<{ text?: string }>).detail?.text;
-      if (text?.trim()) {
-        setInput(text.trim());
-        navigateToChatbot();
-      }
+      if (text?.trim()) setInput(text.trim());
     };
     window.addEventListener("chatbot-quick-prompt", onQuick);
     window.addEventListener("chatbot-draft-prompt", onDraft);
@@ -50,17 +54,18 @@ export default function ChatbotGalaxyComposer() {
       window.removeEventListener("chatbot-quick-prompt", onQuick);
       window.removeEventListener("chatbot-draft-prompt", onDraft);
     };
-  }, [sendMessage, pager]);
+  }, [sendMessage]);
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed) {
-      navigateToChatbot();
-      return;
+    if (!trimmed || disabled) return;
+    if (selectedImage) {
+      void sendMessage(trimmed, selectedImage.dataUrl);
+    } else {
+      void sendMessage(trimmed);
     }
-    void sendMessage(trimmed);
     setInput("");
-    navigateToChatbot();
+    setSelectedImage(null);
   };
 
   const disabled = !companyId || streaming || Boolean(pendingTool);
@@ -72,21 +77,52 @@ export default function ChatbotGalaxyComposer() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 320, damping: 28 }}
-      onClick={navigateToChatbot}
     >
-      <div className={`relative ${DASHBOARD_DESKTOP_GALAXY_STRIP_INNER_CLASS} shrink-0`}>
-        <GalaxyButton
-          asInteractiveButton={false}
-          className="chatbot-galaxy-composer h-full w-full"
-        >
-          <motion.div
-            className="pointer-events-auto relative flex h-full w-full max-w-3xl items-center justify-center px-4 gap-3"
-            style={outfit}
+      {selectedImage ? (
+        <div className="mx-auto mb-1 flex items-center gap-2 px-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={selectedImage.dataUrl}
+            alt="Image jointe"
+            className="h-10 w-10 rounded-lg object-cover border border-white/20"
+          />
+          <button
+            type="button"
+            onClick={() => setSelectedImage(null)}
+            className="text-[11px] text-white/60 hover:text-white"
+            aria-label="Supprimer l'image"
           >
+            ✕
+          </button>
+        </div>
+      ) : null}
+      <div className={`relative ${DASHBOARD_DESKTOP_GALAXY_STRIP_INNER_CLASS} shrink-0`}>
+        <GalaxyButton asInteractiveButton={false} className="chatbot-galaxy-composer h-full w-full">
+          <motion.div className="chatbot-galaxy-composer-field pointer-events-auto">
+            <AnimatePresence>
+              {companyId ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.92, x: -8 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, x: -8 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                  className="contents"
+                >
+                  <GalaxyComposerNewButton
+                    testId="chatbot-new-conversation"
+                    ariaLabel={String(t("chatbot.new_conversation"))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      newConversation();
+                    }}
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
             <textarea
               ref={inputRef}
               data-testid="chatbot-input"
-              value={input}
+              value={interimTranscript && !input ? interimTranscript : input}
               disabled={disabled}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -97,39 +133,37 @@ export default function ChatbotGalaxyComposer() {
               }}
               rows={1}
               placeholder={
-                companyId ? "" : String(t("chatbot.select_company_placeholder"))
+                listening ? "…" : companyId ? "" : String(t("chatbot.select_company_placeholder"))
               }
-              className="max-h-24 min-h-0 w-full min-w-0 flex-1 resize-none bg-transparent py-1 text-center text-[15px] leading-snug text-white placeholder:text-center placeholder:text-white/65 focus:outline-none disabled:opacity-50"
+              className="chatbot-galaxy-composer-input bg-transparent py-0 text-center text-[15px] leading-snug placeholder:text-center focus:outline-none disabled:opacity-50"
+              style={{ color: interimTranscript && !input ? "rgba(255,255,255,0.55)" : "white" }}
               aria-label={String(t("chatbot.input_aria"))}
             />
-            <AnimatePresence>
-              {isChatbotPage && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8, x: 10 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, x: 10 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    newConversation();
-                  }}
-                  title={String(t("chatbot.new_conversation"))}
-                  className="absolute right-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {micSupported ? (
+              <GalaxyComposerMicButton
+                testId="chatbot-mic"
+                ariaLabel={listening ? "Arrêter la dictée" : "Dicter un message"}
+                listening={listening}
+                disabled={!companyId}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void toggleListening();
+                }}
+              />
+            ) : null}
+            <ChatbotImageUpload
+              disabled={disabled}
+              onImageSelected={(dataUrl, mimeType) => setSelectedImage({ dataUrl, mimeType })}
+            />
+            <GalaxyComposerSendButton
+              testId="chatbot-send"
+              ariaLabel={String(t("chatbot.send_aria"))}
+              disabled={disabled || (!input.trim() && !interimTranscript.trim())}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSend();
+              }}
+            />
           </motion.div>
         </GalaxyButton>
       </div>

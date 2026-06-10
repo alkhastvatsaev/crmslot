@@ -57,12 +57,7 @@ const LECOT_PHRASES = [
   "propose 5 serrures pour lecot",
 ];
 
-const CLIENT_NAME_PHRASES = [
-  "Dupont",
-  "client Martin SPRL",
-  "nom : Vatsaev",
-  "c'est pour Durand",
-];
+const CLIENT_NAME_PHRASES = ["Dupont", "client Martin SPRL", "nom : Vatsaev", "c'est pour Durand"];
 
 describe("materialAgentRouteParcours — OpenAI mocké", () => {
   const envOpenAI = process.env.OPENAI_API_KEY;
@@ -77,55 +72,47 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
     else process.env.OPENAI_API_KEY = envOpenAI;
   });
 
-  describe.each(STOCK_PHRASES.map((p) => [p] as const))(
-    "demande stock [%s]",
-    (phrase) => {
-      it("délègue à runChatbotOpenAI avec hub matériel", async () => {
-        await mockOpenAiDone(phrase);
-        const res = await handleMaterialAgentPost(
-          { companyId, messages: [{ role: "user", content: phrase }] },
-          auth,
-        );
-        await readSseJsonLines(res);
-        expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
-        const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
-        expect(call?.hubAgentMode).toBe(true);
-        expect(call?.toolCtx.lastUserText).toBe(phrase);
-        expect(call?.toolCtx.companyId).toBe(companyId);
-      });
-    },
-  );
+  describe.each(STOCK_PHRASES.map((p) => [p] as const))("demande stock [%s]", (phrase) => {
+    it("délègue à runChatbotOpenAI avec hub matériel", async () => {
+      await mockOpenAiDone(phrase);
+      const res = await handleMaterialAgentPost(
+        { companyId, messages: [{ role: "user", content: phrase }] },
+        auth
+      );
+      await readSseJsonLines(res);
+      expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
+      const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
+      expect(call?.hubAgentMode).toBe(true);
+      expect(call?.toolCtx.lastUserText).toBe(phrase);
+      expect(call?.toolCtx.companyId).toBe(companyId);
+    });
+  });
 
-  describe.each(LECOT_PHRASES.map((p) => [p] as const))(
-    "demande Lecot [%s]",
-    (phrase) => {
-      it("délègue la demande Lecot à OpenAI", async () => {
-        await mockOpenAiDone(phrase);
-        const res = await handleMaterialAgentPost(
-          {
-            companyId,
-            orderClientName: "Ancien Client",
-            messages: [{ role: "user", content: phrase }],
-          },
-          auth,
-        );
-        const events = await readSseJsonLines(res);
-        expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
-        expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
-        // Session reset emitted when phrase triggers a new-order context
-        if (/nouvelle|autre|changer|catalogue\s+lecot|commande\s+lecot/i.test(phrase)) {
-          expect(events).toContainEqual(
-            expect.objectContaining({ type: "material_order_client", clientName: "" }),
-          );
-        }
-      });
-    },
-  );
+  describe.each(LECOT_PHRASES.map((p) => [p] as const))("demande Lecot [%s]", (phrase) => {
+    it("délègue la demande Lecot à OpenAI", async () => {
+      await mockOpenAiDone(phrase);
+      const res = await handleMaterialAgentPost(
+        {
+          companyId,
+          companyName: "Société Parcours",
+          messages: [{ role: "user", content: phrase }],
+        },
+        auth
+      );
+      const events = await readSseJsonLines(res);
+      expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
+      expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
+      const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
+      expect(call?.toolCtx.materialOrderClientName).toBe("Société Parcours");
+      expect(call?.toolCtx.requireMaterialOrderClientName).toBe(false);
+    });
+  });
 
   describe.each(CLIENT_NAME_PHRASES.map((p) => [p] as const))(
     "réponse nom client [%s]",
     (phrase) => {
-      it("enregistre sans appeler OpenAI", async () => {
+      it("délègue la réponse nom client à OpenAI", async () => {
+        await mockOpenAiDone(phrase);
         const res = await handleMaterialAgentPost(
           {
             companyId,
@@ -138,14 +125,12 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
               { role: "user", content: phrase },
             ],
           },
-          auth,
+          auth
         );
         const events = await readSseJsonLines(res);
-        expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
-        expect(events.some((e) => (e as { type?: string }).type === "material_order_client")).toBe(
-          true,
-        );
+        expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
+        expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
       });
-    },
+    }
   );
 });

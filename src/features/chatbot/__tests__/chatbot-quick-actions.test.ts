@@ -14,7 +14,7 @@ describe("chatbot-quick-actions", () => {
     expect(actions).toHaveLength(2);
     expect(actions[0].payload).toBe("Commander LEC-2001 — Serrure Vachette");
     expect(actions[0].variant).toBe("primary");
-    expect(actions[0].label).toContain("145");
+    expect(actions[0].meta).toContain("145");
   });
 
   it("deriveChatbotQuickActions parses catalogue Lecot lines", () => {

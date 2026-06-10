@@ -1,15 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  collection,
-  limit,
-  onSnapshot,
-  query,
-  where,
-  type Firestore,
-} from "firebase/firestore";
+import { collection, limit, onSnapshot, query, where, type Firestore } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { fetchChatbotPwaRegistry } from "@/features/chatbot/fetchChatbotPwaRegistry";
 import { subscribeSupplierOrders } from "@/features/suppliers/supplierFirestore";
 import type { SupplierOrder } from "@/features/suppliers/types";
@@ -38,17 +32,19 @@ function parseOrderDate(raw: unknown): number {
 
 function mergeSupplierOrders(
   firestoreOrders: SupplierOrder[],
-  previewOrders: SupplierOrder[],
+  previewOrders: SupplierOrder[]
 ): SupplierOrder[] {
   const byId = new Map<string, SupplierOrder>();
   for (const o of previewOrders) byId.set(o.id, o);
   for (const o of firestoreOrders) byId.set(o.id, o);
-  return [...byId.values()].sort((a, b) => parseOrderDate(b.createdAt) - parseOrderDate(a.createdAt));
+  return [...byId.values()].sort(
+    (a, b) => parseOrderDate(b.createdAt) - parseOrderDate(a.createdAt)
+  );
 }
 
 export function useChatbotSupplierOrdersPanel(
   companyId: string | null,
-  firebaseUid?: string | null,
+  firebaseUid?: string | null
 ) {
   const [panel, setPanel] = useState<ChatbotSupplierOrdersPanelState>(closed);
   const [supplierOrdersBase, setSupplierOrdersBase] = useState<SupplierOrder[]>([]);
@@ -58,7 +54,7 @@ export function useChatbotSupplierOrdersPanel(
 
   const supplierOrders = useMemo(
     () => mergeSupplierOrders(supplierOrdersBase, previewSupplierOrders),
-    [supplierOrdersBase, previewSupplierOrders],
+    [supplierOrdersBase, previewSupplierOrders]
   );
 
   const refreshRegistry = useCallback(async () => {
@@ -71,10 +67,10 @@ export function useChatbotSupplierOrdersPanel(
       return;
     }
     if (result.status === 503) {
-      console.warn("[chatbot] pwa-registry (Firestore client utilisé):", result.message);
+      logger.warn("[chatbot] pwa-registry (Firestore client utilisé):", { error: result.message });
       return;
     }
-    console.warn("[chatbot] pwa-registry:", result.message);
+    logger.warn("[chatbot] pwa-registry:", { error: result.message });
   }, [companyId, firebaseUid]);
 
   useEffect(() => {
@@ -100,7 +96,7 @@ export function useChatbotSupplierOrdersPanel(
     const q = query(
       collection(db, "material_orders"),
       where("companyId", "==", companyId),
-      limit(40),
+      limit(40)
     );
     return onSnapshot(
       q,
@@ -113,15 +109,17 @@ export function useChatbotSupplierOrdersPanel(
           for (const r of prev) byId.set(r.id, r);
           for (const r of rows) byId.set(r.id, r);
           const merged = [...byId.values()].sort(
-            (a, b) => parseOrderDate(b.createdAt) - parseOrderDate(a.createdAt),
+            (a, b) => parseOrderDate(b.createdAt) - parseOrderDate(a.createdAt)
           );
           if (merged.length > 0) setRegistryError(null);
           return merged;
         });
       },
       (err) => {
-        console.warn("[material_orders] onSnapshot error:", err);
-      },
+        logger.warn("[material_orders] onSnapshot error:", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
     );
   }, [panel.open, companyId]);
 
@@ -129,7 +127,7 @@ export function useChatbotSupplierOrdersPanel(
     (
       highlightOrderId: string,
       materialOrderId?: string | null,
-      previewOrder?: SupplierOrder | null,
+      previewOrder?: SupplierOrder | null
     ) => {
       if (previewOrder) {
         setPreviewSupplierOrders((prev) => {
@@ -145,7 +143,7 @@ export function useChatbotSupplierOrdersPanel(
       }));
       void refreshRegistry();
     },
-    [refreshRegistry],
+    [refreshRegistry]
   );
 
   const closeSupplierOrdersPanel = useCallback(() => {

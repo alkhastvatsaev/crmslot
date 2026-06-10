@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useEffect } from "react";
 import { signInAnonymously } from "firebase/auth";
 import { toast } from "sonner";
@@ -16,7 +18,7 @@ export default function DevPreviewAnonymousAuth() {
     if (!devUiPreviewEnabled || !isConfigured || !auth) return;
     if (auth.currentUser) return;
     void signInAnonymously(auth).catch((err) => {
-      console.warn("[DevPreviewAnonymousAuth] signInAnonymously failed", err);
+      logger.warn("[DevPreviewAnonymousAuth] signInAnonymously failed", err);
       toast.error("Session Firebase (mode dev)", {
         description:
           "Activez le fournisseur « Anonyme » dans Firebase Console (Authentication → Sign-in method) et vérifiez .env.local.",

@@ -1,7 +1,24 @@
 /** @jest-environment jsdom */
 
-import { render, screen } from "@/test-utils/render";
+import { render, screen, waitFor } from "@/test-utils/render";
 import DesktopOnlyGate, { isPhoneClassDevice } from "@/features/app/DesktopOnlyGate";
+import { fetchMobileRuntimeConfig } from "@/features/mobile/fetchMobileRuntimeConfig";
+
+jest.mock("@/core/config/devUiPreview", () => ({
+  devUiPreviewEnabled: false,
+}));
+
+jest.mock("@/core/config/mobileAccess", () => ({
+  mobileAccessAllowed: false,
+}));
+
+jest.mock("@/features/mobile/fetchMobileRuntimeConfig", () => ({
+  fetchMobileRuntimeConfig: jest.fn(),
+}));
+
+const fetchMobileRuntimeConfigMock = fetchMobileRuntimeConfig as jest.MockedFunction<
+  typeof fetchMobileRuntimeConfig
+>;
 
 describe("isPhoneClassDevice", () => {
   const originalUa = navigator.userAgent;
@@ -30,13 +47,91 @@ describe("isPhoneClassDevice", () => {
   });
 });
 
-describe("DesktopOnlyGate", () => {
-  it("renders children in dev preview mode", () => {
+describe("DesktopOnlyGate prod-like", () => {
+  const originalUa = navigator.userAgent;
+
+  beforeEach(() => {
+    fetchMobileRuntimeConfigMock.mockReset();
+  });
+
+  afterEach(() => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: originalUa,
+      configurable: true,
+    });
+  });
+
+  it("allows desktop user agent without calling runtime config", async () => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+      configurable: true,
+    });
+
     render(
       <DesktopOnlyGate>
         <span data-testid="child">ok</span>
-      </DesktopOnlyGate>,
+      </DesktopOnlyGate>
     );
-    expect(screen.getByTestId("child")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("child")).toBeInTheDocument();
+    });
+    expect(fetchMobileRuntimeConfigMock).not.toHaveBeenCalled();
+  });
+
+  it("allows phone when runtime config enables mobile access", async () => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+      configurable: true,
+    });
+    fetchMobileRuntimeConfigMock.mockResolvedValue({
+      ok: true,
+      mobileAccessAllowed: true,
+      forceMobileQueryKey: "forceMobile",
+      pwaServiceWorkerEnabled: false,
+      gitSha: null,
+      hubPageCount: 7,
+      nodeEnv: "production",
+      timestamp: "2026-06-07T00:00:00.000Z",
+    });
+
+    render(
+      <DesktopOnlyGate>
+        <span data-testid="child">ok</span>
+      </DesktopOnlyGate>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("child")).toBeInTheDocument();
+    });
+    expect(fetchMobileRuntimeConfigMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks phone when runtime config denies mobile access", async () => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+      configurable: true,
+    });
+    fetchMobileRuntimeConfigMock.mockResolvedValue({
+      ok: true,
+      mobileAccessAllowed: false,
+      forceMobileQueryKey: "forceMobile",
+      pwaServiceWorkerEnabled: false,
+      gitSha: null,
+      hubPageCount: 7,
+      nodeEnv: "production",
+      timestamp: "2026-06-07T00:00:00.000Z",
+    });
+
+    render(
+      <DesktopOnlyGate>
+        <span data-testid="child">ok</span>
+      </DesktopOnlyGate>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("desktop-only-gate-blocked")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("child")).not.toBeInTheDocument();
   });
 });

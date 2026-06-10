@@ -2,7 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import AiAssistant, { type AiPlaybackSync, type QueuedClip } from "@/features/dispatch/components/AiAssistant";
+import AiAssistant, {
+  type AiPlaybackSync,
+  type QueuedClip,
+} from "@/features/dispatch/components/AiAssistant";
 import MapTranscriptionOverlay from "@/features/map/components/MapTranscriptionOverlay";
 import MapTranscriptionActionsPanel from "@/features/map/components/MapTranscriptionActionsPanel";
 import { DASHBOARD_DESKTOP_GALAXY_RAIL_CLASS } from "@/core/ui/dashboardDesktopLayout";
@@ -13,9 +16,21 @@ const OVERLAY_ROOT_ID = "dashboard-overlay-root";
 type Props = {
   transcriptionArmed: boolean;
   onUserPressPlay: () => void;
-  onInterventionCreated?: (mission: { id: number; key: string; clientName: string; coordinates: [number, number]; time: string; status: string; source?: "live"; date?: string }) => void;
+  onInterventionCreated?: (mission: {
+    id: number;
+    key: string;
+    clientName: string;
+    coordinates: [number, number];
+    time: string;
+    status: string;
+    source?: "live";
+    date?: string;
+  }) => void;
   /** true = overlays + file audio seulement (dock Galaxy = Chatbot). */
   hideDockStrip?: boolean;
+  /** Polling Firestore / disque MacroDroid (désactivé hors page carte mobile). */
+  backgroundTasksEnabled?: boolean;
+  mobilePowerSave?: boolean;
 };
 
 /**
@@ -26,6 +41,8 @@ export default function MapGalaxyTranscriptionLayer({
   onUserPressPlay,
   onInterventionCreated,
   hideDockStrip = false,
+  backgroundTasksEnabled = true,
+  mobilePowerSave = false,
 }: Props) {
   const [playbackSync, setPlaybackSync] = useState<AiPlaybackSync>(null);
   const [openEditSignal, setOpenEditSignal] = useState(0);
@@ -44,11 +61,16 @@ export default function MapGalaxyTranscriptionLayer({
   }, [transcriptionArmed]);
 
   useEffect(() => {
-    const sync = () => setOverlayRoot(document.getElementById(OVERLAY_ROOT_ID));
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    const readRoot = () => document.getElementById(OVERLAY_ROOT_ID);
+    const existing = readRoot();
+    if (existing) {
+      setOverlayRoot(existing);
+      return;
+    }
+    const id = window.requestAnimationFrame(() => {
+      setOverlayRoot(readRoot());
+    });
+    return () => window.cancelAnimationFrame(id);
   }, []);
 
   /**
@@ -108,6 +130,8 @@ export default function MapGalaxyTranscriptionLayer({
         onPlaybackSync={setPlaybackSync}
         onUserLongPress={() => setHistoryModeOpen(true)}
         onQueueChange={setQueue}
+        backgroundTasksEnabled={backgroundTasksEnabled}
+        mobilePowerSave={mobilePowerSave}
       />
     </>
   );
@@ -163,9 +187,7 @@ function HistoryPanel({ queue, onClose: _onClose }: { queue: QueuedClip[]; onClo
               ← Retour aux audios
             </button>
             {loading ? (
-              <div className="text-lg font-semibold text-white/90">
-                Transcription…
-              </div>
+              <div className="text-lg font-semibold text-white/90">Transcription…</div>
             ) : (
               <div className="pointer-events-auto whitespace-pre-wrap text-2xl font-extrabold leading-snug tracking-tight text-white max-h-[60vh] overflow-y-auto hide-scrollbar">
                 {transcript}
@@ -173,9 +195,7 @@ function HistoryPanel({ queue, onClose: _onClose }: { queue: QueuedClip[]; onClo
             )}
           </>
         ) : queue.length === 0 ? (
-          <div className="text-lg font-semibold text-white/90">
-            Aucun historique disponible.
-          </div>
+          <div className="text-lg font-semibold text-white/90">Aucun historique disponible.</div>
         ) : (
           <div className="pointer-events-auto flex flex-wrap justify-center gap-3 max-h-[60vh] overflow-y-auto p-4 hide-scrollbar">
             {queue
@@ -189,9 +209,7 @@ function HistoryPanel({ queue, onClose: _onClose }: { queue: QueuedClip[]; onClo
                     onClick={() => setSelectedUrl(clip.url)}
                     className="px-5 py-2.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors border border-white/10 shadow-lg backdrop-blur-md flex items-center gap-2"
                   >
-                    <span className="font-bold text-lg text-white/90">
-                      Audio
-                    </span>
+                    <span className="font-bold text-lg text-white/90">Audio</span>
                     <span className="font-medium text-sm text-white/60">
                       {d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>

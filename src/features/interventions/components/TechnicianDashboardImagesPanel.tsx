@@ -14,8 +14,6 @@ import type { Intervention } from "@/features/interventions/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import QuickCameraUploader from "./QuickCameraUploader";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -81,7 +79,6 @@ export default function TechnicianDashboardImagesPanel({
     return (
       <div
         data-testid="technician-dashboard-images-empty"
-        style={outfit}
         className="flex h-full w-full flex-col items-center justify-center rounded-[inherit] px-5 py-8 text-center"
       >
         <ImageIcon className="mb-3 h-10 w-10 text-slate-300" aria-hidden />
@@ -96,13 +93,12 @@ export default function TechnicianDashboardImagesPanel({
     return (
       <div
         data-testid="technician-dashboard-images-loading"
-        style={outfit}
         className="flex h-full w-full flex-col p-4"
       >
         <div className="mb-4 h-6 w-1/2 animate-pulse rounded-md bg-slate-200/60" />
         <div className="space-y-4">
           {[0, 1].map((i) => (
-            <div key={i} className="h-48 w-full animate-pulse rounded-[20px] bg-slate-200/60" />
+            <div key={i} className="h-48 w-full animate-pulse rounded-[16px] bg-slate-200/60" />
           ))}
         </div>
       </div>
@@ -114,7 +110,6 @@ export default function TechnicianDashboardImagesPanel({
     return (
       <div
         data-testid="technician-dashboard-images-closed"
-        style={outfit}
         className="flex h-full w-full flex-col items-center justify-center rounded-[inherit] px-5 py-8 text-center"
       >
         <ImageIcon className="mb-3 h-10 w-10 text-slate-300" aria-hidden />
@@ -130,7 +125,6 @@ export default function TechnicianDashboardImagesPanel({
   return (
     <div
       data-testid="technician-dashboard-images"
-      style={outfit}
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]"
     >
       <input
@@ -146,7 +140,7 @@ export default function TechnicianDashboardImagesPanel({
         {images.length === 0 ? (
           <div
             data-testid="technician-dashboard-images-empty-photos"
-            className="flex flex-col items-center justify-center rounded-[20px] border border-dashed border-slate-200 bg-white/50 px-6 py-10 text-center"
+            className="flex flex-col items-center justify-center rounded-[16px] border border-dashed border-slate-200 bg-white/50 px-6 py-10 text-center"
           >
             <ImageIcon className="mb-3 h-8 w-8 text-slate-300" aria-hidden />
             <p className="text-[14px] font-medium text-slate-500">
@@ -164,7 +158,7 @@ export default function TechnicianDashboardImagesPanel({
               <motion.div
                 key={idx}
                 variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-                className="group relative overflow-hidden rounded-[20px] bg-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.12)]"
+                className="group relative overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.12)]"
               >
                 <Image
                   src={url}
@@ -178,8 +172,8 @@ export default function TechnicianDashboardImagesPanel({
           </motion.div>
         )}
 
-        <QuickCameraUploader 
-          onPhotoTaken={(file) => void handlePhotoTaken(file)} 
+        <QuickCameraUploader
+          onPhotoTaken={(file) => void handlePhotoTaken(file)}
           label={String(t("technician_hub.dashboard.images.upload_btn"))}
           isUploading={uploading}
         />

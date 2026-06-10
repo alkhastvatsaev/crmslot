@@ -2,10 +2,14 @@
 
 import { useMemo } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useDateContext } from "@/context/DateContext";
 import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
 import { useHubAgent } from "@/features/hubAgents/useHubAgent";
 import { isCrmHistoryAgentInScope } from "@/features/crmHistory/crmHistoryAgentScope";
-import { buildCrmHistoryActivitySnapshot } from "@/features/crmHistory/crmHistoryAgentSnapshot";
+import {
+  buildCrmHistoryActivitySnapshot,
+  buildQmKpiSnapshot,
+} from "@/features/crmHistory/crmHistoryAgentSnapshot";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 
 const STORAGE_KEY = "belmap-crm-history-agent-v1";
@@ -18,18 +22,33 @@ type Options = {
 
 export function useCrmHistoryAgent({ companyId, events, enabled = true }: Options) {
   const { t } = useTranslation();
+  const { selectedDate } = useDateContext();
+
+  const dateLabel = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(selectedDate);
+    d.setHours(0, 0, 0, 0);
+    if (d.getTime() === today.getTime()) return "aujourd'hui";
+    return selectedDate.toLocaleDateString("fr-BE", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }, [selectedDate]);
 
   const activitySnapshot = useMemo(() => buildCrmHistoryActivitySnapshot(events), [events]);
+  const kpiSnapshot = useMemo(() => buildQmKpiSnapshot(events, dateLabel), [events, dateLabel]);
 
   const onStreamEvent = useHubAgentStreamHandler();
 
   const offTopicSuggestions = useMemo(
     () => [
-      String(t("crmHistory.ai.shortcuts.summary_week")),
-      String(t("crmHistory.ai.shortcuts.materials_ordered")),
-      String(t("crmHistory.ai.shortcuts.unresolved")),
+      String(t("crmHistory.ai.shortcuts.closure_rate")),
+      String(t("crmHistory.ai.shortcuts.why_cancelled")),
+      String(t("crmHistory.ai.shortcuts.tech_performance")),
     ],
-    [t],
+    [t]
   );
 
   return useHubAgent({
@@ -47,6 +66,7 @@ export function useCrmHistoryAgent({ companyId, events, enabled = true }: Option
       role,
       messages,
       activitySnapshot,
+      kpiSnapshot,
     }),
     onStreamEvent,
   });

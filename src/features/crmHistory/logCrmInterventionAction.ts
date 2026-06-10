@@ -1,4 +1,5 @@
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import {
@@ -30,12 +31,15 @@ export async function logCrmInterventionAction(params: {
       statusBefore: params.statusBefore ?? params.iv.status,
       statusAfter: params.statusAfter,
       note: params.note,
-    },
+    }
   );
 
   try {
     await logCompanyCrmActivity(firestore, payload);
   } catch (e) {
-    console.warn("[logCrmInterventionAction]", params.kind, e);
+    logger.warn("[logCrmInterventionAction]", {
+      kind: params.kind,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

@@ -7,13 +7,13 @@ Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichi
 
 ## 1. État actuel (mai 2026)
 
-| Indicateur | Valeur |
-|------------|--------|
-| Suites Jest | **~260** (~1 300 tests) |
-| CI unitaire | `npm run test:ci` (= typecheck + coverage) dans [`.github/workflows/test.yml`](../.github/workflows/test.yml) |
-| E2E | **9** specs Playwright dans `tests/e2e/` (job séparé) |
-| Seuils coverage globaux | Faibles (~4 % statements) + **planchers par fichier P0** dispatch/interventions |
-| Chatbot | **28 suites / 78 tests** — **100 % verts** en isolation |
+| Indicateur              | Valeur                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Suites Jest             | **~260** (~1 300 tests)                                                                                       |
+| CI unitaire             | `npm run test:ci` (= typecheck + coverage) dans [`.github/workflows/test.yml`](../.github/workflows/test.yml) |
+| E2E                     | **9** specs Playwright dans `tests/e2e/` (job séparé)                                                         |
+| Seuils coverage globaux | Faibles (~4 % statements) + **planchers par fichier P0** dispatch/interventions                               |
+| Chatbot                 | **28 suites / 78 tests** — **100 % verts** en isolation                                                       |
 
 ### CI
 
@@ -29,14 +29,14 @@ Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichi
 
 ### Lacunes principales
 
-| Zone | Problème |
-|------|----------|
-| **`useChatbot.ts`** (~600+ lignes) | Orchestration stream, preview facture, localStorage — **aucun test dédié** |
-| **`chatbot-tool-executor.ts`** (~900+ lignes) | Tous les outils Firestore/email — **aucun test direct** |
-| **Routes API** `src/app/api/ai/chatbot/*` | Exclues du coverage ; pas de tests d’intégration |
-| **E2E chatbot** | Aucun parcours Playwright |
-| **Fichiers dupliqués** | `chatbot-tools 2.ts`, `chatbot-openai 3.ts`, `route 2.ts` — piège pour les agents |
-| **Doc agent** | Pas de checklist « j’ai touché le chatbot → je lance quoi » |
+| Zone                                          | Problème                                                                          |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| **`useChatbot.ts`** (~600+ lignes)            | Orchestration stream, preview facture, localStorage — **aucun test dédié**        |
+| **`chatbot-tool-executor.ts`** (~900+ lignes) | Tous les outils Firestore/email — **aucun test direct**                           |
+| **Routes API** `src/app/api/ai/chatbot/*`     | Exclues du coverage ; pas de tests d’intégration                                  |
+| **E2E chatbot**                               | Aucun parcours Playwright                                                         |
+| **Fichiers dupliqués**                        | `chatbot-tools 2.ts`, `chatbot-openai 3.ts`, `route 2.ts` — piège pour les agents |
+| **Doc agent**                                 | Pas de checklist « j’ai touché le chatbot → je lance quoi »                       |
 
 ---
 
@@ -69,30 +69,30 @@ flowchart TB
 
 ### 3.1 Fichiers source de vérité (ne pas éditer les copies)
 
-| Rôle | Fichier |
-|------|---------|
-| Outils (schéma) | [`chatbot-tools.ts`](../src/features/chatbot/chatbot-tools.ts) |
-| Exécution outils | [`chatbot-tool-executor.ts`](../src/features/chatbot/chatbot-tool-executor.ts) |
-| OpenAI / messages | [`chatbot-openai.ts`](../src/features/chatbot/chatbot-openai.ts) |
-| Route SSE | [`src/app/api/ai/chatbot/route.ts`](../src/app/api/ai/chatbot/route.ts) |
-| Hook UI | [`hooks/useChatbot.ts`](../src/features/chatbot/hooks/useChatbot.ts) |
-| Intent local (sans API) | [`chatbot-local-intent.ts`](../src/features/chatbot/chatbot-local-intent.ts) |
+| Rôle                      | Fichier                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| Outils (schéma)           | [`chatbot-tools.ts`](../src/features/chatbot/chatbot-tools.ts)                                   |
+| Exécution outils          | [`chatbot-tool-executor.ts`](../src/features/chatbot/chatbot-tool-executor.ts)                   |
+| OpenAI / messages         | [`chatbot-openai.ts`](../src/features/chatbot/chatbot-openai.ts)                                 |
+| Route SSE                 | [`src/app/api/ai/chatbot/route.ts`](../src/app/api/ai/chatbot/route.ts)                          |
+| Hook UI                   | [`hooks/useChatbot.ts`](../src/features/chatbot/hooks/useChatbot.ts)                             |
+| Intent local (sans API)   | [`chatbot-local-intent.ts`](../src/features/chatbot/chatbot-local-intent.ts)                     |
 | Désambiguïsation adresses | [`chatbot-address-disambiguation.ts`](../src/features/chatbot/chatbot-address-disambiguation.ts) |
 
 **À supprimer ou ignorer** (dette) : tout fichier `* 2.ts`, `* 3.ts` dans `chatbot/` et `api/ai/chatbot/`.
 
 ### 3.2 Déjà testé (maintenir à chaque changement)
 
-| Module | Fichier test |
-|--------|----------------|
-| Intent PWA / facture | `chatbot-pwa-intent.test.ts`, `chatbot-local-intent.test.ts` |
-| Choix « 1 / 2 / 3 » adresses | `chatbot-address-disambiguation.test.ts` |
-| Recherche workspace | `chatbot-workspace-search.test.ts` |
-| Billing lignes / parse | `chatbot-billing.test.ts`, `chatbot-billing-parse.test.ts` |
-| Lecot / commandes | `chatbot-lecot*.test.ts`, `chatbot-order-side-effect.test.ts` |
-| Preview document | `chatbot-document-side-effect.test.ts` |
-| Routing outils | `chatbot-tool-routing.test.ts` |
-| UI rails | `ChatbotRightRail`, `ChatbotSupplierOrdersPanel`, `ChatbotPdfPreviewPanel`, etc. |
+| Module                       | Fichier test                                                                     |
+| ---------------------------- | -------------------------------------------------------------------------------- |
+| Intent PWA / facture         | `chatbot-pwa-intent.test.ts`, `chatbot-local-intent.test.ts`                     |
+| Choix « 1 / 2 / 3 » adresses | `chatbot-address-disambiguation.test.ts`                                         |
+| Recherche workspace          | `chatbot-workspace-search.test.ts`                                               |
+| Billing lignes / parse       | `chatbot-billing.test.ts`, `chatbot-billing-parse.test.ts`                       |
+| Lecot / commandes            | `chatbot-lecot*.test.ts`, `chatbot-order-side-effect.test.ts`                    |
+| Preview document             | `chatbot-document-side-effect.test.ts`                                           |
+| Routing outils               | `chatbot-tool-routing.test.ts`                                                   |
+| UI rails                     | `ChatbotRightRail`, `ChatbotSupplierOrdersPanel`, `ChatbotPdfPreviewPanel`, etc. |
 
 Commande locale :
 
@@ -184,6 +184,7 @@ Snippet AGENTS.md à ajouter (optionnel) :
 
 ```markdown
 ### Chatbot (Codex / agents)
+
 Voir `docs/TESTING.md` §3. Après toute modif chatbot : `npx jest src/features/chatbot --no-coverage`.
 ```
 
@@ -273,18 +274,28 @@ Parcours déjà couverts : dispatch, assignation back-office, hub technicien, pa
 
 ## 7. Commandes utiles
 
-| Action | Commande |
-|--------|----------|
-| Tout le chatbot | `npm run test:chatbot` |
-| Tout interventions | `npm run test:interventions` |
-| Chatbot + coverage | `npm run test:chatbot:coverage` (seuils chatbot : lancer `npm run test:coverage` en CI) |
-| E2E chatbot | `npm run test:e2e:chatbot` |
-| E2E facturation | `npm run test:e2e:invoice` |
-| Un fichier | `npx jest src/features/chatbot/__tests__/chatbot-local-intent.test.ts --no-coverage` |
-| CI locale | `npm run test:ci` |
-| Coverage | `npm run test:coverage` |
-| E2E | `npm run test:e2e` |
-| CI complet | `npm run ci` / `npm run ci:all` |
+| Action                 | Commande                                                                                |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| Tout le chatbot        | `npm run test:chatbot`                                                                  |
+| Tout interventions     | `npm run test:interventions`                                                            |
+| Chatbot + coverage     | `npm run test:chatbot:coverage` (seuils chatbot : lancer `npm run test:coverage` en CI) |
+| E2E chatbot            | `npm run test:e2e:chatbot`                                                              |
+| E2E facturation        | `npm run test:e2e:invoice`                                                              |
+| E2E hub société        | `npm run test:e2e:company`                                                              |
+| E2E clôture technicien | `npm run test:e2e:technician`                                                           |
+| E2E offline sync       | `npm run test:e2e:offline`                                                              |
+| E2E matrice API auth   | `npm run test:e2e:api-matrix`                                                           |
+| Matériel + catalogue   | `npm run test:feature-hub`                                                              |
+| Gmail                  | `npm run test:gmail`                                                                    |
+| CRM                    | `npm run test:crm`                                                                      |
+| Billing hub            | `npm run test:billing-hub`                                                              |
+| Webhooks               | `npm run test:webhooks`                                                                 |
+| Régénérer routes API   | `npm run generate:api-routes`                                                           |
+| Un fichier             | `npx jest src/features/chatbot/__tests__/chatbot-local-intent.test.ts --no-coverage`    |
+| CI locale              | `npm run test:ci`                                                                       |
+| Coverage               | `npm run test:coverage`                                                                 |
+| E2E                    | `npm run test:e2e`                                                                      |
+| CI complet             | `npm run ci` / `npm run ci:all`                                                         |
 
 ---
 
@@ -301,4 +312,4 @@ Une tâche est **terminée** quand :
 
 ---
 
-*Dernière mise à jour : généré pour la demande « architecture tests + focus chatbot / agents ».*
+_Dernière mise à jour : généré pour la demande « architecture tests + focus chatbot / agents »._

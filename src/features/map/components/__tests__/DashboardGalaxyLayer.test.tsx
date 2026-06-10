@@ -19,11 +19,6 @@ jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   },
 }));
 
-jest.mock("@/features/chatbot/components/ChatbotGalaxyComposer", () => ({
-  __esModule: true,
-  default: () => <div data-testid="chatbot-galaxy-composer" />,
-}));
-
 jest.mock("@/features/featureHub/components/CompanyStockGalaxyComposer", () => ({
   __esModule: true,
   default: () => <div data-testid="company-stock-galaxy-composer" />,
@@ -56,41 +51,48 @@ describe("DashboardGalaxyLayer", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
-      </DashboardPagerProvider>,
+      </DashboardPagerProvider>
     );
     expect(screen.getByTestId("company-stock-galaxy-composer")).toBeInTheDocument();
-    expect(screen.queryByTestId("chatbot-galaxy-composer")).not.toBeInTheDocument();
   });
 
   it("shows CRM history composer on history page", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={CRM_HISTORY_SLOT_INDEX}>
         <DashboardGalaxyLayer />
-      </DashboardPagerProvider>,
+      </DashboardPagerProvider>
     );
     expect(screen.getByTestId("crm-history-galaxy-composer")).toBeInTheDocument();
-    expect(screen.queryByTestId("chatbot-galaxy-composer")).not.toBeInTheDocument();
   });
 
   it("shows billing composer on billing page", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={BILLING_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
-      </DashboardPagerProvider>,
+      </DashboardPagerProvider>
     );
     expect(screen.getByTestId("billing-hub-galaxy-composer")).toBeInTheDocument();
-    expect(screen.queryByTestId("chatbot-galaxy-composer")).not.toBeInTheDocument();
   });
 
-  it("shows no agent composer on map page", () => {
+  it("shows no agent composer on map page and keeps map galaxy dock", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={0}>
         <DashboardGalaxyLayer />
-      </DashboardPagerProvider>,
+      </DashboardPagerProvider>
     );
-    expect(screen.queryByTestId("chatbot-galaxy-composer")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-galaxy-composer")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("crm-history-galaxy-composer")).not.toBeInTheDocument();
     expect(screen.queryByTestId("billing-hub-galaxy-composer")).not.toBeInTheDocument();
+    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
+  });
+
+  it("shows no agent composer on company hub page", () => {
+    render(
+      <DashboardPagerProvider pageCount={7} initialPageIndex={1}>
+        <DashboardGalaxyLayer />
+      </DashboardPagerProvider>
+    );
+    expect(screen.queryByTestId("company-stock-galaxy-composer")).not.toBeInTheDocument();
     expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
   });
 
@@ -98,7 +100,7 @@ describe("DashboardGalaxyLayer", () => {
     render(
       <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
-      </DashboardPagerProvider>,
+      </DashboardPagerProvider>
     );
     expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(true);
   });

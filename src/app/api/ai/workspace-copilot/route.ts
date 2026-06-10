@@ -5,6 +5,7 @@ import type {
   WorkspaceCopilotApiMessage,
   WorkspaceCopilotSnapshot,
 } from "@/features/copilot/types";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -12,8 +13,7 @@ const MAX_MESSAGES = 24;
 const MAX_USER_CHARS = 4000;
 
 function buildSystemPrompt(snapshot: WorkspaceCopilotSnapshot): string {
-  const lang =
-    snapshot.locale === "en" ? "English" : snapshot.locale === "nl" ? "Dutch" : "French";
+  const lang = snapshot.locale === "en" ? "English" : snapshot.locale === "nl" ? "Dutch" : "French";
 
   return `You are BELGMAP Copilot, the integrated AI assistant inside the BELGMAP field-service PWA (locksmith / technical interventions).
 
@@ -51,7 +51,11 @@ function sanitizeMessages(raw: unknown): WorkspaceCopilotApiMessage[] | null {
 function isValidSnapshot(raw: unknown): raw is WorkspaceCopilotSnapshot {
   if (!raw || typeof raw !== "object") return false;
   const s = raw as WorkspaceCopilotSnapshot;
-  return typeof s.generatedAt === "string" && typeof s.company?.id === "string" && Boolean(s.company.id.trim());
+  return (
+    typeof s.generatedAt === "string" &&
+    typeof s.company?.id === "string" &&
+    Boolean(s.company.id.trim())
+  );
 }
 
 export async function POST(request: Request) {
@@ -106,7 +110,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ reply, configured: true });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erreur serveur";
-    console.error("[workspace-copilot]", error);
+    logger.error("[workspace-copilot]", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
