@@ -1,8 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import mapboxgl from "mapbox-gl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Archive, Trash2 } from "lucide-react";
+import TourOptimizeButton from "@/features/technicians/components/TourOptimizeButton";
 import { doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
@@ -31,6 +32,11 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { detectMobileClient } from "@/core/config/mobileClientDetection";
+import { resolveMapboxMobilePixelRatio } from "@/features/map/mapMobilePower";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
+import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { missionStableKey } from "@/features/map/missionStableKey";
 import { MAP_DEMO_TECHNICIAN_MARKERS } from "@/features/map/mapDemoTechnicianMarkers";
 import { createTechnicianVanMarkerElement } from "@/features/map/mapTechnicianMarkerDom";
@@ -65,6 +71,7 @@ export default function MapboxView() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
+  const isMobile = useIsMobile();
   const pager = useDashboardPagerOptional();
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
@@ -89,6 +96,7 @@ export default function MapboxView() {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [mapBootError, setMapBootError] = useState<"token" | "load" | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [routeLine, setRouteLine] = useState<Array<[number, number]>>([]);
   const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString("en-CA"), [selectedDate]);
 
   const allMissions = useMemo(() => {
@@ -150,6 +158,18 @@ export default function MapboxView() {
     () => allMissions.filter((m) => !archivedKeys.has(missionStableKey(m))),
     [allMissions, archivedKeys]
   );
+
+  const visibleInterventions = useMemo(() => {
+    const keys = new Set(visibleMissions.map((m) => m.key).filter(Boolean));
+    return firestoreInterventions.filter((iv) => keys.has(iv.id));
+  }, [firestoreInterventions, visibleMissions]);
+
+  const handleRouteOptimized = useCallback((ordered: Intervention[]) => {
+    const coords: Array<[number, number]> = ordered
+      .filter((iv) => iv.location?.lat && iv.location?.lng)
+      .map((iv) => [iv.location.lng, iv.location.lat]);
+    setRouteLine(coords);
+  }, []);
 
   const kpiCounts = useMemo(
     () => ({
@@ -222,6 +242,7 @@ export default function MapboxView() {
 
     let cancelled = false;
     let sizeObserver: ResizeObserver | null = null;
+    let onVisibilityChange: (() => void) | null = null;
 
     const attachMap = () => {
       if (cancelled || mapRef.current) return;
@@ -229,15 +250,20 @@ export default function MapboxView() {
 
       mapboxgl.accessToken = token;
       const initialCenter: [number, number] = [4.3522, 50.8466];
+      const mobileMap =
+        typeof window !== "undefined"
+          ? detectMobileClient(navigator.userAgent, window.location.search)
+          : false;
 
       const map = new mapboxgl.Map({
         container,
-        style: "mapbox://styles/mapbox/standard",
+        style: mobileMap ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/standard",
         center: initialCenter,
         zoom: 12.5,
         pitch: 0,
         bearing: 0,
-        antialias: true,
+        antialias: !mobileMap,
+        ...(mobileMap ? { pixelRatio: resolveMapboxMobilePixelRatio() } : {}),
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],
@@ -249,6 +275,14 @@ export default function MapboxView() {
 
       mapRef.current = map;
       setMapBootError(null);
+
+      if (isMobile) {
+        map.dragPan.disable();
+        map.touchZoomRotate.disable();
+        map.scrollZoom.disable();
+        map.doubleClickZoom.disable();
+        map.keyboard.disable();
+      }
 
       map.on("load", () => {
         if (cancelled) return;
@@ -293,6 +327,23 @@ export default function MapboxView() {
         }
       });
       sizeObserver.observe(container);
+
+      onVisibilityChange = () => {
+        if (document.hidden) {
+          try {
+            map.stop();
+          } catch {
+            /* ignore */
+          }
+          return;
+        }
+        try {
+          map.resize();
+        } catch {
+          /* ignore */
+        }
+      };
+      document.addEventListener("visibilitychange", onVisibilityChange);
     };
 
     attachMap();
@@ -303,6 +354,9 @@ export default function MapboxView() {
         cancelled = true;
         waitObserver.disconnect();
         sizeObserver?.disconnect();
+        if (onVisibilityChange) {
+          document.removeEventListener("visibilitychange", onVisibilityChange);
+        }
         if (mapRef.current) {
           mapRef.current.remove();
           mapRef.current = null;
@@ -314,6 +368,9 @@ export default function MapboxView() {
     return () => {
       cancelled = true;
       sizeObserver?.disconnect();
+      if (onVisibilityChange) {
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -425,6 +482,46 @@ export default function MapboxView() {
     }
   }, [visibleMissions, mapReady, isDispatchMap]);
 
+  const handleMobileMapResize = React.useCallback((rail: MobileHubRail) => {
+    if (rail !== "center") return;
+    const map = mapRef.current;
+    if (!map) return;
+    try {
+      map.resize();
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const SOURCE = "route-optimize-line";
+    const LAYER = "route-optimize-layer";
+    const geoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
+      type: "Feature",
+      properties: {},
+      geometry: { type: "LineString", coordinates: routeLine },
+    };
+    if (map.getSource(SOURCE)) {
+      (map.getSource(SOURCE) as mapboxgl.GeoJSONSource).setData(geoJSON);
+    } else if (routeLine.length >= 2) {
+      map.addSource(SOURCE, { type: "geojson", data: geoJSON });
+      map.addLayer({
+        id: LAYER,
+        type: "line",
+        source: SOURCE,
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: {
+          "line-color": "#3b82f6",
+          "line-width": 3,
+          "line-opacity": 0.75,
+          "line-dasharray": [2, 2],
+        },
+      });
+    }
+  }, [routeLine, mapReady]);
+
   const dashboardPageIndex = pager?.pageIndex ?? 0;
 
   useEffect(() => {
@@ -471,6 +568,177 @@ export default function MapboxView() {
       essential: true,
     });
   };
+
+  const mapPanelInner = (
+    <div
+      className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden"
+      aria-label="Carte"
+      style={{
+        userSelect: "none",
+        WebkitUserSelect: "none" as React.CSSProperties["WebkitUserSelect"],
+        background: "#f8fafc",
+      }}
+    >
+      <div ref={mapContainerRef} id="map" className="absolute inset-0 h-full w-full" />
+      {mapBootError ? (
+        <div
+          data-testid="map-boot-error"
+          className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 bg-slate-50/95 px-6 text-center"
+        >
+          <p className="text-[14px] font-medium text-slate-800">
+            {mapBootError === "token" ? t("map.boot_error_token") : t("map.boot_error_load")}
+          </p>
+          {mapBootError === "token" ? (
+            <p className="max-w-sm text-[12px] text-slate-500">{t("map.boot_error_token_hint")}</p>
+          ) : null}
+        </div>
+      ) : null}
+      <div
+        className="absolute z-[1] flex flex-col gap-2"
+        style={{ bottom: "calc(env(safe-area-inset-bottom,0px) + 16px)", right: "16px" }}
+      >
+        <button
+          onClick={handleRecenter}
+          className="group flex h-10 w-10 cursor-pointer items-center justify-center rounded-[12px] border border-white/75 bg-white/95 opacity-90 shadow-md backdrop-blur-xl transition-all duration-300 hover:opacity-100"
+          title="Recentrer la carte"
+          type="button"
+        >
+          <svg className="h-5 w-5 text-slate-600" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        </button>
+        {visibleInterventions.length >= 2 ? (
+          <TourOptimizeButton
+            missions={visibleInterventions}
+            onOptimized={handleRouteOptimized}
+            className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-white/75 bg-white/95 opacity-90 shadow-md backdrop-blur-xl transition-all duration-300 hover:opacity-100"
+          />
+        ) : null}
+      </div>
+      <AnimatePresence>
+        {selectedMission && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex min-h-0 items-start justify-center overflow-y-auto overscroll-y-contain bg-gradient-to-b from-transparent to-black/60 p-3 pb-8 pt-[max(0.75rem,env(safe-area-inset-top))] pointer-events-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative mx-auto mb-6 mt-1 w-full max-w-lg shrink-0 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 shadow-lg backdrop-blur-md"
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedMission(null)}
+                className="absolute right-1 top-1 z-50 rounded-full p-2 text-white hover:bg-white/10"
+                aria-label={String(t("common.close"))}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="#ffffff"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <div className="w-full pt-1 pr-10 text-center text-white">
+                <h2 className="break-words text-2xl font-bold text-white">
+                  {selectedMission.clientName}
+                </h2>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-base text-white/90">
+                  <span className="px-3 py-1 font-semibold rounded-full bg-white/20">
+                    {selectedMission.status}
+                  </span>
+                  <span className="font-medium">{selectedMission.time}</span>
+                </div>
+                {selectedMission.phone && (
+                  <a
+                    href={`tel:${selectedMission.phone}`}
+                    className="mt-4 block text-lg font-medium text-blue-300"
+                  >
+                    {selectedMission.phone}
+                  </a>
+                )}
+                {selectedMission.address && (
+                  <p className="mt-2 text-base text-white/80">{selectedMission.address}</p>
+                )}
+                <div className="mt-5 flex justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleArchiveMission(selectedMission)}
+                    aria-label={String(t("map.daily_missions.archive_aria"))}
+                    className="rounded-full border border-white/20 bg-white/10 p-2.5 text-white/60 hover:text-white"
+                  >
+                    <Archive className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteMission(selectedMission)}
+                    aria-label={String(t("map.daily_missions.delete_aria"))}
+                    className="rounded-full border border-red-500/30 bg-red-500/10 p-2.5 text-red-400"
+                  >
+                    <Trash2 className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <MobileHubLayout
+        rootTestId="mobile-map-triple"
+        leftLabel={String(t("map.mobile.rail_missions"))}
+        centerLabel={String(t("map.mobile.rail_map"))}
+        rightLabel={String(t("map.mobile.rail_inbox"))}
+        panelPadding={false}
+        onRailChange={handleMobileMapResize}
+        left={
+          <DailyMissions
+            missions={visibleMissions}
+            onMissionClick={handleMissionClick}
+            isEmbedded
+          />
+        }
+        center={
+          <div id="map-container" className="flex h-full min-h-0 flex-col">
+            {mapPanelInner}
+          </div>
+        }
+        right={
+          dashboardPageIndex === 0 ? (
+            <BackOfficeInboxPanel dayMissions={visibleMissions} />
+          ) : (
+            <RequesterTrackingPanel />
+          )
+        }
+      />
+    );
+  }
+
+  const mapCenter = (
+    <section
+      className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+      id="map-container"
+      aria-label="Carte"
+    >
+      {mapPanelInner}
+    </section>
+  );
 
   return (
     <div className={DASHBOARD_DESKTOP_ROOT_CLASS}>

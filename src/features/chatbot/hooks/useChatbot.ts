@@ -27,6 +27,7 @@ import { isChatbotPwaPendingToolId } from "@/features/chatbot/chatbot-pwa-intent
 import { countChatbotUserTurns } from "@/features/chatbot/chatbot-latency";
 import {
   normalizeStoredMessages,
+  type ChatbotVisionContent,
 } from "@/features/chatbot/chatbot-stored-messages";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import {
@@ -37,7 +38,6 @@ import {
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { BELGMAP_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
-
 
 const STORAGE_PREFIX = "belmap-chatbot-v2";
 function loadConversations(key: string): ChatbotConversation[] {
@@ -63,7 +63,7 @@ function saveConversations(key: string, rows: ChatbotConversation[]) {
 
 async function readChatbotStream(
   res: Response,
-  onEvent: (ev: ChatbotStreamEvent) => void,
+  onEvent: (ev: ChatbotStreamEvent) => void
 ): Promise<void> {
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -108,7 +108,9 @@ async function readChatbotStream(
   }
 }
 
-function resolveCompanyId(workspace: ReturnType<typeof useCompanyWorkspaceOptional>): string | null {
+function resolveCompanyId(
+  workspace: ReturnType<typeof useCompanyWorkspaceOptional>
+): string | null {
   const id = (workspace?.activeCompanyId ?? "").trim();
   if (id) return id;
   if (workspace?.isTenantUser) return DEMO_COMPANY_ID;
@@ -131,7 +133,7 @@ export function useChatbot() {
 
   const storageKey = useMemo(
     () => `${STORAGE_PREFIX}:${uid}:${companyId ?? "none"}`,
-    [uid, companyId],
+    [uid, companyId]
   );
 
   const [conversations, setConversations] = useState<ChatbotConversation[]>([]);
@@ -149,7 +151,7 @@ export function useChatbot() {
       const pending = buildPendingInterventionIdsFromAssistant(
         assistantText,
         workspaceSnapshot,
-        uiMessages,
+        uiMessages
       );
       if (pending) {
         pendingBillingChoiceIdsRef.current = pending;
@@ -162,14 +164,14 @@ export function useChatbot() {
         assistantText,
         workspaceSnapshot,
         uiMessages,
-        null,
+        null
       );
       if (!interventionId) return;
 
       documentPreviewApi.openDocumentPreview(interventionId, "invoice", true);
       supplierOrdersPanelApi.ensureRightPanelOpen();
     },
-    [documentPreviewApi, supplierOrdersPanelApi, workspaceSnapshot],
+    [documentPreviewApi, supplierOrdersPanelApi, workspaceSnapshot]
   );
 
   useEffect(() => {
@@ -182,7 +184,7 @@ export function useChatbot() {
 
   const activeConversation = useMemo(
     () => conversations.find((c) => c.id === activeId) ?? null,
-    [conversations, activeId],
+    [conversations, activeId]
   );
 
   const persist = useCallback(
@@ -190,7 +192,7 @@ export function useChatbot() {
       setConversations(rows);
       saveConversations(storageKey, rows);
     },
-    [storageKey],
+    [storageKey]
   );
 
   const appendToConversation = useCallback(
@@ -200,7 +202,7 @@ export function useChatbot() {
         uiMessages?: ChatbotUiMessage[];
         apiMessages?: unknown[];
         title?: string;
-      },
+      }
     ) => {
       setConversations((prev) => {
         const next = prev.map((c) =>
@@ -212,13 +214,13 @@ export function useChatbot() {
                 title: patch.title ?? c.title,
                 updatedAt: Date.now(),
               }
-            : c,
+            : c
         );
         saveConversations(storageKey, next);
         return next;
       });
     },
-    [storageKey],
+    [storageKey]
   );
 
   const newConversation = useCallback(() => {
@@ -238,11 +240,14 @@ export function useChatbot() {
   }, [conversations, persist]);
 
   const handleStreamEvent = useCallback(
-    (ev: ChatbotStreamEvent, ctx: {
-      accText: { v: string };
-      nextApi: { v: unknown[] };
-      streamError: { v: string | null };
-    }) => {
+    (
+      ev: ChatbotStreamEvent,
+      ctx: {
+        accText: { v: string };
+        nextApi: { v: unknown[] };
+        streamError: { v: string | null };
+      }
+    ) => {
       if (ev.type === "text") {
         ctx.accText.v += ev.delta;
         setStreamingText(ctx.accText.v);
@@ -265,7 +270,7 @@ export function useChatbot() {
         supplierOrdersPanelApi.openSupplierOrdersPanel(
           ev.highlightOrderId,
           ev.materialOrderId,
-          ev.previewOrder,
+          ev.previewOrder
         );
       }
       if (ev.type === "supplier_order_pdf") {
@@ -285,7 +290,7 @@ export function useChatbot() {
                 stockItemId: ev.stockItemId ?? null,
                 filter: ev.filter,
               },
-            }),
+            })
           );
         }
       }
@@ -300,7 +305,7 @@ export function useChatbot() {
         setError(ev.message);
       }
     },
-    [documentPreviewApi, supplierOrdersPanelApi, pager],
+    [documentPreviewApi, supplierOrdersPanelApi, pager]
   );
 
   const runStream = useCallback(
@@ -311,7 +316,7 @@ export function useChatbot() {
         confirmTool?: { toolUseId: string; name: string; input: Record<string, unknown> };
         toolScope?: string[];
         omitWorkspaceSnapshot?: boolean;
-      },
+      }
     ) => {
       if (!companyId) {
         setError("Sélectionnez une société active (switcher en haut) pour utiliser le Chatbot.");
@@ -344,8 +349,7 @@ export function useChatbot() {
             messages: apiHistory,
             workspaceSnapshot: includeSnapshot ? workspaceSnapshot : undefined,
             toolScope: extra?.toolScope,
-            focusInterventionId:
-              documentPreviewApi.documentPreview.interventionId?.trim() || null,
+            focusInterventionId: documentPreviewApi.documentPreview.interventionId?.trim() || null,
             conversationId: convId,
             ...extra,
           }),
@@ -357,7 +361,7 @@ export function useChatbot() {
         }
 
         await readChatbotStream(res, (ev) =>
-          handleStreamEvent(ev, { accText, nextApi, streamError }),
+          handleStreamEvent(ev, { accText, nextApi, streamError })
         );
 
         const finalText = (accText.v.trim() || streamError.v || "").trim();
@@ -389,15 +393,15 @@ export function useChatbot() {
                         ? uiMessages[0].content.slice(0, 48)
                         : c.title,
                   }
-                : c,
+                : c
             );
             saveConversations(storageKey, next);
             return next;
           });
-        } else if (trimmedApi.length > (normalizeStoredMessages(apiHistory).length)) {
+        } else if (trimmedApi.length > normalizeStoredMessages(apiHistory).length) {
           setConversations((prev) => {
             const next = prev.map((c) =>
-              c.id === convId ? { ...c, apiMessages: trimmedApi, updatedAt: Date.now() } : c,
+              c.id === convId ? { ...c, apiMessages: trimmedApi, updatedAt: Date.now() } : c
             );
             saveConversations(storageKey, next);
             return next;
@@ -433,7 +437,7 @@ export function useChatbot() {
       storageKey,
       syncAssistantBillingPanel,
       workspaceSnapshot,
-    ],
+    ]
   );
 
   /** PDF / facture via API PWA — aucun token OpenAI. */
@@ -466,7 +470,7 @@ export function useChatbot() {
         }
 
         await readChatbotStream(res, (ev) =>
-          handleStreamEvent(ev, { accText, nextApi, streamError }),
+          handleStreamEvent(ev, { accText, nextApi, streamError })
         );
 
         if (!streamError.v && (action.action === "patch" || action.action === "append_billing")) {
@@ -498,7 +502,7 @@ export function useChatbot() {
         setStreamingText("");
       }
     },
-    [activeId, appendToConversation, companyId, conversations, handleStreamEvent, role],
+    [activeId, appendToConversation, companyId, conversations, handleStreamEvent, role]
   );
 
   const confirmPendingTool = useCallback(async () => {
@@ -513,16 +517,13 @@ export function useChatbot() {
         {
           action: "patch",
           interventionId,
-          lineIndex:
-            typeof tool.input.lineIndex === "number" ? tool.input.lineIndex : undefined,
+          lineIndex: typeof tool.input.lineIndex === "number" ? tool.input.lineIndex : undefined,
           unitPriceEur:
             typeof tool.input.unitPriceEur === "number" ? tool.input.unitPriceEur : undefined,
-          clientName:
-            typeof tool.input.clientName === "string" ? tool.input.clientName : undefined,
-          previewDocumentType:
-            tool.input.previewDocumentType === "quote" ? "quote" : "invoice",
+          clientName: typeof tool.input.clientName === "string" ? tool.input.clientName : undefined,
+          previewDocumentType: tool.input.previewDocumentType === "quote" ? "quote" : "invoice",
         },
-        activeId,
+        activeId
       );
       return;
     }
@@ -539,7 +540,7 @@ export function useChatbot() {
   }, [activeId, companyId, conversations, pendingTool, runDocumentAction, runStream]);
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, imageDataUrl?: string) => {
       const trimmed = text.trim();
       if (!trimmed || streaming) return;
 
@@ -587,7 +588,16 @@ export function useChatbot() {
         } satisfies ChatbotConversation);
 
       const nextUi = [...conv.messages, userMsg];
-      const nextApi = [...(conv.apiMessages ?? []), { role: "user", content: trimmed }];
+      const userApiContent: string | ChatbotVisionContent = imageDataUrl
+        ? [
+            { type: "text" as const, text: trimmed },
+            {
+              type: "image_url" as const,
+              image_url: { url: imageDataUrl },
+            },
+          ]
+        : trimmed;
+      const nextApi = [...(conv.apiMessages ?? []), { role: "user", content: userApiContent }];
 
       appendToConversation(convId, { uiMessages: nextUi, apiMessages: nextApi });
 
@@ -603,7 +613,7 @@ export function useChatbot() {
       persist,
       runStream,
       streaming,
-    ],
+    ]
   );
 
   const cancelPendingTool = useCallback(() => {
