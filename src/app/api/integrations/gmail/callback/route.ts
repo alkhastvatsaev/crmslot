@@ -7,6 +7,7 @@ import {
 } from "@/core/services/email/gmailOAuthConfig";
 import { getStoredGmailOAuth } from "@/core/services/email/gmailOAuthStore";
 import { setGmailHubDisconnectedCookie } from "@/core/services/email/gmailHubSession";
+import { flushPendingLecotEmails } from "@/features/chatbot/flushPendingLecotEmails";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,9 @@ export async function GET(req: NextRequest) {
     }
 
     await persistGmailOAuthFromCallback({ refreshToken, email });
+    flushPendingLecotEmails().catch((err) => {
+      console.error("[gmail-callback] flush pending lecot emails failed:", err);
+    });
     return redirectToHub({ gmail_connected: "1" });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "oauth_exchange_failed";

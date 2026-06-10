@@ -5,7 +5,6 @@ import { Inbox, Loader2, Search } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import GmailHubAvatar from "@/features/gmail/components/GmailHubAvatar";
-import { GMAIL_HUB_SEARCH_CHIPS } from "@/features/gmail/gmailHubConstants";
 import {
   formatMailDateShort,
   gmailDivider,
@@ -85,11 +84,6 @@ export default function GmailHubInboxList({
     };
   }, [rowMenu, closeMenu]);
 
-  const applyChip = (q: string) => {
-    onSearchChange(q);
-    onSearchSubmit();
-  };
-
   return (
     <div className={gmailShell} data-testid="gmail-hub-panel-center" style={gmailHubFont}>
       <header className={`shrink-0 border-b ${gmailDivider} px-4 pb-3 pt-3`}>
@@ -119,24 +113,6 @@ export default function GmailHubInboxList({
             placeholder={String(t("gmail.hub.search_placeholder"))}
             className={`${gmailFieldClass} pl-9`}
           />
-        </div>
-        <div className="mt-2 flex flex-wrap gap-1.5" data-testid="gmail-hub-search-chips">
-          {GMAIL_HUB_SEARCH_CHIPS.map((chip) => (
-            <button
-              key={chip.id}
-              type="button"
-              data-testid={`gmail-hub-chip-${chip.id}`}
-              onClick={() => applyChip(chip.q)}
-              className={cn(
-                "rounded-full border border-black/[0.08] bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors",
-                searchQuery === chip.q
-                  ? "border-slate-400 bg-slate-100 text-slate-900"
-                  : "hover:bg-black/[0.03]"
-              )}
-            >
-              {t(chip.labelKey)}
-            </button>
-          ))}
         </div>
       </header>
 

@@ -4,7 +4,7 @@ import "@/features/gmail/gmail-hub.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
@@ -13,6 +13,7 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import GmailHubSetupPanel from "@/features/gmail/components/GmailHubSetupPanel";
 import GmailHubLinkInterventionPanel from "@/features/gmail/components/GmailHubLinkInterventionPanel";
@@ -31,6 +32,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const workspace = useCompanyWorkspaceOptional();
+  const { logEmail } = useActivityLog();
   const companyId =
     (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
   /** Sans pager (tests) : chargement immédiat ; avec pager : uniquement quand la page est visible. */
@@ -198,8 +200,9 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       setSelectedId(msg.id);
       setComposing(false);
       void hub.loadThread(msg.threadId, msg.id);
+      logEmail(msg.subject ?? "(sans objet)");
     },
-    [hub.loadThread]
+    [hub.loadThread, logEmail]
   );
 
   /** Ouvre le mail le plus récent (1er de la liste Gmail) quand rien n'est sélectionné. */
@@ -227,11 +230,12 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         toast.success(
           String(markAsUnread ? t("gmail.hub.marked_unread") : t("gmail.hub.marked_read"))
         );
+        logEmail(`${markAsUnread ? "Non-lu" : "Lu"} : ${msg.subject ?? "(sans objet)"}`);
       } catch (e) {
         toast.error(e instanceof Error ? e.message : String(t("common.error")));
       }
     },
-    [hub, t]
+    [hub, t, logEmail]
   );
 
   const handleReaderToggleRead = useCallback(() => {
@@ -431,7 +435,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   });
 
   return (
-    <DashboardTriplePanelLayout
+    <AdaptiveTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
       centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
