@@ -18,6 +18,7 @@ type AiAssistantStripProps = {
   transcriptOverlayVisible?: boolean;
   onTogglePlayback: (e: React.SyntheticEvent) => void;
   onUserLongPress?: () => void;
+  mobilePowerSave?: boolean;
 };
 
 export default function AiAssistantStrip({
@@ -27,6 +28,7 @@ export default function AiAssistantStrip({
   transcriptOverlayVisible = false,
   onTogglePlayback,
   onUserLongPress,
+  mobilePowerSave,
 }: AiAssistantStripProps) {
   const mapPanelRect = useAiStripInsetRect();
 
@@ -82,6 +84,7 @@ export default function AiAssistantStrip({
           ) : null}
           <GalaxyButton
             asInteractiveButton={false}
+            {...(mobilePowerSave !== undefined ? { mobilePowerSave } : {})}
             className={`h-full w-full ${showBadge ? "notified" : ""}`}
           >
             <AnimatePresence initial={false}>

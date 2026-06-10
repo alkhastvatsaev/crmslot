@@ -22,6 +22,8 @@ type AiAssistantProps = {
   transcriptOverlayVisible?: boolean;
   onUserLongPress?: () => void;
   onQueueChange?: (queue: QueuedClip[]) => void;
+  backgroundTasksEnabled?: boolean;
+  mobilePowerSave?: boolean;
 };
 
 export default function AiAssistant({
@@ -33,12 +35,15 @@ export default function AiAssistant({
   transcriptOverlayVisible = false,
   onUserLongPress,
   onQueueChange,
+  backgroundTasksEnabled = true,
+  mobilePowerSave,
 }: AiAssistantProps = {}) {
   const { queue, isPlaying, startPlayback, stopPlayback } = useAiAudioPlayback({
     onUserPressPlay,
     onPlaybackSync,
     onActiveClipUrlChange,
     onQueueChange,
+    backgroundTasksEnabled,
   });
 
   const togglePlayback = (e: React.SyntheticEvent) => {
@@ -59,6 +64,7 @@ export default function AiAssistant({
       transcriptOverlayVisible={transcriptOverlayVisible}
       onTogglePlayback={togglePlayback}
       onUserLongPress={onUserLongPress}
+      mobilePowerSave={mobilePowerSave}
     />
   );
 }
