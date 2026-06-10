@@ -12,9 +12,14 @@ const outfit = Outfit({
 const appGitSha = process.env.NEXT_PUBLIC_APP_GIT_SHA ?? "";
 
 export const metadata: Metadata = {
-  title: "testbelgiquepwa",
+  title: "BELGMAP",
   description: "Plateforme de gestion d'interventions de serrurerie en Belgique",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BELGMAP",
+  },
   ...(appGitSha
     ? {
         other: {
@@ -28,7 +33,9 @@ export const viewport: Viewport = {
   themeColor: "#f8fafc",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 import { Toaster } from "sonner";

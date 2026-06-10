@@ -418,6 +418,115 @@
   padding: 0.875rem;
 }
 
+/* ── Hub dots (indicateur de position) ─────────────────── */
+
+.mobile-hub-dots {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 0.375rem;
+  height: 0.625rem;
+}
+
+.mobile-hub-dot {
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 9999px;
+  background: rgb(203 213 225);
+  transition:
+    width 0.22s ease,
+    background 0.22s ease;
+}
+
+.mobile-hub-dot--active {
+  width: 1rem;
+  background: rgb(100 116 139);
+}
+
+/* ── Map swipe lock overlay ─────────────────────────────── */
+
+.mobile-map-swipe-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border-radius: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+.mobile-map-swipe-lock-ripple {
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  margin-left: -2rem;
+  margin-top: -2rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  z-index: 11;
+  animation: map-lock-ripple 0.65s ease-out forwards;
+}
+
+@keyframes map-lock-ripple {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.mobile-map-swipe-lock-badge {
+  position: absolute;
+  bottom: 0.875rem;
+  right: 0.875rem;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: map-lock-badge-in 0.18s ease-out;
+}
+
+@keyframes map-lock-badge-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.mobile-map-swipe-lock-hint {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
 /* ── Tab bar ────────────────────────────────────────────── */
 
 .mobile-tab-bar {

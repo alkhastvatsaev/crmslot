@@ -1,9 +1,14 @@
 {
-  "name": "testbelgiquepwa",
-  "short_name": "testbelgiquepwa",
-  "description": "Exploration 3D de la Belgique et de Bruxelles.",
-  "start_url": "./index.html",
+  "name": "BELGMAP",
+  "short_name": "BELGMAP",
+  "description": "Plateforme de gestion d'interventions de serrurerie en Belgique",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "dir": "ltr",
+  "id": "/",
   "background_color": "#f8fafc",
   "theme_color": "#f8fafc",
   "icons": [
