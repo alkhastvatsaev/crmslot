@@ -1,6 +1,7 @@
 "use client";
 
-import { UserPlus, CheckCircle2, Clock, Trash2, X } from "lucide-react";
+import { UserPlus, CheckCircle2, Clock, Pencil, Trash2 } from "lucide-react";
+import EquipmentPanel from "@/features/equipment/components/EquipmentPanel";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton, HubCard, HubDetailHeader, HUB_TYPE } from "@/core/ui/hub";
@@ -11,7 +12,6 @@ import {
   isInterventionInBackofficeRequestsQueue,
   isInterventionPendingBackOfficeIntake,
 } from "@/features/interventions/technicianSchedule";
-import { canTransitionInterventionStatus } from "@/features/interventions/workflow/interventionWorkflow";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import type { Intervention } from "@/features/interventions/types";
@@ -100,6 +100,9 @@ export default function InterventionDetailPanel({
   onUpdateDateTime,
 }: Props) {
   const { t } = useTranslation();
+  const scheduleEditorOpen =
+    isEditingDateTime && isInterventionInBackofficeRequestsQueue(selectedItem);
+  const actionBarFill = assignPickerOpen || scheduleEditorOpen;
 
   return (
     <motion.div
@@ -114,11 +117,13 @@ export default function InterventionDetailPanel({
         title={
           assignPickerOpen
             ? t("dispatch.assign_picker.title")
-            : isInterventionInBackofficeRequestsQueue(selectedItem)
-              ? isInterventionAwaitingTechnicianAcceptance(selectedItem)
-                ? t("backoffice.inbox.detail_title_returned")
-                : t("backoffice.inbox.detail_title_request")
-              : t("backoffice.inbox.detail_title_report")
+            : scheduleEditorOpen
+              ? t("backoffice.inbox.requested_schedule")
+              : isInterventionInBackofficeRequestsQueue(selectedItem)
+                ? isInterventionAwaitingTechnicianAcceptance(selectedItem)
+                  ? t("backoffice.inbox.detail_title_returned")
+                  : t("backoffice.inbox.detail_title_request")
+                : t("backoffice.inbox.detail_title_report")
         }
         onBack={() => {
           onClose();
@@ -127,8 +132,8 @@ export default function InterventionDetailPanel({
         }}
       />
 
-      {/* Detail Content — masqué quand le picker assignation occupe tout l'espace */}
-      {!assignPickerOpen ? (
+      {/* Detail Content — masqué quand picker assignation ou éditeur créneaux occupe l'espace */}
+      {!assignPickerOpen && !scheduleEditorOpen ? (
         <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 space-y-8">
           {/* Header Info */}
           <div>
@@ -219,77 +224,14 @@ export default function InterventionDetailPanel({
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                   {t("backoffice.inbox.requested_schedule")}
                 </span>
-                {!isEditingDateTime && (
-                  <button
-                    onClick={() => {
-                      setEditDate(selectedItem.requestedDate || "");
-                      setEditTime(selectedItem.requestedTime || "");
-                      setIsEditingDateTime(true);
-                    }}
-                    className="text-[11px] text-blue-600 font-bold hover:underline"
-                  >
-                    {t("backoffice.inbox.edit").toUpperCase()}
-                  </button>
-                )}
               </div>
 
-              {isEditingDateTime ? (
-                <div className="space-y-2">
-                  <ScheduleConflictBanner conflicts={editScheduleConflicts} />
-                  <ProposedScheduleSlots
-                    titleKey={intakeSlotsTitleKey}
-                    dateYmd={
-                      editDate.trim() ||
-                      selectedItem.requestedDate?.trim() ||
-                      new Date().toISOString().slice(0, 10)
-                    }
-                    onDateChange={(date) => {
-                      setEditDate(date);
-                      setEditTime("");
-                    }}
-                    slots={intakeProposedSlots}
-                    selectedTime={editTime || null}
-                    onSelectTime={setEditTime}
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="date"
-                      value={editDate}
-                      onChange={(e) => setEditDate(e.target.value)}
-                      className="rounded-[12px] border border-slate-200 px-3 py-2 text-sm"
-                    />
-                    <input
-                      type="time"
-                      value={editTime}
-                      onChange={(e) => setEditTime(e.target.value)}
-                      className="rounded-[12px] border border-slate-200 px-3 py-2 text-sm"
-                    />
-                    <div className="col-span-2 flex justify-end gap-2 mt-1">
-                      <button
-                        onClick={() => setIsEditingDateTime(false)}
-                        className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-100"
-                      >
-                        {t("common.cancel")}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void onUpdateDateTime()}
-                        disabled={editScheduleConflicts.length > 0}
-                        className="text-xs px-3 py-1.5 rounded-[8px] bg-slate-900 text-white disabled:opacity-50"
-                      >
-                        {t("common.save")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-blue-900 font-bold">
-                  <Clock className="w-4 h-4" />
-                  {selectedItem.requestedDate
-                    ? `${selectedItem.requestedDate} ${selectedItem.requestedTime ? `à ${selectedItem.requestedTime}` : ""}`
-                    : t("backoffice.inbox.asap")}
-                </div>
-              )}
+              <div className="flex items-center gap-2 text-blue-900 font-bold">
+                <Clock className="w-4 h-4" />
+                {selectedItem.requestedDate
+                  ? `${selectedItem.requestedDate} ${selectedItem.requestedTime ? `à ${selectedItem.requestedTime}` : ""}`
+                  : t("backoffice.inbox.asap")}
+              </div>
             </div>
           )}
 
@@ -387,6 +329,13 @@ export default function InterventionDetailPanel({
             </div>
           ) : null}
 
+          {/* Equipment inventory for this client */}
+          {selectedItem.clientId ? (
+            <div className="space-y-1" data-testid="backoffice-equipment-section">
+              <EquipmentPanel clientId={selectedItem.clientId} />
+            </div>
+          ) : null}
+
           {/* Signature for reports */}
           {!isInterventionInBackofficeRequestsQueue(selectedItem) &&
             selectedReportCompletion.signatureUrl && (
@@ -407,7 +356,7 @@ export default function InterventionDetailPanel({
         </div>
       ) : null}
 
-      <HubActionBar fill={assignPickerOpen}>
+      <HubActionBar fill={actionBarFill}>
         {isInterventionInBackofficeRequestsQueue(selectedItem) ? (
           assignPickerOpen ? (
             <TechnicianAssignPicker
@@ -415,34 +364,82 @@ export default function InterventionDetailPanel({
               intervention={selectedItem}
               peerInterventions={interventions}
               isAssigning={isAssigning}
+              techniciansOnly
               onCancel={() => setAssignPickerOpen(false)}
               onAssign={(technicianUid, schedule) =>
                 onAssign(selectedItem.id, technicianUid, schedule)
               }
             />
-          ) : (
-            <>
-              {canTransitionInterventionStatus(selectedItem.status, "cancelled") ? (
+          ) : scheduleEditorOpen ? (
+            <div
+              data-testid="backoffice-inbox-schedule-editor"
+              className="flex min-h-0 flex-1 flex-col gap-3"
+            >
+              <ScheduleConflictBanner conflicts={editScheduleConflicts} />
+              <ProposedScheduleSlots
+                className="min-h-0 flex-1 border-0 p-0 shadow-none"
+                titleKey={intakeSlotsTitleKey}
+                dateYmd={
+                  editDate.trim() ||
+                  selectedItem.requestedDate?.trim() ||
+                  new Date().toISOString().slice(0, 10)
+                }
+                onDateChange={(date) => {
+                  setEditDate(date);
+                  setEditTime("");
+                }}
+                slots={intakeProposedSlots}
+                selectedTime={editTime || null}
+                onSelectTime={setEditTime}
+              />
+              <div className="mt-auto flex gap-3 pt-2">
                 <HubButton
                   type="button"
                   variant="secondary"
-                  data-testid="backoffice-inbox-cancel"
-                  onClick={() => void onCancelIntervention(selectedItem.id)}
+                  className="flex-1"
+                  data-testid="backoffice-inbox-schedule-cancel"
+                  onClick={() => setIsEditingDateTime(false)}
                 >
-                  <X className="h-4 w-4" />
-                  {t("status.cancelled")}
+                  {t("common.cancel")}
                 </HubButton>
-              ) : null}
-              <HubButton variant="dangerOutline" onClick={() => onDelete(selectedItem.id)}>
-                <Trash2 className="h-4 w-4" />
-                {t("common.delete")}
+                <HubButton
+                  type="button"
+                  variant="accent"
+                  emphasis
+                  className="flex-1"
+                  data-testid="backoffice-inbox-schedule-save"
+                  disabled={editScheduleConflicts.length > 0}
+                  onClick={() => void onUpdateDateTime()}
+                >
+                  {t("common.save")}
+                </HubButton>
+              </div>
+            </div>
+          ) : (
+            <>
+              <HubButton
+                type="button"
+                variant="secondary"
+                data-testid="backoffice-inbox-edit"
+                onClick={() => {
+                  setAssignPickerOpen(false);
+                  setEditDate(selectedItem.requestedDate || "");
+                  setEditTime(selectedItem.requestedTime || "");
+                  setIsEditingDateTime(true);
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+                {t("backoffice.inbox.edit")}
               </HubButton>
               <HubButton
                 type="button"
                 variant="accent"
                 emphasis
                 data-testid="backoffice-inbox-assign"
-                onClick={() => setAssignPickerOpen(true)}
+                onClick={() => {
+                  setIsEditingDateTime(false);
+                  setAssignPickerOpen(true);
+                }}
               >
                 <UserPlus className="h-4 w-4" />
                 {t("backoffice.inbox.confirm_assign")}

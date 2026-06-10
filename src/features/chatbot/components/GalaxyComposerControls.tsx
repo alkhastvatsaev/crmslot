@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type NewButtonProps = {
@@ -32,6 +32,50 @@ export function GalaxyComposerNewButton({ ariaLabel, testId, onClick, className 
       )}
     >
       <Plus className="h-[17px] w-[17px]" strokeWidth={1.5} aria-hidden />
+    </button>
+  );
+}
+
+type MicButtonProps = {
+  ariaLabel: string;
+  testId: string;
+  listening: boolean;
+  disabled?: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  className?: string;
+};
+
+/** Micro — cercle verre, rouge pulsant quand actif. */
+export function GalaxyComposerMicButton({
+  ariaLabel,
+  testId,
+  listening,
+  disabled = false,
+  onClick,
+  className,
+}: MicButtonProps) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-pressed={listening}
+      className={cn(
+        "chatbot-galaxy-composer-action",
+        listening
+          ? "chatbot-galaxy-composer-action--mic-active animate-pulse"
+          : "chatbot-galaxy-composer-action--new",
+        disabled && "chatbot-galaxy-composer-action--muted",
+        className
+      )}
+    >
+      {listening ? (
+        <MicOff className="h-[17px] w-[17px]" strokeWidth={1.5} aria-hidden />
+      ) : (
+        <Mic className="h-[17px] w-[17px]" strokeWidth={1.5} aria-hidden />
+      )}
     </button>
   );
 }

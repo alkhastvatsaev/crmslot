@@ -1,7 +1,11 @@
 /** Format messages API chatbot — module sans dépendance executor/openai (évite cycle d'import). */
 
+export type ChatbotVisionContent = Array<
+  { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } }
+>;
+
 export type ChatbotStoredMessage =
-  | { role: "user"; content: string }
+  | { role: "user"; content: string | ChatbotVisionContent }
   | {
       role: "assistant";
       content?: string | null;
@@ -20,8 +24,8 @@ export function normalizeStoredMessages(messages: unknown[]): ChatbotStoredMessa
     if (!raw || typeof raw !== "object") continue;
     const m = raw as Record<string, unknown>;
 
-    if (m.role === "user" && typeof m.content === "string") {
-      out.push({ role: "user", content: m.content });
+    if (m.role === "user" && (typeof m.content === "string" || Array.isArray(m.content))) {
+      out.push({ role: "user", content: m.content as string | ChatbotVisionContent });
       continue;
     }
 
@@ -43,7 +47,7 @@ export function normalizeStoredMessages(messages: unknown[]): ChatbotStoredMessa
                 id: `call_${fc.name}_${i}`,
                 name: fc.name,
                 arguments: fc.args,
-              }),
+              })
             )
           : undefined;
       out.push({

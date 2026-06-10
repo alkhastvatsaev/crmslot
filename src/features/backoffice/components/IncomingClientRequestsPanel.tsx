@@ -21,10 +21,13 @@ import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedI
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import SlaStatusBadge from "@/features/sla/components/SlaStatusBadge";
 
 export default function IncomingClientRequestsPanel() {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const slaEnabled = useFeatureFlag("slaTracker");
 
   const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
   const { interventions, loading } = useBackOfficeInterventions(cid);
@@ -201,6 +204,11 @@ export default function IncomingClientRequestsPanel() {
                   <h3 className="text-[14px] font-semibold text-slate-800 truncate text-center">
                     {clientName}
                   </h3>
+                  {slaEnabled ? (
+                    <div className="flex justify-center">
+                      <SlaStatusBadge intervention={req} />
+                    </div>
+                  ) : null}
                 </motion.div>
               );
             })}
@@ -428,6 +436,7 @@ export default function IncomingClientRequestsPanel() {
                   intervention={selectedRequest}
                   peerInterventions={interventions}
                   isAssigning={isAssigning}
+                  techniciansOnly
                   onCancel={() => setAssignPickerOpen(false)}
                   onAssign={(technicianUid, schedule) =>
                     handleAssignToTechnician(selectedRequest.id, technicianUid, schedule)
