@@ -449,6 +449,11 @@
       "center": "CRM Activity Feed",
       "right": "Event detail"
     },
+    "mobile": {
+      "rail_agent": "Agent",
+      "rail_feed": "Feed",
+      "rail_detail": "Detail"
+    },
     "left": {
       "filters": "Filters",
       "period_label": "Period",
@@ -891,7 +896,20 @@
     "right_tabs": {
       "aria": "Requester portal categories",
       "tracking": "Case tracking",
-      "chat": "Chat"
+      "chat": "Chat",
+      "invoice": "Invoice",
+      "documents": "Documents",
+      "timeline": "History"
+    },
+    "invoice": {
+      "back_to_tab": "Back to invoice",
+      "empty_no_case_title": "Your invoice will appear here",
+      "empty_no_case_hint": "Submit your service request to track billing for your case in this tab.",
+      "ready_title": "Your invoice",
+      "ready_hint": "The invoice for your service request is available.",
+      "view_pdf": "View invoice",
+      "view_pdf_hint": "Open the PDF in this tab",
+      "download_storage": "Download PDF"
     }
   },
   "technician_lab": {
@@ -1100,6 +1118,11 @@
     },
     "mission": {
       "fallback_title": "Intervention"
+    },
+    "mobile": {
+      "rail_missions": "Jobs",
+      "rail_map": "Map",
+      "rail_inbox": "Inbox"
     },
     "daily_missions": {
       "archive_aria": "Archive — hide this mission from today’s map on this device",
@@ -1432,6 +1455,29 @@
     "error_no_lines": "Add at least one valid item.",
     "toast_created": "Order created"
   },
+  "equipment": {
+    "title": "Equipment inventory",
+    "add": "Add",
+    "name_placeholder": "Equipment name *",
+    "brand": "Brand",
+    "model": "Model",
+    "serial": "Serial number",
+    "serial_short": "S/N:",
+    "install_date": "Installation date",
+    "next_service": "Next service",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "retire": "Retire",
+    "retired_summary": "{{count}} retired item(s)",
+    "empty": "No equipment recorded for this client.",
+    "service_prefix": "Service:",
+    "overdue": "Overdue",
+    "due_soon": "Due soon",
+    "toast_added": "Equipment added",
+    "toast_retired": "Equipment retired"
+  },
   "stock": {
     "panel_title": "Vehicle stock",
     "add": "Add",
@@ -1486,6 +1532,9 @@
     "toast_sent": "Quote sent",
     "toast_accepted": "Quote accepted",
     "toast_declined": "Quote declined",
+    "toast_expired": "This quote has expired.",
+    "toast_billing_applied": "Lines copied to the intervention invoice",
+    "download_pdf": "PDF",
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -1806,5 +1855,21 @@
       "center": "Chatbot",
       "right": "purchase orders and invoices"
     }
+  },
+  "mobile": {
+    "page_nav_label": "Page navigation",
+    "page_nav_item": "Page {{index}} of {{total}}",
+    "tab_bar_label": "Main sections",
+    "tab_map": "Map",
+    "tab_company": "Company",
+    "tab_technician": "Tech",
+    "tab_gmail": "Gmail",
+    "tab_material": "Stock",
+    "tab_crm": "CRM",
+    "tab_billing": "Billing",
+    "rail_segment_label": "Page panels",
+    "rail_left": "Left",
+    "rail_center": "Center",
+    "rail_right": "Right"
   }
 }

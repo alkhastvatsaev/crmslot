@@ -449,6 +449,11 @@
       "center": "Flux d'activité CRM",
       "right": "Détail de l'événement"
     },
+    "mobile": {
+      "rail_agent": "Agent",
+      "rail_feed": "Flux",
+      "rail_detail": "Détail"
+    },
     "left": {
       "filters": "Filtres",
       "period_label": "Période",
@@ -891,7 +896,20 @@
     "right_tabs": {
       "aria": "Catégories portail demandeur",
       "tracking": "Suivi dossier",
-      "chat": "Chat"
+      "chat": "Chat",
+      "invoice": "Facture",
+      "documents": "Documents",
+      "timeline": "Historique"
+    },
+    "invoice": {
+      "back_to_tab": "Retour à la facture",
+      "empty_no_case_title": "Votre facture apparaîtra ici",
+      "empty_no_case_hint": "Envoyez votre demande d'intervention pour suivre la facturation de votre dossier dans cet onglet.",
+      "ready_title": "Votre facture",
+      "ready_hint": "La facture de votre intervention est disponible.",
+      "view_pdf": "Voir la facture",
+      "view_pdf_hint": "Ouvrir le PDF dans cet onglet",
+      "download_storage": "Télécharger le PDF"
     }
   },
   "technician_lab": {
@@ -1100,6 +1118,11 @@
     },
     "mission": {
       "fallback_title": "Intervention"
+    },
+    "mobile": {
+      "rail_missions": "Missions",
+      "rail_map": "Carte",
+      "rail_inbox": "Inbox"
     },
     "daily_missions": {
       "archive_aria": "Archiver — masquer cette mission de la vue du jour sur cet appareil",
@@ -1452,6 +1475,29 @@
     "error_no_lines": "Ajoutez au moins un article valide.",
     "toast_created": "Commande créée"
   },
+  "equipment": {
+    "title": "Parc matériel",
+    "add": "Ajouter",
+    "name_placeholder": "Nom de l'équipement *",
+    "brand": "Marque",
+    "model": "Modèle",
+    "serial": "N° de série",
+    "serial_short": "S/N :",
+    "install_date": "Date d'installation",
+    "next_service": "Prochain entretien",
+    "notes": "Notes",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "retire": "Mettre hors service",
+    "retired_summary": "{{count}} équipement(s) hors service",
+    "empty": "Aucun équipement enregistré pour ce client.",
+    "service_prefix": "Entretien :",
+    "overdue": "En retard",
+    "due_soon": "Bientôt",
+    "toast_added": "Équipement ajouté",
+    "toast_retired": "Équipement mis hors service"
+  },
   "stock": {
     "panel_title": "Stock véhicule",
     "add": "Ajouter",
@@ -1506,6 +1552,9 @@
     "toast_sent": "Devis envoyé",
     "toast_accepted": "Devis accepté",
     "toast_declined": "Devis refusé",
+    "toast_expired": "Ce devis a expiré.",
+    "toast_billing_applied": "Lignes copiées vers la facture de l'intervention",
+    "download_pdf": "PDF",
     "status": {
       "draft": "Brouillon",
       "sent": "Envoyé",
@@ -1806,5 +1855,21 @@
       "center": "Chatbot",
       "right": "bons de commande et factures"
     }
+  },
+  "mobile": {
+    "page_nav_label": "Navigation entre les pages",
+    "page_nav_item": "Page {{index}} sur {{total}}",
+    "tab_bar_label": "Sections principales",
+    "tab_map": "Carte",
+    "tab_company": "Société",
+    "tab_technician": "Tech",
+    "tab_gmail": "Gmail",
+    "tab_material": "Matériel",
+    "tab_crm": "CRM",
+    "tab_billing": "Factures",
+    "rail_segment_label": "Panneaux de la page",
+    "rail_left": "Gauche",
+    "rail_center": "Centre",
+    "rail_right": "Droite"
   }
 }
