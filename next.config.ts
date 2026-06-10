@@ -56,6 +56,18 @@ const withPWA = withPWAInit({
   },
 });
 
+/** Hôtes tunnel (ngrok, etc.) autorisés pour le HMR Next en dev — évite reload en boucle sur iPhone. */
+function readDevTunnelOrigins(): string[] {
+  const raw = process.env.NGROK_DEV_ORIGIN?.trim();
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+const devTunnelOrigins = readDevTunnelOrigins();
+
 const nextConfig: NextConfig = {
   serverExternalPackages: [
     "fluent-ffmpeg",
@@ -70,6 +82,10 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED: pwaDisabledInDev ? "false" : "true",
   },
   outputFileTracingRoot: process.cwd(),
+  ...(process.env.NEXT_E2E_GATE_DIST === "1" ? { distDir: ".next-e2e-gate" } : {}),
+  ...(process.env.NODE_ENV === "development" && devTunnelOrigins.length > 0
+    ? { allowedDevOrigins: devTunnelOrigins }
+    : {}),
 };
 
 export default withPWA(nextConfig);
