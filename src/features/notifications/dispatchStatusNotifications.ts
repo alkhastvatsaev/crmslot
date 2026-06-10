@@ -1,4 +1,6 @@
 import { logger } from "@/core/logger";
+import { featureFlagsFromEnv } from "@/core/featureFlags";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { findApplicableRules } from "@/features/notifications/statusNotificationRules";
 
@@ -55,6 +57,7 @@ export function buildNotificationPayloads(
   const variables: Record<string, string> = {
     clientName,
     interventionId: intervention.id,
+    clientPhone: intervention.clientPhone || "",
     address: intervention.address || "",
     title: intervention.title || "",
     scheduledDate: intervention.scheduledDate || "",
@@ -95,9 +98,26 @@ export async function dispatchStatusNotifications(
   const payloads = buildNotificationPayloads(params);
   if (payloads.length === 0) return;
 
+  const whatsappEnabled = featureFlagsFromEnv().whatsappNotifications;
+
   // Fire-and-forget — ne jamais bloquer le workflow principal
   for (const payload of payloads) {
     try {
+      if (payload.channel === "whatsapp") {
+        const to = payload.variables.clientPhone;
+        if (!whatsappEnabled || !to) continue;
+        void fetchWithAuth("/api/notifications/whatsapp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to,
+            interventionStatus: payload.variables.newStatus,
+            address: payload.variables.address,
+            clientName: payload.variables.clientName,
+          }),
+        });
+        continue;
+      }
       void fetch("/api/notifications/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
