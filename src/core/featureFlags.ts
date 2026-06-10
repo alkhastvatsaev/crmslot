@@ -25,6 +25,8 @@ export type BelgmapFeatureFlags = {
   supplierPortal: boolean;
   /** Parc matériel client — inventaire équipements par client/site. */
   equipmentInventory: boolean;
+  /** Facturation électronique Peppol / UBL (obligation BE 2026). */
+  peppolEInvoicing: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
@@ -42,6 +44,7 @@ export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   whatsappNotifications: true,
   supplierPortal: true,
   equipmentInventory: true,
+  peppolEInvoicing: false,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -93,6 +96,7 @@ export function featureFlagsFromEnv(): BelgmapFeatureFlags {
       "NEXT_PUBLIC_FF_EQUIPMENT_INVENTORY",
       DEFAULT_FEATURE_FLAGS.equipmentInventory
     ),
+    peppolEInvoicing: readEnvBool("NEXT_PUBLIC_FF_PEPPOL", DEFAULT_FEATURE_FLAGS.peppolEInvoicing),
   };
 }
 
