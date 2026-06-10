@@ -28,6 +28,9 @@ export interface SupplierOrder {
   /** Commande simulée (pas d'envoi Lecot réel). */
   isDemo?: boolean;
   interventionId?: string | null;
+  /** true = email bon de commande non envoyé (Gmail déconnecté au moment de la commande). */
+  emailPending?: boolean;
+  emailSentAt?: string | null;
 }
 
 export const SUPPLIER_ORDER_STATUS_LABELS: Record<SupplierOrderStatus, string> = {
