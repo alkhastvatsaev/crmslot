@@ -7,7 +7,7 @@ import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 
-const STATUS_EVENTS_LIMIT = 400;
+const STATUS_EVENTS_LIMIT = 1000;
 
 export function useCompanyStatusEventsFeed(companyId: string | null) {
   const [events, setEvents] = useState<InterventionStatusEvent[]>([]);

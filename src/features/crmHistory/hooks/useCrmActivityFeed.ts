@@ -12,14 +12,13 @@ import {
   synthesizeCommissionEvents,
   synthesizeEmailEvents,
   synthesizeInterventionEvents,
-  synthesizeInterventionBillingEvents,
   synthesizeInterventionLifecycleEvents,
   synthesizeMaterialOrderEvents,
   synthesizeSupplierOrderEvents,
 } from "../crmActivitySynthesizer";
 import { synthesizeCompanyCrmLogEvents } from "../crmActivityLog";
 import { dedupeCrmEvents, synthesizeStatusEvents } from "../crmStatusEvents";
-import { applyPeriod, applyTypeFilter, applySearch } from "../crmActivityFilters";
+import { applyPeriod, applyTypeFilter, applySearch, applyDateFilter } from "../crmActivityFilters";
 import type { CrmPeriodFilter, CrmTypeFilter } from "../crmActivityTypes";
 import type { Intervention } from "@/features/interventions/types";
 import { useCompanyStatusEventsFeed } from "./useCompanyStatusEventsFeed";
@@ -32,6 +31,7 @@ export function useCrmActivityFeed(
   period: CrmPeriodFilter,
   typeFilter: CrmTypeFilter,
   searchQuery: string,
+  selectedDate?: Date | null
 ) {
   const [ordersRevision, setOrdersRevision] = useState(0);
 
@@ -74,7 +74,7 @@ export function useCrmActivityFeed(
 
   const interventionMap = useMemo<Map<string, Intervention>>(
     () => new Map(interventions.map((iv) => [iv.id, iv])),
-    [interventions],
+    [interventions]
   );
 
   const allEvents = useMemo(
@@ -82,7 +82,6 @@ export function useCrmActivityFeed(
       dedupeCrmEvents(
         mergeAndSortCrmEvents(
           synthesizeInterventionEvents(interventions),
-          synthesizeInterventionBillingEvents(interventions),
           synthesizeInterventionLifecycleEvents(interventions),
           synthesizeStatusEvents(statusEvents, interventionMap),
           synthesizeCompanyCrmLogEvents(crmLogRows),
@@ -90,8 +89,8 @@ export function useCrmActivityFeed(
           synthesizeMaterialOrderEvents(materialOrders),
           synthesizeSupplierOrderEvents(supplierOrders),
           synthesizeEmailEvents(emails, interventionMap),
-          synthesizeCommissionEvents(commissions, interventionMap),
-        ),
+          synthesizeCommissionEvents(commissions, interventionMap)
+        )
       ),
     [
       interventions,
@@ -104,15 +103,17 @@ export function useCrmActivityFeed(
       crmLogRows,
       ivanaMessages,
       ordersRevision,
-    ],
+    ]
   );
 
   const filteredEvents = useMemo(() => {
-    let evts = applyPeriod(allEvents, period);
+    let evts = selectedDate
+      ? applyDateFilter(allEvents, selectedDate)
+      : applyPeriod(allEvents, period);
     evts = applyTypeFilter(evts, typeFilter);
     evts = applySearch(evts, searchQuery);
     return evts;
-  }, [allEvents, period, typeFilter, searchQuery]);
+  }, [allEvents, period, typeFilter, searchQuery, selectedDate]);
 
   const loading = allEvents.length === 0 && anySourceLoading;
   const refreshing = allEvents.length > 0 && anySourceLoading;

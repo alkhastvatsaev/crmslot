@@ -27,7 +27,12 @@ export type CompanyCrmActivityKind =
   | "chatbot_gmail_action"
   | "chatbot_write_action"
   | "quote_created"
-  | "quote_status_changed";
+  | "quote_status_changed"
+  /** Audit navigation — généré automatiquement côté client. */
+  | "page_navigated"
+  | "intervention_viewed"
+  | "email_viewed"
+  | "user_session_start";
 
 export type CompanyCrmActivityDoc = {
   companyId: string;
@@ -145,6 +150,10 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   chatbot_write_action: "chatbot_write_action",
   quote_created: "quote_created",
   quote_status_changed: "quote_status_changed",
+  page_navigated: "page_navigated",
+  intervention_viewed: "intervention_viewed",
+  email_viewed: "email_viewed",
+  user_session_start: "user_session_start",
 };
 
 export function parseTs(raw: unknown): number {
