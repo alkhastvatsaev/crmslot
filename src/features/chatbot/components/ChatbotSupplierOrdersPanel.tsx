@@ -32,6 +32,10 @@ import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { HUB_TYPE } from "@/core/ui/hub/hubTheme";
 
+function isOpenSupplierOrder(order: SupplierOrder): boolean {
+  return order.status === "draft" || order.status === "sent" || order.status === "confirmed";
+}
+
 function formatWhenShort(raw: unknown): string {
   if (!raw) return "";
   let ms = 0;
@@ -43,19 +47,6 @@ function formatWhenShort(raw: unknown): string {
     ms = t;
   }
   return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
-}
-
-import type { SupplierOrderStatus } from "@/features/suppliers/types";
-
-function getDemoOrderStatus(orderId: string, originalStatus: string): SupplierOrderStatus {
-  if (originalStatus !== "sent") return originalStatus as SupplierOrderStatus;
-  let hash = 0;
-  for (let i = 0; i < orderId.length; i++) {
-    hash = orderId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % 4;
-  const statuses: SupplierOrderStatus[] = ["draft", "sent", "confirmed", "delivered"];
-  return statuses[index] ?? "sent";
 }
 
 function SupplierOrderRow({
@@ -73,18 +64,15 @@ function SupplierOrderRow({
 }) {
   const { t } = useTranslation();
   const date = formatWhenShort(order.createdAt);
-  const displayOrder = order.isDemo
-    ? { ...order, status: getDemoOrderStatus(order.id, order.status) }
-    : order;
   const title =
     orderTitle.trim() ||
-    displayOrder.lines[0]?.label?.trim() ||
-    displayOrder.lines[0]?.sku?.trim() ||
+    order.lines[0]?.label?.trim() ||
+    order.lines[0]?.sku?.trim() ||
     String(t("chatbot.order_untitled"));
 
   return (
     <article
-      data-testid={`chatbot-supplier-order-${displayOrder.id}`}
+      data-testid={`chatbot-supplier-order-${order.id}`}
       className={cn(
         "group border-b border-slate-100 last:border-b-0 transition-colors",
         highlighted ? "bg-slate-50" : "hover:bg-slate-50/60"
@@ -94,7 +82,7 @@ function SupplierOrderRow({
         type="button"
         className="w-full px-4 py-3 text-left"
         onClick={onViewPdf}
-        data-testid={`chatbot-supplier-order-pdf-${displayOrder.id}`}
+        data-testid={`chatbot-supplier-order-pdf-${order.id}`}
         aria-label={String(t("chatbot.view_supplier_order_pdf"))}
       >
         <div className="flex items-start justify-between gap-2">
@@ -104,6 +92,14 @@ function SupplierOrderRow({
           >
             {title}
           </p>
+          {order.emailPending ? (
+            <span
+              className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700"
+              title="Email non envoyé — reconnectez Gmail"
+            >
+              Email ⚠
+            </span>
+          ) : null}
         </div>
         <p
           className="mt-1 truncate text-[11px] text-slate-500"
@@ -112,8 +108,14 @@ function SupplierOrderRow({
           {capitalizeName(clientLabel)}
           {date ? ` · ${date}` : ""}
         </p>
-        {displayOrder.isDemo ? (
-          <SupplierOrderDemoProgress orderId={displayOrder.id} status={displayOrder.status} />
+        {isOpenSupplierOrder(order) ? (
+          <SupplierOrderDemoProgress
+            orderId={order.id}
+            status={order.status}
+            createdAt={order.createdAt}
+            sentAt={order.sentAt}
+            deliveredAt={order.deliveredAt}
+          />
         ) : null}
       </button>
     </article>
@@ -267,6 +269,7 @@ export default function ChatbotSupplierOrdersPanel({
       : orderId === highlightMaterialId;
 
   const hasBoth = supplierOrders.length > 0 && materialOrders.length > 0;
+  const pendingEmailCount = supplierOrders.filter((o) => o.emailPending).length;
 
   const orderImageLookups = useMemo(() => {
     if (!isRightRail) return [];
@@ -284,15 +287,16 @@ export default function ChatbotSupplierOrdersPanel({
         const orderTitle = summarizeSupplierOrderLines(order.lines);
         const clientLabel = supplierOrderClientLabel(order);
         const date = formatWhenShort(order.createdAt);
-        const displayOrder = order.isDemo
-          ? { ...order, status: getDemoOrderStatus(order.id, order.status) }
-          : order;
         const title =
           orderTitle.trim() ||
-          displayOrder.lines[0]?.label?.trim() ||
-          displayOrder.lines[0]?.sku?.trim() ||
+          order.lines[0]?.label?.trim() ||
+          order.lines[0]?.sku?.trim() ||
           String(t("chatbot.order_untitled"));
-        const tracking = resolveSupplierOrderTrackingProgress(displayOrder.status);
+        const tracking = resolveSupplierOrderTrackingProgress(order.status, {
+          createdAt: order.createdAt,
+          sentAt: order.sentAt,
+          deliveredAt: order.deliveredAt,
+        });
 
         return (
           <li key={`supplier-${order.id}`} className="min-w-0">
@@ -467,6 +471,15 @@ export default function ChatbotSupplierOrdersPanel({
         className="custom-scrollbar min-h-0 flex-1 overflow-y-auto"
         data-testid="chatbot-orders-list"
       >
+        {pendingEmailCount > 0 ? (
+          <p
+            className="mx-4 mb-2 mt-1 rounded-[12px] bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800"
+            data-testid="chatbot-pending-email-banner"
+          >
+            ⚠ {pendingEmailCount} bon{pendingEmailCount > 1 ? "s" : ""} non envoyé
+            {pendingEmailCount > 1 ? "s" : ""} — reconnectez Gmail pour les transmettre à Lecot.
+          </p>
+        ) : null}
         {registryError ? (
           <p
             className="mx-4 mb-2 mt-1 rounded-[12px] bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800"

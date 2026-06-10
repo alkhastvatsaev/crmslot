@@ -203,6 +203,8 @@ export async function runChatbotOpenAI(params: {
   hasWorkspaceSnapshot?: boolean;
   /** Agents hub dédiés : auto-confirme les écritures (sauf order_lecot). */
   hubAgentMode?: boolean;
+  /** Désactive le garde-fou anti-chaînage search→order (ex : commande directe depuis modal). */
+  skipLecotChainGuard?: boolean;
   /** Température OpenAI (défaut 0.25). Les agents déterministes peuvent descendre à 0.15. */
   temperature?: number;
   emit: ChatbotStreamEmit;
@@ -376,6 +378,16 @@ export async function runChatbotOpenAI(params: {
         // Injecter le nom résolu pour que l'exécuteur n'ait pas besoin de re-résoudre.
         orderCall.arguments.clientName = effectiveClient;
       }
+    } else if (params.hubAgentMode) {
+      const orderCall = parsedCalls.find((c) => c.name === "order_lecot_parts");
+      if (orderCall) {
+        const rawFromAI = String(orderCall.arguments.clientName ?? "").trim();
+        const aiNameValid =
+          rawFromAI && !isMaterialAgentLecotCommandText(rawFromAI) && rawFromAI.length <= 80;
+        if (!aiNameValid && params.toolCtx.materialOrderClientName?.trim()) {
+          orderCall.arguments.clientName = params.toolCtx.materialOrderClientName.trim();
+        }
+      }
     }
 
     const assistantTurn: ChatbotStoredMessage = {
@@ -524,7 +536,7 @@ export async function runChatbotOpenAI(params: {
           );
           if (actions.length > 0) {
             params.emit({ type: "quick_actions", actions });
-            if (params.hubAgentMode) searchedLecotInHub = true;
+            if (params.hubAgentMode && !params.skipLecotChainGuard) searchedLecotInHub = true;
           }
         }
       }

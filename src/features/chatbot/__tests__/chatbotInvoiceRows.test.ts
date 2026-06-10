@@ -1,5 +1,6 @@
 import {
   buildChatbotInvoiceRows,
+  invoiceClientOnlyLabel,
   isChatbotInvoiceCandidate,
 } from "@/features/chatbot/chatbotInvoiceRows";
 import type { Intervention } from "@/features/interventions/types";
@@ -14,8 +15,42 @@ describe("chatbotInvoiceRows", () => {
         time: "",
         status: "invoiced",
         location: { lat: 0, lng: 0 },
-      }),
+      })
     ).toBe(true);
+  });
+
+  it("uses client name only, not intervention title", () => {
+    expect(
+      invoiceClientOnlyLabel({
+        clientFirstName: "Jean",
+        clientLastName: "Dupont",
+        clientName: "Dupont SA",
+      } as never)
+    ).toBe("Jean Dupont");
+    expect(
+      invoiceClientOnlyLabel({
+        title: "Serrure bloquée",
+        clientName: "Martin",
+      } as never)
+    ).toBe("Martin");
+    expect(
+      invoiceClientOnlyLabel({
+        title: "Serrure bloquée",
+      } as never)
+    ).toBe("");
+    const rows = buildChatbotInvoiceRows([
+      {
+        id: "iv-title-only",
+        title: "Serrure bloquée",
+        address: "x",
+        time: "",
+        status: "invoiced",
+        location: { lat: 0, lng: 0 },
+        invoiceAmountCents: 1000,
+      },
+    ] as Intervention[]);
+    expect(rows[0]?.clientLabel).toBe("Client");
+    expect(rows[0]?.problem).toBe("Serrure bloquée");
   });
 
   it("builds sorted rows with totals", () => {

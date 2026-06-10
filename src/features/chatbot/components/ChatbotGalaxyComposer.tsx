@@ -59,7 +59,11 @@ export default function ChatbotGalaxyComposer() {
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || disabled) return;
-    void sendMessage(trimmed, selectedImage?.dataUrl);
+    if (selectedImage) {
+      void sendMessage(trimmed, selectedImage.dataUrl);
+    } else {
+      void sendMessage(trimmed);
+    }
     setInput("");
     setSelectedImage(null);
   };

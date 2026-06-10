@@ -1,4 +1,7 @@
-import { resolveDemoSupplierOrderProgress } from "@/features/chatbot/supplierOrderDemoProgress";
+import {
+  resolveDemoSupplierOrderProgress,
+  type SupplierOrderProgressInput,
+} from "@/features/chatbot/supplierOrderDemoProgress";
 import type { MaterialOrder } from "@/features/materials/types";
 import type { SupplierOrderStatus } from "@/features/suppliers/types";
 
@@ -15,9 +18,10 @@ const MATERIAL_PERCENT_BY_STATUS: Record<MaterialOrder["status"], number> = {
 };
 
 export function resolveSupplierOrderTrackingProgress(
-  status: SupplierOrderStatus | string
+  status: SupplierOrderStatus | string,
+  options?: Omit<SupplierOrderProgressInput, "status">
 ): OrderTrackingProgress {
-  const { percent, cancelled } = resolveDemoSupplierOrderProgress(status);
+  const { percent, cancelled } = resolveDemoSupplierOrderProgress({ status, ...options });
   return { percent, cancelled };
 }
 

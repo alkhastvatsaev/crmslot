@@ -224,6 +224,16 @@ export function resolveLecotCatalogSearchQuery(
     return null;
   }
 
+  // Format bouton modal stock : "Commander N× "label" (réf. SKU) — société : X"
+  const modalOrderMatch = t.match(
+    /^commander\s+\d+[×x]\s+"([^"]+)"\s*\(réf\.\s*([A-Z0-9][A-Z0-9-]*)\)/i
+  );
+  if (modalOrderMatch) {
+    const label = modalOrderMatch[1].trim();
+    const sku = modalOrderMatch[2].trim().toUpperCase();
+    return sku.length >= 2 ? sku : label;
+  }
+
   const fromFollowUp = extractLecotProductQueryFromFollowUp(t);
   if (fromFollowUp) {
     const kw = extractLecotProductKeyword(fromFollowUp);

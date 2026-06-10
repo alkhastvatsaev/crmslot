@@ -6,6 +6,15 @@ const openDocumentPreview = jest.fn();
 const openSupplierOrderPdf = jest.fn();
 const closeDocumentPreview = jest.fn();
 
+jest.mock("@/features/backoffice/useBackOfficeInterventions", () => ({
+  useBackOfficeInterventions: () => ({
+    interventions: [],
+    loading: false,
+    error: null,
+    firebaseUid: null,
+  }),
+}));
+
 jest.mock("@/features/chatbot/hooks/useChatbotDocumentTileThumbnails", () => ({
   useChatbotDocumentTileThumbnails: () => ({
     thumbnails: {
@@ -39,6 +48,7 @@ jest.mock("@/features/chatbot/ChatbotContext", () => ({
         supplierId: "lecot",
         supplierName: "Lecot",
         status: "sent",
+        clientName: "Martin",
         lines: [{ sku: "A1", label: "Cylindre", quantity: 1, unitPriceCents: 5000 }],
         totalCents: 5000,
         createdAt: "2026-05-19T10:00:00.000Z",
@@ -46,6 +56,8 @@ jest.mock("@/features/chatbot/ChatbotContext", () => ({
         isDemo: true,
       },
     ],
+    materialOrders: [],
+    workspaceSnapshot: null,
     documentPreview: {
       interventionId: "",
       kind: "material_order",
@@ -69,22 +81,29 @@ describe("ChatbotDocumentsRightPanel", () => {
     closeDocumentPreview.mockClear();
   });
 
-  it("renders full-height list with thumbnail grids (2 columns)", () => {
+  it("renders documents in one chronological grid (2 columns)", () => {
     render(<ChatbotDocumentsRightPanel />);
     expect(screen.getByTestId("chatbot-documents-right-panel")).toBeInTheDocument();
-    expect(screen.getByTestId("chatbot-documents-grid-invoices")).toHaveClass("grid-cols-2");
-    expect(screen.getByTestId("chatbot-documents-grid-orders")).toHaveClass("grid-cols-2");
+    const grid = screen.getByTestId("chatbot-documents-grid");
+    expect(grid).toHaveClass("grid-cols-2");
+    expect(screen.queryByTestId("chatbot-documents-grid-invoices")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chatbot-documents-grid-orders")).not.toBeInTheDocument();
+    const tiles = Array.from(grid.children);
+    expect(tiles[0]).toContainElement(screen.getByTestId("chatbot-document-order-ord-1"));
+    expect(tiles[1]).toContainElement(screen.getByTestId("chatbot-document-invoice-iv-1"));
     expect(screen.getByTestId("chatbot-document-invoice-iv-1")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-document-order-ord-1")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-document-invoice-iv-1-preview")).toHaveAttribute(
       "src",
-      "data:image/jpeg;base64,mock-inv",
+      "data:image/jpeg;base64,mock-inv"
     );
     expect(screen.getByTestId("chatbot-document-order-ord-1-preview")).toHaveAttribute(
       "src",
-      "data:image/jpeg;base64,mock-ord",
+      "data:image/jpeg;base64,mock-ord"
     );
     expect(screen.getByText(/Dupont/)).toBeInTheDocument();
+    expect(screen.getByText(/Martin/)).toBeInTheDocument();
+    expect(screen.getByText(/Serrure/)).toBeInTheDocument();
     expect(screen.getByText(/Cylindre/)).toBeInTheDocument();
   });
 

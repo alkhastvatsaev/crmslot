@@ -11,12 +11,26 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 type Props = {
   orderId: string;
   status: SupplierOrderStatus | string;
+  createdAt?: unknown;
+  sentAt?: unknown;
+  deliveredAt?: unknown;
 };
 
-/** Barre + étapes — mode démonstration uniquement. */
-export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
+/** Barre + étapes — avance sur 2 jours depuis la date de commande. */
+export default function SupplierOrderDemoProgress({
+  orderId,
+  status,
+  createdAt,
+  sentAt,
+  deliveredAt,
+}: Props) {
   const { t } = useTranslation();
-  const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress(status);
+  const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress({
+    status,
+    createdAt,
+    sentAt,
+    deliveredAt,
+  });
 
   if (cancelled) {
     return (
