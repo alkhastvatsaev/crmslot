@@ -140,20 +140,20 @@ describe("materialAgentOpenAiHub — runChatbotOpenAI + stream mocké", () => {
   it("ruptures → outil list_stock_alerts puis réponse texte", async () => {
     openAiRounds.push(
       { tools: [{ name: "list_stock_alerts", arguments: {} }] },
-      { text: "Il y a 1 article en rupture." },
+      { text: "Il y a 1 article en rupture." }
     );
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-hub",
         messages: [{ role: "user", content: "ruptures de stock" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(mockExecuteChatbotTool).toHaveBeenCalledWith(
       "list_stock_alerts",
       expect.any(Object),
-      expect.objectContaining({ companyId: "co-hub" }),
+      expect.objectContaining({ companyId: "co-hub" })
     );
     const text = events
       .filter((e) => (e as { type?: string }).type === "text")
@@ -166,25 +166,25 @@ describe("materialAgentOpenAiHub — runChatbotOpenAI + stream mocké", () => {
   it("commande lecot → passe par OpenAI (plus de raccourci catalogue)", async () => {
     openAiRounds.push(
       { tools: [{ name: "search_lecot_products", arguments: { query: "poignée", limit: 5 } }] },
-      { text: "Voici des poignées du catalogue Lecot." },
+      { text: "Voici des poignées du catalogue Lecot." }
     );
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-hub",
         messages: [{ role: "user", content: "commander une poignée lecot" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(mockExecuteChatbotTool).toHaveBeenCalledWith(
       "search_lecot_products",
       expect.objectContaining({ query: expect.stringMatching(/poign/i) }),
-      expect.anything(),
+      expect.anything()
     );
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
   });
 
-  it("order_lecot sans client → demande le nom (pas d'exécution commande)", async () => {
+  it("order_lecot sans client explicite → commande avec nom société", async () => {
     openAiRounds.push({
       tools: [
         {
@@ -198,54 +198,25 @@ describe("materialAgentOpenAiHub — runChatbotOpenAI + stream mocké", () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-hub",
+        companyName: "Atelier Hub",
         messages: [
           { role: "user", content: "commande lecot" },
           { role: "assistant", content: "**Catalogue**\n1. Serrure (SKU LEC-1)" },
           { role: "user", content: "Commander LEC-1 — Serrure" },
         ],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     const text = events
       .filter((e) => (e as { type?: string }).type === "text")
       .map((e) => (e as { delta?: string }).delta ?? "")
       .join("");
-    expect(text).toMatch(/nom du client/i);
-    expect(mockExecuteChatbotTool).not.toHaveBeenCalledWith(
-      "order_lecot_parts",
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
-  it("order_lecot avec client session → commande exécutée", async () => {
-    openAiRounds.push({
-      tools: [
-        {
-          name: "order_lecot_parts",
-          arguments: {
-            lines: [{ sku: "LEC-1", label: "Serrure", quantity: 1, unitPriceEur: 12 }],
-          },
-        },
-      ],
-    });
-    const res = await handleMaterialAgentPost(
-      {
-        companyId: "co-hub",
-        orderClientName: "Dupont",
-        messages: [
-          { role: "user", content: "commande lecot" },
-          { role: "user", content: "Commander LEC-1 — Serrure" },
-        ],
-      },
-      auth,
-    );
-    await readSseJsonLines(res);
+    expect(text).not.toMatch(/nom du client/i);
     expect(mockExecuteChatbotTool).toHaveBeenCalledWith(
       "order_lecot_parts",
-      expect.objectContaining({ clientName: "Dupont" }),
-      expect.any(Object),
+      expect.objectContaining({ clientName: "Atelier Hub" }),
+      expect.objectContaining({ materialOrderClientName: "Atelier Hub" })
     );
   });
 });

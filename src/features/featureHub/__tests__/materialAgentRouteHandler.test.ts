@@ -91,38 +91,38 @@ describe("materialAgentRouteHandler", () => {
     expect(call?.system).toMatch(/search_lecot_products/);
   });
 
-  it("delegates client name reply to OpenAI (no pre-interception)", async () => {
+  it("passes company name as default order client (no client session)", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
-        messages: [
-          { role: "user", content: "Commander CYL-1 — Cylindre" },
-          {
-            role: "assistant",
-            content:
-              "Quel est le **nom du client** pour cette commande ?\n[[material-agent-need-client-name]]",
-          },
-          { role: "user", content: "Dupont" },
-        ],
+        companyName: "Atelier Test",
+        messages: [{ role: "user", content: "Commander CYL-1 — Cylindre" }],
       },
       auth
     );
     const events = await readSseJsonLines(res);
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
-    expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolCtx: expect.objectContaining({
+          materialOrderClientName: "Atelier Test",
+          requireMaterialOrderClientName: false,
+        }),
+      })
+    );
   });
 
-  it("clears session client and delegates nouvelle commande lecot to OpenAI", async () => {
+  it("delegates nouvelle commande lecot to OpenAI without client session reset", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
-        orderClientName: "Ancien Client",
+        companyName: "Atelier Test",
         messages: [{ role: "user", content: "nouvelle commande lecot" }],
       },
       auth
     );
     const events = await readSseJsonLines(res);
-    expect(events).toContainEqual(
+    expect(events).not.toContainEqual(
       expect.objectContaining({ type: "material_order_client", clientName: "" })
     );
     expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);

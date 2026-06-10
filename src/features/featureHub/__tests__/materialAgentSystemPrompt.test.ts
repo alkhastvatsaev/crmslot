@@ -28,17 +28,17 @@ describe("buildMaterialAgentSystemPrompt", () => {
     expect(prompt).not.toMatch(/Snapshot stock actuel/);
   });
 
-  it("includes client session block when orderClientName is set", () => {
+  it("instructs direct company stock orders without asking for client name", () => {
     const prompt = buildMaterialAgentSystemPrompt({
-      companyName: "X",
+      companyName: "Atelier Test",
       companyId: "y",
       today: "2026-01-01",
       stockSnapshot: null,
-      orderClientName: "Dupont",
     });
-    expect(prompt).toMatch(/Client Lecot session en cours/);
-    expect(prompt).toContain("Dupont");
-    expect(prompt).not.toMatch(/Aucun client enregistré/);
+    expect(prompt).toMatch(/Commandes stock société/);
+    expect(prompt).toContain("Atelier Test");
+    expect(prompt).toMatch(/Ne demande JAMAIS le nom d'un client/i);
+    expect(prompt).not.toMatch(/Quel est le nom du client/i);
   });
 
   it("includes lecot catalog hint when provided", () => {
@@ -50,17 +50,5 @@ describe("buildMaterialAgentSystemPrompt", () => {
     });
     expect(prompt).toMatch(/Indice catalogue/);
     expect(prompt).toContain("poignée");
-  });
-
-  it("shows no-client warning when orderClientName is null", () => {
-    const prompt = buildMaterialAgentSystemPrompt({
-      companyName: "X",
-      companyId: "y",
-      today: "2026-01-01",
-      stockSnapshot: null,
-      orderClientName: null,
-    });
-    expect(prompt).toMatch(/Aucun client enregistré/);
-    expect(prompt).not.toMatch(/Client Lecot session en cours/);
   });
 });
