@@ -1,15 +1,20 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
 
   const stripeSecret = process.env.STRIPE_SECRET_KEY?.trim();
-  if (!stripeSecret) {
+  const mockMode = !stripeSecret && stripeMockPaymentsEnabled();
+  if (!stripeSecret && !mockMode) {
     return NextResponse.json({ error: "Stripe non configuré" }, { status: 500 });
   }
 
@@ -62,7 +67,20 @@ export async function POST(request: Request) {
 
   const origin = process.env.PUBLIC_APP_URL?.trim()?.replace(/\/$/, "") ?? "http://localhost:3000";
 
-  const stripe = new Stripe(stripeSecret, { apiVersion: "2026-04-22.dahlia" });
+  if (mockMode) {
+    // Sandbox sans compte Stripe : lien interne à usage unique qui marque le dossier payé.
+    const mockToken = randomUUID();
+    const url = `${origin}/api/stripe/mock-pay?interventionId=${encodeURIComponent(interventionId)}&token=${mockToken}`;
+    await ref.update({
+      stripePaymentLinkUrl: url,
+      mockPayToken: mockToken,
+      paymentStatus: "pending",
+      invoiceAmountCents: amountCents,
+    });
+    return NextResponse.json({ url, paymentStatus: "pending", mock: true });
+  }
+
+  const stripe = new Stripe(stripeSecret as string, { apiVersion: "2026-04-22.dahlia" });
 
   const link = await stripe.paymentLinks.create({
     line_items: [
@@ -78,6 +96,11 @@ export async function POST(request: Request) {
       },
     ],
     metadata: { interventionId, createdByUid: auth.uid },
+    // Sans payment_intent_data, le PaymentIntent du Payment Link n'hérite pas des
+    // metadata → l'événement payment_intent.succeeded serait inexploitable côté webhook.
+    payment_intent_data: {
+      metadata: { interventionId, createdByUid: auth.uid },
+    },
     after_completion: {
       type: "redirect",
       redirect: {
