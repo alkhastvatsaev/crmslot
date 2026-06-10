@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./panel-tokens.css";
 @import "./dashboard-layout.css";
+@import "./dashboard-mobile-layout.css";
 @import "./globals-hud.css";
 @import "tw-animate-css";
 
@@ -717,6 +718,9 @@ p {
   }
   html {
     @apply font-sans;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   input,

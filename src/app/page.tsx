@@ -33,16 +33,20 @@ import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeCo
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
-import TechnicianConnectivityBar from "@/features/offline/components/TechnicianConnectivityBar";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import TechnicianNotificationBootstrap from "@/features/notifications/components/TechnicianNotificationBootstrap";
 import DevPreviewAnonymousAuth from "@/features/dev/DevPreviewAnonymousAuth";
+import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
+import MobileShell from "@/features/dashboard/components/MobileShell";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
+import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
+import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -86,8 +90,31 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
   loading: () => null,
 });
 
-/** Écran d’accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
+const desktopHeader = (
+  <>
+    <aside
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
+    >
+      <ClockCalendar />
+    </aside>
+    <div
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
+    >
+      <StagingPreviewBanner />
+      <SpotlightSearch />
+    </div>
+    <aside
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
+    >
+      <UserProfile />
+    </aside>
+  </>
+);
+
+/** Écran d'accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
 export default function Dashboard() {
+  const isMobile = useIsMobile();
+
   const dashboardPages = useMemo(
     () => [
       <ErrorBoundary key="map" name="map">
@@ -121,6 +148,7 @@ export default function Dashboard() {
     <DateProvider>
       <DesktopOnlyGate>
         <LoginOverlay>
+          <DevServiceWorkerCleanup />
           <DevPreviewAnonymousAuth />
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
@@ -139,7 +167,6 @@ export default function Dashboard() {
                                       <BillingHubIntentProvider>
                                         <TechnicianBackofficeReportBridgeProvider>
                                           <TechnicianFinishJobProvider>
-                                            <TechnicianConnectivityBar />
                                             <Suspense fallback={null}>
                                               <TechnicianNotificationBootstrap />
                                             </Suspense>
@@ -148,30 +175,28 @@ export default function Dashboard() {
                                               <ClientPortalNotificationBootstrap />
                                               <ClientPortalPaymentReturnEffects />
                                             </Suspense>
-                                            <DashboardDesktopShell
-                                              header={
-                                                <>
-                                                  <aside
-                                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
-                                                  >
-                                                    <ClockCalendar />
-                                                  </aside>
-                                                  <div
-                                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
-                                                  >
-                                                    <StagingPreviewBanner />
-                                                    <SpotlightSearch />
-                                                  </div>
-                                                  <aside
-                                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
-                                                  >
-                                                    <UserProfile />
-                                                  </aside>
-                                                </>
-                                              }
-                                              pager={<DashboardPager pages={dashboardPages} />}
-                                              galaxy={<DashboardGalaxyLayer />}
-                                            />
+                                            <AuthActivityLogger />
+                                            <ActivityLogPageObserver />
+
+                                            {isMobile === null ? (
+                                              <div
+                                                data-testid="mobile-detection-loading"
+                                                className="flex min-h-dvh items-center justify-center bg-slate-50"
+                                              >
+                                                <div
+                                                  className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
+                                                  aria-hidden
+                                                />
+                                              </div>
+                                            ) : isMobile ? (
+                                              <MobileShell pages={dashboardPages} />
+                                            ) : (
+                                              <DashboardDesktopShell
+                                                header={desktopHeader}
+                                                pager={<DashboardPager pages={dashboardPages} />}
+                                                galaxy={<DashboardGalaxyLayer />}
+                                              />
+                                            )}
                                           </TechnicianFinishJobProvider>
                                         </TechnicianBackofficeReportBridgeProvider>
                                       </BillingHubIntentProvider>
