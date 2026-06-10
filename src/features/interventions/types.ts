@@ -1,14 +1,14 @@
 export interface InterventionEvent {
   id: string;
   interventionId: string;
-  type: 'status_change' | 'comment' | 'email' | 'material_order' | 'commission' | 'portal_chat';
+  type: "status_change" | "comment" | "email" | "material_order" | "commission" | "portal_chat";
   createdAt: string;
   createdByUid: string;
   content?: string;
   oldStatus?: string;
   newStatus?: string;
   /** Notes internes vs visibles client (portail). */
-  visibility?: 'internal' | 'client';
+  visibility?: "internal" | "client";
   actorRole?: string;
 }
 
@@ -18,15 +18,15 @@ export interface Intervention {
   address: string;
   time: string;
   status:
-    | 'pending'
-    | 'assigned'
-    | 'en_route'
-    | 'in_progress'
-    | 'done'
-    | 'pending_needs_address'
-    | 'invoiced'
-    | 'waiting_material'
-    | 'cancelled';
+    | "pending"
+    | "assigned"
+    | "en_route"
+    | "in_progress"
+    | "done"
+    | "pending_needs_address"
+    | "invoiced"
+    | "waiting_material"
+    | "cancelled";
   location: {
     lat: number;
     lng: number;
@@ -40,7 +40,7 @@ export interface Intervention {
   clientPhone?: string | null;
   clientEmail?: string | null;
   urgency?: boolean;
-  category?: 'serrurerie' | 'autre';
+  category?: "serrurerie" | "autre";
   problem?: string | null;
   date?: string | null;
   hour?: string | null;
@@ -57,7 +57,7 @@ export interface Intervention {
   createdByUid?: string | null;
   /** Responsable actuel du dossier (dénormalisé à chaque transition). */
   currentOwnerUid?: string | null;
-  currentOwnerRole?: 'dispatcher' | 'technician' | 'client' | 'system' | null;
+  currentOwnerRole?: "dispatcher" | "technician" | "client" | "system" | null;
   statusUpdatedAt?: string | null;
   /** Technicien désigné — filtre sécurité + dashboard Prompt 4. */
   assignedTechnicianUid?: string | null;
@@ -77,7 +77,7 @@ export interface Intervention {
   /** Miniatures JPEG compressées (data URLs), usage interne / prévisualisation. */
   attachmentThumbnails?: string[];
   /** Fin d’intervention — URLs Storage (JPEG) avec catégorisation par type. */
-  completionPhotos?: { url: string; category: 'panne' | 'materiel' | 'preuve' | 'autre' }[];
+  completionPhotos?: { url: string; category: "panne" | "materiel" | "preuve" | "autre" }[];
   /** Legacy field, conservé pour la rétrocompatibilité (temporaire) */
   completionPhotoUrls?: string[];
   completionSignatureUrl?: string | null;
@@ -88,8 +88,15 @@ export interface Intervention {
   invoicedAt?: string | null;
   /** Montant facturé en centimes (base commission + paiement client). */
   invoiceAmountCents?: number | null;
+  /** Numéro de facture légal séquentiel (ex. FAC-2026-00042), attribué à la finalisation. */
+  invoiceNumber?: string | null;
   /** Lignes facturables saisies par le technicien avant clôture. */
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
   /** Commission technicien calculée en centimes (dénormalisé). */
   commissionAmountCents?: number | null;
   paymentStatus?: "unpaid" | "pending" | "paid" | "refunded" | null;

@@ -16,6 +16,7 @@ type InterventionInvoiceInput = {
   clientName?: string | null;
   problem?: string | null;
   invoiceAmountCents?: number;
+  invoiceNumber?: string | null;
   billingLines?: BillingLineInput[];
 };
 
@@ -25,7 +26,7 @@ function formatEur(cents: number): string {
 
 export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput): Buffer {
   const activeLines = (iv.billingLines ?? []).filter(
-    (l) => l.description.trim() && l.quantity > 0 && l.unitPriceCents > 0,
+    (l) => l.description.trim() && l.quantity > 0 && l.unitPriceCents > 0
   );
   const htCents =
     activeLines.length > 0
@@ -62,7 +63,7 @@ export function buildInterventionInvoicePdfBuffer(iv: InterventionInvoiceInput):
 
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...colors.primary);
-  doc.text(`N° ${iv.id}`, 140, 22);
+  doc.text(`N° ${iv.invoiceNumber?.trim() || iv.id}`, 140, 22);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...colors.secondary);
   doc.text(`Date : ${new Date().toLocaleDateString("fr-BE")}`, 140, 30);

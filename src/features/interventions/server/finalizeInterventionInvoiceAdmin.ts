@@ -20,7 +20,7 @@ export type FinalizeInvoiceAdminResult = {
 /** Génère le PDF facture sur Storage (sans changer le statut). */
 export async function finalizeInterventionInvoiceAdmin(
   iv: Intervention,
-  interventionId: string,
+  interventionId: string
 ): Promise<FinalizeInvoiceAdminResult> {
   const lines = (Array.isArray(iv.billingLines) ? iv.billingLines : []) as DraftBillingLine[];
   const invoiceAmountCents =
@@ -35,6 +35,7 @@ export async function finalizeInterventionInvoiceAdmin(
     clientName: iv.clientName ?? null,
     problem: iv.problem ?? null,
     invoiceAmountCents,
+    invoiceNumber: iv.invoiceNumber ?? null,
     billingLines: lines,
   });
 
@@ -65,13 +66,16 @@ export async function patchInvoicedFieldsAdmin(
   db: admin.firestore.Firestore,
   interventionId: string,
   patch: FinalizeInvoiceAdminResult,
-  paymentStatus?: Intervention["paymentStatus"],
+  paymentStatus?: Intervention["paymentStatus"]
 ): Promise<void> {
-  await db.collection("interventions").doc(interventionId).update({
-    invoicePdfUrl: patch.invoicePdfUrl,
-    invoicePdfStoragePath: patch.invoicePdfStoragePath,
-    invoiceAmountCents: patch.invoiceAmountCents,
-    invoicedAt: FieldValue.serverTimestamp(),
-    paymentStatus: paymentStatus === "paid" ? "paid" : "unpaid",
-  });
+  await db
+    .collection("interventions")
+    .doc(interventionId)
+    .update({
+      invoicePdfUrl: patch.invoicePdfUrl,
+      invoicePdfStoragePath: patch.invoicePdfStoragePath,
+      invoiceAmountCents: patch.invoiceAmountCents,
+      invoicedAt: FieldValue.serverTimestamp(),
+      paymentStatus: paymentStatus === "paid" ? "paid" : "unpaid",
+    });
 }

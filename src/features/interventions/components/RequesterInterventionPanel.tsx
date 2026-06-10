@@ -10,6 +10,7 @@ import { SmartTimeSlotPicker } from "./SmartTimeSlotPicker";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
+  REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT,
   SMART_FORM_TEMPLATES,
   type SmartFormTemplate,
 } from "@/features/interventions/smartInterventionConstants";
@@ -111,6 +112,27 @@ export default function RequesterInterventionPanel() {
     toggleListening: toggleDescriptionVoice,
     interimTranscript,
   } = useBrowserSpeechDictation(appendDescriptionFromVoice, handleAudioRecorded);
+
+  const trySubmitOnEnter = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.defaultPrevented) return;
+      if (currentStep !== 4 || !canSubmit || isSubmitting) return;
+      e.preventDefault();
+      void handleSubmit();
+    },
+    [currentStep, canSubmit, isSubmitting, handleSubmit]
+  );
+
+  useEffect(() => {
+    if (currentStep !== 4) return;
+    const onEnterSubmit = () => {
+      if (!canSubmit || isSubmitting) return;
+      void handleSubmit();
+    };
+    window.addEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
+    return () =>
+      window.removeEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
+  }, [currentStep, canSubmit, isSubmitting, handleSubmit]);
 
   const handleProblemSelect = (tpl: SmartFormTemplate) => {
     const labelText = String(t(tpl.label));
@@ -312,16 +334,18 @@ export default function RequesterInterventionPanel() {
           {currentStep === 4 && (
             <motion.div
               key="step4"
+              data-testid="requester-step4"
               variants={stepVariants}
               initial="initial"
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col gap-4 px-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className="absolute inset-0 flex min-h-0 flex-col overflow-hidden px-4 py-3"
+              onKeyDown={trySubmitOnEnter}
             >
-              <div className="flex flex-col gap-2 h-full">
-                <div className="flex flex-col gap-1 rounded-[24px] bg-white p-3 shadow-sm border border-black/5 mt-40">
-                  <div className="flex items-center gap-2">
+              <div className="flex min-h-0 flex-1 flex-col justify-between gap-3">
+                <div className="flex min-h-0 flex-1 flex-col gap-1 rounded-[24px] border border-black/5 bg-white p-3 shadow-sm">
+                  <div className="flex shrink-0 items-center gap-2">
                     <div className="relative flex-1">
                       <SmartFormAddressAutocomplete
                         value={interventionAddress}
@@ -353,23 +377,23 @@ export default function RequesterInterventionPanel() {
                     </button>
                   </div>
 
-                  <div className="relative overflow-hidden rounded-[16px]">
+                  <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
                     <SmartFormAddressMiniMap
                       address={interventionAddress}
                       placeLatLng={interventionLatLng}
-                      className="h-[200px] w-full !border-none"
+                      className="h-full min-h-[140px] w-full !border-none"
                     />
                     <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />
                   </div>
                 </div>
 
-                <div className="mt-auto pt-4 pb-2">
+                <div className="shrink-0 pb-1">
                   <button
                     type="button"
                     data-testid="intervention-submit-btn"
                     disabled={!canSubmit}
                     onClick={handleSubmit}
-                    className="flex w-fit mx-auto min-w-[280px] px-8 items-center justify-center gap-2 rounded-[16px] bg-black py-4 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                    className="mx-auto flex w-fit min-w-[280px] items-center justify-center gap-2 rounded-[16px] bg-black px-8 py-4 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                   >
                     {isSubmitting ? (
                       <Loader2 className="h-5 w-5 animate-spin" />

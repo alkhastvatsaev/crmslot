@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type KeyboardEvent } from "react";
 import { Building2, Mail, Phone, User, UserRound } from "lucide-react";
 import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPanel";
+import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
 import { useRequesterHub, RequesterType } from "../context/RequesterHubContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { HUB_FONT_OUTFIT, HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
@@ -22,7 +23,7 @@ const iconRail = cn(
 const glassRow = cn("flex items-center gap-3 transition-colors duration-300", HUB_SURFACE.fieldRow);
 
 export default function RequesterProfilePanel() {
-  const { profile, setProfile, validationFailedCount } = useRequesterHub();
+  const { profile, setProfile, validationFailedCount, currentStep } = useRequesterHub();
   const { t } = useTranslation();
   const shakeControls = useAnimation();
   useEffect(() => {
@@ -39,6 +40,13 @@ export default function RequesterProfilePanel() {
   };
 
   const isInvalid = (val: string) => validationFailedCount > 0 && !val.trim();
+
+  const onEnterSubmit = (e: KeyboardEvent) => {
+    if (e.key !== "Enter" || e.shiftKey) return;
+    if (currentStep !== 4) return;
+    e.preventDefault();
+    dispatchRequesterInterventionEnterSubmit();
+  };
 
   return (
     <div
@@ -98,6 +106,7 @@ export default function RequesterProfilePanel() {
                   type="text"
                   placeholder={t("requester.profile.first_name")}
                   value={profile.firstName}
+                  onKeyDown={onEnterSubmit}
                   onChange={(e) => setProfile((prev) => ({ ...prev, firstName: e.target.value }))}
                   className={cn(
                     inputClass,
@@ -125,6 +134,7 @@ export default function RequesterProfilePanel() {
                   type="text"
                   placeholder={t("requester.profile.last_name")}
                   value={profile.lastName}
+                  onKeyDown={onEnterSubmit}
                   onChange={(e) => setProfile((prev) => ({ ...prev, lastName: e.target.value }))}
                   className={cn(
                     inputClass,
@@ -154,6 +164,7 @@ export default function RequesterProfilePanel() {
                   type="tel"
                   placeholder={t("requester.profile.phone")}
                   value={profile.phone}
+                  onKeyDown={onEnterSubmit}
                   onChange={(e) => setProfile((prev) => ({ ...prev, phone: e.target.value }))}
                   className={cn(inputClass, isInvalid(profile.phone) && "placeholder:text-red-300")}
                 />
@@ -178,6 +189,7 @@ export default function RequesterProfilePanel() {
                   type="email"
                   placeholder="Mail"
                   value={profile.email}
+                  onKeyDown={onEnterSubmit}
                   onChange={(e) => setProfile((prev) => ({ ...prev, email: e.target.value }))}
                   className={cn(inputClass, isInvalid(profile.email) && "placeholder:text-red-300")}
                 />

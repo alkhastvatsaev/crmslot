@@ -25,15 +25,8 @@ jest.mock("@/context/TechnicianFinishJobContext", () => ({
   }),
 }));
 
-jest.mock("@/context/OfflineSyncContext", () => ({
-  useOfflineSync: () => ({
-    navigatorOnline: true,
-    pendingCompletionCount: 0,
-    isSyncing: false,
-    lastFlushReport: null,
-    flushNow: jest.fn(),
-    refreshPendingCount: jest.fn(),
-  }),
+jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
+  useIsMobile: () => false,
 }));
 
 const mockAssignments = useTechnicianAssignments as jest.MockedFunction<
@@ -61,7 +54,6 @@ describe("TechnicianHubPage", () => {
       "detail"
     );
     expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
-    expect(screen.getByTestId("technician-offline-sync-panel")).toBeInTheDocument();
-    expect(document.getElementById("technician-hub-offline")).toBeTruthy();
+    expect(screen.queryByTestId("technician-offline-sync-panel")).not.toBeInTheDocument();
   });
 });
