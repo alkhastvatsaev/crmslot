@@ -1,15 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FileText, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
+import {
+  buildInterventionClientLabelMap,
+  buildSupplierOrderClientNameByOrderId,
+  buildSupplierOrderInterventionIdByOrderId,
+  resolveSupplierOrderListClientLabel,
+} from "@/features/chatbot/chatbotOrderClientLabels";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
+import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import {
+  documentCreatedAtMs,
   filterChatbotInvoices,
   filterChatbotSupplierOrders,
+  mergeChatbotDocumentsByCreatedAt,
   parseDocumentsSearchQuery,
 } from "@/features/chatbot/filterChatbotDocuments";
 import {
@@ -24,16 +34,9 @@ function formatEur(cents: number): string {
   return `${(cents / 100).toLocaleString("fr-BE", { maximumFractionDigits: 0 })} €`;
 }
 
-function formatWhen(raw: string | null | undefined): string {
-  if (!raw) return "";
-  let ms = 0;
-  if (typeof raw === "object" && raw !== null && "seconds" in raw) {
-    ms = (raw as { seconds: number }).seconds * 1000;
-  } else {
-    const t = Date.parse(String(raw));
-    if (!Number.isFinite(t)) return "";
-    ms = t;
-  }
+function formatWhen(raw: unknown): string {
+  const ms = documentCreatedAtMs(raw);
+  if (!ms) return "";
   return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
 }
 
@@ -74,6 +77,7 @@ type DocumentTileProps = {
   disabled?: boolean;
   kind: DocTileKind;
   title: string;
+  subtitle?: string;
   meta?: string;
   thumbnailUrl?: string | null;
   thumbnailLoading?: boolean;
@@ -86,6 +90,7 @@ function DocumentTile({
   disabled,
   kind,
   title,
+  subtitle,
   meta,
   thumbnailUrl,
   thumbnailLoading,
@@ -150,6 +155,11 @@ function DocumentTile({
         <span className="block truncate text-[12px] font-medium leading-tight tracking-[-0.02em] text-slate-800">
           {title}
         </span>
+        {subtitle ? (
+          <span className="mt-0.5 block truncate text-[10px] leading-tight text-slate-500">
+            {subtitle}
+          </span>
+        ) : null}
         {meta ? (
           <span className="mt-0.5 block truncate text-[10px] tabular-nums text-slate-400">
             {meta}
@@ -157,14 +167,6 @@ function DocumentTile({
         ) : null}
       </div>
     </button>
-  );
-}
-
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <p className="mb-2 px-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400/90">
-      {children}
-    </p>
   );
 }
 
@@ -176,11 +178,50 @@ export default function ChatbotDocumentsRightPanel() {
     chatbotInvoices,
     chatbotInvoicesLoading,
     supplierOrders,
+    materialOrders,
+    workspaceSnapshot,
     documentPreview,
     openDocumentPreview,
     openSupplierOrderPdf,
     closeDocumentPreview,
   } = useChatbotContext();
+
+  const workspace = useCompanyWorkspaceOptional();
+  const interventionsCompanyId =
+    (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
+  const { interventions } = useBackOfficeInterventions(interventionsCompanyId);
+
+  const clientLabelByInterventionId = useMemo(
+    () => buildInterventionClientLabelMap(chatbotInvoices, workspaceSnapshot, interventions),
+    [chatbotInvoices, workspaceSnapshot, interventions]
+  );
+
+  const orderInterventionIdByOrderId = useMemo(
+    () => buildSupplierOrderInterventionIdByOrderId(supplierOrders, materialOrders),
+    [supplierOrders, materialOrders]
+  );
+
+  const clientNameBySupplierOrderId = useMemo(
+    () => buildSupplierOrderClientNameByOrderId(supplierOrders, materialOrders),
+    [supplierOrders, materialOrders]
+  );
+
+  const invoiceClientLabel = useCallback(
+    (interventionId: string, fallback: string) =>
+      clientLabelByInterventionId.get(interventionId)?.trim() || fallback,
+    [clientLabelByInterventionId]
+  );
+
+  const supplierOrderClientLabel = useCallback(
+    (order: SupplierOrder) =>
+      resolveSupplierOrderListClientLabel(
+        order,
+        clientNameBySupplierOrderId,
+        orderInterventionIdByOrderId,
+        clientLabelByInterventionId
+      ),
+    [clientNameBySupplierOrderId, orderInterventionIdByOrderId, clientLabelByInterventionId]
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -199,7 +240,12 @@ export default function ChatbotDocumentsRightPanel() {
     [supplierOrders, parsedSearch]
   );
 
-  const docCount = filteredInvoices.length + filteredOrders.length;
+  const documentItems = useMemo(
+    () => mergeChatbotDocumentsByCreatedAt(filteredInvoices, filteredOrders),
+    [filteredInvoices, filteredOrders]
+  );
+
+  const docCount = documentItems.length;
   const libraryCount = chatbotInvoices.length + supplierOrders.length;
   const hasLibrary = libraryCount > 0;
   const hasList = docCount > 0;
@@ -224,19 +270,12 @@ export default function ChatbotDocumentsRightPanel() {
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="shrink-0 space-y-3 px-4 pt-4 pb-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">
-              {t("chatbot.documents_heading")}
-            </h2>
-            {hasLibrary ? (
-              <span
-                className="text-[10px] tabular-nums text-slate-400"
-                data-testid="chatbot-documents-count"
-              >
-                {parsedSearch.hasQuery ? `${docCount}/${libraryCount}` : libraryCount}
-              </span>
-            ) : null}
-          </div>
+          <h2 className="sr-only">{t("chatbot.documents_heading")}</h2>
+          {hasLibrary ? (
+            <span className="sr-only" data-testid="chatbot-documents-count">
+              {parsedSearch.hasQuery ? `${docCount}/${libraryCount}` : libraryCount}
+            </span>
+          ) : null}
           <div className="relative" data-testid="chatbot-documents-search">
             <Search
               className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
@@ -287,72 +326,55 @@ export default function ChatbotDocumentsRightPanel() {
               {t("chatbot.documents_empty")}
             </p>
           ) : (
-            <div className="space-y-5">
-              {filteredInvoices.length > 0 ? (
-                <section data-testid="chatbot-documents-section-invoices">
-                  <SectionLabel>{String(t("chatbot.invoices_heading"))}</SectionLabel>
-                  <ul
-                    className="grid grid-cols-2 gap-2.5"
-                    data-testid="chatbot-documents-grid-invoices"
-                  >
-                    {filteredInvoices.map((row) => {
-                      const key = `invoice:${row.interventionId}`;
-                      return (
-                        <li key={key} className="min-w-0">
-                          <DocumentTile
-                            testId={`chatbot-document-invoice-${row.interventionId}`}
-                            active={selectedKey === key}
-                            kind="invoice"
-                            title={row.clientLabel}
-                            meta={[formatWhen(row.invoicedAt), formatEur(row.totalCents)]
-                              .filter(Boolean)
-                              .join(" · ")}
-                            thumbnailUrl={
-                              thumbnails[invoiceTileKey(row.interventionId)]?.thumbnailUrl
-                            }
-                            thumbnailLoading={thumbnailLoading[invoiceTileKey(row.interventionId)]}
-                            onClick={() => openDocumentPreview(row.interventionId, "invoice")}
-                          />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
-              ) : null}
+            <ul className="grid grid-cols-2 gap-2.5" data-testid="chatbot-documents-grid">
+              {documentItems.map((item) => {
+                if (item.kind === "invoice") {
+                  const row = item.invoice;
+                  const key = `invoice:${row.interventionId}`;
+                  return (
+                    <li key={key} className="min-w-0">
+                      <DocumentTile
+                        testId={`chatbot-document-invoice-${row.interventionId}`}
+                        active={selectedKey === key}
+                        kind="invoice"
+                        title={invoiceClientLabel(row.interventionId, row.clientLabel)}
+                        subtitle={row.problem?.trim() || undefined}
+                        meta={[formatWhen(row.invoicedAt), formatEur(row.totalCents)]
+                          .filter(Boolean)
+                          .join(" · ")}
+                        thumbnailUrl={thumbnails[invoiceTileKey(row.interventionId)]?.thumbnailUrl}
+                        thumbnailLoading={thumbnailLoading[invoiceTileKey(row.interventionId)]}
+                        onClick={() => openDocumentPreview(row.interventionId, "invoice")}
+                      />
+                    </li>
+                  );
+                }
 
-              {filteredOrders.length > 0 ? (
-                <section data-testid="chatbot-documents-section-orders">
-                  <ul
-                    className="grid grid-cols-2 gap-2.5"
-                    data-testid="chatbot-documents-grid-orders"
-                  >
-                    {filteredOrders.map((order) => {
-                      const key = `supplier:${order.id}`;
-                      return (
-                        <li key={key} className="min-w-0">
-                          <DocumentTile
-                            testId={`chatbot-document-order-${order.id}`}
-                            active={selectedKey === key}
-                            disabled={!companyId}
-                            kind="order"
-                            title={supplierOrderTitle(order)}
-                            meta={[formatWhen(order.createdAt), formatEur(order.totalCents)]
-                              .filter(Boolean)
-                              .join(" · ")}
-                            thumbnailUrl={thumbnails[supplierTileKey(order.id)]?.thumbnailUrl}
-                            thumbnailLoading={thumbnailLoading[supplierTileKey(order.id)]}
-                            onClick={() => {
-                              if (!companyId) return;
-                              void openSupplierOrderPdf(companyId, order.id);
-                            }}
-                          />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
-              ) : null}
-            </div>
+                const order = item.order;
+                const key = `supplier:${order.id}`;
+                return (
+                  <li key={key} className="min-w-0">
+                    <DocumentTile
+                      testId={`chatbot-document-order-${order.id}`}
+                      active={selectedKey === key}
+                      disabled={!companyId}
+                      kind="order"
+                      title={supplierOrderClientLabel(order)}
+                      subtitle={supplierOrderTitle(order)}
+                      meta={[formatWhen(order.createdAt), formatEur(order.totalCents)]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      thumbnailUrl={thumbnails[supplierTileKey(order.id)]?.thumbnailUrl}
+                      thumbnailLoading={thumbnailLoading[supplierTileKey(order.id)]}
+                      onClick={() => {
+                        if (!companyId) return;
+                        void openSupplierOrderPdf(companyId, order.id);
+                      }}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </div>
       </div>

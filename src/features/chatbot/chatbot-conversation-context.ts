@@ -65,7 +65,7 @@ const FLOW_TOOLS: Record<ChatbotFlowId, readonly string[]> = {
 
 const FLOW_HINTS: Record<ChatbotFlowId, RegExp> = {
   lecot:
-    /lecot|fournisseur|commande\s+(?:mat|matériel|materiel|lecot)|sku|référence|reference|perceuse|cylindre|serrure|catalogue|verrou|poignée|poignee|gâche|gache|barillet/i,
+    /lecot|fournisseur|commande\s+(?:mat|matériel|materiel|lecot)|sku|référence|reference|réf\.|perceuse|cylindre|serrure|catalogue|verrou|poignée|poignee|gâche|gache|barillet|commander\s+\d+[×x]/i,
   billing: /facture|devis|prix|montant|€|eur\b|euro|facturer|billing|paiement|encaissement/i,
   email: /email|mail|courriel|envoyer.*(?:mail|email)|pièce jointe/i,
   planning: /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i,

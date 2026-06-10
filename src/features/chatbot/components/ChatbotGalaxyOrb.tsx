@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { startGalaxyStarsAnimation } from "@/core/ui/GalaxyButton/galaxyStarsAnimation";
 import "@/core/ui/GalaxyButton/GalaxyButton.css";
 
-const STAR_COUNT_SM = 420;
-const STAR_COUNT_HERO = 720;
+const STAR_COUNT_SM = 60;
+const STAR_COUNT_HERO = 180;
 
 type Props = {
   className?: string;

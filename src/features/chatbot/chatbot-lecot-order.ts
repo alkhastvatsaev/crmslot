@@ -294,6 +294,12 @@ export async function orderLecotPartsForChatbot(
       notes,
       reference: demoReference,
     });
+    if (!emailResult.ok && emailResult.error?.includes("Gmail OAuth non configuré")) {
+      await orderRef.update({
+        emailPending: true,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
     const emailNote = emailResult.ok
       ? ` Email bon de commande envoyé à ${LECOT_EMAIL}.`
       : emailResult.error
@@ -430,6 +436,12 @@ export async function orderLecotPartsForChatbot(
     notes,
     reference: lecotRef,
   });
+  if (!emailResult.ok && emailResult.error?.includes("Gmail OAuth non configuré")) {
+    await orderRef.update({
+      emailPending: true,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
   const emailNote = emailResult.ok
     ? ` Email bon de commande envoyé à ${LECOT_EMAIL}.`
     : emailResult.error
