@@ -54,10 +54,12 @@ import {
   proposeCompanyOpenSlots,
 } from "@/features/scheduling/proposeAvailableSlots";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
 export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const { logIntervention } = useActivityLog();
   const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
   const { interventions, loading } = useBackOfficeInterventions(cid);
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
@@ -79,6 +81,10 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     const next = id?.trim() ? id.trim() : null;
     setSelectedItemIdLocal(next);
     inboxIntent?.setSelectedInboxInterventionId(next);
+    if (next) {
+      const iv = interventions.find((x) => x.id === next);
+      if (iv) logIntervention(iv);
+    }
   };
 
   const { selectedDate } = useDateContext();

@@ -192,6 +192,25 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     ).toBeInTheDocument();
   });
 
+  it("remplace annuler/supprimer par Modifier dans le détail demande", async () => {
+    renderInbox(<BackOfficeInboxPanel />);
+    openRequestsTab();
+    fireEvent.click(screen.getByTestId("backoffice-inbox-request-row-req-inbox-1"));
+
+    const detail = await screen.findByTestId("backoffice-inbox-detail");
+    expect(within(detail).queryByTestId("backoffice-inbox-cancel")).not.toBeInTheDocument();
+    expect(within(detail).queryByText(/Supprimer/i)).not.toBeInTheDocument();
+
+    fireEvent.click(within(detail).getByTestId("backoffice-inbox-edit"));
+    const editor = await within(detail).findByTestId("backoffice-inbox-schedule-editor");
+    expect(within(editor).getByText(/Créneaux libres/i)).toBeInTheDocument();
+    expect(within(editor).getByTestId("proposed-schedule-date")).toBeInTheDocument();
+    expect(within(editor).getByTestId("backoffice-inbox-schedule-cancel")).toBeInTheDocument();
+    expect(within(editor).getByTestId("backoffice-inbox-schedule-save")).toHaveTextContent(
+      /Sauver/i
+    );
+  });
+
   it("ouvre le détail puis assigne via transition workflow", async () => {
     renderInbox(<BackOfficeInboxPanel />);
     openRequestsTab();
@@ -204,6 +223,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     fireEvent.click(screen.getByTestId("backoffice-inbox-assign"));
 
     const picker = await screen.findByTestId("technician-assign-picker");
+    expect(within(picker).queryByTestId("proposed-schedule-slots")).not.toBeInTheDocument();
     const confirm = within(picker).getByTestId("technician-assign-confirm");
     await waitFor(() => expect(confirm).not.toBeDisabled());
     fireEvent.click(confirm);
