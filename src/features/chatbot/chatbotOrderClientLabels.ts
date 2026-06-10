@@ -1,8 +1,10 @@
-import type { ChatbotInvoiceRow } from "@/features/chatbot/chatbotInvoiceRows";
+import {
+  invoiceClientOnlyLabel,
+  type ChatbotInvoiceRow,
+} from "@/features/chatbot/chatbotInvoiceRows";
 import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import { MATERIAL_ORDER_CLIENT_FALLBACK } from "@/features/materials/materialOrderClientName";
-import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions/types";
 import type { SupplierOrder } from "@/features/suppliers/types";
 
@@ -10,13 +12,13 @@ import type { SupplierOrder } from "@/features/suppliers/types";
 export function buildInterventionClientLabelMap(
   invoices: ChatbotInvoiceRow[],
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  interventions: Intervention[] = [],
+  interventions: Intervention[] = []
 ): Map<string, string> {
   const map = new Map<string, string>();
 
   for (const iv of interventions) {
     const id = iv.id?.trim();
-    const label = interventionClientLabel(iv)?.trim();
+    const label = invoiceClientOnlyLabel(iv)?.trim();
     if (id && label) map.set(id, label);
   }
 
@@ -38,7 +40,7 @@ export function buildInterventionClientLabelMap(
 /** Lie chaque commande fournisseur à un dossier (champ direct ou bon matériel associé). */
 export function buildSupplierOrderInterventionIdByOrderId(
   supplierOrders: SupplierOrder[],
-  materialOrders: MaterialOrderDoc[],
+  materialOrders: MaterialOrderDoc[]
 ): Map<string, string> {
   const map = new Map<string, string>();
 
@@ -59,7 +61,7 @@ export function buildSupplierOrderInterventionIdByOrderId(
 /** Nom client par id commande fournisseur (doc + bon matériel lié). */
 export function buildSupplierOrderClientNameByOrderId(
   supplierOrders: SupplierOrder[],
-  materialOrders: MaterialOrderDoc[],
+  materialOrders: MaterialOrderDoc[]
 ): Map<string, string> {
   const map = new Map<string, string>();
   for (const material of materialOrders) {
@@ -78,7 +80,7 @@ export function resolveSupplierOrderListClientLabel(
   order: Pick<SupplierOrder, "id" | "clientName" | "interventionId">,
   clientNameBySupplierOrderId: Map<string, string>,
   orderInterventionIdByOrderId: Map<string, string>,
-  clientLabelByInterventionId: Map<string, string>,
+  clientLabelByInterventionId: Map<string, string>
 ): string {
   const stored =
     order.clientName?.trim() || clientNameBySupplierOrderId.get(order.id)?.trim() || null;
@@ -88,14 +90,14 @@ export function resolveSupplierOrderListClientLabel(
       order.id,
       order.interventionId,
       orderInterventionIdByOrderId,
-      clientLabelByInterventionId,
-    ),
+      clientLabelByInterventionId
+    )
   );
 }
 
 export function resolveMaterialOrderListClientLabel(
   order: Pick<MaterialOrderDoc, "id" | "clientName" | "interventionId">,
-  clientLabelByInterventionId: Map<string, string>,
+  clientLabelByInterventionId: Map<string, string>
 ): string {
   const ivId = order.interventionId?.trim();
   const fromIv = ivId ? (clientLabelByInterventionId.get(ivId) ?? null) : null;
@@ -106,7 +108,7 @@ export function resolveSupplierOrderClientLabel(
   orderId: string,
   orderInterventionId: string | null | undefined,
   orderIdToInterventionId: Map<string, string>,
-  labelByInterventionId: Map<string, string>,
+  labelByInterventionId: Map<string, string>
 ): string | null {
   const ivId = orderInterventionId?.trim() || orderIdToInterventionId.get(orderId) || null;
   if (!ivId) return null;
@@ -116,7 +118,7 @@ export function resolveSupplierOrderClientLabel(
 /** Libellé principal dans les listes commandes (stocké sur la commande → dossier lié → « Client »). */
 export function resolveOrderListClientLabel(
   storedClientName: string | null | undefined,
-  resolvedFromIntervention: string | null | undefined,
+  resolvedFromIntervention: string | null | undefined
 ): string {
   const stored = storedClientName?.trim();
   if (stored) return stored;
@@ -128,7 +130,7 @@ export function resolveOrderListClientLabel(
 /** @deprecated Utiliser resolveSupplierOrderClientLabel. */
 export function resolveOrderClientLabel(
   interventionId: string | null | undefined,
-  labelByInterventionId: Map<string, string>,
+  labelByInterventionId: Map<string, string>
 ): string | null {
   const id = interventionId?.trim();
   if (!id) return null;

@@ -449,6 +449,11 @@
       "center": "CRM Activity Feed",
       "right": "Event detail"
     },
+    "mobile": {
+      "rail_agent": "Agent",
+      "rail_feed": "Feed",
+      "rail_detail": "Detail"
+    },
     "left": {
       "filters": "Filters",
       "period_label": "Period",
@@ -578,22 +583,22 @@
         "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.)."
       }
     },
-    "agent_placeholder": "Activity, cases, summary…",
+    "agent_placeholder": "KPIs, performance, quality analysis…",
     "agent_reset": "New conversation",
     "agent_thinking": "Analyzing…",
     "agent_no_company": "Select an active company.",
-    "agent_off_topic": "I am the History Agent — I only analyze CRM activity and history. For billing, stock, or the full Chatbot, use the dedicated page.",
+    "agent_off_topic": "I am the QM Agent — I analyze operational performance and quality. For stock, Lecot orders, or accounting, use the dedicated page.",
     "ai": {
-      "title": "AI Copilot",
-      "subtitle": "Smart analysis",
+      "title": "Quality Management Agent",
+      "subtitle": "Performance & quality",
       "shortcuts_label": "Shortcuts",
       "shortcuts": {
-        "summary_week": "Summarize this week's activity",
-        "materials_ordered": "What materials were ordered?",
-        "unresolved": "Which interventions are pending?",
-        "tech_performance": "Analyze technician performance"
+        "closure_rate": "Explain today's closure rate",
+        "why_cancelled": "Why were interventions cancelled?",
+        "tech_performance": "Analyze technician performance",
+        "summary_week": "Summarize this week's activity"
       },
-      "info": "AI analyses your entire CRM history to give you actionable insights."
+      "info": "The QM Agent analyzes your KPIs in real time and identifies quality issues."
     }
   },
   "companyStock": {
@@ -796,7 +801,7 @@
     "nav_technician_lab": "Technician lab",
     "nav_gmail": "Gmail",
     "nav_feature_hub": "Materials",
-    "nav_crm_history": "CRM History",
+    "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Billing",
     "open_aria": "Open search",
     "active_label": "Active",
@@ -891,7 +896,20 @@
     "right_tabs": {
       "aria": "Requester portal categories",
       "tracking": "Case tracking",
-      "chat": "Chat"
+      "chat": "Chat",
+      "invoice": "Invoice",
+      "documents": "Documents",
+      "timeline": "History"
+    },
+    "invoice": {
+      "back_to_tab": "Back to invoice",
+      "empty_no_case_title": "Your invoice will appear here",
+      "empty_no_case_hint": "Submit your service request to track billing for your case in this tab.",
+      "ready_title": "Your invoice",
+      "ready_hint": "The invoice for your service request is available.",
+      "view_pdf": "View invoice",
+      "view_pdf_hint": "Open the PDF in this tab",
+      "download_storage": "Download PDF"
     }
   },
   "technician_lab": {
@@ -1100,6 +1118,11 @@
     },
     "mission": {
       "fallback_title": "Intervention"
+    },
+    "mobile": {
+      "rail_missions": "Jobs",
+      "rail_map": "Map",
+      "rail_inbox": "Inbox"
     },
     "daily_missions": {
       "archive_aria": "Archive — hide this mission from today’s map on this device",
@@ -1403,15 +1426,7 @@
     }
   },
   "calendar": {
-    "weekdays_initials": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
-    ]
+    "weekdays_initials": ["M", "T", "W", "T", "F", "S", "S"]
   },
   "smart_time_slot": {
     "next_availabilities": "Next availabilities",
@@ -1424,15 +1439,7 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "availabilities_on": "Availabilities on {{date}}",
-    "days": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
-    ]
+    "days": ["M", "T", "W", "T", "F", "S", "S"]
   },
   "invoice_automation": {
     "title": "Automatic Invoicing",
@@ -1447,6 +1454,29 @@
     "create": "Create order",
     "error_no_lines": "Add at least one valid item.",
     "toast_created": "Order created"
+  },
+  "equipment": {
+    "title": "Equipment inventory",
+    "add": "Add",
+    "name_placeholder": "Equipment name *",
+    "brand": "Brand",
+    "model": "Model",
+    "serial": "Serial number",
+    "serial_short": "S/N:",
+    "install_date": "Installation date",
+    "next_service": "Next service",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "retire": "Retire",
+    "retired_summary": "{{count}} retired item(s)",
+    "empty": "No equipment recorded for this client.",
+    "service_prefix": "Service:",
+    "overdue": "Overdue",
+    "due_soon": "Due soon",
+    "toast_added": "Equipment added",
+    "toast_retired": "Equipment retired"
   },
   "stock": {
     "panel_title": "Vehicle stock",
@@ -1502,6 +1532,9 @@
     "toast_sent": "Quote sent",
     "toast_accepted": "Quote accepted",
     "toast_declined": "Quote declined",
+    "toast_expired": "This quote has expired.",
+    "toast_billing_applied": "Lines copied to the intervention invoice",
+    "download_pdf": "PDF",
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -1793,6 +1826,7 @@
     "orders_heading": "Orders",
     "orders_and_slips_heading": "Orders & slips",
     "orders_empty": "No orders yet.",
+    "order_untitled": "Untitled order",
     "view_supplier_order_pdf": "View purchase order",
     "view_material_order_pdf": "View material slip",
     "doc_badge_invoice": "Invoice",
@@ -1806,6 +1840,7 @@
     "pdf_document_pdf_fallback": "PDF Document",
     "select_company_placeholder": "Select an active company…",
     "input_aria": "Chatbot message",
+    "send_aria": "Send message",
     "demo_step_validated": "Validated",
     "demo_step_preparing": "Preparing",
     "demo_step_shipped": "Shipped",
@@ -1820,5 +1855,21 @@
       "center": "Chatbot",
       "right": "purchase orders and invoices"
     }
+  },
+  "mobile": {
+    "page_nav_label": "Page navigation",
+    "page_nav_item": "Page {{index}} of {{total}}",
+    "tab_bar_label": "Main sections",
+    "tab_map": "Map",
+    "tab_company": "Company",
+    "tab_technician": "Tech",
+    "tab_gmail": "Gmail",
+    "tab_material": "Stock",
+    "tab_crm": "CRM",
+    "tab_billing": "Billing",
+    "rail_segment_label": "Page panels",
+    "rail_left": "Left",
+    "rail_center": "Center",
+    "rail_right": "Right"
   }
 }

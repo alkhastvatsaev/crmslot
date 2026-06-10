@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled, stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { logger } from "@/core/logger";
+import {
+  DEMO_COMPANY_ID,
+  devUiPreviewEnabled,
+  stripKnownSyntheticInterventions,
+} from "@/core/config/devUiPreview";
 import { demoInterventionsForCompany } from "@/features/dev/demoInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
@@ -30,17 +35,19 @@ export function useBackOfficeInterventions(companyId: string | null) {
         q,
         (snap) => {
           const raw = stripKnownSyntheticInterventions(
-            snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention)),
+            snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
           );
           setInterventions(filterInterventionsByCompany(cid, raw));
           setLoadedCid(cid);
           setError(null);
         },
         (e) => {
-          console.error("Back-office interventions snapshot:", e);
+          logger.error("Back-office interventions snapshot:", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           setError(e.message || "Erreur Firestore");
           setLoadedCid(cid);
-        },
+        }
       );
     }, 10);
 

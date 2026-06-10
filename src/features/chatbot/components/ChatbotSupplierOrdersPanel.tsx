@@ -10,8 +10,19 @@ import {
   resolveMaterialOrderListClientLabel,
   resolveSupplierOrderListClientLabel,
 } from "@/features/chatbot/chatbotOrderClientLabels";
+import { buildChatbotOrderImageLookups } from "@/features/chatbot/chatbotOrderImageLookup";
+import {
+  summarizeMaterialOrderParts,
+  summarizeSupplierOrderLines,
+} from "@/features/chatbot/chatbotOrderListSummary";
+import {
+  resolveMaterialOrderTrackingProgress,
+  resolveSupplierOrderTrackingProgress,
+} from "@/features/chatbot/chatbotOrderTrackingProgress";
+import ChatbotOrderListTile from "@/features/chatbot/components/ChatbotOrderListTile";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
 import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
+import { useChatbotOrderImages } from "@/features/chatbot/hooks/useChatbotOrderImages";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import type { SupplierOrder } from "@/features/suppliers/types";
@@ -19,23 +30,10 @@ import type { MaterialOrderDoc } from "@/features/materials/materialOrderFiresto
 import SupplierOrderDemoProgress from "@/features/chatbot/components/SupplierOrderDemoProgress";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { HUB_TYPE } from "@/core/ui/hub/hubTheme";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
-/** Accent unique du panneau — bleu, sobre. */
-const ACCENT = {
-  wash: "from-blue-50/70 via-blue-50/20 to-transparent",
-  bar: "bg-blue-300/90 group-hover:bg-blue-400",
-  barActive: "bg-blue-500",
-  rowHighlight: "border-l-blue-500 bg-blue-50/55",
-  price: "text-blue-700",
-  refresh: "text-blue-500 hover:bg-blue-100/80 hover:text-blue-700",
-  count: "text-blue-600/70",
-  demo: "text-blue-600",
-} as const;
-
-function formatEur(cents: number): string {
-  return `${(cents / 100).toLocaleString("fr-BE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} €`;
+function isOpenSupplierOrder(order: SupplierOrder): boolean {
+  return order.status === "draft" || order.status === "sent" || order.status === "confirmed";
 }
 
 function formatWhenShort(raw: unknown): string {
@@ -51,137 +49,139 @@ function formatWhenShort(raw: unknown): string {
   return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
 }
 
-function OrderDateLine({ createdAt }: { createdAt: unknown }) {
-  const date = formatWhenShort(createdAt);
-  if (!date) return null;
-  return <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p>;
-}
-
-import type { SupplierOrderStatus } from "@/features/suppliers/types";
-
-function getDemoOrderStatus(orderId: string, originalStatus: string): SupplierOrderStatus {
-  if (originalStatus !== "sent") return originalStatus as SupplierOrderStatus;
-  let hash = 0;
-  for (let i = 0; i < orderId.length; i++) {
-    hash = orderId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % 4;
-  const statuses: SupplierOrderStatus[] = ["draft", "sent", "confirmed", "delivered"];
-  return statuses[index] ?? "sent";
-}
-
 function SupplierOrderRow({
   order,
+  orderTitle,
   clientLabel,
   highlighted,
   onViewPdf,
 }: {
   order: SupplierOrder;
+  orderTitle: string;
   clientLabel: string;
   highlighted: boolean;
   onViewPdf: () => void;
 }) {
   const { t } = useTranslation();
-  const displayOrder = order.isDemo
-    ? { ...order, status: getDemoOrderStatus(order.id, order.status) }
-    : order;
+  const date = formatWhenShort(order.createdAt);
+  const title =
+    orderTitle.trim() ||
+    order.lines[0]?.label?.trim() ||
+    order.lines[0]?.sku?.trim() ||
+    String(t("chatbot.order_untitled"));
 
   return (
     <article
-      data-testid={`chatbot-supplier-order-${displayOrder.id}`}
+      data-testid={`chatbot-supplier-order-${order.id}`}
       className={cn(
-        "group flex border-b border-blue-100/50 py-3 pl-1 pr-1 transition-colors last:border-b-0",
-        highlighted && cn("border-l-2", ACCENT.rowHighlight),
+        "group border-b border-slate-100 last:border-b-0 transition-colors",
+        highlighted ? "bg-slate-50" : "hover:bg-slate-50/60"
       )}
     >
-      <div className="flex w-full items-start gap-2.5">
-        <span
-          className={cn(
-            "mt-0.5 h-8 w-1 shrink-0 rounded-full transition-colors",
-            highlighted ? ACCENT.barActive : ACCENT.bar,
-          )}
-          aria-hidden
-        />
-        <div className="min-w-0 flex-1 flex flex-col">
-          <div className="flex justify-between items-start">
-            <button
-              type="button"
-              className="text-left min-w-0 flex-1"
-              onClick={onViewPdf}
-              data-testid={`chatbot-supplier-order-pdf-${displayOrder.id}`}
-              aria-label={String(t("chatbot.view_supplier_order_pdf"))}
+      <button
+        type="button"
+        className="w-full px-4 py-3 text-left"
+        onClick={onViewPdf}
+        data-testid={`chatbot-supplier-order-pdf-${order.id}`}
+        aria-label={String(t("chatbot.view_supplier_order_pdf"))}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <p
+            className="min-w-0 flex-1 line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900"
+            data-testid="chatbot-order-title"
+          >
+            {title}
+          </p>
+          {order.emailPending ? (
+            <span
+              className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700"
+              title="Email non envoyé — reconnectez Gmail"
             >
-              <p
-                className="truncate text-[13px] font-medium leading-snug text-slate-900"
-                data-testid="chatbot-order-client-label"
-              >
-                {capitalizeName(clientLabel)}
-              </p>
-              <OrderDateLine createdAt={displayOrder.createdAt} />
-            </button>
-            <p className={cn("shrink-0 text-[13px] font-semibold tabular-nums ml-2", ACCENT.price)}>
-              {formatEur(displayOrder.totalCents)}
-            </p>
-          </div>
-
-          {displayOrder.isDemo ? (
-            <SupplierOrderDemoProgress orderId={displayOrder.id} status={displayOrder.status} />
+              Email ⚠
+            </span>
           ) : null}
         </div>
-      </div>
+        <p
+          className="mt-1 truncate text-[11px] text-slate-500"
+          data-testid="chatbot-order-client-label"
+        >
+          {capitalizeName(clientLabel)}
+          {date ? ` · ${date}` : ""}
+        </p>
+        {isOpenSupplierOrder(order) ? (
+          <SupplierOrderDemoProgress
+            orderId={order.id}
+            status={order.status}
+            createdAt={order.createdAt}
+            sentAt={order.sentAt}
+            deliveredAt={order.deliveredAt}
+          />
+        ) : null}
+      </button>
     </article>
   );
 }
 
 function MaterialOrderRow({
   order,
+  orderTitle,
   clientLabel,
   highlighted,
   onViewPdf,
 }: {
   order: MaterialOrderDoc;
+  orderTitle: string;
   clientLabel: string;
   highlighted: boolean;
   onViewPdf?: () => void;
 }) {
   const { t } = useTranslation();
   const date = formatWhenShort(order.createdAt);
+  const title =
+    orderTitle.trim() ||
+    order.partsRequested[0]?.description?.trim() ||
+    String(t("chatbot.order_untitled"));
+
+  const inner = (
+    <>
+      <div className="flex items-start justify-between gap-2">
+        <p
+          className="min-w-0 flex-1 line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900"
+          data-testid="chatbot-order-title"
+        >
+          {title}
+        </p>
+        {date ? <span className="shrink-0 text-[11px] text-slate-400">{date}</span> : null}
+      </div>
+      <p
+        className="mt-1 truncate text-[11px] text-slate-500"
+        data-testid="chatbot-order-client-label"
+      >
+        {capitalizeName(clientLabel)}
+      </p>
+    </>
+  );
 
   return (
     <article
       data-testid={`chatbot-material-order-${order.id}`}
       className={cn(
-        "group flex items-center gap-2 border-b border-slate-100/90 py-3 pl-2 pr-1 transition-colors last:border-b-0",
-        highlighted ? "border-l-2 border-l-slate-900 bg-slate-50/90" : "border-l-2 border-l-transparent",
-        !onViewPdf && "opacity-80",
+        "border-b border-slate-100 last:border-b-0 transition-colors",
+        highlighted ? "bg-slate-50" : onViewPdf ? "hover:bg-slate-50/60" : "opacity-70"
       )}
     >
       {onViewPdf ? (
         <button
           type="button"
-          className="min-w-0 flex-1 text-left"
+          className="w-full px-4 py-3 text-left"
           onClick={onViewPdf}
           data-testid={`chatbot-material-order-pdf-${order.id}`}
           aria-label={String(t("chatbot.view_material_order_pdf"))}
         >
-          <p
-            className="truncate text-[13px] font-medium leading-snug text-slate-900"
-            data-testid="chatbot-order-client-label"
-          >
-            {capitalizeName(clientLabel)}
-          </p>
-          {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
+          {inner}
         </button>
       ) : (
-        <div className="min-w-0 flex-1">
-          <p
-            className="truncate text-[13px] font-medium leading-snug text-slate-900"
-            data-testid="chatbot-order-client-label"
-          >
-            {capitalizeName(clientLabel)}
-          </p>
-          {date ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{date}</p> : null}
-        </div>
+        <div className="px-4 py-3">{inner}</div>
       )}
     </article>
   );
@@ -191,7 +191,6 @@ type ChatbotSupplierOrdersPanelProps = {
   placement?: "leftRail" | "rightRail" | "embedded";
 };
 
-/** Liste commandes — présentation minimaliste. */
 export default function ChatbotSupplierOrdersPanel({
   placement = "embedded",
 }: ChatbotSupplierOrdersPanelProps) {
@@ -221,17 +220,17 @@ export default function ChatbotSupplierOrdersPanel({
 
   const clientLabelByInterventionId = useMemo(
     () => buildInterventionClientLabelMap(chatbotInvoices, workspaceSnapshot, interventions),
-    [chatbotInvoices, workspaceSnapshot, interventions],
+    [chatbotInvoices, workspaceSnapshot, interventions]
   );
 
   const orderInterventionIdByOrderId = useMemo(
     () => buildSupplierOrderInterventionIdByOrderId(supplierOrders, materialOrders),
-    [supplierOrders, materialOrders],
+    [supplierOrders, materialOrders]
   );
 
   const clientNameBySupplierOrderId = useMemo(
     () => buildSupplierOrderClientNameByOrderId(supplierOrders, materialOrders),
-    [supplierOrders, materialOrders],
+    [supplierOrders, materialOrders]
   );
 
   const supplierOrderClientLabel = useCallback(
@@ -240,15 +239,15 @@ export default function ChatbotSupplierOrdersPanel({
         order,
         clientNameBySupplierOrderId,
         orderInterventionIdByOrderId,
-        clientLabelByInterventionId,
+        clientLabelByInterventionId
       ),
-    [clientNameBySupplierOrderId, orderInterventionIdByOrderId, clientLabelByInterventionId],
+    [clientNameBySupplierOrderId, orderInterventionIdByOrderId, clientLabelByInterventionId]
   );
 
   const materialOrderClientLabel = useCallback(
     (order: MaterialOrderDoc) =>
       resolveMaterialOrderListClientLabel(order, clientLabelByInterventionId),
-    [clientLabelByInterventionId],
+    [clientLabelByInterventionId]
   );
 
   const isLeftRail = placement === "leftRail";
@@ -269,12 +268,169 @@ export default function ChatbotSupplierOrdersPanel({
       ? highlightMaterialId === orderId && documentPreview.kind === "material_order"
       : orderId === highlightMaterialId;
 
+  const hasBoth = supplierOrders.length > 0 && materialOrders.length > 0;
+  const pendingEmailCount = supplierOrders.filter((o) => o.emailPending).length;
+
+  const orderImageLookups = useMemo(() => {
+    if (!isRightRail) return [];
+    return buildChatbotOrderImageLookups(supplierOrders.slice(0, 15), materialOrders);
+  }, [isRightRail, supplierOrders, materialOrders]);
+  const orderImages = useChatbotOrderImages(orderImageLookups, { enabled: isRightRail });
+
+  const renderRightRailList = () => (
+    <ul
+      data-testid="chatbot-orders-list-rail"
+      data-layout="list"
+      className="flex flex-col gap-2.5 p-2.5"
+    >
+      {supplierOrders.slice(0, 15).map((order) => {
+        const orderTitle = summarizeSupplierOrderLines(order.lines);
+        const clientLabel = supplierOrderClientLabel(order);
+        const date = formatWhenShort(order.createdAt);
+        const title =
+          orderTitle.trim() ||
+          order.lines[0]?.label?.trim() ||
+          order.lines[0]?.sku?.trim() ||
+          String(t("chatbot.order_untitled"));
+        const tracking = resolveSupplierOrderTrackingProgress(order.status, {
+          createdAt: order.createdAt,
+          sentAt: order.sentAt,
+          deliveredAt: order.deliveredAt,
+        });
+
+        return (
+          <li key={`supplier-${order.id}`} className="min-w-0">
+            <ChatbotOrderListTile
+              orderId={order.id}
+              title={title}
+              subtitle={[capitalizeName(clientLabel), date].filter(Boolean).join(" · ")}
+              imageUrl={orderImages[order.id]}
+              tracking={tracking}
+              highlighted={isSupplierHighlighted(order.id)}
+              testIdPrefix="chatbot-supplier-order"
+              ariaLabel={String(t("chatbot.view_supplier_order_pdf"))}
+              onClick={() => {
+                if (!companyId) return;
+                void openSupplierOrderPdf(companyId, order.id, false, pdfOverlayTarget);
+              }}
+            />
+          </li>
+        );
+      })}
+      {materialOrders.map((order) => {
+        const orderTitle = summarizeMaterialOrderParts(order.partsRequested);
+        const clientLabel = materialOrderClientLabel(order);
+        const date = formatWhenShort(order.createdAt);
+        const title =
+          orderTitle.trim() ||
+          order.partsRequested[0]?.description?.trim() ||
+          String(t("chatbot.order_untitled"));
+        const tracking = resolveMaterialOrderTrackingProgress(order.status);
+
+        return (
+          <li key={`material-${order.id}`} className="min-w-0">
+            <ChatbotOrderListTile
+              orderId={order.id}
+              title={title}
+              subtitle={[capitalizeName(clientLabel), date].filter(Boolean).join(" · ")}
+              imageUrl={orderImages[order.id]}
+              tracking={tracking}
+              highlighted={isMaterialHighlighted(order.id)}
+              testIdPrefix="chatbot-material-order"
+              ariaLabel={
+                order.interventionId ? String(t("chatbot.view_material_order_pdf")) : undefined
+              }
+              clickable={Boolean(order.interventionId)}
+              onClick={
+                order.interventionId
+                  ? () =>
+                      openDocumentPreview(
+                        order.interventionId,
+                        "material_order",
+                        false,
+                        pdfOverlayTarget
+                      )
+                  : undefined
+              }
+            />
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  const renderOrdersList = () => (
+    <>
+      <section data-testid="chatbot-supplier-orders-section">
+        {hasBoth && supplierOrders.length > 0 && !isRightRail ? (
+          <div className="px-4 pb-1 pt-2">
+            <span className={cn(HUB_TYPE.eyebrow, "text-[10px]")}>Fournisseur</span>
+          </div>
+        ) : null}
+        {supplierOrders.slice(0, 15).map((order) => (
+          <SupplierOrderRow
+            key={order.id}
+            order={order}
+            orderTitle={summarizeSupplierOrderLines(order.lines)}
+            clientLabel={supplierOrderClientLabel(order)}
+            highlighted={isSupplierHighlighted(order.id)}
+            onViewPdf={() => {
+              if (!companyId) return;
+              if (isSideRail) {
+                void openSupplierOrderPdf(companyId, order.id, false, pdfOverlayTarget);
+              } else {
+                ensureRightPanelOpen();
+                void openSupplierOrderPdf(companyId, order.id);
+              }
+            }}
+          />
+        ))}
+      </section>
+
+      {materialOrders.length > 0 ? (
+        <section
+          data-testid="chatbot-material-orders-section"
+          className={cn(hasBoth && "mt-2 border-t border-slate-100 pt-1")}
+        >
+          {hasBoth ? (
+            <div className="px-4 pb-1 pt-2">
+              <span className={cn(HUB_TYPE.eyebrow, "text-[10px]")}>Matériel</span>
+            </div>
+          ) : null}
+          {materialOrders.map((order) => (
+            <MaterialOrderRow
+              key={order.id}
+              order={order}
+              orderTitle={summarizeMaterialOrderParts(order.partsRequested)}
+              clientLabel={materialOrderClientLabel(order)}
+              highlighted={isMaterialHighlighted(order.id)}
+              onViewPdf={
+                order.interventionId
+                  ? () => {
+                      if (isSideRail) {
+                        openDocumentPreview(
+                          order.interventionId,
+                          "material_order",
+                          false,
+                          pdfOverlayTarget
+                        );
+                      } else {
+                        ensureRightPanelOpen();
+                        openDocumentPreview(order.interventionId, "material_order");
+                      }
+                    }
+                  : undefined
+              }
+            />
+          ))}
+        </section>
+      ) : null}
+    </>
+  );
+
   return (
     <div
-      className={cn(
-        "relative flex min-h-0 flex-1 flex-col overflow-hidden",
-        !isSideRail && "bg-gradient-to-b from-blue-50/50 to-slate-50/90",
-      )}
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
       data-testid={
         isLeftRail
           ? "chatbot-orders-left-panel"
@@ -282,113 +438,67 @@ export default function ChatbotSupplierOrdersPanel({
             ? "company-stock-orders-panel"
             : "chatbot-supplier-orders-panel"
       }
-      style={isSideRail ? outfit : undefined}
     >
-      {isSideRail ? (
+      {/* Header — masqué sur le rail Matériel (droite) */}
+      {isRightRail ? null : isSideRail ? (
         <div className="shrink-0 px-4 pt-4 pb-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[13px] font-medium tracking-[-0.02em] text-slate-800">{t("chatbot.orders_heading")}</h2>
+          <div className="flex items-center justify-between gap-2">
+            <span className={HUB_TYPE.eyebrow}>{t("chatbot.orders_heading")}</span>
             {totalCount > 0 ? (
-              <span className="text-[10px] tabular-nums text-slate-400">{totalCount}</span>
+              <span className="text-[11px] font-medium tabular-nums text-slate-400">
+                {totalCount}
+              </span>
             ) : null}
           </div>
         </div>
       ) : (
-        <header className="flex shrink-0 items-center justify-between border-b border-blue-100/50 px-4 pb-2.5 pt-3">
-          <div>
-            <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-slate-900">
-              <span className={cn("h-2 w-2 shrink-0 rounded-full", ACCENT.barActive)} aria-hidden />
-              {t("chatbot.orders_and_slips_heading")}
-            </h2>
-          </div>
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-100 px-4 pb-2.5 pt-3">
+          <h2 className={HUB_TYPE.title}>{t("chatbot.orders_and_slips_heading")}</h2>
           <button
             type="button"
             data-testid="chatbot-supplier-orders-close"
             onClick={closeSupplierOrdersPanel}
-            className="rounded-full p-2 text-slate-400 hover:bg-slate-100"
+            className="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
             aria-label={String(t("chatbot.close_preview"))}
           >
-            <span className="text-lg leading-none">×</span>
+            <span className="text-[16px] leading-none">×</span>
           </button>
         </header>
       )}
 
+      {/* List */}
       <div
-        className={cn(
-          "custom-scrollbar min-h-0 flex-1 overflow-y-auto",
-          isSideRail ? "px-3 pb-4" : "px-2 pb-4",
-        )}
+        className="custom-scrollbar min-h-0 flex-1 overflow-y-auto"
         data-testid="chatbot-orders-list"
       >
+        {pendingEmailCount > 0 ? (
+          <p
+            className="mx-4 mb-2 mt-1 rounded-[12px] bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800"
+            data-testid="chatbot-pending-email-banner"
+          >
+            ⚠ {pendingEmailCount} bon{pendingEmailCount > 1 ? "s" : ""} non envoyé
+            {pendingEmailCount > 1 ? "s" : ""} — reconnectez Gmail pour les transmettre à Lecot.
+          </p>
+        ) : null}
         {registryError ? (
           <p
-            className="mx-2 mb-2 rounded-md bg-amber-50/80 px-2.5 py-2 text-[11px] leading-snug text-amber-900/90"
+            className="mx-4 mb-2 mt-1 rounded-[12px] bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800"
             data-testid="chatbot-registry-error"
           >
             {registryError}
           </p>
         ) : null}
 
-        <section data-testid="chatbot-supplier-orders-section">
-          {supplierOrders.length === 0 && materialOrders.length === 0 ? (
-            <p
-              className="px-3 py-8 text-center text-[12px] leading-relaxed text-slate-400"
-              data-testid="chatbot-supplier-orders-empty"
-            >
-              {t("chatbot.orders_empty")}
-            </p>
-          ) : null}
-          {supplierOrders.slice(0, 15).map((order) => (
-            <SupplierOrderRow
-              key={order.id}
-              order={order}
-              clientLabel={supplierOrderClientLabel(order)}
-              highlighted={isSupplierHighlighted(order.id)}
-              onViewPdf={() => {
-                if (!companyId) return;
-                if (isSideRail) {
-                  void openSupplierOrderPdf(companyId, order.id, false, pdfOverlayTarget);
-                } else {
-                  ensureRightPanelOpen();
-                  void openSupplierOrderPdf(companyId, order.id);
-                }
-              }}
-            />
-          ))}
-        </section>
-
-        {materialOrders.length > 0 ? (
-          <section
-            data-testid="chatbot-material-orders-section"
-            className={cn(supplierOrders.length > 0 && "mt-1 border-t border-blue-100/60")}
+        {supplierOrders.length === 0 && materialOrders.length === 0 ? (
+          <p
+            className="px-4 py-10 text-center text-[12px] text-slate-400"
+            data-testid="chatbot-supplier-orders-empty"
           >
-            {materialOrders.map((order) => (
-              <MaterialOrderRow
-                key={order.id}
-                order={order}
-                clientLabel={materialOrderClientLabel(order)}
-                highlighted={isMaterialHighlighted(order.id)}
-                onViewPdf={
-                  order.interventionId
-                    ? () => {
-                        if (isSideRail) {
-                          openDocumentPreview(
-                            order.interventionId,
-                            "material_order",
-                            false,
-                            pdfOverlayTarget,
-                          );
-                        } else {
-                          ensureRightPanelOpen();
-                          openDocumentPreview(order.interventionId, "material_order");
-                        }
-                      }
-                    : undefined
-                }
-              />
-            ))}
-          </section>
+            {t("chatbot.orders_empty")}
+          </p>
         ) : null}
+
+        {isRightRail ? renderRightRailList() : renderOrdersList()}
       </div>
 
       {previewOnSideRail ? (

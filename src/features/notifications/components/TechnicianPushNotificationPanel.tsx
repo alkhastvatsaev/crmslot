@@ -4,8 +4,6 @@ import { Bell, BellOff, BellRing, Loader2 } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useTechnicianPushMessaging } from "@/features/notifications/useTechnicianPushMessaging";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 export default function TechnicianPushNotificationPanel() {
   const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
   const { status, lastError, registerPush } = useTechnicianPushMessaging(vapidKey);
@@ -28,10 +26,14 @@ export default function TechnicianPushNotificationPanel() {
                   : "En attente d’activation.";
 
   return (
-    <div data-testid="technician-push-panel" style={outfit} className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-3`}>
+    <div
+      data-testid="technician-push-panel"
+      className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-3`}
+    >
       <h2 className="sr-only">Notifications push</h2>
       <p className="sr-only">
-        Alertes missions et rappel quotidien 17h Europe/Bruxelles si interventions ouvertes ; Firebase Cloud Messaging et service worker.
+        Alertes missions et rappel quotidien 17h Europe/Bruxelles si interventions ouvertes ;
+        Firebase Cloud Messaging et service worker.
       </p>
 
       <div className="flex flex-col items-center gap-2 rounded-[16px] border border-black/[0.06] bg-white/90 px-3 py-4 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]">
@@ -53,7 +55,10 @@ export default function TechnicianPushNotificationPanel() {
           )}
         </div>
         {lastError ? (
-          <p data-testid="technician-push-error" className="text-center text-[12px] font-medium text-rose-700">
+          <p
+            data-testid="technician-push-error"
+            className="text-center text-[12px] font-medium text-rose-700"
+          >
             {lastError}
           </p>
         ) : null}

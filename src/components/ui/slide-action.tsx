@@ -75,7 +75,7 @@ export function BidirectionalSlideAction({
   const runAction = async (
     direction: "accept" | "decline",
     targetX: number,
-    action: () => void | Promise<void>,
+    action: () => void | Promise<void>
   ) => {
     setIsActing(true);
     setOutcome(direction === "accept" ? "accept" : "decline");
@@ -89,7 +89,7 @@ export function BidirectionalSlideAction({
 
   const handleDragEnd = (
     _event: MouseEvent | TouchEvent | PointerEvent,
-    info: { offset: { x: number } },
+    info: { offset: { x: number } }
   ) => {
     if (disabled || isActing || outcome !== "idle" || !containerRef.current) return;
 
@@ -116,9 +116,9 @@ export function BidirectionalSlideAction({
       ref={containerRef}
       data-testid={testId}
       className={cn(
-        "relative flex h-[58px] w-full items-center justify-center overflow-hidden rounded-full border border-neutral-200/80 bg-white",
+        "relative flex h-[58px] w-full items-center justify-center overflow-hidden rounded-full border border-slate-200/80 bg-white",
         disabled && "pointer-events-none opacity-50",
-        className,
+        className
       )}
     >
       <motion.div
@@ -126,8 +126,7 @@ export function BidirectionalSlideAction({
         className="pointer-events-none absolute inset-0 rounded-full"
         style={{
           opacity: declineFill,
-          background:
-            "linear-gradient(90deg, #e11d48 0%, #fecdd3 32%, #ffffff 72%)",
+          background: "linear-gradient(90deg, #e11d48 0%, #fecdd3 32%, #ffffff 72%)",
         }}
       />
       <motion.div
@@ -135,15 +134,14 @@ export function BidirectionalSlideAction({
         className="pointer-events-none absolute inset-0 rounded-full"
         style={{
           opacity: acceptFill,
-          background:
-            "linear-gradient(270deg, #059669 0%, #a7f3d0 32%, #ffffff 72%)",
+          background: "linear-gradient(270deg, #059669 0%, #a7f3d0 32%, #ffffff 72%)",
         }}
       />
 
-      <span className="pointer-events-none absolute left-4 z-[1] text-[11px] font-bold uppercase tracking-wide text-neutral-400">
+      <span className="pointer-events-none absolute left-4 z-[1] text-[11px] font-bold uppercase tracking-wide text-slate-400">
         {declineLabel}
       </span>
-      <span className="pointer-events-none absolute right-4 z-[1] text-[11px] font-bold uppercase tracking-wide text-neutral-400">
+      <span className="pointer-events-none absolute right-4 z-[1] text-[11px] font-bold uppercase tracking-wide text-slate-400">
         {acceptLabel}
       </span>
 
@@ -163,13 +161,13 @@ export function BidirectionalSlideAction({
             ? "border-emerald-700 bg-emerald-700"
             : outcome === "decline"
               ? "border-rose-600 bg-rose-600"
-              : "border-neutral-200 bg-neutral-900",
+              : "border-slate-200 bg-slate-900"
         )}
       >
         <span
           className={cn(
             "absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full",
-            outcome === "idle" ? "bg-white" : "bg-white/90",
+            outcome === "idle" ? "bg-white" : "bg-white/90"
           )}
         />
       </motion.div>
@@ -238,7 +236,7 @@ export function SlideAction({
 
   const handleDragEnd = async (
     _event: MouseEvent | TouchEvent | PointerEvent,
-    info: { offset: { x: number } },
+    info: { offset: { x: number } }
   ) => {
     if (disabled || !containerRef.current || !knobRef.current) return;
 
@@ -281,10 +279,10 @@ export function SlideAction({
         isPremium
           ? "bg-slate-100/95 shadow-[inset_0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/90"
           : isField
-            ? "border border-neutral-200 bg-neutral-100"
+            ? "border border-slate-200 bg-slate-100"
             : "rounded-[36px] border border-white/60 bg-white/40 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl",
         disabled && "pointer-events-none opacity-50",
-        className,
+        className
       )}
     >
       {!isField && !isPremium ? (
@@ -303,7 +301,7 @@ export function SlideAction({
         style={{ opacity: textOpacity }}
         className={cn(
           "pointer-events-none absolute inset-0 flex items-center justify-center",
-          isPremium ? "pl-[3.25rem] pr-4" : "pl-14",
+          isPremium ? "pl-[3.25rem] pr-4" : "pl-14"
         )}
       >
         <span
@@ -311,8 +309,8 @@ export function SlideAction({
             isPremium
               ? "text-[14px] font-medium tracking-tight text-slate-600"
               : "text-[13px] font-semibold tracking-wide",
-            !isPremium && isField ? "text-neutral-500" : "",
-            !isPremium && !isField ? "text-slate-800/60 mix-blend-overlay" : "",
+            !isPremium && isField ? "text-slate-500" : "",
+            !isPremium && !isField ? "text-slate-800/60 mix-blend-overlay" : ""
           )}
         >
           {label}
@@ -346,10 +344,13 @@ export function SlideAction({
               ? "bg-slate-900 text-white shadow-[0_10px_28px_-6px_rgba(15,23,42,0.45)] ring-2 ring-white/90"
               : isField
                 ? "bg-[#0F172A] text-white shadow-sm"
-                : "bg-white text-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
+                : "bg-white text-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.1)]"
         )}
       >
-        <Icon className={cn(isPremium ? "h-[1.125rem] w-[1.125rem]" : "h-5 w-5")} strokeWidth={2.25} />
+        <Icon
+          className={cn(isPremium ? "h-[1.125rem] w-[1.125rem]" : "h-5 w-5")}
+          strokeWidth={2.25}
+        />
       </motion.div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { openDB, type IDBPDatabase } from "idb";
+import { logger } from "@/core/logger";
 import type { ChatbotDocumentKind } from "./chatbot-document";
 
 const DB_NAME = "belgmap-pdfs-cache";
@@ -43,7 +44,9 @@ export async function savePdfToCache(
     const key = getCacheKey(interventionId, kind, companyId, orderId);
     await db.put(STORE_NAME, blob, key);
   } catch (e) {
-    console.warn("Erreur de sauvegarde PDF en cache", e);
+    logger.warn("Erreur de sauvegarde PDF en cache", {
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -56,9 +59,11 @@ export async function getPdfFromCache(
   try {
     const db = await getDb();
     const key = getCacheKey(interventionId, kind, companyId, orderId);
-    return (await db.get(STORE_NAME, key)) as Blob | undefined ?? null;
+    return ((await db.get(STORE_NAME, key)) as Blob | undefined) ?? null;
   } catch (e) {
-    console.warn("Erreur de lecture PDF en cache", e);
+    logger.warn("Erreur de lecture PDF en cache", {
+      error: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }
@@ -74,6 +79,8 @@ export async function removePdfFromCache(
     const key = getCacheKey(interventionId, kind, companyId, orderId);
     await db.delete(STORE_NAME, key);
   } catch (e) {
-    console.warn("Erreur suppression PDF cache", e);
+    logger.warn("Erreur suppression PDF cache", {
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

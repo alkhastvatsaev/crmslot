@@ -1,21 +1,21 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import { auth } from '@/core/config/firebase';
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import React, { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import { auth } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
+import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 
-import { syncClientPortalProfile } from '@/features/auth/clientPortalProfile';
-import { devUiPreviewEnabled } from '@/core/config/devUiPreview';
+import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
+import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 
 export default function LoginOverlay({ children }: { children: React.ReactNode }) {
-  const [loadingState, setLoadingState] = useState<'checking' | 'ready'>('checking');
+  const [loadingState, setLoadingState] = useState<"checking" | "ready">("checking");
   const [, setIsAuthenticated] = useState(false);
-
 
   useEffect(() => {
     if (!auth) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoadingState('ready');
+      setLoadingState("ready");
       return;
     }
 
@@ -24,10 +24,12 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
         try {
           if (!auth.currentUser) await signInAnonymously(auth);
         } catch (e) {
-          console.warn("[LoginOverlay] dev anonymous sign-in failed", e);
+          logger.warn("[LoginOverlay] dev anonymous sign-in failed", {
+            error: e instanceof Error ? e.message : String(e),
+          });
         }
         setIsAuthenticated(true);
-        setLoadingState('ready');
+        setLoadingState("ready");
       })();
       return;
     }
@@ -37,21 +39,25 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
         try {
           await syncClientPortalProfile(user);
         } catch (e) {
-          console.error("[LoginOverlay] sync error", e);
+          logger.error("[LoginOverlay] sync error", {
+            error: e instanceof Error ? e.message : String(e),
+          });
         }
         setIsAuthenticated(true);
-        setLoadingState('ready');
+        setLoadingState("ready");
       } else {
         try {
           const cred = await signInAnonymously(auth!);
           await syncClientPortalProfile(cred.user);
           setIsAuthenticated(true);
-          setLoadingState('ready');
+          setLoadingState("ready");
         } catch (e) {
-          console.error("[LoginOverlay] Anonymous sign-in failed", e);
+          logger.error("[LoginOverlay] Anonymous sign-in failed", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           // If anonymous fails (e.g. offline), we still let them in for the demo UI
           setIsAuthenticated(true);
-          setLoadingState('ready');
+          setLoadingState("ready");
         }
       }
     });
@@ -59,9 +65,9 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
     return () => unsubscribe();
   }, []);
 
-  if (loadingState === 'checking') {
+  if (loadingState === "checking") {
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#f8fafc]">
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-50">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" strokeWidth={1.5} />
       </div>
     );

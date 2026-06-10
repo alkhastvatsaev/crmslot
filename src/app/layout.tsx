@@ -12,9 +12,14 @@ const outfit = Outfit({
 const appGitSha = process.env.NEXT_PUBLIC_APP_GIT_SHA ?? "";
 
 export const metadata: Metadata = {
-  title: "testbelgiquepwa",
+  title: "BELGMAP",
   description: "Plateforme de gestion d'interventions de serrurerie en Belgique",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BELGMAP",
+  },
   ...(appGitSha
     ? {
         other: {
@@ -28,14 +33,15 @@ export const viewport: Viewport = {
   themeColor: "#f8fafc",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
-import { Toaster } from 'sonner';
+import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export default function RootLayout({
   children,
@@ -43,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={cn(outfit.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="fr" className={cn(outfit.variable, geist.variable)} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <I18nProvider>{children}</I18nProvider>
         <Toaster position="top-center" theme="light" richColors closeButton />

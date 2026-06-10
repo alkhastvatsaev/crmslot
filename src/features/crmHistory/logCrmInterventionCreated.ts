@@ -1,4 +1,5 @@
 import { firestore } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { buildCompanyCrmActivityPayload, logCompanyCrmActivity } from "./crmActivityLog";
@@ -46,12 +47,14 @@ export async function logCrmInterventionCreated(params: {
     {
       statusAfter: "pending",
       note: sourceLabels[params.source],
-    },
+    }
   );
 
   try {
     await logCompanyCrmActivity(firestore, payload);
   } catch (e) {
-    console.warn("[logCrmInterventionCreated]", e);
+    logger.warn("[logCrmInterventionCreated]", {
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

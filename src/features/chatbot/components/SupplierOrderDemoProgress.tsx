@@ -11,12 +11,26 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 type Props = {
   orderId: string;
   status: SupplierOrderStatus | string;
+  createdAt?: unknown;
+  sentAt?: unknown;
+  deliveredAt?: unknown;
 };
 
-/** Barre + étapes — mode démonstration uniquement. */
-export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
+/** Barre + étapes — avance sur 2 jours depuis la date de commande. */
+export default function SupplierOrderDemoProgress({
+  orderId,
+  status,
+  createdAt,
+  sentAt,
+  deliveredAt,
+}: Props) {
   const { t } = useTranslation();
-  const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress(status);
+  const { activeIndex, cancelled } = resolveDemoSupplierOrderProgress({
+    status,
+    createdAt,
+    sentAt,
+    deliveredAt,
+  });
 
   if (cancelled) {
     return (
@@ -34,7 +48,7 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
 
   return (
     <div
-      className="mt-2.5 pr-1"
+      className="mt-2 pr-1"
       data-testid={`chatbot-supplier-order-demo-progress-${orderId}`}
       aria-label={String(t("chatbot.demo_order_progress_aria"))}
     >
@@ -53,24 +67,24 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
                 <div
                   className={cn(
                     "h-[2px] flex-1",
-                    idx === 0 ? "invisible" : done || active ? "bg-blue-400" : "bg-slate-200",
+                    idx === 0 ? "invisible" : done || active ? "bg-slate-400" : "bg-slate-200"
                   )}
                 />
                 <div
                   className={cn(
                     "shrink-0 rounded-full transition-all",
                     active
-                      ? "h-2.5 w-2.5 bg-blue-500 shadow-sm shadow-blue-300 ring-2 ring-blue-200/80"
+                      ? "h-2.5 w-2.5 bg-slate-800 ring-2 ring-slate-200"
                       : done
-                        ? "h-2 w-2 bg-blue-400"
-                        : "h-2 w-2 bg-slate-200",
+                        ? "h-2 w-2 bg-slate-400"
+                        : "h-2 w-2 bg-slate-200"
                   )}
                   aria-current={active ? "step" : undefined}
                 />
                 <div
                   className={cn(
                     "h-[2px] flex-1",
-                    last ? "invisible" : done ? "bg-blue-400" : "bg-slate-200",
+                    last ? "invisible" : done ? "bg-slate-400" : "bg-slate-200"
                   )}
                 />
               </div>
@@ -78,10 +92,10 @@ export default function SupplierOrderDemoProgress({ orderId, status }: Props) {
                 className={cn(
                   "truncate text-center text-[9px] leading-tight",
                   active
-                    ? "font-semibold text-blue-600"
+                    ? "font-semibold text-slate-700"
                     : done
-                      ? "text-blue-500"
-                      : "text-slate-300",
+                      ? "text-slate-400"
+                      : "text-slate-300"
                 )}
               >
                 {t(`chatbot.demo_step_${step.key}`)}

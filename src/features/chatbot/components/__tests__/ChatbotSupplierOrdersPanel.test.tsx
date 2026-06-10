@@ -63,16 +63,70 @@ describe("ChatbotSupplierOrdersPanel", () => {
     render(<ChatbotSupplierOrdersPanel />);
     expect(screen.getByTestId("chatbot-supplier-orders-panel")).toBeInTheDocument();
     expect(screen.getByTestId("chatbot-supplier-order-ord-1")).toBeInTheDocument();
-    expect(screen.getByText("Client")).toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-order-title")).toHaveTextContent("2× Cylindre");
+    expect(screen.getByTestId("chatbot-order-client-label")).toHaveTextContent("Client");
     expect(screen.getByTestId("chatbot-supplier-order-pdf-ord-1")).toBeInTheDocument();
+  });
+
+  it("renders compact order list on material right rail", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
+    jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
+      supplierOrdersPanel: { open: true, highlightOrderId: null, highlightMaterialOrderId: null },
+      supplierOrders: [],
+      materialOrders: [
+        {
+          id: "demo-mo-1",
+          interventionId: "INT-24051",
+          clientName: "M. Dupont",
+          technicianUid: "demo-tech-local",
+          partsRequested: [
+            { description: "Cylindre européen 80 mm", quantity: 1, reference: "CYL-EURO-80" },
+          ],
+          urgency: "high",
+          status: "pending",
+          createdAt: "2026-05-21T12:00:00.000Z",
+          updatedAt: "2026-05-21T12:00:00.000Z",
+        },
+      ],
+      companyId: "co-1",
+      registryError: null,
+      closeSupplierOrdersPanel: jest.fn(),
+      openSupplierOrderPdf: jest.fn(),
+      openDocumentPreview: jest.fn(),
+      ensureRightPanelOpen: jest.fn(),
+      documentPreview: {
+        interventionId: "",
+        kind: "material_order",
+        title: "",
+        blobUrl: null,
+        loading: false,
+        error: null,
+        supplierOrderId: null,
+        overlayTarget: null,
+      },
+      closeDocumentPreview: jest.fn(),
+      refreshRegistry: jest.fn(),
+      chatbotInvoices: [],
+      workspaceSnapshot: null,
+    });
+
+    render(<ChatbotSupplierOrdersPanel placement="rightRail" />);
+    expect(screen.getByTestId("chatbot-orders-list-rail")).toHaveAttribute("data-layout", "list");
+    expect(screen.getByTestId("chatbot-material-order-list-item-demo-mo-1")).toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-material-order-title-demo-mo-1")).toHaveTextContent(
+      "Cylindre européen 80 mm"
+    );
+    expect(screen.getByTestId("chatbot-material-order-progress-bar-demo-mo-1")).toHaveStyle({
+      width: "25%",
+    });
+    expect(screen.queryByTestId("chatbot-material-orders-section")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chatbot-supplier-order-pdf-ord-1")).not.toBeInTheDocument();
   });
 
   it("shows client name when order is linked to an intervention", () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock interventions
-    jest.spyOn(
-      require("@/features/backoffice/useBackOfficeInterventions"),
-      "useBackOfficeInterventions",
-    ).mockReturnValue({
+    const backOfficeInterventions = require("@/features/backoffice/useBackOfficeInterventions");
+    jest.spyOn(backOfficeInterventions, "useBackOfficeInterventions").mockReturnValue({
       interventions: [
         {
           id: "iv-dupont",
@@ -88,7 +142,11 @@ describe("ChatbotSupplierOrdersPanel", () => {
     });
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
-      supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
+      supplierOrdersPanel: {
+        open: true,
+        highlightOrderId: "ord-1",
+        highlightMaterialOrderId: null,
+      },
       supplierOrders: [
         {
           id: "ord-1",
@@ -133,7 +191,7 @@ describe("ChatbotSupplierOrdersPanel", () => {
       closeDocumentPreview: jest.fn(),
     });
     render(<ChatbotSupplierOrdersPanel placement="leftRail" />);
-    expect(screen.getByText("Jean Dupont")).toBeInTheDocument();
+    expect(screen.getByTestId("chatbot-order-client-label")).toHaveTextContent("Jean Dupont");
   });
 
   it("shows demo progress on left rail for isDemo orders", () => {
@@ -148,7 +206,11 @@ describe("ChatbotSupplierOrdersPanel", () => {
     const openSupplierOrderPdf = jest.fn();
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
-      supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
+      supplierOrdersPanel: {
+        open: true,
+        highlightOrderId: "ord-1",
+        highlightMaterialOrderId: null,
+      },
       supplierOrders: [
         {
           id: "ord-1",
@@ -196,7 +258,11 @@ describe("ChatbotSupplierOrdersPanel", () => {
     const closeDocumentPreview = jest.fn();
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- partial mock du contexte chatbot
     jest.spyOn(require("@/features/chatbot/ChatbotContext"), "useChatbotContext").mockReturnValue({
-      supplierOrdersPanel: { open: true, highlightOrderId: "ord-1", highlightMaterialOrderId: null },
+      supplierOrdersPanel: {
+        open: true,
+        highlightOrderId: "ord-1",
+        highlightMaterialOrderId: null,
+      },
       supplierOrders: [
         {
           id: "ord-1",

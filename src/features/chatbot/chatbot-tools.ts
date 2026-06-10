@@ -21,8 +21,7 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   },
   {
     name: "list_interventions",
-    description:
-      "Liste les interventions de la société active avec filtres optionnels.",
+    description: "Liste les interventions de la société active avec filtres optionnels.",
     input_schema: {
       type: "object",
       properties: {
@@ -176,7 +175,8 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   },
   {
     name: "list_intervention_emails",
-    description: "Emails liés à une intervention (fil Firestore / dossier — pas la boîte Gmail globale).",
+    description:
+      "Emails liés à une intervention (fil Firestore / dossier — pas la boîte Gmail globale).",
     input_schema: {
       type: "object",
       properties: {
@@ -333,8 +333,7 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   },
   {
     name: "update_intervention_schedule",
-    description:
-      "Met à jour la date/heure planifiée. userConfirmed=true obligatoire.",
+    description: "Met à jour la date/heure planifiée. userConfirmed=true obligatoire.",
     input_schema: {
       type: "object",
       properties: {
@@ -408,7 +407,8 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
       properties: {
         query: {
           type: "string",
-          description: "Terme de recherche en français (ex: perceuse, cylindre Yale, serrure multipoints)",
+          description:
+            "Terme de recherche en français (ex: perceuse, cylindre Yale, serrure multipoints)",
         },
         limit: {
           type: "number",
@@ -439,15 +439,39 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
       properties: {
         lines: {
           type: "array",
-          description: "Lignes de commande — reprendre sku et unitPriceEur depuis search_lecot_products",
+          description:
+            "Lignes de commande — reprendre sku et unitPriceEur depuis search_lecot_products",
           items: {
             type: "object",
             properties: {
-              sku: { type: "string", description: "Référence SKU du catalogue (ex. LEC-SER-1001) — copier depuis search_lecot_products" },
-              label: { type: "string", description: "Libellé exact du produit — copier depuis search_lecot_products" },
-              quantity: { type: "number", description: "Quantité (mets toujours 1 par défaut, ne demande jamais à l'utilisateur)" },
-              unitPriceEur: { type: "number", description: "OBLIGATOIRE — prix unitaire HT en euros depuis search_lecot_products (ex. 145.00)" },
-              unitPriceCents: { type: "number", description: "Alternative : prix unitaire HT en centimes (ex. 14500 = 145 €)" },
+              sku: {
+                type: "string",
+                description:
+                  "Référence SKU du catalogue (ex. LEC-SER-1001) — copier depuis search_lecot_products",
+              },
+              label: {
+                type: "string",
+                description: "Libellé exact du produit — copier depuis search_lecot_products",
+              },
+              quantity: {
+                type: "number",
+                description:
+                  "Quantité (mets toujours 1 par défaut, ne demande jamais à l'utilisateur)",
+              },
+              unitPriceEur: {
+                type: "number",
+                description:
+                  "OBLIGATOIRE — prix unitaire HT en euros depuis search_lecot_products (ex. 145.00)",
+              },
+              unitPriceCents: {
+                type: "number",
+                description: "Alternative : prix unitaire HT en centimes (ex. 14500 = 145 €)",
+              },
+              imageUrl: {
+                type: "string",
+                description:
+                  "URL vignette produit — copier depuis search_lecot_products si disponible",
+              },
             },
             required: ["label", "unitPriceEur"],
           },
@@ -478,10 +502,20 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
     input_schema: {
       type: "object",
       properties: {
-        messageId: { type: "string", description: "ID du mail auquel répondre (obtenu via list_gmail_inbox)" },
+        messageId: {
+          type: "string",
+          description: "ID du mail auquel répondre (obtenu via list_gmail_inbox)",
+        },
         bodyText: { type: "string", description: "Corps de la réponse en texte plain" },
-        to: { type: "string", description: "Adresse email du destinataire (optionnel, déduit du mail original si absent)" },
-        subject: { type: "string", description: "Sujet (optionnel, 'Re: <sujet original>' par défaut)" },
+        to: {
+          type: "string",
+          description:
+            "Adresse email du destinataire (optionnel, déduit du mail original si absent)",
+        },
+        subject: {
+          type: "string",
+          description: "Sujet (optionnel, 'Re: <sujet original>' par défaut)",
+        },
       },
       required: ["messageId", "bodyText"],
     },
@@ -493,7 +527,10 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
     input_schema: {
       type: "object",
       properties: {
-        status: { type: "string", description: "pending | approved | ordered | delivered | received | cancelled" },
+        status: {
+          type: "string",
+          description: "pending | approved | ordered | delivered | received | cancelled",
+        },
         limit: { type: "number", description: "Max 40, défaut 20" },
       },
     },
@@ -565,7 +602,10 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
       properties: {
         messageId: { type: "string", description: "ID du mail Gmail" },
         interventionId: { type: "string", description: "ID de l'intervention à lier" },
-        note: { type: "string", description: "Note optionnelle à ajouter à la timeline de l'intervention" },
+        note: {
+          type: "string",
+          description: "Note optionnelle à ajouter à la timeline de l'intervention",
+        },
       },
       required: ["messageId", "interventionId"],
     },

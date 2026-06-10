@@ -449,6 +449,11 @@
       "center": "CRM Activiteitsfeed",
       "right": "Gebeurtenisdetail"
     },
+    "mobile": {
+      "rail_agent": "Agent",
+      "rail_feed": "Feed",
+      "rail_detail": "Detail"
+    },
     "left": {
       "filters": "Filters",
       "period_label": "Periode",
@@ -578,22 +583,22 @@
         "quote_status_changed": "De offertestatus is gewijzigd (concept, verzonden, geaccepteerd, geweigerd, enz.)."
       }
     },
-    "agent_placeholder": "Activiteit, dossiers, samenvatting…",
+    "agent_placeholder": "KPI's, prestaties, kwaliteitsanalyse…",
     "agent_reset": "Nieuw gesprek",
     "agent_thinking": "Analyseren…",
     "agent_no_company": "Selecteer een actief bedrijf.",
-    "agent_off_topic": "Ik ben de Geschiedenisagent — ik analyseer alleen CRM-activiteit en geschiedenis. Voor facturatie, stock of de volledige Chatbot, gebruik de juiste pagina.",
+    "agent_off_topic": "Ik ben de QM-agent — ik analyseer operationele prestaties en kwaliteit. Voor stock, Lecot-bestellingen of boekhouding, gebruik de juiste pagina.",
     "ai": {
-      "title": "AI Copiloot",
-      "subtitle": "Slimme analyse",
+      "title": "Quality Management Agent",
+      "subtitle": "Prestaties & kwaliteit",
       "shortcuts_label": "Snelkoppelingen",
       "shortcuts": {
-        "summary_week": "Vat de activiteit van deze week samen",
-        "materials_ordered": "Welke materialen zijn besteld?",
-        "unresolved": "Welke interventies zijn in behandeling?",
-        "tech_performance": "Analyseer de prestaties van technici"
+        "closure_rate": "Verklaar het afsluitpercentage van vandaag",
+        "why_cancelled": "Waarom zijn interventies geannuleerd?",
+        "tech_performance": "Analyseer de prestaties van technici",
+        "summary_week": "Vat de activiteit van deze week samen"
       },
-      "info": "AI analyseert uw volledige CRM-geschiedenis voor bruikbare inzichten."
+      "info": "De QM-agent analyseert uw KPI's in realtime en identificeert kwaliteitsproblemen."
     }
   },
   "companyStock": {
@@ -796,7 +801,7 @@
     "nav_technician_lab": "Technicuslab",
     "nav_gmail": "Gmail",
     "nav_feature_hub": "Materiaal",
-    "nav_crm_history": "CRM",
+    "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Facturatie",
     "open_aria": "Zoek openen",
     "active_label": "Actief",
@@ -891,7 +896,20 @@
     "right_tabs": {
       "aria": "Categorieën aanvragersportaal",
       "tracking": "Dossiertracking",
-      "chat": "Chat"
+      "chat": "Chat",
+      "invoice": "Factuur",
+      "documents": "Documenten",
+      "timeline": "Geschiedenis"
+    },
+    "invoice": {
+      "back_to_tab": "Terug naar factuur",
+      "empty_no_case_title": "Uw factuur verschijnt hier",
+      "empty_no_case_hint": "Dien uw interventieaanvraag in om de facturatie van uw dossier in dit tabblad te volgen.",
+      "ready_title": "Uw factuur",
+      "ready_hint": "De factuur voor uw interventie is beschikbaar.",
+      "view_pdf": "Factuur bekijken",
+      "view_pdf_hint": "Open de PDF in dit tabblad",
+      "download_storage": "PDF downloaden"
     }
   },
   "technician_lab": {
@@ -1100,6 +1118,11 @@
     },
     "mission": {
       "fallback_title": "Interventie"
+    },
+    "mobile": {
+      "rail_missions": "Missies",
+      "rail_map": "Kaart",
+      "rail_inbox": "Inbox"
     },
     "daily_missions": {
       "archive_aria": "Archiveren — deze missie verbergen op de kaart van vandaag op dit apparaat",
@@ -1403,15 +1426,7 @@
     }
   },
   "calendar": {
-    "weekdays_initials": [
-      "M",
-      "D",
-      "W",
-      "D",
-      "V",
-      "Z",
-      "Z"
-    ]
+    "weekdays_initials": ["M", "D", "W", "D", "V", "Z", "Z"]
   },
   "smart_time_slot": {
     "next_availabilities": "Volgende beschikbaarheden",
@@ -1424,15 +1439,7 @@
     "today": "Vandaag",
     "tomorrow": "Morgen",
     "availabilities_on": "Beschikbaarheid op {{date}}",
-    "days": [
-      "M",
-      "D",
-      "W",
-      "D",
-      "V",
-      "Z",
-      "Z"
-    ]
+    "days": ["M", "D", "W", "D", "V", "Z", "Z"]
   },
   "invoice_automation": {
     "title": "Automatische Facturatie",
@@ -1447,6 +1454,29 @@
     "create": "Bestelling aanmaken",
     "error_no_lines": "Voeg minimaal één geldig artikel toe.",
     "toast_created": "Bestelling aangemaakt"
+  },
+  "equipment": {
+    "title": "Materiaalpark",
+    "add": "Toevoegen",
+    "name_placeholder": "Naam van het toestel *",
+    "brand": "Merk",
+    "model": "Model",
+    "serial": "Serienummer",
+    "serial_short": "S/N:",
+    "install_date": "Installatiedatum",
+    "next_service": "Volgend onderhoud",
+    "notes": "Notities",
+    "save": "Opslaan",
+    "saving": "Bezig met opslaan…",
+    "cancel": "Annuleren",
+    "retire": "Buiten dienst stellen",
+    "retired_summary": "{{count}} toestel(len) buiten dienst",
+    "empty": "Geen toestellen geregistreerd voor deze klant.",
+    "service_prefix": "Onderhoud:",
+    "overdue": "Te laat",
+    "due_soon": "Binnenkort",
+    "toast_added": "Toestel toegevoegd",
+    "toast_retired": "Toestel buiten dienst gesteld"
   },
   "stock": {
     "panel_title": "Voertuigstock",
@@ -1502,6 +1532,9 @@
     "toast_sent": "Offerte verzonden",
     "toast_accepted": "Offerte geaccepteerd",
     "toast_declined": "Offerte geweigerd",
+    "toast_expired": "Deze offerte is verlopen.",
+    "toast_billing_applied": "Regels gekopieerd naar de factuur van de interventie",
+    "download_pdf": "PDF",
     "status": {
       "draft": "Concept",
       "sent": "Verzonden",
@@ -1793,6 +1826,7 @@
     "orders_heading": "Bestellingen",
     "orders_and_slips_heading": "Bestellingen & bonnen",
     "orders_empty": "Nog geen bestellingen.",
+    "order_untitled": "Bestelling zonder titel",
     "view_supplier_order_pdf": "Bestelbon bekijken",
     "view_material_order_pdf": "Materiaalbon bekijken",
     "doc_badge_invoice": "Factuur",
@@ -1806,6 +1840,7 @@
     "pdf_document_pdf_fallback": "PDF-document",
     "select_company_placeholder": "Selecteer een actief bedrijf…",
     "input_aria": "Chatbot-bericht",
+    "send_aria": "Bericht verzenden",
     "demo_step_validated": "Gevalideerd",
     "demo_step_preparing": "Voorbereiden",
     "demo_step_shipped": "Verzonden",
@@ -1820,5 +1855,21 @@
       "center": "Chatbot",
       "right": "bestellingen en facturen"
     }
+  },
+  "mobile": {
+    "page_nav_label": "Navigatie tussen pagina's",
+    "page_nav_item": "Pagina {{index}} van {{total}}",
+    "tab_bar_label": "Hoofdsecties",
+    "tab_map": "Kaart",
+    "tab_company": "Bedrijf",
+    "tab_technician": "Tech",
+    "tab_gmail": "Gmail",
+    "tab_material": "Materiaal",
+    "tab_crm": "CRM",
+    "tab_billing": "Facturen",
+    "rail_segment_label": "Paneel van de pagina",
+    "rail_left": "Links",
+    "rail_center": "Midden",
+    "rail_right": "Rechts"
   }
 }

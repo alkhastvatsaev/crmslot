@@ -35,13 +35,25 @@ describe("lecotApiSearch", () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => ({
-        products: [{ sku: "LEC-1", name: "Cylindre", price: 35 }],
+        products: [
+          {
+            sku: "LEC-1",
+            name: "Cylindre",
+            price: 35,
+            imageUrl: "https://lecot.example/media/cyl.jpg",
+          },
+        ],
       }),
     });
 
     const rows = await searchLecotViaApi("cyl");
     expect(rows).toEqual([
-      { sku: "LEC-1", label: "Cylindre", unitPriceCents: 3500 },
+      {
+        sku: "LEC-1",
+        label: "Cylindre",
+        unitPriceCents: 3500,
+        imageUrl: "https://lecot.example/media/cyl.jpg",
+      },
     ]);
   });
 });

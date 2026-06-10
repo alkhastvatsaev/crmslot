@@ -1,16 +1,8 @@
-import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
 import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAgentSystemPrompt";
-import {
-  buildMaterialAgentClientNameRegisteredReply,
-  isAwaitingMaterialAgentClientName,
-  parseMaterialAgentClientNameFromUserText,
-  resolveMaterialAgentOrderClientName,
-  shouldResetMaterialOrderClientSession,
-} from "@/features/featureHub/materialAgentOrderClient";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
 import { MATERIAL_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
@@ -22,33 +14,15 @@ export type MaterialAgentPostBody = {
   companyName?: string;
   role?: CompanyRole | null;
   messages?: unknown[];
-  /** Nom client mémorisé pour cette session (obligatoire avant commande). */
-  orderClientName?: string | null;
   /** Snapshot JSON du stock courant pour enrichir le system prompt (optionnel). */
   stockSnapshot?: string | null;
 };
 
 export type MaterialAgentRouteAuth = { uid: string };
 
-function streamMaterialAgentClientNameRegistered(
-  messages: unknown[],
-  clientName: string,
-): Response {
-  return createChatbotSseResponse(async (enqueue) => {
-    const reply = buildMaterialAgentClientNameRegisteredReply(clientName);
-    const stored = normalizeStoredMessages(messages);
-    enqueue({ type: "material_order_client", clientName });
-    enqueue({ type: "text", delta: reply });
-    enqueue({
-      type: "done",
-      apiMessages: [...stored, { role: "assistant", content: reply }],
-    });
-  });
-}
-
 export async function handleMaterialAgentPost(
   body: MaterialAgentPostBody | null,
-  auth: MaterialAgentRouteAuth,
+  auth: MaterialAgentRouteAuth
 ): Promise<Response> {
   const companyId = (body?.companyId ?? "").trim();
   if (!companyId) {
@@ -80,19 +54,14 @@ export async function handleMaterialAgentPost(
 
   const lastUser = (conversationCtx.lastUserText ?? lastUserMessageText(messages) ?? "").trim();
 
-  const resetClientSession = shouldResetMaterialOrderClientSession(lastUser);
-  const orderClientName = resolveMaterialAgentOrderClientName({
-    orderClientNameFromClient: resetClientSession ? null : body?.orderClientName,
-    messages,
-    lastUserText: lastUser,
-  });
+  // "Commander N× "label" (réf. SKU) — société : X" → commande directe depuis le modal stock.
+  const isModalDirectOrder = /^commander\s+\d+[×x]\s+"/i.test(lastUser);
 
   const system = buildMaterialAgentSystemPrompt({
     companyName,
     companyId,
     today,
     stockSnapshot: body?.stockSnapshot ?? null,
-    orderClientName,
     lecotCatalogHint: conversationCtx.lecotSearchQuery,
   });
 
@@ -101,21 +70,13 @@ export async function handleMaterialAgentPost(
     actorUid: auth.uid,
     role,
     lastUserText: lastUser,
-    materialOrderClientName: orderClientName,
-    requireMaterialOrderClientName: true,
+    materialOrderClientName: companyName,
+    requireMaterialOrderClientName: false,
   };
 
   const toolScope = [...MATERIAL_AGENT_TOOL_SCOPE];
 
-  const parsedClientReply = parseMaterialAgentClientNameFromUserText(lastUser, messages);
-  if (parsedClientReply && isAwaitingMaterialAgentClientName(messages)) {
-    return streamMaterialAgentClientNameRegistered(messages, parsedClientReply);
-  }
-
   return createChatbotSseResponse(async (enqueue) => {
-    if (resetClientSession) {
-      enqueue({ type: "material_order_client", clientName: "" });
-    }
     try {
       const result = await runChatbotOpenAI({
         apiKey,
@@ -127,6 +88,7 @@ export async function handleMaterialAgentPost(
         conversationContext: { ...conversationCtx, toolScope },
         hasWorkspaceSnapshot: false,
         hubAgentMode: true,
+        skipLecotChainGuard: isModalDirectOrder,
         temperature: 0.15,
         emit: enqueue,
       });

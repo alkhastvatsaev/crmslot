@@ -1,6 +1,7 @@
 import {
   filterChatbotInvoices,
   filterChatbotSupplierOrders,
+  mergeChatbotDocumentsByCreatedAt,
   parseDocumentsSearchQuery,
   scoreDocumentSearchToken,
   tokenizeDocumentSearchQuery,
@@ -62,7 +63,11 @@ describe("filterChatbotDocuments", () => {
   });
 
   it("tokenizes quoted phrases as one criterion", () => {
-    expect(tokenizeDocumentSearchQuery('"porte bloquee" dupont')).toEqual(["porte", "bloquee", "dupont"]);
+    expect(tokenizeDocumentSearchQuery('"porte bloquee" dupont')).toEqual([
+      "porte",
+      "bloquee",
+      "dupont",
+    ]);
   });
 
   it("strips honorifics from search tokens", () => {
@@ -101,5 +106,12 @@ describe("filterChatbotDocuments", () => {
     const parsed = parseDocumentsSearchQuery("dupont");
     const ranked = filterChatbotInvoices([other, invoice], parsed);
     expect(ranked[0]?.interventionId).toBe("iv-dupont-42");
+  });
+
+  it("merges invoices and orders by creation date (newest first)", () => {
+    const merged = mergeChatbotDocumentsByCreatedAt([invoice], [order]);
+    expect(merged).toHaveLength(2);
+    expect(merged[0]?.kind).toBe("order");
+    expect(merged[1]?.kind).toBe("invoice");
   });
 });

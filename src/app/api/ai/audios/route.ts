@@ -1,17 +1,21 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { requireAuthenticatedUser } from '@/core/api/routeAuth';
-import { readAudioUploadSidecarIfPresent, readTranscriptSidecarIfPresent } from '@/core/services/audio/transcript-sidecar';
+import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import {
+  readAudioUploadSidecarIfPresent,
+  readTranscriptSidecarIfPresent,
+} from "@/core/services/audio/transcript-sidecar";
+import { logger } from "@/core/logger";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const auth = await requireAuthenticatedUser(request);
-  if ('response' in auth) return auth.response;
+  if ("response" in auth) return auth.response;
 
   try {
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
 
     if (!fs.existsSync(uploadsDir)) {
       return NextResponse.json({ audios: [] });
@@ -21,7 +25,7 @@ export async function GET(request: Request) {
       const out: string[] = [];
       const entries = fs.readdirSync(dirAbs, { withFileTypes: true });
       for (const e of entries) {
-        if (e.name.startsWith('.')) continue;
+        if (e.name.startsWith(".")) continue;
         const abs = path.join(dirAbs, e.name);
         const rel = dirRel ? path.posix.join(dirRel, e.name) : e.name;
         if (e.isDirectory()) {
@@ -33,15 +37,15 @@ export async function GET(request: Request) {
       return out;
     };
 
-    const files = walk(uploadsDir, '');
+    const files = walk(uploadsDir, "");
 
     const audios = files
       .filter(
         (file) =>
-          file.endsWith('.amr') ||
-          file.endsWith('.wav') ||
-          file.endsWith('.mp3') ||
-          file.endsWith('.m4a')
+          file.endsWith(".amr") ||
+          file.endsWith(".wav") ||
+          file.endsWith(".mp3") ||
+          file.endsWith(".m4a")
       )
       .map((file) => {
         const stats = fs.statSync(path.join(uploadsDir, file));
@@ -60,7 +64,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ audios });
   } catch (error) {
-    console.error('Erreur lors de la lecture des fichiers audio :', error);
-    return NextResponse.json({ error: 'Impossible de lire le dossier' }, { status: 500 });
+    logger.error("Erreur lors de la lecture des fichiers audio :", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json({ error: "Impossible de lire le dossier" }, { status: 500 });
   }
 }

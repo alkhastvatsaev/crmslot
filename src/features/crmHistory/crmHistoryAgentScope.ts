@@ -1,10 +1,13 @@
 const CRM_PATTERNS: { re: RegExp; weight: number }[] = [
   { re: /historique|activité|activite|crm|timeline|événement|evenement/i, weight: 3 },
+  { re: /quality|qualité|qualite|management|qm|kpi|performance|indicateur/i, weight: 3 },
+  { re: /taux|clôture|cloture|annul|refus|retour|problème|probleme/i, weight: 3 },
   { re: /intervention|dossier|client|technicien|chantier/i, weight: 2 },
   { re: /email|mail|courriel|communication|ivana|portail/i, weight: 2 },
   { re: /commande|matériel|materiel|fournisseur|lecot/i, weight: 2 },
   { re: /résumé|resume|synthèse|synthese|semaine|mois|aujourd'hui/i, weight: 2 },
-  { re: /statistique|performance|kpi|combien/i, weight: 2 },
+  { re: /statistique|combien|pourquoi|analyse|comparer|tendance/i, weight: 2 },
+  { re: /rapport|rapport\s+validé|terrain|assigné|planifié|devis/i, weight: 2 },
 ];
 
 const OFF_TOPIC_PATTERNS: { re: RegExp; weight: number }[] = [

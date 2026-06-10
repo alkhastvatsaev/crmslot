@@ -4,7 +4,7 @@ import "@/features/gmail/gmail-hub.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
@@ -13,16 +13,14 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import GmailHubSetupPanel from "@/features/gmail/components/GmailHubSetupPanel";
 import GmailHubLinkInterventionPanel from "@/features/gmail/components/GmailHubLinkInterventionPanel";
 import GmailHubSidebar from "@/features/gmail/components/GmailHubSidebar";
 import GmailHubInboxList from "@/features/gmail/components/GmailHubInboxList";
 import GmailHubReaderPane from "@/features/gmail/components/GmailHubReaderPane";
-import {
-  base64ToBlobUrl,
-  revokeBlobUrl,
-} from "@/features/gmail/gmailHubAttachmentBlob";
+import { base64ToBlobUrl, revokeBlobUrl } from "@/features/gmail/gmailHubAttachmentBlob";
 import { gmailShell, parseSenderEmail } from "@/features/gmail/gmailHubUi";
 import type { GmailHubAttachment, GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
 
@@ -34,9 +32,9 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const workspace = useCompanyWorkspaceOptional();
+  const { logEmail } = useActivityLog();
   const companyId =
-    (workspace?.activeCompanyId ?? "").trim() ||
-    (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
   /** Sans pager (tests) : chargement immédiat ; avec pager : uniquement quand la page est visible. */
   const pageActive = pager == null || pager.pageIndex === slotIndex;
   const [linkPanelOpen, setLinkPanelOpen] = useState(false);
@@ -150,19 +148,19 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         setPdfPreviewAttachmentId(att.attachmentId);
       } catch (e) {
         setPdfPreviewError(
-          e instanceof Error ? e.message : String(t("gmail.hub.attachment_error")),
+          e instanceof Error ? e.message : String(t("gmail.hub.attachment_error"))
         );
         setPdfPreviewAttachmentId(att.attachmentId);
       } finally {
         setPdfPreviewLoadingId(null);
       }
     },
-    [hub.selectedMessage?.id, hub.loadAttachment, t],
+    [hub.selectedMessage?.id, hub.loadAttachment, t]
   );
 
   const userLabels = useMemo(
     () => hub.labels.filter((l) => l.type === "user").slice(0, 12),
-    [hub.labels],
+    [hub.labels]
   );
 
   const activeLabelTitle = useMemo(() => {
@@ -185,7 +183,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       setComposing(false);
       hub.clearThread();
     },
-    [hub],
+    [hub]
   );
 
   const startCompose = useCallback(() => {
@@ -202,8 +200,9 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       setSelectedId(msg.id);
       setComposing(false);
       void hub.loadThread(msg.threadId, msg.id);
+      logEmail(msg.subject ?? "(sans objet)");
     },
-    [hub.loadThread],
+    [hub.loadThread, logEmail]
   );
 
   /** Ouvre le mail le plus récent (1er de la liste Gmail) quand rien n'est sélectionné. */
@@ -229,13 +228,14 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       try {
         await hub.toggleReadState(msg.id, markAsUnread);
         toast.success(
-          String(markAsUnread ? t("gmail.hub.marked_unread") : t("gmail.hub.marked_read")),
+          String(markAsUnread ? t("gmail.hub.marked_unread") : t("gmail.hub.marked_read"))
         );
+        logEmail(`${markAsUnread ? "Non-lu" : "Lu"} : ${msg.subject ?? "(sans objet)"}`);
       } catch (e) {
         toast.error(e instanceof Error ? e.message : String(t("common.error")));
       }
     },
-    [hub, t],
+    [hub, t, logEmail]
   );
 
   const handleReaderToggleRead = useCallback(() => {
@@ -257,7 +257,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         }
       })();
     },
-    [hub, t],
+    [hub, t]
   );
 
   const goAdjacentMessage = useCallback(
@@ -268,7 +268,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
       const next = hub.messages[idx + delta];
       if (next) handleSelectMessage(next);
     },
-    [selectedId, hub.messages, handleSelectMessage],
+    [selectedId, hub.messages, handleSelectMessage]
   );
 
   const handleConnect = async () => {
@@ -323,7 +323,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
         toast.error(e instanceof Error ? e.message : String(t("common.error")));
       }
     },
-    [hub.selectedMessage, linkToIntervention, resetGmailLink, t],
+    [hub.selectedMessage, linkToIntervention, resetGmailLink, t]
   );
 
   const handleSend = async () => {
@@ -368,8 +368,8 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
           : {
               ...msg,
               labelIds: [...msg.labelIds.filter((l) => !remove.includes(l)), ...add],
-            },
-      ),
+            }
+      )
     );
     try {
       await hub.modifyMessage(m.id, add, remove);
@@ -417,10 +417,13 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const devLocal = hub.status?.devLocalMode === true;
   const unauthorized =
     !devLocal &&
-    !!(hub.error?.toLowerCase().includes("non autoris") ||
-      hub.error?.toLowerCase().includes("unauthorized"));
+    !!(
+      hub.error?.toLowerCase().includes("non autoris") ||
+      hub.error?.toLowerCase().includes("unauthorized")
+    );
+  const invalidGrant = hub.error?.toLowerCase().includes("invalid_grant") === true;
   const clientReady = hub.status?.oauthClientConfigured === true;
-  const connected = hub.status?.oauthConfigured === true;
+  const connected = !invalidGrant && hub.status?.oauthConfigured === true;
 
   useGmailHubKeyboard({
     enabled: connected && !composing,
@@ -432,7 +435,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   });
 
   return (
-    <DashboardTriplePanelLayout
+    <AdaptiveTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
       centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
@@ -469,6 +472,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
           <GmailHubSetupPanel
             unauthorized={unauthorized}
             clientReady={clientReady}
+            expiredToken={invalidGrant}
             onConnect={() => void handleConnect()}
           />
         ) : (
@@ -482,9 +486,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             loading={hub.loadingList}
             loadingMore={hub.loadingMore}
             hasMore={Boolean(hub.nextPageToken)}
-            onLoadMore={() =>
-              void hub.loadMoreMessages({ labelId: activeLabelId, q: searchQuery })
-            }
+            onLoadMore={() => void hub.loadMoreMessages({ labelId: activeLabelId, q: searchQuery })}
             error={hub.error}
             onSelectMessage={handleSelectMessage}
             onToggleRead={(msg, markAsUnread) => void handleListToggleRead(msg, markAsUnread)}

@@ -1,7 +1,12 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
 import RequesterInterventionPanel from "@/features/interventions/components/RequesterInterventionPanel";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import RequesterProfilePanel from "@/features/interventions/components/RequesterProfilePanel";
+import {
+  RequesterHubProvider,
+  useRequesterHub,
+  type InterventionRequestData,
+} from "@/features/interventions/context/RequesterHubContext";
 import { mockState } from "@/test-utils/mockState";
 
 // ── External deps ────────────────────────────────────────────────────────────
@@ -19,7 +24,10 @@ jest.mock("@/features/interventions/recordDuplicateAlertIfNeeded", () => ({
 
 jest.mock("@/features/interventions/smartFormReverseGeocode", () => ({
   resolveInterventionAddressFromCoords: jest.fn(() =>
-    Promise.resolve({ formatted: "Rue de la Loi 1, 1000 Bruxelles", location: { lat: 50.84, lng: 4.35 } }),
+    Promise.resolve({
+      formatted: "Rue de la Loi 1, 1000 Bruxelles",
+      location: { lat: 50.84, lng: 4.35 },
+    })
   ),
 }));
 
@@ -31,6 +39,10 @@ jest.mock("@/features/interventions/clientAudioUpload", () => ({
 
 jest.mock("@/features/interventions/detectDuplicates", () => ({
   findPotentialDuplicates: jest.fn(() => []),
+}));
+
+jest.mock("sonner", () => ({
+  toast: { success: jest.fn(), error: jest.fn() },
 }));
 
 jest.mock("@/features/interventions/components/SmartFormAddressAutocomplete", () => ({
@@ -52,6 +64,22 @@ jest.mock("@/features/interventions/components/SmartFormAddressMiniMap", () => (
 jest.mock("@/features/interventions/components/SmartTimeSlotPicker", () => ({
   SmartTimeSlotPicker: () => <div data-testid="time-slot-picker" />,
 }));
+
+jest.mock("@/core/config/firebase", () => {
+  const { mockState } = jest.requireActual(
+    "@/test-utils/mockState"
+  ) as typeof import("@/test-utils/mockState");
+  return {
+    auth: {
+      get currentUser() {
+        return mockState.currentUser;
+      },
+    },
+    firestore: {},
+    storage: {},
+    isConfigured: true,
+  };
+});
 
 jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: jest.fn(() => null),
@@ -80,12 +108,17 @@ function renderPanel() {
   return render(
     <RequesterHubProvider>
       <RequesterInterventionPanel />
-    </RequesterHubProvider>,
+    </RequesterHubProvider>
   );
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 describe("RequesterInterventionPanel", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    mockState.reset();
+  });
+
   it("renders the panel root", () => {
     renderPanel();
     expect(screen.getByTestId("requester-intervention-panel")).toBeInTheDocument();
@@ -104,7 +137,7 @@ describe("RequesterInterventionPanel", () => {
     expect(screen.queryByTestId("smart-form-template-blocked")).not.toBeInTheDocument();
     // Mic button accessible label from step 1
     expect(
-      screen.getByRole("button", { name: /press to speak|parler|spreken/i }),
+      screen.getByRole("button", { name: /press to speak|parler|spreken/i })
     ).toBeInTheDocument();
   });
 
@@ -117,13 +150,13 @@ describe("RequesterInterventionPanel", () => {
     render(
       <RequesterHubProvider>
         <Step4Driver address="" problem="Porte bloquée" />
-      </RequesterHubProvider>,
+      </RequesterHubProvider>
     );
     const btn = await screen.findByTestId("intervention-submit-btn");
     expect(btn).toBeDisabled();
   });
 
-  it("submit blocked when user is anonymous (login mode)", async () => {
+  it("switches to particulier tab when submit without login", async () => {
     mockState.currentUser = {
       uid: "anon-uid",
       isAnonymous: true,
@@ -137,32 +170,92 @@ describe("RequesterInterventionPanel", () => {
 
     render(
       <RequesterHubProvider>
-        <Step4Driver address="Rue de la Loi 1, 1000 Bruxelles" problem="Porte bloquée" />
-      </RequesterHubProvider>,
+        <Step4WithProfile address="Rue de la Loi 1, 1000 Bruxelles" problem="Porte bloquée" />
+      </RequesterHubProvider>
     );
 
     const btn = await screen.findByTestId("intervention-submit-btn");
-    // canSubmit = true but auth check in handleSubmit will block
+    expect(btn).not.toBeDisabled();
     fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-type-probe")).toHaveTextContent("particulier");
+    });
+    expect(screen.getByTestId("requester-type-particulier")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.queryByTestId("requester-login-rail")).not.toBeInTheDocument();
 
     const { setDoc } = jest.requireMock("firebase/firestore") as { setDoc: jest.Mock };
     expect(setDoc).not.toHaveBeenCalled();
   });
+
+  it("submits on Enter when step 4 form is complete", async () => {
+    mockState.currentUser = {
+      uid: "anon-uid",
+      isAnonymous: true,
+      email: null,
+      emailVerified: false,
+      displayName: null,
+      photoURL: null,
+      providerData: [],
+      getIdToken: async () => "anon-token",
+    } as unknown as typeof mockState.currentUser;
+
+    render(
+      <RequesterHubProvider>
+        <Step4WithProfile address="Rue de la Loi 1, 1000 Bruxelles" problem="Porte bloquée" />
+      </RequesterHubProvider>
+    );
+
+    const step4 = await screen.findByTestId("requester-step4");
+    fireEvent.keyDown(step4, { key: "Enter", code: "Enter" });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-type-probe")).toHaveTextContent("particulier");
+    });
+  });
+
+  it("last step is not scrollable", async () => {
+    render(
+      <RequesterHubProvider>
+        <Step4Driver address="Rue Test" problem="Porte bloquée" />
+      </RequesterHubProvider>
+    );
+    const step4 = await screen.findByTestId("requester-step4");
+    expect(step4.className).not.toMatch(/overflow-y-auto/);
+    expect(step4.className).toMatch(/overflow-hidden/);
+  });
 });
+
+function ProfileTypeProbe() {
+  const { profile } = useRequesterHub();
+  return <span data-testid="profile-type-probe">{profile.type}</span>;
+}
+
+function Step4WithProfile({ address, problem }: { address: string; problem: string }) {
+  return (
+    <>
+      <ProfileTypeProbe />
+      <RequesterProfilePanel />
+      <Step4Driver address={address} problem={problem} />
+    </>
+  );
+}
 
 // ── Inner component that drives the hub context to step 4 then renders panel ─
 function Step4Driver({ address, problem }: { address: string; problem: string }) {
-  const { setCurrentStep, setRequestData } =
-    require("@/features/interventions/context/RequesterHubContext").useRequesterHub();
+  const { setCurrentStep, setRequestData } = useRequesterHub();
 
   React.useEffect(() => {
-    setRequestData((prev: Record<string, unknown>) => ({
+    setRequestData((prev: InterventionRequestData) => ({
       ...prev,
       interventionAddress: address,
       problemLabel: problem,
     }));
     setCurrentStep(4);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <RequesterInterventionPanel />;

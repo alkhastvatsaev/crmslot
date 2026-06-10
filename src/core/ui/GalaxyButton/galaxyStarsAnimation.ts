@@ -1,5 +1,10 @@
 /** Animation étoiles / fond bleu — partagée GalaxyButton + avatars Chatbot. */
 
+import {
+  resolveGalaxyAnimationProfile,
+  type GalaxyAnimationProfile,
+} from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
+
 export type GalaxyStarsOptions = {
   starCount?: number;
   /** Suit la souris sur la surface (désactivé pour petits orbes). */
@@ -7,6 +12,10 @@ export type GalaxyStarsOptions = {
   baseSpeed?: number;
   /** `avatar` = orbe 32px ; `dock` = bandeau Galaxy (défaut). */
   variant?: "dock" | "avatar";
+  /** Force le profil basse conso (footer mobile). */
+  mobilePowerSave?: boolean;
+  /** Surcharge explicite du profil (tests). */
+  powerProfile?: Partial<GalaxyAnimationProfile>;
 };
 
 type Star = {
@@ -31,9 +40,14 @@ const COLORS = [
 const GALAXY_TILT = 1.1;
 const GALAXY_ANGLE = 0.3;
 
-function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number, isAvatar: boolean = false) {
+function paintGalaxyBackground(
+  surface: HTMLElement,
+  xPct: number,
+  yPct: number,
+  isAvatar: boolean = false
+) {
   if (isAvatar) {
-    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 120%)`;
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 38%, rgba(23, 37, 84, 0.35) 52%, rgba(23, 37, 84, 0.08) 62%, transparent 72%)`;
   } else {
     surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
   }
@@ -42,11 +56,15 @@ function paintGalaxyBackground(surface: HTMLElement, xPct: number, yPct: number,
 export function startGalaxyStarsAnimation(
   canvas: HTMLCanvasElement,
   surface: HTMLElement,
-  options: GalaxyStarsOptions = {},
+  options: GalaxyStarsOptions = {}
 ): () => void {
-  const starCount = options.starCount ?? 6000;
-  const interactive = options.interactive ?? true;
-  const baseSpeed = options.baseSpeed ?? 1;
+  const profile = resolveGalaxyAnimationProfile({
+    mobilePowerSave: options.mobilePowerSave,
+    ...options.powerProfile,
+  });
+  const starCount = options.starCount ?? profile.starCount;
+  const interactive = options.interactive ?? profile.interactive;
+  const baseSpeed = options.baseSpeed ?? profile.baseSpeed;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return () => {};
@@ -61,12 +79,16 @@ export function startGalaxyStarsAnimation(
   let currentX = 0;
   let currentY = 0;
   let animationFrameId = 0;
+  let frameIndex = 0;
+  let lastFrameAt = 0;
   let variant: "dock" | "avatar" = options.variant ?? "dock";
   let maxDrawRadius = Infinity;
   let depthZScale = 150;
 
+  const minFrameMs = profile.maxFps > 0 ? 1000 / profile.maxFps : Infinity;
+
   const initCanvas = () => {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, profile.maxDevicePixelRatio);
     width = surface.offsetWidth;
     height = surface.offsetHeight;
     if (width < 2 || height < 2) return;
@@ -83,8 +105,8 @@ export function startGalaxyStarsAnimation(
     const mini = Math.min(width, height);
     const isAvatar = variant === "avatar";
 
-    const baseRadius = isAvatar ? mini * 0.55 : Math.max(width, height) * 0.75;
-    maxDrawRadius = isAvatar ? 0.6 : Infinity;
+    const baseRadius = isAvatar ? mini * 0.42 : Math.max(width, height) * 0.75;
+    maxDrawRadius = isAvatar ? 0.45 : Infinity;
     depthZScale = isAvatar ? mini * 1.8 : 150;
 
     for (let i = 0; i < starCount; i += 1) {
@@ -95,9 +117,7 @@ export function startGalaxyStarsAnimation(
       const angle = Math.random() * Math.PI * 2;
       const color = COLORS[Math.floor(Math.random() * COLORS.length)]!;
 
-      const size = isAvatar
-        ? Math.random() * 0.2 + 0.1
-        : Math.random() * 0.4 + 0.1;
+      const size = isAvatar ? Math.random() * 0.2 + 0.1 : Math.random() * 0.4 + 0.1;
 
       stars.push({
         radius,
@@ -115,7 +135,29 @@ export function startGalaxyStarsAnimation(
     paintGalaxyBackground(surface, 50, 50, isAvatar);
   };
 
-  const animate = () => {
+  const scheduleNextFrame = () => {
+    animationFrameId = requestAnimationFrame(animate);
+  };
+
+  const animate = (now: number = performance.now()) => {
+    animationFrameId = 0;
+
+    if (profile.pauseWhenHidden && typeof document !== "undefined" && document.hidden) {
+      return;
+    }
+
+    if (profile.maxFps === 0 || starCount === 0) {
+      paintGalaxyBackground(surface, 50, 50, variant === "avatar");
+      return;
+    }
+
+    if (lastFrameAt > 0 && now - lastFrameAt < minFrameMs) {
+      scheduleNextFrame();
+      return;
+    }
+    lastFrameAt = now;
+    frameIndex += 1;
+
     ctx.clearRect(0, 0, width, height);
 
     currentX += (targetX - currentX) * 0.08;
@@ -145,7 +187,7 @@ export function startGalaxyStarsAnimation(
         ctx.beginPath();
         ctx.arc(finalX, finalY, finalSize, 0, Math.PI * 2);
 
-        const twinkle = (Math.sin(Date.now() * 0.002 * star.twinkleSpeed) + 1) * 0.5;
+        const twinkle = (Math.sin(now * 0.002 * star.twinkleSpeed) + 1) * 0.5;
         const alpha = star.opacity * (0.3 + twinkle * 0.7) * Math.min(1, depthScale);
         const c = star.color;
         ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${Math.max(0, alpha)})`;
@@ -153,13 +195,13 @@ export function startGalaxyStarsAnimation(
       }
     }
 
-    if (width > 0 && height > 0) {
+    if (width > 0 && height > 0 && frameIndex % Math.max(1, profile.backgroundEveryNFrames) === 0) {
       const xPct = (currentX / width) * 100;
       const yPct = (currentY / height) * 100;
       paintGalaxyBackground(surface, xPct, yPct, variant === "avatar");
     }
 
-    animationFrameId = requestAnimationFrame(animate);
+    scheduleNextFrame();
   };
 
   const handleMouseEnter = () => {
@@ -189,17 +231,61 @@ export function startGalaxyStarsAnimation(
   window.addEventListener("resize", onResize);
 
   const resizeObserver =
-    typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => initCanvas())
-      : null;
+    typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => initCanvas()) : null;
   resizeObserver?.observe(surface);
+
+  const onVisibilityChange = () => {
+    if (!profile.pauseWhenHidden) return;
+    if (document.hidden) {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
+      return;
+    }
+    if (!animationFrameId && profile.maxFps > 0 && starCount > 0) {
+      lastFrameAt = 0;
+      scheduleNextFrame();
+    }
+  };
+  if (profile.pauseWhenHidden && typeof document !== "undefined") {
+    document.addEventListener("visibilitychange", onVisibilityChange);
+  }
+
+  // Pause quand l'élément sort du viewport (pages cachées du carousel, onglets inactifs).
+  const intersectionObserver =
+    profile.pauseWhenHidden && typeof IntersectionObserver !== "undefined"
+      ? new IntersectionObserver(
+          (entries) => {
+            const visible = entries[0]?.isIntersecting ?? true;
+            if (!visible) {
+              if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = 0;
+              }
+            } else if (
+              !animationFrameId &&
+              profile.maxFps > 0 &&
+              starCount > 0 &&
+              !document.hidden
+            ) {
+              lastFrameAt = 0;
+              scheduleNextFrame();
+            }
+          },
+          { threshold: 0.01 }
+        )
+      : null;
+  intersectionObserver?.observe(canvas);
 
   paintGalaxyBackground(surface, 50, 50, options.variant === "avatar");
   initCanvas();
-  animate();
+  if (profile.maxFps > 0 && starCount > 0) {
+    scheduleNextFrame();
+  }
 
   return () => {
-    cancelAnimationFrame(animationFrameId);
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
     if (interactive) {
       surface.removeEventListener("mouseenter", handleMouseEnter);
       surface.removeEventListener("mousemove", handleMouseMove);
@@ -207,5 +293,9 @@ export function startGalaxyStarsAnimation(
     }
     window.removeEventListener("resize", onResize);
     resizeObserver?.disconnect();
+    intersectionObserver?.disconnect();
+    if (profile.pauseWhenHidden && typeof document !== "undefined") {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    }
   };
 }

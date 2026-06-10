@@ -166,6 +166,68 @@ service cloud.firestore {
         allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
         allow create, update, delete: if false;
       }
+
+      /** Devis (flag quotesEnabled) — staff société uniquement. */
+      match /quotes/{quoteId} {
+        allow read: if canAccessCompanyHubData(companyId);
+        allow create: if canAccessCompanyHubData(companyId)
+          && request.resource.data.companyId == companyId
+          && request.resource.data.status == 'draft'
+          && request.resource.data.lines is list
+          && request.resource.data.totalCents is number;
+        allow update: if canAccessCompanyHubData(companyId)
+          && request.resource.data.companyId == companyId;
+        allow delete: if false;
+      }
+
+      /** Contrats de maintenance récurrents (flag maintenanceContracts). */
+      match /maintenanceContracts/{contractId} {
+        allow read: if canAccessCompanyHubData(companyId);
+        allow create: if canAccessCompanyHubData(companyId)
+          && request.resource.data.companyId == companyId;
+        allow update: if canAccessCompanyHubData(companyId)
+          && request.resource.data.companyId == companyId;
+        allow delete: if false;
+      }
+
+      /** Stock véhicule technicien (flag vehicleStock) — technicien propriétaire ou staff société. */
+      match /technicianStocks/{techUid}/items/{itemId} {
+        allow read: if isAuthed()
+          && (request.auth.uid == techUid || canAccessCompanyHubData(companyId));
+        allow create, update: if isAuthed()
+          && (request.auth.uid == techUid || canAccessCompanyHubData(companyId));
+        allow delete: if false;
+      }
+
+      /** Parc matériel client (flag equipmentInventory) — staff société. */
+      match /equipment/{equipmentId} {
+        allow read: if canAccessCompanyHubData(companyId);
+        allow create: if canAccessCompanyHubData(companyId)
+          && request.resource.data.companyId == companyId;
+        allow update: if canAccessCompanyHubData(companyId);
+        allow delete: if false;
+      }
+
+      /** Feuilles de temps technicien — propriétaire ou staff société. */
+      match /timeEntries/{entryId} {
+        allow read: if isAuthed()
+          && (
+            canAccessCompanyHubData(companyId)
+            || resource.data.technicianUid == request.auth.uid
+          );
+        allow create: if isAuthed()
+          && request.resource.data.companyId == companyId
+          && (
+            request.resource.data.technicianUid == request.auth.uid
+            || canAccessCompanyHubData(companyId)
+          );
+        allow update: if isAuthed()
+          && (
+            resource.data.technicianUid == request.auth.uid
+            || canAccessCompanyHubData(companyId)
+          );
+        allow delete: if false;
+      }
     }
 
     /** Création collaborateur uniquement via Admin SDK (accept-invite). Premier admin : créateur du doc companies. */
@@ -257,7 +319,9 @@ service cloud.firestore {
         || data.companyId.size() == 0
         || data.companyId == 'demo-local-company'
         || tenantClaimsIncludeCompany(data.companyId)
-        || userBelongsToCompany(data.companyId);
+        || userBelongsToCompany(data.companyId)
+        || clientPortalLinkedToCompany(data.companyId)
+        || allowedUsersPhoneMatchesIvanaCompany(data.companyId);
     }
 
     /** Facturation / commissions : réservés admin tenant ou membership (webhook Stripe = Admin SDK). */
@@ -266,8 +330,10 @@ service cloud.firestore {
         'paymentStatus',
         'stripePaymentLinkUrl',
         'stripePaymentIntentId',
+        'mockPayToken',
         'paidAt',
         'invoiceAmountCents',
+        'invoiceNumber',
         'commissionAmountCents',
         'commissionRuleId',
         'invoicePdfUrl',

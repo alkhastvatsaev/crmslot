@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link2, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { cn } from "@/lib/utils";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import type { GmailLinkCandidate } from "@/features/gmail/useGmailHubLinkIntervention";
-import { gmailDivider, gmailEyebrow, gmailFieldClass, gmailPrimaryBtn } from "@/features/gmail/gmailHubUi";
+import { gmailDivider, gmailEyebrow, gmailFieldClass } from "@/features/gmail/gmailHubUi";
+import { HubButton } from "@/core/ui/hub";
 import type { Intervention } from "@/features/interventions/types";
 
 type Props = {
@@ -51,13 +53,7 @@ export default function GmailHubLinkInterventionPanel({
     if (!q) return [];
     return interventions
       .filter((iv) => {
-        const hay = [
-          interventionClientLabel(iv),
-          iv.address,
-          iv.clientEmail,
-          iv.id,
-          iv.title,
-        ]
+        const hay = [interventionClientLabel(iv), iv.address, iv.clientEmail, iv.id, iv.title]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
@@ -110,7 +106,10 @@ export default function GmailHubLinkInterventionPanel({
           ) : null}
 
           {showCandidates ? (
-            <ul className="mb-2 max-h-[140px] space-y-1 overflow-y-auto custom-scrollbar" data-testid="gmail-hub-link-candidates">
+            <ul
+              className="mb-2 max-h-[140px] space-y-1 overflow-y-auto custom-scrollbar"
+              data-testid="gmail-hub-link-candidates"
+            >
               {candidates.map((c) => (
                 <li key={c.interventionId}>
                   <button
@@ -124,9 +123,7 @@ export default function GmailHubLinkInterventionPanel({
                     }`}
                   >
                     <span className="font-medium">{c.clientName}</span>
-                    {c.status ? (
-                      <span className="ml-2 opacity-70">{c.status}</span>
-                    ) : null}
+                    {c.status ? <span className="ml-2 opacity-70">{c.status}</span> : null}
                     {c.reasons[0] ? (
                       <span className="mt-0.5 block text-[10px] opacity-75">{c.reasons[0]}</span>
                     ) : null}
@@ -139,7 +136,10 @@ export default function GmailHubLinkInterventionPanel({
           ) : null}
 
           {showLocal ? (
-            <ul className="mb-2 max-h-[120px] space-y-1 overflow-y-auto custom-scrollbar" data-testid="gmail-hub-link-local">
+            <ul
+              className="mb-2 max-h-[120px] space-y-1 overflow-y-auto custom-scrollbar"
+              data-testid="gmail-hub-link-local"
+            >
               {filteredLocal.map((iv) => (
                 <li key={iv.id}>
                   <button
@@ -160,7 +160,7 @@ export default function GmailHubLinkInterventionPanel({
           ) : null}
 
           <label className="mb-2 block">
-            <span className="mb-1 block text-[10px] uppercase tracking-wide text-slate-400">
+            <span className={cn("mb-1 block", gmailEyebrow)}>
               {t("gmail.hub.link_note_optional")}
             </span>
             <input
@@ -173,10 +173,10 @@ export default function GmailHubLinkInterventionPanel({
             />
           </label>
 
-          <button
+          <HubButton
             type="button"
             data-testid="gmail-hub-link-submit"
-            className={gmailPrimaryBtn}
+            fullWidth
             disabled={!selectedId || linking}
             onClick={() => selectedId && onLink(selectedId, note.trim() || undefined)}
           >
@@ -186,7 +186,7 @@ export default function GmailHubLinkInterventionPanel({
               <Link2 className="h-4 w-4" strokeWidth={1.5} />
             )}
             {t("gmail.hub.link_confirm")}
-          </button>
+          </HubButton>
         </>
       )}
     </div>

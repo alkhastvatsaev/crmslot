@@ -1,0 +1,32 @@
+# Tests hub facturation quand le module change.
+name: Billing hub tests
+
+on:
+  pull_request:
+    paths:
+      - "src/features/billingHub/**"
+      - "src/features/billing/**"
+      - "src/app/api/ai/billing-hub-agent/**"
+      - "jest.config.ts"
+      - "jest.setup.ts"
+      - ".github/workflows/billing-hub-tests.yml"
+
+jobs:
+  billing-hub-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run billing hub unit tests
+        run: npm run test:billing-hub

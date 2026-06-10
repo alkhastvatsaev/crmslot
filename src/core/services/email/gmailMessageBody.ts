@@ -1,4 +1,4 @@
-import type { gmail_v1 } from "googleapis";
+import type { gmail_v1 } from "@googleapis/gmail";
 
 export function decodeGmailBase64Url(data: string): string {
   return decodeGmailBase64UrlToBuffer(data).toString("utf-8");
@@ -18,23 +18,20 @@ export type GmailMessageAttachmentMeta = {
 
 function headerValue(
   headers: gmail_v1.Schema$MessagePartHeader[] | undefined,
-  name: string,
+  name: string
 ): string {
   const key = name.toLowerCase();
   return headers?.find((h) => h.name?.toLowerCase() === key)?.value?.trim() ?? "";
 }
 
-export function getMessageHeader(
-  message: gmail_v1.Schema$Message,
-  name: string,
-): string {
+export function getMessageHeader(message: gmail_v1.Schema$Message, name: string): string {
   return headerValue(message.payload?.headers, name);
 }
 
 function collectParts(
   part: gmail_v1.Schema$MessagePart | undefined,
   textChunks: string[],
-  htmlChunks: string[],
+  htmlChunks: string[]
 ): void {
   if (!part) return;
   const mime = part.mimeType?.toLowerCase() ?? "";
@@ -63,7 +60,7 @@ export function extractMessageBodies(message: gmail_v1.Schema$Message): {
 
 function collectAttachments(
   part: gmail_v1.Schema$MessagePart | undefined,
-  out: GmailMessageAttachmentMeta[],
+  out: GmailMessageAttachmentMeta[]
 ): void {
   if (!part) return;
   const attachmentId = part.body?.attachmentId?.trim();
@@ -82,7 +79,7 @@ function collectAttachments(
 }
 
 export function extractMessageAttachments(
-  message: gmail_v1.Schema$Message,
+  message: gmail_v1.Schema$Message
 ): GmailMessageAttachmentMeta[] {
   const out: GmailMessageAttachmentMeta[] = [];
   collectAttachments(message.payload, out);

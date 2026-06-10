@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import {
-  readTwilioWebhookParams,
-  validateTwilioWebhookRequest,
-} from "@/core/api/twilioWebhook";
+import { readTwilioWebhookParams, validateTwilioWebhookRequest } from "@/core/api/twilioWebhook";
 import { downloadTwilioRecording } from "@/core/services/audio/downloadTwilioRecording";
 import { ingestCallAudioBuffer } from "@/core/services/audio/ingestCallAudioBuffer";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -39,7 +37,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, audioUrl: publicUrl }, { status: 200 });
   } catch (error) {
-    console.error("[twilio-recording] error:", error);
+    logger.error("[twilio-recording] error:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     const message = error instanceof Error ? error.message : "Erreur interne";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

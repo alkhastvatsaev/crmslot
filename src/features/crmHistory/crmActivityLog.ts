@@ -1,10 +1,4 @@
-import {
-  addDoc,
-  collection,
-  type Firestore,
-  type WriteBatch,
-  doc,
-} from "firebase/firestore";
+import { addDoc, collection, type Firestore, type WriteBatch, doc } from "firebase/firestore";
 import type { Intervention } from "@/features/interventions/types";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import type { CrmActivityEvent, CrmEventType } from "./crmActivityTypes";
@@ -33,7 +27,12 @@ export type CompanyCrmActivityKind =
   | "chatbot_gmail_action"
   | "chatbot_write_action"
   | "quote_created"
-  | "quote_status_changed";
+  | "quote_status_changed"
+  /** Audit navigation — généré automatiquement côté client. */
+  | "page_navigated"
+  | "intervention_viewed"
+  | "email_viewed"
+  | "user_session_start";
 
 export type CompanyCrmActivityDoc = {
   companyId: string;
@@ -45,8 +44,8 @@ export type CompanyCrmActivityDoc = {
   interventionTitle?: string | null;
   clientName?: string | null;
   address?: string | null;
-  statusBefore?: Intervention["status"] | null;
-  statusAfter?: Intervention["status"] | null;
+  statusBefore?: string | null;
+  statusAfter?: string | null;
   note?: string | null;
 };
 
@@ -54,10 +53,18 @@ function crmActivityCollection(db: Firestore, companyId: string) {
   return collection(db, "companies", companyId.trim(), "crm_activity");
 }
 
-function interventionContext(iv: Pick<
-  Intervention,
-  "id" | "title" | "clientName" | "clientFirstName" | "clientLastName" | "clientCompanyName" | "address"
->): Pick<CompanyCrmActivityDoc, "interventionId" | "interventionTitle" | "clientName" | "address"> {
+function interventionContext(
+  iv: Pick<
+    Intervention,
+    | "id"
+    | "title"
+    | "clientName"
+    | "clientFirstName"
+    | "clientLastName"
+    | "clientCompanyName"
+    | "address"
+  >
+): Pick<CompanyCrmActivityDoc, "interventionId" | "interventionTitle" | "clientName" | "address"> {
   const clientName =
     iv.clientCompanyName ??
     iv.clientName ??
@@ -86,7 +93,7 @@ export function buildCompanyCrmActivityPayload(
     | "status"
   >,
   extra?: Partial<Pick<CompanyCrmActivityDoc, "statusBefore" | "statusAfter" | "note">>,
-  now = new Date(),
+  now = new Date()
 ): CompanyCrmActivityDoc {
   return {
     companyId: companyId.trim(),
@@ -103,7 +110,7 @@ export function buildCompanyCrmActivityPayload(
 export function appendCompanyCrmActivityToBatch(
   batch: WriteBatch,
   db: Firestore,
-  payload: CompanyCrmActivityDoc,
+  payload: CompanyCrmActivityDoc
 ): string {
   const ref = doc(crmActivityCollection(db, payload.companyId));
   batch.set(ref, payload);
@@ -112,7 +119,7 @@ export function appendCompanyCrmActivityToBatch(
 
 export async function logCompanyCrmActivity(
   db: Firestore,
-  payload: CompanyCrmActivityDoc,
+  payload: CompanyCrmActivityDoc
 ): Promise<string> {
   const ref = await addDoc(crmActivityCollection(db, payload.companyId), payload);
   return ref.id;
@@ -143,6 +150,10 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   chatbot_write_action: "chatbot_write_action",
   quote_created: "quote_created",
   quote_status_changed: "quote_status_changed",
+  page_navigated: "page_navigated",
+  intervention_viewed: "intervention_viewed",
+  email_viewed: "email_viewed",
+  user_session_start: "user_session_start",
 };
 
 export function parseTs(raw: unknown): number {
@@ -155,7 +166,7 @@ export function parseTs(raw: unknown): number {
 }
 
 export function synthesizeCompanyCrmLogEvents(
-  rows: Array<CompanyCrmActivityDoc & { id: string }>,
+  rows: Array<CompanyCrmActivityDoc & { id: string }>
 ): CrmActivityEvent[] {
   return rows.map((row) => ({
     id: `crm:${row.id}`,

@@ -8,23 +8,26 @@
  * Shell: `.panel-glass` (+ optional `.panel-glass--blur`)
  * Inner clip: `[data-glass-panel-inner]` / `.panel-glass-inner`
  * Never put `overflow: hidden` on `.panel-glass`.
+ *
+ * Inner hub content (tabs, cards, CTAs): `src/core/ui/hub/hubTheme.ts`
  */
 
 :root {
-    --panel-shadow-ambient: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    --panel-shadow-contact: 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    --panel-shadow-rim: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --panel-shadow-ambient: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --panel-shadow-contact: 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --panel-shadow-rim: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 
-    --panel-shadow-hover-ambient: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-    --panel-shadow-hover-contact: 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --panel-shadow-hover-ambient: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  --panel-shadow-hover-contact: 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 
-    --panel-shadow: var(--panel-shadow-ambient), var(--panel-shadow-contact), var(--panel-shadow-rim);
-    --panel-shadow-hover: var(--panel-shadow-hover-ambient), var(--panel-shadow-hover-contact), var(--panel-shadow-rim);
+  --panel-shadow: var(--panel-shadow-ambient), var(--panel-shadow-contact), var(--panel-shadow-rim);
+  --panel-shadow-hover:
+    var(--panel-shadow-hover-ambient), var(--panel-shadow-hover-contact), var(--panel-shadow-rim);
 
-    --dashboard-panel-shadow: var(--panel-shadow);
-    --dashboard-panel-shadow-hover: var(--panel-shadow-hover);
+  --dashboard-panel-shadow: var(--panel-shadow);
+  --dashboard-panel-shadow-hover: var(--panel-shadow-hover);
 
-    --panel-border-color: rgba(0, 0, 0, 0.04);
+  --panel-border-color: rgba(0, 0, 0, 0.04);
 }
 
 /* Unified glass shell — use on every dashboard panel */
@@ -32,35 +35,35 @@
 .panel-shadow,
 .dashboard-panel-shadow,
 [data-glass-panel] {
-    border-radius: 24px;
-    border: 1px solid var(--panel-border-color);
-    box-shadow: var(--panel-shadow);
-    min-width: 0;
+  border-radius: 24px;
+  border: 1px solid var(--panel-border-color);
+  box-shadow: var(--panel-shadow);
+  min-width: 0;
 }
 
 .panel-glass--blur {
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
 .panel-glass-hover:hover,
 .panel-shadow-hover:hover,
 [data-glass-panel][data-panel-shadow-hover]:hover {
-    box-shadow: none;
+  box-shadow: none;
 }
 
 [data-glass-panel-inner],
 .panel-glass-inner,
 .panel-shadow-inner {
-    display: flex;
-    min-width: 0;
-    min-height: 0;
-    flex: 1 1 auto;
-    flex-direction: column;
-    overflow: hidden;
-    border-radius: inherit;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .dashboard-desktop-galaxy-dock-chrome.panel-glass .premium-btn {
-    box-shadow: none;
+  box-shadow: none;
 }

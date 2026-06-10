@@ -3,6 +3,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { writeAudioDecisionToDisk } from "@/core/services/audio/audio-decision-store";
 import { isSafeUploadsRelativePath } from "@/core/services/audio/intervention-json-path";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
@@ -17,9 +18,10 @@ export async function POST(request: Request) {
   if ("response" in auth) return auth.response;
 
   try {
-    const body = (await request.json().catch(() => null)) as
-      | { fileName?: unknown; status?: unknown }
-      | null;
+    const body = (await request.json().catch(() => null)) as {
+      fileName?: unknown;
+      status?: unknown;
+    } | null;
 
     const fileName = typeof body?.fileName === "string" ? body.fileName.trim() : "";
     const status = body?.status;
@@ -62,8 +64,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, fileName, status, updatedAt });
   } catch (error) {
-    console.error("[audio-decision] error:", error);
+    logger.error("[audio-decision] error:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
-

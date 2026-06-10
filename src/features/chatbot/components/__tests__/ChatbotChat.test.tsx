@@ -68,7 +68,7 @@ describe("ChatbotChat", () => {
     render(<ChatbotChat />);
     expect(screen.getByTestId("chatbot-quick-actions")).toBeInTheDocument();
     expect(
-      screen.getAllByTestId("chatbot-quick-action-lecot-derived-1-LEC-2001").length,
+      screen.getAllByTestId("chatbot-quick-action-lecot-derived-1-LEC-2001").length
     ).toBeGreaterThan(0);
   });
 
@@ -80,17 +80,18 @@ describe("ChatbotChat", () => {
         {
           id: "m1",
           role: "assistant",
-          content: "Confirmer ? <suggestion>Oui, commander</suggestion><suggestion>Non merci</suggestion>",
+          content:
+            "Confirmer ? <suggestion>Oui, commander</suggestion><suggestion>Non merci</suggestion>",
         },
       ],
       updatedAt: Date.now(),
     };
     render(<ChatbotChat />);
     expect(screen.getByTestId("chatbot-quick-action-suggestion-tag-0")).toHaveTextContent(
-      "Oui, commander",
+      "Oui, commander"
     );
     expect(screen.getByTestId("chatbot-quick-action-suggestion-tag-1")).toHaveTextContent(
-      "Non merci",
+      "Non merci"
     );
   });
 
@@ -102,16 +103,15 @@ describe("ChatbotChat", () => {
         {
           id: "m1",
           role: "assistant",
-          content: "**Catalogue Lecot** :\n1. [Serrure](lecot:https://lecot.be/q) — 10 € (SKU LEC-2001)",
+          content:
+            "**Catalogue Lecot** :\n1. [Serrure](lecot:https://lecot.be/q) — 10 € (SKU LEC-2001)",
         },
       ],
       updatedAt: Date.now(),
     };
     render(<ChatbotChat />);
     fireEvent.click(screen.getByTestId("chatbot-quick-action-lecot-derived-1-LEC-2001"));
-    expect(mockChatbotContext.sendMessage).toHaveBeenCalledWith(
-      "Commander LEC-2001 — Serrure",
-    );
+    expect(mockChatbotContext.sendMessage).toHaveBeenCalledWith("Commander LEC-2001 — Serrure");
   });
 
   it("uses stored actions from message when present", () => {
@@ -165,6 +165,17 @@ describe("ChatbotChat", () => {
     expect(screen.queryByTestId("chatbot-quick-action-prompt-0")).not.toBeInTheDocument();
   });
 
+  it("shows hero-sized galaxy orb when conversation is empty", () => {
+    mockChatbotContext.activeConversation = {
+      id: "c-empty",
+      title: "Nouveau",
+      messages: [],
+      updatedAt: Date.now(),
+    };
+    render(<ChatbotChat />);
+    expect(screen.getByTestId("chatbot-galaxy-orb")).toHaveAttribute("data-size", "hero");
+  });
+
   it("renders clickable lecot links in assistant messages", () => {
     mockChatbotContext.activeConversation = {
       id: "c1",
@@ -173,7 +184,8 @@ describe("ChatbotChat", () => {
         {
           id: "m1",
           role: "assistant",
-          content: "Commande : [Cylindre](lecot:https://lecot.be/nl-be/catalogsearch/result?q=cylindre)",
+          content:
+            "Commande : [Cylindre](lecot:https://lecot.be/nl-be/catalogsearch/result?q=cylindre)",
         },
       ],
       updatedAt: Date.now(),
@@ -191,7 +203,8 @@ describe("ChatbotChat", () => {
         {
           id: "m1",
           role: "assistant",
-          content: "Voulez-vous que je commande ce produit ?\n<suggestion>Oui, commander</suggestion>\n<suggestion>Non merci</suggestion>",
+          content:
+            "Voulez-vous que je commande ce produit ?\n<suggestion>Oui, commander</suggestion>\n<suggestion>Non merci</suggestion>",
         },
       ],
       updatedAt: Date.now(),
@@ -259,7 +272,8 @@ describe("ChatbotChat", () => {
         {
           id: "m1",
           role: "assistant",
-          content: "Options : <SUGGESTION>Option majuscule</SUGGESTION><Suggestion>Option mixte</Suggestion>",
+          content:
+            "Options : <SUGGESTION>Option majuscule</SUGGESTION><Suggestion>Option mixte</Suggestion>",
         },
       ],
       updatedAt: Date.now(),

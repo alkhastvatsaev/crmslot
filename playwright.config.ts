@@ -1,59 +1,115 @@
-import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
+import { defineConfig, devices } from "@playwright/test";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
+/** Env public minimal pour démarrer Next en E2E (aligné .github/workflows/e2e.yml). */
+const e2ePublicEnv: Record<string, string> = {
+  NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "placeholder",
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "placeholder.firebaseapp.com",
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "placeholder",
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "placeholder.appspot.com",
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "0",
+  NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "1:0:web:0",
+  NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "pk.placeholder",
+};
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+/** Serveur prod-like : pas de preview dev, pas d’ALLOW_MOBILE build-time. */
+const desktopGateProdEnv: Record<string, string> = {
+  ...e2ePublicEnv,
+  NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW: "true",
+};
+
+const defaultDevWebServer = {
+  command: "npm run dev",
+  url: "http://localhost:3000",
+  reuseExistingServer: !process.env.CI,
+  timeout: 120_000,
+  env: {
+    ...process.env,
+    ...e2ePublicEnv,
+  },
+};
+
+/** Build + start port 3001 — Next 16 n’autorise qu’un seul `next dev` par repo. */
+const desktopGateProdWebServer = {
+  command: "bash scripts/e2e-desktop-gate-server.sh",
+  url: "http://localhost:3001",
+  reuseExistingServer: !process.env.CI,
+  timeout: 300_000,
+  env: {
+    ...process.env,
+    ...desktopGateProdEnv,
+    NEXT_E2E_GATE_DIST: "1",
+  },
+};
+
+const gateE2eMode = process.env.PLAYWRIGHT_GATE_E2E === "1";
+
 export default defineConfig({
-  testDir: './tests/e2e',
-  /* Maximum time one test can run for. */
+  testDir: "./tests/e2e",
   timeout: 60 * 1000,
   expect: {
-    /**
-     * Maximum time expect() should wait for the condition to be met.
-     * For example in `await expect(locator).toHaveText();`
-     */
     timeout: 30_000,
   },
-  /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. Limit locally to 2 */
-  workers: process.env.CI ? 1 : 2,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  workers: 1,
+  reporter: "html",
   use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    baseURL: gateE2eMode ? "http://localhost:3001" : "http://localhost:3000",
+    trace: "on-first-retry",
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      testIgnore: [/mobile-shell\.spec\.ts/, /desktop-only-gate-prod\.spec\.ts/],
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "mobile-shell",
+      testMatch: /mobile-shell\.spec\.ts/,
+      use: {
+        ...devices["iPhone 13"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "desktop-gate-prod",
+      testMatch: /desktop-only-gate-prod\.spec\.ts/,
+      grepInvert: /@desktop/,
+      use: {
+        ...devices["iPhone 13"],
+        baseURL: "http://localhost:3001",
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "desktop-gate-prod-chrome",
+      testMatch: /desktop-only-gate-prod\.spec\.ts/,
+      grep: /@desktop/,
+      dependencies: ["desktop-gate-prod"],
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://localhost:3001",
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
     },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: gateE2eMode ? desktopGateProdWebServer : defaultDevWebServer,
 });

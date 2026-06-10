@@ -26,9 +26,10 @@ describe("DailyMissions", () => {
             date: "2026-01-01",
           },
         ]}
-      />,
+      />
     );
     expect(screen.queryByTestId("daily-missions-empty-grid")).not.toBeInTheDocument();
+    expect(screen.getByTestId("daily-mission-iv-1")).toBeInTheDocument();
     expect(screen.getByText("Dupont")).toBeInTheDocument();
     expect(screen.getAllByTestId(/daily-missions-empty-slot-/)).toHaveLength(11);
   });

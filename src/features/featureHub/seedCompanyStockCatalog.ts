@@ -14,6 +14,8 @@ export async function seedCompanyStockCatalog(companyId: string): Promise<number
       quantity: row.quantity,
       alertThreshold: row.alertThreshold,
       unit: row.unit,
+      ...(row.lecotSku ? { lecotSku: row.lecotSku } : {}),
+      ...(row.imageUrl ? { imageUrl: row.imageUrl } : {}),
     };
     await createStockItem(input);
     created += 1;

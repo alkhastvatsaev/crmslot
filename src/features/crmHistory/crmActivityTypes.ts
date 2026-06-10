@@ -28,10 +28,21 @@ export type CrmEventType =
   | "email_received"
   | "commission_calculated"
   | "quote_created"
-  | "quote_status_changed";
+  | "quote_status_changed"
+  /** Audit de navigation — tout ce que l'utilisateur ouvre/consulte. */
+  | "page_navigated"
+  | "intervention_viewed"
+  | "email_viewed"
+  | "user_session_start";
 
 export type CrmPeriodFilter = "today" | "week" | "month" | "all";
-export type CrmTypeFilter = "all" | "interventions" | "materials" | "suppliers" | "communications";
+export type CrmTypeFilter =
+  | "all"
+  | "interventions"
+  | "materials"
+  | "suppliers"
+  | "communications"
+  | "navigation";
 
 export interface CrmActivityEvent {
   id: string;

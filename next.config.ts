@@ -42,10 +42,10 @@ const withPWA = withPWAInit({
       // File d'attente hors-ligne pour toutes les requêtes d'API (SMS, OpenAI, Google)
       {
         urlPattern: /^\/api\/.*/i,
-        handler: 'NetworkOnly',
+        handler: "NetworkOnly",
         options: {
           backgroundSync: {
-            name: 'api-queue',
+            name: "api-queue",
             options: {
               maxRetentionTime: 24 * 60, // Conserve les requêtes en échec pendant 24h
             },
@@ -56,14 +56,36 @@ const withPWA = withPWAInit({
   },
 });
 
+/** Hôtes tunnel (ngrok, etc.) autorisés pour le HMR Next en dev — évite reload en boucle sur iPhone. */
+function readDevTunnelOrigins(): string[] {
+  const raw = process.env.NGROK_DEV_ORIGIN?.trim();
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+const devTunnelOrigins = readDevTunnelOrigins();
+
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["fluent-ffmpeg", "playwright", "playwright-core"],
+  serverExternalPackages: [
+    "fluent-ffmpeg",
+    "playwright",
+    "playwright-core",
+    "@googleapis/gmail",
+    "google-auth-library",
+  ],
   env: {
     NEXT_PUBLIC_APP_GIT_SHA: resolveGitShaForBuild(),
     /** false en `npm run dev` sans ENABLE_PWA_IN_DEV — FCM ne tente pas le SW. */
     NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED: pwaDisabledInDev ? "false" : "true",
   },
   outputFileTracingRoot: process.cwd(),
+  ...(process.env.NEXT_E2E_GATE_DIST === "1" ? { distDir: ".next-e2e-gate" } : {}),
+  ...(process.env.NODE_ENV === "development" && devTunnelOrigins.length > 0
+    ? { allowedDevOrigins: devTunnelOrigins }
+    : {}),
 };
 
 export default withPWA(nextConfig);

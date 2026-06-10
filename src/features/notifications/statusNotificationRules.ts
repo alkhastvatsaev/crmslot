@@ -43,21 +43,21 @@ export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
     subjectKey: "notifications.push.assigned.subject",
     bodyKey: "notifications.push.assigned.body",
   },
-  // Client notifié quand technicien en route
+  // Client notifié quand technicien en route (WhatsApp si flag whatsappNotifications)
   {
     fromStatus: "assigned",
     toStatus: "en_route",
     targets: ["client"],
-    channels: ["email"],
+    channels: ["email", "whatsapp"],
     subjectKey: "notifications.email.en_route.subject",
     bodyKey: "notifications.email.en_route.body",
   },
-  // Client notifié quand intervention terminée
+  // Client notifié quand intervention terminée (WhatsApp si flag whatsappNotifications)
   {
     fromStatus: "in_progress",
     toStatus: "done",
     targets: ["client"],
-    channels: ["email"],
+    channels: ["email", "whatsapp"],
     subjectKey: "notifications.email.done.subject",
     bodyKey: "notifications.email.done.body",
   },
@@ -95,11 +95,9 @@ export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
  */
 export function findApplicableRules(
   fromStatus: Intervention["status"],
-  toStatus: Intervention["status"],
+  toStatus: Intervention["status"]
 ): StatusNotificationRule[] {
   return STATUS_NOTIFICATION_RULES.filter(
-    (r) =>
-      r.toStatus === toStatus &&
-      (r.fromStatus === "*" || r.fromStatus === fromStatus),
+    (r) => r.toStatus === toStatus && (r.fromStatus === "*" || r.fromStatus === fromStatus)
   );
 }

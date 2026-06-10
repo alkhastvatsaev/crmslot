@@ -1,9 +1,9 @@
 import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
+import { launchLecotBrowser, loginLecotShop } from "@/features/catalog/lecotPlaywrightBrowser";
 import {
   lecotShopCatalogSearchUrl,
   lecotShopCheckoutUrl,
   lecotShopCredentials,
-  lecotShopLoginUrl,
 } from "@/features/catalog/lecotShopConfig";
 
 export type LecotGuestInfo = {
@@ -23,57 +23,12 @@ export type LecotPlaywrightResult =
   | { ok: true; source: "playwright_cart_ready"; message: string }
   | { ok: false; source: "playwright"; error: string };
 
-
 async function launchBrowser() {
-  try {
-    const { chromium } = await import("playwright");
-    return await chromium.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-    });
-  } catch (err) {
-    console.warn(
-      "[lecot/playwright] navigateur indisponible — utilisez le catalogue local ou `npx playwright install`.",
-      err instanceof Error ? err.message : err,
-    );
-    return null;
-  }
+  return launchLecotBrowser();
 }
 
 async function loginToLecot(page: import("playwright").Page): Promise<boolean> {
-  const creds = lecotShopCredentials();
-  if (!creds) return false;
-
-  try {
-    await page.goto(lecotShopLoginUrl(), { waitUntil: "domcontentloaded", timeout: 15_000 });
-
-    const cookieBtn = page
-      .locator("button#btn-cookie-allow, .cookie-allow, #CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll")
-      .first();
-    if (await cookieBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await cookieBtn.click().catch(() => null);
-    }
-
-    const emailInput = page
-      .locator("input#email, input[name='login[username]'], input[type='email']")
-      .first();
-    if (!(await emailInput.isVisible({ timeout: 6_000 }).catch(() => false))) return false;
-
-    await emailInput.fill(creds.email);
-    await page
-      .locator("input#pass, input[name='login[password]'], input[type='password']")
-      .first()
-      .fill(creds.password);
-    await page
-      .locator("button#send2, .form-login button[type='submit'], button.login")
-      .first()
-      .click();
-
-    await page.waitForLoadState("domcontentloaded", { timeout: 12_000 }).catch(() => null);
-    return !page.url().includes("/login");
-  } catch {
-    return false;
-  }
+  return loginLecotShop(page);
 }
 
 function parsePrice(text: string | null): number {
@@ -86,7 +41,7 @@ function parsePrice(text: string | null): number {
 /** Scrapes lecot.be after login. Returns null on failure → fallback to local catalog. */
 export async function searchLecotViaPlaywright(
   query: string,
-  limit = 8,
+  limit = 8
 ): Promise<CatalogProduct[] | null> {
   if (!lecotShopCredentials()) return null;
 
@@ -114,12 +69,10 @@ export async function searchLecotViaPlaywright(
         return {
           label: nameEl?.textContent?.trim() ?? "",
           sku:
-            skuEl?.textContent?.trim() ||
-            (skuEl as HTMLElement | null)?.dataset?.productSku ||
-            "",
+            skuEl?.textContent?.trim() || (skuEl as HTMLElement | null)?.dataset?.productSku || "",
           priceText: priceEl?.textContent?.trim() ?? "",
         };
-      }),
+      })
     );
 
     const products: CatalogProduct[] = items
@@ -142,7 +95,7 @@ export async function searchLecotViaPlaywright(
 /** Logs in to lecot.be, adds products to cart, places order via saved account address. */
 export async function placeOrderViaPlaywright(
   lines: Array<{ sku: string; label: string; quantity: number }>,
-  _guestInfo: LecotGuestInfo,
+  _guestInfo: LecotGuestInfo
 ): Promise<LecotPlaywrightResult> {
   if (!lecotShopCredentials()) {
     return {
@@ -242,7 +195,9 @@ export async function placeOrderViaPlaywright(
     // 2. Klarna Pay Later
     if (!paymentSelected) {
       const klarnaRadio = page
-        .locator("input[value*='klarna'], input[id*='klarna'], label:has-text('Klarna') input, label:has-text('Payer plus tard') input")
+        .locator(
+          "input[value*='klarna'], input[id*='klarna'], label:has-text('Klarna') input, label:has-text('Payer plus tard') input"
+        )
         .first();
       if (await klarnaRadio.isVisible({ timeout: 2_000 }).catch(() => false)) {
         await klarnaRadio.click();
@@ -258,26 +213,54 @@ export async function placeOrderViaPlaywright(
       const cardCvv = process.env.LECOT_CARD_CVV?.trim();
       if (cardNumber && cardExpiry && cardCvv) {
         const visaRadio = page
-          .locator("input[value*='braintree'], input[value*='adyen_cc'], input[value*='stripe'], input[value*='visa'], label:has-text('Visa') input, label:has-text('Mastercard') input, label:has-text('carte de crédit') input")
+          .locator(
+            "input[value*='braintree'], input[value*='adyen_cc'], input[value*='stripe'], input[value*='visa'], label:has-text('Visa') input, label:has-text('Mastercard') input, label:has-text('carte de crédit') input"
+          )
           .first();
         if (await visaRadio.isVisible({ timeout: 2_000 }).catch(() => false)) {
           await visaRadio.click();
           await page.waitForTimeout(1_500);
           // Card form may be in an iframe
-          const cardFrame = page.frameLocator("iframe[id*='card'], iframe[name*='card'], iframe[src*='braintree'], iframe[src*='adyen']").first();
-          const cardInput = cardFrame.locator("input[id*='card-number'], input[name*='number'], input[autocomplete*='cc-number']").first();
+          const cardFrame = page
+            .frameLocator(
+              "iframe[id*='card'], iframe[name*='card'], iframe[src*='braintree'], iframe[src*='adyen']"
+            )
+            .first();
+          const cardInput = cardFrame
+            .locator(
+              "input[id*='card-number'], input[name*='number'], input[autocomplete*='cc-number']"
+            )
+            .first();
           const hasIframe = await cardInput.isVisible({ timeout: 2_000 }).catch(() => false);
           if (hasIframe) {
             await cardInput.fill(cardNumber);
-            await cardFrame.locator("input[id*='expiry'], input[name*='expiry'], input[autocomplete*='cc-exp']").first().fill(cardExpiry);
-            await cardFrame.locator("input[id*='cvv'], input[name*='cvc'], input[autocomplete*='cc-csc']").first().fill(cardCvv);
+            await cardFrame
+              .locator("input[id*='expiry'], input[name*='expiry'], input[autocomplete*='cc-exp']")
+              .first()
+              .fill(cardExpiry);
+            await cardFrame
+              .locator("input[id*='cvv'], input[name*='cvc'], input[autocomplete*='cc-csc']")
+              .first()
+              .fill(cardCvv);
           } else {
             // Direct form (no iframe)
-            const directCard = page.locator("input[id*='card-number'], input[name*='number'], input[autocomplete*='cc-number']").first();
+            const directCard = page
+              .locator(
+                "input[id*='card-number'], input[name*='number'], input[autocomplete*='cc-number']"
+              )
+              .first();
             if (await directCard.isVisible({ timeout: 2_000 }).catch(() => false)) {
               await directCard.fill(cardNumber);
-              await page.locator("input[id*='expiry'], input[name*='expiry'], input[autocomplete*='cc-exp']").first().fill(cardExpiry);
-              await page.locator("input[id*='cvv'], input[name*='cvc'], input[autocomplete*='cc-csc']").first().fill(cardCvv);
+              await page
+                .locator(
+                  "input[id*='expiry'], input[name*='expiry'], input[autocomplete*='cc-exp']"
+                )
+                .first()
+                .fill(cardExpiry);
+              await page
+                .locator("input[id*='cvv'], input[name*='cvc'], input[autocomplete*='cc-csc']")
+                .first()
+                .fill(cardCvv);
             }
           }
           paymentSelected = true;
@@ -296,7 +279,7 @@ export async function placeOrderViaPlaywright(
 
     const placeOrderBtn = page
       .locator(
-        "button[data-role='review-save'], .checkout-payment-method button.checkout, button.action-primary[title*='Commander'], button.action-primary[title*='Order'], button.action-primary[title*='Passer']",
+        "button[data-role='review-save'], .checkout-payment-method button.checkout, button.action-primary[title*='Commander'], button.action-primary[title*='Order'], button.action-primary[title*='Passer']"
       )
       .first();
     if (!(await placeOrderBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {

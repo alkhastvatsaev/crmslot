@@ -7,15 +7,12 @@ import {
   OFFLINE_HUB_EXAMPLE_QUEUE_COUNT,
 } from "@/features/offline/offlineHubExample";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 export function OfflineHubExampleNetwork() {
   const { t } = useTranslation();
 
   return (
     <div
       data-testid="offline-hub-example-network"
-      style={outfit}
       className="space-y-3 rounded-[18px] border border-slate-100 bg-white p-4 text-[13px] text-slate-700"
     >
       <div className="flex items-center gap-2 font-semibold text-emerald-700">
@@ -26,7 +23,9 @@ export function OfflineHubExampleNetwork() {
       <p className="flex items-center gap-2 text-[12px] text-slate-500">
         <ListTodo className="h-4 w-4 shrink-0" aria-hidden />
         {t("offline.hub.queue_label")}:{" "}
-        <span className="font-bold tabular-nums text-slate-800">{OFFLINE_HUB_EXAMPLE_QUEUE_COUNT}</span>
+        <span className="font-bold tabular-nums text-slate-800">
+          {OFFLINE_HUB_EXAMPLE_QUEUE_COUNT}
+        </span>
       </p>
     </div>
   );
@@ -38,13 +37,15 @@ export function OfflineHubExampleCache() {
   return (
     <div
       data-testid="offline-hub-example-cache"
-      style={outfit}
       className="rounded-[18px] border border-slate-100 bg-white p-4 text-[13px] text-slate-700"
     >
-      <p data-testid="offline-hub-example-cache-count" className="mb-2 font-semibold text-slate-900">
+      <p
+        data-testid="offline-hub-example-cache-count"
+        className="mb-2 font-semibold text-slate-900"
+      >
         {t("offline.sync.terrain_cache_count").replace(
           "{count}",
-          String(OFFLINE_HUB_EXAMPLE_MISSIONS.length),
+          String(OFFLINE_HUB_EXAMPLE_MISSIONS.length)
         )}
       </p>
       <ul className="max-h-48 space-y-1 overflow-y-auto">

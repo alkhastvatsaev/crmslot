@@ -12,8 +12,6 @@ import {
 } from "@/features/featureHub/companyStockVisualTheme";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   metrics: CompanyStockDashboardMetrics;
 };
@@ -31,20 +29,15 @@ export default function CompanyStockPulseBar({ metrics }: Props) {
     <div
       data-testid="company-stock-pulse"
       className="shrink-0 rounded-[16px] border border-slate-200/70 bg-gradient-to-br from-white to-slate-50/60 px-3 py-3"
-      style={outfit}
       aria-label={String(t("companyStock.pulse_aria"))}
     >
       <div className="flex items-center gap-3">
         <div
           className={cn(
             "relative flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full p-[3px]",
-            urgent === 0 && "bg-teal-100/50 ring-1 ring-teal-200/60",
+            urgent === 0 && "bg-teal-100/50 ring-1 ring-teal-200/60"
           )}
-          style={
-            urgent > 0
-              ? { background: stockPulseRingGradient(outPct, lowPct) }
-              : undefined
-          }
+          style={urgent > 0 ? { background: stockPulseRingGradient(outPct, lowPct) } : undefined}
         >
           <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-sm shadow-slate-900/[0.04]">
             <span
@@ -53,7 +46,9 @@ export default function CompanyStockPulseBar({ metrics }: Props) {
             >
               {metrics.coveragePct}
             </span>
-            <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-400">%</span>
+            <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-400">
+              %
+            </span>
           </div>
         </div>
 
@@ -112,7 +107,7 @@ export default function CompanyStockPulseBar({ metrics }: Props) {
             <span
               className={cn(
                 "inline-flex h-8 w-8 items-center justify-center rounded-[12px] border",
-                STOCK_SIGNAL.jobs,
+                STOCK_SIGNAL.jobs
               )}
               title={String(t("companyStock.kpi_jobs_waiting"))}
               data-testid="company-stock-signal-jobs"

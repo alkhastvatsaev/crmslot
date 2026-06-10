@@ -3,22 +3,23 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { validateInterventionReportServer } from "@/features/interventions/server/validateInterventionReportServer";
+import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
 
 type Body = { sendEmail?: boolean };
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
 
   const { id } = await context.params;
   const interventionId = id?.trim();
   if (!interventionId) {
-    return NextResponse.json({ ok: false, error: "Identifiant intervention manquant." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Identifiant intervention manquant." },
+      { status: 400 }
+    );
   }
 
   let body: Body = {};
@@ -40,7 +41,7 @@ export async function POST(
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
-    console.error("[validate-report]", e);
+    logger.error("[validate-report]", { error: e instanceof Error ? e.message : String(e) });
     const message = e instanceof Error ? e.message : "Validation impossible";
     const status = message.includes("Droits") ? 403 : 500;
     return NextResponse.json({ ok: false, error: message }, { status });

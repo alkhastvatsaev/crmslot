@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Plus, CheckCircle, XCircle } from "lucide-react";
+import { FileText, Plus, CheckCircle, XCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -9,6 +9,9 @@ import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { subscribeQuotes, updateQuoteStatus } from "../quoteFirestore";
+import { applyQuoteToInterventionBilling } from "../convertQuoteToInvoice";
+import { effectiveQuoteStatus, quoteCanBeResponded } from "../quoteExpiration";
+import { downloadQuotePdf } from "../buildQuotePdfFromQuote";
 import QuoteStatusBadge from "./QuoteStatusBadge";
 import QuoteEditorPanel from "./QuoteEditorPanel";
 import type { Quote } from "../types";
@@ -46,16 +49,24 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
 
   const handleRespond = async (quote: Quote, accept: boolean) => {
     if (!firestore) return;
+    if (!quoteCanBeResponded(quote)) {
+      toast.error(String(t("quotes.toast_expired")));
+      return;
+    }
     try {
       const nextStatus = accept ? "accepted" : "declined";
       await updateQuoteStatus(firestore, companyId, quote.id, nextStatus);
+      if (accept) {
+        const applied = await applyQuoteToInterventionBilling(firestore, quote);
+        if (applied) toast.success(String(t("quotes.toast_billing_applied")));
+      }
       await logCrmCompanyAction({
         companyId,
         kind: "quote_status_changed",
         actorUid: workspace?.firebaseUid ?? "system",
         actorRole: "dispatcher",
-        statusBefore: quote.status as any,
-        statusAfter: nextStatus as any,
+        statusBefore: quote.status,
+        statusAfter: nextStatus,
         note: quote.notes || undefined,
         intervention: {
           id: quote.id,
@@ -64,9 +75,11 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
           clientName: quote.clientName || undefined,
           clientCompanyName: quote.clientName || undefined,
           address: "",
-        } as any,
+        },
       });
-      toast.success(accept ? String(t("quotes.toast_accepted")) : String(t("quotes.toast_declined")));
+      toast.success(
+        accept ? String(t("quotes.toast_accepted")) : String(t("quotes.toast_declined"))
+      );
     } catch {
       toast.error(String(t("common.error")));
     }
@@ -84,7 +97,10 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
         <button
           type="button"
           data-testid="quote-new"
-          onClick={() => { setSelectedQuote(null); setShowEditor((v) => !v); }}
+          onClick={() => {
+            setSelectedQuote(null);
+            setShowEditor((v) => !v);
+          }}
           className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -93,10 +109,7 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
       </div>
 
       {showEditor && !selectedQuote && (
-        <QuoteEditorPanel
-          interventionId={interventionId}
-          onSaved={() => setShowEditor(false)}
-        />
+        <QuoteEditorPanel interventionId={interventionId} onSaved={() => setShowEditor(false)} />
       )}
 
       {filteredQuotes.length === 0 && !showEditor ? (
@@ -122,15 +135,34 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
                       <span className="text-sm font-semibold text-slate-800">
                         {q.clientName ?? t("quotes.unknown_client")}
                       </span>
-                      <QuoteStatusBadge status={q.status} />
+                      <QuoteStatusBadge status={effectiveQuoteStatus(q)} />
                     </div>
-                    <span className="text-sm font-bold text-blue-700">{formatEur(q.totalCents)}</span>
+                    <span className="text-sm font-bold text-blue-700">
+                      {formatEur(q.totalCents)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400">
                     <span>{formatDate(q.createdAt)}</span>
-                    <span>{q.lines.length} {t("quotes.lines_count")}</span>
+                    <span>
+                      {q.lines.length} {t("quotes.lines_count")}
+                    </span>
                   </div>
                   <div className="flex gap-2">
+                    <button
+                      type="button"
+                      data-testid={`quote-pdf-${q.id}`}
+                      onClick={() => {
+                        try {
+                          downloadQuotePdf(q);
+                        } catch {
+                          toast.error(String(t("common.error")));
+                        }
+                      }}
+                      className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:underline"
+                    >
+                      <Download className="h-3 w-3" />
+                      {t("quotes.download_pdf")}
+                    </button>
                     {q.status === "draft" || q.status === "sent" ? (
                       <>
                         <button
@@ -141,7 +173,7 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
                         >
                           {t("quotes.edit")}
                         </button>
-                        {q.status === "sent" && (
+                        {quoteCanBeResponded(q) && (
                           <>
                             <button
                               type="button"

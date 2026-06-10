@@ -12,7 +12,7 @@ describe("UserProfile", () => {
       "SOCIÉTÉ BX",
       "MANSOUR",
       "MATÉRIEL",
-      "HISTORIQUE",
+      "QUALITY MANAGEMENT",
       "FACTURATION",
       "GMAIL",
     ]);
@@ -30,5 +30,14 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("profile-name")).toHaveTextContent("IVANA");
     fireEvent.click(screen.getByTestId("next-profile-btn"));
     expect(screen.getByTestId("profile-name")).toHaveTextContent("MATÉRIEL");
+  });
+
+  it("hides carousel navigation in mobile label mode", () => {
+    renderWithPager(<UserProfile showPageNavigation={false} />, DASHBOARD_CAROUSEL_PAGE_COUNT, {
+      initialPageIndex: 0,
+    });
+    expect(screen.getByTestId("user-profile-mobile-label")).toBeInTheDocument();
+    expect(screen.queryByTestId("prev-profile-btn")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("next-profile-btn")).not.toBeInTheDocument();
   });
 });

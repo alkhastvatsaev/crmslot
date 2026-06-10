@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import CompanyStockAgentPanel from "@/features/featureHub/components/CompanyStockAgentPanel";
 import CompanyStockCenterPanel from "@/features/featureHub/components/CompanyStockCenterPanel";
 import CompanyStockOrdersRightRail from "@/features/featureHub/components/CompanyStockOrdersRightRail";
@@ -37,28 +37,29 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   const pager = useDashboardPagerOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
   const companyId =
-    (workspace?.activeCompanyId ?? "").trim() ||
-    (workspace?.isTenantUser ? DEMO_COMPANY_ID : "");
+    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : "");
 
   const { items, loading: stockLoading } = useCompanyStockItems(companyId || null);
 
-  const { orders, loading: ordersLoading, dismissDemoOrder } = useCompanyMaterialOrdersRecent(
-    companyId || null,
-  );
+  const {
+    orders,
+    loading: ordersLoading,
+    dismissDemoOrder,
+  } = useCompanyMaterialOrdersRecent(companyId || null);
 
   const { orders: supplierOrders, loading: supplierLoading } = useCompanySupplierOrdersRecent(
-    companyId || null,
+    companyId || null
   );
   const { interventions, loading: ivLoading } = useBackOfficeInterventions(companyId || null);
 
   const waitingMaterialJobs = useMemo(
     () => interventions.filter((iv) => iv.status === "waiting_material").length,
-    [interventions],
+    [interventions]
   );
 
   const metrics = useMemo(
     () => computeCompanyStockMetrics(items, orders, supplierOrders, waitingMaterialJobs),
-    [items, orders, supplierOrders, waitingMaterialJobs],
+    [items, orders, supplierOrders, waitingMaterialJobs]
   );
 
   const loading = stockLoading || ordersLoading || supplierLoading || ivLoading;
@@ -66,7 +67,7 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
 
   const agentCtx = useMemo(
     () => ({ companyId: companyId || "", items, orders, metrics }),
-    [companyId, items, orders, metrics],
+    [companyId, items, orders, metrics]
   );
 
   const gate = !companyId ? (
@@ -79,7 +80,7 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   ) : null;
 
   return (
-    <DashboardTriplePanelLayout
+    <AdaptiveTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
       centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}

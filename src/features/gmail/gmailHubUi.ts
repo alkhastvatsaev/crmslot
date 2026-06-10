@@ -1,35 +1,33 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Archive,
-  FileText,
-  Inbox,
-  Mail,
-  Send,
-  Star,
-  Trash2,
-} from "lucide-react";
+import { Archive, FileText, Inbox, Mail, Send, Star, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { HUB_FIELD_CLASS, HUB_FONT_OUTFIT, HUB_RADIUS, HUB_TYPE } from "@/core/ui/hub/hubTheme";
+import { hubButtonClassName } from "@/core/ui/hub/HubButton";
 
-export const gmailHubFont = { fontFamily: "'Outfit', sans-serif" } as const;
+export const gmailHubFont = HUB_FONT_OUTFIT;
 
 /** Même contraintes que les rails Chatbot / Back-office (`flex-1 min-h-0` dans GlassPanel). */
 export const gmailShell = "flex min-h-0 flex-1 flex-col overflow-hidden";
 
 export const gmailDivider = "border-black/[0.06]";
 
-export const gmailFieldClass =
-  "w-full rounded-xl border-0 bg-white/60 px-3.5 py-2.5 text-[13px] text-slate-800 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.06)] placeholder:text-slate-400 outline-none transition-shadow focus:bg-white/80 focus:shadow-[inset_0_0_0_1px_rgba(15,23,42,0.12)]";
+export const gmailFieldClass = HUB_FIELD_CLASS;
 
-export const gmailGhostBtn =
-  "inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-white/70 hover:text-slate-900 hover:shadow-[0_1px_3px_rgba(15,23,42,0.06)]";
+export const gmailGhostBtn = cn(
+  "inline-flex h-9 w-9 items-center justify-center text-slate-500 transition-all hover:bg-white/70 hover:text-slate-900 hover:shadow-[0_1px_3px_rgba(15,23,42,0.06)]",
+  HUB_RADIUS.control
+);
 
-export const gmailToolbarBtn =
-  "inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-600 transition-all hover:bg-white/80 hover:text-slate-900";
+export const gmailToolbarBtn = cn(
+  "inline-flex h-9 w-9 items-center justify-center text-slate-600 transition-all hover:bg-white/80 hover:text-slate-900",
+  HUB_RADIUS.control
+);
 
-export const gmailPrimaryBtn =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-[12px] font-medium tracking-wide text-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.45)] transition-all hover:bg-slate-800 hover:shadow-[0_10px_28px_-6px_rgba(15,23,42,0.5)] disabled:opacity-40";
+export const gmailPrimaryBtn = hubButtonClassName({
+  className: "h-10 px-4 text-[12px] font-medium tracking-wide",
+});
 
-export const gmailEyebrow =
-  "text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400";
+export const gmailEyebrow = HUB_TYPE.eyebrow;
 
 export const LABEL_ICONS: Record<string, LucideIcon> = {
   INBOX: Inbox,
@@ -105,13 +103,13 @@ export function parseSenderEmail(from: string): string {
 
 const AVATAR_BG_TEXT: { bg: string; text: string }[] = [
   { bg: "bg-violet-100", text: "text-violet-700" },
-  { bg: "bg-blue-100",   text: "text-blue-700"   },
-  { bg: "bg-emerald-100",text: "text-emerald-700" },
-  { bg: "bg-amber-100",  text: "text-amber-700"   },
-  { bg: "bg-rose-100",   text: "text-rose-700"    },
-  { bg: "bg-cyan-100",   text: "text-cyan-700"    },
-  { bg: "bg-pink-100",   text: "text-pink-700"    },
-  { bg: "bg-indigo-100", text: "text-indigo-700"  },
+  { bg: "bg-blue-100", text: "text-blue-700" },
+  { bg: "bg-emerald-100", text: "text-emerald-700" },
+  { bg: "bg-amber-100", text: "text-amber-700" },
+  { bg: "bg-rose-100", text: "text-rose-700" },
+  { bg: "bg-cyan-100", text: "text-cyan-700" },
+  { bg: "bg-pink-100", text: "text-pink-700" },
+  { bg: "bg-indigo-100", text: "text-indigo-700" },
 ];
 
 export function senderAvatarColor(name: string): { bg: string; text: string } {

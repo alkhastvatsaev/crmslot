@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
 import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
@@ -13,7 +13,6 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
   TECHNICIAN_HUB_ANCHOR_FINISH,
-  TECHNICIAN_HUB_ANCHOR_OFFLINE,
 } from "@/features/interventions/technicianHubNavigation";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
@@ -27,9 +26,10 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
+import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
+import VehicleStockPanel from "@/features/stock/components/VehicleStockPanel";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import { navigateTechnicianHub } from "@/features/interventions/technicianHubNavigation";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
 type Props = { slotIndex: number };
 
@@ -45,20 +45,19 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [commandOpen, setCommandOpen] = useState(false);
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
-  const pager = useDashboardPagerOptional();
+  const vehicleStockEnabled = useFeatureFlag("vehicleStock");
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
+  const { logIntervention } = useActivityLog();
 
   const selectedFromList = useMemo(
-    () => (selectedCaseId ? interventions.find((x) => x.id === selectedCaseId) ?? null : null),
-    [selectedCaseId, interventions],
+    () => (selectedCaseId ? (interventions.find((x) => x.id === selectedCaseId) ?? null) : null),
+    [selectedCaseId, interventions]
   );
 
   /** Pas de 2e listener doc si la mission est déjà dans la query assignée (réduit race Firestore ca9). */
-  const needsDocListener = Boolean(
-    selectedCaseId && !finishJobInterventionId && !selectedFromList,
-  );
+  const needsDocListener = Boolean(selectedCaseId && !finishJobInterventionId && !selectedFromList);
   const liveFromSnapshot = useInterventionLive(needsDocListener ? selectedCaseId : null);
 
   const liveSelectedIntervention = selectedFromList ?? liveFromSnapshot;
@@ -66,25 +65,19 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   /** Même filtre « aujourd’hui » que la liste gauche (sélection auto du 1er dossier du jour). */
   const filteredSorted = useMemo(() => {
     const todayRows = interventions.filter((iv) =>
-      interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor),
+      interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
     const awaiting = todayRows.filter((iv) =>
-      isTechnicianAssignmentAwaitingResponse(iv, firebaseUid),
+      isTechnicianAssignmentAwaitingResponse(iv, firebaseUid)
     );
-    const rest = todayRows.filter(
-      (iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid),
-    );
-    return [
-      ...sortInterventionsByScheduleAsc(awaiting),
-      ...sortInterventionsByScheduleAsc(rest),
-    ];
+    const rest = todayRows.filter((iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
+    return [...sortInterventionsByScheduleAsc(awaiting), ...sortInterventionsByScheduleAsc(rest)];
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   /** Ne pas auto-sélectionner une mission déjà en archives (évite détail « clôturée » + photos sans clic explicite). */
   const activeTodaySorted = useMemo(
-    () =>
-      filteredSorted.filter((iv) => iv.status !== "done" && iv.status !== "invoiced"),
-    [filteredSorted],
+    () => filteredSorted.filter((iv) => iv.status !== "done" && iv.status !== "invoiced"),
+    [filteredSorted]
   );
 
   const todayMissions = useMemo<Mission[]>(
@@ -98,11 +91,14 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         status: String(t(statusLabelKey(iv.status))),
         statusCode: iv.status,
       })),
-    [filteredSorted, t],
+    [filteredSorted, t]
   );
 
   const handleMissionClick = (mission: Mission) => {
-    if (mission.key) setSelectedCaseId(mission.key);
+    if (!mission.key) return;
+    setSelectedCaseId(mission.key);
+    const iv = interventions.find((x) => x.id === mission.key);
+    if (iv) logIntervention(iv);
   };
 
   useEffect(() => {
@@ -125,7 +121,14 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       }
       return activeTodaySorted[0]?.id ?? null;
     });
-  }, [pendingCaseId, setPendingCaseId, interventions, missionDayAnchor, activeTodaySorted, firebaseUid]);
+  }, [
+    pendingCaseId,
+    setPendingCaseId,
+    interventions,
+    missionDayAnchor,
+    activeTodaySorted,
+    firebaseUid,
+  ]);
 
   /** Une seule vue centrale : détail mission OU clôture (pas d’overlay superposé). */
   useEffect(() => {
@@ -137,62 +140,82 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const centerView = finishJobInterventionId ? "finish" : "detail";
 
+  const leftPanel = (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <DailyMissions missions={todayMissions} onMissionClick={handleMissionClick} isEmbedded />
+    </div>
+  );
+
+  const centerPanel = (
+    <section
+      id={TECHNICIAN_HUB_ANCHOR_MISSIONS}
+      data-technician-center-view={centerView}
+      className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
+    >
+      {finishJobInterventionId ? (
+        <TechnicianFinishJobPanel />
+      ) : (
+        <TechnicianDashboardDetailPanel
+          caseId={selectedCaseId}
+          liveIntervention={liveSelectedIntervention}
+          technicianUid={firebaseUid}
+        />
+      )}
+    </section>
+  );
+
+  const rightPanel = (
+    <div
+      id={TECHNICIAN_HUB_ANCHOR_FINISH}
+      className="scroll-mt-2 flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <TechnicianDashboardImagesPanel caseId={selectedCaseId} />
+      {vehicleStockEnabled ? (
+        <div
+          data-testid="technician-hub-vehicle-stock"
+          className="max-h-[45%] shrink-0 overflow-y-auto border-t border-slate-100 p-3"
+        >
+          <VehicleStockPanel techUid={firebaseUid ?? undefined} />
+        </div>
+      ) : null}
+    </div>
+  );
+
+  const layoutLabels = {
+    left: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.left")}`,
+    center: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.center")}`,
+    right: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`,
+  };
+
   return (
     <>
-    {commandPaletteEnabled ? (
-      <InterventionCommandPalette
-        open={commandOpen}
-        onOpenChange={setCommandOpen}
-        missions={filteredSorted}
-        selectedCaseId={selectedCaseId}
-        onSelectCase={setSelectedCaseId}
-        onFinishCase={(id) => {
-          setSelectedCaseId(id);
-          setFinishJobInterventionId(id);
-        }}
+      <TechnicianGeofenceWatcher missions={interventions} />
+      {commandPaletteEnabled ? (
+        <InterventionCommandPalette
+          open={commandOpen}
+          onOpenChange={setCommandOpen}
+          missions={filteredSorted}
+          selectedCaseId={selectedCaseId}
+          onSelectCase={setSelectedCaseId}
+          onFinishCase={(id) => {
+            setSelectedCaseId(id);
+            setFinishJobInterventionId(id);
+          }}
+        />
+      ) : null}
+      <AdaptiveTriplePanelLayout
+        rootTestId={`dashboard-pager-slot-${slotIndex}`}
+        leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
+        centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
+        rightTestId={`dashboard-pager-slot-${slotIndex}-panel-right`}
+        leftAriaLabel={layoutLabels.left}
+        centerAriaLabel={layoutLabels.center}
+        rightAriaLabel={layoutLabels.right}
+        left={leftPanel}
+        center={centerPanel}
+        right={rightPanel}
+        centerPadding={false}
       />
-    ) : null}
-    <DashboardTriplePanelLayout
-      rootTestId={`dashboard-pager-slot-${slotIndex}`}
-      leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
-      centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
-      rightTestId={`dashboard-pager-slot-${slotIndex}-panel-right`}
-      leftAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.left")}`}
-      centerAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.center")}`}
-      rightAriaLabel={`${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`}
-      left={
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <DailyMissions
-            missions={todayMissions}
-            onMissionClick={handleMissionClick}
-            isEmbedded
-          />
-        </div>
-      }
-      centerPadding={false}
-      center={
-        <section
-          id={TECHNICIAN_HUB_ANCHOR_MISSIONS}
-          data-technician-center-view={centerView}
-          className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
-        >
-          {finishJobInterventionId ? (
-            <TechnicianFinishJobPanel />
-          ) : (
-            <TechnicianDashboardDetailPanel
-              caseId={selectedCaseId}
-              liveIntervention={liveSelectedIntervention}
-              technicianUid={firebaseUid}
-            />
-          )}
-        </section>
-      }
-      right={
-        <div id={TECHNICIAN_HUB_ANCHOR_FINISH} className="scroll-mt-2 flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
-          <TechnicianDashboardImagesPanel caseId={selectedCaseId} />
-        </div>
-      }
-    />
     </>
   );
 }

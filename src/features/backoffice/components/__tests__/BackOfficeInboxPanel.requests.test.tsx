@@ -143,7 +143,7 @@ function renderInbox(ui: React.ReactElement) {
   return render(
     <I18nProvider>
       <DateProvider>{ui}</DateProvider>
-    </I18nProvider>,
+    </I18nProvider>
   );
 }
 
@@ -161,8 +161,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
   });
 
   function openRequestsTab() {
-    const tab = screen.getByRole("button", { name: /Demandes|Requests/i });
-    fireEvent.click(tab);
+    fireEvent.click(screen.getByTestId("backoffice-inbox-tab-requests"));
   }
 
   it("affiche l’onglet Demandes et la carte pending", () => {
@@ -188,7 +187,28 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     });
     renderInbox(<BackOfficeInboxPanel />);
     openRequestsTab();
-    expect(screen.getByTestId("backoffice-inbox-request-row-req-assigned-stuck")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("backoffice-inbox-request-row-req-assigned-stuck")
+    ).toBeInTheDocument();
+  });
+
+  it("remplace annuler/supprimer par Modifier dans le détail demande", async () => {
+    renderInbox(<BackOfficeInboxPanel />);
+    openRequestsTab();
+    fireEvent.click(screen.getByTestId("backoffice-inbox-request-row-req-inbox-1"));
+
+    const detail = await screen.findByTestId("backoffice-inbox-detail");
+    expect(within(detail).queryByTestId("backoffice-inbox-cancel")).not.toBeInTheDocument();
+    expect(within(detail).queryByText(/Supprimer/i)).not.toBeInTheDocument();
+
+    fireEvent.click(within(detail).getByTestId("backoffice-inbox-edit"));
+    const editor = await within(detail).findByTestId("backoffice-inbox-schedule-editor");
+    expect(within(editor).getByText(/Créneaux libres/i)).toBeInTheDocument();
+    expect(within(editor).getByTestId("proposed-schedule-date")).toBeInTheDocument();
+    expect(within(editor).getByTestId("backoffice-inbox-schedule-cancel")).toBeInTheDocument();
+    expect(within(editor).getByTestId("backoffice-inbox-schedule-save")).toHaveTextContent(
+      /Sauver/i
+    );
   });
 
   it("ouvre le détail puis assigne via transition workflow", async () => {
@@ -203,6 +223,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     fireEvent.click(screen.getByTestId("backoffice-inbox-assign"));
 
     const picker = await screen.findByTestId("technician-assign-picker");
+    expect(within(picker).queryByTestId("proposed-schedule-slots")).not.toBeInTheDocument();
     const confirm = within(picker).getByTestId("technician-assign-confirm");
     await waitFor(() => expect(confirm).not.toBeDisabled());
     fireEvent.click(confirm);
@@ -214,7 +235,13 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
 
   it("affiche le picker même si location absente (repli coordonnées)", async () => {
     mockUseBackOffice.mockReturnValue({
-      interventions: [{ ...pendingRequest, id: "req-no-loc", location: undefined as unknown as Intervention["location"] }],
+      interventions: [
+        {
+          ...pendingRequest,
+          id: "req-no-loc",
+          location: undefined as unknown as Intervention["location"],
+        },
+      ],
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
@@ -226,8 +253,6 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     fireEvent.click(screen.getByTestId("backoffice-inbox-assign"));
 
     expect(await screen.findByTestId("technician-assign-picker")).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.getByTestId("technician-assign-confirm")).not.toBeDisabled(),
-    );
+    await waitFor(() => expect(screen.getByTestId("technician-assign-confirm")).not.toBeDisabled());
   });
 });

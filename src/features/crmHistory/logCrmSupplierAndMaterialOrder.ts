@@ -1,13 +1,11 @@
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { logger } from "@/core/logger";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
 import type { Intervention } from "@/features/interventions/types";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrderLine } from "@/features/suppliers/types";
-import {
-  buildCompanyCrmActivityPayload,
-  type CompanyCrmActivityKind,
-} from "./crmActivityLog";
+import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
 import { dispatchCrmOrdersChanged } from "./crmOrdersChangedEvent";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
 
@@ -16,12 +14,15 @@ function actorRoleFromCtx(ctx: Pick<ChatbotToolContext, "role">): WorkflowOwnerR
 }
 
 function formatLinesSummary(lines: SupplierOrderLine[]): string {
-  return lines.map((l) => `${l.quantity}× ${l.label}`).join(", ").slice(0, 240);
+  return lines
+    .map((l) => `${l.quantity}× ${l.label}`)
+    .join(", ")
+    .slice(0, 240);
 }
 
 async function loadInterventionForCrm(
   companyId: string,
-  interventionId: string,
+  interventionId: string
 ): Promise<Pick<
   Intervention,
   | "id"
@@ -45,14 +46,13 @@ async function loadInterventionForCrm(
     clientName: typeof data.clientName === "string" ? data.clientName : undefined,
     clientFirstName: typeof data.clientFirstName === "string" ? data.clientFirstName : null,
     clientLastName: typeof data.clientLastName === "string" ? data.clientLastName : null,
-    clientCompanyName:
-      typeof data.clientCompanyName === "string" ? data.clientCompanyName : null,
+    clientCompanyName: typeof data.clientCompanyName === "string" ? data.clientCompanyName : null,
   };
 }
 
 function companyLevelInterventionStub(
   interventionId: string | null | undefined,
-  clientName: string | null | undefined,
+  clientName: string | null | undefined
 ): Pick<
   Intervention,
   | "id"
@@ -93,20 +93,23 @@ async function writeCrmActivity(
     | "clientCompanyName"
   >,
   note: string,
-  extra?: { statusAfter?: Intervention["status"] },
+  extra?: { statusAfter?: Intervention["status"] }
 ): Promise<void> {
   const payload = buildCompanyCrmActivityPayload(
     companyId,
     kind,
     { uid: actorUid, role: actorRole },
     iv,
-    { note, statusAfter: extra?.statusAfter },
+    { note, statusAfter: extra?.statusAfter }
   );
   try {
     await logCompanyCrmActivityAdmin(getAdminDb(), payload);
     dispatchCrmOrdersChanged({ companyId: payload.companyId });
   } catch (e) {
-    console.warn("[logCrmSupplierAndMaterialOrder]", kind, e);
+    logger.warn("[logCrmSupplierAndMaterialOrder]", {
+      kind,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -152,7 +155,7 @@ export async function logCrmSupplierOrderPlacedAdmin(params: {
     params.ctx.actorUid,
     actorRoleFromCtx(params.ctx),
     iv,
-    parts.join(" · "),
+    parts.join(" · ")
   );
 }
 
@@ -184,7 +187,7 @@ export async function logCrmMaterialOrderPlacedAdmin(params: {
     params.ctx.actorUid,
     actorRoleFromCtx(params.ctx),
     iv,
-    parts.join(" · "),
+    parts.join(" · ")
   );
 }
 
@@ -199,9 +202,8 @@ export async function logCrmMaterialOrderApprovedAdmin(params: {
 }): Promise<void> {
   const interventionId = params.interventionId?.trim() || "";
   const iv =
-    (interventionId
-      ? await loadInterventionForCrm(params.companyId, interventionId)
-      : null) ?? companyLevelInterventionStub(interventionId || null, params.clientName);
+    (interventionId ? await loadInterventionForCrm(params.companyId, interventionId) : null) ??
+    companyLevelInterventionStub(interventionId || null, params.clientName);
 
   await writeCrmActivity(
     params.companyId,
@@ -210,6 +212,6 @@ export async function logCrmMaterialOrderApprovedAdmin(params: {
     params.role === "admin" || params.role === "collaborateur" ? "dispatcher" : "dispatcher",
     iv,
     `Demande matériel validée · #${params.materialOrderId.slice(0, 8)} → commandé`,
-    { statusAfter: "pending" },
+    { statusAfter: "pending" }
   );
 }

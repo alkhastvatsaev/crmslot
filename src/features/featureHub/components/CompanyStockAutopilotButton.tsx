@@ -11,8 +11,6 @@ import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockC
 import { runStockAutopilotPlan } from "@/features/featureHub/companyStockAutopilotRun";
 import type { StockAutopilotPlan } from "@/features/featureHub/companyStockAutopilot";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 type Props = {
   plan: StockAutopilotPlan;
   onDemoOrderApproved?: (orderId: string) => void;
@@ -65,14 +63,17 @@ export default function CompanyStockAutopilotButton({
       title={label}
       aria-label={label}
       onClick={() => void handlePrimary()}
-      style={outfit}
       className={cn(
         "relative inline-flex shrink-0 items-center justify-center rounded-[14px] font-semibold transition",
-        iconOnly ? "h-10 w-10" : compact ? "gap-2 px-3 py-2 text-[12px]" : "gap-2 px-4 py-2.5 text-[13px]",
+        iconOnly
+          ? "h-10 w-10"
+          : compact
+            ? "gap-2 px-3 py-2 text-[12px]"
+            : "gap-2 px-4 py-2.5 text-[13px]",
         hasWork
           ? "bg-slate-800 text-white shadow-sm hover:bg-slate-700"
           : "border border-teal-200/90 bg-teal-600 text-white hover:bg-teal-500 shadow-sm shadow-teal-900/10",
-        running && "opacity-70",
+        running && "opacity-70"
       )}
     >
       {running ? (

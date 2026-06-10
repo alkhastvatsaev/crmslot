@@ -4,10 +4,17 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { transcodeFileToWavBuffer } from "@/core/services/audio/ffmpeg-wav-buffer";
 import { transcrireAppelSerrurier } from "@/core/services/audio/transcription";
-import type { AudioUploadSidecar, SynthesizedTranscription } from "@/core/services/audio/transcription.types";
+import type {
+  AudioUploadSidecar,
+  SynthesizedTranscription,
+} from "@/core/services/audio/transcription.types";
 import type { PendingUploadJob } from "@/core/services/audio/process-upload-jobs";
 import { writeAudioUploadSidecar } from "@/core/services/audio/transcript-sidecar";
-import { guessClientFolderNameFromText, moveUploadBundleIntoClientFolder } from "@/core/services/audio/upload-organization";
+import {
+  guessClientFolderNameFromText,
+  moveUploadBundleIntoClientFolder,
+} from "@/core/services/audio/upload-organization";
+import { logger } from "@/core/logger";
 
 export type RunProcessUploadJobParams = {
   uploadsDir: string;
@@ -40,7 +47,9 @@ function errorAnalysis(message: string): SynthesizedTranscription {
  * Transcode / STT / rangement client + sidecar + Firestore `ai_status/macrodroid`.
  * Utilisé par `process-uploads` et, en asynchrone, par `audio-dispatch` après envoi MacroDroid.
  */
-export async function runProcessUploadJob(params: RunProcessUploadJobParams): Promise<RunProcessUploadJobResult> {
+export async function runProcessUploadJob(
+  params: RunProcessUploadJobParams
+): Promise<RunProcessUploadJobResult> {
   const { uploadsDir, job, source, dispatchPhone } = params;
 
   let ext = path.extname(job.canonical) || ".m4a";
@@ -83,7 +92,10 @@ export async function runProcessUploadJob(params: RunProcessUploadJobParams): Pr
     rawTranscript = result.rawTranscript;
     clientFolder = guessClientFolderNameFromText(analysis.transcription || rawTranscript || "");
   } catch (sttError) {
-    console.error("[runProcessUploadJob] Erreur transcription:", job.canonical, sttError);
+    logger.error("[runProcessUploadJob] Erreur transcription:", {
+      canonical: job.canonical,
+      error: sttError instanceof Error ? sttError.message : String(sttError),
+    });
     const errorMsg = sttError instanceof Error ? sttError.message : String(sttError);
     analysis = errorAnalysis(errorMsg);
     rawTranscript = `[Erreur] L'IA n'a pas pu traiter ce fichier. ${errorMsg}`;
@@ -130,23 +142,22 @@ export async function runProcessUploadJob(params: RunProcessUploadJobParams): Pr
   try {
     if (admin.apps.length) {
       const db = admin.firestore();
-      await db
-        .collection("ai_status")
-        .doc("macrodroid")
-        .set(
-          {
-            status: "ready",
-            phone: extractedPhone,
-            transcript: analysis.transcription,
-            audioUrl: publicUrl,
-            updatedAt: processedAt,
-            lastProcessedAt: processedAt,
-          },
-          { merge: true }
-        );
+      await db.collection("ai_status").doc("macrodroid").set(
+        {
+          status: "ready",
+          phone: extractedPhone,
+          transcript: analysis.transcription,
+          audioUrl: publicUrl,
+          updatedAt: processedAt,
+          lastProcessedAt: processedAt,
+        },
+        { merge: true }
+      );
     }
   } catch (e) {
-    console.warn("[runProcessUploadJob] Firestore:", e);
+    logger.warn("[runProcessUploadJob] Firestore:", {
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 
   return {

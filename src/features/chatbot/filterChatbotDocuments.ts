@@ -138,7 +138,7 @@ function levenshtein(a: string, b: string): number {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + cost,
+        matrix[i - 1][j - 1] + cost
       );
     }
   }
@@ -344,7 +344,11 @@ export function supplierOrderSearchHaystack(order: SupplierOrder): string {
     .join(" ");
 }
 
-function sortBySearchScore<T>(rows: T[], haystackFor: (row: T) => string, parsed: ParsedDocumentsSearchQuery): T[] {
+function sortBySearchScore<T>(
+  rows: T[],
+  haystackFor: (row: T) => string,
+  parsed: ParsedDocumentsSearchQuery
+): T[] {
   return rows
     .map((row) => ({
       row,
@@ -357,7 +361,7 @@ function sortBySearchScore<T>(rows: T[], haystackFor: (row: T) => string, parsed
 
 export function filterChatbotInvoices(
   rows: ChatbotInvoiceRow[],
-  parsed: ParsedDocumentsSearchQuery,
+  parsed: ParsedDocumentsSearchQuery
 ): ChatbotInvoiceRow[] {
   if (parsed.kindFilter === "order") return [];
   return sortBySearchScore(rows, chatbotInvoiceSearchHaystack, parsed);
@@ -365,8 +369,42 @@ export function filterChatbotInvoices(
 
 export function filterChatbotSupplierOrders(
   rows: SupplierOrder[],
-  parsed: ParsedDocumentsSearchQuery,
+  parsed: ParsedDocumentsSearchQuery
 ): SupplierOrder[] {
   if (parsed.kindFilter === "invoice") return [];
   return sortBySearchScore(rows, supplierOrderSearchHaystack, parsed);
+}
+
+export type ChatbotDocumentListItem =
+  | { kind: "invoice"; createdAtMs: number; invoice: ChatbotInvoiceRow }
+  | { kind: "order"; createdAtMs: number; order: SupplierOrder };
+
+export function documentCreatedAtMs(raw: unknown): number {
+  if (raw == null) return 0;
+  if (typeof raw === "object" && raw !== null && "seconds" in raw) {
+    const seconds = (raw as { seconds: number }).seconds;
+    return typeof seconds === "number" ? seconds * 1000 : 0;
+  }
+  const t = Date.parse(String(raw));
+  return Number.isFinite(t) ? t : 0;
+}
+
+/** Factures + bons de commande mélangés, du plus récent au plus ancien. */
+export function mergeChatbotDocumentsByCreatedAt(
+  invoices: ChatbotInvoiceRow[],
+  orders: SupplierOrder[]
+): ChatbotDocumentListItem[] {
+  const items: ChatbotDocumentListItem[] = [
+    ...invoices.map((invoice) => ({
+      kind: "invoice" as const,
+      createdAtMs: documentCreatedAtMs(invoice.invoicedAt),
+      invoice,
+    })),
+    ...orders.map((order) => ({
+      kind: "order" as const,
+      createdAtMs: documentCreatedAtMs(order.createdAt),
+      order,
+    })),
+  ];
+  return items.sort((a, b) => b.createdAtMs - a.createdAtMs);
 }

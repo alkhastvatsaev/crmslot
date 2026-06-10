@@ -5,6 +5,8 @@ export type CatalogProduct = {
   label: string;
   unitPriceCents: number;
   category?: string;
+  /** Vignette catalogue (Lecot ou overlay local). */
+  imageUrl?: string | null;
 };
 
 /** Catalogue local de secours (fusionné avec Lecot via `/api/catalog/lecot-search`). */
@@ -16,7 +18,7 @@ export const STUB_CATALOG: CatalogProduct[] = [
 
 export function filterCatalogForIntervention(
   products: CatalogProduct[],
-  iv: Pick<Intervention, "category" | "problem">,
+  iv: Pick<Intervention, "category" | "problem">
 ): CatalogProduct[] {
   const cat = iv.category?.trim();
   if (!cat) return products;

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import { GMAIL_HUB_SCOPES } from "@/core/services/email/gmailHubScopes";
-import { getGmailOAuthConfig, isGmailOAuthClientConfigured } from "@/core/services/email/gmailOAuthConfig";
+import {
+  getGmailOAuthConfig,
+  isGmailOAuthClientConfigured,
+} from "@/core/services/email/gmailOAuthConfig";
 import { setGmailHubDisconnectedCookie } from "@/core/services/email/gmailHubSession";
 
 export const runtime = "nodejs";
@@ -18,12 +21,12 @@ export async function GET(req: NextRequest) {
         error:
           "GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET requis dans .env.local (Google Cloud → Identifiants OAuth).",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
   const { clientId, clientSecret, redirectUri } = getGmailOAuthConfig();
-  const oauth2 = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  const oauth2 = new OAuth2Client(clientId, clientSecret, redirectUri);
   const url = oauth2.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",

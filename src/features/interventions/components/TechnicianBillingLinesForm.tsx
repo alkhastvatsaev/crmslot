@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import { useState, useEffect } from "react";
 import { Plus, Trash2, FileText, Mic, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -48,7 +50,7 @@ export default function TechnicianBillingLinesForm({
 }: Props) {
   const { t } = useTranslation();
   const [lines, setLines] = useState<BillingLine[]>(
-    initialLines && initialLines.length > 0 ? initialLines : [emptyLine()],
+    initialLines && initialLines.length > 0 ? initialLines : [emptyLine()]
   );
 
   const [dictatedText, setDictatedText] = useState("");
@@ -58,9 +60,8 @@ export default function TechnicianBillingLinesForm({
     setDictatedText((prev) => (prev ? `${prev} ${text}` : text));
   };
 
-  const { listening, toggleListening, interimTranscript } = useBrowserSpeechDictation(
-    handleTranscript
-  );
+  const { listening, toggleListening, interimTranscript } =
+    useBrowserSpeechDictation(handleTranscript);
 
   const handleDictationResult = async (text: string) => {
     if (!text.trim()) return;
@@ -79,7 +80,7 @@ export default function TechnicianBillingLinesForm({
           unitPriceCents: l.unitPriceCents || 0,
           reference: l.reference || "",
         }));
-        
+
         setLines((prev) => {
           if (prev.length === 1 && !prev[0].description) {
             return newLines;
@@ -91,7 +92,7 @@ export default function TechnicianBillingLinesForm({
         toast.error(t("billing_lines.voice_empty") || "Aucune ligne détectée");
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e instanceof Error ? e.message : String(e));
       toast.error(t("billing_lines.voice_error") || "Erreur lors de l'analyse");
     } finally {
       setIsAnalyzing(false);
@@ -118,29 +119,19 @@ export default function TechnicianBillingLinesForm({
         quantity: l.quantity,
         unitPriceCents: l.unitPriceCents,
         reference: l.reference || "",
-      })),
+      }))
     );
   };
 
-  const updateLine = (
-    idx: number,
-    field: keyof BillingLine,
-    value: string | number,
-  ) => {
-    setLines((prev) =>
-      prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)),
-    );
+  const updateLine = (idx: number, field: keyof BillingLine, value: string | number) => {
+    setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)));
   };
 
-  const removeLine = (idx: number) =>
-    setLines((prev) => prev.filter((_, i) => i !== idx));
+  const removeLine = (idx: number) => setLines((prev) => prev.filter((_, i) => i !== idx));
 
   const addLine = () => setLines((prev) => [...prev, emptyLine()]);
 
-  const totalCents = lines.reduce(
-    (sum, l) => sum + l.quantity * l.unitPriceCents,
-    0,
-  );
+  const totalCents = lines.reduce((sum, l) => sum + l.quantity * l.unitPriceCents, 0);
 
   const hasValidLines = lines.some((l) => l.description.trim() !== "");
   const terrain = variant === "terrain";
@@ -155,7 +146,9 @@ export default function TechnicianBillingLinesForm({
         className="flex min-h-0 flex-1 flex-col overflow-hidden gap-2"
       >
         <div className="flex shrink-0 items-center justify-between gap-2">
-          <span className="text-[13px] font-semibold text-slate-800">{t("billing_lines.title")}</span>
+          <span className="text-[13px] font-semibold text-slate-800">
+            {t("billing_lines.title")}
+          </span>
           <div className="flex items-center gap-2">
             <span className="text-[15px] font-bold tabular-nums text-slate-900">
               {(totalCents / 100).toFixed(2)} €
@@ -301,9 +294,7 @@ export default function TechnicianBillingLinesForm({
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-slate-800" aria-hidden />
-          <h2 className="text-[15px] font-semibold text-slate-800">
-            {t("billing_lines.title")}
-          </h2>
+          <h2 className="text-[15px] font-semibold text-slate-800">{t("billing_lines.title")}</h2>
         </div>
         <button
           type="button"
@@ -312,18 +303,14 @@ export default function TechnicianBillingLinesForm({
             toggleListening();
           }}
           className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-bold transition-all ${
-            listening 
-              ? "bg-red-100 text-red-600 animate-pulse" 
+            listening
+              ? "bg-red-100 text-red-600 animate-pulse"
               : "bg-purple-100 text-purple-700 hover:bg-purple-200"
           }`}
           disabled={isAnalyzing}
           title="Dictez votre facturation pour générer les lignes automatiquement"
         >
-          {isAnalyzing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Mic className="h-4 w-4" />
-          )}
+          {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mic className="h-4 w-4" />}
           {isAnalyzing ? "Analyse..." : listening ? "Écoute..." : "Saisie IA"}
         </button>
       </div>
@@ -357,10 +344,7 @@ export default function TechnicianBillingLinesForm({
       {/* Line items */}
       <div className="space-y-3">
         {lines.map((line, idx) => (
-          <div
-            key={idx}
-            className="relative rounded-xl border border-slate-100 bg-slate-50 p-3"
-          >
+          <div key={idx} className="relative rounded-xl border border-slate-100 bg-slate-50 p-3">
             {lines.length > 1 && (
               <button
                 type="button"
@@ -398,7 +382,8 @@ export default function TechnicianBillingLinesForm({
                     />
                     <a
                       href={lecotShopCatalogSearchUrl(line.reference || line.description)}
-                      target="_blank" rel="noreferrer"
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex shrink-0 items-center justify-center rounded-lg bg-slate-800 px-3 text-[11px] font-bold text-white hover:bg-slate-700 transition-colors"
                       onClick={(e) => {
                         if (!line.reference && !line.description) e.preventDefault();
@@ -419,9 +404,7 @@ export default function TechnicianBillingLinesForm({
                     value={line.quantity}
                     min={0.5}
                     step={0.5}
-                    onChange={(e) =>
-                      updateLine(idx, "quantity", Number(e.target.value))
-                    }
+                    onChange={(e) => updateLine(idx, "quantity", Number(e.target.value))}
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-[13px] focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -436,11 +419,7 @@ export default function TechnicianBillingLinesForm({
                     min={0}
                     step={0.5}
                     onChange={(e) =>
-                      updateLine(
-                        idx,
-                        "unitPriceCents",
-                        Math.round(Number(e.target.value) * 100),
-                      )
+                      updateLine(idx, "unitPriceCents", Math.round(Number(e.target.value) * 100))
                     }
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-[13px] focus:ring-2 focus:ring-blue-500 outline-none"
                   />
@@ -464,12 +443,8 @@ export default function TechnicianBillingLinesForm({
 
       {/* Total */}
       <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
-        <span className="text-[13px] font-bold text-slate-600">
-          {t("billing_lines.total")}
-        </span>
-        <span className="text-[18px] font-black text-black">
-          {(totalCents / 100).toFixed(2)} €
-        </span>
+        <span className="text-[13px] font-bold text-slate-600">{t("billing_lines.total")}</span>
+        <span className="text-[18px] font-black text-black">{(totalCents / 100).toFixed(2)} €</span>
       </div>
 
       {/* Actions */}
@@ -479,7 +454,7 @@ export default function TechnicianBillingLinesForm({
             type="button"
             data-testid="billing-back"
             onClick={onBack}
-            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[20px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
+            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[16px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
           >
             ← {t("billing_lines.skip")}
           </button>
@@ -488,7 +463,7 @@ export default function TechnicianBillingLinesForm({
             type="button"
             data-testid="billing-skip"
             onClick={onSkip}
-            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[20px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
+            className="flex min-h-[52px] flex-1 items-center justify-center rounded-[16px] bg-white text-[14px] font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-black/5 transition hover:bg-slate-50 active:scale-[0.98]"
           >
             {t("billing_lines.skip")}
           </button>
@@ -498,7 +473,7 @@ export default function TechnicianBillingLinesForm({
           data-testid="billing-confirm"
           disabled={!hasValidLines}
           onClick={() => onConfirm(lines.filter((l) => l.description.trim()))}
-          className="flex min-h-[52px] flex-[2] items-center justify-center gap-2 rounded-[20px] bg-slate-900 text-[14px] font-semibold text-white shadow-lg transition hover:bg-slate-800 active:scale-[0.98] disabled:opacity-40"
+          className="flex min-h-[52px] flex-[2] items-center justify-center gap-2 rounded-[16px] bg-slate-900 text-[14px] font-semibold text-white shadow-lg transition hover:bg-slate-800 active:scale-[0.98] disabled:opacity-40"
         >
           <FileText className="h-4 w-4" />
           {t("billing_lines.confirm")}

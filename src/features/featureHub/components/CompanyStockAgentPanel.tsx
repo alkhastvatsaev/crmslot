@@ -15,8 +15,6 @@ import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
 import type { CompanyStockAgentContext } from "@/features/featureHub/companyStockAgentTypes";
 import { useMaterialAgent } from "@/features/featureHub/hooks/useMaterialAgent";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
-
 function suggestionsToActions(suggestions: string[]): ChatbotQuickAction[] {
   return suggestions.map((label, i) => ({
     id: `material-suggestion-${i}`,
@@ -48,7 +46,7 @@ function MaterialAgentBubble({
 }: BubbleProps) {
   const isUser = role === "user";
   const actions =
-    !isUser && isLatest && quickActions?.length
+    !isUser && quickActions?.length
       ? quickActions
       : !isUser && isLatest && suggestions?.length
         ? suggestionsToActions(suggestions)
@@ -67,7 +65,7 @@ function MaterialAgentBubble({
           "max-w-[88%] whitespace-pre-wrap rounded-[18px] px-4 py-3 text-[14px] leading-relaxed",
           isUser
             ? "rounded-br-[6px] bg-slate-900 text-white"
-            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm",
+            : "rounded-bl-[6px] border border-slate-100 bg-white text-slate-900 shadow-sm"
         )}
       >
         {isUser ? text : renderChatbotMarkdownLite(text)}
@@ -110,7 +108,7 @@ export default function CompanyStockAgentPanel({
       if (action.searchQuery != null) setSearch(action.searchQuery);
       if (action.focusStockItemId) setSelectedStockItemId(action.focusStockItemId);
     },
-    [setSearch, setSelectedStockItemId],
+    [setSearch, setSelectedStockItemId]
   );
 
   const agent = useMaterialAgent(ctx, {
@@ -162,7 +160,6 @@ export default function CompanyStockAgentPanel({
       <div
         data-testid="company-stock-agent-panel"
         className="flex min-h-0 flex-1 items-center justify-center bg-white"
-        style={outfit}
       >
         <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
       </div>
@@ -172,7 +169,6 @@ export default function CompanyStockAgentPanel({
   return (
     <motion.div
       data-testid="company-stock-agent-panel"
-      style={outfit}
       className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white"
     >
       <div
@@ -180,7 +176,7 @@ export default function CompanyStockAgentPanel({
         data-testid="company-stock-agent-messages"
         className={cn(
           GLASS_PANEL_BODY_SCROLL_COMPACT,
-          "custom-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6",
+          "custom-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 pb-6"
         )}
       >
         <AnimatePresence>
@@ -193,7 +189,7 @@ export default function CompanyStockAgentPanel({
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
             >
-              <ChatbotGalaxyOrb className="scale-[2]" />
+              <ChatbotGalaxyOrb size="hero" />
             </motion.div>
           ) : null}
         </AnimatePresence>

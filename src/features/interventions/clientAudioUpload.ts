@@ -1,6 +1,7 @@
 import { signInAnonymously } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, isConfigured, storage } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 
 /**
  * Sauvegarde fichiers sous `.demo-data/` ou `/public` : OK en `next dev` uniquement.
@@ -43,7 +44,9 @@ export async function uploadInterventionAudioToFirebase(blob: Blob): Promise<{
     const url = await getDownloadURL(r);
     return { url, storagePath, mime };
   } catch (e) {
-    console.error("[uploadInterventionAudioToFirebase]", e);
+    logger.error("[uploadInterventionAudioToFirebase]", {
+      error: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }

@@ -1,0 +1,1438 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e17]:
+    - banner [ref=e18]:
+      - generic [ref=e19]:
+        - complementary [ref=e20]:
+          - generic [ref=e23] [cursor=pointer]:
+            - button [ref=e24]:
+              - img [ref=e25]
+            - generic [ref=e27]:
+              - generic [ref=e28]: sam 6 juin
+              - generic [ref=e30]: 10:18:35
+            - button [ref=e31]:
+              - img [ref=e32]
+        - button "Ouvrir la recherche" [ref=e35]
+        - complementary [ref=e36]:
+          - generic [ref=e38] [cursor=pointer]:
+            - button [ref=e39]:
+              - img [ref=e40]
+            - generic [ref=e42]:
+              - generic [ref=e43]: IVANA
+              - generic [ref=e44]: BACK OFFICE
+            - button [ref=e45]:
+              - img [ref=e46]
+    - generic [ref=e51]:
+      - main [ref=e1558]:
+        - generic [ref=e1560]:
+          - complementary [ref=e1561]
+          - main [ref=e1577]:
+            - generic [ref=e1579]:
+              - generic [ref=e1580]:
+                - generic:
+                  - region "Map" [ref=e1581]
+                  - img "Map marker" [ref=e1582]:
+                    - img [ref=e54]
+                    - generic [ref=e59]: Mansour
+              - button "Recentrer la carte" [ref=e1583] [cursor=pointer]:
+                - img [ref=e1584]
+          - complementary [ref=e1586]:
+            - generic [ref=e1589]:
+              - tablist [ref=e1590]:
+                - tab "Demandes" [ref=e1591]:
+                  - generic [ref=e1592]: Demandes
+                - tab "Rapports 5" [ref=e1593]:
+                  - generic [ref=e1594]: Rapports
+                  - generic [ref=e1595]: "5"
+                - tab "Chat" [selected] [ref=e1596]:
+                  - generic [ref=e1597]: Chat
+                - tab "Documents" [ref=e1598]:
+                  - generic [ref=e1599]: Documents
+              - button "TEAM CHAT" [ref=e1602]:
+                - generic [ref=e1603]: TEAM CHAT
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - tablist:
+                          - tab [selected]:
+                            - img
+                            - generic: Login
+                          - tab:
+                            - img
+                            - generic: Particulier
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=3]: Espace Client
+                              - generic:
+                                - generic: E-mail
+                                - textbox:
+                                  - /placeholder: E-mail
+                                - button [disabled]:
+                                  - img
+                                  - text: Recevoir un Smart Link
+                                - generic:
+                                  - generic: ou
+                                - generic:
+                                  - button
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Que faut-il réparer ?
+                            - generic:
+                              - button:
+                                - generic:
+                                  - generic: Porte bloquée
+                              - button:
+                                - generic:
+                                  - generic: Porte
+                                  - generic: blindée
+                              - button:
+                                - generic:
+                                  - generic: Clé
+                                  - generic: cassée
+                              - button:
+                                - generic:
+                                  - generic: Cylindre
+                              - button:
+                                - generic:
+                                  - generic: Porte
+                                  - generic: claquée
+                              - button:
+                                - generic:
+                                  - generic: Coffre
+                                  - generic: fort
+                              - button:
+                                - generic:
+                                  - generic: Volet roulant
+                              - button:
+                                - generic:
+                                  - generic: Digicode
+                              - button:
+                                - generic:
+                                  - generic: Double
+                                  - generic: de clé
+                      - generic:
+                        - generic:
+                          - button [disabled]:
+                            - img
+                          - status
+              - region:
+                - generic:
+                  - generic:
+                    - tablist:
+                      - tab:
+                        - generic: Suivi dossier
+                      - tab:
+                        - generic: Chat
+                      - tab [selected]:
+                        - generic: Documents
+                      - tab:
+                        - generic: Historique
+                    - tabpanel:
+                      - generic: Aucun document disponible pour le moment.
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - paragraph: Sélectionnez une mission pour voir les détails
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                      - paragraph: Sélectionnez une mission pour voir les photos du client
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                        - searchbox
+                      - generic:
+                        - list:
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Cylindres
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Barillet A2P 5 goupilles
+                                - generic: BAR-A2P
+                              - generic:
+                                - generic:
+                                  - generic: Ruptures
+                                  - generic:
+                                    - text: "0"
+                                    - generic: / 3 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Cylindres
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Cylindre européen 80 mm sécurité
+                                - generic: CYL-EURO-80
+                              - generic:
+                                - generic:
+                                  - generic: Ruptures
+                                  - generic:
+                                    - text: "0"
+                                    - generic: / 4 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Clés & badges
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Télécommande portail 4 canaux
+                                - generic: TELE-4CH
+                              - generic:
+                                - generic:
+                                  - generic: Ruptures
+                                  - generic:
+                                    - text: "0"
+                                    - generic: / 5 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Clés & badges
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Badge RFID 125 kHz
+                                - generic: BADGE-125
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "12"
+                                    - generic: / 20 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Serrures
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Crémone multipoint 3 points
+                                - generic: CREM-3PT
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "1"
+                                    - generic: / 4 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Cylindres
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Cylindre européen 70 mm
+                                - generic: CYL-EURO-70
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "2"
+                                    - generic: / 6 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Serrures
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Gâche électrique réversible
+                                - generic: GACH-ELEC
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "3"
+                                    - generic: / 8 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Consommables
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Joint EPDM porte blindée
+                                - generic: JOINT-EPDM
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "4"
+                                    - generic: / 12 m
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Cylindres
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Lubrifiant cylindre 400 ml
+                                - generic: LUB-CYL
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "6"
+                                    - generic: / 8 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Autres
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Poignée de porte Lecot inox
+                                - generic: LECOT-POIG
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "7"
+                                    - generic: / 10 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Serrures
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Serrure applique A2P
+                                - generic: SERR-APL
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "5"
+                                    - generic: / 6 pcs
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Quincaillerie
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Vis inox M6 × 40 (boîte 100)
+                                - generic: VIS-INOX-6
+                              - generic:
+                                - generic:
+                                  - generic: Stock bas
+                                  - generic:
+                                    - text: "8"
+                                    - generic: / 15 boîte
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Consommables
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Gants nitrile (boîte 100)
+                                - generic: GANT-NIT
+                              - generic:
+                                - generic:
+                                  - generic: Stock OK
+                                  - generic:
+                                    - text: "22"
+                                    - generic: / 10 boîte
+                          - listitem:
+                            - button:
+                              - generic:
+                                - generic: Quincaillerie
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic: Gond renforcé paumelle lourde
+                                - generic: GOND-REN
+                              - generic:
+                                - generic:
+                                  - generic: Stock OK
+                                  - generic:
+                                    - text: "14"
+                                    - generic: / 10 pcs
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic: Commandes
+                            - generic: "48"
+                        - generic:
+                          - generic:
+                            - generic: chatbot.supplier_orders_label
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 189 €
+                                - paragraph: 5 juin
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 32 €
+                                - paragraph: 23 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 95 €
+                                - paragraph: 23 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 95 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Bompart
+                                  - generic: 15 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Bompart
+                                  - generic: 30 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 35 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Bach
+                                  - generic: 28 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Bach
+                                  - generic: 189 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 189 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 89 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 218 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Vatsaev
+                                  - generic: 218 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Monsieur Bach
+                                  - generic: 145 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Bach
+                                  - generic: 189 €
+                                - paragraph: 22 mai
+                                - generic:
+                                  - list:
+                                    - listitem:
+                                      - generic: Validée
+                                    - listitem:
+                                      - generic: Préparation
+                                    - listitem:
+                                      - generic: Expédiée
+                                    - listitem:
+                                      - generic: Livrée
+                          - generic:
+                            - generic: chatbot.material_orders_label
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 20 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 20 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 20 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 20 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 19 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 19 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 19 mai
+                            - article:
+                              - button:
+                                - generic:
+                                  - paragraph: Client
+                                  - generic: 19 mai
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic: 05 juin 2026
+                            - generic: "4"
+                          - generic:
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Facturation modifiée
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                                - generic: Facture · 2 ligne(s) · 170 €
+                              - generic: 10:58
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Intervention terminée
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 10:58
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Technicien assigné
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 10:57
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Dossier créé
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 10:56
+                        - generic:
+                          - generic:
+                            - generic: 24 mai 2026
+                            - generic: "2"
+                          - generic:
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Facturation modifiée
+                                  - generic: — Cylindre
+                                - generic: Alex Bach
+                                - generic: Facture · 2 ligne(s) · 170 €
+                              - generic: 19:48
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Intervention terminée
+                                  - generic: — Cylindre
+                                - generic: Alex Bach
+                              - generic: 19:48
+                        - generic:
+                          - generic:
+                            - generic: 23 mai 2026
+                            - generic: "8"
+                          - generic:
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Technicien assigné
+                                  - generic: — Cylindre
+                                - generic: Alex Bach
+                              - generic: 19:10
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Facturation modifiée
+                                  - generic: — Porte claquée
+                                - generic: Alkhastv Vatsaev
+                                - generic: Facture · 2 ligne(s) · 170 €
+                              - generic: 13:46
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Intervention terminée
+                                  - generic: — Porte claquée
+                                - generic: Alkhastv Vatsaev
+                              - generic: 13:46
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Facturation modifiée
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                                - generic: Facture · 2 ligne(s) · 170 €
+                              - generic: 13:30
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Intervention terminée
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 13:30
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Technicien assigné
+                                  - generic: — Porte claquée
+                                - generic: Alkhastv Vatsaev
+                              - generic: 13:28
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Dossier créé
+                                  - generic: — Cylindre
+                                - generic: Alex Bach
+                              - generic: 08:27
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Dossier créé
+                                  - generic: — Porte claquée
+                                - generic: Alkhastv Vatsaev
+                              - generic: 08:18
+                        - generic:
+                          - generic:
+                            - generic: 22 mai 2026
+                            - generic: "6"
+                          - generic:
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Facturation modifiée
+                                  - generic: — Porte claquée
+                                - generic: Alkhast Vatsaev
+                                - generic: Facture · 2 ligne(s) · 504 €
+                              - generic: 16:54
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Intervention terminée
+                                  - generic: — Porte claquée
+                                - generic: Alkhast Vatsaev
+                              - generic: 16:54
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Technicien assigné
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 16:53
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Dossier créé
+                                  - generic: — Porte claquée
+                                - generic: Alex Bach
+                              - generic: 16:52
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Message Ivana
+                                  - generic: — Porte claquée
+                                - generic: Alkhast Vatsaev
+                                - generic: Back-office · ?
+                              - generic: 09:24
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Message Ivana
+                                - generic: Client · ?
+                              - generic: 09:23
+                        - generic:
+                          - generic:
+                            - generic: 21 mai 2026
+                            - generic: "5"
+                          - generic:
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Technicien assigné
+                                  - generic: — Porte claquée
+                                - generic: Alkhast Vatsaev
+                              - generic: 22:39
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Dossier créé
+                                  - generic: — Porte claquée
+                                - generic: Alkhast Vatsaev
+                              - generic: 22:37
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Commande matériel
+                                - generic: M. Dupont
+                                - generic: "Client : M. Dupont"
+                              - generic: 14:00
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Commande matériel
+                                - generic: Martin SPRL
+                                - generic: "Client : Martin SPRL"
+                              - generic: 14:00
+                            - button:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic:
+                                  - generic: Message Ivana
+                                - generic: Back-office · ?
+                              - generic: 01:16
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                      - paragraph: Aucun événement sélectionné
+                      - paragraph: Cliquez sur une ligne du flux pour afficher une explication détaillée.
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Facturation
+                        - button:
+                          - img
+                          - text: Export comptable CSV
+                          - generic: "5"
+                      - generic:
+                        - generic:
+                          - strong: 1184,00 €
+                          - text: HT
+                        - generic:
+                          - text: Encours
+                          - strong: 1184,00 €
+                      - generic:
+                        - tablist:
+                          - tab [selected]:
+                            - generic: Tout
+                            - generic: "5"
+                          - tab:
+                            - generic: Impayé
+                            - generic: "5"
+                          - tab:
+                            - generic: En attente
+                            - generic: "0"
+                          - tab:
+                            - generic: Payé
+                            - generic: "0"
+                          - tab:
+                            - generic: À facturer
+                            - generic: "0"
+                      - generic:
+                        - img
+                        - searchbox
+                      - generic:
+                        - table:
+                          - rowgroup:
+                            - row:
+                              - columnheader: Client
+                              - columnheader: Montant HT
+                              - columnheader: Statut
+                          - rowgroup:
+                            - row:
+                              - cell:
+                                - generic: Alkhast Vatsaev
+                                - generic: ZFS3PNBXJf22ATbmv8B9
+                              - cell: 504,00 €
+                              - cell:
+                                - generic: Non payé
+                            - row:
+                              - cell:
+                                - generic: —
+                                - generic: 9Q275X5USNedwKxKzwNi
+                              - cell: 170,00 €
+                              - cell:
+                                - generic: Non payé
+                            - row:
+                              - cell:
+                                - generic: —
+                                - generic: Xil45LXMtYqGmQHRgRMB
+                              - cell: 170,00 €
+                              - cell:
+                                - generic: Non payé
+                            - row:
+                              - cell:
+                                - generic: —
+                                - generic: k5Xk5MzFdDl4GQFxPyZ3
+                              - cell: 170,00 €
+                              - cell:
+                                - generic: Non payé
+                            - row:
+                              - cell:
+                                - generic: —
+                                - generic: sqsNx0NwFCzY2CbdVXFV
+                              - cell: 170,00 €
+                              - cell:
+                                - generic: Non payé
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - heading [level=2]: Documents
+                              - generic: "45"
+                            - generic:
+                              - img
+                              - searchbox
+                          - generic:
+                            - generic:
+                              - generic:
+                                - paragraph: Factures
+                                - list:
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Facture
+                                      - generic:
+                                        - generic: Alex Bach
+                                        - generic: 5 juin · 170 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Facture
+                                      - generic:
+                                        - generic: Alkhastv Vatsaev
+                                        - generic: 23 mai · 170 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Facture
+                                      - generic:
+                                        - generic: Alkhast Vatsaev
+                                        - generic: 22 mai · 504 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Facture
+                                      - generic:
+                                        - generic: Alex Bach
+                                        - generic: 24 mai · 170 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Facture
+                                      - generic:
+                                        - generic: Alex Bach
+                                        - generic: 23 mai · 170 €
+                              - generic:
+                                - list:
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 3 points
+                                        - generic: 5 juin · 189 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Poignée Hoppe Tokyo sur rosace inox
+                                        - generic: 23 mai · 32 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre Iseo F6 Extra Profile 40x40
+                                        - generic: 23 mai · 95 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre Iseo F6 Extra Profile 40x40
+                                        - generic: 22 mai · 95 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Gants anti-coupure Showa S-Tex 376
+                                        - generic: 22 mai · 15 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Gants de protection Mapa Ultrane 526
+                                        - generic: 22 mai · 30 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Badge RFID Mifare 1K bleu (lot de 25)
+                                        - generic: 22 mai · 35 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Poignée Hoppe Amsterdam sur rosace
+                                        - generic: 22 mai · 28 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 3 points
+                                        - generic: 22 mai · 189 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 3 points
+                                        - generic: 22 mai · 189 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre A2P
+                                        - generic: 22 mai · 89 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 22 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 22 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                        - generic: 22 mai · 145 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 3 points
+                                        - generic: 22 mai · 189 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                        - generic: 22 mai · 145 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Pistolet à bumping serrurerie
+                                        - generic: 22 mai · 185 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                        - generic: 20 mai · 145 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                        - generic: 20 mai · 275 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 20 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 20 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 20 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Joint silicone porte coupe-feu 5m
+                                        - generic: 20 mai · 28 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                        - generic: 20 mai · 275 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: lecot
+                                        - generic: 20 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre Vachette Radialis 35x35
+                                        - generic: 20 mai · 88 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                        - generic: 20 mai · 218 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Pistolet à bumping serrurerie
+                                        - generic: 20 mai · 185 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                        - generic: 20 mai · 145 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints
+                                        - generic: 20 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                        - generic: 20 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure en applique monopoint
+                                        - generic: 19 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints à encastrer 3 points Vachette
+                                        - generic: 19 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multipoints à encastrer 3 points Vachette
+                                        - generic: 19 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre européen de sécurité 30x30mm
+                                        - generic: 19 mai · 35 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure 3 points Fichet Bloccauto
+                                        - generic: 19 mai · 195 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre européen 35x35mm nickelé
+                                        - generic: 19 mai · 96 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Cylindre Yale Superior 30x30mm
+                                        - generic: 19 mai · 116 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                        - generic: 19 mai · 0 €
+                                  - listitem:
+                                    - button:
+                                      - generic:
+                                        - generic:
+                                          - img
+                                        - generic: Bon
+                                      - generic:
+                                        - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                        - generic: 19 mai · 0 €
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - paragraph: Chargement…
+              - region:
+                - generic:
+                  - generic:
+                    - paragraph: Chargement…
+              - region
+    - generic:
+      - button "Déjà sur la première page" [disabled]:
+        - img
+      - button "Aller à la page 4" [ref=e1607] [cursor=pointer]:
+        - img [ref=e846]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e10] [cursor=pointer]:
+    - img [ref=e11]
+  - alert [ref=e14]

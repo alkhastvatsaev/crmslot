@@ -1,23 +1,19 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { Loader2, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useCallback, useEffect, useMemo } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useBillingHubIntent } from "@/context/BillingHubIntentContext";
-import AccountingExportButton from "@/features/billing/components/AccountingExportButton";
-import BillingHubFilterBar from "@/features/billingHub/components/BillingHubFilterBar";
 import { applyBillingListFilters } from "@/features/billingHub/filterBillingHub";
 import {
-  computeBillingHubMetrics,
   formatEurFromCents,
   interventionBillingTotalCents,
-  type BillingHubMetrics,
 } from "@/features/billingHub/billingHubMetrics";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import type { Intervention } from "@/features/interventions/types";
 
-const outfit = { fontFamily: "'Outfit', sans-serif" } as const;
+const BILLING_GRID_MIN_SLOTS = 9;
 
 const STATUS_CLASS: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
@@ -26,40 +22,65 @@ const STATUS_CLASS: Record<string, string> = {
   refunded: "bg-slate-100 text-slate-500",
 };
 
+const TILE_RING: Record<string, string> = {
+  paid: "ring-emerald-200/80",
+  pending: "ring-amber-200/80",
+  unpaid: "ring-red-200/70",
+  refunded: "ring-slate-200/80",
+};
+
+function BillingHubEmptySlot({ index }: { index: number }) {
+  return (
+    <div
+      data-testid={`billing-hub-empty-slot-${index}`}
+      aria-hidden
+      className="aspect-square w-full justify-self-center rounded-[24px] border border-black/[0.06] bg-white/40 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]"
+    />
+  );
+}
+
 type Props = {
   interventions: Intervention[];
-  metrics: BillingHubMetrics;
   isPreviewCatalog: boolean;
   loading: boolean;
 };
 
-export default function BillingHubCenterPanel({
-  interventions,
-  metrics,
-  isPreviewCatalog,
-  loading,
-}: Props) {
+export default function BillingHubCenterPanel({ interventions, isPreviewCatalog, loading }: Props) {
   const { t } = useTranslation();
-  const { filter, setFilter, search, setSearch, selectedInterventionId, setSelectedInterventionId } =
+  const { filter, search, selectedInterventionId, setSelectedInterventionId } =
     useBillingHubIntent();
+  const { logIntervention } = useActivityLog();
 
-  const tableRows = useMemo(
-    () => applyBillingListFilters(interventions, { filter, search }),
-    [interventions, filter, search],
+  const handleTileClick = useCallback(
+    (iv: Intervention) => {
+      setSelectedInterventionId(iv.id);
+      logIntervention(iv);
+    },
+    [setSelectedInterventionId, logIntervention]
   );
 
+  const gridRows = useMemo(
+    () => applyBillingListFilters(interventions, { filter, search }),
+    [interventions, filter, search]
+  );
+
+  const trailingEmptySlots = useMemo(() => {
+    if (gridRows.length === 0) return BILLING_GRID_MIN_SLOTS;
+    if (gridRows.length >= BILLING_GRID_MIN_SLOTS) return 0;
+    return BILLING_GRID_MIN_SLOTS - gridRows.length;
+  }, [gridRows.length]);
+
   useEffect(() => {
-    if (loading || tableRows.length === 0) return;
-    const still = tableRows.some((iv) => iv.id === selectedInterventionId);
-    if (!still) setSelectedInterventionId(tableRows[0].id);
-  }, [loading, tableRows, selectedInterventionId, setSelectedInterventionId]);
+    if (loading || gridRows.length === 0) return;
+    const still = gridRows.some((iv) => iv.id === selectedInterventionId);
+    if (!still) setSelectedInterventionId(gridRows[0].id);
+  }, [loading, gridRows, selectedInterventionId, setSelectedInterventionId]);
 
   if (loading) {
     return (
       <div
         data-testid="billing-hub-center"
         className="flex min-h-0 flex-1 items-center justify-center"
-        style={outfit}
       >
         <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
       </div>
@@ -67,108 +88,64 @@ export default function BillingHubCenterPanel({
   }
 
   return (
-    <div
-      data-testid="billing-hub-center"
-      className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden"
-      style={outfit}
-    >
-      <header className="flex shrink-0 items-center justify-between gap-2">
-        <h2 className="text-[15px] font-semibold tracking-tight text-slate-900">
-          {t("billingHub.title")}
-        </h2>
-        <AccountingExportButton interventions={interventions} />
-      </header>
-
+    <div data-testid="billing-hub-center" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {isPreviewCatalog ? (
-        <span
-          data-testid="billing-hub-preview-badge"
-          className="shrink-0 self-start rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-800"
-        >
+        <span data-testid="billing-hub-preview-badge" className="sr-only" aria-hidden>
           {t("billingHub.preview_badge")}
         </span>
       ) : null}
 
-      <div className="flex shrink-0 flex-wrap items-center gap-3 text-[11px] tabular-nums text-slate-600">
-        <span data-testid="billing-hub-kpi-total">
-          <strong className="text-slate-900">{formatEurFromCents(metrics.totalHtCents)}</strong> HT
-        </span>
-        <span data-testid="billing-hub-kpi-unpaid">
-          {t("billingHub.kpi_unpaid_short")}{" "}
-          <strong className="text-red-700">{formatEurFromCents(metrics.unpaidHtCents)}</strong>
-        </span>
-      </div>
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
+        <div
+          className="grid grid-cols-3 gap-3 px-3 pb-6 pt-4 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]"
+          data-testid={gridRows.length === 0 ? "billing-hub-empty-grid" : "billing-hub-grid"}
+        >
+          {gridRows.map((iv) => {
+            const active = iv.id === selectedInterventionId;
+            const st = iv.paymentStatus ?? "unpaid";
+            const cents = interventionBillingTotalCents(iv);
 
-      <BillingHubFilterBar metrics={metrics} activeFilter={filter} onFilterChange={setFilter} />
-
-      <div className="relative shrink-0" data-testid="billing-hub-search">
-        <Search
-          className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-          aria-hidden
-        />
-        <Input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={String(t("billingHub.search_placeholder"))}
-          className="h-8 rounded-[12px] border-slate-200/80 bg-white pl-9 text-[12px]"
-        />
-      </div>
-
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto rounded-[12px] border border-black/[0.06] bg-white">
-        {tableRows.length === 0 ? (
-          <p className="py-12 text-center text-[12px] text-slate-400">{t("billingHub.empty_filter")}</p>
-        ) : (
-          <table className="w-full text-[11px]" data-testid="billing-hub-table">
-            <thead className="sticky top-0 bg-slate-50 text-[9px] uppercase tracking-wide text-slate-400">
-              <tr className="border-b border-black/[0.06]">
-                <th className="px-2 py-2 text-left font-semibold">{t("billingHub.col_client")}</th>
-                <th className="hidden px-2 py-2 text-right font-semibold sm:table-cell">
-                  {t("billingHub.col_amount")}
-                </th>
-                <th className="px-2 py-2 text-right font-semibold">{t("billingHub.col_status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableRows.map((iv) => {
-                const active = iv.id === selectedInterventionId;
-                const st = iv.paymentStatus ?? "unpaid";
-                const cents = interventionBillingTotalCents(iv);
-                return (
-                  <tr
-                    key={iv.id}
-                    data-testid={`billing-hub-row-${iv.id}`}
-                    onClick={() => setSelectedInterventionId(iv.id)}
-                    className={cn(
-                      "cursor-pointer border-b border-black/[0.03] hover:bg-slate-50/90",
-                      active && "bg-slate-100",
-                      st === "unpaid" && !active && "bg-red-50/30",
-                    )}
-                  >
-                    <td className="px-2 py-2">
-                      <span className="block truncate font-medium text-slate-800">
-                        {iv.clientName || "—"}
-                      </span>
-                      <span className="block truncate text-[10px] text-slate-400">{iv.id}</span>
-                    </td>
-                    <td className="hidden px-2 py-2 text-right font-semibold tabular-nums sm:table-cell">
-                      {cents > 0 ? formatEurFromCents(cents) : "—"}
-                    </td>
-                    <td className="px-2 py-2 text-right">
-                      <span
-                        className={cn(
-                          "inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase",
-                          STATUS_CLASS[st] ?? STATUS_CLASS.unpaid,
-                        )}
-                      >
-                        {t(`billing.status_${st === "paid" ? "paid" : st === "pending" ? "pending" : st === "refunded" ? "refunded" : "unpaid"}`)}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+            return (
+              <button
+                key={iv.id}
+                type="button"
+                data-testid={`billing-hub-row-${iv.id}`}
+                onClick={() => handleTileClick(iv)}
+                className={cn(
+                  "flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-[24px] border bg-white/95 p-3 text-center shadow-[0_6px_18px_-4px_rgba(15,23,42,0.1)] transition hover:scale-[1.02] active:scale-[0.96]",
+                  active
+                    ? "border-slate-900 ring-2 ring-slate-900/20"
+                    : cn("border-black/[0.06] ring-1", TILE_RING[st] ?? TILE_RING.unpaid)
+                )}
+              >
+                <span className="line-clamp-2 text-[13px] font-bold leading-tight tracking-[-0.02em] text-slate-900">
+                  {iv.clientName || "—"}
+                </span>
+                <span className="text-[15px] font-semibold tabular-nums text-slate-800">
+                  {cents > 0 ? formatEurFromCents(cents) : "—"}
+                </span>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[9px] font-bold uppercase",
+                    STATUS_CLASS[st] ?? STATUS_CLASS.unpaid
+                  )}
+                >
+                  {t(
+                    `billing.status_${st === "paid" ? "paid" : st === "pending" ? "pending" : st === "refunded" ? "refunded" : "unpaid"}`
+                  )}
+                </span>
+              </button>
+            );
+          })}
+          {trailingEmptySlots > 0
+            ? Array.from({ length: trailingEmptySlots }, (_, i) => (
+                <BillingHubEmptySlot
+                  key={`empty-${gridRows.length + i}`}
+                  index={gridRows.length + i}
+                />
+              ))
+            : null}
+        </div>
       </div>
     </div>
   );

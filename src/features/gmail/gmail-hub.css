@@ -21,7 +21,12 @@
 }
 
 .gmail-hub-row-selected {
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.07) 0%, rgba(15, 23, 42, 0.02) 48%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.07) 0%,
+    rgba(15, 23, 42, 0.02) 48%,
+    transparent 100%
+  );
   box-shadow: inset 2px 0 0 0 rgb(15 23 42);
 }
 
@@ -33,7 +38,7 @@
 }
 
 .gmail-hub-reader-surface {
-  background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
+  background: linear-gradient(180deg, rgb(248 250 252) 0%, rgb(241 245 249) 100%);
 }
 
 .gmail-hub-iframe {
@@ -60,7 +65,7 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: 20px;
-  background: #fafaf9;
+  background: rgb(248 250 252);
   box-shadow:
     0 0 0 1px rgba(15, 23, 42, 0.07),
     0 40px 100px -16px rgba(15, 23, 42, 0.4);

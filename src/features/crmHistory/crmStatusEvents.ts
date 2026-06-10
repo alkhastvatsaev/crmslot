@@ -3,9 +3,24 @@ import type { InterventionStatusEvent } from "@/features/interventions/workflow/
 import type { CrmActivityEvent, CrmEventType } from "./crmActivityTypes";
 import { parseTs } from "./crmActivityLog";
 
+// Prefixes that identify events from real Firestore documents (never synthesized from snapshots).
+const REAL_EVENT_PREFIXES = [
+  "crm:",
+  "se:",
+  "email:",
+  "commission:",
+  "mo:",
+  "so:",
+  "ivana:",
+] as const;
+
+function isRealEvent(e: CrmActivityEvent): boolean {
+  return REAL_EVENT_PREFIXES.some((p) => e.id.startsWith(p));
+}
+
 function interventionBase(
   iv: Intervention | undefined,
-  interventionId: string,
+  interventionId: string
 ): Pick<CrmActivityEvent, "interventionId" | "interventionTitle" | "clientName" | "address"> {
   const clientName =
     iv?.clientCompanyName ??
@@ -43,7 +58,7 @@ function resolveStatusEventType(evt: InterventionStatusEvent): CrmEventType {
 
 export function statusEventToCrmEvent(
   evt: InterventionStatusEvent,
-  interventionMap: Map<string, Intervention>,
+  interventionMap: Map<string, Intervention>
 ): CrmActivityEvent | null {
   const ts = parseTs(evt.at);
   if (!ts) return null;
@@ -59,7 +74,7 @@ export function statusEventToCrmEvent(
     note: evt.note ?? undefined,
     technicianUid:
       evt.toStatus === "assigned" || evt.toStatus === "en_route"
-        ? iv?.assignedTechnicianUid ?? undefined
+        ? (iv?.assignedTechnicianUid ?? undefined)
         : undefined,
     ...interventionBase(iv, evt.interventionId),
   };
@@ -67,55 +82,43 @@ export function statusEventToCrmEvent(
 
 export function synthesizeStatusEvents(
   events: InterventionStatusEvent[],
-  interventionMap: Map<string, Intervention>,
+  interventionMap: Map<string, Intervention>
 ): CrmActivityEvent[] {
   return events
     .map((e) => statusEventToCrmEvent(e, interventionMap))
     .filter((e): e is CrmActivityEvent => e !== null);
 }
 
-/** Évite doublons entre journal Firestore et champs dénormalisés sur l’intervention. */
+/**
+ * Déduplique les événements CRM en préservant TOUS les événements réels (crm:, se:, email:, etc.).
+ * Seuls les événements synthétisés (depuis les champs snapshot d’une intervention) sont retirés
+ * quand un événement réel couvre déjà le même slot (interventionId + secondes + type).
+ * Rien n’est jamais supprimé côté Firestore — uniquement des doublons d’affichage.
+ */
 export function dedupeCrmEvents(events: CrmActivityEvent[]): CrmActivityEvent[] {
+  // Pass 1 : dédup par ID exact — un événement réel prime toujours sur un synthétique même ID.
   const byId = new Map<string, CrmActivityEvent>();
-  const score = (e: CrmActivityEvent): number => {
-    if (e.id.startsWith("se:")) return 4;
-    if (e.id.startsWith("crm:")) return 4;
-    if (
-      e.type === "intervention_technician_declined" ||
-      e.type === "intervention_deleted" ||
-      e.type === "intervention_returned_to_requests"
-    ) {
-      return 3;
-    }
-    if (e.type === "intervention_status" && e.id.endsWith(":status")) return 1;
-    return 2;
-  };
-
   for (const e of events) {
     const existing = byId.get(e.id);
-    if (!existing || score(e) >= score(existing)) {
+    if (!existing || (isRealEvent(e) && !isRealEvent(existing))) {
       byId.set(e.id, e);
     }
   }
 
-  const bucketSeen = new Set<string>();
-  const out: CrmActivityEvent[] = [];
-  const sorted = [...byId.values()].sort((a, b) => score(b) - score(a));
-  for (const e of sorted) {
-    if (e.interventionId && e.ts > 0) {
-      const bucket = `${e.interventionId}:${Math.floor(e.ts / 1000)}:${e.type}`;
-      if (
-        (e.type === "intervention_status" ||
-          e.type === "intervention_completed" ||
-          e.type === "intervention_billing_updated") &&
-        bucketSeen.has(bucket)
-      ) {
-        continue;
-      }
-      bucketSeen.add(bucket);
+  // Pass 2 : collecter les buckets couverts par des événements réels.
+  const realBuckets = new Set<string>();
+  for (const e of byId.values()) {
+    if (isRealEvent(e) && e.interventionId && e.ts > 0) {
+      realBuckets.add(`${e.interventionId}:${Math.floor(e.ts / 1000)}:${e.type}`);
     }
-    out.push(e);
   }
 
-  return out.sort((a, b) => b.ts - a.ts);
+  // Pass 3 : conserver tous les réels ; retirer les synthétiques couverts par un réel.
+  return [...byId.values()]
+    .filter((e) => {
+      if (isRealEvent(e)) return true;
+      if (!e.interventionId || e.ts <= 0) return true;
+      return !realBuckets.has(`${e.interventionId}:${Math.floor(e.ts / 1000)}:${e.type}`);
+    })
+    .sort((a, b) => b.ts - a.ts);
 }

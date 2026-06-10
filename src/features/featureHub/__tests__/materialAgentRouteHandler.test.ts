@@ -49,7 +49,7 @@ describe("materialAgentRouteHandler", () => {
   it("returns 400 when companyId is missing", async () => {
     const res = await handleMaterialAgentPost(
       { messages: [{ role: "user", content: "ruptures" }] },
-      auth,
+      auth
     );
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual({ error: "companyId requis" });
@@ -70,7 +70,7 @@ describe("materialAgentRouteHandler", () => {
         messages: [{ role: "user", content: "état du stock" }],
         stockSnapshot: '{"totalSkus":3}',
       },
-      auth,
+      auth
     );
 
     const events = await readSseJsonLines(res);
@@ -82,7 +82,7 @@ describe("materialAgentRouteHandler", () => {
         hubAgentMode: true,
         conversationContext: expect.objectContaining({ toolScope: [...MATERIAL_AGENT_TOOL_SCOPE] }),
         toolCtx: expect.objectContaining({ companyId: "co-mat", actorUid: "uid-mat" }),
-      }),
+      })
     );
     const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
     expect(call?.system).toContain("Agent Matériel");
@@ -91,41 +91,39 @@ describe("materialAgentRouteHandler", () => {
     expect(call?.system).toMatch(/search_lecot_products/);
   });
 
-  it("registers client name reply without OpenAI when awaiting name", async () => {
+  it("passes company name as default order client (no client session)", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
-        messages: [
-          { role: "user", content: "Commander CYL-1 — Cylindre" },
-          {
-            role: "assistant",
-            content:
-              "Quel est le **nom du client** pour cette commande ?\n[[material-agent-need-client-name]]",
-          },
-          { role: "user", content: "Dupont" },
-        ],
+        companyName: "Atelier Test",
+        messages: [{ role: "user", content: "Commander CYL-1 — Cylindre" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
-    expect(events).toContainEqual(
-      expect.objectContaining({ type: "material_order_client", clientName: "Dupont" }),
+    expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
+    expect(mockRunChatbotOpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolCtx: expect.objectContaining({
+          materialOrderClientName: "Atelier Test",
+          requireMaterialOrderClientName: false,
+        }),
+      })
     );
-    expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
   });
 
-  it("clears session client and delegates nouvelle commande lecot to OpenAI", async () => {
+  it("delegates nouvelle commande lecot to OpenAI without client session reset", async () => {
     const res = await handleMaterialAgentPost(
       {
         companyId: "co-mat",
-        orderClientName: "Ancien Client",
+        companyName: "Atelier Test",
         messages: [{ role: "user", content: "nouvelle commande lecot" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
-    expect(events).toContainEqual(
-      expect.objectContaining({ type: "material_order_client", clientName: "" }),
+    expect(events).not.toContainEqual(
+      expect.objectContaining({ type: "material_order_client", clientName: "" })
     );
     expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
     expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
@@ -137,7 +135,7 @@ describe("materialAgentRouteHandler", () => {
         companyId: "co-mat",
         messages: [{ role: "user", content: "commande lecot" }],
       },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
@@ -148,11 +146,11 @@ describe("materialAgentRouteHandler", () => {
     delete process.env.OPENAI_API_KEY;
     const res = await handleMaterialAgentPost(
       { companyId: "co-mat", messages: [{ role: "user", content: "hi" }] },
-      auth,
+      auth
     );
     const events = await readSseJsonLines(res);
     expect(events).toContainEqual(
-      expect.objectContaining({ type: "error", message: "OPENAI_API_KEY manquante." }),
+      expect.objectContaining({ type: "error", message: "OPENAI_API_KEY manquante." })
     );
     expect(mockRunChatbotOpenAI).not.toHaveBeenCalled();
   });

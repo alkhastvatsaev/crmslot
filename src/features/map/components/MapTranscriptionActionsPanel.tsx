@@ -1,5 +1,7 @@
 "use client";
 
+import { logger } from "@/core/logger";
+
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
@@ -17,8 +19,7 @@ import {
   GLASS_PANEL_BODY_SCROLL_COMPACT,
 } from "@/core/ui/glassPanelChrome";
 
-const MAP_TRANSCRIPTION_PANEL_SHELL =
-  `pointer-events-auto absolute top-1/2 z-[9999] flex h-[min(70dvh,720px)] min-h-0 -translate-y-1/2 flex-col ${DASHBOARD_PANEL_CHROME_ROUNDED} ${DASHBOARD_PANEL_CHROME_BORDER} bg-white/85 ${DASHBOARD_PANEL_SHADOW_CLASS} ${DASHBOARD_PANEL_CHROME_BLUR}`;
+const MAP_TRANSCRIPTION_PANEL_SHELL = `pointer-events-auto absolute top-1/2 z-[9999] flex h-[min(70dvh,720px)] min-h-0 -translate-y-1/2 flex-col ${DASHBOARD_PANEL_CHROME_ROUNDED} ${DASHBOARD_PANEL_CHROME_BORDER} bg-white/85 ${DASHBOARD_PANEL_SHADOW_CLASS} ${DASHBOARD_PANEL_CHROME_BLUR}`;
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
 import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -27,21 +28,28 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 type DecisionStatus = "none" | "refused" | "created";
 
 type LatestAudioResponse = {
-  audio:
-    | null
-    | {
-        name: string;
-        url: string;
-        createdAt: string;
-        transcript: string | null;
-        meta?: AudioUploadSidecar;
-      };
+  audio: null | {
+    name: string;
+    url: string;
+    createdAt: string;
+    transcript: string | null;
+    meta?: AudioUploadSidecar;
+  };
   decision: { status: DecisionStatus; updatedAt: string | null };
 };
 
 type Props = {
   armed: boolean;
-  onInterventionCreated?: (mission: { id: number; key: string; clientName: string; coordinates: [number, number]; time: string; status: string; source?: "live"; date?: string }) => void;
+  onInterventionCreated?: (mission: {
+    id: number;
+    key: string;
+    clientName: string;
+    coordinates: [number, number];
+    time: string;
+    status: string;
+    source?: "live";
+    date?: string;
+  }) => void;
   /** Incrémenté à chaque appui sur Play pour ouvrir automatiquement le formulaire */
   openEditSignal?: number;
   /** Si défini : poller `/api/ai/audio-for-url` pour ce clip uniquement (aligné sur la file Galaxy). */
@@ -72,7 +80,9 @@ export default function MapTranscriptionActionsPanel({
   });
 
   /** Aligne le panneau d’édition sur le rail gauche **visible** (évite les coords du pager hors écran). */
-  const [railScreenRect, setRailScreenRect] = useState<{ left: number; width: number } | null>(null);
+  const [railScreenRect, setRailScreenRect] = useState<{ left: number; width: number } | null>(
+    null
+  );
 
   useLayoutEffect(() => {
     if (!editOpen) {
@@ -260,7 +270,9 @@ export default function MapTranscriptionActionsPanel({
     setBusy("create");
     try {
       const tenantCompanyId =
-        workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : undefined;
+        workspace?.isTenantUser && workspace.activeCompanyId
+          ? workspace.activeCompanyId
+          : undefined;
       const interventionCompanyId =
         tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : undefined);
       const res = await fetchWithAuth("/api/interventions/from-audio", {
@@ -273,22 +285,22 @@ export default function MapTranscriptionActionsPanel({
         }),
       });
       if (res.ok) {
-        const payload = (await res.json().catch(() => null)) as
-          | {
-              intervention?: {
-                clientName?: string | null;
-                title?: string;
-                status?: string;
-                location?: { lat: number; lng: number };
-              };
-            }
-          | null;
+        const payload = (await res.json().catch(() => null)) as {
+          intervention?: {
+            clientName?: string | null;
+            title?: string;
+            status?: string;
+            location?: { lat: number; lng: number };
+          };
+        } | null;
         const loc = payload?.intervention?.location;
         if (loc && typeof loc.lat === "number" && typeof loc.lng === "number") {
           onInterventionCreated?.({
             id: Date.now(),
             key: fileName,
-            clientName: formatClientName(form.clientName || payload?.intervention?.clientName || "Client"),
+            clientName: formatClientName(
+              form.clientName || payload?.intervention?.clientName || "Client"
+            ),
             coordinates: [loc.lng, loc.lat],
             time: normalizeTime(form.time),
             status: payload?.intervention?.status || "À venir",
@@ -320,14 +332,15 @@ export default function MapTranscriptionActionsPanel({
         const dStr = form.date.trim();
         const tStr = form.time.trim();
         const scheduleFromForm =
-          dStr &&
-          /^\d{4}-\d{2}-\d{2}$/.test(dStr) &&
-          tStr &&
-          /^\d{1,2}:\d{2}$/.test(tStr)
+          dStr && /^\d{4}-\d{2}-\d{2}$/.test(dStr) && tStr && /^\d{1,2}:\d{2}$/.test(tStr)
             ? { scheduledDate: dStr, scheduledTime: tStr.slice(0, 5) }
             : {};
         const doc = {
-          title: (form.problem.trim() || analysis.probleme?.trim() || "Intervention serrurerie").slice(0, 140),
+          title: (
+            form.problem.trim() ||
+            analysis.probleme?.trim() ||
+            "Intervention serrurerie"
+          ).slice(0, 140),
           address: address ?? "Adresse inconnue",
           time: form.time.trim(),
           status: address ? "pending" : "pending_needs_address",
@@ -399,7 +412,7 @@ export default function MapTranscriptionActionsPanel({
       );
       setEditOpen(false);
     } catch (e) {
-      console.error(e);
+      logger.error(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(null);
     }
@@ -433,114 +446,114 @@ export default function MapTranscriptionActionsPanel({
             }
           >
             <div className={DASHBOARD_PANEL_INNER_CLIP_CLASS}>
-            <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} grid grid-cols-2 gap-3 pr-2`}>
-              <label className="col-span-2">
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.address")}
-                </div>
-                <input
-                  data-testid="edit-address"
-                  value={form.address}
-                  onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+              <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} grid grid-cols-2 gap-3 pr-2`}>
+                <label className="col-span-2">
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.address")}
+                  </div>
+                  <input
+                    data-testid="edit-address"
+                    value={form.address}
+                    onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label>
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.client_name")}
-                </div>
-                <input
-                  data-testid="edit-clientName"
-                  value={form.clientName}
-                  onChange={(e) => setForm((p) => ({ ...p, clientName: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+                <label>
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.client_name")}
+                  </div>
+                  <input
+                    data-testid="edit-clientName"
+                    value={form.clientName}
+                    onChange={(e) => setForm((p) => ({ ...p, clientName: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label>
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.phone")}
-                </div>
-                <input
-                  data-testid="edit-phone"
-                  value={form.phone}
-                  onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+                <label>
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.phone")}
+                  </div>
+                  <input
+                    data-testid="edit-phone"
+                    value={form.phone}
+                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label className="col-span-2">
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.problem")}
-                </div>
-                <input
-                  data-testid="edit-problem"
-                  value={form.problem}
-                  onChange={(e) => setForm((p) => ({ ...p, problem: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+                <label className="col-span-2">
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.problem")}
+                  </div>
+                  <input
+                    data-testid="edit-problem"
+                    value={form.problem}
+                    onChange={(e) => setForm((p) => ({ ...p, problem: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label>
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.date")}
-                </div>
-                <input
-                  data-testid="edit-date"
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+                <label>
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.date")}
+                  </div>
+                  <input
+                    data-testid="edit-date"
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label>
-                <div className="mb-1 text-[11px] font-bold text-slate-700">
-                  {t("map.transcription.time")}
-                </div>
-                <input
-                  data-testid="edit-time"
-                  type="time"
-                  value={form.time}
-                  onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
-                />
-              </label>
+                <label>
+                  <div className="mb-1 text-[11px] font-bold text-slate-700">
+                    {t("map.transcription.time")}
+                  </div>
+                  <input
+                    data-testid="edit-time"
+                    type="time"
+                    value={form.time}
+                    onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-black/10"
+                  />
+                </label>
 
-              <label className="col-span-2 flex items-center gap-2 pt-1">
-                <input
-                  data-testid="edit-urgency"
-                  type="checkbox"
-                  checked={form.urgency}
-                  onChange={(e) => setForm((p) => ({ ...p, urgency: e.target.checked }))}
-                />
-                <span className="text-sm font-bold text-slate-800">
-                  {t("map.transcription.urgency")}
-                </span>
-              </label>
-            </div>
+                <label className="col-span-2 flex items-center gap-2 pt-1">
+                  <input
+                    data-testid="edit-urgency"
+                    type="checkbox"
+                    checked={form.urgency}
+                    onChange={(e) => setForm((p) => ({ ...p, urgency: e.target.checked }))}
+                  />
+                  <span className="text-sm font-bold text-slate-800">
+                    {t("map.transcription.urgency")}
+                  </span>
+                </label>
+              </div>
 
-            <div className="mt-auto flex w-full shrink-0 gap-3 border-t border-black/10 px-4 pb-5 pt-4">
-              <button
-                type="button"
-                data-testid="edit-delete"
-                onClick={() => void supprimer()}
-                disabled={busy !== null}
-                className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl bg-red-600 text-sm font-bold text-white shadow-[0_10px_26px_-6px_rgba(220,38,38,0.45)] transition hover:bg-red-700 disabled:opacity-50"
-              >
-                {t("common.delete")}
-              </button>
-              <button
-                type="button"
-                data-testid="edit-create"
-                onClick={() => void create()}
-                disabled={busy !== null || !isValid}
-                className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-[0_12px_28px_-6px_rgba(16,185,129,0.42)] transition hover:bg-emerald-700 disabled:opacity-50"
-              >
-                Créer
-              </button>
-            </div>
+              <div className="mt-auto flex w-full shrink-0 gap-3 border-t border-black/10 px-4 pb-5 pt-4">
+                <button
+                  type="button"
+                  data-testid="edit-delete"
+                  onClick={() => void supprimer()}
+                  disabled={busy !== null}
+                  className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl bg-red-600 text-sm font-bold text-white shadow-[0_10px_26px_-6px_rgba(220,38,38,0.45)] transition hover:bg-red-700 disabled:opacity-50"
+                >
+                  {t("common.delete")}
+                </button>
+                <button
+                  type="button"
+                  data-testid="edit-create"
+                  onClick={() => void create()}
+                  disabled={busy !== null || !isValid}
+                  className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-[0_12px_28px_-6px_rgba(16,185,129,0.42)] transition hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  Créer
+                </button>
+              </div>
             </div>
           </motion.div>
         ) : null}
@@ -548,4 +561,3 @@ export default function MapTranscriptionActionsPanel({
     </>
   );
 }
-

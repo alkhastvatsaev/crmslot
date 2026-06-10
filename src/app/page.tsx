@@ -33,15 +33,20 @@ import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeCo
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
-import TechnicianConnectivityBar from "@/features/offline/components/TechnicianConnectivityBar";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import TechnicianNotificationBootstrap from "@/features/notifications/components/TechnicianNotificationBootstrap";
 import DevPreviewAnonymousAuth from "@/features/dev/DevPreviewAnonymousAuth";
+import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
+import MobileShell from "@/features/dashboard/components/MobileShell";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
+import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
+import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
+import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -57,12 +62,12 @@ const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"),
 
 const DashboardSecondaryPlaceholder = dynamic(
   () => import("@/features/dashboard/components/DashboardSecondaryPlaceholder"),
-  { ssr: false, loading: () => null },
+  { ssr: false, loading: () => null }
 );
 
 const TechnicianHubPage = dynamic(
   () => import("@/features/interventions/components/TechnicianHubPage"),
-  { ssr: false, loading: () => null },
+  { ssr: false, loading: () => null }
 );
 
 const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubPage"), {
@@ -75,103 +80,136 @@ const FeatureHubPage = dynamic(() => import("@/features/featureHub/components/Fe
   loading: () => null,
 });
 
-const CrmHistoryPage = dynamic(
-  () => import("@/features/crmHistory/components/CrmHistoryPage"),
-  { ssr: false, loading: () => null },
-);
+const CrmHistoryPage = dynamic(() => import("@/features/crmHistory/components/CrmHistoryPage"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const BillingHubPage = dynamic(() => import("@/features/billingHub/components/BillingHubPage"), {
   ssr: false,
   loading: () => null,
 });
 
-/** Écran d’accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
+const desktopHeader = (
+  <>
+    <aside
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
+    >
+      <ClockCalendar />
+    </aside>
+    <div
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
+    >
+      <StagingPreviewBanner />
+      <SpotlightSearch />
+    </div>
+    <aside
+      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
+    >
+      <UserProfile />
+    </aside>
+  </>
+);
+
+/** Écran d'accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
 export default function Dashboard() {
+  const isMobile = useIsMobile();
+
   const dashboardPages = useMemo(
     () => [
-      <>
+      <ErrorBoundary key="map" name="map">
         <MapboxView />
         <MacroDroidIndicator />
         <AutoProcessUploads />
-      </>,
-      <DashboardSecondaryPlaceholder key="secondary" />,
-      <TechnicianHubPage key="technician-hub" slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />,
-      <FeatureHubPage key="feature-hub" slotIndex={FEATURE_HUB_SLOT_INDEX} />,
-      <CrmHistoryPage key="crm-history" slotIndex={CRM_HISTORY_SLOT_INDEX} />,
-      <BillingHubPage key="billing-hub" slotIndex={BILLING_HUB_SLOT_INDEX} />,
-      <GmailHubPage key="gmail-hub" slotIndex={GMAIL_HUB_SLOT_INDEX} />,
+      </ErrorBoundary>,
+      <ErrorBoundary key="secondary" name="secondary">
+        <DashboardSecondaryPlaceholder />
+      </ErrorBoundary>,
+      <ErrorBoundary key="technician-hub" name="technician-hub">
+        <TechnicianHubPage slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="feature-hub" name="feature-hub">
+        <FeatureHubPage slotIndex={FEATURE_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="crm-history" name="crm-history">
+        <CrmHistoryPage slotIndex={CRM_HISTORY_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="billing-hub" name="billing-hub">
+        <BillingHubPage slotIndex={BILLING_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="gmail-hub" name="gmail-hub">
+        <GmailHubPage slotIndex={GMAIL_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
     ],
-    [],
+    []
   );
 
   return (
     <DateProvider>
       <DesktopOnlyGate>
         <LoginOverlay>
+          <DevServiceWorkerCleanup />
           <DevPreviewAnonymousAuth />
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={dashboardPages.length}>
                 <ChatbotProvider>
-                <RequesterHubProvider>
-                  <ClientPortalPushProvider>
-                  <TechnicianQueryProvider>
-                    <OfflineSyncProvider>
-                      <TechnicianCaseIntentProvider>
-                        <BackofficeInboxIntentProvider>
-                        <CompanyStockIntentProvider>
-                        <CompanyStockAgentBridgeProvider>
-                        <CrmHistoryAgentBridgeProvider>
-                        <BillingHubAgentBridgeProvider>
-                        <BillingHubIntentProvider>
-                        <TechnicianBackofficeReportBridgeProvider>
-                          <TechnicianFinishJobProvider>
-                            <TechnicianConnectivityBar />
-                            <Suspense fallback={null}>
-                              <TechnicianNotificationBootstrap />
-                            </Suspense>
-                            <ClientPortalAuthEffects />
-                            <Suspense fallback={null}>
-                              <ClientPortalNotificationBootstrap />
-                              <ClientPortalPaymentReturnEffects />
-                            </Suspense>
-                            <DashboardDesktopShell
-                              header={
-                                <>
-                                  <aside
-                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
-                                  >
-                                    <ClockCalendar />
-                                  </aside>
-                                  <div
-                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
-                                  >
-                                    <StagingPreviewBanner />
-                                    <SpotlightSearch />
-                                  </div>
-                                  <aside
-                                    className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
-                                  >
-                                    <UserProfile />
-                                  </aside>
-                                </>
-                              }
-                              pager={<DashboardPager pages={dashboardPages} />}
-                              galaxy={<DashboardGalaxyLayer />}
-                            />
-                          </TechnicianFinishJobProvider>
-                        </TechnicianBackofficeReportBridgeProvider>
-                        </BillingHubIntentProvider>
-                        </BillingHubAgentBridgeProvider>
-                        </CrmHistoryAgentBridgeProvider>
-                        </CompanyStockAgentBridgeProvider>
-                        </CompanyStockIntentProvider>
-                        </BackofficeInboxIntentProvider>
-                      </TechnicianCaseIntentProvider>
-                    </OfflineSyncProvider>
-                  </TechnicianQueryProvider>
-                  </ClientPortalPushProvider>
-                </RequesterHubProvider>
+                  <RequesterHubProvider>
+                    <ClientPortalPushProvider>
+                      <TechnicianQueryProvider>
+                        <OfflineSyncProvider>
+                          <TechnicianCaseIntentProvider>
+                            <BackofficeInboxIntentProvider>
+                              <CompanyStockIntentProvider>
+                                <CompanyStockAgentBridgeProvider>
+                                  <CrmHistoryAgentBridgeProvider>
+                                    <BillingHubAgentBridgeProvider>
+                                      <BillingHubIntentProvider>
+                                        <TechnicianBackofficeReportBridgeProvider>
+                                          <TechnicianFinishJobProvider>
+                                            <Suspense fallback={null}>
+                                              <TechnicianNotificationBootstrap />
+                                            </Suspense>
+                                            <ClientPortalAuthEffects />
+                                            <Suspense fallback={null}>
+                                              <ClientPortalNotificationBootstrap />
+                                              <ClientPortalPaymentReturnEffects />
+                                            </Suspense>
+                                            <AuthActivityLogger />
+                                            <ActivityLogPageObserver />
+
+                                            {isMobile === null ? (
+                                              <div
+                                                data-testid="mobile-detection-loading"
+                                                className="flex min-h-dvh items-center justify-center bg-slate-50"
+                                              >
+                                                <div
+                                                  className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
+                                                  aria-hidden
+                                                />
+                                              </div>
+                                            ) : isMobile ? (
+                                              <MobileShell pages={dashboardPages} />
+                                            ) : (
+                                              <DashboardDesktopShell
+                                                header={desktopHeader}
+                                                pager={<DashboardPager pages={dashboardPages} />}
+                                                galaxy={<DashboardGalaxyLayer />}
+                                              />
+                                            )}
+                                          </TechnicianFinishJobProvider>
+                                        </TechnicianBackofficeReportBridgeProvider>
+                                      </BillingHubIntentProvider>
+                                    </BillingHubAgentBridgeProvider>
+                                  </CrmHistoryAgentBridgeProvider>
+                                </CompanyStockAgentBridgeProvider>
+                              </CompanyStockIntentProvider>
+                            </BackofficeInboxIntentProvider>
+                          </TechnicianCaseIntentProvider>
+                        </OfflineSyncProvider>
+                      </TechnicianQueryProvider>
+                    </ClientPortalPushProvider>
+                  </RequesterHubProvider>
                 </ChatbotProvider>
               </DashboardPagerProvider>
             </GalaxyLayerBridgeProvider>
