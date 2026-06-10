@@ -7,8 +7,10 @@ import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSche
 import { capitalizeName } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import type { Intervention } from "@/features/interventions/types";
 import SlaBadge from "@/features/interventions/components/SlaBadge";
+import SlaStatusBadge from "@/features/sla/components/SlaStatusBadge";
 
 export type InboxInterventionRowVariant = "request" | "report-active" | "report-archived";
 
@@ -30,6 +32,7 @@ export function BackOfficeInboxInterventionRow({
   onSelect: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const slaTrackerEnabled = useFeatureFlag("slaTracker");
   const isRequest = variant === "request";
   const isUrgent = item.urgency;
 
@@ -86,7 +89,11 @@ export function BackOfficeInboxInterventionRow({
               <CheckCircle2 className="w-4 h-4 text-green-500" />
             )}
             <h4 className="text-[15px] font-bold text-slate-800 truncate">{clientName}</h4>
-            <SlaBadge intervention={item} />
+            {slaTrackerEnabled && item.priority ? (
+              <SlaStatusBadge intervention={item} />
+            ) : (
+              <SlaBadge intervention={item} />
+            )}
           </div>
           <p className="text-[13px] text-slate-500 truncate mb-2">
             {item.problem || item.title || t("backoffice.inbox.no_description")}

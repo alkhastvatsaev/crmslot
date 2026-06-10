@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { auth, firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
@@ -24,11 +25,19 @@ import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeI
 export function useBackOfficeDashboard() {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const { logIntervention } = useActivityLog();
   const [filters, setFilters] = useState<BackofficeViewFilters>(() =>
     defaultBackofficeViewFilters()
   );
   const [companyFilterId, setCompanyFilterId] = useState("");
-  const [detail, setDetail] = useState<Intervention | null>(null);
+  const [detail, setDetailState] = useState<Intervention | null>(null);
+  const setDetail = useCallback(
+    (iv: Intervention | null) => {
+      setDetailState(iv);
+      if (iv) logIntervention(iv);
+    },
+    [logIntervention]
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
