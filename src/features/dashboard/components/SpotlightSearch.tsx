@@ -32,7 +32,7 @@ const SPOTLIGHT_NAV_ICONS = {
   "spotlight.nav_billing_hub": Receipt,
 } as const;
 
-export default function SpotlightSearch() {
+export default function SpotlightSearch({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const { language, setLanguage, t } = useTranslation();
   const pager = useDashboardPagerOptional();
@@ -66,9 +66,20 @@ export default function SpotlightSearch() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("spotlight.open_aria")}
-        className={`${dashboardHeaderPanelShellClass} items-center justify-between bg-white/95 px-6 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`}
+        className={
+          compact
+            ? "mobile-header-chip mobile-header-chip--interactive w-full justify-between font-medium text-slate-500"
+            : `${dashboardHeaderPanelShellClass} items-center justify-between bg-white/95 px-6 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`
+        }
       >
-        <span className="flex items-center gap-2 text-sm text-gray-400"></span>
+        <span className="flex items-center gap-2 truncate text-sm">
+          {t("spotlight.search_placeholder")}
+        </span>
+        {!compact ? (
+          <kbd className="hidden rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:inline">
+            ⌘K
+          </kbd>
+        ) : null}
       </button>
 
       <AnimatePresence>

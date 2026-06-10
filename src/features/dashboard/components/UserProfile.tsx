@@ -20,7 +20,12 @@ export const appProfiles = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
   roleKey: page.profileRoleKey,
 }));
 
-export default function UserProfile() {
+type UserProfileProps = {
+  /** Desktop : chevrons changent de page. Mobile : label synchronisé au swipe vertical uniquement. */
+  showPageNavigation?: boolean;
+};
+
+export default function UserProfile({ showPageNavigation = true }: UserProfileProps) {
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const profiles = appProfiles;
@@ -51,6 +56,45 @@ export default function UserProfile() {
     pager?.setPageIndex(newIndex);
   };
 
+  const profileLabel = (
+    <div className="flex items-center justify-center gap-2 sm:gap-4">
+      <span
+        data-testid="profile-name"
+        className="text-base font-semibold text-slate-800 tracking-wide whitespace-nowrap sm:text-[20px]"
+      >
+        {currentProfile.name}
+      </span>
+      <span
+        data-testid="profile-role"
+        className="px-2 py-1 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[10px] font-extrabold uppercase tracking-widest border border-[#CCE3FF] shadow-sm whitespace-nowrap"
+      >
+        {t(`profiles.roles.${currentProfile.roleKey}`)}
+      </span>
+    </div>
+  );
+
+  if (!showPageNavigation) {
+    return (
+      <div
+        data-testid="user-profile-mobile-label"
+        className="mobile-header-chip w-full min-h-0 flex-col gap-1 py-2"
+      >
+        <span
+          data-testid="profile-name"
+          className="text-sm font-semibold text-slate-800 tracking-wide whitespace-nowrap"
+        >
+          {currentProfile.name}
+        </span>
+        <span
+          data-testid="profile-role"
+          className="px-2 py-0.5 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[9px] font-extrabold uppercase tracking-widest border border-[#CCE3FF]"
+        >
+          {t(`profiles.roles.${currentProfile.roleKey}`)}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`${dashboardHeaderPanelShellClass} ${DASHBOARD_PANEL_SHADOW_HOVER_CLASS} cursor-pointer items-center justify-center bg-white/70 ease-out hover:scale-[1.01] hover:bg-white/80 active:scale-[0.99]`}
@@ -64,20 +108,7 @@ export default function UserProfile() {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center justify-center gap-4 flex-1">
-          <span
-            data-testid="profile-name"
-            className="text-[20px] font-semibold text-slate-800 tracking-wide whitespace-nowrap"
-          >
-            {currentProfile.name}
-          </span>
-          <span
-            data-testid="profile-role"
-            className="px-2 py-1 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[10px] font-extrabold uppercase tracking-widest border border-[#CCE3FF] shadow-sm whitespace-nowrap"
-          >
-            {t(`profiles.roles.${currentProfile.roleKey}`)}
-          </span>
-        </div>
+        <div className="flex flex-1 items-center justify-center">{profileLabel}</div>
 
         <button
           onClick={handleNext}
