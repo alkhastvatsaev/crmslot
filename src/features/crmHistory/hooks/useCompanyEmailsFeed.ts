@@ -6,7 +6,7 @@ import { firestore } from "@/core/config/firebase";
 import { INTERVENTION_EMAILS_COLLECTION } from "@/features/emails/interventionEmailFirestore";
 import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
 
-const FEED_LIMIT = 60;
+const FEED_LIMIT = 300;
 
 export function useCompanyEmailsFeed(companyId: string | null) {
   const [emails, setEmails] = useState<InterventionEmailDoc[]>([]);
@@ -23,20 +23,20 @@ export function useCompanyEmailsFeed(companyId: string | null) {
       collection(firestore, INTERVENTION_EMAILS_COLLECTION),
       where("companyId", "==", companyId),
       orderBy("createdAt", "desc"),
-      limit(FEED_LIMIT),
+      limit(FEED_LIMIT)
     );
     return onSnapshot(
       q,
       (snap) => {
         setEmails(
-          snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterventionEmailDoc, "id">) })),
+          snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterventionEmailDoc, "id">) }))
         );
         setLoading(false);
       },
       () => {
         setEmails([]);
         setLoading(false);
-      },
+      }
     );
   }, [companyId]);
 

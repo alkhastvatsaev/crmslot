@@ -7,7 +7,7 @@ import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { CompanyCrmActivityDoc } from "../crmActivityLog";
 
-const CRM_ACTIVITY_LIMIT = 200;
+const CRM_ACTIVITY_LIMIT = 2000;
 
 export function useCompanyCrmActivityLog(companyId: string | null) {
   const [rows, setRows] = useState<Array<CompanyCrmActivityDoc & { id: string }>>([]);

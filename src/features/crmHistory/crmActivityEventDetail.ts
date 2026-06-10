@@ -8,7 +8,11 @@ export type CrmActivityEventDetail = {
 
 type Translate = (key: string) => string;
 
-function fieldLine(t: Translate, labelKey: string, value: string | undefined | null): string | null {
+function fieldLine(
+  t: Translate,
+  labelKey: string,
+  value: string | undefined | null
+): string | null {
   const v = value?.trim();
   if (!v) return null;
   return `${t(labelKey)} : ${v}`;
@@ -27,7 +31,7 @@ function formatEuros(amount: number | undefined): string | null {
 function statusLabel(
   event: CrmActivityEvent,
   code: string | undefined,
-  t: Translate,
+  t: Translate
 ): string | null {
   if (!code) return null;
   if (event.type === "quote_status_changed") {
@@ -46,7 +50,13 @@ function commonContextLines(event: CrmActivityEvent, t: Translate): string[] {
   push(fieldLine(t, "crmHistory.detail.label.client", event.clientName));
   push(fieldLine(t, "crmHistory.detail.label.address", event.address));
   push(fieldLine(t, "crmHistory.detail.label.order", event.orderLabel));
-  push(fieldLine(t, "crmHistory.detail.label.order_amount", formatEurosFromCents(event.orderTotalCents)));
+  push(
+    fieldLine(
+      t,
+      "crmHistory.detail.label.order_amount",
+      formatEurosFromCents(event.orderTotalCents)
+    )
+  );
   return lines;
 }
 
@@ -64,7 +74,8 @@ const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
   intervention_schedule_updated: "crmHistory.detail.body.intervention_schedule_updated",
   intervention_billing_updated: "crmHistory.detail.body.intervention_billing_updated",
   intervention_payment_updated: "crmHistory.detail.body.intervention_payment_updated",
-  intervention_terrain_report_received: "crmHistory.detail.body.intervention_terrain_report_received",
+  intervention_terrain_report_received:
+    "crmHistory.detail.body.intervention_terrain_report_received",
   bridged_report_dismissed: "crmHistory.detail.body.bridged_report_dismissed",
   ivana_chat_message: "crmHistory.detail.body.ivana_chat_message",
   material_order_status_changed: "crmHistory.detail.body.material_order_status_changed",
@@ -81,18 +92,20 @@ const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
   commission_calculated: "crmHistory.detail.body.commission_calculated",
   quote_created: "crmHistory.detail.body.quote_created",
   quote_status_changed: "crmHistory.detail.body.quote_status_changed",
+  page_navigated: "crmHistory.detail.body.page_navigated",
+  intervention_viewed: "crmHistory.detail.body.intervention_viewed",
+  email_viewed: "crmHistory.detail.body.email_viewed",
+  user_session_start: "crmHistory.detail.body.user_session_start",
 };
 
 /** Texte explicatif pour le panneau droit de l’historique CRM. */
 export function buildCrmActivityEventDetail(
   event: CrmActivityEvent,
-  t: Translate,
+  t: Translate
 ): CrmActivityEventDetail {
   const lines: string[] = [t(DETAIL_BODY_KEY[event.type])];
 
-  const actorKey = event.actorRole
-    ? (`crmHistory.actor.${event.actorRole}` as const)
-    : null;
+  const actorKey = event.actorRole ? (`crmHistory.actor.${event.actorRole}` as const) : null;
   if (actorKey) {
     const actorLine = fieldLine(t, "crmHistory.detail.label.actor", t(actorKey));
     if (actorLine) lines.push(actorLine);
@@ -105,7 +118,7 @@ export function buildCrmActivityEventDetail(
       lines.push(
         t("crmHistory.detail.status_transition")
           .replace("{before}", before)
-          .replace("{after}", after),
+          .replace("{after}", after)
       );
     } else if (after) {
       lines.push(fieldLine(t, "crmHistory.detail.label.status", after)!);
@@ -115,9 +128,7 @@ export function buildCrmActivityEventDetail(
   }
 
   if (event.materialOrderStatus) {
-    lines.push(
-      fieldLine(t, "crmHistory.detail.label.material_status", event.materialOrderStatus)!,
-    );
+    lines.push(fieldLine(t, "crmHistory.detail.label.material_status", event.materialOrderStatus)!);
   }
 
   if (event.chatRole) {
@@ -125,22 +136,27 @@ export function buildCrmActivityEventDetail(
       fieldLine(
         t,
         "crmHistory.detail.label.chat_role",
-        t(`crmHistory.detail.chat_role.${event.chatRole}`),
-      )!,
+        t(`crmHistory.detail.chat_role.${event.chatRole}`)
+      )!
     );
   }
 
   if (event.emailSubject) {
     lines.push(fieldLine(t, "crmHistory.detail.label.email_subject", event.emailSubject)!);
   }
-  if (event.type === "email_sent" || event.type === "email_received" || event.type === "chatbot_email_sent") {
-    if (event.emailFrom) lines.push(fieldLine(t, "crmHistory.detail.label.email_from", event.emailFrom)!);
+  if (
+    event.type === "email_sent" ||
+    event.type === "email_received" ||
+    event.type === "chatbot_email_sent"
+  ) {
+    if (event.emailFrom)
+      lines.push(fieldLine(t, "crmHistory.detail.label.email_from", event.emailFrom)!);
     if (event.emailTo) lines.push(fieldLine(t, "crmHistory.detail.label.email_to", event.emailTo)!);
   }
 
   if (event.commissionAmountEuros != null) {
     lines.push(
-      fieldLine(t, "crmHistory.detail.label.commission", formatEuros(event.commissionAmountEuros))!,
+      fieldLine(t, "crmHistory.detail.label.commission", formatEuros(event.commissionAmountEuros))!
     );
   }
   if (event.commissionAction) {

@@ -47,7 +47,12 @@ export function synthesizeInterventionEvents(interventions: Intervention[]): Crm
 
     const completedTs = parseTs(iv.completedAt);
     if (completedTs) {
-      events.push({ id: `${iv.id}:completed`, type: "intervention_completed", ts: completedTs, ...base });
+      events.push({
+        id: `${iv.id}:completed`,
+        type: "intervention_completed",
+        ts: completedTs,
+        ...base,
+      });
     }
 
     const invoicedTs =
@@ -69,46 +74,9 @@ export function synthesizeInterventionEvents(interventions: Intervention[]): Crm
   return events;
 }
 
-/** Facturation sur dossier (lignes + statusUpdatedAt) — visible même sans entrée journal. */
-export function synthesizeInterventionBillingEvents(
-  interventions: Intervention[],
-): CrmActivityEvent[] {
-  const events: CrmActivityEvent[] = [];
-
-  for (const iv of interventions) {
-    const lines = iv.billingLines;
-    if (!Array.isArray(lines) || lines.length === 0) continue;
-
-    const ts = parseTs(iv.statusUpdatedAt) || parseTs(iv.invoicedAt) || parseTs(iv.completedAt);
-    if (!ts) continue;
-
-    const totalCents =
-      typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
-        ? Math.round(iv.invoiceAmountCents)
-        : lines.reduce(
-            (s, l) => s + Math.round((l.unitPriceCents ?? 0) * (l.quantity ?? 1)),
-            0,
-          );
-
-    const clientName = interventionClientName(iv);
-    events.push({
-      id: `${iv.id}:billing-snapshot`,
-      type: "intervention_billing_updated",
-      ts,
-      interventionId: iv.id,
-      interventionTitle: iv.title,
-      clientName,
-      address: iv.address,
-      note: `Facture · ${lines.length} ligne(s) · ${Math.round(totalCents) / 100} €`,
-    });
-  }
-
-  return events;
-}
-
 /** Refus terrain / retour file Demandes (champs dénormalisés — rétroactif). */
 export function synthesizeInterventionLifecycleEvents(
-  interventions: Intervention[],
+  interventions: Intervention[]
 ): CrmActivityEvent[] {
   const events: CrmActivityEvent[] = [];
 
@@ -183,9 +151,7 @@ export function synthesizeSupplierOrderEvents(orders: SupplierOrder[]): CrmActiv
   const events: CrmActivityEvent[] = [];
   for (const o of orders) {
     const clientName =
-      typeof o.clientName === "string" && o.clientName.trim()
-        ? o.clientName.trim()
-        : undefined;
+      typeof o.clientName === "string" && o.clientName.trim() ? o.clientName.trim() : undefined;
     const orderLabel = `${o.supplierName} — ${o.lines.map((l) => `${l.quantity}× ${l.label}`).join(", ")}`;
     const baseTs = resolveOrderEventTs(o.sentAt, o.updatedAt, o.createdAt);
     events.push({
@@ -225,7 +191,7 @@ export function synthesizeSupplierOrderEvents(orders: SupplierOrder[]): CrmActiv
 
 export function synthesizeEmailEvents(
   emails: InterventionEmailDoc[],
-  interventionMap: Map<string, Intervention>,
+  interventionMap: Map<string, Intervention>
 ): CrmActivityEvent[] {
   return emails.map((e) => {
     const iv = e.interventionId ? interventionMap.get(e.interventionId) : undefined;
@@ -238,7 +204,9 @@ export function synthesizeEmailEvents(
       undefined;
     return {
       id: `email:${e.id}`,
-      type: (e.direction === "outbound" ? "email_sent" : "email_received") as CrmActivityEvent["type"],
+      type: (e.direction === "outbound"
+        ? "email_sent"
+        : "email_received") as CrmActivityEvent["type"],
       ts: parseTs(e.createdAt),
       interventionId: e.interventionId || undefined,
       interventionTitle: iv?.title,
@@ -253,7 +221,7 @@ export function synthesizeEmailEvents(
 
 export function synthesizeCommissionEvents(
   rows: CompanyCommissionAuditRow[],
-  interventionMap: Map<string, Intervention>,
+  interventionMap: Map<string, Intervention>
 ): CrmActivityEvent[] {
   return rows.map((r) => {
     const iv = interventionMap.get(r.interventionId);

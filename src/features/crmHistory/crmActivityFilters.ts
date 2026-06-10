@@ -1,12 +1,23 @@
 import type { CrmActivityEvent, CrmPeriodFilter, CrmTypeFilter } from "./crmActivityTypes";
 
+export function applyDateFilter(events: CrmActivityEvent[], date: Date): CrmActivityEvent[] {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+  return events.filter((e) => e.ts >= start.getTime() && e.ts <= end.getTime());
+}
+
 export const PERIOD_MS: Record<Exclude<CrmPeriodFilter, "all">, number> = {
   today: 86_400_000,
   week: 7 * 86_400_000,
   month: 30 * 86_400_000,
 };
 
-export function applyPeriod(events: CrmActivityEvent[], period: CrmPeriodFilter): CrmActivityEvent[] {
+export function applyPeriod(
+  events: CrmActivityEvent[],
+  period: CrmPeriodFilter
+): CrmActivityEvent[] {
   if (period === "all") return events;
   const cutoff = Date.now() - PERIOD_MS[period];
   return events.filter((e) => e.ts >= cutoff);
@@ -14,7 +25,7 @@ export function applyPeriod(events: CrmActivityEvent[], period: CrmPeriodFilter)
 
 export function applyTypeFilter(
   events: CrmActivityEvent[],
-  filter: CrmTypeFilter,
+  filter: CrmTypeFilter
 ): CrmActivityEvent[] {
   if (filter === "all") return events;
   if (filter === "interventions")
@@ -25,7 +36,7 @@ export function applyTypeFilter(
         e.type === "chatbot_timeline_comment" ||
         e.type === "chatbot_write_action" ||
         e.type === "quote_created" ||
-        e.type === "quote_status_changed",
+        e.type === "quote_status_changed"
     );
   if (filter === "materials")
     return events.filter(
@@ -33,21 +44,28 @@ export function applyTypeFilter(
         e.type === "material_ordered" ||
         e.type === "material_order_status_changed" ||
         e.type === "supplier_ordered" ||
-        e.type === "supplier_order_lecot",
+        e.type === "supplier_order_lecot"
     );
   if (filter === "suppliers")
-    return events.filter(
-      (e) => e.type === "supplier_ordered" || e.type === "supplier_order_lecot",
-    );
+    return events.filter((e) => e.type === "supplier_ordered" || e.type === "supplier_order_lecot");
   if (filter === "communications")
     return events.filter(
       (e) =>
         e.type === "email_sent" ||
         e.type === "email_received" ||
+        e.type === "email_viewed" ||
         e.type === "commission_calculated" ||
         e.type === "ivana_chat_message" ||
         e.type === "chatbot_email_sent" ||
-        e.type === "chatbot_gmail_action",
+        e.type === "chatbot_gmail_action"
+    );
+  if (filter === "navigation")
+    return events.filter(
+      (e) =>
+        e.type === "page_navigated" ||
+        e.type === "intervention_viewed" ||
+        e.type === "email_viewed" ||
+        e.type === "user_session_start"
     );
   return events;
 }
@@ -64,6 +82,6 @@ export function applySearch(events: CrmActivityEvent[], q: string): CrmActivityE
       e.emailSubject?.toLowerCase().includes(term) ||
       e.emailFrom?.toLowerCase().includes(term) ||
       e.note?.toLowerCase().includes(term) ||
-      e.actorRole?.toLowerCase().includes(term),
+      e.actorRole?.toLowerCase().includes(term)
   );
 }

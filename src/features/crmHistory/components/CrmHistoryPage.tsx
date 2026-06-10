@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { CrmPeriodFilter } from "../crmActivityTypes";
 import { useDateContext } from "@/context/DateContext";
 import { toast } from "sonner";
-import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
+import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
@@ -22,6 +22,8 @@ import type { CrmActivityEvent } from "../crmActivityTypes";
 import CrmHistoryAgentPanel from "./CrmHistoryAgentPanel";
 import CrmHistoryCenterFeed from "./CrmHistoryCenterFeed";
 import CrmHistoryEventDetailPanel from "./CrmHistoryEventDetailPanel";
+import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 
 type Props = { slotIndex?: number };
 
@@ -37,6 +39,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
+  const crmContactsEnabled = useFeatureFlag("crmContacts");
 
   const { selectedDate } = useDateContext();
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(
@@ -84,7 +87,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   );
 
   return (
-    <DashboardTriplePanelLayout
+    <AdaptiveTriplePanelLayout
       rootTestId={`dashboard-pager-slot-${slotIndex}`}
       leftTestId={`dashboard-pager-slot-${slotIndex}-panel-left`}
       centerTestId={`dashboard-pager-slot-${slotIndex}-panel-center`}
@@ -92,6 +95,9 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
       leftAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.left")}`}
       centerAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.center")}`}
       rightAriaLabel={`${t("crmHistory.aria.page")} ${humanPage} — ${t("crmHistory.aria.right")}`}
+      mobileLeftLabel={String(t("crmHistory.mobile.rail_agent"))}
+      mobileCenterLabel={String(t("crmHistory.mobile.rail_feed"))}
+      mobileRightLabel={String(t("crmHistory.mobile.rail_detail"))}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
       left={
         <section className={railShell}>
@@ -125,8 +131,13 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
       centerPadding={false}
       rightPadding={false}
       right={
-        <section className={railShell}>
+        <section className={`${railShell} overflow-y-auto`}>
           <CrmHistoryEventDetailPanel event={null} allEvents={events} selectedDate={selectedDate} />
+          {crmContactsEnabled ? (
+            <div data-testid="crm-history-clients-rail" className="shrink-0">
+              <ClientsCrmPanel />
+            </div>
+          ) : null}
         </section>
       }
     />

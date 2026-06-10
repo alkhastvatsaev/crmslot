@@ -26,6 +26,10 @@ import {
   Ban,
   XCircle,
   ExternalLink,
+  Navigation,
+  Eye,
+  MousePointer,
+  LogIn,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -187,6 +191,26 @@ const EVENT_META: Record<
     Icon: FileCheck,
     colorClass: "text-emerald-600",
     dotClass: "bg-emerald-500",
+  },
+  page_navigated: {
+    Icon: Navigation,
+    colorClass: "text-slate-400",
+    dotClass: "bg-slate-300",
+  },
+  intervention_viewed: {
+    Icon: Eye,
+    colorClass: "text-slate-500",
+    dotClass: "bg-slate-400",
+  },
+  email_viewed: {
+    Icon: MousePointer,
+    colorClass: "text-slate-500",
+    dotClass: "bg-slate-400",
+  },
+  user_session_start: {
+    Icon: LogIn,
+    colorClass: "text-green-600",
+    dotClass: "bg-green-500",
   },
 };
 
