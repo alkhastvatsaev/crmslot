@@ -94,7 +94,7 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
       const res = await handleMaterialAgentPost(
         {
           companyId,
-          orderClientName: "Ancien Client",
+          companyName: "Société Parcours",
           messages: [{ role: "user", content: phrase }],
         },
         auth
@@ -102,12 +102,9 @@ describe("materialAgentRouteParcours — OpenAI mocké", () => {
       const events = await readSseJsonLines(res);
       expect(mockRunChatbotOpenAI).toHaveBeenCalledTimes(1);
       expect(events.some((e) => (e as { type?: string }).type === "done")).toBe(true);
-      // Session reset emitted when phrase triggers a new-order context
-      if (/nouvelle|autre|changer|catalogue\s+lecot|commande\s+lecot/i.test(phrase)) {
-        expect(events).toContainEqual(
-          expect.objectContaining({ type: "material_order_client", clientName: "" })
-        );
-      }
+      const call = mockRunChatbotOpenAI.mock.calls[0]?.[0];
+      expect(call?.toolCtx.materialOrderClientName).toBe("Société Parcours");
+      expect(call?.toolCtx.requireMaterialOrderClientName).toBe(false);
     });
   });
 

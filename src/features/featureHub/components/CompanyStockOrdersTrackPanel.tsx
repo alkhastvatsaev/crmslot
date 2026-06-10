@@ -221,9 +221,13 @@ export default function CompanyStockOrdersTrackPanel({
                       ? ` · ${formatWhenShort(order.createdAt)}`
                       : ""}
                   </p>
-                  {order.isDemo ? (
-                    <SupplierOrderDemoProgress orderId={order.id} status={order.status} />
-                  ) : null}
+                  <SupplierOrderDemoProgress
+                    orderId={order.id}
+                    status={order.status}
+                    createdAt={order.createdAt}
+                    sentAt={order.sentAt}
+                    deliveredAt={order.deliveredAt}
+                  />
                 </li>
               ))}
             </ul>
