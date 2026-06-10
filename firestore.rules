@@ -330,6 +330,7 @@ service cloud.firestore {
         'paymentStatus',
         'stripePaymentLinkUrl',
         'stripePaymentIntentId',
+        'mockPayToken',
         'paidAt',
         'invoiceAmountCents',
         'invoiceNumber',
