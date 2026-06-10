@@ -79,12 +79,14 @@ async function ensureUserForInterventionSubmit() {
 export function useRequesterInterventionForm() {
   const {
     profile,
+    setProfile,
     requestData,
     setRequestData,
     isSubmitting,
     setIsSubmitting,
     setLastSubmittedRequest,
     setLastSubmittedInterventionId,
+    setPortalRightTab,
     resetAll,
     triggerValidation,
   } = useRequesterHub();
@@ -283,7 +285,9 @@ export function useRequesterInterventionForm() {
     if (profile.type === "login") {
       const u = auth?.currentUser;
       if (!u || u.isAnonymous) {
-        toast.error(String(t("requester.toasts.login_tab_required")));
+        setProfile((prev) => ({ ...prev, type: "particulier" }));
+        triggerValidation();
+        toast.error(String(t("requester.toasts.fill_left_panel")));
         return;
       }
     } else {
@@ -331,10 +335,12 @@ export function useRequesterInterventionForm() {
 
       // DUPLICATE CHECK BEFORE SUBMISSION
       const problemForDedupe = description.trim() || problemLabel.trim();
-      const qDup = query(
-        collection(firestore, "interventions"),
-        where("companyId", "==", interventionCompanyId)
-      );
+      const qDup = tenantCompanyId
+        ? query(
+            collection(firestore, "interventions"),
+            where("companyId", "==", interventionCompanyId)
+          )
+        : query(collection(firestore, "interventions"), where("createdByUid", "==", user.uid));
       const snapDup = await getDocs(qDup);
       const existing = snapDup.docs.map((d) => ({
         id: d.id,
@@ -395,6 +401,7 @@ export function useRequesterInterventionForm() {
       const db = firestore;
       const newDocRef = doc(collection(db, "interventions"));
       setLastSubmittedInterventionId(newDocRef.id);
+      setPortalRightTab("invoice");
       const title = (problemLabel.trim() || description.trim()).slice(0, 140);
       const nowIso = new Date().toISOString();
       const hour =

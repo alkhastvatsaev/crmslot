@@ -650,10 +650,9 @@ export function useSmartForm() {
 
       // Duplicate check before submission
       if (interventionCompanyId) {
-        const qDup = query(
-          collection(db, "interventions"),
-          where("companyId", "==", interventionCompanyId)
-        );
+        const qDup = tenantCompanyId
+          ? query(collection(db, "interventions"), where("companyId", "==", interventionCompanyId))
+          : query(collection(db, "interventions"), where("createdByUid", "==", user.uid));
         const snapDup = await getDocs(qDup);
         const existing = snapDup.docs.map((d) => ({
           id: d.id,

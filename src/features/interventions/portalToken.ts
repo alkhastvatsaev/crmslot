@@ -20,13 +20,25 @@ export type PortalInterventionSummary = {
   problem: string | null;
   createdAt: string | null;
   paymentStatus: Intervention["paymentStatus"];
+  /** Montant facturé en centimes (affiché au client une fois facturé). */
+  invoiceAmountCents: number | null;
+  /** URL de paiement hébergée Stripe (ou simulée) — sûre à exposer sur lien token. */
+  paymentLinkUrl: string | null;
 };
 
-/** Retourne uniquement les champs sûrs pour le portail public. Ne contient aucun UID, téléphone, ou données financières. */
+/**
+ * Retourne uniquement les champs sûrs pour le portail public (lien token).
+ * Aucun UID ni téléphone. Le montant facturé et l'URL de paiement Stripe
+ * sont volontairement inclus pour permettre le règlement depuis le suivi.
+ */
 export function toPortalSummary(
   iv: Intervention,
-  technicianDisplayName?: string | null,
+  technicianDisplayName?: string | null
 ): PortalInterventionSummary {
+  const invoiced =
+    typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
+      ? Math.round(iv.invoiceAmountCents)
+      : null;
   return {
     id: iv.id,
     status: iv.status,
@@ -41,5 +53,7 @@ export function toPortalSummary(
     problem: iv.problem ?? null,
     createdAt: iv.createdAt ?? null,
     paymentStatus: iv.paymentStatus ?? null,
+    invoiceAmountCents: invoiced,
+    paymentLinkUrl: iv.stripePaymentLinkUrl?.trim() || null,
   };
 }

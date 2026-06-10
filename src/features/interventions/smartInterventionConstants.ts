@@ -8,6 +8,14 @@ export const SMART_INTERVENTION_DRAFT_STORAGE_KEY = "bm_smart_intervention_draft
 /** Valeur interne du champ adresse pendant la géolocalisation (ne pas traduire ; affichage via i18n). */
 export const REQUESTER_GEOLOC_ADDRESS_PENDING = "__BM_REQUESTER_GEOLOC_PENDING__" as const;
 
+/** Entrée sur l'étape adresse (hub société) — envoi si le formulaire est complet. */
+export const REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT = "requester-intervention-enter-submit";
+
+export function dispatchRequesterInterventionEnterSubmit(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT));
+}
+
 /**
  * Sans suggestion Google / point sur carte, on n’enchaîne pas l’étape adresse → type
  * sur une saisie trop courte (évite le passage à l’étape 2 au premier caractère).
@@ -16,13 +24,9 @@ export const SMART_FORM_ADDRESS_MIN_CHARS_STEP_2 = 12;
 
 export function smartFormAddressEligibleForStep2(
   address: string,
-  placeLatLng?: { lat: number; lng: number },
+  placeLatLng?: { lat: number; lng: number }
 ): boolean {
-  if (
-    placeLatLng &&
-    Number.isFinite(placeLatLng.lat) &&
-    Number.isFinite(placeLatLng.lng)
-  ) {
+  if (placeLatLng && Number.isFinite(placeLatLng.lat) && Number.isFinite(placeLatLng.lng)) {
     return true;
   }
   const t = address.trim();

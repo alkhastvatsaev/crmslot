@@ -8,6 +8,11 @@ const mockPrepare = jest.fn();
 const mockFinalize = jest.fn();
 const mockTransition = jest.fn();
 const mockSendMail = jest.fn();
+const mockAllocateNumber = jest.fn();
+
+jest.mock("@/features/billing/server/allocateInvoiceNumberAdmin", () => ({
+  allocateInvoiceNumberAdmin: (...args: unknown[]) => mockAllocateNumber(...args),
+}));
 
 jest.mock("@/features/backoffice/assignInterventionServerAuth", () => ({
   assertCanAssignInterventionServer: (...args: unknown[]) => mockAssertDispatch(...args),
@@ -31,6 +36,10 @@ jest.mock("@/features/interventions/workflow/transitionInterventionStatusAdmin",
 
 jest.mock("firebase-admin/firestore", () => ({
   FieldValue: { serverTimestamp: () => "__ts__" },
+}));
+
+jest.mock("@/features/billing/server/allocateInvoiceNumberAdmin", () => ({
+  allocateInvoiceNumberAdmin: (...args: unknown[]) => mockAllocateNumber(...args),
 }));
 
 function iv(partial: Partial<Intervention> = {}): Intervention {
@@ -71,6 +80,7 @@ function makeDb(initial: Intervention, refreshed?: Intervention) {
 describe("validateInterventionReportServer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAllocateNumber.mockResolvedValue("2026-0001");
     mockAssertDispatch.mockResolvedValue(true);
     mockPrepare.mockResolvedValue({
       billingLines: [{ description: "Déplacement", quantity: 1, unitPriceCents: 4500 }],
@@ -84,6 +94,7 @@ describe("validateInterventionReportServer", () => {
     });
     mockTransition.mockResolvedValue({ id: "evt-1" });
     mockSendMail.mockResolvedValue({ ok: true });
+    mockAllocateNumber.mockResolvedValue("FAC-2026-00007");
   });
 
   it("validates done report, transitions to invoiced and emails client", async () => {
@@ -105,9 +116,11 @@ describe("validateInterventionReportServer", () => {
         extraPatch: expect.objectContaining({
           invoicePdfUrl: "https://storage.example/invoice.pdf",
           invoiceAmountCents: 4500,
+          invoiceNumber: "FAC-2026-00007",
         }),
-      }),
+      })
     );
+    expect(mockAllocateNumber).toHaveBeenCalledWith(db, "co-1");
     expect(mockSendMail).toHaveBeenCalled();
     expect(result).toEqual({
       invoicePdfUrl: "https://storage.example/invoice.pdf",
@@ -115,6 +128,24 @@ describe("validateInterventionReportServer", () => {
       emailSent: true,
       emailError: undefined,
     });
+  });
+
+  it("réutilise un invoiceNumber déjà attribué (jamais de réallocation)", async () => {
+    const existing = iv({ invoiceNumber: "FAC-2026-00003" });
+    const db = makeDb(existing, { ...existing, invoiceAmountCents: 4500 });
+    await validateInterventionReportServer({
+      db: db as never,
+      interventionId: "iv-val-1",
+      actorUid: "dispatch-1",
+      decoded: {} as never,
+      sendEmail: false,
+    });
+    expect(mockAllocateNumber).not.toHaveBeenCalled();
+    expect(mockTransition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        extraPatch: expect.objectContaining({ invoiceNumber: "FAC-2026-00003" }),
+      })
+    );
   });
 
   it("rejects when status is not done", async () => {
@@ -125,8 +156,8 @@ describe("validateInterventionReportServer", () => {
         interventionId: "iv-val-1",
         actorUid: "dispatch-1",
         decoded: {} as never,
-      }),
-    ).rejects.toThrow('statut « in_progress »');
+      })
+    ).rejects.toThrow("statut « in_progress »");
   });
 
   it("rejects when dispatcher lacks rights", async () => {
@@ -138,7 +169,7 @@ describe("validateInterventionReportServer", () => {
         interventionId: "iv-val-1",
         actorUid: "anon",
         decoded: {} as never,
-      }),
+      })
     ).rejects.toThrow("Droits insuffisants");
   });
 
@@ -156,7 +187,7 @@ describe("validateInterventionReportServer", () => {
         interventionId: "missing",
         actorUid: "dispatch-1",
         decoded: {} as never,
-      }),
+      })
     ).rejects.toThrow("Intervention introuvable");
   });
 
@@ -168,7 +199,7 @@ describe("validateInterventionReportServer", () => {
         interventionId: "iv-val-1",
         actorUid: "dispatch-1",
         decoded: {} as never,
-      }),
+      })
     ).rejects.toThrow("companyId manquant");
   });
 
