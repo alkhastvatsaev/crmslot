@@ -47,7 +47,7 @@ export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   quotesEnabled: true,
   maintenanceContracts: true,
   slaTracker: true,
-  geofenceAuto: true,
+  geofenceAuto: false,
   vehicleStock: true,
   whatsappNotifications: true,
   supplierPortal: true,
