@@ -1,8 +1,16 @@
+import React from "react";
 import { render, screen } from "@/test-utils/render";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 
 jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
   useIsMobile: () => true,
+}));
+
+jest.mock("@/features/dashboard/MobileHubRailContext", () => ({
+  useMobileHubRailRegistration: () => jest.fn(),
+  useMobileHubRailSnapshot: () => null,
+  useRequestMobileHubRail: () => jest.fn(),
+  MobileHubRailProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 describe("AdaptiveTriplePanelLayout", () => {

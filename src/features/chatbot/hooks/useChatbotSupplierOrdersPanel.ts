@@ -16,7 +16,7 @@ export type ChatbotSupplierOrdersPanelState = {
 };
 
 const closed: ChatbotSupplierOrdersPanelState = {
-  open: true,
+  open: false,
   highlightOrderId: null,
   highlightMaterialOrderId: null,
 };
@@ -58,7 +58,7 @@ export function useChatbotSupplierOrdersPanel(
   );
 
   const refreshRegistry = useCallback(async () => {
-    if (!companyId) return;
+    if (!companyId || !firebaseUid || firebaseUid === "anon") return;
     const result = await fetchChatbotPwaRegistry(companyId);
     if (result.ok) {
       setRegistryError(null);
@@ -74,7 +74,7 @@ export function useChatbotSupplierOrdersPanel(
   }, [companyId, firebaseUid]);
 
   useEffect(() => {
-    if (!panel.open || !companyId) {
+    if (!panel.open || !companyId || !firebaseUid || firebaseUid === "anon") {
       setSupplierOrdersBase([]);
       setMaterialOrders([]);
       return;
@@ -91,7 +91,7 @@ export function useChatbotSupplierOrdersPanel(
   }, [panel.open, companyId, refreshRegistry]);
 
   useEffect(() => {
-    if (!panel.open || !companyId || !firestore) return;
+    if (!panel.open || !companyId || !firebaseUid || firebaseUid === "anon" || !firestore) return;
     const db = firestore as Firestore;
     const q = query(
       collection(db, "material_orders"),
@@ -121,7 +121,7 @@ export function useChatbotSupplierOrdersPanel(
         });
       }
     );
-  }, [panel.open, companyId]);
+  }, [panel.open, companyId, firebaseUid]);
 
   const openSupplierOrdersPanel = useCallback(
     (

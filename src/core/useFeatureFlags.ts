@@ -17,7 +17,8 @@ export function useFeatureFlags(): BelgmapFeatureFlags {
   const [remote, setRemote] = useState<Partial<BelgmapFeatureFlags> | null>(null);
 
   useEffect(() => {
-    if (!firestore || !isConfigured || !companyId) {
+    const firebaseUid = workspace?.firebaseUid;
+    if (!firestore || !isConfigured || !companyId || !firebaseUid) {
       setRemote(null);
       return () => {};
     }
@@ -32,14 +33,11 @@ export function useFeatureFlags(): BelgmapFeatureFlags {
         }
         setRemote(raw as Partial<BelgmapFeatureFlags>);
       },
-      () => setRemote(null),
+      () => setRemote(null)
     );
-  }, [companyId]);
+  }, [companyId, workspace?.firebaseUid]);
 
-  return useMemo(
-    () => mergeFeatureFlags(featureFlagsFromEnv(), remote),
-    [remote],
-  );
+  return useMemo(() => mergeFeatureFlags(featureFlagsFromEnv(), remote), [remote]);
 }
 
 export function useFeatureFlag<K extends keyof BelgmapFeatureFlags>(key: K): boolean {
