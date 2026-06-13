@@ -58,6 +58,12 @@ export const CHATBOT_TOOL_GMAIL = [
 
 export const CHATBOT_TOOL_STOCK = ["list_stock_alerts"] as const;
 
+export const CHATBOT_TOOL_VEHICLE_STOCK = [
+  "list_vehicle_stock",
+  "add_vehicle_stock_item",
+  "update_vehicle_stock_item",
+] as const;
+
 export const CHATBOT_TOOL_TIMELINE = ["add_timeline_comment"] as const;
 
 const BILLING_HINT =
@@ -84,7 +90,7 @@ const GREETING_HINT = /^(bonjour|salut|hey|hello|coucou|bonsoir|ça va|ca va|mer
 export function inferChatbotToolScope(userText: string): string[] | undefined {
   const t = userText.trim();
   if (!t) return undefined;
-  
+
   if (GREETING_HINT.test(t)) return [];
 
   if (shouldPreferChatbotEmailOverLecot(t)) {
@@ -132,7 +138,7 @@ export function inferChatbotToolScope(userText: string): string[] | undefined {
 
 export function filterChatbotToolDefinitions<T extends { name: string }>(
   definitions: T[],
-  scope: string[] | undefined,
+  scope: string[] | undefined
 ): T[] {
   if (scope === undefined) return definitions;
   if (scope.length === 0) return [];

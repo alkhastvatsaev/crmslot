@@ -14,10 +14,7 @@ import type {
 export type TransitionInterventionStatusAdminParams = {
   db: admin.firestore.Firestore;
   interventionId: string;
-  iv: Pick<
-    Intervention,
-    "status" | "assignedTechnicianUid" | "createdByUid" | "companyId"
-  >;
+  iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "createdByUid" | "companyId">;
   toStatus: Intervention["status"];
   actor: TransitionActor;
   note?: string;
@@ -31,7 +28,7 @@ export type TransitionInterventionStatusAdminParams = {
  * (routes API — incompatible avec le SDK client `firebase/firestore`).
  */
 export async function transitionInterventionStatusAdmin(
-  params: TransitionInterventionStatusAdminParams,
+  params: TransitionInterventionStatusAdminParams
 ): Promise<InterventionStatusEvent> {
   const {
     db,
@@ -93,7 +90,11 @@ export async function transitionInterventionStatusAdmin(
   if (writeInboxAlerts) {
     const targets = statusChangeNotificationTargets(iv, toStatus, actor.uid);
     for (const targetUid of targets) {
-      const alertRef = db.collection("users").doc(targetUid).collection("intervention_alerts").doc();
+      const alertRef = db
+        .collection("users")
+        .doc(targetUid)
+        .collection("intervention_alerts")
+        .doc();
       batch.set(alertRef, {
         interventionId,
         companyId: iv.companyId ?? null,
@@ -107,6 +108,21 @@ export async function transitionInterventionStatusAdmin(
   }
 
   await batch.commit();
+
+  const companyId = iv.companyId?.trim();
+  if (companyId && fromStatus !== toStatus) {
+    void import("@/features/integrations/server/dispatchCompanyWebhooksAdmin")
+      .then(({ dispatchCompanyWebhooksAdmin }) =>
+        dispatchCompanyWebhooksAdmin(companyId, "intervention.status_changed", {
+          interventionId,
+          at,
+          data: { fromStatus, toStatus },
+        })
+      )
+      .catch(() => {
+        // Webhooks sortants ne doivent jamais bloquer la transition.
+      });
+  }
 
   return { id: eventRef.id, ...eventPayload };
 }

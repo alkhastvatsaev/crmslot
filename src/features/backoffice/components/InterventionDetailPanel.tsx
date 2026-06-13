@@ -1,6 +1,15 @@
 "use client";
 
-import { UserPlus, CheckCircle2, Clock, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import {
+  UserPlus,
+  CheckCircle2,
+  Clock,
+  Pencil,
+  RotateCcw,
+  Send,
+  AlertTriangle,
+} from "lucide-react";
 import EquipmentPanel from "@/features/equipment/components/EquipmentPanel";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -20,6 +29,8 @@ import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleCon
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 import DuplicateWarningBanner from "@/features/interventions/components/DuplicateWarningBanner";
+import InterventionInvoicePreviewCard from "@/features/billing/components/InterventionInvoicePreviewCard";
+import { invoicePreviewFromIntervention } from "@/features/billing/invoicePreviewFromIntervention";
 import type { ScheduleConflict } from "@/features/scheduling/scheduleConflicts";
 import type { ProposedSlot } from "@/features/scheduling/proposeAvailableSlots";
 
@@ -58,9 +69,9 @@ type Props = {
   isAssigning: boolean;
   // handlers
   onClose: () => void;
-  onDelete: (id: string) => void;
   onCancelIntervention: (id: string) => void;
   onVerify: (id: string) => void;
+  onReject: (id: string, reason?: string) => void | Promise<void>;
   onAssign: (
     id: string,
     technicianUid: string,
@@ -69,6 +80,12 @@ type Props = {
   onDownloadQuotePdf: (id: string) => void;
   onUpdateDateTime: () => void;
 };
+
+const QUICK_REJECT_REASON_KEYS = [
+  "backoffice.inbox.reject_quick_photos",
+  "backoffice.inbox.reject_quick_signature",
+  "backoffice.inbox.reject_quick_description",
+] as const;
 
 export default function InterventionDetailPanel({
   selectedItem,
@@ -92,17 +109,34 @@ export default function InterventionDetailPanel({
   setAssignPickerOpen,
   isAssigning,
   onClose,
-  onDelete,
   onCancelIntervention,
   onVerify,
+  onReject,
   onAssign,
   onDownloadQuotePdf,
   onUpdateDateTime,
 }: Props) {
   const { t } = useTranslation();
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectBusy, setRejectBusy] = useState(false);
   const scheduleEditorOpen =
     isEditingDateTime && isInterventionInBackofficeRequestsQueue(selectedItem);
   const actionBarFill = assignPickerOpen || scheduleEditorOpen;
+  const isReportQueue = !isInterventionInBackofficeRequestsQueue(selectedItem);
+  const canRejectReport = isReportQueue && selectedItem.status === "done";
+
+  const handleRejectConfirm = async () => {
+    if (rejectBusy) return;
+    setRejectBusy(true);
+    try {
+      await onReject(selectedItem.id, rejectReason.trim() || undefined);
+      setRejectOpen(false);
+      setRejectReason("");
+    } finally {
+      setRejectBusy(false);
+    }
+  };
 
   return (
     <motion.div
@@ -203,6 +237,12 @@ export default function InterventionDetailPanel({
               address={selectedItem.address}
               problem={selectedItem.problem ?? selectedItem.title ?? ""}
               companyId={cid}
+              client={{
+                firstName: selectedItem.clientFirstName ?? undefined,
+                lastName: selectedItem.clientLastName ?? undefined,
+                phone: selectedItem.clientPhone ?? selectedItem.phone ?? undefined,
+                email: selectedItem.clientEmail ?? undefined,
+              }}
             />
           )}
 
@@ -353,6 +393,68 @@ export default function InterventionDetailPanel({
                 </div>
               </div>
             )}
+
+          {/* Facture proposée par le technicien — vérification avant validation */}
+          {!isInterventionInBackofficeRequestsQueue(selectedItem) ? (
+            <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(selectedItem)} />
+          ) : null}
+
+          {canRejectReport && rejectOpen ? (
+            <div
+              data-testid="backoffice-inbox-reject-form"
+              className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3"
+            >
+              <p className="text-[13px] font-bold text-amber-900">
+                {t("backoffice.inbox.reject_reason_label")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {QUICK_REJECT_REASON_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    data-testid={`backoffice-inbox-reject-quick-${key.split(".").pop()}`}
+                    disabled={rejectBusy}
+                    onClick={() => setRejectReason(String(t(key)))}
+                    className="rounded-full border border-amber-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-amber-900 transition hover:bg-amber-100 active:scale-95 disabled:opacity-40"
+                  >
+                    {String(t(key))}
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder={t("backoffice.inbox.reject_reason_placeholder")}
+                rows={3}
+                className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-slate-800 outline-none focus:border-amber-400 placeholder:text-slate-400 resize-none"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <HubButton
+                  type="button"
+                  variant="dangerOutline"
+                  data-testid="backoffice-inbox-reject-confirm"
+                  disabled={rejectBusy}
+                  onClick={() => void handleRejectConfirm()}
+                  className="flex-1"
+                >
+                  <Send className="h-4 w-4" />
+                  {t("backoffice.inbox.reject_send")}
+                </HubButton>
+                <HubButton
+                  type="button"
+                  disabled={rejectBusy}
+                  onClick={() => {
+                    setRejectOpen(false);
+                    setRejectReason("");
+                  }}
+                  className="shrink-0"
+                >
+                  {t("common.cancel")}
+                </HubButton>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -448,16 +550,22 @@ export default function InterventionDetailPanel({
           )
         ) : (
           <>
-            <HubButton variant="dangerOutline" onClick={() => onDelete(selectedItem.id)}>
-              <Trash2 className="h-4 w-4" />
-              {t("common.delete")}
-            </HubButton>
+            {canRejectReport && !rejectOpen ? (
+              <HubButton
+                type="button"
+                data-testid="backoffice-inbox-reject-report"
+                onClick={() => setRejectOpen(true)}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t("backoffice.inbox.reject_report")}
+              </HubButton>
+            ) : null}
             <HubButton
               type="button"
               variant="success"
               emphasis
               data-testid="backoffice-inbox-verify-report"
-              disabled={selectedItem.status === "invoiced"}
+              disabled={selectedItem.status === "invoiced" || rejectOpen}
               onClick={() => onVerify(selectedItem.id)}
               className={cn(
                 selectedItem.status === "invoiced" &&

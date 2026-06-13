@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type { PortalInterventionSummary } from "@/features/interventions/portalToken";
+import PortalQuoteSection from "@/features/interventions/components/PortalQuoteSection";
+import PortalSignSection from "@/features/interventions/components/PortalSignSection";
 
 export const revalidate = 0;
 
@@ -168,6 +170,10 @@ export default async function PortalTrackingPage({
           </div>
         )}
 
+        {!isCancelled && data.quotes?.length ? (
+          <PortalQuoteSection portalToken={token} quotes={data.quotes} />
+        ) : null}
+
         {/* Payment card */}
         {!isCancelled &&
           data.paymentStatus !== "paid" &&
@@ -208,6 +214,14 @@ export default async function PortalTrackingPage({
               )}
             </div>
           )}
+
+        {!isCancelled && data.status === "done" ? (
+          <PortalSignSection
+            interventionId={data.id}
+            portalToken={token}
+            clientName={[data.clientFirstName, data.clientLastName].filter(Boolean).join(" ")}
+          />
+        ) : null}
 
         {/* Details card */}
         <div className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5 space-y-3">

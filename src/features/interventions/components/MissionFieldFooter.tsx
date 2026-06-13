@@ -11,6 +11,8 @@ import { HubButton } from "@/core/ui/hub";
 type Props = {
   intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
   isUpdating?: boolean;
+  /** Masque Départ / Sur place / Terminer — géré par le time tracking unifié. */
+  hideAutomatedActions?: boolean;
   onPrimaryTransition: (toStatus: Intervention["status"]) => void;
   onFinish: () => void;
   onWaitingMaterial?: () => void;
@@ -20,6 +22,7 @@ type Props = {
 export default function MissionFieldFooter({
   intervention,
   isUpdating = false,
+  hideAutomatedActions = false,
   onPrimaryTransition,
   onFinish,
   onWaitingMaterial,
@@ -28,23 +31,29 @@ export default function MissionFieldFooter({
   const [moreOpen, setMoreOpen] = useState(false);
   const config = resolveMissionActionBar(intervention);
 
-  if (!config.primary) return null;
+  const primaryHidden =
+    hideAutomatedActions &&
+    config.primary != null &&
+    (config.primary.kind === "transition" || config.primary.kind === "finish");
+  const primary = primaryHidden ? null : config.primary;
+
+  const showMore = intervention.status === "in_progress" && Boolean(onWaitingMaterial);
+
+  if (!primary && !showMore) return null;
 
   const handleTransition = () => {
-    if (!config.primary || config.primary.kind !== "transition" || isUpdating) return;
-    onPrimaryTransition(config.primary.toStatus);
+    if (!primary || primary.kind !== "transition" || isUpdating) return;
+    onPrimaryTransition(primary.toStatus);
   };
 
   const slideIcon =
-    config.primary.kind === "transition" && config.primary.toStatus === "en_route"
+    primary?.kind === "transition" && primary.toStatus === "en_route"
       ? Navigation2
-      : config.primary.kind === "transition" && config.primary.toStatus === "in_progress"
+      : primary?.kind === "transition" && primary.toStatus === "in_progress"
         ? MapPin
         : Play;
 
-  const slideLabel = config.primary.kind === "transition" ? t(config.primary.labelKey) : "";
-
-  const showMore = intervention.status === "in_progress" && Boolean(onWaitingMaterial);
+  const slideLabel = primary?.kind === "transition" ? t(primary.labelKey) : "";
 
   return (
     <footer
@@ -79,7 +88,7 @@ export default function MissionFieldFooter({
         </div>
       ) : null}
 
-      {config.primary.kind === "finish" ? (
+      {primary?.kind === "finish" ? (
         <HubButton
           type="button"
           data-testid="mission-action-primary-finish"
@@ -89,12 +98,12 @@ export default function MissionFieldFooter({
           className="h-14 max-w-[20.5rem] rounded-full text-[15px] font-semibold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)]"
         >
           <Camera className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
-          {t(config.primary.labelKey)}
+          {t(primary.labelKey)}
         </HubButton>
-      ) : (
+      ) : primary?.kind === "transition" ? (
         <div className="w-full max-w-[20.5rem]">
           <SlideAction
-            testId={config.primary.testId}
+            testId={primary.testId}
             label={slideLabel}
             icon={slideIcon}
             disabled={isUpdating}
@@ -103,7 +112,7 @@ export default function MissionFieldFooter({
             onAction={handleTransition}
           />
         </div>
-      )}
+      ) : null}
     </footer>
   );
 }

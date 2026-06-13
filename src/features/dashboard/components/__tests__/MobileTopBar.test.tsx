@@ -1,22 +1,28 @@
-import { render, screen, fireEvent } from "@/test-utils/render";
+import { render, screen } from "@/test-utils/render";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
+import { DateProvider } from "@/context/DateContext";
+import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 
-jest.mock("@/features/dashboard/components/UserProfile", () => ({
+jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
   __esModule: true,
-  default: () => <div data-testid="user-profile">profile</div>,
+  default: () => null,
 }));
 
 describe("MobileTopBar", () => {
-  it("affiche le bouton avec le profil", () => {
-    render(<MobileTopBar />);
+  it("affiche le bouton profil interactif", () => {
+    render(
+      <DateProvider>
+        <DashboardPagerProvider pageCount={3}>
+          <DashboardPageSelectorProvider>
+            <MobileTopBar />
+          </DashboardPageSelectorProvider>
+        </DashboardPagerProvider>
+      </DateProvider>
+    );
     expect(screen.getByTestId("mobile-top-bar")).toBeInTheDocument();
-    expect(screen.getByTestId("user-profile")).toBeInTheDocument();
-  });
-
-  it("appelle onToggle au clic", () => {
-    const onToggle = jest.fn();
-    render(<MobileTopBar onToggle={onToggle} />);
-    fireEvent.click(screen.getByTestId("mobile-top-bar"));
-    expect(onToggle).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("user-profile-toggle")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-header-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("clock-calendar-widget")).toBeInTheDocument();
   });
 });

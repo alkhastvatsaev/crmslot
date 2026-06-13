@@ -1,8 +1,10 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
+import { createRef } from "react";
 import {
   GalaxyComposerNewButton,
   GalaxyComposerSendButton,
+  galaxyComposerFieldMouseDown,
 } from "@/features/chatbot/components/GalaxyComposerControls";
 
 describe("GalaxyComposerControls", () => {
@@ -32,5 +34,22 @@ describe("GalaxyComposerControls", () => {
     expect(sendBtn).not.toHaveAttribute("title");
     fireEvent.click(sendBtn);
     expect(onSend).toHaveBeenCalledTimes(1);
+  });
+
+  it("focuses textarea when clicking the galaxy field shell", () => {
+    const inputRef = createRef<HTMLTextAreaElement>();
+    render(<textarea ref={inputRef} data-testid="galaxy-input" />);
+    const focusSpy = jest.spyOn(inputRef.current!, "focus");
+    const selectSpy = jest.spyOn(inputRef.current!, "setSelectionRange");
+    const shell = document.createElement("div");
+
+    galaxyComposerFieldMouseDown(
+      { target: shell, preventDefault: jest.fn() } as unknown as React.MouseEvent,
+      inputRef,
+      false
+    );
+
+    expect(focusSpy).toHaveBeenCalled();
+    expect(selectSpy).toHaveBeenCalledWith(0, 0);
   });
 });

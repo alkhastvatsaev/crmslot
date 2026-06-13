@@ -42,6 +42,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const crmContactsEnabled = useFeatureFlag("crmContacts");
 
   const { selectedDate } = useDateContext();
+  const selectedDayKey = selectedDate.toLocaleDateString("en-CA");
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(
     companyId,
     "all",
@@ -50,6 +51,10 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
     selectedDate
   );
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedEventId(null);
+  }, [selectedDayKey]);
 
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null;
 

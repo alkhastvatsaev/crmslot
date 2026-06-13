@@ -3,6 +3,10 @@ import { featureFlagsFromEnv } from "@/core/featureFlags";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { findApplicableRules } from "@/features/notifications/statusNotificationRules";
+import {
+  channelAllowed,
+  type NotificationPreferences,
+} from "@/features/notifications/notificationPreferences";
 
 // ---------------------------------------------------------------------------
 // Notification dispatcher — triggers email/SMS after status transitions
@@ -34,6 +38,12 @@ export interface DispatchNotificationsParams {
   >;
   /** Nom du technicien assigné (affiché dans les emails). */
   technicianName?: string;
+  /** Préférences du destinataire client — canaux désactivés ignorés. */
+  clientPreferences?: Partial<NotificationPreferences> | null;
+  /** Préférences technicien assigné. */
+  technicianPreferences?: Partial<NotificationPreferences> | null;
+  /** Préférences dispatcher / staff. */
+  dispatcherPreferences?: Partial<NotificationPreferences> | null;
 }
 
 /**
@@ -44,7 +54,15 @@ export interface DispatchNotificationsParams {
 export function buildNotificationPayloads(
   params: DispatchNotificationsParams
 ): NotificationPayload[] {
-  const { fromStatus, toStatus, intervention, technicianName } = params;
+  const {
+    fromStatus,
+    toStatus,
+    intervention,
+    technicianName,
+    clientPreferences,
+    technicianPreferences,
+    dispatcherPreferences,
+  } = params;
   const rules = findApplicableRules(fromStatus, toStatus);
 
   if (rules.length === 0) return [];
@@ -72,6 +90,9 @@ export function buildNotificationPayloads(
   for (const rule of rules) {
     for (const target of rule.targets) {
       for (const channel of rule.channels) {
+        if (target === "client" && !channelAllowed(clientPreferences, channel)) continue;
+        if (target === "technician" && !channelAllowed(technicianPreferences, channel)) continue;
+        if (target === "dispatcher" && !channelAllowed(dispatcherPreferences, channel)) continue;
         payloads.push({
           channel,
           recipientRole: target,

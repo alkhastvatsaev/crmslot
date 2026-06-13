@@ -1,0 +1,67 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "Ouvrir la navigation" [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: IVANA
+          - generic [ref=e7]: BACK OFFICE
+    - generic [ref=e8]:
+      - main [ref=e9]:
+        - region "Carte" [ref=e16]:
+          - generic "Carte" [ref=e19]:
+            - generic [ref=e20]:
+              - generic:
+                - region "Map" [ref=e41]
+                - img "Map marker" [ref=e42]:
+                  - img [ref=e44]
+                  - generic [ref=e49]: Mansour
+            - button "Recentrer la carte" [ref=e22] [cursor=pointer]:
+              - img [ref=e23]
+      - generic:
+        - generic:
+          - button:
+            - generic:
+              - img
+            - generic: Carte
+          - button:
+            - generic:
+              - img
+            - generic: Espace société
+          - button:
+            - generic:
+              - img
+            - generic: Technicien
+          - button:
+            - generic:
+              - img
+            - generic: Matériel
+          - button:
+            - generic:
+              - img
+            - generic: Quality Management
+          - button:
+            - generic:
+              - img
+            - generic: Facturation
+          - button:
+            - generic:
+              - img
+            - generic: Gmail
+          - button:
+            - generic:
+              - img
+            - generic: Assistant IA
+    - contentinfo [ref=e25]
+  - region "Notifications alt+T"
+  - generic [ref=e35] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e36]:
+      - img [ref=e37]
+    - generic [ref=e50]:
+      - button "Open issues overlay" [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]: "0"
+          - generic [ref=e54]: "1"
+        - generic [ref=e55]: Issue
+      - button "Collapse issues badge" [ref=e56]:
+        - img [ref=e57]
+  - alert [ref=e40]

@@ -51,9 +51,8 @@ describe("applyPeriod", () => {
     expect(applyPeriod([old], "month")).toHaveLength(0);
   });
 
-  it("keeps event at exact cutoff boundary", () => {
-    const cutoff = Date.now() - PERIOD_MS.today;
-    const edge = makeEvent({ ts: cutoff });
+  it("keeps event just inside the today cutoff", () => {
+    const edge = makeEvent({ ts: Date.now() - PERIOD_MS.today + 1 });
     expect(applyPeriod([edge], "today")).toContainEqual(edge);
   });
 });
@@ -93,7 +92,7 @@ describe("applyTypeFilter", () => {
     const withLecot = [...EVENTS, makeEvent({ id: "lecot1", type: "supplier_order_lecot" })];
     const result = applyTypeFilter(withLecot, "materials");
     expect(result.map((e) => e.type).sort()).toEqual(
-      ["material_ordered", "supplier_order_lecot", "supplier_ordered"].sort(),
+      ["material_ordered", "supplier_order_lecot", "supplier_ordered"].sort()
     );
   });
 

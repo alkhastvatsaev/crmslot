@@ -2,9 +2,23 @@ import type { Intervention } from "@/features/interventions/types";
 import {
   isTechnicianActiveFieldMission,
   isTechnicianAssignmentAwaitingResponse,
+  matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
 
 export type TechnicianTabFilter = "today" | "week" | "all";
+
+/** Champs utilisés par {@link getScheduleAnchor} et les filtres d’onglet technicien. */
+export type InterventionScheduleFields = Pick<
+  Intervention,
+  | "scheduledDate"
+  | "scheduledTime"
+  | "requestedDate"
+  | "requestedTime"
+  | "date"
+  | "hour"
+  | "time"
+  | "createdAt"
+>;
 
 /** Parse Firestore Timestamp, chaîne ISO, nombre (ms) ou Date pour tri / filtres. */
 export function coerceFirestoreLikeDate(value: unknown): Date | null {
@@ -38,7 +52,7 @@ export function coerceFirestoreLikeDate(value: unknown): Date | null {
  * Ancrage à partir des champs historiques `date` (AAAA-MM-JJ) + `hour` ou `time`
  * (ex. flux audio / carte) — avant `createdAt`, pour aligner carte et hub technicien.
  */
-function anchorFromLegacyDateHour(iv: Intervention): Date | null {
+function anchorFromLegacyDateHour(iv: InterventionScheduleFields): Date | null {
   const dateStr = (iv.date ?? "").trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
   const hourRaw = (iv.hour ?? "").trim() || (iv.time ?? "").trim();
@@ -58,7 +72,7 @@ function anchorFromLegacyDateHour(iv: Intervention): Date | null {
 }
 
 /** Ancrage temporel pour filtres & tri (Europe/Brussels via Date locale du navigateur). */
-export function getScheduleAnchor(iv: Intervention): Date {
+export function getScheduleAnchor(iv: InterventionScheduleFields): Date {
   if (iv.scheduledDate && iv.scheduledTime) {
     const iso = `${iv.scheduledDate}T${iv.scheduledTime}:00`;
     const d = new Date(iso);
@@ -112,22 +126,48 @@ function endOfWeekSunday(ref: Date): Date {
 }
 
 /**
+ * Missions clôturées (`done` / `invoiced`) qui restent visibles dans la grille gauche
+ * (texte vert) : planifiées pour l’onglet courant ou terminées le jour de référence.
+ */
+export function isTechnicianCompletedFieldMission(
+  iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "completedAt"> &
+    InterventionScheduleFields,
+  technicianUid: string | null | undefined,
+  tab: TechnicianTabFilter,
+  now = new Date()
+): boolean {
+  if (!matchesAssignedTechnician(iv, technicianUid)) return false;
+  if (iv.status !== "done" && iv.status !== "invoiced") return false;
+  if (interventionMatchesTab(iv, tab, now)) return true;
+  if (tab !== "today") return false;
+  const completedAt = coerceFirestoreLikeDate(iv.completedAt);
+  if (!completedAt) return false;
+  return completedAt >= startOfToday(now) && completedAt <= endOfToday(now);
+}
+
+/**
  * Liste missions technicien (panneau gauche) :
  * - assignations en attente d’acceptation (toute date) ;
- * - missions acceptées en cours (`en_route`, etc.) — ne pas les faire disparaître après acceptation.
+ * - missions acceptées en cours (`en_route`, etc.) — ne pas les faire disparaître après acceptation ;
+ * - missions clôturées aujourd’hui — rester visibles avec style « terminé ».
  */
 export function interventionVisibleInTechnicianMissionList(
   iv: Intervention,
   tab: TechnicianTabFilter,
   technicianUid: string | null | undefined,
-  now = new Date(),
+  now = new Date()
 ): boolean {
   if (isTechnicianAssignmentAwaitingResponse(iv, technicianUid)) return true;
   if (isTechnicianActiveFieldMission(iv, technicianUid)) return true;
+  if (isTechnicianCompletedFieldMission(iv, technicianUid, tab, now)) return true;
   return interventionMatchesTab(iv, tab, now);
 }
 
-export function interventionMatchesTab(iv: Intervention, tab: TechnicianTabFilter, now = new Date()): boolean {
+export function interventionMatchesTab(
+  iv: InterventionScheduleFields,
+  tab: TechnicianTabFilter,
+  now = new Date()
+): boolean {
   if (tab === "all") return true;
   const anchor = getScheduleAnchor(iv).getTime();
   if (anchor === 0) return false;
@@ -176,7 +216,7 @@ function normalizeTimeHm(input: string | null | undefined): string | null {
  */
 export function scheduledFieldsWhenReleasingToTechnician(
   iv: Pick<Intervention, "requestedDate" | "requestedTime" | "scheduledDate" | "scheduledTime">,
-  now = new Date(),
+  now = new Date()
 ): { scheduledDate: string; scheduledTime: string } {
   const schD = iv.scheduledDate?.trim();
   const schT = normalizeTimeHm(iv.scheduledTime);
@@ -208,7 +248,7 @@ export function isInterventionPendingBackOfficeIntake(iv: Pick<Intervention, "st
 
 /** Assignée au technicien mais pas encore acceptée (refus possible ou bug acceptation). */
 export function isInterventionAwaitingTechnicianAcceptance(
-  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">
 ): boolean {
   if (iv.status === "assigned") return true;
   if (iv.status === "in_progress" && !(iv.technicianAcceptedAt ?? "").trim()) return true;
@@ -220,11 +260,10 @@ export function isInterventionAwaitingTechnicianAcceptance(
  * (refus technicien ou acceptation jamais confirmée).
  */
 export function isInterventionInBackofficeRequestsQueue(
-  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">
 ): boolean {
   return (
-    isInterventionPendingBackOfficeIntake(iv) ||
-    isInterventionAwaitingTechnicianAcceptance(iv)
+    isInterventionPendingBackOfficeIntake(iv) || isInterventionAwaitingTechnicianAcceptance(iv)
   );
 }
 
@@ -235,7 +274,7 @@ export function isInterventionReleasedToTechnicianField(iv: Intervention): boole
 
 /** Carte / missions live technicien : pas avant acceptation (statut `assigned` ou legacy sans `technicianAcceptedAt`). */
 export function isInterventionVisibleOnTechnicianMap(
-  iv: Pick<Intervention, "status" | "technicianAcceptedAt">,
+  iv: Pick<Intervention, "status" | "technicianAcceptedAt">
 ): boolean {
   if (isInterventionPendingBackOfficeIntake(iv)) return false;
   if (iv.status === "cancelled") return false;
@@ -244,14 +283,8 @@ export function isInterventionVisibleOnTechnicianMap(
   return true;
 }
 
-export function isInterventionActiveOnTechnicianHub(
-  iv: Pick<Intervention, "status">,
-): boolean {
-  return (
-    iv.status !== "done" &&
-    iv.status !== "invoiced" &&
-    iv.status !== "cancelled"
-  );
+export function isInterventionActiveOnTechnicianHub(iv: Pick<Intervention, "status">): boolean {
+  return iv.status !== "done" && iv.status !== "invoiced" && iv.status !== "cancelled";
 }
 
 export function formatScheduledLabel(iv: Intervention): string {
@@ -274,9 +307,9 @@ export function formatScheduledTimeOnly(iv: Intervention): string {
   if (iv.requestedTime) return iv.requestedTime;
   if (iv.hour && iv.hour.trim() !== "") return iv.hour;
   if (iv.time && iv.time.trim() !== "") return iv.time;
-  
+
   if (iv.urgency) return "common.urgent";
-  
+
   return "common.dash";
 }
 
@@ -325,7 +358,9 @@ export type DailyMissionCardTone = "done" | "active" | "upcoming";
  * Associe le libellé affiché sur une mission (voir {@link statusLabelFr}, ou mock `À venir` / `Terminé` / …)
  * à la même logique couleur que les missions générées.
  */
-export function dailyMissionCardToneFromStatus(status: Intervention["status"] | null | undefined): DailyMissionCardTone {
+export function dailyMissionCardToneFromStatus(
+  status: Intervention["status"] | null | undefined
+): DailyMissionCardTone {
   if (!status) return "upcoming";
   if (status === "done" || status === "invoiced" || status === "cancelled") return "done";
   if (

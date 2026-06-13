@@ -1,0 +1,1123 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e17]:
+    - banner [ref=e18]:
+      - generic [ref=e19]:
+        - complementary [ref=e20]:
+          - generic [ref=e23] [cursor=pointer]:
+            - button [ref=e24]:
+              - img [ref=e25]
+            - generic [ref=e27]:
+              - generic [ref=e28]: jeu 11 juin
+              - generic [ref=e30]: 19:22:27
+            - button [ref=e31]:
+              - img [ref=e32]
+        - button "Ouvrir la recherche" [ref=e35]
+        - complementary [ref=e36]:
+          - generic [ref=e38] [cursor=pointer]:
+            - button [ref=e39]:
+              - img [ref=e40]
+            - generic [ref=e43]:
+              - generic [ref=e44]: IVANA
+              - generic [ref=e45]: BACK OFFICE
+            - button [ref=e46]:
+              - img [ref=e47]
+    - generic [ref=e52]:
+      - main [ref=e54]:
+        - generic [ref=e56]:
+          - complementary [ref=e57]
+          - main [ref=e73]:
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - generic:
+                  - region "Map" [ref=e77]
+                  - img "Map marker" [ref=e78]:
+                    - img [ref=e80]
+                    - generic [ref=e85]: Mansour
+              - button "Recentrer la carte" [ref=e86] [cursor=pointer]:
+                - img [ref=e87]
+          - complementary [ref=e89]:
+            - generic [ref=e92]:
+              - tablist [ref=e93]:
+                - tab "Demandes" [ref=e94]:
+                  - generic [ref=e95]: Demandes
+                - tab "Rapports" [ref=e96]:
+                  - generic [ref=e97]: Rapports
+                - tab "Chat" [selected] [ref=e98]:
+                  - generic [ref=e99]: Chat
+                - tab "Documents" [ref=e100]:
+                  - generic [ref=e101]: Documents
+              - button "TEAM" [ref=e104]:
+                - generic [ref=e105]: TEAM
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - tablist:
+                          - tab [selected]:
+                            - img
+                            - generic: Login
+                          - tab:
+                            - img
+                            - generic: Particulier
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=3]: Espace Client
+                              - generic:
+                                - generic: E-mail
+                                - textbox:
+                                  - /placeholder: E-mail
+                                - button [disabled]:
+                                  - img
+                                  - text: Recevoir un Smart Link
+                                - generic:
+                                  - generic: ou
+                                - generic:
+                                  - button
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Que faut-il réparer ?
+                            - generic:
+                              - button:
+                                - generic:
+                                  - generic: Porte bloquée
+                              - button:
+                                - generic:
+                                  - generic: Porte
+                                  - generic: blindée
+                              - button:
+                                - generic:
+                                  - generic: Clé
+                                  - generic: cassée
+                              - button:
+                                - generic:
+                                  - generic: Cylindre
+                              - button:
+                                - generic:
+                                  - generic: Porte
+                                  - generic: claquée
+                              - button:
+                                - generic:
+                                  - generic: Coffre
+                                  - generic: fort
+                              - button:
+                                - generic:
+                                  - generic: Volet roulant
+                              - button:
+                                - generic:
+                                  - generic: Digicode
+                              - button:
+                                - generic:
+                                  - generic: Double
+                                  - generic: de clé
+                      - generic:
+                        - generic:
+                          - button [disabled]:
+                            - img
+                          - status
+              - region:
+                - generic:
+                  - generic:
+                    - tablist:
+                      - tab:
+                        - generic: Suivi dossier
+                      - tab:
+                        - generic: Chat
+                      - tab:
+                        - generic: Facture
+                      - tab [selected]:
+                        - generic: Documents
+                      - tab:
+                        - generic: Historique
+                    - tabpanel:
+                      - generic: Aucun document disponible pour le moment.
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - heading [level=3]: Alex Bach
+                          - generic:
+                            - generic: 12:00
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - paragraph: Sélectionnez une mission pour voir les détails
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                      - paragraph: Sélectionnez une mission pour voir les photos du client
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img
+                          - heading [level=3]: Stock véhicule
+                        - paragraph: Aucun article.
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - list:
+                          - listitem:
+                            - button:
+                              - generic: Barillet A2P 5 goupilles
+                          - listitem:
+                            - button:
+                              - generic: Cylindre européen 80 mm sécurité
+                          - listitem:
+                            - button:
+                              - generic: Télécommande portail 4 canaux
+                          - listitem:
+                            - button:
+                              - generic: Badge RFID 125 kHz
+                          - listitem:
+                            - button:
+                              - generic: Crémone multipoint 3 points
+                          - listitem:
+                            - button:
+                              - generic: Cylindre européen 70 mm
+                          - listitem:
+                            - button:
+                              - generic: Gâche électrique réversible
+                          - listitem:
+                            - button:
+                              - generic: Joint EPDM porte blindée
+                          - listitem:
+                            - button:
+                              - generic: Lubrifiant cylindre 400 ml
+                          - listitem:
+                            - button:
+                              - generic: Poignée de porte Lecot inox
+                          - listitem:
+                            - button:
+                              - generic: Serrure applique A2P
+                          - listitem:
+                            - button:
+                              - generic: Vis inox M6 × 40 (boîte 100)
+                          - listitem:
+                            - button:
+                              - generic: Gants nitrile (boîte 100)
+                          - listitem:
+                            - button:
+                              - generic: Gond renforcé paumelle lourde
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - list:
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: hey
+                                  - generic: Société Démo (sans Firebase) · 10 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Lubrifiant cylindre 400 ml
+                                  - generic: Société Démo (sans Firebase) · 10 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Lubrifiant cylindre 400 ml
+                                  - generic: Société Démo (sans Firebase) · 7 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Crémone multipoint 3 points
+                                  - generic: Société Démo (sans Firebase) · 7 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Vis inox M6 × 40 (boîte 100)
+                                  - generic: Vatsaev · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Lubrifiant cylindre 400 ml
+                                  - generic: Vatsaev · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Serrure applique A2P
+                                  - generic: Nollan · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Gâche électrique réversible 12V
+                                  - generic: Nollan · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Gâche électrique réversible
+                                  - generic: Lauret · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                  - generic: Lauret · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Vis inox M6 × 40 (boîte 100)
+                                  - generic: Meyer · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Gâche électrique réversible
+                                  - generic: Meyer · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Cylindre Iseo F6 Extra Profile 40x40
+                                  - generic: Bach · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Cylindre Iseo F6 Extra Profile 30x30
+                                  - generic: Bach · 6 juin
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Poignée Hoppe Tokyo sur rosace inox
+                                  - generic: Vatsaev · 23 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                  - generic: Client · 20 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                  - generic: Client · 20 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: Serrure multipoints · +2
+                                  - generic: Client · 20 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                  - generic: Client · 20 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - generic: Serrure en applique monopoint
+                                  - generic: Client · 19 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: Serrure multipoints à encastrer 3 points Vachette
+                                  - generic: Client · 19 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: Serrure multipoints à encastrer 3 points Vachette
+                                  - generic: Client · 19 mai
+                                  - progressbar
+                            - listitem:
+                              - button:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - generic: 2× Cylindre Yale Superior 30x30mm
+                                  - generic: Client · 19 mai
+                                  - progressbar
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic: "1"
+                            - generic: 19:10
+                            - generic:
+                              - img
+                            - generic:
+                              - generic: Facturé
+                              - generic: Alex Bach
+                          - button:
+                            - generic: "2"
+                            - generic: 07:36
+                            - generic:
+                              - img
+                            - generic:
+                              - generic: Intervention terminée
+                              - generic: Alex Bach
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic: "0"
+                            - generic: Créées
+                          - generic:
+                            - generic: "1"
+                            - generic: Clôturées
+                          - generic:
+                            - generic: —
+                            - generic: Taux
+                          - generic:
+                            - generic: "0"
+                            - generic: Assignées
+                          - generic:
+                            - generic: "0"
+                            - generic: Planifiées
+                          - generic:
+                            - generic: "0"
+                            - generic: Rapports
+                          - generic:
+                            - generic: "0"
+                            - generic: Annulées
+                          - generic:
+                            - generic: "0"
+                            - generic: Refus tech
+                          - generic:
+                            - generic: "0"
+                            - generic: Retours
+                          - generic:
+                            - generic: "1"
+                            - generic: Facturées
+                          - generic:
+                            - generic: "0"
+                            - generic: Devis
+                          - generic:
+                            - generic: —
+                            - generic: CA mat.
+                          - generic:
+                            - generic: "0"
+                            - generic: Matériaux
+                          - generic:
+                            - generic: "0"
+                            - generic: Emails
+                          - generic:
+                            - generic: "0"
+                            - generic: Chat IA
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - img
+                            - generic:
+                              - heading [level=3]: Usage des 7 pages
+                              - paragraph: Temps passé et vues — local + PostHog/GA4 si configurés.
+                          - button: Réinitialiser
+                        - paragraph: "Temps total sur le carrousel : <1s"
+                        - list:
+                          - listitem:
+                            - generic:
+                              - generic: Carte
+                              - generic: <1s · 1 vues
+                          - listitem:
+                            - generic:
+                              - generic: Espace société
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Technicien
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Matériel
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Quality Management
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Facturation
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Gmail
+                              - generic: <1s · 0 vues
+                          - listitem:
+                            - generic:
+                              - generic: Assistant IA
+                              - generic: <1s · 0 vues
+                      - generic:
+                        - generic:
+                          - img
+                          - heading [level=3]: Rapports facturation
+                        - generic:
+                          - generic:
+                            - term: Factures payées
+                            - definition: "0"
+                          - generic:
+                            - term: Impayés
+                            - definition: "1"
+                          - generic:
+                            - term: CA facturé HT
+                            - definition: 507.46 €
+                      - generic:
+                        - button:
+                          - img
+                          - text: Exporter feuilles de temps
+                      - generic:
+                        - generic:
+                          - img
+                          - heading [level=3]: Coordonnées de facturation
+                        - generic:
+                          - textbox:
+                            - /placeholder: N° TVA
+                          - textbox:
+                            - /placeholder: IBAN
+                          - textbox:
+                            - /placeholder: Rue
+                          - textbox:
+                            - /placeholder: Code postal
+                          - textbox:
+                            - /placeholder: Ville
+                          - textbox:
+                            - /placeholder: Email admin (digest hebdo)
+                          - button: Enregistrer
+                      - generic:
+                        - generic:
+                          - img
+                          - heading [level=3]: Webhooks sortants
+                        - generic:
+                          - textbox:
+                            - /placeholder: https://...
+                          - textbox:
+                            - /placeholder: Secret HMAC
+                          - button: Ajouter
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic: —
+                            - generic: 337,46 €
+                            - generic: Non payé
+                          - button:
+                            - generic: —
+                            - generic: 170,00 €
+                            - generic: En attente
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                              - generic: Facturation
+                              - generic: Non payé
+                            - img
+                        - button:
+                          - img
+                          - text: Facturer via Chatbot
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - heading [level=2]: Documents
+                              - generic: "42"
+                              - generic:
+                                - img
+                                - searchbox
+                            - generic:
+                              - list:
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Facture
+                                    - generic:
+                                      - generic: Alex Bach
+                                      - generic: Je suis bloqué dehors, la porte s’est claquée.
+                                      - generic: 11 juin · 170 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Facture
+                                    - generic:
+                                      - generic: Alex Bach
+                                      - generic: Je suis bloqué dehors, la porte s’est claquée.
+                                      - generic: 10 juin · 337 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Société démo (sans Firebase)
+                                      - generic: hey
+                                      - generic: 10 juin · 0 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Société démo (sans Firebase)
+                                      - generic: Lubrifiant cylindre 400 ml
+                                      - generic: 10 juin · 14 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Société démo (sans Firebase)
+                                      - generic: Lubrifiant cylindre 400 ml
+                                      - generic: 7 juin · 14 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Société démo (sans Firebase)
+                                      - generic: Crémone multipoint 3 points
+                                      - generic: 7 juin · 14 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: vatsaev
+                                      - generic: Vis inox M6 × 40 (boîte 100)
+                                      - generic: 6 juin · 11 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: vatsaev
+                                      - generic: Lubrifiant cylindre 400 ml
+                                      - generic: 6 juin · 14 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Nollan
+                                      - generic: Serrure applique A2P
+                                      - generic: 6 juin · 125 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Nollan
+                                      - generic: Gâche électrique réversible 12V
+                                      - generic: 6 juin · 42 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Lauret
+                                      - generic: Gâche électrique réversible
+                                      - generic: 6 juin · 42 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Lauret
+                                      - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                      - generic: 6 juin · 275 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Meyer
+                                      - generic: Vis inox M6 × 40 (boîte 100)
+                                      - generic: 6 juin · 11 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Meyer
+                                      - generic: Gâche électrique réversible
+                                      - generic: 6 juin · 42 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Bach
+                                      - generic: Cylindre Iseo F6 Extra Profile 40x40
+                                      - generic: 6 juin · 95 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Bach
+                                      - generic: Cylindre Iseo F6 Extra Profile 30x30
+                                      - generic: 6 juin · 88 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: vatsaev
+                                      - generic: Poignée Hoppe Tokyo sur rosace inox
+                                      - generic: 23 mai · 32 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: vatsaev
+                                      - generic: Cylindre Iseo F6 Extra Profile 40x40
+                                      - generic: 23 mai · 95 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Bompart
+                                      - generic: Gants de protection Mapa Ultrane 526
+                                      - generic: 22 mai · 30 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Bach
+                                      - generic: Poignée Hoppe Amsterdam sur rosace
+                                      - generic: 22 mai · 28 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: vatsaev
+                                      - generic: Serrure multipoints Mul-T-Lock Matrix 3 points
+                                      - generic: 22 mai · 189 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: VATSAEV
+                                      - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                      - generic: 22 mai · 218 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: monsieur bach
+                                      - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                      - generic: 22 mai · 145 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: VATSAEV
+                                      - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                      - generic: 22 mai · 145 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: VATSAEV
+                                      - generic: Pistolet à bumping serrurerie
+                                      - generic: 22 mai · 185 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Vachette Radialis 3 points encastrable axe 45mm
+                                      - generic: 20 mai · 145 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                      - generic: 20 mai · 275 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                      - generic: 20 mai · 218 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                      - generic: 20 mai · 218 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Joint silicone porte coupe-feu 5m
+                                      - generic: 20 mai · 28 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Mul-T-Lock Matrix 5 points
+                                      - generic: 20 mai · 275 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Cylindre Vachette Radialis 35x35
+                                      - generic: 20 mai · 88 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints Vachette Radialis 5 points encastrable axe 50mm
+                                      - generic: 20 mai · 218 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Pistolet à bumping serrurerie
+                                      - generic: 20 mai · 185 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                      - generic: 20 mai · 0 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure en applique monopoint
+                                      - generic: 19 mai · 0 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multipoints à encastrer 3 points Vachette
+                                      - generic: 19 mai · 0 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Cylindre européen de sécurité 30x30mm
+                                      - generic: 19 mai · 35 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure 3 points Fichet Bloccauto
+                                      - generic: 19 mai · 195 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Cylindre européen 35x35mm nickelé
+                                      - generic: 19 mai · 96 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                      - generic: 19 mai · 0 €
+                                - listitem:
+                                  - button:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                      - generic: Bon
+                                    - generic:
+                                      - generic: Client
+                                      - generic: Serrure multi-points actionnée par poignée - GU Ferco Trimatic R2
+                                      - generic: 19 mai · 0 €
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - paragraph: Chargement…
+              - region:
+                - generic:
+                  - generic:
+                    - paragraph: Chargement…
+              - region
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Contexte
+                      - generic:
+                        - generic:
+                          - paragraph: Société démo (sans Firebase)
+                          - generic:
+                            - generic:
+                              - term: Dossiers
+                              - definition: "2"
+                            - generic:
+                              - term: Urgences ouvertes
+                              - definition: "0"
+                            - generic:
+                              - term: En cours
+                              - definition: "0"
+                            - generic:
+                              - term: À encaisser
+                              - definition: "2"
+                            - generic:
+                              - term: Clients (aperçu)
+                              - definition: "1"
+                            - generic:
+                              - term: File backend
+                              - definition: "0"
+                          - paragraph: En ligne · 2 dossiers détaillés envoyés au modèle
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img
+                        - generic:
+                          - paragraph: BELGMAP Copilot
+                          - paragraph: "Société active : Société démo (sans Firebase)"
+                        - generic: Contexte live
+                      - generic:
+                        - generic:
+                          - generic: Bonjour — je connais les dossiers, clients et factures de votre espace BELGMAP. Posez une question ou choisissez une suggestion à droite.
+                      - generic:
+                        - generic:
+                          - generic: Message pour l’assistant
+                          - generic:
+                            - textbox:
+                              - /placeholder: Ex. Quelles urgences sont ouvertes ? Qui n’a pas payé ?
+                          - button [disabled]:
+                            - img
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Suggestions
+                      - generic:
+                        - generic:
+                          - paragraph:
+                            - img
+                            - text: Questions rapides
+                          - button: Quelles sont les priorités du jour (urgences, non assignés) ?
+                          - button: Liste les interventions terminées mais non payées avec montants.
+                          - button: Résume les dossiers urgents encore ouverts.
+                          - button: Quels clients ont le plus de dossiers actifs ?
+                          - button: Fais un briefing opérationnel de la journée pour le back-office.
+    - generic:
+      - button "Déjà sur la première page" [disabled]:
+        - img
+      - button "Aller à la page 4" [ref=e112] [cursor=pointer]:
+        - img [ref=e113]
+  - region "Notifications alt+T"
+  - generic [ref=e9] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e10]:
+      - img [ref=e11]
+    - generic [ref=e115]:
+      - button "Open issues overlay" [ref=e116]:
+        - generic [ref=e117]:
+          - generic [ref=e118]: "2"
+          - generic [ref=e119]: "3"
+        - generic [ref=e120]:
+          - text: Issue
+          - generic [ref=e121]: s
+      - button "Collapse issues badge" [ref=e122]:
+        - img [ref=e123]
+  - alert [ref=e14]

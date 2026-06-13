@@ -1,56 +1,52 @@
+import type { ReactNode } from "react";
 import { render, screen, fireEvent } from "@/test-utils/render";
 import MobileShell from "@/features/dashboard/components/MobileShell";
+import { DateProvider } from "@/context/DateContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
-
-jest.mock("@/features/dashboard/components/MobileTopBar", () => ({
-  __esModule: true,
-  default: ({ onToggle }: { onToggle?: () => void }) => (
-    <button data-testid="mobile-top-bar" onClick={onToggle} />
-  ),
-}));
+import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 
 jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
   __esModule: true,
   default: () => <div data-testid="galaxy-layer" />,
 }));
 
-jest.mock("@/features/dashboard/components/MobilePageSelector", () => ({
-  __esModule: true,
-  default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
-    <div data-testid="mobile-page-selector" data-open={String(open)}>
-      <button data-testid="close-selector" onClick={onClose} />
-    </div>
-  ),
-}));
+function renderMobileShell(pages: ReactNode[]) {
+  return render(
+    <DateProvider>
+      <DashboardPagerProvider pageCount={pages.length}>
+        <DashboardPageSelectorProvider>
+          <MobileShell pages={pages} />
+        </DashboardPageSelectorProvider>
+      </DashboardPagerProvider>
+    </DateProvider>
+  );
+}
 
 describe("MobileShell", () => {
   it("compose header, écran unique et footer", () => {
-    render(
-      <DashboardPagerProvider pageCount={2}>
-        <MobileShell pages={[<div key="0">Hub A</div>, <div key="1">Hub B</div>]} />
-      </DashboardPagerProvider>
-    );
+    renderMobileShell([<div key="0">Hub A</div>, <div key="1">Hub B</div>]);
 
     expect(screen.getByTestId("mobile-shell")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-top-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("user-profile-toggle")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-screen-host")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-shell-footer")).toBeInTheDocument();
+    expect(screen.queryByTestId("mobile-hub-dots-bar")).not.toBeInTheDocument();
     expect(screen.getByText("Hub A")).toBeInTheDocument();
   });
 
-  it("toggle le sélecteur de pages au clic sur le top bar", () => {
-    render(
-      <DashboardPagerProvider pageCount={2}>
-        <MobileShell pages={[<div key="0">A</div>]} />
-      </DashboardPagerProvider>
-    );
+  it("affiche le sélecteur dans le panneau central au clic profil", () => {
+    renderMobileShell([<div key="0">A</div>, <div key="1">B</div>, <div key="2">C</div>]);
 
-    const selector = screen.getByTestId("mobile-page-selector");
-    expect(selector).toHaveAttribute("data-open", "false");
+    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mobile-page-0")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId("mobile-top-bar"));
-    expect(selector).toHaveAttribute("data-open", "true");
+    fireEvent.click(screen.getByTestId("user-profile-toggle"));
+    expect(screen.getByTestId("dashboard-page-selector-host")).toBeInTheDocument();
+    expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
+    expect(screen.getByText("A").closest("[aria-hidden='true']")).toBeTruthy();
 
-    fireEvent.click(screen.getByTestId("mobile-top-bar"));
-    expect(selector).toHaveAttribute("data-open", "false");
+    fireEvent.click(screen.getByTestId("dashboard-page-selector-item-2"));
+    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mobile-page-2")).toBeInTheDocument();
   });
 });

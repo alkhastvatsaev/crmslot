@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export default function ClockCalendar({ compact = false }: { compact?: boolean }) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
-  const { language, tValue } = useTranslation();
+  const { language } = useTranslation();
 
   const locale = language === "nl" ? "nl-NL" : language === "en" ? "en-GB" : "fr-FR";
 
@@ -39,34 +39,41 @@ export default function ClockCalendar({ compact = false }: { compact?: boolean }
   if (compact) {
     return (
       <div
-        id="dynamic-widget"
         data-testid="clock-calendar-widget"
-        className="mobile-header-chip w-full justify-between gap-1 px-2"
+        className={cn(
+          "mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-between gap-2 px-4"
+        )}
       >
         <button
           data-testid="prev-day-btn"
           onClick={(e) => changeDay(e, -1)}
-          className="rounded-full p-1.5 text-slate-400 hover:text-slate-700"
+          className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 text-xs font-medium text-slate-700">
-          <span data-testid="date-display" className="truncate uppercase tracking-wide">
+        <div className="flex min-w-0 flex-1 flex-row items-center justify-center gap-4">
+          <span
+            data-testid="date-display"
+            className="min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800"
+          >
             {dateString}
           </span>
-          <span className="h-3 w-px shrink-0 bg-slate-300" aria-hidden />
-          <span data-testid="time-display" className="shrink-0 tabular-nums">
+          <span className="h-4 w-px shrink-0 bg-slate-300" aria-hidden />
+          <span
+            data-testid="time-display"
+            className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800"
+          >
             {timeString}
           </span>
         </div>
         <button
           data-testid="next-day-btn"
           onClick={(e) => changeDay(e, 1)}
-          className="rounded-full p-1.5 text-slate-400 hover:text-slate-700"
+          className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
     );

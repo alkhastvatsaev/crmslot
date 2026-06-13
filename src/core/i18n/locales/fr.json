@@ -53,6 +53,10 @@
       "empty": "Aucun créneau libre pour ce technicien à cette date.",
       "company_title": "Créneaux libres (tous techniciens)"
     },
+    "multi_tech": {
+      "title": "Planning multi-techniciens",
+      "technician": "Technicien"
+    },
     "drag_board": {
       "title": "Planning glisser-déposer",
       "technician": "Technicien",
@@ -325,7 +329,11 @@
       "link_no_candidates": "Aucun dossier évident — recherchez par nom ci-dessus.",
       "link_note_optional": "Note interne (optionnel)",
       "link_confirm": "Lier au dossier",
-      "link_ok": "Mail enregistré sur le dossier."
+      "link_ok": "Mail enregistré sur le dossier.",
+      "create_intervention": "Créer dossier + assigner (IA)",
+      "create_intervention_ok": "Dossier créé depuis l'e-mail",
+      "create_intervention_assigned": "Technicien assigné : {{name}}",
+      "create_intervention_pending_assign": "Dossier créé — assignez un technicien depuis le back-office."
     }
   },
   "crm": {
@@ -416,23 +424,16 @@
   },
   "catalog": {
     "search_placeholder": "Rechercher un produit (réf., libellé)…",
-    "add_line": "Ajouter",
+    "empty": "Aucun produit trouvé.",
     "no_results": "Aucun produit trouvé.",
     "search_error": "Recherche hors ligne — résultats locaux affichés.",
     "searching": "Recherche…",
-    "company_title": "Catalogue société",
-    "company_subtitle": "Produits prioritaires dans la recherche facturation.",
-    "company_sku": "Référence",
-    "company_label": "Libellé",
-    "company_price": "Prix (€)",
-    "company_add": "Ajouter au catalogue",
-    "company_empty": "Aucun produit société.",
-    "company_disabled": "Activez la recherche produits Lecot.",
-    "company_fields_required": "Référence et libellé obligatoires.",
-    "company_price_invalid": "Prix invalide.",
-    "company_product_created": "Produit ajouté.",
-    "company_lecot_sku": "Réf. Lecot (optionnel)",
-    "company_lecot_link": "Lecot"
+    "add_line": "Ajouter",
+    "add_to_order": "Ajouter à la commande",
+    "price": "Prix unitaire",
+    "sku": "Référence",
+    "supplier": "Fournisseur",
+    "open_catalog": "Catalogue produits"
   },
   "featureHub": {
     "aria": {
@@ -486,6 +487,7 @@
       "intervention_returned_to_requests": "Retour file Demandes",
       "intervention_deleted": "Dossier supprimé",
       "intervention_report_validated": "Rapport validé (facturé)",
+      "intervention_report_rejected": "Rapport refusé — renvoyé au tech",
       "intervention_cancelled": "Intervention annulée",
       "intervention_schedule_updated": "Planning modifié",
       "intervention_billing_updated": "Facturation modifiée",
@@ -506,7 +508,8 @@
       "email_received": "Email reçu",
       "commission_calculated": "Commission calculée",
       "quote_created": "Devis créé",
-      "quote_status_changed": "Statut devis modifié"
+      "quote_status_changed": "Statut devis modifié",
+      "time_entry_recorded": "Pointage terrain"
     },
     "loading": "Chargement de l'historique…",
     "live": "Temps réel",
@@ -560,6 +563,7 @@
         "intervention_returned_to_requests": "Le dossier a été renvoyé dans la file « Demandes » du back-office, sans technicien actif.",
         "intervention_deleted": "Le dossier a été supprimé ou archivé de manière définitive dans l'espace société.",
         "intervention_report_validated": "Le rapport terrain a été validé ; le dossier est prêt pour la facturation ou la clôture administrative.",
+        "intervention_report_rejected": "Le rapport terrain a été refusé par le back-office ; le technicien doit le compléter avant nouvelle soumission.",
         "intervention_cancelled": "L'intervention a été annulée : plus de passage terrain prévu pour ce dossier.",
         "intervention_schedule_updated": "La date ou le créneau d'intervention a été modifié (planning client ou dispatch).",
         "intervention_billing_updated": "Les lignes de facturation (HT/TVA, libellés) ou le montant du dossier ont été mis à jour.",
@@ -580,7 +584,8 @@
         "email_received": "Un e-mail entrant a été reçu et rattaché à l'activité du dossier ou de la société.",
         "commission_calculated": "Une commission commerciale a été calculée ou recalculée sur la base des règles société.",
         "quote_created": "Un devis a été créé pour le client lié à ce dossier ou à cette demande.",
-        "quote_status_changed": "Le statut du devis a changé (brouillon, envoyé, accepté, refusé, etc.)."
+        "quote_status_changed": "Le statut du devis a changé (brouillon, envoyé, accepté, refusé, etc.).",
+        "time_entry_recorded": "Un pointage technicien (déplacement, sur site, pause…) a été enregistré pour ce dossier."
       }
     },
     "agent_placeholder": "KPIs, performance, analyse qualité…",
@@ -943,8 +948,10 @@
         "gps_navigation": "Navigation GPS",
         "mission_completed": "Cette intervention est terminée et clôturée.",
         "mission_done_badge": "Terminée",
-        "invoice_backoffice_pending": "Facture en préparation — validation et envoi par le back-office.",
+        "invoice_backoffice_pending": "Envoyez la facture au client ci-dessous.",
         "edit_report": "Modifier le rapport",
+        "report_rejected_title": "Rapport à corriger (IVANA)",
+        "report_rejected_hint": "Refaites la clôture : photos, signature, puis facture.",
         "finish_job": "Terminer l'intervention",
         "updating": "Mise à jour...",
         "start_intervention": "Démarrer l'intervention",
@@ -1064,13 +1071,49 @@
         "server_save_title": "Sauvegarde serveur",
         "offline_queue": "File hors ligne",
         "offline_queue_desc": "Synchronisation automatique dès que le réseau est stable.",
-        "report_sent": "Rapport transmis au back-office",
-        "report_sent_desc": "Photos et signature transmises. La facture est préparée automatiquement ; IVANA valide et l’envoie au client.",
+        "report_sent": "Intervention clôturée",
+        "report_sent_desc": "Vérifiez la facture IA puis envoyez-la au client en un clic.",
         "report_updated": "Rapport mis à jour",
         "report_updated_desc": "La mission reste terminée. Vos corrections sont enregistrées.",
         "presentation_mode": "Mode présentation",
         "presentation_mode_desc": "Sauvegarde cloud allégée. Le back-office voit le rapport via le mode démo.",
         "send_failed": "Envoi impossible"
+      },
+      "invoice": {
+        "ready_badge": "Facture prête",
+        "preparing": "Préparation IA…",
+        "adjust_hint": "Ajuster en 1 clic si besoin",
+        "quick_travel": "+ Déplacement",
+        "quick_labor_30": "+ 30 min MO",
+        "quick_labor_1h": "+ 1 h MO",
+        "quick_discount": "−10 %",
+        "quick_urgency": "+10 % urgence",
+        "send_cta": "Envoyer la facture au client",
+        "skip": "Plus tard",
+        "no_email": "E-mail client manquant — la facture sera émise sans envoi mail.",
+        "draft_error": "Facture IA indisponible",
+        "send_error": "Envoi facture impossible",
+        "sent_ok": "Facture envoyée",
+        "sent_ok_desc": "E-mail envoyé à {{email}}",
+        "sent_no_mail": "Facture émise (sans e-mail)",
+        "no_lines": "Aucune ligne — ajoutez-en une ci-dessous.",
+        "line_delete_aria": "Supprimer cette ligne",
+        "line_edit_price_aria": "Modifier le prix",
+        "line_price_confirm_aria": "Valider le prix",
+        "add_line": "+ Ajouter une ligne",
+        "add_line_desc_placeholder": "ex : remplacement joint",
+        "add_line_price_placeholder": "Prix €",
+        "add_line_confirm": "Ajouter",
+        "preview_aria": "Aperçu facture",
+        "preview_title": "Aperçu facture",
+        "preview_heading": "FACTURE",
+        "preview_to": "Client :",
+        "preview_col_desc": "Description",
+        "preview_col_qty": "Qté",
+        "preview_col_price": "P.U.",
+        "preview_col_total": "Total",
+        "preview_total_label": "Total HT",
+        "preview_will_send": "Sera envoyée à :"
       },
       "submit": {
         "busy": "Clôture en cours…",
@@ -1192,7 +1235,7 @@
       "signature_client": "Signature client",
       "signature_alt": "Signature",
       "confirm_assign": "Confirmer & assigner",
-      "verify_report": "Valider le rapport",
+      "verify_report": "Valider",
       "report_already_verified": "Rapport déjà validé",
       "hide_report": "Masquer ce rapport",
       "problem_prefix": "Problème",
@@ -1201,7 +1244,18 @@
       "draft_billing_total": "Total estimé",
       "verify_terrain_report_aria": "Valider le rapport terrain",
       "already_verified": "Déjà validé",
-      "now": "Maintenant"
+      "now": "Maintenant",
+      "reject_report": "Refuser",
+      "reject_reason_label": "Motif du refus (optionnel)",
+      "reject_reason_placeholder": "ex : photos manquantes, problème non décrit…",
+      "reject_send": "Renvoyer au technicien",
+      "reject_quick_photos": "Photos manquantes",
+      "reject_quick_signature": "Signature illisible",
+      "reject_quick_description": "Description incomplète",
+      "invoice_pdf_label": "Facture",
+      "view_invoice_pdf": "Voir la facture PDF",
+      "invoice_preview_label": "Facture proposée",
+      "invoice_preview_empty": "Aucune facture préparée par le technicien pour l'instant."
     },
     "toasts": {
       "request_deleted": "Demande supprimée",
@@ -1212,6 +1266,7 @@
       "assign_failed": "Erreur lors de l'assignation",
       "firestore_unavailable": "Firestore indisponible",
       "report_verified": "Rapport validé",
+      "report_rejected": "Rapport refusé — renvoyé au technicien",
       "permission_denied_verify": "Permission refusée. Vérifiez votre rôle sur la société ou déployez les règles Firestore à jour.",
       "admin_unavailable": "Firebase Admin manquant (.env serveur). Requis pour assigner en local sans déployer les règles.",
       "datetime_updated": "Horaire mis à jour",
@@ -1464,7 +1519,10 @@
     "toast_invalid_amount": "Montant invalide",
     "toast_error": "Erreur lors de la sauvegarde",
     "template_label": "Modèle de facturation",
-    "template_placeholder": "— Charger un modèle —"
+    "template_placeholder": "— Charger un modèle —",
+    "einvoice_send": "Émettre e-facture Peppol",
+    "einvoice_sent": "E-facture transmise",
+    "einvoice_sent_label": "E-facture envoyée"
   },
   "suppliers": {
     "panel_title": "Commandes fournisseur",
@@ -1507,7 +1565,9 @@
     "min_qty": "Seuil alerte",
     "create": "Enregistrer",
     "error_fields_required": "SKU et libellé requis.",
-    "toast_added": "Article ajouté"
+    "toast_added": "Article ajouté",
+    "agent_thinking": "Mise à jour stock…",
+    "agent_off_topic": "Je gère uniquement le stock véhicule. Essayez : « Quel est mon stock ? »"
   },
   "maintenance": {
     "panel_title": "Contrats de maintenance",
@@ -1548,12 +1608,17 @@
     "lines_count": "ligne(s)",
     "unknown_client": "Client inconnu",
     "error_no_lines": "Ajoutez au moins une ligne.",
+    "error_no_email": "Indiquez l'e-mail du client pour envoyer le devis.",
     "toast_saved": "Devis enregistré",
     "toast_sent": "Devis envoyé",
+    "toast_sent_email": "Devis envoyé par e-mail (PDF + lien suivi)",
+    "toast_send_email_failed": "Envoi e-mail impossible",
     "toast_accepted": "Devis accepté",
     "toast_declined": "Devis refusé",
     "toast_expired": "Ce devis a expiré.",
     "toast_billing_applied": "Lignes copiées vers la facture de l'intervention",
+    "toast_invoice_issued": "Facture émise et envoyée au client",
+    "toast_invoice_pending": "Devis accepté — facture à émettre après clôture terrain",
     "download_pdf": "PDF",
     "status": {
       "draft": "Brouillon",
@@ -1577,6 +1642,8 @@
     }
   },
   "dispatch": {
+    "auto_assign_ok": "Technicien assigné automatiquement",
+    "auto_assign_desc": "{{name}} — dispatch IA",
     "assign_picker": {
       "title": "Choisir un technicien",
       "cancel": "Annuler",
@@ -1644,7 +1711,9 @@
   },
   "offline": {
     "hub": {
-      "aria": { "page": "Page" },
+      "aria": {
+        "page": "Page"
+      },
       "panel_network": "Connexion",
       "panel_sync": "Synchronisation",
       "left_hint": "Les clôtures et photos prises hors réseau sont mises en file jusqu’au retour en ligne.",
@@ -1687,6 +1756,15 @@
   "company": {
     "new_request": "Nouvelle demande d'intervention",
     "billing_strip": "Facturation / abonnement — paiements clients via Stripe (portail + webhook).",
+    "billing_settings_title": "Coordonnées de facturation",
+    "billing_settings_save": "Enregistrer",
+    "billing_settings_saved": "Coordonnées enregistrées",
+    "billing_vat": "N° TVA",
+    "billing_iban": "IBAN",
+    "billing_street": "Rue",
+    "billing_zip": "Code postal",
+    "billing_city": "Ville",
+    "billing_admin_email": "Email admin (digest hebdo)",
     "aria": {
       "firebase_unconfigured": "Firebase non configuré",
       "login_required": "Connexion requise",
@@ -1716,19 +1794,6 @@
       "sync_failed": "Sync impossible"
     }
   },
-  "catalog": {
-    "search_placeholder": "Rechercher un produit (réf., libellé)…",
-    "empty": "Aucun produit trouvé.",
-    "no_results": "Aucun produit trouvé.",
-    "search_error": "Recherche hors ligne — résultats locaux affichés.",
-    "searching": "Recherche…",
-    "add_line": "Ajouter",
-    "add_to_order": "Ajouter à la commande",
-    "price": "Prix unitaire",
-    "sku": "Référence",
-    "supplier": "Fournisseur",
-    "open_catalog": "Catalogue produits"
-  },
   "planning": {
     "title": "Planning journalier",
     "date_label": "Date",
@@ -1752,7 +1817,7 @@
     "toast_send_failed": "Envoi impossible",
     "toast_login_required": "Connexion requise",
     "toast_login_description": "Connectez-vous pour utiliser le chat.",
-    "global_chat_title": "TEAM CHAT",
+    "global_chat_title": "TEAM",
     "global_chat_subtitle": "Messages généraux de la société",
     "day_clients_title": "Clients du jour ({count})",
     "day_clients_empty": "Aucun client prévu pour cette date",
@@ -1770,7 +1835,9 @@
     "reply_default": "Merci pour votre message. Le back-office a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
   },
   "copilot": {
-    "aria": { "page": "Page" },
+    "aria": {
+      "page": "Page"
+    },
     "panel_context": "Contexte",
     "panel_chat": "Assistant",
     "panel_suggestions": "Suggestions",
@@ -1857,6 +1924,8 @@
     }
   },
   "mobile": {
+    "page_selector_title": "Choisir une page",
+    "page_selector_hint": "Les hubs s'affichent ici, dans le panneau principal.",
     "page_nav_label": "Navigation entre les pages",
     "page_nav_item": "Page {{index}} sur {{total}}",
     "tab_bar_label": "Sections principales",
@@ -1870,6 +1939,66 @@
     "rail_segment_label": "Panneaux de la page",
     "rail_left": "Gauche",
     "rail_center": "Centre",
-    "rail_right": "Droite"
+    "rail_right": "Droite",
+    "tab_ai": "IA"
+  },
+  "notifications": {
+    "prefs_title": "Préférences de notifications",
+    "prefs_saved": "Préférences enregistrées"
+  },
+  "integrations": {
+    "webhooks_title": "Webhooks sortants",
+    "webhook_secret": "Secret HMAC",
+    "webhook_add": "Ajouter",
+    "webhook_added": "Webhook ajouté"
+  },
+  "esign": {
+    "portal_title": "Signature du rapport",
+    "portal_hint": "Signez électroniquement le rapport d'intervention.",
+    "request_button": "Demander la signature",
+    "request_sent": "Lien de signature envoyé",
+    "open_sign_page": "Ouvrir la page de signature",
+    "mock_title": "Signature électronique",
+    "mock_hint": "Signez dans le cadre ci-dessous pour valider le rapport.",
+    "mock_submit": "Valider ma signature",
+    "mock_decline": "Refuser",
+    "mock_missing_request": "Lien de signature invalide ou expiré.",
+    "mock_signature_required": "Veuillez signer avant de valider.",
+    "mock_done_signed": "Merci — votre signature a été enregistrée.",
+    "mock_done_declined": "Signature refusée."
+  },
+  "analytics": {
+    "reports_title": "Rapports facturation",
+    "paid_count": "Factures payées",
+    "unpaid_count": "Impayés",
+    "revenue_cents": "CA facturé HT",
+    "disabled": "Rapports désactivés (activez NEXT_PUBLIC_FF_ANALYTICS).",
+    "carousel_title": "Usage des 7 pages",
+    "carousel_hint": "Temps passé et vues — local + PostHog/GA4 si configurés.",
+    "carousel_empty": "Naviguez dans l'app pour collecter des stats (swipe, onglets, spotlight).",
+    "carousel_reset": "Réinitialiser",
+    "carousel_total_dwell": "Temps total sur le carrousel : {{duration}}"
+  },
+  "portal": {
+    "copy_link": "Copier lien suivi client",
+    "link_copied": "Lien de suivi copié",
+    "link_copied_short": "Copié",
+    "quotes_title": "Votre devis",
+    "quotes_hint": "Consultez le détail et validez en un clic — sans répondre à l'e-mail.",
+    "quotes_ref": "Devis {{ref}}",
+    "quotes_total_ttc": "TTC",
+    "quotes_valid_until": "Valable jusqu'au {{date}}",
+    "quotes_accept": "Accepter le devis",
+    "quotes_decline": "Refuser",
+    "quotes_accepted": "Accepté",
+    "quotes_declined": "Refusé",
+    "quotes_expired": "Expiré",
+    "toast_quote_accepted": "Devis accepté — merci !",
+    "toast_quote_declined": "Devis refusé",
+    "toast_invoice_issued": "Facture envoyée par e-mail",
+    "toast_invoice_pending": "Facture en attente de clôture terrain"
+  },
+  "timetracking": {
+    "export_payroll": "Exporter feuilles de temps"
   }
 }

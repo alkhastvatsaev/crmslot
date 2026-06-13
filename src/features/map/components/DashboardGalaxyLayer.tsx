@@ -8,9 +8,11 @@ import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import BillingHubGalaxyComposer from "@/features/billingHub/components/BillingHubGalaxyComposer";
 import CrmHistoryGalaxyComposer from "@/features/crmHistory/components/CrmHistoryGalaxyComposer";
 import CompanyStockGalaxyComposer from "@/features/featureHub/components/CompanyStockGalaxyComposer";
+import PwaCopilotGalaxyComposer from "@/features/copilot/components/PwaCopilotGalaxyComposer";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 
 const MAP_HUB_SLOT_INDEX = 0;
 
@@ -25,11 +27,10 @@ export default function DashboardGalaxyLayer() {
   if (pageIndex === FEATURE_HUB_SLOT_INDEX) hubComposer = <CompanyStockGalaxyComposer />;
   else if (pageIndex === CRM_HISTORY_SLOT_INDEX) hubComposer = <CrmHistoryGalaxyComposer />;
   else if (pageIndex === BILLING_HUB_SLOT_INDEX) hubComposer = <BillingHubGalaxyComposer />;
+  else if (pageIndex === OFFLINE_HUB_SLOT_INDEX) hubComposer = <PwaCopilotGalaxyComposer />;
 
   const hideMapGalaxyDockStrip = hubComposer != null;
-  const mobilePowerSave = isMobile === true;
-  const audioBackgroundTasksEnabled =
-    isMobile !== true || pageIndex === MAP_HUB_SLOT_INDEX || transcriptionArmed;
+  const audioBackgroundTasksEnabled = isMobile !== true || transcriptionArmed;
 
   return (
     <>
@@ -39,7 +40,7 @@ export default function DashboardGalaxyLayer() {
         onUserPressPlay={armTranscription}
         onInterventionCreated={emitInterventionCreated}
         backgroundTasksEnabled={audioBackgroundTasksEnabled}
-        mobilePowerSave={mobilePowerSave}
+        mobilePowerSave={isMobile === true}
       />
       {hubComposer}
     </>

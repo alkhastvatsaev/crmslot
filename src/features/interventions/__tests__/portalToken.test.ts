@@ -34,6 +34,7 @@ describe("toPortalSummary", () => {
     expect(summary.invoiceAmountCents).toBe(12500);
     expect(summary.paymentLinkUrl).toBe("https://pay.stripe.com/abc");
     expect(summary.paymentStatus).toBe("pending");
+    expect(summary.quotes).toEqual([]);
   });
 
   it("montant null si non facturé", () => {

@@ -55,5 +55,6 @@ describe("TechnicianHubPage", () => {
     );
     expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
     expect(screen.queryByTestId("technician-offline-sync-panel")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("technician-hub-vehicle-stock")).not.toBeInTheDocument();
   });
 });

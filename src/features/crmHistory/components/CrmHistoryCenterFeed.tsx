@@ -22,6 +22,7 @@ import {
   FileCheck,
   MessageCircle,
   CalendarClock,
+  Clock,
   CreditCard,
   Ban,
   XCircle,
@@ -56,6 +57,11 @@ const EVENT_META: Record<
     Icon: ArrowRight,
     colorClass: "text-amber-600",
     dotClass: "bg-amber-400",
+  },
+  time_entry_recorded: {
+    Icon: Clock,
+    colorClass: "text-sky-600",
+    dotClass: "bg-sky-400",
   },
   intervention_completed: {
     Icon: CheckCircle2,
@@ -111,6 +117,11 @@ const EVENT_META: Record<
     Icon: FileCheck,
     colorClass: "text-teal-700",
     dotClass: "bg-teal-500",
+  },
+  intervention_report_rejected: {
+    Icon: RotateCcw,
+    colorClass: "text-amber-700",
+    dotClass: "bg-amber-500",
   },
   intervention_cancelled: {
     Icon: Ban,
@@ -684,7 +695,6 @@ export default function CrmHistoryCenterFeed({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="crm-center-feed">
-      {/* QmStatsStrip hidden — TODO redesign as 3×3 squares grid */}
       <style>{`
         @keyframes crmSlideIn {
           from { opacity: 0; transform: translateY(8px); }
@@ -692,6 +702,12 @@ export default function CrmHistoryCenterFeed({
         }
         .crm-animate-item { animation: crmSlideIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
       `}</style>
+      {refreshing && (
+        <div className="shrink-0 flex items-center justify-center gap-1.5 py-1 text-[11px] text-slate-400">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          Mise à jour…
+        </div>
+      )}
       {feedError ? (
         <p
           className="shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] text-amber-900"

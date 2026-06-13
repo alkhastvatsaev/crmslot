@@ -1,7 +1,18 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { Command } from "cmdk";
-import { X, Globe, Map, Building2, Wrench, Mail, Sparkles, Receipt } from "lucide-react";
+import {
+  X,
+  Globe,
+  Map,
+  Building2,
+  Wrench,
+  Mail,
+  Package,
+  Sparkles,
+  Receipt,
+  BrainCircuit,
+} from "lucide-react";
 import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,9 +38,10 @@ const SPOTLIGHT_NAV_ICONS = {
   "spotlight.nav_company": Building2,
   "spotlight.nav_technician": Wrench,
   "spotlight.nav_gmail": Mail,
-  "spotlight.nav_feature_hub": Sparkles,
+  "spotlight.nav_feature_hub": Package,
   "spotlight.nav_crm_history": Sparkles,
   "spotlight.nav_billing_hub": Receipt,
+  "spotlight.nav_offline": BrainCircuit,
 } as const;
 
 export default function SpotlightSearch({ compact = false }: { compact?: boolean }) {
@@ -71,16 +83,7 @@ export default function SpotlightSearch({ compact = false }: { compact?: boolean
             ? "mobile-header-chip mobile-header-chip--interactive w-full justify-between font-medium text-slate-500"
             : `${dashboardHeaderPanelShellClass} items-center justify-between bg-white/95 px-6 font-semibold text-gray-900/60 hover:bg-white hover:text-gray-900 group`
         }
-      >
-        <span className="flex items-center gap-2 truncate text-sm">
-          {t("spotlight.search_placeholder")}
-        </span>
-        {!compact ? (
-          <kbd className="hidden rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:inline">
-            ⌘K
-          </kbd>
-        ) : null}
-      </button>
+      ></button>
 
       <AnimatePresence>
         {open && (

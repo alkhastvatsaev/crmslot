@@ -28,9 +28,7 @@
     {
       "collectionGroup": "interventions",
       "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "scheduledDate", "order": "ASCENDING" }
-      ]
+      "fields": [{ "fieldPath": "scheduledDate", "order": "ASCENDING" }]
     },
     {
       "collectionGroup": "portal_ivana_chat_messages",
@@ -150,9 +148,12 @@
     {
       "collectionGroup": "crm_activity",
       "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "at", "order": "DESCENDING" }
-      ]
+      "fields": [{ "fieldPath": "at", "order": "DESCENDING" }]
+    },
+    {
+      "collectionGroup": "interventions",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "portalAccessToken", "order": "ASCENDING" }]
     }
   ],
   "fieldOverrides": []

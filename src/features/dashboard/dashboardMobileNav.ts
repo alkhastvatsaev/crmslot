@@ -1,4 +1,14 @@
-import { Building2, Mail, Map, Receipt, Sparkles, Wrench, type LucideIcon } from "lucide-react";
+import {
+  BrainCircuit,
+  Building2,
+  Mail,
+  Map,
+  Package,
+  Receipt,
+  Sparkles,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import type { DashboardCarouselPageDef } from "@/features/dashboard/dashboardCarouselRegistry";
 
 export type DashboardMobileNavIconKey = DashboardCarouselPageDef["spotlightLabelKey"];
@@ -8,9 +18,10 @@ export const DASHBOARD_MOBILE_NAV_ICONS: Record<DashboardMobileNavIconKey, Lucid
   "spotlight.nav_company": Building2,
   "spotlight.nav_technician": Wrench,
   "spotlight.nav_gmail": Mail,
-  "spotlight.nav_feature_hub": Sparkles,
+  "spotlight.nav_feature_hub": Package,
   "spotlight.nav_crm_history": Sparkles,
   "spotlight.nav_billing_hub": Receipt,
+  "spotlight.nav_offline": BrainCircuit,
 };
 
 export type MobileHubRail = "left" | "center" | "right";
@@ -31,4 +42,5 @@ export const MOBILE_TAB_I18N: Record<DashboardMobileNavIconKey, string> = {
   "spotlight.nav_feature_hub": "mobile.tab_material",
   "spotlight.nav_crm_history": "mobile.tab_crm",
   "spotlight.nav_billing_hub": "mobile.tab_billing",
+  "spotlight.nav_offline": "mobile.tab_ai",
 };

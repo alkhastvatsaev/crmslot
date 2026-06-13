@@ -1,3 +1,4 @@
+import type { PortalQuoteSummary } from "@/features/quotes/portalQuoteSummary";
 import type { Intervention } from "@/features/interventions/types";
 
 export function generatePortalAccessToken(): string {
@@ -24,6 +25,8 @@ export type PortalInterventionSummary = {
   invoiceAmountCents: number | null;
   /** URL de paiement hébergée Stripe (ou simulée) — sûre à exposer sur lien token. */
   paymentLinkUrl: string | null;
+  /** Devis envoyés ou répondus liés au dossier (portail). */
+  quotes: PortalQuoteSummary[];
 };
 
 /**
@@ -33,7 +36,8 @@ export type PortalInterventionSummary = {
  */
 export function toPortalSummary(
   iv: Intervention,
-  technicianDisplayName?: string | null
+  technicianDisplayName?: string | null,
+  quotes: PortalQuoteSummary[] = []
 ): PortalInterventionSummary {
   const invoiced =
     typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
@@ -55,5 +59,6 @@ export function toPortalSummary(
     paymentStatus: iv.paymentStatus ?? null,
     invoiceAmountCents: invoiced,
     paymentLinkUrl: iv.stripePaymentLinkUrl?.trim() || null,
+    quotes,
   };
 }

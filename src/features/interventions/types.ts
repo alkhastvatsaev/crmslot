@@ -90,6 +90,17 @@ export interface Intervention {
   invoiceAmountCents?: number | null;
   /** Numéro de facture légal séquentiel (ex. FAC-2026-00042), attribué à la finalisation. */
   invoiceNumber?: string | null;
+  /** Trace d'émission e-facture UBL/Peppol. */
+  eInvoice?: {
+    status: "sent" | "error";
+    provider: string;
+    transmissionId?: string | null;
+    error?: string | null;
+    sentAt: string;
+    sentByUid: string;
+  } | null;
+  /** Note IA lors de la préparation du brouillon facture. */
+  draftBillingAiNote?: string | null;
   /** Lignes facturables saisies par le technicien avant clôture. */
   billingLines?: {
     description: string;
@@ -107,12 +118,23 @@ export interface Intervention {
   completedByUid?: string | null;
   /** Validation Ivana (back-office). */
   ivanaVerified?: boolean;
+  /** Rapport refusé par IVANA — renvoi au technicien pour complément. */
+  reportRejectionReason?: string | null;
+  reportRejectedAt?: string | null;
   /** Durée prévue de l'intervention (minutes). Améliore la précision des conflits de planning. */
   estimatedDurationMinutes?: number | null;
   /** Durée réelle calculée à la clôture (completedAt − technicianAcceptedAt). */
   actualDurationMinutes?: number | null;
   /** Token UUID d'accès portail client (lecture anonyme via API route). */
   portalAccessToken?: string | null;
+  /** Rappels RDV déjà envoyés (clé = 24h | 2h | 30min, valeur = ISO sentAt). */
+  appointmentRemindersSent?: Partial<Record<"24h" | "2h" | "30min", string>> | null;
+  /** Signature électronique à distance (Phase 10). */
+  remoteSignStatus?: "pending" | "signed" | "declined" | null;
+  remoteSignRequestId?: string | null;
+  remoteSignUrl?: string | null;
+  /** URL de la signature capturée (remote e-sign). */
+  remoteSignatureUrl?: string | null;
   /** CRM — référence client société. */
   clientId?: string | null;
   /** CRM — site d'intervention lié au client. */

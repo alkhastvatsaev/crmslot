@@ -36,6 +36,7 @@ import {
   type ChatbotQuickAction,
 } from "@/features/chatbot/chatbot-quick-actions";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { BELGMAP_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
 
@@ -123,13 +124,26 @@ export function useChatbot() {
   const workspace = useCompanyWorkspaceOptional();
   const companyId = resolveCompanyId(workspace);
   const uid = workspace?.firebaseUid ?? "anon";
+  const isMobile = useIsMobile();
+  const [mobileBackgroundArmed, setMobileBackgroundArmed] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const supplierOrdersPanelApi = useChatbotSupplierOrdersPanel(companyId, uid);
-  const invoicesPanelApi = useChatbotInvoicesPanel(companyId, true);
+
+  const chatbotBackgroundEnabled =
+    isMobile !== true ||
+    mobileBackgroundArmed ||
+    streaming ||
+    supplierOrdersPanelApi.supplierOrdersPanel.open ||
+    Boolean(documentPreviewApi.documentPreview.interventionId?.trim());
+
+  const invoicesPanelApi = useChatbotInvoicesPanel(companyId, chatbotBackgroundEnabled);
   const companyName =
     workspace?.memberships.find((m) => m.companyId === companyId)?.companyName ??
     (companyId === DEMO_COMPANY_ID ? "Société démo" : null);
   const role = workspace?.activeRole ?? null;
-  const { snapshot: workspaceSnapshot } = useWorkspaceCopilotSnapshot();
+  const { snapshot: workspaceSnapshot } = useWorkspaceCopilotSnapshot({
+    enabled: chatbotBackgroundEnabled,
+  });
 
   const storageKey = useMemo(
     () => `${STORAGE_PREFIX}:${uid}:${companyId ?? "none"}`,
@@ -138,7 +152,6 @@ export function useChatbot() {
 
   const [conversations, setConversations] = useState<ChatbotConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [pendingTool, setPendingTool] = useState<ChatbotPendingTool | null>(null);
   const [activeTool, setActiveTool] = useState<{ tool: string; label: string } | null>(null);
@@ -544,6 +557,8 @@ export function useChatbot() {
       const trimmed = text.trim();
       if (!trimmed || streaming) return;
 
+      if (isMobile === true) setMobileBackgroundArmed(true);
+
       if (pendingTool && isChatbotConfirmationUtterance(trimmed)) {
         await confirmPendingTool();
         return;
@@ -609,6 +624,7 @@ export function useChatbot() {
       companyId,
       confirmPendingTool,
       conversations,
+      isMobile,
       pendingTool,
       persist,
       runStream,

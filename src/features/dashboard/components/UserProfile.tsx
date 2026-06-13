@@ -1,13 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
+import React, { useState, useEffect } from "react";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   DASHBOARD_CAROUSEL_PAGES,
   clampDashboardCarouselPageIndex,
-  stepDashboardCarouselNavIndex,
 } from "@/features/dashboard/dashboardCarouselRegistry";
 import {
   dashboardHeaderPanelShellClass,
@@ -21,17 +20,16 @@ export const appProfiles = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
 }));
 
 type UserProfileProps = {
-  /** Desktop : chevrons changent de page. Mobile : label synchronisé au swipe vertical uniquement. */
-  showPageNavigation?: boolean;
+  /** Clic sur le profil → grille de pages dans le panneau central. */
+  interactive?: boolean;
+  variant?: "desktop" | "mobile";
 };
 
-export default function UserProfile({ showPageNavigation = true }: UserProfileProps) {
-  const { t } = useTranslation();
+function useProfileIndex() {
   const pager = useDashboardPagerOptional();
   const profiles = appProfiles;
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Synchronise le profil avec la page courante (1 profil par page carrousel).
   useEffect(() => {
     if (!pager) return;
     const index = clampDashboardCarouselPageIndex(pager.pageIndex, pager.pageCount);
@@ -40,84 +38,96 @@ export default function UserProfile({ showPageNavigation = true }: UserProfilePr
   }, [pager, pager?.pageIndex, pager?.pageCount]);
 
   const safeIndex = currentIndex >= 0 && currentIndex < profiles.length ? currentIndex : 0;
-  const currentProfile = profiles[safeIndex];
+  return profiles[safeIndex];
+}
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newIndex = stepDashboardCarouselNavIndex(currentIndex, "next");
-    setCurrentIndex(newIndex);
-    pager?.setPageIndex(newIndex);
-  };
+export default function UserProfile({
+  interactive = false,
+  variant = "desktop",
+}: UserProfileProps) {
+  if (!interactive) {
+    return <UserProfileStatic variant={variant} />;
+  }
+  return <UserProfileInteractive variant={variant} />;
+}
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newIndex = stepDashboardCarouselNavIndex(currentIndex, "prev");
-    setCurrentIndex(newIndex);
-    pager?.setPageIndex(newIndex);
-  };
-
-  const profileLabel = (
-    <div className="flex items-center justify-center gap-2 sm:gap-4">
-      <span
-        data-testid="profile-name"
-        className="text-base font-semibold text-slate-800 tracking-wide whitespace-nowrap sm:text-[20px]"
-      >
-        {currentProfile.name}
-      </span>
-      <span
-        data-testid="profile-role"
-        className="px-2 py-1 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[10px] font-extrabold uppercase tracking-widest border border-[#CCE3FF] shadow-sm whitespace-nowrap"
-      >
-        {t(`profiles.roles.${currentProfile.roleKey}`)}
-      </span>
+function UserProfileStatic({ variant }: { variant: "desktop" | "mobile" }) {
+  const { t } = useTranslation();
+  const currentProfile = useProfileIndex();
+  return (
+    <div
+      data-testid="user-profile-static"
+      className="mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-center gap-2 px-4"
+    >
+      <ProfileLabel variant={variant} currentProfile={currentProfile} t={t} />
     </div>
   );
+}
 
-  if (!showPageNavigation) {
-    return (
-      <div
-        data-testid="user-profile-mobile-label"
-        className="mobile-header-chip w-full min-h-0 flex-col gap-1 py-2"
-      >
+function UserProfileInteractive({ variant }: { variant: "desktop" | "mobile" }) {
+  const { t } = useTranslation();
+  const pageSelector = useDashboardPageSelector();
+  const currentProfile = useProfileIndex();
+
+  const mobileClasses =
+    "mobile-header-chip mobile-header-chip--interactive mobile-profile-chip h-full w-full flex-row items-center justify-center gap-2 px-4";
+  const desktopClasses = `${dashboardHeaderPanelShellClass} ${DASHBOARD_PANEL_SHADOW_HOVER_CLASS} w-full cursor-pointer items-center justify-center bg-white/70 ease-out hover:scale-[1.01] hover:bg-white/80 active:scale-[0.99]`;
+
+  return (
+    <button
+      type="button"
+      data-testid="user-profile-toggle"
+      className={variant === "mobile" ? mobileClasses : desktopClasses}
+      aria-label="Ouvrir la navigation"
+      aria-expanded={pageSelector.open}
+      onClick={() => pageSelector.toggle()}
+    >
+      <ProfileLabel variant={variant} currentProfile={currentProfile} t={t} />
+    </button>
+  );
+}
+
+function ProfileLabel({
+  variant,
+  currentProfile,
+  t,
+}: {
+  variant: "desktop" | "mobile";
+  currentProfile: (typeof appProfiles)[number];
+  t: (key: string) => string;
+}) {
+  const profileLabel =
+    variant === "mobile" ? (
+      <div className="flex min-w-0 items-center gap-2">
         <span
           data-testid="profile-name"
-          className="text-sm font-semibold text-slate-800 tracking-wide whitespace-nowrap"
+          className="truncate text-sm font-semibold text-slate-800 tracking-wide"
         >
           {currentProfile.name}
         </span>
         <span
           data-testid="profile-role"
-          className="px-2 py-0.5 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[9px] font-extrabold uppercase tracking-widest border border-[#CCE3FF]"
+          className="shrink-0 rounded-md border border-[#CCE3FF] bg-[#E5F1FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-widest text-[#007AFF]"
+        >
+          {t(`profiles.roles.${currentProfile.roleKey}`)}
+        </span>
+      </div>
+    ) : (
+      <div className="flex items-center justify-center gap-2 sm:gap-4">
+        <span
+          data-testid="profile-name"
+          className="text-base font-semibold text-slate-800 tracking-wide whitespace-nowrap sm:text-[20px]"
+        >
+          {currentProfile.name}
+        </span>
+        <span
+          data-testid="profile-role"
+          className="px-2 py-1 rounded-md bg-[#E5F1FF] text-[#007AFF] text-[10px] font-extrabold uppercase tracking-widest border border-[#CCE3FF] shadow-sm whitespace-nowrap"
         >
           {t(`profiles.roles.${currentProfile.roleKey}`)}
         </span>
       </div>
     );
-  }
 
-  return (
-    <div
-      className={`${dashboardHeaderPanelShellClass} ${DASHBOARD_PANEL_SHADOW_HOVER_CLASS} cursor-pointer items-center justify-center bg-white/70 ease-out hover:scale-[1.01] hover:bg-white/80 active:scale-[0.99]`}
-    >
-      <div className="flex items-center justify-between w-full px-4">
-        <button
-          onClick={handlePrev}
-          data-testid="prev-profile-btn"
-          className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer text-slate-400 hover:text-slate-700 flex-shrink-0"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        <div className="flex flex-1 items-center justify-center">{profileLabel}</div>
-
-        <button
-          onClick={handleNext}
-          data-testid="next-profile-btn"
-          className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer text-slate-400 hover:text-slate-700 flex-shrink-0"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
+  return profileLabel;
 }

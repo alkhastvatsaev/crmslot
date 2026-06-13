@@ -53,6 +53,10 @@
       "empty": "No free slots for this technician on that date.",
       "company_title": "Open slots (all technicians)"
     },
+    "multi_tech": {
+      "title": "Multi-technician schedule",
+      "technician": "Technician"
+    },
     "drag_board": {
       "title": "Drag-and-drop scheduling",
       "technician": "Technician",
@@ -325,7 +329,11 @@
       "link_no_candidates": "No obvious case — search by name above.",
       "link_note_optional": "Internal note (optional)",
       "link_confirm": "Link to case",
-      "link_ok": "Email saved on the case."
+      "link_ok": "Email saved on the case.",
+      "create_intervention": "Create case + AI assign",
+      "create_intervention_ok": "Case created from email",
+      "create_intervention_assigned": "Technician assigned: {{name}}",
+      "create_intervention_pending_assign": "Case created — assign a technician from back-office."
     }
   },
   "crm": {
@@ -416,23 +424,16 @@
   },
   "catalog": {
     "search_placeholder": "Search product (SKU, label)…",
-    "add_line": "Add",
+    "empty": "No product found.",
     "no_results": "No products found.",
     "search_error": "Search offline — showing local results.",
     "searching": "Searching…",
-    "company_title": "Company catalog",
-    "company_subtitle": "Priority products in billing search.",
-    "company_sku": "SKU",
-    "company_label": "Label",
-    "company_price": "Price (€)",
-    "company_add": "Add to catalog",
-    "company_empty": "No company products.",
-    "company_disabled": "Enable Lecot product search.",
-    "company_fields_required": "SKU and label are required.",
-    "company_price_invalid": "Invalid price.",
-    "company_product_created": "Product added.",
-    "company_lecot_sku": "Lecot ref. (optional)",
-    "company_lecot_link": "Lecot"
+    "add_line": "Add",
+    "add_to_order": "Add to order",
+    "price": "Unit price",
+    "sku": "Reference",
+    "supplier": "Supplier",
+    "open_catalog": "Product catalogue"
   },
   "featureHub": {
     "aria": {
@@ -486,6 +487,7 @@
       "intervention_returned_to_requests": "Returned to requests queue",
       "intervention_deleted": "Case deleted",
       "intervention_report_validated": "Report validated (invoiced)",
+      "intervention_report_rejected": "Report rejected — sent back to tech",
       "intervention_cancelled": "Intervention cancelled",
       "intervention_schedule_updated": "Schedule updated",
       "intervention_billing_updated": "Billing updated",
@@ -506,7 +508,8 @@
       "email_received": "Email received",
       "commission_calculated": "Commission calculated",
       "quote_created": "Quote created",
-      "quote_status_changed": "Quote status updated"
+      "quote_status_changed": "Quote status updated",
+      "time_entry_recorded": "Field time entry"
     },
     "loading": "Loading history…",
     "live": "Live",
@@ -560,6 +563,7 @@
         "intervention_returned_to_requests": "The case was sent back to the back-office Requests queue with no active technician.",
         "intervention_deleted": "The case was permanently deleted or archived from the company workspace.",
         "intervention_report_validated": "The field report was validated; the case is ready for billing or administrative closure.",
+        "intervention_report_rejected": "The field report was rejected by back-office; the technician must complete it before resubmission.",
         "intervention_cancelled": "The intervention was cancelled: no further field visit is planned.",
         "intervention_schedule_updated": "The intervention date or time slot was updated (client or dispatch planning).",
         "intervention_billing_updated": "Billing lines (excl. VAT, labels) or case amounts were updated.",
@@ -580,7 +584,8 @@
         "email_received": "An inbound email was received and linked to case or company activity.",
         "commission_calculated": "A sales commission was calculated or recalculated from company rules.",
         "quote_created": "A quote was created for the client linked to this case or request.",
-        "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.)."
+        "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.).",
+        "time_entry_recorded": "A technician time entry (travel, on site, break…) was recorded for this case."
       }
     },
     "agent_placeholder": "KPIs, performance, quality analysis…",
@@ -943,8 +948,10 @@
         "gps_navigation": "GPS Navigation",
         "mission_completed": "This intervention is finished and closed.",
         "mission_done_badge": "Done",
-        "invoice_backoffice_pending": "Invoice being prepared — back office will validate and email the client.",
+        "invoice_backoffice_pending": "Send the invoice to the client below.",
         "edit_report": "Edit report",
+        "report_rejected_title": "Report needs fixes (back office)",
+        "report_rejected_hint": "Close the job again: photos, signature, then invoice.",
         "finish_job": "Finish Job",
         "updating": "Updating...",
         "start_intervention": "Start intervention",
@@ -1064,13 +1071,49 @@
         "server_save_title": "Server save",
         "offline_queue": "Offline queue",
         "offline_queue_desc": "Automatic sync as soon as the network is stable.",
-        "report_sent": "Report sent to back-office",
-        "report_sent_desc": "Photos and signature sent. Invoice is prepared automatically; back office validates and emails the client.",
+        "report_sent": "Job closed",
+        "report_sent_desc": "Review the AI invoice and send it to the client in one tap.",
         "report_updated": "Report updated",
         "report_updated_desc": "The job stays marked done. Your changes are saved.",
         "presentation_mode": "Presentation mode",
         "presentation_mode_desc": "Lightweight cloud save. Back-office sees the report via demo mode.",
         "send_failed": "Unable to send"
+      },
+      "invoice": {
+        "ready_badge": "Invoice ready",
+        "preparing": "AI preparing…",
+        "adjust_hint": "One-tap adjustments if needed",
+        "quick_travel": "+ Travel",
+        "quick_labor_30": "+ 30 min labor",
+        "quick_labor_1h": "+ 1 h labor",
+        "quick_discount": "−10%",
+        "quick_urgency": "+10% urgency",
+        "send_cta": "Send invoice to client",
+        "skip": "Later",
+        "no_email": "No client email — invoice will be issued without email.",
+        "draft_error": "AI invoice unavailable",
+        "send_error": "Could not send invoice",
+        "sent_ok": "Invoice sent",
+        "sent_ok_desc": "Email sent to {{email}}",
+        "sent_no_mail": "Invoice issued (no email)",
+        "no_lines": "No lines — add one below.",
+        "line_delete_aria": "Delete this line",
+        "line_edit_price_aria": "Edit price",
+        "line_price_confirm_aria": "Confirm price",
+        "add_line": "+ Add a line",
+        "add_line_desc_placeholder": "e.g. gasket replacement",
+        "add_line_price_placeholder": "Price €",
+        "add_line_confirm": "Add",
+        "preview_aria": "Invoice preview",
+        "preview_title": "Invoice preview",
+        "preview_heading": "INVOICE",
+        "preview_to": "Client:",
+        "preview_col_desc": "Description",
+        "preview_col_qty": "Qty",
+        "preview_col_price": "Unit",
+        "preview_col_total": "Total",
+        "preview_total_label": "Total excl. VAT",
+        "preview_will_send": "Will be sent to:"
       },
       "submit": {
         "busy": "Closing…",
@@ -1192,7 +1235,7 @@
       "signature_client": "Client signature",
       "signature_alt": "Signature",
       "confirm_assign": "Confirm & assign",
-      "verify_report": "Verify report",
+      "verify_report": "Validate",
       "report_already_verified": "Report already verified",
       "hide_report": "Hide this report",
       "problem_prefix": "Problem",
@@ -1201,7 +1244,18 @@
       "draft_billing_total": "Estimated total",
       "verify_terrain_report_aria": "Verify field report",
       "already_verified": "Already verified",
-      "now": "Now"
+      "now": "Now",
+      "reject_report": "Decline",
+      "reject_reason_label": "Reason for rejection (optional)",
+      "reject_reason_placeholder": "e.g. missing photos, issue not described…",
+      "reject_send": "Send back to technician",
+      "reject_quick_photos": "Missing photos",
+      "reject_quick_signature": "Illegible signature",
+      "reject_quick_description": "Incomplete description",
+      "invoice_pdf_label": "Invoice",
+      "view_invoice_pdf": "View invoice PDF",
+      "invoice_preview_label": "Proposed invoice",
+      "invoice_preview_empty": "No invoice prepared by the technician yet."
     },
     "toasts": {
       "request_deleted": "Request deleted",
@@ -1212,6 +1266,7 @@
       "assign_failed": "Assignment failed",
       "firestore_unavailable": "Firestore unavailable",
       "report_verified": "Report verified",
+      "report_rejected": "Report rejected — sent back to technician",
       "permission_denied_verify": "Permission denied. Check your company role or deploy the latest Firestore rules.",
       "admin_unavailable": "Firebase Admin not configured (server .env). Required for local assign without deploying rules.",
       "datetime_updated": "Schedule updated",
@@ -1487,7 +1542,9 @@
     "min_qty": "Alert threshold",
     "create": "Save",
     "error_fields_required": "SKU and label required.",
-    "toast_added": "Item added"
+    "toast_added": "Item added",
+    "agent_thinking": "Updating stock…",
+    "agent_off_topic": "I only manage vehicle stock. Try: « What's my stock? »"
   },
   "maintenance": {
     "panel_title": "Maintenance contracts",
@@ -1528,12 +1585,17 @@
     "lines_count": "line(s)",
     "unknown_client": "Unknown client",
     "error_no_lines": "Add at least one line.",
+    "error_no_email": "Enter the client email to send the quote.",
     "toast_saved": "Quote saved",
     "toast_sent": "Quote sent",
+    "toast_sent_email": "Quote emailed (PDF + tracking link)",
+    "toast_send_email_failed": "Could not send email",
     "toast_accepted": "Quote accepted",
     "toast_declined": "Quote declined",
     "toast_expired": "This quote has expired.",
     "toast_billing_applied": "Lines copied to the intervention invoice",
+    "toast_invoice_issued": "Invoice issued and emailed to the client",
+    "toast_invoice_pending": "Quote accepted — invoice will be issued after field closure",
     "download_pdf": "PDF",
     "status": {
       "draft": "Draft",
@@ -1557,6 +1619,8 @@
     }
   },
   "dispatch": {
+    "auto_assign_ok": "Technician auto-assigned",
+    "auto_assign_desc": "{{name}} — AI dispatch",
     "assign_picker": {
       "title": "Choose a technician",
       "cancel": "Cancel",
@@ -1589,7 +1653,10 @@
     "toast_invalid_amount": "Invalid amount",
     "toast_error": "Error saving",
     "template_label": "Billing template",
-    "template_placeholder": "— Load a template —"
+    "template_placeholder": "— Load a template —",
+    "einvoice_send": "Send Peppol e-invoice",
+    "einvoice_sent": "E-invoice transmitted",
+    "einvoice_sent_label": "E-invoice sent"
   },
   "invoice": {
     "download_pdf": "Download PDF invoice",
@@ -1644,7 +1711,9 @@
   },
   "offline": {
     "hub": {
-      "aria": { "page": "Page" },
+      "aria": {
+        "page": "Page"
+      },
       "panel_network": "Connection",
       "panel_sync": "Synchronisation",
       "left_hint": "Completions and photos taken offline are queued until you are back online.",
@@ -1687,6 +1756,15 @@
   "company": {
     "new_request": "New intervention request",
     "billing_strip": "Billing / subscription — client payments via Stripe (portal + webhook).",
+    "billing_settings_title": "Billing details",
+    "billing_settings_save": "Save",
+    "billing_settings_saved": "Details saved",
+    "billing_vat": "VAT number",
+    "billing_iban": "IBAN",
+    "billing_street": "Street",
+    "billing_zip": "Postal code",
+    "billing_city": "City",
+    "billing_admin_email": "Admin email (weekly digest)",
     "aria": {
       "firebase_unconfigured": "Firebase not configured",
       "login_required": "Login required",
@@ -1716,19 +1794,6 @@
       "sync_failed": "Sync failed"
     }
   },
-  "catalog": {
-    "search_placeholder": "Search product (SKU, label)…",
-    "empty": "No product found.",
-    "no_results": "No products found.",
-    "search_error": "Search offline — showing local results.",
-    "searching": "Searching…",
-    "add_line": "Add",
-    "add_to_order": "Add to order",
-    "price": "Unit price",
-    "sku": "Reference",
-    "supplier": "Supplier",
-    "open_catalog": "Product catalogue"
-  },
   "planning": {
     "title": "Daily planning",
     "date_label": "Date",
@@ -1752,7 +1817,7 @@
     "toast_send_failed": "Send failed",
     "toast_login_required": "Login required",
     "toast_login_description": "Please log in to use the chat.",
-    "global_chat_title": "TEAM CHAT",
+    "global_chat_title": "TEAM",
     "global_chat_subtitle": "Company-wide messages",
     "day_clients_title": "Today's clients ({count})",
     "day_clients_empty": "No clients scheduled for this date",
@@ -1770,7 +1835,9 @@
     "reply_default": "Thank you for your message. The back-office has been notified and will get back to you shortly. You can also submit a request from the company space."
   },
   "copilot": {
-    "aria": { "page": "Page" },
+    "aria": {
+      "page": "Page"
+    },
     "panel_context": "Context",
     "panel_chat": "Assistant",
     "panel_suggestions": "Suggestions",
@@ -1857,6 +1924,8 @@
     }
   },
   "mobile": {
+    "page_selector_title": "Choose a page",
+    "page_selector_hint": "Hubs open here in the main panel.",
     "page_nav_label": "Page navigation",
     "page_nav_item": "Page {{index}} of {{total}}",
     "tab_bar_label": "Main sections",
@@ -1870,6 +1939,66 @@
     "rail_segment_label": "Page panels",
     "rail_left": "Left",
     "rail_center": "Center",
-    "rail_right": "Right"
+    "rail_right": "Right",
+    "tab_ai": "AI"
+  },
+  "notifications": {
+    "prefs_title": "Notification preferences",
+    "prefs_saved": "Preferences saved"
+  },
+  "integrations": {
+    "webhooks_title": "Outbound webhooks",
+    "webhook_secret": "HMAC secret",
+    "webhook_add": "Add",
+    "webhook_added": "Webhook added"
+  },
+  "esign": {
+    "portal_title": "Sign report",
+    "portal_hint": "Electronically sign the intervention report.",
+    "request_button": "Request signature",
+    "request_sent": "Signature link sent",
+    "open_sign_page": "Open signing page",
+    "mock_title": "Electronic signature",
+    "mock_hint": "Sign in the box below to approve the report.",
+    "mock_submit": "Confirm my signature",
+    "mock_decline": "Decline",
+    "mock_missing_request": "Invalid or expired signing link.",
+    "mock_signature_required": "Please sign before confirming.",
+    "mock_done_signed": "Thank you — your signature has been recorded.",
+    "mock_done_declined": "Signature declined."
+  },
+  "analytics": {
+    "reports_title": "Billing reports",
+    "paid_count": "Paid invoices",
+    "unpaid_count": "Unpaid",
+    "revenue_cents": "Invoiced revenue (excl. VAT)",
+    "disabled": "Reports disabled (enable NEXT_PUBLIC_FF_ANALYTICS).",
+    "carousel_title": "7-page carousel usage",
+    "carousel_hint": "Time on page and views — local storage + PostHog/GA4 when configured.",
+    "carousel_empty": "Navigate the app to collect stats (swipe, tabs, spotlight).",
+    "carousel_reset": "Reset",
+    "carousel_total_dwell": "Total carousel time: {{duration}}"
+  },
+  "timetracking": {
+    "export_payroll": "Export timesheets"
+  },
+  "portal": {
+    "copy_link": "Copy client tracking link",
+    "link_copied": "Tracking link copied",
+    "link_copied_short": "Copied",
+    "quotes_title": "Your quote",
+    "quotes_hint": "Review details and approve in one click — no need to reply by email.",
+    "quotes_ref": "Quote {{ref}}",
+    "quotes_total_ttc": "incl. VAT",
+    "quotes_valid_until": "Valid until {{date}}",
+    "quotes_accept": "Accept quote",
+    "quotes_decline": "Decline",
+    "quotes_accepted": "Accepted",
+    "quotes_declined": "Declined",
+    "quotes_expired": "Expired",
+    "toast_quote_accepted": "Quote accepted — thank you!",
+    "toast_quote_declined": "Quote declined",
+    "toast_invoice_issued": "Invoice sent by email",
+    "toast_invoice_pending": "Invoice pending field completion"
   }
 }

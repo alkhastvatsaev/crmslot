@@ -1,0 +1,83 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - complementary [ref=e7]:
+          - generic [ref=e10] [cursor=pointer]:
+            - button [ref=e11]:
+              - img [ref=e12]
+            - generic [ref=e14]:
+              - generic [ref=e15]: sam 13 juin
+              - generic [ref=e17]: 08:18:09
+            - button [ref=e18]:
+              - img [ref=e19]
+        - button "Ouvrir la recherche" [ref=e22]
+        - complementary [ref=e23]:
+          - button "Ouvrir la navigation" [ref=e24] [cursor=pointer]:
+            - generic [ref=e25]:
+              - generic [ref=e26]: IVANA
+              - generic [ref=e27]: BACK OFFICE
+    - generic [ref=e31]:
+      - main [ref=e33]:
+        - generic [ref=e35]:
+          - complementary [ref=e36]
+          - main [ref=e52]:
+            - button "Recentrer la carte" [ref=e56] [cursor=pointer]:
+              - img [ref=e57]
+          - complementary [ref=e59]:
+            - generic [ref=e62]:
+              - tablist [ref=e63]:
+                - tab "Demandes" [ref=e64]:
+                  - generic [ref=e65]: Demandes
+                - tab "Rapports" [ref=e66]:
+                  - generic [ref=e67]: Rapports
+                - tab "Chat" [selected] [ref=e68]:
+                  - generic [ref=e69]: Chat
+                - tab "Documents" [ref=e70]:
+                  - generic [ref=e71]: Documents
+              - button "TEAM" [ref=e74]:
+                - generic [ref=e75]: TEAM
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Contexte
+                      - generic:
+                        - paragraph: Chargement des dossiers…
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Bonjour — je connais les dossiers, clients et factures de votre espace BELGMAP. Posez une question ou choisissez une suggestion à droite.
+              - region:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Suggestions
+                      - generic:
+                        - generic:
+                          - paragraph:
+                            - img
+                            - text: Questions rapides
+                          - button [disabled]: Quelles sont les priorités du jour (urgences, non assignés) ?
+                          - button [disabled]: Liste les interventions terminées mais non payées avec montants.
+                          - button [disabled]: Résume les dossiers urgents encore ouverts.
+                          - button [disabled]: Quels clients ont le plus de dossiers actifs ?
+                          - button [disabled]: Fais un briefing opérationnel de la journée pour le back-office.
+    - generic:
+      - button "Déjà sur la première page" [disabled]:
+        - img
+      - button "Aller à la page 4" [ref=e82] [cursor=pointer]:
+        - img [ref=e83]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - img [ref=e91]
+  - alert [ref=e94]
