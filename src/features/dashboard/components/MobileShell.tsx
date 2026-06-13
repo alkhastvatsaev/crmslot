@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import type { ReactNode } from "react";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
-import MobilePageSelector from "@/features/dashboard/components/MobilePageSelector";
+import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
+import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
+import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
+import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
   MOBILE_GALAXY_DOCK_CLASS,
@@ -18,34 +21,41 @@ import {
 type Props = { pages: ReactNode[] };
 
 export default function MobileShell({ pages }: Props) {
-  const [selectorOpen, setSelectorOpen] = useState(false);
+  const { open: pageSelectorOpen } = useDashboardPageSelector();
 
   return (
-    <div className={MOBILE_SHELL_CLASS} data-mobile-shell data-testid="mobile-shell">
+    <MobileHubRailProvider>
       <div
-        id="dashboard-overlay-root"
-        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
-        aria-hidden
-      />
+        className={MOBILE_SHELL_CLASS}
+        data-mobile-shell
+        data-page-selector-open={pageSelectorOpen ? "true" : undefined}
+        data-testid="mobile-shell"
+      >
+        <div
+          id="dashboard-overlay-root"
+          className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+          aria-hidden
+        />
 
-      <header className={MOBILE_SHELL_HEADER_CLASS}>
-        <MobileTopBar onToggle={() => setSelectorOpen((prev) => !prev)} />
-      </header>
+        <header className={MOBILE_SHELL_HEADER_CLASS}>
+          <MobileTopBar />
+        </header>
 
-      <div className={MOBILE_SHELL_BODY_CLASS} style={{ position: "relative" }}>
-        <MobileScreenHost pages={pages} />
-        <MobilePageSelector open={selectorOpen} onClose={() => setSelectorOpen(false)} />
-      </div>
-
-      <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="mobile-shell-footer">
-        <div className={MOBILE_GALAXY_DOCK_CLASS} data-testid="mobile-shell-galaxy">
-          <div aria-hidden />
-          <div className={MOBILE_GALAXY_DOCK_CHROME_CLASS}>
-            <DashboardGalaxyLayer />
-          </div>
-          <div aria-hidden />
+        <div className={MOBILE_SHELL_BODY_CLASS}>
+          <MobileScreenHost pages={pages} />
         </div>
-      </footer>
-    </div>
+
+        <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="mobile-shell-footer">
+          <MobileShellSlotGrid
+            rootClassName={MOBILE_GALAXY_DOCK_CLASS}
+            chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
+            data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
+          >
+            <DashboardGalaxyLayer />
+          </MobileShellSlotGrid>
+          <MobileHubDotsBar />
+        </footer>
+      </div>
+    </MobileHubRailProvider>
   );
 }

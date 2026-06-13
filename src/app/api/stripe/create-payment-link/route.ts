@@ -1,10 +1,12 @@
-import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
+import { createInterventionPaymentLinkAdmin } from "@/features/billing/server/createInterventionPaymentLinkAdmin";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
+import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
+import type { Intervention } from "@/features/interventions/types";
 
 export const runtime = "nodejs";
 
@@ -31,89 +33,39 @@ export async function POST(request: Request) {
   }
 
   const db = getAdminDb();
-  const ref = db.collection("interventions").doc(interventionId);
-  const snap = await ref.get();
+  const snap = await db.collection("interventions").doc(interventionId).get();
   if (!snap.exists) {
     return NextResponse.json({ error: "Dossier introuvable" }, { status: 404 });
   }
 
-  const data = snap.data() ?? {};
-  const createdByUid = typeof data.createdByUid === "string" ? data.createdByUid : "";
-  if (createdByUid !== auth.uid) {
+  const iv = { id: snap.id, ...snap.data() } as Intervention;
+  const companyId = String(iv.companyId ?? "").trim();
+  const createdByUid = typeof iv.createdByUid === "string" ? iv.createdByUid : "";
+
+  const isRequester = createdByUid === auth.uid;
+  const isStaff =
+    companyId && (await assertCanAssignInterventionServer(db, auth.uid, companyId, auth.decoded));
+  const isTechnician = assertTechnicianMayUpdateAssignedIntervention(iv, auth.uid);
+
+  if (!isRequester && !isStaff && !isTechnician) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
-  if (data.status !== "invoiced" && data.status !== "done") {
-    return NextResponse.json({ error: "Paiement non disponible pour ce statut" }, { status: 400 });
-  }
-
-  if (data.paymentStatus === "paid") {
+  try {
+    const result = await createInterventionPaymentLinkAdmin({
+      db,
+      interventionId,
+      actorUid: auth.uid,
+      iv,
+    });
     return NextResponse.json({
-      url: data.stripePaymentLinkUrl ?? null,
-      paymentStatus: "paid",
+      url: result.url,
+      paymentStatus: result.paymentStatus ?? "unpaid",
+      mock: result.mock,
     });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Création lien paiement impossible";
+    const status = message.includes("statut") ? 400 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
-
-  const existingUrl =
-    typeof data.stripePaymentLinkUrl === "string" ? data.stripePaymentLinkUrl : "";
-  if (existingUrl.length > 0) {
-    return NextResponse.json({ url: existingUrl, paymentStatus: data.paymentStatus ?? "unpaid" });
-  }
-
-  const amountCents =
-    typeof data.invoiceAmountCents === "number" && data.invoiceAmountCents > 0
-      ? Math.round(data.invoiceAmountCents)
-      : 15_000;
-
-  const origin = process.env.PUBLIC_APP_URL?.trim()?.replace(/\/$/, "") ?? "http://localhost:3000";
-
-  if (mockMode) {
-    // Sandbox sans compte Stripe : lien interne à usage unique qui marque le dossier payé.
-    const mockToken = randomUUID();
-    const url = `${origin}/api/stripe/mock-pay?interventionId=${encodeURIComponent(interventionId)}&token=${mockToken}`;
-    await ref.update({
-      stripePaymentLinkUrl: url,
-      mockPayToken: mockToken,
-      paymentStatus: "pending",
-      invoiceAmountCents: amountCents,
-    });
-    return NextResponse.json({ url, paymentStatus: "pending", mock: true });
-  }
-
-  const stripe = new Stripe(stripeSecret as string, { apiVersion: "2026-04-22.dahlia" });
-
-  const link = await stripe.paymentLinks.create({
-    line_items: [
-      {
-        price_data: {
-          currency: "eur",
-          unit_amount: amountCents,
-          product_data: {
-            name: `Intervention ${interventionId.slice(0, 8)}`,
-          },
-        },
-        quantity: 1,
-      },
-    ],
-    metadata: { interventionId, createdByUid: auth.uid },
-    // Sans payment_intent_data, le PaymentIntent du Payment Link n'hérite pas des
-    // metadata → l'événement payment_intent.succeeded serait inexploitable côté webhook.
-    payment_intent_data: {
-      metadata: { interventionId, createdByUid: auth.uid },
-    },
-    after_completion: {
-      type: "redirect",
-      redirect: {
-        url: `${origin}/?payment=success&interventionId=${encodeURIComponent(interventionId)}`,
-      },
-    },
-  });
-
-  await ref.update({
-    stripePaymentLinkUrl: link.url,
-    paymentStatus: "pending",
-    invoiceAmountCents: amountCents,
-  });
-
-  return NextResponse.json({ url: link.url, paymentStatus: "pending" });
 }

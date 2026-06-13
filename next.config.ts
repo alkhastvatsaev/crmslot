@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { execSync } from "node:child_process";
 import withPWAInit from "@ducanh2912/next-pwa";
+import { resolveMobileDevOrigins } from "./src/core/config/mobileDevOrigins";
 
 /** SHA injecté au build : sur Vercel = VERCEL_GIT_COMMIT_SHA ; en local = git rev-parse HEAD (compare avec le déploiement). */
 function resolveGitShaForBuild(): string {
@@ -56,17 +57,8 @@ const withPWA = withPWAInit({
   },
 });
 
-/** Hôtes tunnel (ngrok, etc.) autorisés pour le HMR Next en dev — évite reload en boucle sur iPhone. */
-function readDevTunnelOrigins(): string[] {
-  const raw = process.env.NGROK_DEV_ORIGIN?.trim();
-  if (!raw) return [];
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-const devTunnelOrigins = readDevTunnelOrigins();
+/** Hôtes tunnel + IP LAN — évite reload / chargement infini sur iPhone (`allowedDevOrigins`). */
+const devTunnelOrigins = resolveMobileDevOrigins();
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [

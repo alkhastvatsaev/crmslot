@@ -20,7 +20,6 @@ import type { Intervention } from "@/features/interventions/types";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
 import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
-import InterventionRemindersPanel from "@/features/reminders/components/InterventionRemindersPanel";
 import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import { useBackOfficeInboxState } from "@/features/backoffice/hooks/useBackOfficeInboxState";
@@ -98,6 +97,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
   const {
     cid,
     isTenant,
+    workspaceReady,
     ivanaChatCompanyId,
     pwaV2,
     interventions,
@@ -145,16 +145,38 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
     reportsNothingAtAll,
     itemsToShow,
     selectedReportCompletion,
-    handleDelete,
     handleAssignToTechnician,
     handleCancelIntervention,
     handleVerify,
+    handleRejectReport,
     handleDragBoardSchedule,
     handleUpdateDateTime,
     handleDownloadQuotePdf,
   } = useBackOfficeInboxState(dayMissions);
 
   if (!isTenant) {
+    if (!workspaceReady) {
+      return (
+        <div
+          data-testid="backoffice-inbox-panel"
+          className={cn(
+            "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]",
+            HUB_SURFACE.muted
+          )}
+        >
+          <div
+            data-testid="backoffice-inbox-loading"
+            className="flex flex-1 flex-col gap-3 px-4 py-6"
+            aria-busy="true"
+          >
+            <div className="h-10 animate-pulse rounded-xl bg-slate-200/80" />
+            <div className="h-24 animate-pulse rounded-[24px] bg-white/70 border border-slate-200/50" />
+            <div className="h-24 animate-pulse rounded-[24px] bg-white/70 border border-slate-200/50" />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         data-testid="backoffice-inbox-panel"
@@ -180,19 +202,16 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
         HUB_SURFACE.muted
       )}
     >
-      {pwaV2 ? (
-        <div className="mx-4 mt-2 space-y-2">
-          <InterventionRemindersPanel interventions={interventions} />
-          {activeTab === "requests" ? (
-            <ScheduleDragBoard
-              interventions={interventions}
-              technicianUid={dragBoardTechUid}
-              onTechnicianChange={setDragBoardTechUid}
-              dateYmd={dragBoardDate}
-              onDateChange={setDragBoardDate}
-              onSchedule={(id, time) => void handleDragBoardSchedule(id, time)}
-            />
-          ) : null}
+      {pwaV2 && activeTab === "requests" ? (
+        <div className="mx-4 mt-2">
+          <ScheduleDragBoard
+            interventions={interventions}
+            technicianUid={dragBoardTechUid}
+            onTechnicianChange={setDragBoardTechUid}
+            dateYmd={dragBoardDate}
+            onDateChange={setDragBoardDate}
+            onSchedule={(id, time) => void handleDragBoardSchedule(id, time)}
+          />
         </div>
       ) : null}
 
@@ -437,9 +456,9 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
             setAssignPickerOpen={setAssignPickerOpen}
             isAssigning={isAssigning}
             onClose={() => setSelectedItemId(null)}
-            onDelete={handleDelete}
             onCancelIntervention={handleCancelIntervention}
             onVerify={handleVerify}
+            onReject={handleRejectReport}
             onAssign={handleAssignToTechnician}
             onDownloadQuotePdf={handleDownloadQuotePdf}
             onUpdateDateTime={handleUpdateDateTime}
@@ -462,8 +481,8 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                   terrainAudioLoading={terrainAudioLoading}
                   terrainAudioFailed={terrainAudioFailed}
                   onClose={() => setSelectedTerrainLocalId(null)}
-                  onDelete={handleDelete}
                   onVerify={handleVerify}
+                  onReject={handleRejectReport}
                 />
               );
             })()

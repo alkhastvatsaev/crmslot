@@ -23,6 +23,10 @@ export type HubAgentStreamHandlerOptions = {
   billingDocumentOnBillingPage?: boolean;
   /** Cible overlay PDF (défaut materialRight sur page Matériel). */
   documentPreviewTarget?: DocumentPreviewOverlayTarget;
+  /** Export comptable CSV — déclenché par trigger_accounting_export. */
+  onExportAccountingCsv?: () => void;
+  /** Export feuilles de temps CSV — déclenché par trigger_payroll_export. */
+  onExportPayrollCsv?: () => void;
 };
 
 /** Callback pour brancher les effets UI des outils agents hub. */
@@ -34,9 +38,20 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
   const chatbot = useChatbotContextOptional();
   const billingDocOnBillingPage = options?.billingDocumentOnBillingPage ?? false;
   const docTarget = options?.documentPreviewTarget ?? "materialRight";
+  const onExportAccountingCsv = options?.onExportAccountingCsv;
+  const onExportPayrollCsv = options?.onExportPayrollCsv;
 
   return useCallback(
     (ev: ChatbotStreamEvent) => {
+      if (ev.type === "export_accounting_csv") {
+        onExportAccountingCsv?.();
+        return;
+      }
+
+      if (ev.type === "export_payroll_csv") {
+        onExportPayrollCsv?.();
+        return;
+      }
       if (ev.type === "focus_stock_hub") {
         pager?.setPageIndex(FEATURE_HUB_SLOT_INDEX);
         const detail = {
@@ -83,7 +98,7 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
         chatbot?.openSupplierOrdersPanel(
           ev.highlightOrderId,
           ev.materialOrderId ?? null,
-          ev.previewOrder,
+          ev.previewOrder
         );
         chatbot?.ensureRightPanelOpen();
         dispatchCrmOrdersChanged({
@@ -100,6 +115,17 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
         if (cid) dispatchCrmOrdersChanged({ companyId: cid });
       }
     },
-    [pager, stockIntent, billingIntent, inboxIntent, chatbot, billingDocOnBillingPage, docTarget, options?.companyId],
+    [
+      pager,
+      stockIntent,
+      billingIntent,
+      inboxIntent,
+      chatbot,
+      billingDocOnBillingPage,
+      docTarget,
+      options?.companyId,
+      onExportAccountingCsv,
+      onExportPayrollCsv,
+    ]
   );
 }

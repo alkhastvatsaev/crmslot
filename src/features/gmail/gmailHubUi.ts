@@ -2,7 +2,9 @@ import type { LucideIcon } from "lucide-react";
 import { Archive, FileText, Inbox, Mail, Send, Star, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HUB_FIELD_CLASS, HUB_FONT_OUTFIT, HUB_RADIUS, HUB_TYPE } from "@/core/ui/hub/hubTheme";
-import { hubButtonClassName } from "@/core/ui/hub/HubButton";
+import { hubButtonClassName } from "@/core/ui/hub/hubButtonClassName";
+
+export { parseSenderEmail, parseSenderName } from "@/features/gmail/gmailSenderParse";
 
 export const gmailHubFont = HUB_FONT_OUTFIT;
 
@@ -87,18 +89,6 @@ export function formatMailDateLong(raw: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-export function parseSenderName(from: string): string {
-  const named = from.match(/^([^<]+)</);
-  if (named) return named[1].trim().replace(/^"|"$/g, "");
-  const email = from.match(/<([^>]+)>/);
-  if (email) return email[1].split("@")[0] ?? from;
-  return from.split("@")[0] ?? from;
-}
-
-export function parseSenderEmail(from: string): string {
-  return from.match(/<([^>]+)>/)?.[1] ?? from;
 }
 
 const AVATAR_BG_TEXT: { bg: string; text: string }[] = [

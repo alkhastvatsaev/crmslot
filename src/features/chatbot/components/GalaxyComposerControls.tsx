@@ -1,7 +1,30 @@
 "use client";
 
+import type { MouseEvent, RefObject } from "react";
 import { ArrowRight, Plus, Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/** Clic sur la barre Galaxy → focus textarea (curseur visible). */
+export function galaxyComposerFieldMouseDown(
+  e: MouseEvent,
+  inputRef: RefObject<HTMLTextAreaElement | null>,
+  disabled: boolean
+) {
+  if (disabled) return;
+  const target = e.target as HTMLElement;
+  if (target.closest("button")) return;
+  if (target === inputRef.current) return;
+  e.preventDefault();
+  const el = inputRef.current;
+  if (!el) return;
+  el.focus();
+  const pos = el.value.length;
+  try {
+    el.setSelectionRange(pos, pos);
+  } catch {
+    // setSelectionRange peut échouer si le champ est encore disabled
+  }
+}
 
 type NewButtonProps = {
   ariaLabel: string;

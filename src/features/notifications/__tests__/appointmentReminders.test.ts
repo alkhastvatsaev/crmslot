@@ -18,26 +18,35 @@ describe("appointmentReminders", () => {
     assignedTechnicianUid: "tech-1",
   };
 
-  it("detects 2h reminder window", () => {
-    // Set "now" to 2 hours before scheduled time
-    const now = new Date("2026-05-20T12:00:00");
+  it("detects 2h reminder window (Europe/Brussels)", () => {
+    // RDV 20/05 14:00 Bruxelles (CEST) = 12:00 UTC → now 10:00 UTC = 2h avant
+    const now = new Date("2026-05-20T10:00:00Z");
     const results = findDueReminders([baseIv], now);
     expect(results).toHaveLength(1);
     expect(results[0]?.reminderType).toBe("2h");
   });
 
-  it("detects 24h reminder window", () => {
-    const now = new Date("2026-05-19T14:00:00");
+  it("detects 24h reminder window (Europe/Brussels)", () => {
+    const now = new Date("2026-05-19T12:00:00Z");
     const results = findDueReminders([baseIv], now);
     expect(results).toHaveLength(1);
     expect(results[0]?.reminderType).toBe("24h");
   });
 
-  it("detects 30min reminder window", () => {
-    const now = new Date("2026-05-20T13:30:00");
+  it("detects 30min reminder window (Europe/Brussels)", () => {
+    const now = new Date("2026-05-20T11:30:00Z");
     const results = findDueReminders([baseIv], now);
     expect(results).toHaveLength(1);
     expect(results[0]?.reminderType).toBe("30min");
+  });
+
+  it("ignore les rappels déjà envoyés", () => {
+    const now = new Date("2026-05-20T10:00:00Z");
+    const sentIv = {
+      ...baseIv,
+      appointmentRemindersSent: { "2h": "2026-05-20T09:00:00.000Z" },
+    };
+    expect(findDueReminders([sentIv], now)).toHaveLength(0);
   });
 
   it("skips past appointments", () => {

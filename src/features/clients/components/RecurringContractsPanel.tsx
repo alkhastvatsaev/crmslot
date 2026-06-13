@@ -67,6 +67,8 @@ export default function RecurringContractsPanel() {
     if (!firestore) return;
     setGenerating(contract.id);
     try {
+      const { portalAccessTokenField } =
+        await import("@/features/interventions/ensurePortalAccessToken");
       await addDoc(collection(firestore, "interventions"), {
         title: contract.problemDescription || "Contrat récurrent",
         address: contract.address,
@@ -77,6 +79,7 @@ export default function RecurringContractsPanel() {
         scheduledDate: contract.nextDueDate,
         createdAt: new Date().toISOString(),
         recurringContractId: contract.id,
+        ...portalAccessTokenField(),
       });
       await updateRecurringContract(contract.id, {
         lastGeneratedAt: new Date().toISOString(),

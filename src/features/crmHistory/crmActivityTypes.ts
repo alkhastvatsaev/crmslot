@@ -8,6 +8,7 @@ export type CrmEventType =
   | "intervention_returned_to_requests"
   | "intervention_deleted"
   | "intervention_report_validated"
+  | "intervention_report_rejected"
   | "intervention_cancelled"
   | "intervention_schedule_updated"
   | "intervention_billing_updated"
@@ -33,7 +34,8 @@ export type CrmEventType =
   | "page_navigated"
   | "intervention_viewed"
   | "email_viewed"
-  | "user_session_start";
+  | "user_session_start"
+  | "time_entry_recorded";
 
 export type CrmPeriodFilter = "today" | "week" | "month" | "all";
 export type CrmTypeFilter =

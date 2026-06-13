@@ -45,6 +45,16 @@ export async function markInterventionPaidAdmin(
   await notifyClientPaymentReceived(interventionId, createdByUid).catch(() => {});
 
   if (companyId) {
+    void import("@/features/integrations/server/dispatchCompanyWebhooksAdmin")
+      .then(({ dispatchCompanyWebhooksAdmin }) =>
+        dispatchCompanyWebhooksAdmin(companyId, "intervention.payment_received", {
+          interventionId,
+          at: paidAt,
+          data: { paymentIntentId: paymentIntentId ?? null },
+        })
+      )
+      .catch(() => {});
+
     await logCrmInterventionActionAdmin({
       kind: "intervention_payment_updated",
       iv: {

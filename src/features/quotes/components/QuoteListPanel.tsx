@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { FileText, Plus, CheckCircle, XCircle, Download } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 import { subscribeQuotes, updateQuoteStatus } from "../quoteFirestore";
-import { applyQuoteToInterventionBilling } from "../convertQuoteToInvoice";
 import { effectiveQuoteStatus, quoteCanBeResponded } from "../quoteExpiration";
 import { downloadQuotePdf } from "../buildQuotePdfFromQuote";
 import QuoteStatusBadge from "./QuoteStatusBadge";
@@ -55,10 +55,33 @@ export default function QuoteListPanel({ interventionId }: { interventionId?: st
     }
     try {
       const nextStatus = accept ? "accepted" : "declined";
-      await updateQuoteStatus(firestore, companyId, quote.id, nextStatus);
       if (accept) {
-        const applied = await applyQuoteToInterventionBilling(firestore, quote);
-        if (applied) toast.success(String(t("quotes.toast_billing_applied")));
+        const res = await fetchWithAuth(
+          `/api/companies/${encodeURIComponent(companyId)}/quotes/${encodeURIComponent(quote.id)}/accept`,
+          { method: "POST" }
+        );
+        const data = (await res.json().catch(() => ({}))) as {
+          ok?: boolean;
+          appliedBilling?: boolean;
+          invoiceIssued?: boolean;
+          invoiceError?: string;
+          error?: string;
+        };
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error ?? String(t("common.error")));
+        }
+        if (data.appliedBilling) {
+          toast.success(String(t("quotes.toast_billing_applied")));
+        }
+        if (data.invoiceIssued) {
+          toast.success(String(t("quotes.toast_invoice_issued")));
+        } else if (data.invoiceError) {
+          toast.message(String(t("quotes.toast_invoice_pending")), {
+            description: data.invoiceError,
+          });
+        }
+      } else {
+        await updateQuoteStatus(firestore, companyId, quote.id, nextStatus);
       }
       await logCrmCompanyAction({
         companyId,

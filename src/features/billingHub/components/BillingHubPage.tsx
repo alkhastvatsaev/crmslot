@@ -4,10 +4,14 @@ import { useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import BillingHubCenterPanel from "@/features/billingHub/components/BillingHubCenterPanel";
 import BillingHubAgentPanel from "@/features/billingHub/components/BillingHubAgentPanel";
+import BillingHubRightAssistPanel from "@/features/billingHub/components/BillingHubRightAssistPanel";
 import ChatbotRightRail from "@/features/chatbot/components/ChatbotRightRail";
-import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
-import MaintenanceContractPanel from "@/features/maintenance/components/MaintenanceContractPanel";
-import AccountingExportButton from "@/features/billing/components/AccountingExportButton";
+import CompanyBillingSettingsPanel from "@/features/company/components/CompanyBillingSettingsPanel";
+import WebhookEndpointsPanel from "@/features/integrations/components/WebhookEndpointsPanel";
+import BiReportsPanel from "@/features/analytics/components/BiReportsPanel";
+import CarouselUsagePanel from "@/features/analytics/components/CarouselUsagePanel";
+import NotificationPreferencesPanel from "@/features/notifications/components/NotificationPreferencesPanel";
+import PayrollExportButton from "@/features/timetracking/components/PayrollExportButton";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
@@ -75,16 +79,14 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
             />
           ) : null}
           <div className="custom-scrollbar overflow-y-auto space-y-4 pb-2">
-            {companyId ? (
-              <div data-testid="billing-hub-accounting-export">
-                <AccountingExportButton
-                  interventions={interventions}
-                  periodLabel={new Date().toISOString().slice(0, 7)}
-                />
-              </div>
-            ) : null}
-            <QuoteListPanel />
-            <MaintenanceContractPanel />
+            <CarouselUsagePanel />
+            <BiReportsPanel interventions={interventions} />
+            <div data-testid="billing-hub-payroll-export">
+              <PayrollExportButton scope="company" />
+            </div>
+            <CompanyBillingSettingsPanel />
+            <WebhookEndpointsPanel />
+            <NotificationPreferencesPanel profileKind="staff" />
           </div>
         </section>
       }
@@ -100,8 +102,18 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
         </section>
       }
       right={
-        <section className={documentsRailShell} data-testid="billing-hub-documents-rail">
-          <ChatbotRightRail />
+        <section
+          className={`${documentsRailShell} min-h-0 overflow-hidden`}
+          data-testid="billing-hub-documents-rail"
+        >
+          {companyId ? (
+            <div className="custom-scrollbar min-h-0 max-h-[45%] shrink-0 overflow-y-auto border-b border-slate-100 p-3">
+              <BillingHubRightAssistPanel interventions={interventions} loading={loading} />
+            </div>
+          ) : null}
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <ChatbotRightRail />
+          </div>
         </section>
       }
     />

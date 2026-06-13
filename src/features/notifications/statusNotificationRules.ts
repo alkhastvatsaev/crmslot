@@ -88,6 +88,15 @@ export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
     subjectKey: "notifications.email.cancelled.subject",
     bodyKey: "notifications.email.cancelled.body",
   },
+  // Technicien notifié quand back-office refuse le rapport
+  {
+    fromStatus: "done",
+    toStatus: "in_progress",
+    targets: ["technician"],
+    channels: ["email"],
+    subjectKey: "notifications.email.report_rejected.subject",
+    bodyKey: "notifications.email.report_rejected.body",
+  },
 ];
 
 /**

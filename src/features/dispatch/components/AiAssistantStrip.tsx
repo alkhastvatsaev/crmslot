@@ -84,7 +84,7 @@ export default function AiAssistantStrip({
           ) : null}
           <GalaxyButton
             asInteractiveButton={false}
-            {...(mobilePowerSave !== undefined ? { mobilePowerSave } : {})}
+            mobilePowerSave={mobilePowerSave}
             className={`h-full w-full ${showBadge ? "notified" : ""}`}
           >
             <AnimatePresence initial={false}>

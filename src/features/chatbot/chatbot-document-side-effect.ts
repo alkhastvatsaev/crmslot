@@ -11,10 +11,16 @@ export const CHATBOT_BILLING_WRITE_TOOLS = new Set([
 /** Signal UI : la PWA charge le PDF via /api/interventions/.../document-pdf (jsPDF). */
 export const CHATBOT_PWA_DOCUMENT_FOCUS_TOOLS = new Set(["focus_intervention_document"]);
 
+export const CHATBOT_EXPORT_UI_TOOLS = new Set([
+  "trigger_accounting_export",
+  "trigger_payroll_export",
+]);
+
 /** Après ces outils : SSE document_preview + fin de tour OpenAI (réponse minimale). */
 export const CHATBOT_ZERO_TOKEN_UI_TOOLS = new Set([
   ...CHATBOT_BILLING_WRITE_TOOLS,
   ...CHATBOT_PWA_DOCUMENT_FOCUS_TOOLS,
+  ...CHATBOT_EXPORT_UI_TOOLS,
   ...HUB_AGENT_IMMEDIATE_UI_TOOLS,
 ]);
 
@@ -36,9 +42,7 @@ export type DocumentPreviewPayload = {
   documentType: ChatbotDocumentKind;
 };
 
-export function extractDocumentPreviewFromResult(
-  result: unknown,
-): DocumentPreviewPayload | null {
+export function extractDocumentPreviewFromResult(result: unknown): DocumentPreviewPayload | null {
   if (!result || typeof result !== "object" || !(result as { ok?: boolean }).ok) return null;
   const r = result as {
     interventionId?: string;
@@ -46,7 +50,10 @@ export function extractDocumentPreviewFromResult(
     previewDocumentType?: string;
   };
   const raw = r.documentType || r.previewDocumentType;
-  if (!r.interventionId || (raw !== "quote" && raw !== "invoice" && raw !== "report" && raw !== "material_order")) {
+  if (
+    !r.interventionId ||
+    (raw !== "quote" && raw !== "invoice" && raw !== "report" && raw !== "material_order")
+  ) {
     return null;
   }
   return { interventionId: r.interventionId, documentType: raw };
@@ -71,8 +78,7 @@ export function documentToolSuccessMessage(toolName: string, result: unknown): s
       interventionId?: string | null;
     };
     if (o.supplierOrderId) {
-      const total =
-        typeof o.totalEur === "number" ? ` (${o.totalEur} € HT)` : "";
+      const total = typeof o.totalEur === "number" ? ` (${o.totalEur} € HT)` : "";
       const client =
         typeof o.clientName === "string" && o.clientName.trim()
           ? ` Client : ${o.clientName.trim()}.`
@@ -142,6 +148,12 @@ export function documentToolSuccessMessage(toolName: string, result: unknown): s
     const where = r.savedOnClient ? "dossier et fiche CRM" : "dossier";
     const who = r.clientName ? ` pour ${r.clientName}` : "";
     return `Email ${r.email ?? ""} enregistré sur le ${where}${who}. Les prochains envois pourront le réutiliser.`;
+  }
+
+  if (CHATBOT_EXPORT_UI_TOOLS.has(toolName)) {
+    return toolName === "trigger_accounting_export"
+      ? "✅ Export comptable CSV téléchargé."
+      : "✅ Feuilles de temps CSV téléchargées.";
   }
 
   if (CHATBOT_PWA_DOCUMENT_FOCUS_TOOLS.has(toolName)) {

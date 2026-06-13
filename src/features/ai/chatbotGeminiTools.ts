@@ -128,13 +128,17 @@ export async function executeChatbotTool(
       }
 
       case "create_intervention": {
-        const ref = await db.collection("interventions").add({
-          companyId,
-          ...input,
-          status: "pending",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+        const { withPortalAccessToken } =
+          await import("@/features/interventions/ensurePortalAccessToken");
+        const ref = await db.collection("interventions").add(
+          withPortalAccessToken({
+            companyId,
+            ...input,
+            status: "pending",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          })
+        );
         return {
           success: true,
           interventionId: ref.id,

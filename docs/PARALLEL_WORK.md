@@ -51,6 +51,7 @@ ngrok http 3000
 
 ```bash
 npm run test:mobile-infra
+npm run test:mobile-shell        # profil · sélecteur · panneau central · galaxy
 npm run test:e2e:mobile        # shell iPhone + API smoke (port 3000)
 npm run test:e2e:desktop-gate    # gate prod-like build+start port 3001 (~3 min)
 npm run test:ci           # avant merge main

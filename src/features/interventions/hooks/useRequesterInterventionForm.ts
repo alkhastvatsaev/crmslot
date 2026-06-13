@@ -347,7 +347,16 @@ export function useRequesterInterventionForm() {
         ...d.data(),
       })) as unknown as Intervention[];
       const matches = findPotentialDuplicates(
-        { address: interventionAddress.trim(), problem: problemForDedupe },
+        {
+          address: interventionAddress.trim(),
+          problem: problemForDedupe,
+          client: {
+            firstName: profile.firstName.trim(),
+            lastName: profile.lastName.trim(),
+            phone: profile.phone.trim(),
+            email: profile.email.trim(),
+          },
+        },
         existing,
         0.95
       );
@@ -442,6 +451,9 @@ export function useRequesterInterventionForm() {
       }
       const clientPhoneRaw = profile.phone.trim() || (portalUser?.phoneNumber ?? "").trim();
 
+      const { portalAccessTokenField } =
+        await import("@/features/interventions/ensurePortalAccessToken");
+
       await setDoc(newDocRef, {
         title,
         address: interventionAddress.trim(),
@@ -455,6 +467,7 @@ export function useRequesterInterventionForm() {
         createdByUid: user.uid,
         assignedTechnicianUid: null,
         companyId: interventionCompanyId,
+        ...portalAccessTokenField(),
         ...(photoDataUrls.length
           ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) }
           : {}),
@@ -552,6 +565,12 @@ export function useRequesterInterventionForm() {
             address: interventionAddress.trim(),
             problem: problemForDedupe,
             createdByUid: user.uid,
+            client: {
+              firstName: clientFirstRaw,
+              lastName: clientLastRaw,
+              phone: clientPhoneRaw,
+              email: profile.email.trim(),
+            },
           }).catch(() => null);
 
           deleteDoc(doc(db, "intervention_request_drafts", user.uid)).catch(() => null);

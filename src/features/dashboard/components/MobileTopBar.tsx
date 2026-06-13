@@ -1,19 +1,33 @@
 "use client";
 
+import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
+import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
 import UserProfile from "@/features/dashboard/components/UserProfile";
+import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
+import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import {
+  MOBILE_PROFILE_BAR_CHROME_CLASS,
+  MOBILE_PROFILE_BAR_CLASS,
+} from "@/core/ui/dashboardMobileLayout";
+import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 
-type Props = { onToggle?: () => void };
+export default function MobileTopBar() {
+  const { open: pageSelectorOpen } = useDashboardPageSelector();
 
-export default function MobileTopBar({ onToggle }: Props) {
   return (
-    <button
-      type="button"
-      className="mobile-top-bar"
-      data-testid="mobile-top-bar"
-      aria-label="Ouvrir la navigation"
-      onClick={() => onToggle?.()}
+    <MobileShellSlotGrid
+      rootClassName={MOBILE_PROFILE_BAR_CLASS}
+      chromeClassName={MOBILE_PROFILE_BAR_CHROME_CLASS}
+      data-testid={MOBILE_SHELL_CONTRACT.testIds.topBar}
     >
-      <UserProfile showPageNavigation={false} />
-    </button>
+      <MobileHeaderRailLayout
+        rootTestId="mobile-header-rail"
+        leftTestId="mobile-header-calendar"
+        centerTestId="mobile-header-profile"
+        swipeDisabled={pageSelectorOpen}
+        left={<ClockCalendar compact />}
+        center={<UserProfile interactive variant="mobile" />}
+      />
+    </MobileShellSlotGrid>
   );
 }

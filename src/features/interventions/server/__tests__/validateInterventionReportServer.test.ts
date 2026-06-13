@@ -72,6 +72,7 @@ function makeDb(initial: Intervention, refreshed?: Intervention) {
           const data = call === 1 ? initial : after;
           return { exists: true, id: data.id, data: () => data };
         },
+        update: jest.fn().mockResolvedValue(undefined),
       }),
     }),
   };

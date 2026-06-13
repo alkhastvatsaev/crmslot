@@ -1,4 +1,8 @@
 import { isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
+import { diagnoseEquipmentPhoto } from "@/features/chatbot/chatbot-vision";
+import { parseVoiceJobClosure } from "@/features/chatbot/chatbot-voice-closure";
+import { computeContractChurnRisks } from "@/features/clients/contractChurnRisk";
+import { fetchInterventionsForCompany } from "@/features/chatbot/chatbot-intervention-source";
 import { searchWorkspace } from "@/features/chatbot/chatbot-workspace-search";
 import { invalidateInterventionCache } from "@/features/chatbot/chatbot-intervention-source";
 import { logCrmFromChatbotTool } from "@/features/crmHistory/logCrmFromChatbotTool";
@@ -20,6 +24,9 @@ import {
   listPortalChat,
   statistiquesPeriode,
   getInterventionBilling,
+  listVehicleStock,
+  addVehicleStockItem,
+  updateVehicleStockItem,
 } from "@/features/chatbot/chatbot-executor-queries";
 import {
   updateInterventionBilling,
@@ -59,6 +66,10 @@ export type ChatbotToolContext = {
   materialOrderClientName?: string | null;
   /** Agent Matériel : refuser order_lecot sans clientName. */
   requireMaterialOrderClientName?: boolean;
+  /** Clé API OpenAI — nécessaire pour les outils vision (diagnose_equipment_photo). */
+  openAIApiKey?: string;
+  /** Modèle OpenAI utilisé — transmis aux outils qui lancent leur propre appel. */
+  openAIModelName?: string;
 };
 
 function requireConfirmed(name: string, input: Record<string, unknown>): void {
@@ -176,6 +187,81 @@ async function executeChatbotToolImpl(
       return saveClientEmailFromChatbot(ctx, input);
     case "send_intervention_email":
       return sendInterventionEmailFromChatbot(ctx, input);
+    case "list_vehicle_stock":
+      return listVehicleStock(ctx.companyId, ctx.actorUid);
+    case "add_vehicle_stock_item":
+      return addVehicleStockItem(ctx.companyId, ctx.actorUid, {
+        sku: String(input.sku || ""),
+        label: String(input.label || ""),
+        quantity: Math.max(0, Number(input.quantity) || 0),
+        minQuantity: Math.max(0, Number(input.minQuantity) || 1),
+        unitPriceCents: Math.max(0, Number(input.unitPriceCents) || 0),
+      });
+    case "update_vehicle_stock_item":
+      return updateVehicleStockItem(ctx.companyId, ctx.actorUid, String(input.itemId || ""), {
+        quantityDelta: input.quantityDelta !== undefined ? Number(input.quantityDelta) : undefined,
+        quantity: input.quantity !== undefined ? Number(input.quantity) : undefined,
+        label: input.label !== undefined ? String(input.label) : undefined,
+        minQuantity: input.minQuantity !== undefined ? Number(input.minQuantity) : undefined,
+        unitPriceCents:
+          input.unitPriceCents !== undefined ? Number(input.unitPriceCents) : undefined,
+      });
+    case "diagnose_equipment_photo": {
+      const apiKey = ctx.openAIApiKey ?? process.env.OPENAI_API_KEY ?? "";
+      if (!apiKey) return { error: "OPENAI_API_KEY manquante" };
+      return diagnoseEquipmentPhoto({
+        photoUrl: String(input.photoUrl ?? ""),
+        description: input.description ? String(input.description) : undefined,
+        apiKey,
+        modelName: ctx.openAIModelName,
+      });
+    }
+    case "parse_voice_job_closure": {
+      const apiKey = ctx.openAIApiKey ?? process.env.OPENAI_API_KEY ?? "";
+      if (!apiKey) return { error: "OPENAI_API_KEY manquante" };
+      return parseVoiceJobClosure({
+        transcription: String(input.transcription ?? ""),
+        apiKey,
+        modelName: ctx.openAIModelName,
+      });
+    }
+    case "get_contract_churn_risks": {
+      const firestore = db();
+      const [contractsSnap, interventions] = await Promise.all([
+        firestore
+          .collection("companies")
+          .doc(ctx.companyId)
+          .collection("maintenanceContracts")
+          .where("isActive", "==", true)
+          .limit(100)
+          .get(),
+        fetchInterventionsForCompany(firestore, ctx.companyId, 500),
+      ]);
+      const contracts = contractsSnap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as unknown as import("@/features/maintenance/types").MaintenanceContract[];
+      const risks = computeContractChurnRisks(
+        contracts,
+        interventions as unknown as import("@/features/interventions/types").Intervention[]
+      );
+      const filter = String(input.riskLevelFilter ?? "all");
+      const filtered = filter === "all" ? risks : risks.filter((r) => r.riskLevel === filter);
+      return {
+        total: risks.length,
+        filtered: filtered.length,
+        risks: filtered.slice(0, 20),
+        summary: {
+          at_risk: risks.filter((r) => r.riskLevel === "at_risk").length,
+          watch: risks.filter((r) => r.riskLevel === "watch").length,
+          safe: risks.filter((r) => r.riskLevel === "safe").length,
+        },
+      };
+    }
+    case "trigger_accounting_export":
+      return { ok: true, exportType: "accounting" };
+    case "trigger_payroll_export":
+      return { ok: true, exportType: "payroll" };
     case "focus_intervention_document":
       return focusInterventionDocument(ctx, input);
     case "update_intervention_billing":

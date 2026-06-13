@@ -44,6 +44,8 @@ type Props = {
     | "scheduledTime"
   >;
   peerInterventions?: Intervention[];
+  /** Toutes les interventions de la société — pour calculer les scores de performance. */
+  allInterventions?: Intervention[];
   onAssign: (technicianUid: string, schedule?: AssignScheduleOverride) => void | Promise<void>;
   onCancel: () => void;
   isAssigning?: boolean;
@@ -67,6 +69,7 @@ const statusLabelKey: Record<Technician["status"], string> = {
 export default function TechnicianAssignPicker({
   intervention,
   peerInterventions = [],
+  allInterventions,
   onAssign,
   onCancel,
   isAssigning = false,
@@ -79,6 +82,7 @@ export default function TechnicianAssignPicker({
   const [etaLoading, setEtaLoading] = useState(false);
   const [recommendedId, setRecommendedId] = useState<string | null>(null);
   const [aiReasoning, setAiReasoning] = useState<string | null>(null);
+  const [aiRevenueImpact, setAiRevenueImpact] = useState<string | null>(null);
   const [etaByTechId, setEtaByTechId] = useState<Record<string, string>>({});
   const [scheduleDate, setScheduleDate] = useState(() => {
     const fromIv = intervention.scheduledDate?.trim() || intervention.requestedDate?.trim() || "";
@@ -123,14 +127,15 @@ export default function TechnicianAssignPicker({
           interventionCoords.lat,
           interventionCoords.lng,
           intervention.problem,
-          intervention.address
+          intervention.address,
+          null,
+          allInterventions ?? null
         );
         if (cancelled || !result) return;
         const best = result.technician;
         setRecommendedId(best.id);
-        if (result.reasoning) {
-          setAiReasoning(result.reasoning);
-        }
+        if (result.reasoning) setAiReasoning(result.reasoning);
+        if (result.revenueImpact) setAiRevenueImpact(result.revenueImpact);
         if (best.realEta) {
           setEtaByTechId((prev) => ({ ...prev, [best.id]: best.realEta! }));
         }
@@ -350,11 +355,14 @@ export default function TechnicianAssignPicker({
                           {eta ? <span>· ETA {eta}</span> : null}
                           <span>· {String(t(statusLabelKey[technician.status]))}</span>
                         </span>
-                        {isRecommended && aiReasoning ? (
+                        {isRecommended && (aiReasoning || aiRevenueImpact) ? (
                           <div className="mt-2.5 rounded-[12px] bg-indigo-50/80 border border-indigo-100/50 p-2.5 flex items-start gap-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)]">
                             <Sparkles className="h-4 w-4 shrink-0 text-indigo-500 mt-0.5" />
                             <span className="text-[12px] text-indigo-900 font-medium leading-snug">
                               {aiReasoning}
+                              {aiRevenueImpact ? (
+                                <span className="ml-1 text-emerald-700">· {aiRevenueImpact}</span>
+                              ) : null}
                             </span>
                           </div>
                         ) : null}

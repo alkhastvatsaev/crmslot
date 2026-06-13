@@ -20,17 +20,15 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
     }
 
     if (devUiPreviewEnabled) {
-      void (async () => {
-        try {
-          if (!auth.currentUser) await signInAnonymously(auth);
-        } catch (e) {
+      if (!auth.currentUser) {
+        signInAnonymously(auth).catch((e: unknown) => {
           logger.warn("[LoginOverlay] dev anonymous sign-in failed", {
             error: e instanceof Error ? e.message : String(e),
           });
-        }
-        setIsAuthenticated(true);
-        setLoadingState("ready");
-      })();
+        });
+      }
+      setIsAuthenticated(true);
+      setLoadingState("ready");
       return;
     }
 

@@ -34,6 +34,8 @@ export default function WidgetPage() {
         const cred = await signInAnonymously(auth);
         uid = cred.user.uid;
       }
+      const { portalAccessTokenField } =
+        await import("@/features/interventions/ensurePortalAccessToken");
       const createdRef = await addDoc(collection(firestore, "interventions"), {
         companyId,
         address,
@@ -43,6 +45,7 @@ export default function WidgetPage() {
         createdAt: new Date().toISOString(),
         createdByUid: uid,
         source: "widget_qr",
+        ...portalAccessTokenField(),
       });
       void logCrmInterventionCreated({
         intervention: {
@@ -67,19 +70,25 @@ export default function WidgetPage() {
       <div className="w-full max-w-sm bg-white rounded-3xl shadow-xl border border-black/5 overflow-hidden">
         <div className="bg-slate-900 px-6 py-5">
           <h1 className="text-white font-bold text-[18px]">Demande d&apos;intervention</h1>
-          <p className="text-slate-400 text-[13px] mt-0.5">Remplissez ce formulaire et nous vous rappelons.</p>
+          <p className="text-slate-400 text-[13px] mt-0.5">
+            Remplissez ce formulaire et nous vous rappelons.
+          </p>
         </div>
 
         {done ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center">
             <CheckCircle2 className="h-12 w-12 text-emerald-500" />
             <p className="text-[17px] font-bold text-slate-800">Demande envoyée !</p>
-            <p className="text-[13px] text-slate-500">Notre équipe vous contacte dans les plus brefs délais.</p>
+            <p className="text-[13px] text-slate-500">
+              Notre équipe vous contacte dans les plus brefs délais.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-6">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Adresse</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Adresse
+              </label>
               <input
                 required
                 value={address}
@@ -89,7 +98,9 @@ export default function WidgetPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Problème *</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Problème *
+              </label>
               <textarea
                 required
                 rows={3}
@@ -100,7 +111,9 @@ export default function WidgetPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Téléphone</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Téléphone
+              </label>
               <input
                 type="tel"
                 value={phone}

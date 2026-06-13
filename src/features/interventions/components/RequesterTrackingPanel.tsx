@@ -29,6 +29,7 @@ import RequesterPaymentPanel from "@/features/interventions/components/Requester
 import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
 import RequesterPortalEnrichment from "@/features/interventions/components/RequesterPortalEnrichment";
 import ClientRatingPanel from "@/features/interventions/components/ClientRatingPanel";
+import NotificationPreferencesPanel from "@/features/notifications/components/NotificationPreferencesPanel";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.5 } as const;
@@ -498,6 +499,7 @@ export default function RequesterTrackingPanel() {
                     existingRating={selectedIntervention.clientRating}
                     existingComment={selectedIntervention.clientComment}
                   />
+                  <NotificationPreferencesPanel profileKind="client" />
                 </>
               ) : null}
             </div>

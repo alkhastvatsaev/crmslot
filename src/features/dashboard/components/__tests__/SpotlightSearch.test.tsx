@@ -17,7 +17,7 @@ describe("SpotlightSearch", () => {
   it("renders trigger button", () => {
     renderWithPager(<SpotlightSearch />, SPOTLIGHT_PAGE_COUNT);
     expect(screen.getByTestId("spotlight-trigger")).toBeInTheDocument();
-    expect(screen.getByText("Rechercher...")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ouvrir la recherche" })).toBeInTheDocument();
   });
 
   it("shows 7 nav items when open", () => {

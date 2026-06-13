@@ -15,7 +15,7 @@ interface GalaxyButtonProps {
    * (ex. lecture) sans HTML invalide ni double zone cliquable.
    */
   asInteractiveButton?: boolean;
-  /** Force le profil basse consommation. Omis = auto-détection via media query. */
+  /** Profil ultra-léger (56 étoiles) — ex. assistant carte. */
   mobilePowerSave?: boolean;
 }
 
@@ -81,7 +81,7 @@ const GalaxyButton: React.FC<GalaxyButtonProps> = ({
 
   const inner = (
     <>
-      <canvas ref={canvasRef} id="stars-canvas"></canvas>
+      <canvas ref={canvasRef} className="galaxy-stars-canvas" aria-hidden />
       <div className="btn-content">{children || text}</div>
     </>
   );

@@ -45,7 +45,11 @@ import TechnicianSignaturePad, {
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import FinishJobStepIndicator from "@/features/interventions/components/FinishJobStepIndicator";
+import FinishJobStepIndicator, {
+  type FinishJobStep,
+} from "@/features/interventions/components/FinishJobStepIndicator";
+import TechnicianFinishInvoiceStep from "@/features/interventions/components/TechnicianFinishInvoiceStep";
+import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
 import { finishWizardPhotosFromIntervention } from "@/features/interventions/technicianCompletionReport";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
@@ -65,7 +69,6 @@ const CATEGORY_ICONS = {
   autre: MoreHorizontal,
 } as const;
 
-type WizardStep = "photos" | "signature";
 type PhotoCategory = "panne" | "materiel" | "preuve" | "autre";
 
 const STEP_SHELL = "absolute inset-0 flex min-h-0 flex-col overflow-hidden px-3";
@@ -74,11 +77,14 @@ export default function TechnicianFinishJobPanel() {
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const queryClient = useQueryClient();
-  const { finishJobInterventionId, setFinishJobInterventionId } = useTechnicianFinishJob();
+  const { finishJobInterventionId, finishJobEntryStep, setFinishJobInterventionId } =
+    useTechnicianFinishJob();
   const offlineSync = useOfflineSyncOptional();
   const backofficeBridge = useTechnicianBackofficeReportBridgeOptional();
 
-  const [step, setStep] = useState<WizardStep>("photos");
+  const [step, setStep] = useState<FinishJobStep>("photos");
+  const [draftBillingLines, setDraftBillingLines] = useState<DraftBillingLine[]>([]);
+  const [draftAiNote, setDraftAiNote] = useState<string | null>(null);
   const [photos, setPhotos] = useState<{ url: string; category: PhotoCategory }[]>([]);
   const [currentCategory, setCurrentCategory] = useState<PhotoCategory>("preuve");
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -155,12 +161,45 @@ export default function TechnicianFinishJobPanel() {
     setPhotos([]);
     sigRef.current?.clear();
     setStep("photos");
+    setDraftBillingLines([]);
+    setDraftAiNote(null);
     hydratedReportRef.current = null;
   };
 
+  const prefetchDraftBilling = useCallback(async (ivId: string) => {
+    try {
+      const res = await fetchWithAuth(
+        `/api/interventions/${encodeURIComponent(ivId)}/prepare-draft-billing`,
+        { method: "POST" }
+      );
+      const data = (await res.json()) as {
+        ok?: boolean;
+        billingLines?: DraftBillingLine[];
+        aiNote?: string;
+      };
+      if (res.ok && data.ok && Array.isArray(data.billingLines)) {
+        setDraftBillingLines(data.billingLines);
+        if (typeof data.aiNote === "string") setDraftAiNote(data.aiNote);
+      }
+    } catch (err) {
+      logger.warn("[prefetch-draft-billing]", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }, []);
+
   useEffect(() => {
     resetWizard();
-  }, [interventionId]);
+    if (finishJobEntryStep === "invoice" && interventionId) {
+      setStep("billing");
+      void prefetchDraftBilling(interventionId);
+    }
+  }, [interventionId, finishJobEntryStep, prefetchDraftBilling]);
+
+  useEffect(() => {
+    if (!interventionId || isAmendMode) return;
+    void prefetchDraftBilling(interventionId);
+  }, [interventionId, isAmendMode, prefetchDraftBilling]);
 
   useEffect(() => {
     if (!liveIv || liveIv.status !== "done" || hydratedReportRef.current === liveIv.id) return;
@@ -248,46 +287,27 @@ export default function TechnicianFinishJobPanel() {
         });
       }
 
-      if (!isAmendMode) {
-        void fetchWithAuth(
-          `/api/interventions/${encodeURIComponent(interventionId)}/prepare-draft-billing`,
-          { method: "POST" }
-        ).catch((err) =>
-          logger.warn("[prepare-draft-billing]", {
-            error: err instanceof Error ? err.message : String(err),
-          })
-        );
+      if (isAmendMode) {
+        toast.success(String(t("technician_hub.finish.toasts.report_updated")), {
+          description: String(t("technician_hub.finish.toasts.report_updated_desc")),
+        });
+        await prefetchDraftBilling(interventionId);
+        setStep("billing");
+        return;
       }
 
-      toast.success(
-        String(
-          t(
-            isAmendMode
-              ? "technician_hub.finish.toasts.report_updated"
-              : "technician_hub.finish.toasts.report_sent"
-          )
-        ),
-        {
-          description: String(
-            t(
-              isAmendMode
-                ? "technician_hub.finish.toasts.report_updated_desc"
-                : "technician_hub.finish.toasts.report_sent_desc"
-            )
-          ),
-        }
-      );
+      await prefetchDraftBilling(interventionId);
+
+      toast.success(String(t("technician_hub.finish.toasts.report_sent")), {
+        description: String(t("technician_hub.finish.toasts.report_sent_desc")),
+      });
       if (PRESENTATION_PRIVACY_MODE) {
         toast.message(String(t("technician_hub.finish.toasts.presentation_mode")), {
           description: String(t("technician_hub.finish.toasts.presentation_mode_desc")),
         });
       }
 
-      resetWizard();
-      setFinishJobInterventionId(null);
-      if (!isAmendMode) {
-        navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-      }
+      setStep("billing");
     } catch (e) {
       logger.error(e instanceof Error ? e.message : String(e));
       setStep("signature");
@@ -453,6 +473,36 @@ export default function TechnicianFinishJobPanel() {
             </motion.div>
           )}
 
+          {step === "billing" && interventionId ? (
+            <motion.div
+              key="billing"
+              variants={stepVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={springTransition}
+              className={STEP_SHELL}
+            >
+              <TechnicianFinishInvoiceStep
+                interventionId={interventionId}
+                clientEmail={liveIv?.clientEmail}
+                clientName={liveIv?.clientName}
+                initialLines={draftBillingLines}
+                initialAiNote={draftAiNote}
+                onSent={() => {
+                  resetWizard();
+                  setFinishJobInterventionId(null);
+                  navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+                }}
+                onSkip={() => {
+                  resetWizard();
+                  setFinishJobInterventionId(null);
+                  navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
+                }}
+              />
+            </motion.div>
+          ) : null}
+
           {step === "signature" && (
             <motion.div
               key="signature"
@@ -497,7 +547,7 @@ export default function TechnicianFinishJobPanel() {
           </div>
         ) : null}
 
-        {step === "signature" ? (
+        {step === "billing" ? null : step === "signature" ? (
           <div className="mb-2 flex items-center justify-center gap-3">
             <button
               type="button"

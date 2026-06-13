@@ -24,213 +24,316 @@
  */
 
 :root {
-    --dashboard-grid-gap: 1.5rem;
-    --dashboard-gutter: var(--dashboard-grid-gap);
+  --dashboard-grid-gap: 1.5rem;
+  --dashboard-gutter: var(--dashboard-grid-gap);
 
-    --dashboard-header-height: 70px;
-    --dashboard-galaxy-band-height: 3.5rem;
+  --dashboard-header-height: 70px;
+  --dashboard-galaxy-band-height: 3.5rem;
 
-    /* Rail System column widths */
-    --dashboard-rail-min-width: 380px;
-    --dashboard-center-min-width: 500px;
+  /* Rail System column widths */
+  --dashboard-rail-min-width: 380px;
+  --dashboard-center-min-width: 500px;
 
-    /* Rail System centered wrapper width */
-    --dashboard-stack-max-width: 1520px;
+  /* Rail System centered wrapper width */
+  --dashboard-stack-max-width: 1520px;
 
-    --dashboard-canvas-pad-x: 1.5rem;
-    --dashboard-canvas-pad-top: 1.5rem;
+  --dashboard-canvas-pad-x: 1.5rem;
+  --dashboard-canvas-pad-top: 1.5rem;
 
-    /** Rails 1–4: one grid definition for header, pager pages, and galaxy alignment */
-    --dashboard-grid-columns:
-        minmax(var(--dashboard-rail-min-width), 1fr)
-        minmax(var(--dashboard-center-min-width), 1fr)
-        minmax(var(--dashboard-rail-min-width), 1fr);
+  /** Rails 1–4: one grid definition for header, pager pages, and galaxy alignment */
+  --dashboard-grid-columns: minmax(var(--dashboard-rail-min-width), 1fr)
+    minmax(var(--dashboard-center-min-width), 1fr) minmax(var(--dashboard-rail-min-width), 1fr);
 
-    --dashboard-track-min-width: calc(
-        2 * var(--dashboard-rail-min-width) +
-            var(--dashboard-center-min-width) +
-            2 * var(--dashboard-grid-gap)
-    );
+  --dashboard-track-min-width: calc(
+    2 * var(--dashboard-rail-min-width) + var(--dashboard-center-min-width) + 2 *
+      var(--dashboard-grid-gap)
+  );
 
-    --dashboard-canvas-min-width: calc(
-        var(--dashboard-track-min-width) + 2 * var(--dashboard-canvas-pad-x)
-    );
+  --dashboard-canvas-min-width: calc(
+    var(--dashboard-track-min-width) + 2 * var(--dashboard-canvas-pad-x)
+  );
 
-    --dashboard-panel-min-width: var(--dashboard-rail-min-width);
-    --dashboard-panel-max-width: var(--dashboard-rail-min-width);
-    --dashboard-canvas-max-width: var(--dashboard-stack-max-width);
+  --dashboard-panel-min-width: var(--dashboard-rail-min-width);
+  --dashboard-panel-max-width: var(--dashboard-rail-min-width);
+  --dashboard-canvas-max-width: var(--dashboard-stack-max-width);
 }
 
 @media (min-width: 768px) {
-    :root {
-        --dashboard-canvas-pad-x: 2rem;
-        --dashboard-canvas-pad-top: 2rem;
-    }
+  :root {
+    --dashboard-canvas-pad-x: 2rem;
+    --dashboard-canvas-pad-top: 2rem;
+  }
 }
 
 @media (min-width: 1024px) {
-    :root {
-        --dashboard-canvas-pad-x: 2.5rem;
-        --dashboard-canvas-pad-top: 2.5rem;
-    }
+  :root {
+    --dashboard-canvas-pad-x: 2.5rem;
+    --dashboard-canvas-pad-top: 2.5rem;
+  }
 }
 
 /* ── Viewport ── */
 .dashboard-desktop-app {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100dvh;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
 }
 
 .dashboard-desktop-canvas {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    min-width: var(--dashboard-canvas-min-width);
-    min-height: 0;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: var(--dashboard-canvas-min-width);
+  min-height: 0;
 }
 
 /**
  * Centered block — padding defines outer bounds; inner grids align Rails 1–4.
  */
 .dashboard-desktop-stack {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    width: 100%;
-    max-width: var(--dashboard-stack-max-width);
-    min-width: var(--dashboard-track-min-width);
-    min-height: 0;
-    flex: 1 1 auto;
-    margin-inline: auto;
-    padding-inline: var(--dashboard-canvas-pad-x);
-    padding-top: var(--dashboard-canvas-pad-top);
-    padding-bottom: max(var(--dashboard-canvas-pad-x), env(safe-area-inset-bottom, 0px));
-    gap: var(--dashboard-grid-gap);
-    --dashboard-pager-outside-gap: 0.35rem;
-    --dashboard-pager-outside-extra: calc(5px + 5mm);
-    --dashboard-pager-inset-nudge: 6px;
-    overflow: visible;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--dashboard-stack-max-width);
+  min-width: var(--dashboard-track-min-width);
+  min-height: 0;
+  flex: 1 1 auto;
+  margin-inline: auto;
+  padding-inline: var(--dashboard-canvas-pad-x);
+  padding-top: var(--dashboard-canvas-pad-top);
+  padding-bottom: max(var(--dashboard-canvas-pad-x), env(safe-area-inset-bottom, 0px));
+  gap: var(--dashboard-grid-gap);
+  --dashboard-pager-outside-gap: 0.35rem;
+  --dashboard-pager-outside-extra: calc(5px + 5mm);
+  --dashboard-pager-inset-nudge: 6px;
+  overflow: visible;
 }
 
 .dashboard-desktop-stack-header {
-    flex-shrink: 0;
-    width: 100%;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .dashboard-desktop-stack-body {
-    position: relative;
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 0;
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
 }
 
 .dashboard-desktop-pager-host {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow-x: clip;
-    overflow-y: visible;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/** Sélecteur de pages — colonne centrale du rail (Rail 2), rails latéraux laissés visibles. */
+.dashboard-page-selector-host {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.dashboard-page-selector-host-grid {
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard-page-selector-center-slot {
+  pointer-events: auto;
+  min-height: 0;
+}
+
+.dashboard-page-selector--desktop {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard-page-selector-inner {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.dashboard-page-selector-grid--desktop {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.875rem;
+  flex: 1;
+  align-content: center;
+}
+
+.dashboard-page-selector-item--desktop {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1.125rem 0.75rem;
+  border-radius: 1rem;
+  background: rgb(248 250 252);
+  border: 1px solid rgb(226 232 240);
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard-page-selector-item--desktop:hover {
+  background: rgb(241 245 249);
+  border-color: rgb(203 213 225);
+}
+
+.dashboard-page-selector-item--desktop:active {
+  transform: scale(0.98);
+}
+
+.dashboard-page-selector-item--desktop.dashboard-page-selector-item--active {
+  background: rgb(239 246 255);
+  border-color: rgb(191 219 254);
+}
+
+.dashboard-page-selector-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.875rem;
+  background: rgb(255 255 255);
+  color: rgb(100 116 139);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+.dashboard-page-selector-item--active .dashboard-page-selector-icon {
+  background: rgb(37 99 235);
+  color: rgb(255 255 255);
+  box-shadow: 0 2px 8px rgb(37 99 235 / 0.35);
+}
+
+.dashboard-page-selector-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgb(71 85 105);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.dashboard-page-selector-item--active .dashboard-page-selector-label {
+  color: rgb(37 99 235);
 }
 
 /* Page 6 — `/technician` plein écran (pas de header 3 colonnes ni galaxy). */
 .dashboard-desktop-canvas--technician-lab {
-    align-items: stretch;
-    min-width: 0;
+  align-items: stretch;
+  min-width: 0;
 }
 
 .dashboard-desktop-stack--technician-lab {
-    max-width: none;
-    min-width: 0;
-    width: 100%;
-    padding-inline: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    gap: 0;
+  max-width: none;
+  min-width: 0;
+  width: 100%;
+  padding-inline: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  gap: 0;
 }
 
 .dashboard-desktop-stack--technician-lab .dashboard-desktop-pager-host {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 /**
  * Flèches carrousel — fixed, z-50, dans la gouttière hors panneaux vitre (jamais de coords négatives).
  */
 .dashboard-desktop-pager-controls {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
 }
 
 .dashboard-desktop-pager-controls__btn {
-    position: fixed;
-    top: 50%;
-    display: flex;
-    min-height: 3rem;
-    min-width: 3rem;
-    padding: 0.5rem;
-    transform: translateY(-50%);
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background: transparent;
-    color: rgb(51 65 85 / 0.55);
-    transition:
-        transform 0.25s ease,
-        color 0.25s ease,
-        opacity 0.25s ease;
-    pointer-events: auto;
+  position: fixed;
+  top: 50%;
+  display: flex;
+  min-height: 3rem;
+  min-width: 3rem;
+  padding: 0.5rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgb(51 65 85 / 0.55);
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
+  pointer-events: auto;
 }
 
 .dashboard-desktop-pager-controls__btn:hover:not(:disabled) {
-    transform: translateY(-50%) scale(1.12);
-    color: rgb(15 23 42 / 0.9);
+  transform: translateY(-50%) scale(1.12);
+  color: rgb(15 23 42 / 0.9);
 }
 
 .dashboard-desktop-pager-controls__btn:active:not(:disabled) {
-    transform: translateY(-50%) scale(0.95);
+  transform: translateY(-50%) scale(0.95);
 }
 
 .dashboard-desktop-pager-controls__btn:disabled {
-    pointer-events: none;
-    opacity: 0.25;
+  pointer-events: none;
+  opacity: 0.25;
 }
 
 /* Marge viewport (stack centré) ou padding canvas (pleine largeur) — toujours visible */
 .dashboard-desktop-pager-controls__btn--prev {
-    left: calc(
-        max(
-            0.5rem,
-            (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 + var(--dashboard-pager-outside-gap)
-        ) - var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
-    );
+  left: calc(
+    max(
+        0.5rem,
+        (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 +
+          var(--dashboard-pager-outside-gap)
+      ) -
+      var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
+  );
 }
 
 .dashboard-desktop-pager-controls__btn--next {
-    right: calc(
-        max(
-            0.5rem,
-            (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 + var(--dashboard-pager-outside-gap)
-        ) - var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
-    );
+  right: calc(
+    max(
+        0.5rem,
+        (100vw - min(100vw, var(--dashboard-stack-max-width))) / 2 +
+          var(--dashboard-pager-outside-gap)
+      ) -
+      var(--dashboard-pager-outside-extra) + var(--dashboard-pager-inset-nudge)
+  );
 }
 
 .dashboard-desktop-overlay-root {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
-    overflow: hidden;
-    pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /**
@@ -238,57 +341,57 @@
  * Children 1–3 = left / center / right columns.
  */
 .dashboard-desktop-grid {
-    display: grid;
-    width: 100%;
-    min-width: 0;
-    align-items: stretch;
-    grid-template-columns: var(--dashboard-grid-columns);
-    gap: var(--dashboard-grid-gap);
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  grid-template-columns: var(--dashboard-grid-columns);
+  gap: var(--dashboard-grid-gap);
 }
 
 .dashboard-desktop-grid--fill {
-    height: 100%;
-    min-height: 0;
+  height: 100%;
+  min-height: 0;
 }
 
 .dashboard-desktop-col {
-    display: flex;
-    min-width: 0;
-    min-height: 0;
-    flex-direction: column;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
 }
 
 /* Optional rail labels (documentation / tests) */
 .dashboard-desktop-col--left {
-    grid-column: 1;
+  grid-column: 1;
 }
 
 .dashboard-desktop-col--center {
-    grid-column: 2;
+  grid-column: 2;
 }
 
 .dashboard-desktop-col--right {
-    grid-column: 3;
+  grid-column: 3;
 }
 
 .dashboard-desktop-page-root {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    flex-direction: column;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
 }
 
 .dashboard-layout {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    background: transparent;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: transparent;
 }
 
 .dashboard-layout.mode-presentation {
-    min-height: 0;
+  min-height: 0;
 }
 
 /**
@@ -297,64 +400,64 @@
  * Width always matches #map-container; never spans columns 1–3.
  */
 .dashboard-desktop-galaxy-dock {
-    display: grid;
-    flex-shrink: 0;
-    width: 100%;
-    min-width: 0;
-    grid-template-columns: var(--dashboard-grid-columns);
-    gap: var(--dashboard-grid-gap);
+  display: grid;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: var(--dashboard-grid-columns);
+  gap: var(--dashboard-grid-gap);
 }
 
 .dashboard-desktop-galaxy-dock-chrome {
-    grid-column: 2;
-    width: 100%;
-    min-width: 0;
-    overflow: visible;
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
 }
 
 .dashboard-desktop-galaxy-dock-chrome-inner {
-    width: 100%;
-    overflow: hidden;
-    border-radius: inherit;
+  width: 100%;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .dashboard-desktop-galaxy-strip {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .dashboard-desktop-galaxy-strip-inner {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    height: var(--dashboard-galaxy-band-height);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: var(--dashboard-galaxy-band-height);
 }
 
 .dashboard-desktop-galaxy-rail {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: calc(var(--dashboard-galaxy-band-height) + var(--dashboard-grid-gap));
-    pointer-events: none;
-    box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: calc(var(--dashboard-galaxy-band-height) + var(--dashboard-grid-gap));
+  pointer-events: none;
+  box-sizing: border-box;
 }
 
 /* Legacy aliases */
 .dashboard-desktop-track {
-    display: grid;
-    width: 100%;
-    min-width: 0;
-    align-items: stretch;
-    grid-template-columns: var(--dashboard-grid-columns);
-    gap: var(--dashboard-grid-gap);
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  grid-template-columns: var(--dashboard-grid-columns);
+  gap: var(--dashboard-grid-gap);
 }
 
 .dashboard-desktop-track-fill {
-    height: 100%;
-    min-height: 0;
+  height: 100%;
+  min-height: 0;
 }

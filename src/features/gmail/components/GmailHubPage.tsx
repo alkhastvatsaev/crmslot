@@ -9,6 +9,7 @@ import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
 import { useGmailHubLinkIntervention } from "@/features/gmail/useGmailHubLinkIntervention";
+import { useGmailCreateIntervention } from "@/features/gmail/hooks/useGmailCreateIntervention";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -48,6 +49,8 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
     linkToIntervention,
     reset: resetGmailLink,
   } = useGmailHubLinkIntervention(companyId);
+  const { creating: creatingIntervention, createFromMessage } =
+    useGmailCreateIntervention(companyId);
   const oauthReturnHandled = useRef(false);
   const [activeLabelId, setActiveLabelId] = useState("INBOX");
   const [searchQuery, setSearchQuery] = useState("");
@@ -310,6 +313,26 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
     setComposing(true);
   };
 
+  const handleCreateInterventionFromEmail = useCallback(async () => {
+    const m = hub.selectedMessage;
+    if (!m || !companyId) return;
+    try {
+      const result = await createFromMessage(m.id);
+      toast.success(String(t("gmail.hub.create_intervention_ok")), {
+        description: result.autoAssigned
+          ? String(t("gmail.hub.create_intervention_assigned")).replace(
+              "{{name}}",
+              result.technicianName ?? "—"
+            )
+          : String(t("gmail.hub.create_intervention_pending_assign")),
+      });
+      setLinkPanelOpen(false);
+      resetGmailLink();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(t("common.error")));
+    }
+  }, [hub.selectedMessage, companyId, createFromMessage, resetGmailLink, t]);
+
   const handleLinkToIntervention = useCallback(
     async (interventionId: string, note?: string) => {
       const m = hub.selectedMessage;
@@ -517,6 +540,10 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
             onReply={handleReply}
             linkPanelOpen={linkPanelOpen}
             onToggleLinkPanel={() => setLinkPanelOpen((v) => !v)}
+            onCreateIntervention={
+              companyId ? () => void handleCreateInterventionFromEmail() : undefined
+            }
+            creatingIntervention={creatingIntervention}
             linkPanel={
               <GmailHubLinkInterventionPanel
                 open={linkPanelOpen}

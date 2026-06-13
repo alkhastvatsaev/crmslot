@@ -427,8 +427,53 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     }
   };
 
-  const handleDragBoardSchedule = async (interventionId: string, time: string) => {
-    const techUid = dragBoardTechUid.trim();
+  const handleRejectReport = async (id: string, reason?: string) => {
+    try {
+      const row = interventions.find((x) => x.id === id);
+      if (!row) return;
+      const actorUid = auth?.currentUser?.uid?.trim();
+      if (!actorUid) return;
+      const res = await fetchWithAuth(
+        `/api/interventions/${encodeURIComponent(id)}/reject-report`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: reason?.trim() || undefined }),
+        }
+      );
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) throw new Error(data.error || t("common.try_again"));
+      await logCrmInterventionAction({
+        kind: "intervention_report_rejected",
+        iv: row,
+        actorUid,
+        actorRole: "dispatcher",
+        statusBefore: row.status,
+        statusAfter: "in_progress",
+        note: reason ? `Rapport refusé — ${reason}` : "Rapport refusé — renvoyé au technicien",
+      });
+      toast.success(t("backoffice.toasts.report_rejected"));
+      setSelectedItemId(null);
+      if (terrainBridge) {
+        terrainBridge.reports
+          .filter((r) => r.interventionId === id)
+          .forEach((r) => terrainBridge.dismissReport(r.localId));
+      }
+      setSelectedTerrainLocalId(null);
+    } catch (e) {
+      logger.error("Rejet rapport:", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("common.error"), {
+        description: e instanceof Error ? e.message : t("common.try_again"),
+      });
+    }
+  };
+
+  const handleDragBoardSchedule = async (
+    interventionId: string,
+    time: string,
+    technicianUidOverride?: string
+  ) => {
+    const techUid = (technicianUidOverride ?? dragBoardTechUid).trim();
     if (!techUid) {
       toast.error(String(t("scheduling.drag_board.pick_technician")));
       return;
@@ -491,6 +536,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   };
 
   const isTenant = !!workspace?.isTenantUser;
+  const workspaceReady = workspace?.workspaceReady !== false;
 
   useEffect(() => {
     if (!terrainBridge) return;
@@ -535,6 +581,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     // context / config
     cid,
     isTenant,
+    workspaceReady,
     ivanaChatCompanyId,
     pwaV2,
     workspace,
@@ -601,6 +648,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     handleAssignToTechnician,
     handleCancelIntervention,
     handleVerify,
+    handleRejectReport,
     handleDragBoardSchedule,
     handleUpdateDateTime,
     handleDownloadQuotePdf,

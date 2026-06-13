@@ -3,67 +3,86 @@ import OpenAI from "openai";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { logger } from "@/core/logger";
 
+export const runtime = "nodejs";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
 });
 
+type DispatchTech = {
+  id: string;
+  name?: string;
+  skills?: string[];
+  realEta?: string;
+  status?: string;
+  /** Score de performance composite 0–100 (optionnel — enrichi côté client). */
+  performanceScore?: number;
+  /** Taux de clôture 30j en % (optionnel). */
+  completionRate?: number;
+  /** Ticket moyen facturé 30j en € (optionnel). */
+  avgTicketEur?: number;
+};
+
 export async function POST(req: NextRequest) {
   try {
-    // 1. Authentification
     const authResult = await requireAuthenticatedUser(req);
     if ("response" in authResult) return authResult.response;
 
     const body = await req.json();
-    const { problem, address, technicians } = body;
+    const { problem, address, technicians, urgency } = body as {
+      problem?: string;
+      address?: string;
+      technicians: DispatchTech[];
+      urgency?: string;
+    };
 
     if (!technicians || !Array.isArray(technicians) || technicians.length === 0) {
       return NextResponse.json({ error: "No technicians provided" }, { status: 400 });
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      // Fallback si pas de clé API (pour éviter de casser l'app)
       return NextResponse.json({
-        bestTechnicianId: technicians[0].id,
-        reasoning:
-          "API OpenAI non configurée. Recommandation basée sur le temps de trajet estimé par défaut.",
+        bestTechnicianId: technicians[0]!.id,
+        reasoning: "API OpenAI non configurée — recommandation par défaut.",
       });
     }
 
-    type DispatchTech = {
-      id: string;
-      name?: string;
-      skills?: string[];
-      realEta?: string;
-      status?: string;
-    };
-    const techList = (technicians as DispatchTech[]).map((t) => ({
+    const hasPerformanceData = technicians.some((t) => t.performanceScore !== undefined);
+
+    const techList = technicians.map((t) => ({
       id: t.id,
       name: t.name,
-      skills: t.skills,
-      eta: t.realEta || "Inconnu",
-      status: t.status,
+      skills: t.skills ?? [],
+      eta: t.realEta ?? "Inconnu",
+      status: t.status ?? "unknown",
+      ...(t.performanceScore !== undefined && { performanceScore: t.performanceScore }),
+      ...(t.completionRate !== undefined && { completionRate: `${t.completionRate}%` }),
+      ...(t.avgTicketEur !== undefined && { avgTicketEur: `${t.avgTicketEur}€` }),
     }));
 
+    const performanceCriteria = hasPerformanceData
+      ? `4. Performance (30j) : favoriser le technicien avec le meilleur score composite (completionRate élevé, avgTicketEur élevé = valorise mieux le client). Score = combo taux clôture + ticket moyen.`
+      : "";
+
     const systemPrompt = `Tu es un assistant IA spécialisé dans la répartition des interventions techniques (dispatch).
-Ta mission est de choisir le MEILLEUR technicien pour une intervention donnée.
-Critères de décision (par ordre d'importance) :
-1. Temps de trajet (ETA) : le technicien doit arriver le plus vite possible.
-2. Compétences (skills) : le technicien doit idéalement avoir les compétences adaptées au problème.
-3. Statut : privilégier les techniciens "available".
+Ta mission : choisir le MEILLEUR technicien pour maximiser la satisfaction client ET le chiffre d'affaires.
 
-Tu recevras :
-- Le problème : La description du problème chez le client.
-- L'adresse du client.
-- Les techniciens : Une liste des techniciens les plus proches avec leurs infos.
+Critères de décision (ordre d'importance) :
+1. ETA : arriver le plus vite possible (surtout si urgence).
+2. Compétences (skills) : compétences adaptées au problème décrit.
+3. Statut : privilégier "available".
+${performanceCriteria}
 
-Tu DOIS retourner un objet JSON avec exactement cette structure :
+Retourne UNIQUEMENT ce JSON :
 {
   "bestTechnicianId": "id_du_technicien_choisi",
-  "reasoning": "Une phrase courte (max 20 mots) expliquant de manière professionnelle pourquoi ce technicien est idéal pour cette tâche."
+  "reasoning": "Phrase courte (max 25 mots) expliquant le choix en termes concrets (ETA + compétence + performance si dispo).",
+  "revenueImpact": "estimation texte courte de l'impact revenu du choix (ex: '+15% ticket moyen vs équipe') ou null"
 }`;
 
-    const userPrompt = `Problème : ${problem || "Non précisé"}
-Adresse : ${address || "Non précisée"}
+    const userPrompt = `Problème : ${problem ?? "Non précisé"}
+Adresse : ${address ?? "Non précisée"}
+Urgence : ${urgency ?? "normale"}
 Techniciens disponibles :
 ${JSON.stringify(techList, null, 2)}`;
 
@@ -74,22 +93,24 @@ ${JSON.stringify(techList, null, 2)}`;
         { role: "user", content: userPrompt },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.2,
-      max_tokens: 150,
+      temperature: 0.15,
+      max_tokens: 200,
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error("Empty response from OpenAI");
-    }
+    if (!content) throw new Error("Empty response from OpenAI");
 
-    const result = JSON.parse(content);
+    const result = JSON.parse(content) as {
+      bestTechnicianId?: string;
+      reasoning?: string;
+      revenueImpact?: string | null;
+    };
 
-    // Vérifier que le technicien choisi fait bien partie de la liste
-    const chosen = (technicians as DispatchTech[]).find((t) => t.id === result.bestTechnicianId);
+    const chosen = technicians.find((t) => t.id === result.bestTechnicianId);
     if (!chosen) {
-      result.bestTechnicianId = technicians[0].id;
-      result.reasoning = "Le système a choisi ce technicien par défaut suite à une anomalie.";
+      result.bestTechnicianId = technicians[0]!.id;
+      result.reasoning = "Technicien sélectionné par défaut (anomalie de réponse IA).";
+      result.revenueImpact = null;
     }
 
     return NextResponse.json(result);
@@ -97,7 +118,9 @@ ${JSON.stringify(techList, null, 2)}`;
     logger.error("[smart-dispatch]", {
       error: error instanceof Error ? error.message : String(error),
     });
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: "Erreur interne", details: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur interne", details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
 }

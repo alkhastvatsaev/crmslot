@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
+import EInvoiceButton from "@/features/billing/components/EInvoiceButton";
+import PortalLinkButton from "@/features/interventions/components/PortalLinkButton";
 import InterventionPdfButton from "@/features/interventions/components/InterventionPdfButton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -261,6 +263,11 @@ export default function InvoiceBillingPanel({ intervention, onApplyTemplate }: P
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <EInvoiceButton intervention={intervention} />
+            <PortalLinkButton intervention={intervention} />
           </div>
 
           {/* PDF invoice link */}

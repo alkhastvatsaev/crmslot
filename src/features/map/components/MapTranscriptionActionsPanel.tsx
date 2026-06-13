@@ -24,6 +24,8 @@ import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDup
 import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { requestAutoAssignIntervention } from "@/features/interventions/requestAutoAssignIntervention";
+import { toast } from "sonner";
 
 type DecisionStatus = "none" | "refused" | "created";
 
@@ -265,6 +267,21 @@ export default function MapTranscriptionActionsPanel({
     }
   }, [fileName]);
 
+  const notifyAutoAssign = useCallback(
+    async (interventionId: string) => {
+      const result = await requestAutoAssignIntervention(interventionId);
+      if (result.assigned && result.technicianName) {
+        toast.success(String(t("dispatch.auto_assign_ok")), {
+          description: String(t("dispatch.auto_assign_desc")).replace(
+            "{{name}}",
+            result.technicianName ?? ""
+          ),
+        });
+      }
+    },
+    [t]
+  );
+
   const create = useCallback(async () => {
     if (!fileName) return;
     setBusy("create");
@@ -286,6 +303,7 @@ export default function MapTranscriptionActionsPanel({
       });
       if (res.ok) {
         const payload = (await res.json().catch(() => null)) as {
+          interventionId?: string | null;
           intervention?: {
             clientName?: string | null;
             title?: string;
@@ -307,6 +325,9 @@ export default function MapTranscriptionActionsPanel({
             source: "live",
             date: form.date.trim(),
           });
+        }
+        if (payload?.interventionId) {
+          void notifyAutoAssign(payload.interventionId);
         }
         setLatest((prev) =>
           prev
@@ -362,7 +383,12 @@ export default function MapTranscriptionActionsPanel({
           ...(uid ? { createdByUid: uid } : {}),
         };
 
-        const createdRef = await addDoc(collection(firestore, "interventions"), doc);
+        const { portalAccessTokenField } =
+          await import("@/features/interventions/ensurePortalAccessToken");
+        const createdRef = await addDoc(collection(firestore, "interventions"), {
+          ...doc,
+          ...portalAccessTokenField(),
+        });
         if (fallbackTenantCompanyId) {
           void logCrmInterventionCreated({
             intervention: {
@@ -398,6 +424,7 @@ export default function MapTranscriptionActionsPanel({
           source: "live",
           date: form.date.trim(),
         });
+        void notifyAutoAssign(createdRef.id);
         // Enregistrer la décision (Firestore admin si dispo, sinon disque côté serveur)
         await fetchWithAuth("/api/ai/audio-decision", {
           method: "POST",
@@ -416,7 +443,7 @@ export default function MapTranscriptionActionsPanel({
     } finally {
       setBusy(null);
     }
-  }, [fileName, latest?.audio?.meta, form, onInterventionCreated, workspace]);
+  }, [fileName, latest?.audio?.meta, form, notifyAutoAssign, onInterventionCreated, workspace]);
 
   return (
     <>

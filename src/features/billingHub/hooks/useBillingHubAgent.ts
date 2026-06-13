@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
 import { useHubAgent } from "@/features/hubAgents/useHubAgent";
 import { isBillingHubAgentInScope } from "@/features/billingHub/billingHubAgentScope";
 import { buildBillingHubSnapshot } from "@/features/billingHub/billingHubAgentSnapshot";
+import { downloadAccountingCsv } from "@/features/billing/exportAccountingCsv";
+import { downloadPayrollCsv } from "@/features/timetracking/exportPayrollCsv";
+import { useTimeEntries } from "@/features/timetracking/hooks/useTimeEntries";
+import { auth } from "@/core/config/firebase";
 import type { BillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -19,26 +23,35 @@ type Options = {
   enabled?: boolean;
 };
 
-export function useBillingHubAgent({
-  companyId,
-  interventions,
-  metrics,
-  enabled = true,
-}: Options) {
+export function useBillingHubAgent({ companyId, interventions, metrics, enabled = true }: Options) {
   const { t } = useTranslation();
   const billingIntent = useBillingHubIntentOptional();
 
   const billingSnapshot = useMemo(
     () => buildBillingHubSnapshot(interventions, metrics),
-    [interventions, metrics],
+    [interventions, metrics]
   );
 
   const focusInterventionId = billingIntent?.selectedInterventionId ?? null;
+
+  const uid = auth?.currentUser?.uid?.trim() ?? "";
+  const timeEntries = useTimeEntries(uid || null);
+
+  const onExportAccountingCsv = useCallback(() => {
+    const period = new Date().toISOString().slice(0, 7);
+    downloadAccountingCsv(interventions, `export-comptable-${period}.csv`);
+  }, [interventions]);
+
+  const onExportPayrollCsv = useCallback(() => {
+    downloadPayrollCsv(timeEntries);
+  }, [timeEntries]);
 
   const onStreamEvent = useHubAgentStreamHandler({
     documentPreviewTarget: "right",
     billingDocumentOnBillingPage: true,
     companyId,
+    onExportAccountingCsv,
+    onExportPayrollCsv,
   });
 
   const offTopicSuggestions = useMemo(
@@ -46,7 +59,7 @@ export function useBillingHubAgent({
       String(t("billingHub.agent_suggestion_unpaid")),
       String(t("billingHub.agent_suggestion_to_bill")),
     ],
-    [t],
+    [t]
   );
 
   return useHubAgent({

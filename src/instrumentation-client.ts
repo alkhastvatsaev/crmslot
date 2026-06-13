@@ -1,4 +1,5 @@
 import { clientSentryDsn, sentryEnabled } from "@/core/monitoring/sentry";
+import { initProductAnalytics } from "@/core/analytics/productAnalytics";
 
 const dsn = clientSentryDsn();
 
@@ -11,3 +12,5 @@ if (sentryEnabled(dsn)) {
     });
   });
 }
+
+initProductAnalytics();

@@ -27,15 +27,23 @@ export type BelgmapFeatureFlags = {
   equipmentInventory: boolean;
   /** Facturation électronique Peppol / UBL (obligation BE 2026). */
   peppolEInvoicing: boolean;
+  /** Planning multi-techniciens (colonnes par tech). */
+  multiTechSchedule: boolean;
+  /** Webhooks sortants (HMAC) sur transitions métier. */
+  outboundWebhooks: boolean;
+  /** Signature électronique à distance via portail client. */
+  remoteESign: boolean;
+  /** Rapports BI + analytics PostHog. */
+  analyticsReports: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   unifiedFieldCockpit: true,
   crmContacts: false,
-  lecotProductSearch: false,
+  lecotProductSearch: true,
   commissionsV2: true,
   interventionCommandPalette: true,
-  pwaV2Bundle: false,
+  pwaV2Bundle: true,
   quotesEnabled: true,
   maintenanceContracts: true,
   slaTracker: true,
@@ -44,7 +52,11 @@ export const DEFAULT_FEATURE_FLAGS: BelgmapFeatureFlags = {
   whatsappNotifications: true,
   supplierPortal: true,
   equipmentInventory: true,
-  peppolEInvoicing: false,
+  peppolEInvoicing: true,
+  multiTechSchedule: true,
+  outboundWebhooks: true,
+  remoteESign: true,
+  analyticsReports: true,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -97,6 +109,19 @@ export function featureFlagsFromEnv(): BelgmapFeatureFlags {
       DEFAULT_FEATURE_FLAGS.equipmentInventory
     ),
     peppolEInvoicing: readEnvBool("NEXT_PUBLIC_FF_PEPPOL", DEFAULT_FEATURE_FLAGS.peppolEInvoicing),
+    multiTechSchedule: readEnvBool(
+      "NEXT_PUBLIC_FF_MULTI_TECH_SCHEDULE",
+      DEFAULT_FEATURE_FLAGS.multiTechSchedule
+    ),
+    outboundWebhooks: readEnvBool(
+      "NEXT_PUBLIC_FF_OUTBOUND_WEBHOOKS",
+      DEFAULT_FEATURE_FLAGS.outboundWebhooks
+    ),
+    remoteESign: readEnvBool("NEXT_PUBLIC_FF_REMOTE_ESIGN", DEFAULT_FEATURE_FLAGS.remoteESign),
+    analyticsReports: readEnvBool(
+      "NEXT_PUBLIC_FF_ANALYTICS",
+      DEFAULT_FEATURE_FLAGS.analyticsReports
+    ),
   };
 }
 

@@ -1,11 +1,4 @@
-import {
-  Camera,
-  Clock,
-  Navigation2,
-  Package,
-  Phone,
-  Mail,
-} from "lucide-react";
+import { Camera, Clock, Navigation2, Package, Phone, Mail } from "lucide-react";
 import type { Intervention } from "@/features/interventions/types";
 import type { MissionContactAction } from "@/features/interventions/components/MissionContactRail";
 import { resolveMissionActionBar } from "@/features/interventions/missionActionBar";
@@ -13,11 +6,14 @@ import { formatAddress } from "@/utils/stringUtils";
 
 const ICON = "h-[1.125rem] w-[1.125rem]";
 
+export function buildGoogleMapsDirectionsUrl(address: string | null | undefined): string | null {
+  const raw = (address ?? "").trim();
+  if (!raw) return null;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(raw))}`;
+}
+
 export type BuildMissionContactActionsParams = {
-  intervention: Pick<
-    Intervention,
-    "status" | "clientPhone" | "phone" | "address" | "clientEmail"
-  >;
+  intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
   t: (key: string) => string;
   awaitingAssignment?: boolean;
   isUpdating?: boolean;
@@ -41,9 +37,7 @@ export function buildMissionContactActions({
   const config = resolveMissionActionBar(intervention, { awaitingAssignment });
   const phone = intervention.clientPhone || intervention.phone;
   const email = intervention.clientEmail;
-  const mapsUrl = intervention.address
-    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress(intervention.address))}`
-    : null;
+  const mapsUrl = buildGoogleMapsDirectionsUrl(intervention.address);
 
   const actions: MissionContactAction[] = [];
 
