@@ -8,6 +8,7 @@ jest.mock("@/context/CompanyWorkspaceContext", () => ({
     activeCompanyId: "demo-local-company",
     isTenantUser: true,
     firebaseUid: "uid-test",
+    workspaceReady: true,
   }),
 }));
 
@@ -46,6 +47,20 @@ jest.mock("@/features/crmHistory/hooks/useCompanyCrmActivityLog", () => ({
 
 jest.mock("@/features/crmHistory/hooks/useCompanyIvanaChatFeed", () => ({
   useCompanyIvanaChatFeed: () => ({ messages: [], loading: false }),
+}));
+
+jest.mock("@/context/CrmHistoryAgentBridgeContext", () => ({
+  useCrmHistoryAgentBridgeOptional: () => null,
+}));
+
+jest.mock("@/features/crmHistory/hooks/useCrmHistoryAgent", () => ({
+  useCrmHistoryAgent: () => ({
+    messages: [],
+    thinking: false,
+    sendMessage: jest.fn(),
+    resetConversation: jest.fn(),
+    enabled: false,
+  }),
 }));
 
 const mockUseCrmActivityFeed = jest.fn((..._args: unknown[]) => ({

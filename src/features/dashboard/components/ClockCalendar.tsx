@@ -15,13 +15,11 @@ export default function ClockCalendar({ compact = false }: { compact?: boolean }
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTime(new Date());
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    const timer = setInterval(() => setTime(new Date()), 10_000);
     return () => clearInterval(timer);
   }, [selectedDate]);
 
-  const timeString =
-    time?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) ||
-    "";
+  const timeString = time?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) || "";
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: "short",
     month: "short",
