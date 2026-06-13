@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { firestore as db } from "@/core/config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, firestore as db } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import {
@@ -17,6 +18,7 @@ import {
   uploadPathCandidatesFromUrl,
   waitForCanPlay,
 } from "@/features/dispatch/audioUtils";
+import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 
 export type AiPlaybackSync = {
   clipUrl: string;
@@ -56,6 +58,12 @@ export function useAiAudioPlayback({
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [queue, setQueue] = useState<QueuedClip[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    if (!auth) return;
+    return onAuthStateChanged(auth, (u) => setAuthed(!!u));
+  }, []);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -480,7 +488,7 @@ export function useAiAudioPlayback({
 
   // Firestore listener
   useEffect(() => {
-    if (!backgroundTasksEnabled || !db) return;
+    if (!backgroundTasksEnabled || !db || !authed) return;
 
     const unsub = onSnapshot(doc(db, "ai_status", "macrodroid"), (docSnap) => {
       if (!docSnap.exists()) return;
@@ -533,7 +541,7 @@ export function useAiAudioPlayback({
     });
 
     return () => unsub();
-  }, [backgroundTasksEnabled]);
+  }, [backgroundTasksEnabled, authed]);
 
   // Disk polling
   useEffect(() => {
@@ -542,6 +550,7 @@ export function useAiAudioPlayback({
     let cancelled = false;
 
     const poll = async () => {
+      if (!auth?.currentUser) return;
       try {
         const res = await fetchWithAuth("/api/ai/audios");
         if (!res.ok || cancelled) return;
@@ -605,7 +614,8 @@ export function useAiAudioPlayback({
       }
     };
 
-    const iv = setInterval(poll, 5000);
+    const pollIntervalMs = isMobilePowerSaveClient() ? 30_000 : 5_000;
+    const iv = setInterval(poll, pollIntervalMs);
     poll();
     return () => {
       cancelled = true;

@@ -1,0 +1,120 @@
+import React from "react";
+import { render, screen, waitFor, act } from "@testing-library/react";
+import { CompanyWorkspaceProvider, useCompanyWorkspace } from "@/context/CompanyWorkspaceContext";
+import { mockState } from "@/test-utils/mockState";
+import { onSnapshot } from "firebase/firestore";
+
+jest.mock("@/core/config/devUiPreview", () => ({
+  devUiPreviewEnabled: true,
+  DEMO_COMPANY_ID: "demo-local-company",
+  stagingPreviewEnabled: false,
+  isSyntheticInterventionId: jest.fn(() => false),
+  stripKnownSyntheticInterventions: jest.fn((r: unknown[]) => r),
+  excludeSyntheticInterventions: jest.fn((r: unknown[]) => r),
+}));
+
+const mockOnSnapshot = onSnapshot as jest.MockedFunction<typeof onSnapshot>;
+
+function Consumer() {
+  const ctx = useCompanyWorkspace();
+  return (
+    <div>
+      <span data-testid="company-id">{ctx.activeCompanyId || "empty"}</span>
+      <span data-testid="is-tenant">{String(ctx.isTenantUser)}</span>
+    </div>
+  );
+}
+
+describe("CompanyWorkspaceContext", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    mockState.reset();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("n'expose pas demo-local-company quand l'utilisateur est authentifié sans abonnements", async () => {
+    // User is authenticated (mockState.currentUser set by default), but no memberships
+    mockState.firestoreData["users/mock-user-123/company_memberships"] = [];
+
+    render(
+      <CompanyWorkspaceProvider>
+        <Consumer />
+      </CompanyWorkspaceProvider>
+    );
+
+    // Flush the setTimeout(10) in the memberships effect
+    await act(async () => {
+      jest.advanceTimersByTime(20);
+    });
+
+    await waitFor(() => {
+      // Should NOT be demo-local-company — user is authenticated
+      expect(screen.getByTestId("company-id").textContent).toBe("empty");
+      expect(screen.getByTestId("is-tenant").textContent).toBe("false");
+    });
+  });
+
+  it("expose demo-local-company quand non authentifié (devUiPreviewEnabled=true)", async () => {
+    // No authenticated user
+    mockState.currentUser = null;
+
+    render(
+      <CompanyWorkspaceProvider>
+        <Consumer />
+      </CompanyWorkspaceProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(20);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("company-id").textContent).toBe("demo-local-company");
+      expect(screen.getByTestId("is-tenant").textContent).toBe("true");
+    });
+  });
+
+  it("expose le companyId de l'abonnement quand l'utilisateur a des sociétés", async () => {
+    mockState.firestoreData["users/mock-user-123/company_memberships"] = [
+      { id: "company-abc", role: "admin", companyName: "Société ABC" },
+    ];
+
+    render(
+      <CompanyWorkspaceProvider>
+        <Consumer />
+      </CompanyWorkspaceProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(20);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("company-id").textContent).toBe("company-abc");
+      expect(screen.getByTestId("is-tenant").textContent).toBe("true");
+    });
+  });
+
+  it("ne souscrit pas Firestore avant l'auth (authLoading)", () => {
+    // Make onAuthStateChanged not fire immediately — simulate loading
+    const { onAuthStateChanged } = jest.requireMock("firebase/auth") as {
+      onAuthStateChanged: jest.Mock;
+    };
+    onAuthStateChanged.mockImplementationOnce(() => jest.fn()); // never fires
+
+    render(
+      <CompanyWorkspaceProvider>
+        <Consumer />
+      </CompanyWorkspaceProvider>
+    );
+
+    // No memberships snapshot should have been triggered
+    expect(mockOnSnapshot).not.toHaveBeenCalled();
+    // activeCompanyId stays empty while loading
+    expect(screen.getByTestId("company-id").textContent).toBe("empty");
+  });
+});
