@@ -804,8 +804,9 @@ export function useSmartForm() {
         "Demande d'intervention"
       ).slice(0, 140);
 
-      const { portalAccessTokenField } =
+      const { portalAccessFields } =
         await import("@/features/interventions/ensurePortalAccessToken");
+      const portalFields = portalAccessFields();
 
       await setDoc(newDocRef, {
         title: finalTitle,
@@ -819,7 +820,7 @@ export function useSmartForm() {
         createdAt: nowIso,
         createdByUid: user.uid,
         assignedTechnicianUid: null,
-        ...portalAccessTokenField(),
+        ...portalFields,
         ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
         ...(photoDataUrls.length
           ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) }

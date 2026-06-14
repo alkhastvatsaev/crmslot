@@ -42,6 +42,8 @@ import type { Mission } from "@/features/map/missionTypes";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import {
@@ -61,7 +63,12 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const workspace = useCompanyWorkspaceOptional();
   const { logIntervention } = useActivityLog();
   const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
-  const { interventions, loading } = useBackOfficeInterventions(cid);
+  const isMobile = useIsMobile();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
+  const powerGate = useMobileMapPagePowerGate(activeTab);
+  const inboxFirestoreEnabled = Boolean(cid) && (isMobile !== true || powerGate.inboxDataActive);
+  const { interventions, loading } = useBackOfficeInterventions(inboxFirestoreEnabled ? cid : null);
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
   const bridgedTerrainReports = useMemo(
     () => terrainBridge?.reports ?? [],
@@ -69,11 +76,9 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   );
   const pager = useDashboardPagerOptional();
   const { setPendingCaseId } = useTechnicianCaseIntent();
-  const inboxIntent = useBackofficeInboxIntentOptional();
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
   useBackofficeReminderPush(interventions);
 
-  const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
   const [dragBoardTechUid, setDragBoardTechUid] = useState("");
   const [dragBoardDate, setDragBoardDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedItemId, setSelectedItemIdLocal] = useState<string | null>(null);
@@ -123,6 +128,10 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     setActiveTab("chat");
     inboxIntent?.setPendingChatInterventionId(null);
   }, [inboxIntent?.pendingChatInterventionId, inboxIntent]);
+
+  useEffect(() => {
+    inboxIntent?.setActiveInboxTab(activeTab);
+  }, [activeTab, inboxIntent]);
 
   const handleDownloadQuotePdf = async (interventionId: string) => {
     try {
@@ -558,7 +567,8 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   useEffect(() => {
     if (!selectedItemId || activeTab !== "reports") return;
     const iv = interventions.find((x) => x.id === selectedItemId);
-    if (iv && iv.status !== "done") {
+    // Rapports à valider (done) et archive (invoiced) restent consultables.
+    if (iv && iv.status !== "done" && iv.status !== "invoiced") {
       setSelectedItemId(null);
     }
   }, [selectedItemId, interventions, activeTab]);

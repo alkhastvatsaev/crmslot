@@ -12,6 +12,7 @@ import {
 import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
+import { recoverMainAuthFromClientPortalLeak } from "@/features/auth/recoverMainAuthFromClientPortalLeak";
 import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
@@ -77,6 +78,13 @@ export function CompanyWorkspaceProvider({
   }, []);
 
   useEffect(() => {
+    if (!auth || authLoading || !membershipsReady || memberships.length > 0) return;
+    const user = auth.currentUser;
+    if (!user || user.isAnonymous) return;
+    void recoverMainAuthFromClientPortalLeak(auth, user);
+  }, [authLoading, membershipsReady, memberships.length]);
+
+  useEffect(() => {
     if (!firestore || !firebaseUid || !isConfigured) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMemberships([]);
@@ -134,18 +142,31 @@ export function CompanyWorkspaceProvider({
   }, [firebaseUid]);
 
   // Demo mode ONLY when Firebase is not configured — never for an authenticated user without memberships.
-  const demoTenantActive = devUiPreviewEnabled && (!isConfigured || !firestore || !firebaseUid);
+  const anonymousPreviewUser =
+    devUiPreviewEnabled &&
+    Boolean(firebaseUid) &&
+    Boolean(auth?.currentUser?.isAnonymous) &&
+    membershipsReady &&
+    memberships.length === 0;
+
+  const demoTenantActive =
+    devUiPreviewEnabled && (!isConfigured || !firestore || !firebaseUid || anonymousPreviewUser);
 
   const effectiveMemberships = useMemo(
     () => (demoTenantActive ? [DEMO_MEMBERSHIP] : memberships),
     [demoTenantActive, memberships]
   );
 
-  const effectiveActiveCompanyId = useMemo(
-    () =>
-      authLoading || !membershipsReady ? "" : demoTenantActive ? DEMO_COMPANY_ID : activeCompanyId,
-    [authLoading, membershipsReady, demoTenantActive, activeCompanyId]
-  );
+  const effectiveActiveCompanyId = useMemo(() => {
+    if (authLoading || !membershipsReady) {
+      if (typeof window !== "undefined") {
+        const stored = window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim();
+        if (stored) return stored;
+      }
+      return "";
+    }
+    return demoTenantActive ? DEMO_COMPANY_ID : activeCompanyId;
+  }, [authLoading, membershipsReady, demoTenantActive, activeCompanyId]);
 
   const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
     if (demoTenantActive) return false;

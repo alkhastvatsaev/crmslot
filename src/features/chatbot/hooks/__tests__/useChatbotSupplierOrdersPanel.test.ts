@@ -61,4 +61,12 @@ describe("useChatbotSupplierOrdersPanel", () => {
     expect(mockSubscribeSupplierOrders).not.toHaveBeenCalled();
     expect(mockOnSnapshot).not.toHaveBeenCalled();
   });
+
+  it("n'écoute Firestore pour la bibliothèque que si libraryEnabled est true", () => {
+    renderHook(() => useChatbotSupplierOrdersPanel("co-test", "uid-test", true));
+
+    expect(mockFetchChatbotPwaRegistry).not.toHaveBeenCalled();
+    expect(mockSubscribeSupplierOrders).toHaveBeenCalled();
+    expect(mockOnSnapshot).not.toHaveBeenCalled();
+  });
 });

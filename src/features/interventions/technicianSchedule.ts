@@ -313,6 +313,65 @@ export function formatScheduledTimeOnly(iv: Intervention): string {
   return "common.dash";
 }
 
+export function mapI18nLanguageToLocale(language: "fr" | "en" | "nl"): string {
+  if (language === "en") return "en-GB";
+  if (language === "nl") return "nl-BE";
+  return "fr-BE";
+}
+
+function capitalizeWord(value: string): string {
+  if (!value) return value;
+  return value.charAt(0).toLocaleUpperCase("fr-BE") + value.slice(1);
+}
+
+function formatPortalAppointmentTime(d: Date, locale: string): string {
+  const hours = d.getHours();
+  const minutes = d.getMinutes();
+  const hhmm = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+
+  if (locale.startsWith("fr") || locale.startsWith("nl")) {
+    return hhmm;
+  }
+  return d.toLocaleTimeString(locale, {
+    hour: "numeric",
+    minute: minutes === 0 ? undefined : "2-digit",
+  });
+}
+
+/** Rendez-vous portail client — ex. « Lundi 6 juin à 10 heures » (pas AAAA-MM-JJ). */
+export function formatPortalAppointmentLabel(
+  dateStr: string | null | undefined,
+  timeStr: string | null | undefined,
+  locale = "fr-BE"
+): string | null {
+  const date = dateStr?.trim();
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+
+  const normalizedTime = normalizeTimeHm(timeStr);
+  const anchor = normalizedTime
+    ? new Date(`${date}T${normalizedTime}:00`)
+    : new Date(`${date}T12:00:00`);
+  if (Number.isNaN(anchor.getTime())) return null;
+
+  const weekday = capitalizeWord(anchor.toLocaleDateString(locale, { weekday: "long" }));
+  const day = anchor.getDate();
+  const month = capitalizeWord(anchor.toLocaleDateString(locale, { month: "long" }));
+
+  if (locale.startsWith("fr")) {
+    return normalizedTime
+      ? `${weekday} ${day} ${month} à ${formatPortalAppointmentTime(anchor, locale)}`
+      : `${weekday} ${day} ${month}`;
+  }
+  if (locale.startsWith("nl")) {
+    return normalizedTime
+      ? `${weekday} ${day} ${month} om ${formatPortalAppointmentTime(anchor, locale)}`
+      : `${weekday} ${day} ${month}`;
+  }
+  return normalizedTime
+    ? `${weekday}, ${day} ${month} at ${formatPortalAppointmentTime(anchor, locale)}`
+    : `${weekday}, ${day} ${month}`;
+}
+
 export function interventionClientLabel(iv: Intervention): string {
   const first = iv.clientFirstName?.trim();
   const last = iv.clientLastName?.trim();

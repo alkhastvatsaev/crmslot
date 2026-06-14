@@ -44,9 +44,11 @@ function mergeSupplierOrders(
 
 export function useChatbotSupplierOrdersPanel(
   companyId: string | null,
-  firebaseUid?: string | null
+  firebaseUid?: string | null,
+  libraryEnabled = false
 ) {
   const [panel, setPanel] = useState<ChatbotSupplierOrdersPanelState>(closed);
+  const dataEnabled = panel.open || libraryEnabled;
   const [supplierOrdersBase, setSupplierOrdersBase] = useState<SupplierOrder[]>([]);
   const [previewSupplierOrders, setPreviewSupplierOrders] = useState<SupplierOrder[]>([]);
   const [materialOrders, setMaterialOrders] = useState<MaterialOrderDoc[]>([]);
@@ -74,13 +76,15 @@ export function useChatbotSupplierOrdersPanel(
   }, [companyId, firebaseUid]);
 
   useEffect(() => {
-    if (!panel.open || !companyId || !firebaseUid || firebaseUid === "anon") {
+    if (!dataEnabled || !companyId || !firebaseUid || firebaseUid === "anon") {
       setSupplierOrdersBase([]);
       setMaterialOrders([]);
       return;
     }
 
-    void refreshRegistry();
+    if (panel.open) {
+      void refreshRegistry();
+    }
 
     if (!firestore) return;
 
@@ -88,7 +92,7 @@ export function useChatbotSupplierOrdersPanel(
       setSupplierOrdersBase((prev) => mergeSupplierOrders(rows, prev));
       if (rows.length > 0) setRegistryError(null);
     });
-  }, [panel.open, companyId, refreshRegistry]);
+  }, [dataEnabled, panel.open, companyId, firebaseUid, refreshRegistry]);
 
   useEffect(() => {
     if (!panel.open || !companyId || !firebaseUid || firebaseUid === "anon" || !firestore) return;

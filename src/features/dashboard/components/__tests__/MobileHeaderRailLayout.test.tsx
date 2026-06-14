@@ -12,7 +12,7 @@ function swipeRight(el: HTMLElement) {
 }
 
 describe("MobileHeaderRailLayout", () => {
-  it("affiche le profil (centre) par défaut", () => {
+  it("affiche le calendrier (gauche) par défaut", () => {
     render(
       <MobileHeaderRailLayout
         rootTestId="mobile-header-rail"
@@ -23,11 +23,11 @@ describe("MobileHeaderRailLayout", () => {
       />
     );
 
-    expect(screen.getByTestId("mobile-header-profile")).toHaveAttribute(
+    expect(screen.getByTestId("mobile-header-calendar")).toHaveAttribute(
       "data-mobile-header-rail-active",
       "true"
     );
-    expect(screen.getByTestId("mobile-header-calendar")).toHaveAttribute(
+    expect(screen.getByTestId("mobile-header-profile")).toHaveAttribute(
       "data-mobile-header-rail-active",
       "false"
     );
@@ -49,18 +49,18 @@ describe("MobileHeaderRailLayout", () => {
       expect(screen.getByTestId(testId)).toHaveAttribute("data-mobile-header-rail-active", "true");
     };
 
-    expectActive("mobile-header-profile");
-
-    swipeLeft(root);
     expectActive("mobile-header-calendar");
 
     swipeLeft(root);
     expectActive("mobile-header-profile");
 
-    swipeRight(root);
+    swipeLeft(root);
     expectActive("mobile-header-calendar");
 
     swipeRight(root);
     expectActive("mobile-header-profile");
+
+    swipeRight(root);
+    expectActive("mobile-header-calendar");
   });
 });

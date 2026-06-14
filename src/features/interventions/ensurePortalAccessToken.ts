@@ -1,8 +1,17 @@
+import { generatePortalAccessCode } from "./portalAccessCode";
 import { generatePortalAccessToken } from "./portalToken";
 
-/** Champ à inclure à la création d'une intervention pour activer `/suivi/[token]`. */
-export function portalAccessTokenField(): { portalAccessToken: string } {
-  return { portalAccessToken: generatePortalAccessToken() };
+/** Champs portail client : lien `/suivi/[token]` + code d'accès court. */
+export function portalAccessFields(): { portalAccessToken: string; portalAccessCode: string } {
+  return {
+    portalAccessToken: generatePortalAccessToken(),
+    portalAccessCode: generatePortalAccessCode(),
+  };
+}
+
+/** @deprecated Préférer `portalAccessFields()` */
+export function portalAccessTokenField(): { portalAccessToken: string; portalAccessCode: string } {
+  return portalAccessFields();
 }
 
 /** Enrichit un payload Firestore (client ou Admin SDK) avec un token portail. */

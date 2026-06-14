@@ -66,7 +66,7 @@ export async function syncClientPortalProfile(
       {
         uid: user.uid,
         email: user.email ?? null,
-        displayName: user.displayName ?? user.email?.split("@")[0] ?? null,
+        displayName: user.displayName ?? null,
         photoURL: user.photoURL ?? null,
         ...companyPayload,
         role: existingRole,

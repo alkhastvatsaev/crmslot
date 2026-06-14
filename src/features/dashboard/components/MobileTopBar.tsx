@@ -25,7 +25,7 @@ export default function MobileTopBar() {
         leftTestId="mobile-header-calendar"
         centerTestId="mobile-header-profile"
         swipeDisabled={pageSelectorOpen}
-        left={<ClockCalendar compact />}
+        left={<ClockCalendar compact interactive />}
         center={<UserProfile interactive variant="mobile" />}
       />
     </MobileShellSlotGrid>

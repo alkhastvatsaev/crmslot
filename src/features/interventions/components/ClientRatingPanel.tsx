@@ -10,12 +10,18 @@ interface Props {
   interventionId: string;
   existingRating?: number | null;
   existingComment?: string | null;
+  compact?: boolean;
+  premium?: boolean;
+  unified?: boolean;
 }
 
 export default function ClientRatingPanel({
   interventionId,
   existingRating,
   existingComment,
+  compact = false,
+  premium = false,
+  unified = false,
 }: Props) {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState(0);
@@ -28,36 +34,118 @@ export default function ClientRatingPanel({
     return (
       <div
         data-testid="client-rating-submitted"
-        className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center"
+        className={
+          compact && premium && unified
+            ? "flex flex-col items-center gap-1.5"
+            : compact && premium
+              ? "flex flex-col items-center gap-1.5 rounded-2xl bg-slate-50/90 px-4 py-3 ring-1 ring-black/[0.04]"
+              : compact
+                ? "flex items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5"
+                : "mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center"
+        }
       >
-        <div className="flex justify-center gap-1 mb-1">
+        <div
+          className={cn(
+            "flex justify-center gap-0.5",
+            !compact && "mb-1 gap-1",
+            premium && "gap-1"
+          )}
+        >
           {[1, 2, 3, 4, 5].map((s) => (
             <Star
               key={s}
               className={cn(
-                "w-4 h-4",
-                s <= selected ? "fill-amber-400 text-amber-400" : "text-slate-200"
+                premium ? "h-3.5 w-3.5" : compact ? "h-3 w-3" : "h-4 w-4",
+                s <= selected
+                  ? premium
+                    ? "fill-slate-700 text-slate-700"
+                    : "fill-amber-400 text-amber-400"
+                  : "text-slate-200"
               )}
             />
           ))}
         </div>
-        <p className="text-[13px] font-semibold text-emerald-700">
-          {String(t("rating.thank_you"))}
-        </p>
+        {!compact || premium ? (
+          <p
+            className={
+              premium
+                ? "text-[12px] font-normal text-slate-500"
+                : "text-[13px] font-semibold text-emerald-700"
+            }
+          >
+            {String(t("rating.thank_you"))}
+          </p>
+        ) : (
+          <span className="text-[10px] font-bold text-emerald-700">
+            {String(t("rating.thank_you"))}
+          </span>
+        )}
       </div>
     );
   }
 
-  const handleSubmit = async () => {
-    if (selected === 0) return;
+  const handleSubmit = async (rating = selected) => {
+    if (rating === 0) return;
     setLoading(true);
     try {
-      await submitClientRating(interventionId, selected, comment);
+      await submitClientRating(interventionId, rating, compact ? "" : comment);
+      setSelected(rating);
       setSubmitted(true);
     } finally {
       setLoading(false);
     }
   };
+
+  if (compact) {
+    return (
+      <div
+        data-testid="client-rating-panel"
+        className={
+          premium && unified
+            ? "flex w-full flex-col items-center gap-2"
+            : premium
+              ? "flex w-full flex-col items-center gap-2 rounded-2xl bg-slate-50/90 px-4 py-3 ring-1 ring-black/[0.04]"
+              : "flex w-full flex-col items-center gap-1 rounded-xl border border-black/5 bg-slate-50/80 px-2 py-2"
+        }
+      >
+        <p
+          className={
+            premium && unified
+              ? "sr-only"
+              : premium
+                ? "text-[11px] font-normal text-slate-400"
+                : "text-[10px] font-bold uppercase tracking-wide text-slate-500"
+          }
+        >
+          {String(t("rating.title"))}
+        </p>
+        <div className="flex justify-center gap-1.5">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button
+              key={s}
+              type="button"
+              disabled={loading}
+              onMouseEnter={() => setHovered(s)}
+              onMouseLeave={() => setHovered(0)}
+              onClick={() => void handleSubmit(s)}
+              className="transition-opacity hover:opacity-80 disabled:opacity-50"
+            >
+              <Star
+                className={cn(
+                  premium ? "h-5 w-5" : "h-5 w-5",
+                  s <= (hovered || selected)
+                    ? premium
+                      ? "fill-slate-800 text-slate-800"
+                      : "fill-amber-400 text-amber-400"
+                    : "text-slate-300"
+                )}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -98,7 +186,7 @@ export default function ClientRatingPanel({
       <button
         type="button"
         disabled={selected === 0 || loading}
-        onClick={handleSubmit}
+        onClick={() => void handleSubmit()}
         className="w-full rounded-xl bg-black py-2 text-[13px] font-bold text-white disabled:opacity-40 transition-opacity"
       >
         {loading ? "…" : String(t("rating.submit"))}

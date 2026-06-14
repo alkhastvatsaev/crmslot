@@ -39,7 +39,7 @@ export default function MobileHeaderRailLayout({
   swipeDisabled = false,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [rail, setRail] = useState<HeaderRail>("center");
+  const [rail, setRail] = useState<HeaderRail>("left");
 
   const panels: Record<HeaderRail, ReactNode> = { left, center };
   const testIds: Record<HeaderRail, string | undefined> = {

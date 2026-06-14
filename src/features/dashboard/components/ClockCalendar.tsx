@@ -2,10 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDateContext } from "@/context/DateContext";
+import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
-export default function ClockCalendar({ compact = false }: { compact?: boolean }) {
+type ClockCalendarProps = {
+  compact?: boolean;
+  /** Clic sur date/heure → grille de pages (mobile header). */
+  interactive?: boolean;
+};
+
+export default function ClockCalendar({
+  compact = false,
+  interactive = false,
+}: ClockCalendarProps) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
   const { language } = useTranslation();
@@ -27,12 +37,32 @@ export default function ClockCalendar({ compact = false }: { compact?: boolean }
   };
   const dateString = selectedDate.toLocaleDateString(locale, dateOptions).replace(/\./g, "") || "";
 
+  const pageSelector = useDashboardPageSelectorOptional();
+
   const changeDay = (e: React.MouseEvent, delta: number) => {
     e.stopPropagation();
     const newDate = new Date(selectedDate);
     newDate.setDate(selectedDate.getDate() + delta);
     setSelectedDate(newDate);
   };
+
+  const compactDateTime = (
+    <>
+      <span
+        data-testid="date-display"
+        className="min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800"
+      >
+        {dateString}
+      </span>
+      <span className="h-4 w-px shrink-0 bg-slate-300" aria-hidden />
+      <span
+        data-testid="time-display"
+        className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800"
+      >
+        {timeString}
+      </span>
+    </>
+  );
 
   if (compact) {
     return (
@@ -50,21 +80,22 @@ export default function ClockCalendar({ compact = false }: { compact?: boolean }
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="flex min-w-0 flex-1 flex-row items-center justify-center gap-4">
-          <span
-            data-testid="date-display"
-            className="min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800"
+        {interactive && pageSelector ? (
+          <button
+            type="button"
+            data-testid="clock-calendar-toggle"
+            className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
+            aria-label="Ouvrir la navigation"
+            aria-expanded={pageSelector.open}
+            onClick={() => pageSelector.toggle()}
           >
-            {dateString}
-          </span>
-          <span className="h-4 w-px shrink-0 bg-slate-300" aria-hidden />
-          <span
-            data-testid="time-display"
-            className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800"
-          >
-            {timeString}
-          </span>
-        </div>
+            {compactDateTime}
+          </button>
+        ) : (
+          <div className="flex min-w-0 flex-1 flex-row items-center justify-center gap-4">
+            {compactDateTime}
+          </div>
+        )}
         <button
           data-testid="next-day-btn"
           onClick={(e) => changeDay(e, 1)}

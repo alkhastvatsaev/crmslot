@@ -7,7 +7,7 @@ import {
   type RecaptchaVerifier,
 } from "firebase/auth";
 import { toast } from "sonner";
-import { auth } from "@/core/config/firebase";
+import { clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import {
@@ -28,6 +28,13 @@ import {
   mfaHintKind,
   sendPhoneMfaSms,
 } from "@/features/auth/clientPortalPasswordMfa";
+import { emailPasswordAuthErrorFeedback } from "@/features/auth/clientPortalEmailPasswordAuth";
+import {
+  registerClientPortalAccount,
+  signInClientPortalWithVerifiedEmail,
+} from "@/features/auth/clientPortalEmailVerification";
+
+export type ClientPortalAuthTab = "login" | "register";
 
 /** Messages explicites — Firebase renvoie souvent auth/operation-not-allowed ou unauthorized-continue-uri. */
 export function magicLinkSendErrorFeedback(
@@ -73,13 +80,21 @@ export function magicLinkSendErrorFeedback(
 
 export type UseClientPortalAuthOptions = {
   authRailMode: boolean;
+  authTab?: ClientPortalAuthTab;
 };
 
-export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions) {
+export function useClientPortalAuth({
+  authRailMode,
+  authTab: authTabProp,
+}: UseClientPortalAuthOptions) {
   const pager = useDashboardPagerOptional();
   const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [authTab, setAuthTab] = useState<ClientPortalAuthTab>("login");
+  const [emailAuthBusy, setEmailAuthBusy] = useState(false);
   const [sending, setSending] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
@@ -88,7 +103,7 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
   const [mfaCode, setMfaCode] = useState("");
   const [mfaBusy, setMfaBusy] = useState(false);
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
-  const user = auth?.currentUser ?? null;
+  const user = clientPortalAuth?.currentUser ?? null;
 
   const clearRecaptcha = () => {
     try {
@@ -109,17 +124,23 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
 
   useEffect(() => () => clearRecaptcha(), []);
 
+  useEffect(() => {
+    if (authTabProp) {
+      setAuthTab(authTabProp);
+    }
+  }, [authTabProp]);
+
   const goDashboard = async () => {
-    if (!user || !auth) return;
+    if (!user || !clientPortalAuth) return;
     await syncClientPortalProfile(user);
     pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
   };
 
   const handleGoogleSignIn = async () => {
-    if (!auth || googleBusy) return;
+    if (!clientPortalAuth || googleBusy) return;
     setGoogleBusy(true);
     try {
-      const cred = await signInClientPortalWithGoogle(auth);
+      const cred = await signInClientPortalWithGoogle(clientPortalAuth);
       await syncClientPortalProfile(cred.user);
       if (!authRailMode) {
         pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
@@ -143,8 +164,61 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
     }
   };
 
+  const handleEmailPasswordSubmit = async () => {
+    if (!clientPortalAuth || !email.trim()) {
+      toast.error(t("auth.email_required"));
+      return;
+    }
+    if (!password.trim()) {
+      toast.error(String(t("auth.password_required")));
+      return;
+    }
+    if (authTab === "register" && password !== confirmPassword) {
+      toast.error(String(t("auth.password_mismatch")));
+      return;
+    }
+
+    setEmailAuthBusy(true);
+    try {
+      if (authTab === "register") {
+        await registerClientPortalAccount({
+          auth: clientPortalAuth,
+          email: email.trim(),
+          password,
+        });
+        toast.success(String(t("auth.verification_email_sent")), {
+          description: String(t("auth.verification_email_sent_hint")),
+        });
+      } else {
+        const cred = await signInClientPortalWithVerifiedEmail({
+          auth: clientPortalAuth,
+          email: email.trim(),
+          password,
+        });
+        await syncClientPortalProfile(cred.user);
+        if (!authRailMode) {
+          pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
+        }
+        toast.success(String(t("auth.signin_success")));
+      }
+      setPassword("");
+      setConfirmPassword("");
+    } catch (e) {
+      logger.error("[ClientPortalAuthPanel] email/password auth", {
+        error: e instanceof Error ? e.message : String(e),
+      });
+      const { titleKey, descriptionKey } = emailPasswordAuthErrorFeedback(e);
+      toast.error(
+        String(t(titleKey)),
+        descriptionKey ? { description: String(t(descriptionKey)) } : undefined
+      );
+    } finally {
+      setEmailAuthBusy(false);
+    }
+  };
+
   const sendMagicLink = async () => {
-    if (!auth || !email.trim()) {
+    if (!clientPortalAuth || !email.trim()) {
       toast.error(t("auth.email_required"));
       return;
     }
@@ -179,7 +253,7 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
           toast.success("Lien de démo généré : " + demoLink);
         }
       } else {
-        await sendSignInLinkToEmail(auth, email.trim(), {
+        await sendSignInLinkToEmail(clientPortalAuth, email.trim(), {
           url: `${origin}/`,
           handleCodeInApp: true,
         });
@@ -199,19 +273,22 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
   };
 
   const getOrCreateInvisibleRecaptcha = (): RecaptchaVerifier => {
-    if (!auth) throw new Error("auth");
+    if (!clientPortalAuth) throw new Error("clientPortalAuth");
     if (!recaptchaRef.current) {
-      recaptchaRef.current = createInvisibleRecaptcha(auth, "client-portal-recaptcha-container");
+      recaptchaRef.current = createInvisibleRecaptcha(
+        clientPortalAuth,
+        "client-portal-recaptcha-container"
+      );
     }
     return recaptchaRef.current;
   };
 
   const handleSendPhoneMfa = async () => {
-    if (!auth || !mfaResolver) return;
+    if (!clientPortalAuth || !mfaResolver) return;
     setMfaBusy(true);
     try {
       const verifier = getOrCreateInvisibleRecaptcha();
-      const vid = await sendPhoneMfaSms(auth, mfaResolver, mfaHintIndex, verifier);
+      const vid = await sendPhoneMfaSms(clientPortalAuth, mfaResolver, mfaHintIndex, verifier);
       setPhoneVerificationId(vid);
       toast.success("SMS envoyé");
     } catch (e) {
@@ -263,6 +340,13 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
     // state
     email,
     setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    authTab,
+    setAuthTab,
+    emailAuthBusy,
     sending,
     googleBusy,
     mfaResolver,
@@ -275,6 +359,7 @@ export function useClientPortalAuth({ authRailMode }: UseClientPortalAuthOptions
     // actions
     goDashboard,
     handleGoogleSignIn,
+    handleEmailPasswordSubmit,
     sendMagicLink,
     handleSendPhoneMfa,
     handleConfirmMfa,

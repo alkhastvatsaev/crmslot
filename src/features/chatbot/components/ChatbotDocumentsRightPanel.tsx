@@ -5,6 +5,9 @@ import { FileText, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
   buildInterventionClientLabelMap,
@@ -187,9 +190,16 @@ export default function ChatbotDocumentsRightPanel() {
   } = useChatbotContext();
 
   const workspace = useCompanyWorkspaceOptional();
+  const isMobile = useIsMobile();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const interventionsCompanyId =
     (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
-  const { interventions } = useBackOfficeInterventions(interventionsCompanyId);
+  const interventionsFirestoreEnabled =
+    isMobile !== true || (powerGate.inboxDataActive && powerGate.documentsTabActive);
+  const { interventions } = useBackOfficeInterventions(
+    interventionsFirestoreEnabled ? interventionsCompanyId : null
+  );
 
   const clientLabelByInterventionId = useMemo(
     () => buildInterventionClientLabelMap(chatbotInvoices, workspaceSnapshot, interventions),
@@ -260,7 +270,8 @@ export default function ChatbotDocumentsRightPanel() {
   const { thumbnails, thumbnailLoading } = useChatbotDocumentTileThumbnails(
     companyId,
     filteredInvoiceIds,
-    filteredOrderIds
+    filteredOrderIds,
+    interventionsFirestoreEnabled
   );
 
   return (

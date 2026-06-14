@@ -5,7 +5,7 @@ import { getRedirectResult, isSignInWithEmailLink, signInWithEmailLink } from "f
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { auth, isConfigured } from "@/core/config/firebase";
+import { clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import {
@@ -23,11 +23,11 @@ export default function ClientPortalAuthEffects() {
   const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
-    if (!auth || !isConfigured || typeof window === "undefined") return;
+    if (!clientPortalAuth || !isConfigured || typeof window === "undefined") return;
 
     void (async () => {
       try {
-        const rr = await getRedirectResult(auth);
+        const rr = await getRedirectResult(clientPortalAuth);
         if (rr?.user) {
           await syncClientPortalProfile(rr.user);
           pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);
@@ -55,11 +55,15 @@ export default function ClientPortalAuthEffects() {
       }
 
       try {
-        if (!isSignInWithEmailLink(auth, window.location.href)) return;
+        if (!isSignInWithEmailLink(clientPortalAuth, window.location.href)) return;
 
         const storedEmail = window.localStorage.getItem(EMAIL_LINK_STORAGE_KEY)?.trim() ?? "";
         if (storedEmail) {
-          const cred = await signInWithEmailLink(auth, window.location.href, storedEmail);
+          const cred = await signInWithEmailLink(
+            clientPortalAuth,
+            window.location.href,
+            storedEmail
+          );
           await syncClientPortalProfile(cred.user);
           window.localStorage.removeItem(EMAIL_LINK_STORAGE_KEY);
           window.history.replaceState({}, "", window.location.pathname);
@@ -76,10 +80,14 @@ export default function ClientPortalAuthEffects() {
   }, [pager]);
 
   const handleConfirmEmail = useCallback(async () => {
-    if (!auth || !confirmEmail.trim()) return;
+    if (!clientPortalAuth || !confirmEmail.trim()) return;
     setConfirming(true);
     try {
-      const cred = await signInWithEmailLink(auth, window.location.href, confirmEmail.trim());
+      const cred = await signInWithEmailLink(
+        clientPortalAuth,
+        window.location.href,
+        confirmEmail.trim()
+      );
       await syncClientPortalProfile(cred.user);
       window.history.replaceState({}, "", window.location.pathname);
       pager?.setPageIndex(CLIENT_PORTAL_AUTH_SLOT_INDEX);

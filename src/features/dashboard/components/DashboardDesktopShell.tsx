@@ -82,15 +82,15 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
                       aria-hidden
                     />
                     <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center dashboard-page-selector-center-slot`}
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center`}
+                      aria-hidden
+                    />
+                    <div
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right dashboard-page-selector-right-slot`}
                       data-testid="dashboard-page-selector-host"
                     >
                       <DashboardPageSelector onClose={closeSelector} variant="desktop" />
                     </div>
-                    <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right`}
-                      aria-hidden
-                    />
                   </div>
                 </div>
               ) : null}

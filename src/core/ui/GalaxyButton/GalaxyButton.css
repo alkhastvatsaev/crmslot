@@ -46,6 +46,8 @@
   pointer-events: none;
   z-index: 0;
   border-radius: inherit; /* Assure que le canvas respecte l'arrondi */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .btn-content {
