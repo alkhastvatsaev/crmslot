@@ -1,16 +1,10 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, query, setDoc, where } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 import type { Intervention } from "@/features/interventions/types";
-import { findPotentialDuplicateAmong } from "@/features/interventions/duplicateDetectionCore";
+import {
+  findPotentialDuplicateAmong,
+  type DuplicateClientIdentity,
+} from "@/features/interventions/duplicateDetectionCore";
 
 export type RecordDuplicateAlertParams = {
   db: Firestore;
@@ -19,14 +13,17 @@ export type RecordDuplicateAlertParams = {
   address: string;
   problem: string;
   createdByUid: string;
+  client?: DuplicateClientIdentity;
 };
 
 /**
  * Après création d’une intervention tenant : charge un échantillon récent par société,
  * détecte un doublon probable et persiste une alerte (`docId` = nouvelle intervention).
  */
-export async function recordDuplicateAlertIfNeeded(params: RecordDuplicateAlertParams): Promise<void> {
-  const { db, newInterventionId, companyId, address, problem, createdByUid } = params;
+export async function recordDuplicateAlertIfNeeded(
+  params: RecordDuplicateAlertParams
+): Promise<void> {
+  const { db, newInterventionId, companyId, address, problem, createdByUid, client } = params;
   const cid = (companyId ?? "").trim();
   if (!cid || !newInterventionId.trim()) return;
   if (newInterventionId.startsWith("demo-")) return;
@@ -37,12 +34,13 @@ export async function recordDuplicateAlertIfNeeded(params: RecordDuplicateAlertP
 
   const q = query(collection(db, "interventions"), where("companyId", "==", cid), limit(200));
   const snap = await getDocs(q);
-  const candidates = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
+  const candidates = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
 
   const dup = findPotentialDuplicateAmong({
     excludeId: newInterventionId.trim(),
     address,
     problem,
+    client,
     candidates,
   });
 

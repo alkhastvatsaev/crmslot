@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
 import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
@@ -27,7 +28,6 @@ import {
 import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
-import VehicleStockPanel from "@/features/stock/components/VehicleStockPanel";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
@@ -43,9 +43,9 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const { pendingCaseId, setPendingCaseId } = useTechnicianCaseIntent();
   const { finishJobInterventionId, setFinishJobInterventionId } = useTechnicianFinishJob();
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const requestMobileHubRail = useRequestMobileHubRail();
   const [commandOpen, setCommandOpen] = useState(false);
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
-  const vehicleStockEnabled = useFeatureFlag("vehicleStock");
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
@@ -96,12 +96,20 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const handleMissionClick = (mission: Mission) => {
     if (!mission.key) return;
+    requestMobileHubRail("center");
+    if (finishJobInterventionId && mission.key !== finishJobInterventionId) {
+      setFinishJobInterventionId(null);
+    }
     setSelectedCaseId(mission.key);
     const iv = interventions.find((x) => x.id === mission.key);
     if (iv) logIntervention(iv);
   };
 
   useEffect(() => {
+    if (finishJobInterventionId) {
+      setSelectedCaseId(finishJobInterventionId);
+      return;
+    }
     if (pendingCaseId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedCaseId(pendingCaseId);
@@ -128,15 +136,8 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     missionDayAnchor,
     activeTodaySorted,
     firebaseUid,
+    finishJobInterventionId,
   ]);
-
-  /** Une seule vue centrale : détail mission OU clôture (pas d’overlay superposé). */
-  useEffect(() => {
-    if (!finishJobInterventionId) return;
-    if (finishJobInterventionId !== selectedCaseId) {
-      setFinishJobInterventionId(null);
-    }
-  }, [selectedCaseId, finishJobInterventionId, setFinishJobInterventionId]);
 
   const centerView = finishJobInterventionId ? "finish" : "detail";
 
@@ -170,14 +171,6 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       className="scroll-mt-2 flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <TechnicianDashboardImagesPanel caseId={selectedCaseId} />
-      {vehicleStockEnabled ? (
-        <div
-          data-testid="technician-hub-vehicle-stock"
-          className="max-h-[45%] shrink-0 overflow-y-auto border-t border-slate-100 p-3"
-        >
-          <VehicleStockPanel techUid={firebaseUid ?? undefined} />
-        </div>
-      ) : null}
     </div>
   );
 

@@ -88,6 +88,9 @@ export async function POST(req: Request) {
 // ---------------------------------------------------------------------------
 
 function resolveRecipientEmail(role: string, variables: Record<string, string>): string | null {
+  const explicit = variables.recipientEmail?.trim();
+  if (explicit) return explicit;
+
   // In a full implementation, we'd query Firestore for the user's email.
   // For now, dispatcher emails go to the configured company inbox.
   if (role === "dispatcher") {
@@ -113,6 +116,10 @@ function interpolateTemplate(key: string, vars: Record<string, string>): string 
     "notifications.email.waiting_material.subject":
       "Intervention en attente de matériel — {{title}}",
     "notifications.email.cancelled.subject": "Intervention annulée — {{title}}",
+    "notifications.email.report_rejected.subject":
+      "Rapport refusé — veuillez compléter l'intervention {{title}}",
+    weekly_digest: "Résumé hebdomadaire facturation — société {{companyId}}",
+    appointment_reminder: "{{subject}}",
   };
 
   let text = templates[key] || key;
@@ -155,6 +162,19 @@ function buildEmailHtml(bodyKey: string, vars: Record<string, string>): string {
       <p>Bonjour <strong>{{clientName}}</strong>,</p>
       <p>Nous vous informons que votre intervention <strong>{{title}}</strong> a été annulée.</p>
       <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>`,
+    "notifications.email.report_rejected.body": `
+      <p>Bonjour,</p>
+      <p>Le back-office a refusé votre rapport pour l'intervention <strong>{{title}}</strong>.</p>
+      <p><strong>Motif :</strong> {{rejectionReason}}</p>
+      <p>Merci de rouvrir la mission et de compléter ou corriger le rapport avant de le soumettre à nouveau.</p>`,
+    weekly_digest_body: `
+      <p>Résumé hebdomadaire facturation (société {{companyId}})</p>
+      <ul>
+        <li>Factures payées : {{paidCount}}</li>
+        <li>Impayés : {{unpaidCount}}</li>
+        <li>CA facturé HT : {{revenueEur}} €</li>
+      </ul>`,
+    appointment_reminder_body: `<pre>{{body}}</pre>`,
   };
 
   let body = bodyTemplates[bodyKey] || `<p>${bodyKey}</p>`;

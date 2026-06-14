@@ -31,6 +31,10 @@ type Props = {
   intervention?: Pick<Intervention, "category" | "problem">;
   /** Wizard clôture terrain : pas de scroll, champs réduits. */
   variant?: "default" | "terrain";
+  confirmLabel?: string;
+  skipLabel?: string;
+  clientEmailHint?: string | null;
+  confirmBusy?: boolean;
 };
 
 const emptyLine = (): BillingLine => ({
@@ -47,6 +51,10 @@ export default function TechnicianBillingLinesForm({
   onBack,
   intervention,
   variant = "default",
+  confirmLabel,
+  skipLabel,
+  clientEmailHint,
+  confirmBusy = false,
 }: Props) {
   const { t } = useTranslation();
   const [lines, setLines] = useState<BillingLine[]>(
@@ -135,6 +143,8 @@ export default function TechnicianBillingLinesForm({
 
   const hasValidLines = lines.some((l) => l.description.trim() !== "");
   const terrain = variant === "terrain";
+  const resolvedConfirmLabel = confirmLabel ?? String(t("billing_lines.confirm"));
+  const resolvedSkipLabel = skipLabel ?? String(t("billing_lines.skip"));
 
   if (terrain) {
     const editIndex = 0;
@@ -238,34 +248,46 @@ export default function TechnicianBillingLinesForm({
           </div>
         </div>
 
+        {clientEmailHint ? (
+          <p
+            data-testid="billing-client-email-hint"
+            className="shrink-0 text-center text-[11px] font-medium text-slate-500"
+          >
+            {clientEmailHint}
+          </p>
+        ) : null}
+
         <div className="flex shrink-0 gap-2 pt-1">
           {onBack ? (
             <button
               type="button"
               data-testid="billing-back"
               onClick={onBack}
-              className="flex h-11 min-w-[5rem] flex-1 items-center justify-center rounded-full bg-slate-100 text-[13px] font-semibold text-slate-600"
+              disabled={confirmBusy}
+              className="flex h-11 min-w-[5rem] flex-1 items-center justify-center rounded-full bg-slate-100 text-[13px] font-semibold text-slate-600 disabled:opacity-50"
             >
-              {t("billing_lines.skip")}
+              {resolvedSkipLabel}
             </button>
           ) : (
             <button
               type="button"
               data-testid="billing-skip"
               onClick={onSkip}
-              className="flex h-11 min-w-[5rem] flex-1 items-center justify-center rounded-full bg-slate-100 text-[13px] font-semibold text-slate-600"
+              disabled={confirmBusy}
+              className="flex h-11 min-w-[5rem] flex-1 items-center justify-center rounded-full bg-slate-100 text-[13px] font-semibold text-slate-600 disabled:opacity-50"
             >
-              {t("billing_lines.skip")}
+              {resolvedSkipLabel}
             </button>
           )}
           <button
             type="button"
             data-testid="billing-confirm"
-            disabled={!hasValidLines}
+            disabled={!hasValidLines || confirmBusy}
             onClick={() => onConfirm(lines.filter((l) => l.description.trim()))}
-            className="flex h-11 flex-[2] items-center justify-center rounded-full bg-slate-900 text-[13px] font-semibold text-white disabled:opacity-40"
+            className="flex h-11 flex-[2] items-center justify-center gap-2 rounded-full bg-emerald-600 text-[13px] font-semibold text-white disabled:opacity-40"
           >
-            {t("billing_lines.confirm")}
+            {confirmBusy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
+            {resolvedConfirmLabel}
           </button>
         </div>
       </div>

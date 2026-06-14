@@ -262,6 +262,31 @@ Voir `docs/TESTING.md` §3. Après toute modif chatbot : `npx jest src/features/
 - [ ] Remonter `coverageThreshold.global` par +2 % / trimestre.
 - [ ] Planchers sur autres modules `server/` interventions au fil de l’eau.
 
+### Phase 11 — Régressions mobile auth (CODEX mobile) ✅ 2026-06-13
+
+Contexte : 7 erreurs HTTP 401 + Firestore `permission-denied` corrigées sur mobile (branch `cursor/mobile-corrections`). Cause racine : hooks et contextes déclenchaient des requêtes Firestore/API avant que l’auth Firebase soit résolue.
+
+**Tests de régression ajoutés** :
+
+| Fichier test                                                    | Ce qui est vérifié                                                                                                                                                       |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `chatbot/hooks/__tests__/useChatbotSupplierOrdersPanel.test.ts` | Guard `firebaseUid === "anon"` et `null` — pwa-registry + Firestore non appelés                                                                                          |
+| `dashboard/components/__tests__/MacroDroidIndicator.test.tsx`   | Auth gate : Firestore non souscrit avant auth ; affichage conditionnel selon `status`                                                                                    |
+| `context/__tests__/CompanyWorkspaceContext.test.tsx`            | `authLoading` bloque l’exposition de `activeCompanyId` ; `demoTenantActive` désactivé pour user authentifié sans abonnements ; demo mode actif pour user non authentifié |
+
+**Règles CODEX mobile** :
+
+1. Tout hook qui souscrit Firestore ou appelle une API doit avoir un test pour le cas `firebaseUid = null / "anon"`.
+2. `CompanyWorkspaceContext` : ne jamais enlever les gates `authLoading || !membershipsReady` — ils évitent les requêtes prématurées.
+3. `demoTenantActive` ne doit pas s’activer pour un utilisateur authentifié — condition `!firebaseUid` obligatoire.
+4. Tout composant avec `onAuthStateChanged` interne doit avoir un test avec `mockState.currentUser = null` (Firestore non appelé).
+
+**Commande** :
+
+```bash
+npx jest src/context/__tests__/CompanyWorkspaceContext.test.tsx src/features/chatbot/hooks/__tests__/useChatbotSupplierOrdersPanel.test.ts src/features/dashboard/components/__tests__/MacroDroidIndicator.test.tsx --no-coverage
+```
+
 ---
 
 ## 6. E2E existants (ne pas surcharger)

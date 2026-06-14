@@ -1,5 +1,8 @@
 import type { Intervention } from "@/features/interventions/types";
-import type { TransitionActor, WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type {
+  TransitionActor,
+  WorkflowOwnerRole,
+} from "@/features/interventions/workflow/interventionWorkflowTypes";
 
 /** Transitions métier autorisées (machine à états). */
 export const INTERVENTION_STATUS_TRANSITIONS: Record<
@@ -17,7 +20,8 @@ export const INTERVENTION_STATUS_TRANSITIONS: Record<
   cancelled: [],
 };
 
-const TRANSITION_KEY = (from: Intervention["status"], to: Intervention["status"]) => `${from}->${to}`;
+const TRANSITION_KEY = (from: Intervention["status"], to: Intervention["status"]) =>
+  `${from}->${to}`;
 
 /** Transitions réservées au terrain (technicien assigné). */
 const TECHNICIAN_TRANSITION_KEYS = new Set<string>([
@@ -29,6 +33,7 @@ const TECHNICIAN_TRANSITION_KEYS = new Set<string>([
   TRANSITION_KEY("waiting_material", "in_progress"),
   TRANSITION_KEY("in_progress", "done"),
   TRANSITION_KEY("done", "in_progress"),
+  TRANSITION_KEY("done", "invoiced"),
 ]);
 
 /** Transitions back-office / dispatch. */
@@ -42,11 +47,12 @@ const DISPATCHER_TRANSITION_KEYS = new Set<string>([
   TRANSITION_KEY("in_progress", "cancelled"),
   TRANSITION_KEY("waiting_material", "cancelled"),
   TRANSITION_KEY("done", "invoiced"),
+  TRANSITION_KEY("done", "in_progress"),
 ]);
 
 export function canTransitionInterventionStatus(
   from: Intervention["status"],
-  to: Intervention["status"],
+  to: Intervention["status"]
 ): boolean {
   if (from === to) return false;
   return INTERVENTION_STATUS_TRANSITIONS[from]?.includes(to) ?? false;
@@ -54,7 +60,7 @@ export function canTransitionInterventionStatus(
 
 export function assertTransitionAllowed(
   from: Intervention["status"],
-  to: Intervention["status"],
+  to: Intervention["status"]
 ): void {
   if (!canTransitionInterventionStatus(from, to)) {
     throw new Error(`Transition interdite : ${from} → ${to}`);
@@ -64,7 +70,7 @@ export function assertTransitionAllowed(
 export function actorMayTransition(
   actor: TransitionActor,
   from: Intervention["status"],
-  to: Intervention["status"],
+  to: Intervention["status"]
 ): boolean {
   if (!canTransitionInterventionStatus(from, to)) return false;
   const key = TRANSITION_KEY(from, to);
@@ -76,7 +82,7 @@ export function actorMayTransition(
 
 export function resolveOwnerAfterTransition(
   toStatus: Intervention["status"],
-  iv: Pick<Intervention, "assignedTechnicianUid" | "createdByUid">,
+  iv: Pick<Intervention, "assignedTechnicianUid" | "createdByUid">
 ): { currentOwnerUid: string | null; currentOwnerRole: WorkflowOwnerRole } {
   switch (toStatus) {
     case "assigned":
@@ -122,7 +128,7 @@ export function buildStatusTransitionPatch(params: {
 export function statusChangeNotificationTargets(
   iv: Pick<Intervention, "assignedTechnicianUid" | "createdByUid">,
   toStatus: Intervention["status"],
-  actorUid: string,
+  actorUid: string
 ): string[] {
   const targets = new Set<string>();
   const tech = (iv.assignedTechnicianUid ?? "").trim();

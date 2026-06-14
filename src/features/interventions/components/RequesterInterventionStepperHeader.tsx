@@ -23,7 +23,7 @@ export default function RequesterInterventionStepperHeader() {
   };
 
   return (
-    <div className="flex shrink-0 items-center justify-between bg-white px-4 pt-1 pb-0">
+    <div className="flex shrink-0 items-center justify-between">
       <button
         type="button"
         onClick={handleBack}
@@ -44,7 +44,7 @@ export default function RequesterInterventionStepperHeader() {
             key={step}
             className={cn(
               "h-1.5 rounded-full transition-all duration-300",
-              currentStep === step ? "w-4 bg-black" : "w-1.5 bg-slate-200",
+              currentStep === step ? "w-4 bg-black" : "w-1.5 bg-slate-200"
             )}
           />
         ))}

@@ -659,7 +659,15 @@ export function useSmartForm() {
           ...d.data(),
         })) as unknown as Intervention[];
         const matches = findPotentialDuplicates(
-          { address: address.trim(), problem: finalProblem },
+          {
+            address: address.trim(),
+            problem: finalProblem,
+            client: {
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              phone: phone.trim(),
+            },
+          },
           existing,
           0.95
         );
@@ -796,6 +804,10 @@ export function useSmartForm() {
         "Demande d'intervention"
       ).slice(0, 140);
 
+      const { portalAccessFields } =
+        await import("@/features/interventions/ensurePortalAccessToken");
+      const portalFields = portalAccessFields();
+
       await setDoc(newDocRef, {
         title: finalTitle,
         address: address.trim(),
@@ -808,6 +820,7 @@ export function useSmartForm() {
         createdAt: nowIso,
         createdByUid: user.uid,
         assignedTechnicianUid: null,
+        ...portalFields,
         ...(interventionCompanyId ? { companyId: interventionCompanyId } : {}),
         ...(photoDataUrls.length
           ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) }
@@ -862,6 +875,11 @@ export function useSmartForm() {
             address: address.trim(),
             problem: finalProblem,
             createdByUid: user.uid,
+            client: {
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              phone: phone.trim(),
+            },
           }).catch(() => null);
 
           await deleteDoc(doc(db, "intervention_request_drafts", user.uid)).catch(() => null);

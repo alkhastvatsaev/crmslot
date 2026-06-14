@@ -22,6 +22,7 @@ export const MOBILE_CSS_VAR = {
   galaxyHeight: "--mobile-galaxy-height",
   panelRadius: "--mobile-panel-radius",
   panelGap: "--mobile-panel-gap",
+  stackGap: "--mobile-stack-gap",
   panelWidth: "--mobile-panel-width",
   mapRecenterOffset: "--mobile-map-recenter-offset",
 } as const;
@@ -34,13 +35,23 @@ export const MOBILE_SHELL_FOOTER_CLASS = "mobile-shell-footer";
 export const MOBILE_GALAXY_DOCK_CLASS = "mobile-galaxy-dock";
 export const MOBILE_GALAXY_DOCK_CHROME_CLASS = "mobile-galaxy-dock-chrome";
 
+/** Grille gouttière | contenu | gouttière (profil + galaxy). */
+export const MOBILE_SHELL_SLOT_GRID_CLASS = "mobile-shell-slot-grid";
+export const MOBILE_PROFILE_BAR_CLASS = "mobile-profile-bar";
+export const MOBILE_PROFILE_BAR_CHROME_CLASS = "mobile-profile-bar-chrome";
+export const MOBILE_HEADER_RAIL_HOST_CLASS = "mobile-header-rail-host";
+
 export const MOBILE_SCREEN_HOST_CLASS = "mobile-screen-host";
+export const MOBILE_SCREEN_HOST_PANEL_CLASS = "mobile-screen-host-panel";
+export const MOBILE_SCREEN_HOST_PANEL_BASE_CLASS = "mobile-screen-host-panel--base";
+export const MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS = "mobile-screen-host-panel--selector";
 
 export const MOBILE_TOP_BAR_CLASS = "mobile-top-bar";
 
 export const MOBILE_TAB_BAR_CLASS = "mobile-tab-bar";
 
 export const MOBILE_HUB_LAYOUT_CLASS = "mobile-hub-layout";
+export const MOBILE_HUB_DOTS_BAR_CLASS = "mobile-hub-dots-bar";
 export const MOBILE_RAIL_SEGMENT_CLASS = "mobile-rail-segment";
 export const MOBILE_RAIL_SEGMENT_BTN_CLASS = "mobile-rail-segment-btn";
 export const MOBILE_HUB_PANEL_CLASS = "mobile-hub-panel";

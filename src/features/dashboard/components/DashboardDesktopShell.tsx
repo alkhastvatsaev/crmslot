@@ -3,19 +3,25 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { TECHNICIAN_LAB_IN_CAROUSEL, TECHNICIAN_LAB_SLOT_INDEX } from "@/features/technicians/technicianLabConstants";
+import {
+  TECHNICIAN_LAB_IN_CAROUSEL,
+  TECHNICIAN_LAB_SLOT_INDEX,
+} from "@/features/technicians/technicianLabConstants";
 import {
   DASHBOARD_DESKTOP_APP_SHELL_CLASS,
   DASHBOARD_DESKTOP_CANVAS_CLASS,
   DASHBOARD_DESKTOP_GALAXY_DOCK_CHROME_CLASS,
   DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS,
+  DASHBOARD_DESKTOP_COL_CLASS,
   DASHBOARD_DESKTOP_GRID_CLASS,
+  DASHBOARD_DESKTOP_GRID_FILL_CLASS,
   DASHBOARD_DESKTOP_OVERLAY_ROOT_CLASS,
   DASHBOARD_DESKTOP_STACK_BODY_CLASS,
   DASHBOARD_DESKTOP_STACK_CLASS,
   DASHBOARD_DESKTOP_STACK_HEADER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
-import DashboardPagerControls from "@/features/dashboard/components/DashboardPagerControls";
+import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
+import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 
 type Props = {
   header: ReactNode;
@@ -29,6 +35,7 @@ type Props = {
  */
 export default function DashboardDesktopShell({ header, pager, galaxy }: Props) {
   const dashboardPager = useDashboardPagerOptional();
+  const { open: selectorOpen, close: closeSelector } = useDashboardPageSelector();
   const immersiveTechnicianLab =
     TECHNICIAN_LAB_IN_CAROUSEL && dashboardPager?.pageIndex === TECHNICIAN_LAB_SLOT_INDEX;
 
@@ -37,18 +44,21 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
       <div
         className={cn(
           DASHBOARD_DESKTOP_CANVAS_CLASS,
-          immersiveTechnicianLab && "dashboard-desktop-canvas--technician-lab",
+          immersiveTechnicianLab && "dashboard-desktop-canvas--technician-lab"
         )}
       >
         <div
           className={cn(
             DASHBOARD_DESKTOP_STACK_CLASS,
-            immersiveTechnicianLab && "dashboard-desktop-stack--technician-lab",
+            immersiveTechnicianLab && "dashboard-desktop-stack--technician-lab"
           )}
           data-testid="dashboard-desktop-stack"
         >
           {!immersiveTechnicianLab ? (
-            <header className={DASHBOARD_DESKTOP_STACK_HEADER_CLASS} data-testid="dashboard-global-header">
+            <header
+              className={DASHBOARD_DESKTOP_STACK_HEADER_CLASS}
+              data-testid="dashboard-global-header"
+            >
               <div className={DASHBOARD_DESKTOP_GRID_CLASS}>{header}</div>
             </header>
           ) : null}
@@ -59,7 +69,31 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
               className={DASHBOARD_DESKTOP_OVERLAY_ROOT_CLASS}
               aria-hidden
             />
-            <div className="dashboard-desktop-pager-host">{pager}</div>
+            <div className="dashboard-desktop-pager-host">
+              {pager}
+              {selectorOpen && !immersiveTechnicianLab ? (
+                <div className="dashboard-page-selector-host" aria-hidden={false}>
+                  <div
+                    className={`${DASHBOARD_DESKTOP_GRID_CLASS} ${DASHBOARD_DESKTOP_GRID_FILL_CLASS} dashboard-page-selector-host-grid`}
+                  >
+                    <div
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left`}
+                      aria-hidden
+                    />
+                    <div
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center`}
+                      aria-hidden
+                    />
+                    <div
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right dashboard-page-selector-right-slot`}
+                      data-testid="dashboard-page-selector-host"
+                    >
+                      <DashboardPageSelector onClose={closeSelector} variant="desktop" />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
 
           {!immersiveTechnicianLab ? (
@@ -76,8 +110,6 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
               </div>
             </div>
           ) : null}
-
-          <DashboardPagerControls />
         </div>
       </div>
     </div>

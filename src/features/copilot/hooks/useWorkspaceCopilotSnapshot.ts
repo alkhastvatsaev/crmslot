@@ -8,19 +8,21 @@ import { buildWorkspaceCopilotSnapshot } from "@/features/copilot/buildWorkspace
 import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-export function useWorkspaceCopilotSnapshot(): {
+export function useWorkspaceCopilotSnapshot(options?: { enabled?: boolean }): {
   snapshot: WorkspaceCopilotSnapshot | null;
   loading: boolean;
 } {
+  const enabled = options?.enabled !== false;
   const { language } = useTranslation();
   const { activeCompanyId, activeRole, memberships } = useCompanyWorkspace();
-  const { interventions, loading } = useBackOfficeInterventions(activeCompanyId || null);
+  const { interventions, loading } = useBackOfficeInterventions(
+    enabled ? activeCompanyId || null : null
+  );
   const offlineSync = useOfflineSyncOptional();
   const navigatorOnline = offlineSync?.navigatorOnline ?? true;
   const pendingCompletionCount = offlineSync?.pendingCompletionCount ?? 0;
 
-  const companyName =
-    memberships.find((m) => m.companyId === activeCompanyId)?.companyName ?? null;
+  const companyName = memberships.find((m) => m.companyId === activeCompanyId)?.companyName ?? null;
 
   const snapshot = useMemo(() => {
     const cid = (activeCompanyId ?? "").trim();

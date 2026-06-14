@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { toast } from "sonner";
 import { collection, deleteDoc, doc, setDoc, query, where, getDocs } from "firebase/firestore";
-import { signInAnonymously } from "firebase/auth";
-import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
+import { signInAnonymously, type User } from "firebase/auth";
+import { auth, clientPortalAuth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -27,7 +27,13 @@ import {
   uploadInterventionAudioToFirebase,
 } from "@/features/interventions/clientAudioUpload";
 import { capitalizeName } from "@/utils/stringUtils";
+import { isValidPortalEmail, normalizePortalEmail } from "@/features/interventions/portalEmail";
+import {
+  resolveAccountFieldsForSubmit,
+  validateClientPortalAccountFields,
+} from "@/features/auth/clientPortalAccountProfile";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -59,8 +65,19 @@ function withTimeout<T>(
   });
 }
 
-async function ensureUserForInterventionSubmit() {
+async function ensureUserForInterventionSubmit(
+  profileType: RequesterProfile["type"]
+): Promise<User | null> {
   if (!isConfigured) return null;
+
+  if (profileType === "login" || profileType === "register") {
+    const clientUser = clientPortalAuth?.currentUser ?? null;
+    if (clientUser && !clientUser.isAnonymous && clientUser.emailVerified) {
+      return clientUser;
+    }
+    return null;
+  }
+
   if (!auth) return null;
   if (auth.currentUser) return auth.currentUser;
   try {
@@ -86,8 +103,12 @@ export function useRequesterInterventionForm() {
     setIsSubmitting,
     setLastSubmittedRequest,
     setLastSubmittedInterventionId,
+    setLastSubmittedPortalAccessCode,
     setPortalRightTab,
-    resetAll,
+    setPendingTrackingInterventionId,
+    clientAccountFields,
+    resetRequestOnly,
+    resetRequestAfterSubmit,
     triggerValidation,
   } = useRequesterHub();
 
@@ -282,12 +303,18 @@ export function useRequesterInterventionForm() {
     !isSubmitting;
 
   const handleSubmit = async () => {
-    if (profile.type === "login") {
-      const u = auth?.currentUser;
-      if (!u || u.isAnonymous) {
-        setProfile((prev) => ({ ...prev, type: "particulier" }));
+    if (profile.type !== "particulier") {
+      const u = clientPortalAuth?.currentUser;
+      if (!u || u.isAnonymous || !u.emailVerified) {
         triggerValidation();
         toast.error(String(t("requester.toasts.fill_left_panel")));
+        return;
+      }
+
+      const accountFields = resolveAccountFieldsForSubmit(clientAccountFields, profile, u.email);
+      if (validateClientPortalAccountFields(accountFields).length > 0) {
+        triggerValidation();
+        toast.error(String(t("requester.toasts.fill_account_profile")));
         return;
       }
     } else {
@@ -300,6 +327,12 @@ export function useRequesterInterventionForm() {
       if (missingProfileFields.length > 0) {
         triggerValidation();
         toast.error(String(t("requester.toasts.fill_left_panel")));
+        return;
+      }
+
+      if (!isValidPortalEmail(profile.email)) {
+        triggerValidation();
+        toast.error(String(t("requester.toasts.email_invalid")));
         return;
       }
     }
@@ -327,7 +360,7 @@ export function useRequesterInterventionForm() {
 
     setIsSubmitting(true);
     try {
-      const user = await ensureUserForInterventionSubmit();
+      const user = await ensureUserForInterventionSubmit(profile.type);
       if (!user || !firestore) {
         toast.error(String(t("requester.toasts.auth_failed")));
         return;
@@ -347,7 +380,16 @@ export function useRequesterInterventionForm() {
         ...d.data(),
       })) as unknown as Intervention[];
       const matches = findPotentialDuplicates(
-        { address: interventionAddress.trim(), problem: problemForDedupe },
+        {
+          address: interventionAddress.trim(),
+          problem: problemForDedupe,
+          client: {
+            firstName: profile.firstName.trim(),
+            lastName: profile.lastName.trim(),
+            phone: profile.phone.trim(),
+            email: profile.email.trim(),
+          },
+        },
         existing,
         0.95
       );
@@ -401,7 +443,8 @@ export function useRequesterInterventionForm() {
       const db = firestore;
       const newDocRef = doc(collection(db, "interventions"));
       setLastSubmittedInterventionId(newDocRef.id);
-      setPortalRightTab("invoice");
+      setPendingTrackingInterventionId(newDocRef.id);
+      setPortalRightTab("tracking");
       const title = (problemLabel.trim() || description.trim()).slice(0, 140);
       const nowIso = new Date().toISOString();
       const hour =
@@ -430,8 +473,10 @@ export function useRequesterInterventionForm() {
       }
 
       const portalUser =
-        profile.type === "login" && auth?.currentUser && !auth.currentUser.isAnonymous
-          ? auth.currentUser
+        (profile.type === "login" || profile.type === "register") &&
+        clientPortalAuth?.currentUser &&
+        !clientPortalAuth.currentUser.isAnonymous
+          ? clientPortalAuth.currentUser
           : null;
       let clientFirstRaw = profile.firstName.trim();
       let clientLastRaw = profile.lastName.trim();
@@ -441,6 +486,15 @@ export function useRequesterInterventionForm() {
         clientLastRaw = parts.slice(1).join(" ");
       }
       const clientPhoneRaw = profile.phone.trim() || (portalUser?.phoneNumber ?? "").trim();
+      const clientEmailRaw =
+        profile.email.trim() ||
+        clientAccountFields?.email.trim() ||
+        (portalUser?.email ?? user.email ?? "").trim();
+
+      const { portalAccessFields } =
+        await import("@/features/interventions/ensurePortalAccessToken");
+      const { formatPortalAccessCode } = await import("@/features/interventions/portalAccessCode");
+      const portalFields = portalAccessFields();
 
       await setDoc(newDocRef, {
         title,
@@ -455,13 +509,15 @@ export function useRequesterInterventionForm() {
         createdByUid: user.uid,
         assignedTechnicianUid: null,
         companyId: interventionCompanyId,
+        ...portalFields,
         ...(photoDataUrls.length
           ? { attachmentThumbnails: photoDataUrls.slice(0, SMART_FORM_MAX_PHOTOS) }
           : {}),
         ...(clientFirstRaw ? { clientFirstName: capitalizeName(clientFirstRaw) } : {}),
         ...(clientLastRaw ? { clientLastName: capitalizeName(clientLastRaw) } : {}),
         ...(clientPhoneRaw ? { clientPhone: clientPhoneRaw } : {}),
-        ...(profile.email.trim() ? { clientEmail: profile.email.trim() } : {}),
+        ...(clientEmailRaw ? { clientEmail: clientEmailRaw } : {}),
+        ...(clientEmailRaw ? { clientEmailNormalized: normalizePortalEmail(clientEmailRaw) } : {}),
         ...(interventionDate ? { requestedDate: interventionDate } : {}),
         ...(interventionTime ? { requestedTime: interventionTime } : {}),
         ...(demoAudioUrlForDoc && isPersistableClientAudioUrl(demoAudioUrlForDoc)
@@ -552,6 +608,12 @@ export function useRequesterInterventionForm() {
             address: interventionAddress.trim(),
             problem: problemForDedupe,
             createdByUid: user.uid,
+            client: {
+              firstName: clientFirstRaw,
+              lastName: clientLastRaw,
+              phone: clientPhoneRaw,
+              email: profile.email.trim(),
+            },
           }).catch(() => null);
 
           deleteDoc(doc(db, "intervention_request_drafts", user.uid)).catch(() => null);
@@ -574,8 +636,51 @@ export function useRequesterInterventionForm() {
         interventionAddress,
         interventionLatLng,
       });
-      resetAll();
-      toast.success(String(t("requester.toasts.request_saved")));
+      resetRequestAfterSubmit();
+
+      const formattedCode = formatPortalAccessCode(portalFields.portalAccessCode);
+      setLastSubmittedPortalAccessCode(formattedCode);
+      const notifyPortalAccess = async () => {
+        if (!clientEmailRaw) return;
+        try {
+          const res = await fetchWithAuth(
+            `/api/interventions/${newDocRef.id}/portal-access-notify`,
+            { method: "POST" },
+            { user }
+          );
+          const body = (await res.json().catch(() => ({}))) as {
+            error?: string;
+            emailSent?: boolean;
+          };
+          if (!res.ok) {
+            throw new Error(body.error ?? `HTTP ${res.status}`);
+          }
+          if (body.emailSent === false) {
+            logger.warn("Portal access welcome email not sent", {
+              interventionId: newDocRef.id,
+              to: clientEmailRaw,
+            });
+          }
+        } catch (notifyError) {
+          logger.warn("Portal access notify failed", {
+            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+          });
+        }
+      };
+
+      if (profile.type === "particulier") {
+        void notifyPortalAccess();
+        toast.success(String(t("requester.toasts.request_saved_portal_title")), {
+          description: String(t("requester.toasts.request_saved_portal_desc")).replace(
+            "{{code}}",
+            formattedCode
+          ),
+          duration: 12_000,
+        });
+      } else {
+        void notifyPortalAccess();
+        toast.success(String(t("requester.toasts.request_saved")));
+      }
     } catch (e) {
       logger.error("useRequesterInterventionForm submit", {
         error: e instanceof Error ? e.message : String(e),

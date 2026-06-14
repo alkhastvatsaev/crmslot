@@ -22,16 +22,19 @@ describe("detectDuplicates", () => {
   it("ignores cancelled interventions", () => {
     const candidate = { address: "123 Rue de la Paix", problem: "Serrure cassée" };
     const existing = [
-      iv({ id: "1", address: "123 Rue de la Paix", problem: "Serrure cassée", status: "cancelled" }),
+      iv({
+        id: "1",
+        address: "123 Rue de la Paix",
+        problem: "Serrure cassée",
+        status: "cancelled",
+      }),
     ];
     expect(findPotentialDuplicates(candidate, existing, 0.5)).toEqual([]);
   });
 
   it("detects exact duplicate (score 1.0)", () => {
     const candidate = { address: "123 Rue de la Paix", problem: "Serrure cassée" };
-    const existing = [
-      iv({ id: "1", address: "123 Rue de la Paix", problem: "Serrure cassée" }),
-    ];
+    const existing = [iv({ id: "1", address: "123 Rue de la Paix", problem: "Serrure cassée" })];
     const matches = findPotentialDuplicates(candidate, existing, 0.9);
     expect(matches).toHaveLength(1);
     expect(matches[0].score).toBe(1.0);
@@ -53,9 +56,7 @@ describe("detectDuplicates", () => {
 
   it("handles case-insensitive and punctuation in text", () => {
     const candidate = { address: "123 rue de la paix!", problem: "serrure, cassée?" };
-    const existing = [
-      iv({ id: "1", address: "123 Rue de la Paix", problem: "Serrure cassée" }),
-    ];
+    const existing = [iv({ id: "1", address: "123 Rue de la Paix", problem: "Serrure cassée" })];
     const matches = findPotentialDuplicates(candidate, existing, 0.9);
     expect(matches).toHaveLength(1);
     expect(matches[0].score).toBe(1.0);
@@ -69,7 +70,7 @@ describe("detectDuplicates", () => {
       iv({ id: "3", address: "456 Ave", problem: "Serrure" }), // addr 0, prob 1.0 => 0.4
       iv({ id: "4", address: "123 Rue", problem: "Serrure Porte" }), // prob 0.5 => 0.6 + 0.2 = 0.8
     ];
-    
+
     const matches = findPotentialDuplicates(candidate, existing, 0.1);
     expect(matches).toHaveLength(3);
     expect(matches[0].intervention.id).toBe("1"); // 1.0
@@ -77,12 +78,50 @@ describe("detectDuplicates", () => {
     expect(matches[2].intervention.id).toBe("2"); // 0.6
   });
 
+  it("ignores same address and problem when client identity differs", () => {
+    const candidate = {
+      address: "12 Rue Neuve, Bruxelles",
+      problem: "Serrure cassée",
+      client: { firstName: "Marie", lastName: "Dupont", phone: "0470123456" },
+    };
+    const existing = [
+      iv({
+        id: "1",
+        address: "12 Rue Neuve, Bruxelles",
+        problem: "Serrure cassée",
+        clientFirstName: "Jean",
+        clientLastName: "Martin",
+        clientPhone: "0480111222",
+      }),
+    ];
+    expect(findPotentialDuplicates(candidate, existing, 0.5)).toEqual([]);
+  });
+
+  it("still detects duplicate for same client, address and problem", () => {
+    const candidate = {
+      address: "12 Rue Neuve, Bruxelles",
+      problem: "Serrure cassée",
+      client: { firstName: "Marie", lastName: "Dupont", phone: "0470123456" },
+    };
+    const existing = [
+      iv({
+        id: "1",
+        address: "12 Rue Neuve, Bruxelles",
+        problem: "Serrure cassée",
+        clientFirstName: "Marie",
+        clientLastName: "Dupont",
+        clientPhone: "0470123456",
+      }),
+    ];
+    const matches = findPotentialDuplicates(candidate, existing, 0.9);
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.reason).toContain("même téléphone");
+  });
+
   it("returns 0 score when tokens are shorter than 3 characters", () => {
     // Only "de", "la" are present which are < 3 chars, so tokens set size is 0
     const candidate = { address: "de la", problem: "a b" };
-    const existing = [
-      iv({ id: "1", address: "de la", problem: "a b" }),
-    ];
+    const existing = [iv({ id: "1", address: "de la", problem: "a b" })];
     const matches = findPotentialDuplicates(candidate, existing, 0.0);
     expect(matches).toHaveLength(1);
     expect(matches[0].score).toBe(0.0);

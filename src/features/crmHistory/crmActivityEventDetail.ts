@@ -70,6 +70,7 @@ const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
   intervention_returned_to_requests: "crmHistory.detail.body.intervention_returned_to_requests",
   intervention_deleted: "crmHistory.detail.body.intervention_deleted",
   intervention_report_validated: "crmHistory.detail.body.intervention_report_validated",
+  intervention_report_rejected: "crmHistory.detail.body.intervention_report_rejected",
   intervention_cancelled: "crmHistory.detail.body.intervention_cancelled",
   intervention_schedule_updated: "crmHistory.detail.body.intervention_schedule_updated",
   intervention_billing_updated: "crmHistory.detail.body.intervention_billing_updated",
@@ -96,6 +97,7 @@ const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
   intervention_viewed: "crmHistory.detail.body.intervention_viewed",
   email_viewed: "crmHistory.detail.body.email_viewed",
   user_session_start: "crmHistory.detail.body.user_session_start",
+  time_entry_recorded: "crmHistory.detail.body.time_entry_recorded",
 };
 
 /** Texte explicatif pour le panneau droit de l’historique CRM. */

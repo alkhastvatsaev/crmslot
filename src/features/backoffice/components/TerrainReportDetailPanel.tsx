@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircle2, Clock, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, RotateCcw, Send, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton, HubCard, HubDetailHeader, HUB_TYPE } from "@/core/ui/hub";
@@ -16,6 +17,8 @@ import type {
   TechnicianBackofficeReportBridgeApi,
 } from "@/context/TechnicianBackofficeReportBridgeContext";
 import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
+import InterventionInvoicePreviewCard from "@/features/billing/components/InterventionInvoicePreviewCard";
+import { invoicePreviewFromIntervention } from "@/features/billing/invoicePreviewFromIntervention";
 
 function readTranscription(inv: unknown): string | null {
   if (!inv || typeof inv !== "object") return null;
@@ -33,8 +36,8 @@ type Props = {
   terrainAudioLoading: boolean;
   terrainAudioFailed: boolean;
   onClose: () => void;
-  onDelete: (id: string) => void;
   onVerify: (id: string) => void;
+  onReject: (id: string, reason?: string) => void;
 };
 
 export default function TerrainReportDetailPanel({
@@ -45,10 +48,12 @@ export default function TerrainReportDetailPanel({
   terrainAudioLoading,
   terrainAudioFailed,
   onClose,
-  onDelete,
   onVerify,
+  onReject,
 }: Props) {
   const { t } = useTranslation();
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const first = iv?.clientFirstName ?? "";
   const last = iv?.clientLastName ?? "";
@@ -60,6 +65,12 @@ export default function TerrainReportDetailPanel({
   const address = iv?.address ? formatAddress(iv.address) : "";
   const description = iv?.problem || iv?.title || "";
   const isAlreadyValidated = iv?.status === "invoiced";
+
+  const handleRejectConfirm = () => {
+    onReject(r.interventionId, rejectReason.trim() || undefined);
+    setRejectOpen(false);
+    setRejectReason("");
+  };
 
   return (
     <motion.div
@@ -209,50 +220,63 @@ export default function TerrainReportDetailPanel({
           </div>
         </div>
 
-        {Array.isArray(iv?.billingLines) && iv.billingLines.length > 0 ? (
-          <div className="space-y-3" data-testid="backoffice-terrain-draft-billing">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-              {t("backoffice.inbox.draft_billing")}
+        {iv ? <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(iv)} /> : null}
+
+        {/* Reject inline form */}
+        {rejectOpen ? (
+          <div
+            data-testid="backoffice-reject-form"
+            className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3"
+          >
+            <p className="text-[13px] font-bold text-amber-900">
+              {t("backoffice.inbox.reject_reason_label")}
             </p>
-            <ul className="rounded-[16px] border border-slate-100 bg-slate-50/80 divide-y divide-slate-100">
-              {iv.billingLines.map((line, li) => (
-                <li
-                  key={`${r.localId}-bill-${li}`}
-                  className="flex justify-between gap-3 px-4 py-3 text-[12px] font-semibold text-slate-800"
-                >
-                  <span className="min-w-0 flex-1">
-                    {line.description}
-                    {line.quantity > 1 ? ` × ${line.quantity}` : ""}
-                  </span>
-                  <span className="tabular-nums text-slate-600">
-                    {((Math.round(line.unitPriceCents) * (line.quantity || 1)) / 100).toFixed(2)} €
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0 ? (
-              <p className="text-[12px] font-bold text-slate-700 text-right">
-                {t("backoffice.inbox.draft_billing_total")}{" "}
-                {(iv.invoiceAmountCents / 100).toFixed(2)} € HT
-              </p>
-            ) : null}
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder={t("backoffice.inbox.reject_reason_placeholder")}
+              rows={3}
+              className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-slate-800 outline-none focus:border-amber-400 placeholder:text-slate-400 resize-none"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <HubButton
+                type="button"
+                variant="dangerOutline"
+                data-testid="backoffice-reject-confirm"
+                onClick={handleRejectConfirm}
+                className="flex-1"
+              >
+                <Send className="h-4 w-4" />
+                {t("backoffice.inbox.reject_send")}
+              </HubButton>
+              <HubButton
+                type="button"
+                onClick={() => {
+                  setRejectOpen(false);
+                  setRejectReason("");
+                }}
+                className="shrink-0"
+              >
+                {t("common.cancel")}
+              </HubButton>
+            </div>
           </div>
         ) : null}
       </div>
 
       <HubActionBar>
-        <HubButton
-          type="button"
-          variant="dangerOutline"
-          onClick={() => {
-            onDelete(r.interventionId);
-            terrainBridge?.dismissReport(r.localId);
-            onClose();
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-          {t("common.delete")}
-        </HubButton>
+        {!rejectOpen && !isAlreadyValidated && iv ? (
+          <HubButton
+            type="button"
+            data-testid="backoffice-reject-report-btn"
+            onClick={() => setRejectOpen(true)}
+          >
+            <RotateCcw className="h-4 w-4" />
+            {t("backoffice.inbox.reject_report")}
+          </HubButton>
+        ) : null}
+
         <HubButton
           type="button"
           variant="success"

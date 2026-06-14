@@ -1,4 +1,7 @@
+import { parseBrusselsDateTime } from "@/core/time/parseBrusselsDateTime";
 import type { Intervention } from "@/features/interventions/types";
+
+export type AppointmentReminderType = "24h" | "2h" | "30min";
 
 // ---------------------------------------------------------------------------
 // Appointment Reminder Engine
@@ -20,11 +23,12 @@ export interface ReminderCandidate {
     | "scheduledDate"
     | "scheduledTime"
     | "assignedTechnicianUid"
+    | "appointmentRemindersSent"
   >;
   /** Minutes until scheduled appointment. */
   minutesUntil: number;
   /** Type of reminder to send. */
-  reminderType: "24h" | "2h" | "30min";
+  reminderType: AppointmentReminderType;
 }
 
 /** Windows in minutes before appointment when reminders should fire. */
@@ -34,19 +38,11 @@ const REMINDER_WINDOWS = [
   { type: "30min" as const, minBefore: 30, tolerance: 10 },
 ];
 
-/**
- * Parse scheduled date + time into a Date.
- * Returns null if either field is missing or invalid.
- */
-function parseScheduledDateTime(
-  scheduledDate?: string | null,
-  scheduledTime?: string | null,
-): Date | null {
-  if (!scheduledDate || !scheduledTime) return null;
-  const match = scheduledTime.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return null;
-  const dt = new Date(`${scheduledDate}T${match[1]!.padStart(2, "0")}:${match[2]}:00`);
-  return isNaN(dt.getTime()) ? null : dt;
+function alreadySentReminder(
+  iv: Pick<Intervention, "appointmentRemindersSent">,
+  type: AppointmentReminderType
+): boolean {
+  return Boolean(iv.appointmentRemindersSent?.[type]);
 }
 
 /**
@@ -55,7 +51,7 @@ function parseScheduledDateTime(
  */
 export function findDueReminders(
   interventions: ReminderCandidate["intervention"][],
-  now: Date = new Date(),
+  now: Date = new Date()
 ): ReminderCandidate[] {
   const results: ReminderCandidate[] = [];
 
@@ -63,7 +59,7 @@ export function findDueReminders(
     // Only remind for assigned or en_route interventions
     if (iv.status !== "assigned" && iv.status !== "en_route") continue;
 
-    const scheduledAt = parseScheduledDateTime(iv.scheduledDate, iv.scheduledTime);
+    const scheduledAt = parseBrusselsDateTime(iv.scheduledDate ?? "", iv.scheduledTime ?? "");
     if (!scheduledAt) continue;
 
     const diffMs = scheduledAt.getTime() - now.getTime();
@@ -77,6 +73,7 @@ export function findDueReminders(
         diffMin <= window.minBefore + window.tolerance &&
         diffMin >= window.minBefore - window.tolerance
       ) {
+        if (alreadySentReminder(iv, window.type)) continue;
         results.push({
           intervention: iv,
           minutesUntil: Math.round(diffMin),
@@ -99,9 +96,7 @@ export function buildReminderMessage(candidate: ReminderCandidate): {
 } {
   const iv = candidate.intervention;
   const name =
-    [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") ||
-    iv.clientName ||
-    "Client";
+    [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") || iv.clientName || "Client";
 
   const timeLabels: Record<string, string> = {
     "24h": "demain",

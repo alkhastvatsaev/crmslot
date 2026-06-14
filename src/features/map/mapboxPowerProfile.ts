@@ -1,0 +1,102 @@
+import { detectMobileClient } from "@/core/config/mobileClientDetection";
+
+/** Style premium léger — tuiles vectorielles propres (mobile). */
+export const MAPBOX_STYLE_MOBILE = "mapbox://styles/mapbox/streets-v12";
+
+/** Style premium desktop — Standard sans bâtiments 3D (config basemap). */
+export const MAPBOX_STYLE_DESKTOP = "mapbox://styles/mapbox/standard";
+
+export function isMapMobilePowerSave(
+  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : "",
+  search: string = typeof window !== "undefined" ? window.location.search : ""
+): boolean {
+  return detectMobileClient(userAgent, search);
+}
+
+export function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+export function resolveMapboxPixelRatio(
+  isMobile: boolean,
+  devicePixelRatio: number = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
+): number {
+  if (isMobile) return Math.min(devicePixelRatio, 1.5);
+  return Math.min(devicePixelRatio, 2);
+}
+
+/** @deprecated alias — préférer resolveMapboxPixelRatio */
+export function resolveMapboxMobilePixelRatio(
+  devicePixelRatio: number = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
+): number {
+  return resolveMapboxPixelRatio(true, devicePixelRatio);
+}
+
+export type MapboxInitPowerOptions = {
+  style: string;
+  antialias: boolean;
+  fadeDuration: number;
+  refreshExpiredTiles: boolean;
+  maxTileCacheSize: number;
+  renderWorldCopies: boolean;
+  collectResourceTiming: boolean;
+  respectPrefersReducedMotion: boolean;
+};
+
+export function resolveMapboxInitOptions(isMobile: boolean): MapboxInitPowerOptions {
+  return {
+    style: isMobile ? MAPBOX_STYLE_MOBILE : MAPBOX_STYLE_DESKTOP,
+    antialias: !isMobile,
+    fadeDuration: prefersReducedMotion() ? 0 : isMobile ? 0 : 240,
+    refreshExpiredTiles: false,
+    maxTileCacheSize: isMobile ? 40 : 96,
+    renderWorldCopies: false,
+    collectResourceTiming: false,
+    respectPrefersReducedMotion: true,
+  };
+}
+
+/** Standard : look premium en 2D (sans bâtiments 3D ni POI bruyants). */
+export function applyMapboxPremiumBasemapConfig(map: {
+  setConfigProperty: (layer: string, name: string, value: unknown) => void;
+}): void {
+  try {
+    map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+    map.setConfigProperty("basemap", "showTransitLabels", false);
+    map.setConfigProperty("basemap", "showRoadLabels", true);
+    map.setConfigProperty("basemap", "show3dObjects", false);
+    map.setConfigProperty("basemap", "show3dLandmarks", false);
+  } catch {
+    /* streets-v12 et styles sans config Standard */
+  }
+}
+
+export type MapCameraMotion = "marker" | "recenter" | "bounds";
+
+export function resolveMapCameraDuration(isMobile: boolean, motion: MapCameraMotion): number {
+  if (prefersReducedMotion()) return 0;
+  if (isMobile) {
+    return motion === "bounds" ? 0 : 420;
+  }
+  return motion === "bounds" ? 640 : 820;
+}
+
+/** Halo marker — premium desktop, plus léger sur mobile. */
+export function markerGlowBlurClass(isMobile: boolean): string {
+  return isMobile ? "blur-lg" : "blur-xl";
+}
+
+/**
+ * WebGL actif : page carte visible + (desktop ou rail centre mobile).
+ * Démonte la carte sur les autres pages hub ou rails latéraux.
+ */
+export function isMapWebGLActive(
+  isMobile: boolean | null,
+  dashboardPageIndex: number,
+  mapCenterRailActive: boolean
+): boolean {
+  if (dashboardPageIndex !== 0) return false;
+  if (isMobile === true) return mapCenterRailActive;
+  return true;
+}

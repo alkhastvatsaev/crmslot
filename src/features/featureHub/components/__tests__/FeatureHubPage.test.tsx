@@ -9,6 +9,7 @@ jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: () => ({
     activeCompanyId: "demo-local-company",
     isTenantUser: true,
+    workspaceReady: true,
     firebaseUid: "uid-test",
     activeRole: "admin",
     memberships: [{ companyId: "demo-local-company", companyName: "Demo" }],

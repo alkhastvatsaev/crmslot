@@ -12,7 +12,7 @@ export function emitHubAgentToolSideEffects(
   toolName: string,
   result: unknown,
   emit: ChatbotStreamEmit,
-  companyId: string,
+  companyId: string
 ): void {
   if (toolName === "order_lecot_parts") {
     emitChatbotOrderRegisteredEvents(emit, companyId, result);
@@ -21,6 +21,16 @@ export function emitHubAgentToolSideEffects(
 
   if (toolName === "approve_material_orders" && okResult(result)) {
     emit({ type: "registry_refresh" });
+    return;
+  }
+
+  if (toolName === "trigger_accounting_export") {
+    emit({ type: "export_accounting_csv" });
+    return;
+  }
+
+  if (toolName === "trigger_payroll_export") {
+    emit({ type: "export_payroll_csv" });
     return;
   }
 

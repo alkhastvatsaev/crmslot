@@ -38,7 +38,27 @@ describe("fetchWithAuth", () => {
         headers: expect.objectContaining({
           Authorization: "Bearer mock-id-token",
         }),
-      }),
+      })
+    );
+  });
+
+  it("prefers an explicit user token over auth.currentUser", async () => {
+    const portalUser = {
+      getIdToken: jest.fn().mockResolvedValue("portal-id-token"),
+    };
+    await fetchWithAuth(
+      "/api/interventions/iv-1/portal-access-notify",
+      { method: "POST" },
+      { user: portalUser as never }
+    );
+    expect(portalUser.getIdToken).toHaveBeenCalledWith(false);
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/interventions/iv-1/portal-access-notify",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer portal-id-token",
+        }),
+      })
     );
   });
 });

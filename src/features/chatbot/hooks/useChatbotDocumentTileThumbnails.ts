@@ -2,10 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import {
-  documentPdfApiPath,
-  supplierOrderPdfApiPath,
-} from "@/features/chatbot/chatbot-document";
+import { documentPdfApiPath, supplierOrderPdfApiPath } from "@/features/chatbot/chatbot-document";
 import { getPdfFromCache, savePdfToCache } from "@/features/chatbot/chatbotPdfDb";
 import { renderPdfBlobFirstPageThumbnail } from "@/features/gmail/renderPdfThumbnail";
 
@@ -36,7 +33,7 @@ async function loadInvoiceThumbnail(interventionId: string): Promise<string | nu
 
 async function loadSupplierOrderThumbnail(
   companyId: string,
-  orderId: string,
+  orderId: string
 ): Promise<string | null> {
   let blob = await getPdfFromCache("", "material_order", companyId, orderId);
   if (!blob) {
@@ -53,6 +50,7 @@ export function useChatbotDocumentTileThumbnails(
   companyId: string | null,
   invoiceIds: string[],
   orderIds: string[],
+  enabled = true
 ) {
   const [thumbnails, setThumbnails] = useState<Record<string, ChatbotDocTilePreview>>({});
   const [thumbnailLoading, setThumbnailLoading] = useState<Record<string, boolean>>({});
@@ -64,6 +62,12 @@ export function useChatbotDocumentTileThumbnails(
   }, [companyId, invoiceIds, orderIds]);
 
   useEffect(() => {
+    if (!enabled) {
+      setThumbnails({});
+      setThumbnailLoading({});
+      return;
+    }
+
     let cancelled = false;
     setThumbnails({});
     setThumbnailLoading({});
@@ -123,7 +127,7 @@ export function useChatbotDocumentTileThumbnails(
     return () => {
       cancelled = true;
     };
-  }, [loadKey, companyId, invoiceIds, orderIds]);
+  }, [enabled, loadKey, companyId, invoiceIds, orderIds]);
 
   return { thumbnails, thumbnailLoading };
 }

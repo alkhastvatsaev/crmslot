@@ -3,6 +3,12 @@
  * UI : focus_stock_item, focus_billing_case, open_crm_dossier, focus_intervention_document
  */
 
+export const VEHICLE_STOCK_AGENT_TOOL_SCOPE = [
+  "list_vehicle_stock",
+  "add_vehicle_stock_item",
+  "update_vehicle_stock_item",
+] as const;
+
 export const MATERIAL_AGENT_TOOL_SCOPE = [
   "get_workspace_summary",
   "list_stock_alerts",
@@ -45,6 +51,8 @@ export const BILLING_HUB_AGENT_TOOL_SCOPE = [
   "update_intervention_billing",
   "focus_intervention_document",
   "focus_billing_case",
+  "trigger_accounting_export",
+  "trigger_payroll_export",
   "list_intervention_emails",
   "send_intervention_email",
   "save_client_email",
@@ -56,4 +64,6 @@ export const HUB_AGENT_IMMEDIATE_UI_TOOLS = new Set([
   "focus_stock_item",
   "focus_billing_case",
   "open_crm_dossier",
+  "trigger_accounting_export",
+  "trigger_payroll_export",
 ]);

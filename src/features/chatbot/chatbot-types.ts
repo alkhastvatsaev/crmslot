@@ -61,6 +61,8 @@ export type ChatbotStreamEvent =
       filter?: "all" | "unpaid" | "pending" | "paid" | "to_bill";
     }
   | { type: "open_crm_dossier"; interventionId: string }
+  | { type: "export_accounting_csv" }
+  | { type: "export_payroll_csv" }
   | { type: "material_order_client"; clientName: string }
   | { type: "done"; apiMessages?: unknown[] }
   | { type: "error"; message: string };

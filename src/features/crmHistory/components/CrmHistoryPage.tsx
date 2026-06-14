@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
+import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
@@ -33,8 +33,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
-  const companyId =
-    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+  const { companyId } = resolveHubCompanyId(workspace);
 
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
@@ -42,6 +41,7 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
   const crmContactsEnabled = useFeatureFlag("crmContacts");
 
   const { selectedDate } = useDateContext();
+  const selectedDayKey = selectedDate.toLocaleDateString("en-CA");
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(
     companyId,
     "all",
@@ -50,6 +50,10 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
     selectedDate
   );
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedEventId(null);
+  }, [selectedDayKey]);
 
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null;
 

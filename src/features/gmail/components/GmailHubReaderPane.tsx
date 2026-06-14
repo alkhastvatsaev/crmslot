@@ -1,7 +1,19 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Archive, Link2, Loader2, Mail, MailOpen, Reply, Star, Tag, Trash2, X } from "lucide-react";
+import {
+  Archive,
+  FolderPlus,
+  Link2,
+  Loader2,
+  Mail,
+  MailOpen,
+  Reply,
+  Star,
+  Tag,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import GmailHubAttachments from "@/features/gmail/components/GmailHubAttachments";
@@ -50,6 +62,8 @@ type Props = {
   onReply: () => void;
   linkPanelOpen: boolean;
   onToggleLinkPanel: () => void;
+  onCreateIntervention?: () => void;
+  creatingIntervention?: boolean;
   linkPanel: ReactNode;
   onToggleRead: () => void;
   onToggleLabel: (labelId: string) => void;
@@ -80,6 +94,8 @@ export default function GmailHubReaderPane({
   onReply,
   linkPanelOpen,
   onToggleLinkPanel,
+  onCreateIntervention,
+  creatingIntervention = false,
   linkPanel,
   onToggleRead,
   onToggleLabel,
@@ -100,7 +116,9 @@ export default function GmailHubReaderPane({
   if (composing) {
     return (
       <div className={gmailShell} data-testid="gmail-hub-compose" style={gmailHubFont}>
-        <div className={`flex shrink-0 items-center justify-between border-b ${gmailDivider} px-4 py-3`}>
+        <div
+          className={`flex shrink-0 items-center justify-between border-b ${gmailDivider} px-4 py-3`}
+        >
           <p className={gmailEyebrow}>{t("gmail.hub.compose")}</p>
           <button
             type="button"
@@ -179,7 +197,11 @@ export default function GmailHubReaderPane({
 
   if (pdfPanelOpen) {
     return (
-      <div className={`${gmailShell} gmail-hub-pdf-panel`} data-testid="gmail-hub-pdf-panel" style={gmailHubFont}>
+      <div
+        className={`${gmailShell} gmail-hub-pdf-panel`}
+        data-testid="gmail-hub-pdf-panel"
+        style={gmailHubFont}
+      >
         <div className="gmail-hub-pdf-panel__close flex shrink-0 justify-end px-2 pt-2">
           <button
             type="button"
@@ -223,7 +245,9 @@ export default function GmailHubReaderPane({
 
   return (
     <div className={gmailShell} data-testid="gmail-hub-detail" style={gmailHubFont}>
-      <div className={`flex shrink-0 items-center justify-between gap-2 border-b ${gmailDivider} px-3 py-2`}>
+      <div
+        className={`flex shrink-0 items-center justify-between gap-2 border-b ${gmailDivider} px-3 py-2`}
+      >
         <div className="flex min-w-0 flex-1 items-center gap-0.5 rounded-2xl bg-black/[0.03] p-0.5">
           <button
             type="button"
@@ -234,13 +258,29 @@ export default function GmailHubReaderPane({
           >
             <Reply className="h-4 w-4" strokeWidth={1.5} />
           </button>
+          {onCreateIntervention ? (
+            <button
+              type="button"
+              data-testid="gmail-hub-create-intervention-btn"
+              disabled={creatingIntervention}
+              onClick={onCreateIntervention}
+              className={gmailToolbarBtn}
+              title={String(t("gmail.hub.create_intervention"))}
+            >
+              {creatingIntervention ? (
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+              ) : (
+                <FolderPlus className="h-4 w-4" strokeWidth={1.5} />
+              )}
+            </button>
+          ) : null}
           <button
             type="button"
             data-testid="gmail-hub-link-toggle-btn"
             onClick={onToggleLinkPanel}
             className={cn(
               gmailToolbarBtn,
-              linkPanelOpen && "bg-white/90 text-slate-900 shadow-[0_1px_3px_rgba(15,23,42,0.08)]",
+              linkPanelOpen && "bg-white/90 text-slate-900 shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
             )}
             title={String(t("gmail.hub.link_to_case"))}
           >
@@ -297,7 +337,10 @@ export default function GmailHubReaderPane({
         </div>
         {userLabels.length > 0 ? (
           <label className="relative flex shrink-0 items-center">
-            <Tag className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-slate-400" strokeWidth={1.5} />
+            <Tag
+              className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-slate-400"
+              strokeWidth={1.5}
+            />
             <select
               data-testid="gmail-hub-label-select"
               className="h-9 max-w-[140px] appearance-none rounded-xl border-0 bg-white/70 pl-7 pr-2 text-[11px] text-slate-700 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.08)] outline-none"
@@ -340,7 +383,7 @@ export default function GmailHubReaderPane({
               data-testid={`gmail-hub-thread-msg-${tm.id}`}
               className={cn(
                 "border-b border-black/[0.06]",
-                focused ? "bg-white/50" : "cursor-pointer hover:bg-black/[0.02]",
+                focused ? "bg-white/50" : "cursor-pointer hover:bg-black/[0.02]"
               )}
               onClick={() => {
                 if (!focused) onFocusThreadMessage(tm.id);

@@ -12,7 +12,16 @@ jest.mock("@/core/config/firebase", () => ({
 }));
 
 jest.mock("@/core/api/fetchWithAuth", () => ({
-  fetchWithAuth: jest.fn(() => Promise.resolve({ ok: true, json: async () => ({ ok: true }) })),
+  fetchWithAuth: jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: async () => ({
+        ok: true,
+        billingLines: [{ description: "Déplacement", quantity: 1, unitPriceCents: 4500 }],
+        aiNote: "Forfait",
+      }),
+    })
+  ),
 }));
 
 jest.mock("@/features/crmHistory/logCrmInterventionAction", () => ({
@@ -90,6 +99,7 @@ const mockUseInterventionLive = useInterventionLive as jest.MockedFunction<
 const MOCK_IV = {
   id: "iv-001",
   clientName: "Dubois",
+  clientEmail: "client@test.example",
   category: "serrurerie",
   problem: "Porte bloquée",
   status: "in_progress" as const,
@@ -98,7 +108,9 @@ const MOCK_IV = {
 function setupActive(interventionId = "iv-001") {
   mockUseFinishJob.mockReturnValue({
     finishJobInterventionId: interventionId,
+    finishJobEntryStep: null,
     setFinishJobInterventionId: jest.fn(),
+    startFinishJob: jest.fn(),
   });
   mockUseInterventionLive.mockReturnValue(MOCK_IV);
 }
@@ -121,7 +133,9 @@ describe("TechnicianFinishJobPanel", () => {
   it("renders empty state when no intervention is active", () => {
     mockUseFinishJob.mockReturnValue({
       finishJobInterventionId: null,
+      finishJobEntryStep: null,
       setFinishJobInterventionId: jest.fn(),
+      startFinishJob: jest.fn(),
     });
     render(<TechnicianFinishJobPanel />);
     expect(screen.getByTestId("finish-job-empty")).toBeInTheDocument();
@@ -134,11 +148,11 @@ describe("TechnicianFinishJobPanel", () => {
     expect(screen.getByTestId("finish-job-capture-btn")).toBeInTheDocument();
   });
 
-  it("step indicator shows photos then signature only", () => {
+  it("step indicator includes photos, signature and invoice", () => {
     setupActive();
     render(<TechnicianFinishJobPanel />);
     expect(screen.getByTestId("finish-step-photos")).toHaveAttribute("data-active", "true");
-    expect(screen.queryByTestId("finish-step-billing")).not.toBeInTheDocument();
+    expect(screen.getByTestId("finish-step-billing")).toBeInTheDocument();
   });
 
   it("advances to signature step after photos", async () => {
@@ -158,7 +172,7 @@ describe("TechnicianFinishJobPanel", () => {
     });
   });
 
-  it("submit calls finalizeCompletionOfflineAware and prepare-draft-billing", async () => {
+  it("submit saves completion then shows invoice step", async () => {
     setupActive();
     render(<TechnicianFinishJobPanel />);
     await goToSignatureStep();
@@ -170,9 +184,6 @@ describe("TechnicianFinishJobPanel", () => {
     const { finalizeCompletionOfflineAware } = jest.requireMock(
       "@/features/interventions/completionUpload"
     ) as { finalizeCompletionOfflineAware: jest.Mock };
-    const { fetchWithAuth } = jest.requireMock("@/core/api/fetchWithAuth") as {
-      fetchWithAuth: jest.Mock;
-    };
 
     await waitFor(() => {
       expect(finalizeCompletionOfflineAware).toHaveBeenCalledWith(
@@ -182,10 +193,8 @@ describe("TechnicianFinishJobPanel", () => {
           photoDataUrls: expect.arrayContaining(["data:image/jpeg;base64,mockphoto"]),
         })
       );
-      expect(fetchWithAuth).toHaveBeenCalledWith(
-        "/api/interventions/iv-001/prepare-draft-billing",
-        expect.objectContaining({ method: "POST" })
-      );
+      expect(screen.getByTestId("finish-job-step-invoice")).toBeInTheDocument();
+      expect(screen.getByTestId("finish-invoice-send")).toBeInTheDocument();
     });
   });
 });

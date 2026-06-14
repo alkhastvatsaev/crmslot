@@ -10,6 +10,7 @@ export type CompanyCrmActivityKind =
   | "intervention_returned_to_requests"
   | "intervention_assigned"
   | "intervention_report_validated"
+  | "intervention_report_rejected"
   | "intervention_invoiced"
   | "intervention_cancelled"
   | "intervention_schedule_updated"
@@ -32,7 +33,8 @@ export type CompanyCrmActivityKind =
   | "page_navigated"
   | "intervention_viewed"
   | "email_viewed"
-  | "user_session_start";
+  | "user_session_start"
+  | "time_entry_recorded";
 
 export type CompanyCrmActivityDoc = {
   companyId: string;
@@ -132,6 +134,7 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   intervention_returned_to_requests: "intervention_returned_to_requests",
   intervention_assigned: "intervention_assigned",
   intervention_report_validated: "intervention_report_validated",
+  intervention_report_rejected: "intervention_report_rejected",
   intervention_invoiced: "intervention_invoiced",
   intervention_cancelled: "intervention_cancelled",
   intervention_schedule_updated: "intervention_schedule_updated",
@@ -154,6 +157,7 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   intervention_viewed: "intervention_viewed",
   email_viewed: "email_viewed",
   user_session_start: "user_session_start",
+  time_entry_recorded: "time_entry_recorded",
 };
 
 export function parseTs(raw: unknown): number {

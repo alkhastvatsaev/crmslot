@@ -42,7 +42,7 @@ export default function MapGalaxyTranscriptionLayer({
   onInterventionCreated,
   hideDockStrip = false,
   backgroundTasksEnabled = true,
-  mobilePowerSave = false,
+  mobilePowerSave,
 }: Props) {
   const [playbackSync, setPlaybackSync] = useState<AiPlaybackSync>(null);
   const [openEditSignal, setOpenEditSignal] = useState(0);

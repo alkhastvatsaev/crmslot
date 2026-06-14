@@ -5,6 +5,7 @@ import {
   computeNextDueDate,
   findDueContracts,
 } from "../generateDueInterventions";
+import { withPortalAccessToken } from "@/features/interventions/ensurePortalAccessToken";
 import type { MaintenanceContract } from "../types";
 
 export interface GenerateDueAdminResult {
@@ -39,12 +40,15 @@ export async function generateDueInterventionsAdmin(
   for (const contract of due) {
     const draft = buildInterventionDraft(contract);
     const interventionRef = db.collection("interventions").doc();
-    batch.set(interventionRef, {
-      ...draft,
-      createdAt: nowIso,
-      createdByUid: contract.createdByUid ?? null,
-      source: "maintenance_contract",
-    });
+    batch.set(
+      interventionRef,
+      withPortalAccessToken({
+        ...draft,
+        createdAt: nowIso,
+        createdByUid: contract.createdByUid ?? null,
+        source: "maintenance_contract",
+      })
+    );
 
     const contractRef = db
       .collection("companies")

@@ -1,7 +1,7 @@
-/** Seuil (px) avant de verrouiller l’axe du geste. */
+/** Seuil (px) avant de verrouiller l'axe du geste. */
 export const MOBILE_SCROLL_AXIS_LOCK_THRESHOLD_PX = 10;
 
-/** Ratio minimal entre composantes pour choisir l’axe dominant. */
+/** Ratio minimal entre composantes pour choisir l'axe dominant. */
 export const MOBILE_SCROLL_AXIS_RATIO = 1.25;
 
 export type MobileScrollAxis = "none" | "x" | "y";
@@ -32,47 +32,140 @@ export function isMobileStripCentered(
   return Math.abs(offset) <= tolerancePx;
 }
 
+function isVerticallyScrollable(node: HTMLElement): boolean {
+  const style = window.getComputedStyle(node);
+  const overflowY = style.overflowY;
+  const overflow = style.overflow;
+  const allowsYScroll =
+    overflowY === "auto" || overflowY === "scroll" || overflow === "auto" || overflow === "scroll";
+  return allowsYScroll && node.scrollHeight > node.clientHeight + 1;
+}
+
 function findVerticalScrollParent(
   target: EventTarget | null,
   boundary: HTMLElement
 ): HTMLElement | null {
   let node = target instanceof HTMLElement ? target : null;
   while (node && node !== boundary) {
-    const style = window.getComputedStyle(node);
-    const scrollableY =
-      (style.overflowY === "auto" || style.overflowY === "scroll") &&
-      node.scrollHeight > node.clientHeight + 1;
-    if (scrollableY) return node;
+    if (isVerticallyScrollable(node)) return node;
     node = node.parentElement;
   }
   return null;
 }
 
-function canConsumeVerticalScroll(el: HTMLElement, deltaY: number): boolean {
+export function isVerticalScrollAtTop(el: HTMLElement, epsilonPx = 8): boolean {
+  return el.scrollTop <= epsilonPx;
+}
+
+export function isVerticalScrollAtBottom(el: HTMLElement, epsilonPx = 8): boolean {
+  const maxScroll = el.scrollHeight - el.clientHeight;
+  return maxScroll <= epsilonPx || el.scrollTop >= maxScroll - epsilonPx;
+}
+
+/** Le panneau peut encore absorber ce geste vertical (sinon → changement de page). */
+export function canConsumeVerticalScroll(el: HTMLElement, deltaY: number): boolean {
   const maxScroll = el.scrollHeight - el.clientHeight;
   if (maxScroll <= 0) return false;
   if (deltaY > 0) return el.scrollTop > 0;
   return el.scrollTop < maxScroll - 1;
 }
 
-function findMobilePager(strip: HTMLElement): HTMLElement | null {
-  return strip.closest("[data-mobile-pager]");
+export function shouldRouteVerticalSwipeToPage(
+  innerScrollEl: HTMLElement | null,
+  dy: number
+): boolean {
+  if (!innerScrollEl) return true;
+  return !canConsumeVerticalScroll(innerScrollEl, dy);
+}
+
+export type MobilePageSwipeHandlers = {
+  onSwipeUp: () => void;
+  onSwipeDown: () => void;
+  isDisabled?: () => boolean;
+  swipeThresholdPx?: number;
+};
+
+/**
+ * Swipe vertical → changement de page, avec relais aux bords des panneaux scrollables.
+ */
+export function bindMobilePageSwipeGesture(
+  boundary: HTMLElement,
+  handlers: MobilePageSwipeHandlers
+): () => void {
+  const swipeThresholdPx = handlers.swipeThresholdPx ?? 52;
+
+  let startX = 0;
+  let startY = 0;
+  let axis: MobileScrollAxis = "none";
+  let innerScrollEl: HTMLElement | null = null;
+
+  const onTouchStart = (event: TouchEvent) => {
+    if (handlers.isDisabled?.() || event.touches.length !== 1) return;
+    axis = "none";
+    innerScrollEl = findVerticalScrollParent(event.target, boundary);
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+  };
+
+  const onTouchMove = (event: TouchEvent) => {
+    if (handlers.isDisabled?.() || event.touches.length !== 1) return;
+    const dx = event.touches[0].clientX - startX;
+    const dy = event.touches[0].clientY - startY;
+
+    if (axis === "none") {
+      axis = resolveMobileScrollAxis(dx, dy);
+      if (axis === "none") return;
+    }
+
+    if (axis === "y" && innerScrollEl && !canConsumeVerticalScroll(innerScrollEl, dy)) {
+      event.preventDefault();
+    }
+  };
+
+  const finishGesture = (clientX: number, clientY: number) => {
+    if (handlers.isDisabled?.() || axis !== "y") return;
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    if (resolveMobileScrollAxis(dx, dy, swipeThresholdPx) !== "y") return;
+    if (!shouldRouteVerticalSwipeToPage(innerScrollEl, dy)) return;
+    if (dy < 0) handlers.onSwipeUp();
+    else if (dy > 0) handlers.onSwipeDown();
+  };
+
+  const onTouchEnd = (event: TouchEvent) => {
+    if (event.changedTouches.length !== 1) return;
+    const touch = event.changedTouches[0];
+    finishGesture(touch.clientX, touch.clientY);
+    axis = "none";
+  };
+
+  const onTouchCancel = () => {
+    axis = "none";
+  };
+
+  const capture = { capture: true } as const;
+  boundary.addEventListener("touchstart", onTouchStart, { passive: true, ...capture });
+  boundary.addEventListener("touchmove", onTouchMove, { passive: false, ...capture });
+  boundary.addEventListener("touchend", onTouchEnd, { passive: true, ...capture });
+  boundary.addEventListener("touchcancel", onTouchCancel, { passive: true, ...capture });
+
+  return () => {
+    boundary.removeEventListener("touchstart", onTouchStart, capture);
+    boundary.removeEventListener("touchmove", onTouchMove, capture);
+    boundary.removeEventListener("touchend", onTouchEnd, capture);
+    boundary.removeEventListener("touchcancel", onTouchCancel, capture);
+  };
 }
 
 /**
  * Route les gestes touch sur un strip horizontal :
- * - dominant vertical → scroll du pager parent (changement de page)
+ * - dominant vertical → scroll interne d'un rail latéral si possible
  * - dominant horizontal → scroll du strip (rails gauche/droite)
- * Priorise le scroll interne d’un panneau latéral si possible.
  */
 export function bindMobileNestedScrollGesture(strip: HTMLElement): () => void {
-  const pager = findMobilePager(strip);
-  if (!pager) return () => {};
-
   let startX = 0;
   let startY = 0;
   let startStripScrollLeft = 0;
-  let startPagerScrollTop = 0;
   let startInnerScrollTop = 0;
   let axis: MobileScrollAxis = "none";
   let innerScrollEl: HTMLElement | null = null;
@@ -84,7 +177,6 @@ export function bindMobileNestedScrollGesture(strip: HTMLElement): () => void {
     startX = event.touches[0].clientX;
     startY = event.touches[0].clientY;
     startStripScrollLeft = strip.scrollLeft;
-    startPagerScrollTop = pager.scrollTop;
     startInnerScrollTop = innerScrollEl?.scrollTop ?? 0;
   };
 
@@ -101,12 +193,10 @@ export function bindMobileNestedScrollGesture(strip: HTMLElement): () => void {
     }
 
     if (axis === "y") {
-      event.preventDefault();
       if (innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
+        event.preventDefault();
         innerScrollEl.scrollTop = startInnerScrollTop - dy;
-        return;
       }
-      pager.scrollTop = startPagerScrollTop - dy;
       return;
     }
 

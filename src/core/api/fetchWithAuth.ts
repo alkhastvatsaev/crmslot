@@ -1,13 +1,28 @@
+import type { User } from "firebase/auth";
 import { auth } from "@/core/config/firebase";
+
+export type FetchWithAuthOptions = {
+  /** Utilisateur Firebase dont le jeton doit être envoyé (ex. portail client). */
+  user?: User | null;
+};
+
+function mergeInitHeaders(init?: RequestInit): Record<string, string> | undefined {
+  if (!init?.headers) return undefined;
+  if (init.headers instanceof Headers) return Object.fromEntries(init.headers.entries());
+  if (Array.isArray(init.headers)) return Object.fromEntries(init.headers);
+  return init.headers as Record<string, string>;
+}
 
 /** En-têtes avec jeton Firebase (utilisateur anonyme ou connecté). */
 export async function authHeaders(
   extra?: Record<string, string>,
+  options?: FetchWithAuthOptions
 ): Promise<Record<string, string>> {
   const headers: Record<string, string> = { ...extra };
-  if (auth?.currentUser) {
+  const tokenUser = options?.user ?? auth?.currentUser ?? null;
+  if (tokenUser) {
     try {
-      headers.Authorization = `Bearer ${await auth.currentUser.getIdToken(false)}`;
+      headers.Authorization = `Bearer ${await tokenUser.getIdToken(false)}`;
     } catch {
       /* refresh échoué */
     }
@@ -19,14 +34,9 @@ export async function authHeaders(
 export async function fetchWithAuth(
   input: RequestInfo | URL,
   init?: RequestInit,
+  options?: FetchWithAuthOptions
 ): Promise<Response> {
-  const merged = await authHeaders(
-    init?.headers instanceof Headers
-      ? Object.fromEntries(init.headers.entries())
-      : Array.isArray(init?.headers)
-        ? Object.fromEntries(init.headers)
-        : (init?.headers as Record<string, string> | undefined),
-  );
+  const merged = await authHeaders(mergeInitHeaders(init), options);
   return fetch(input, {
     ...init,
     credentials: init?.credentials ?? "same-origin",
