@@ -8,9 +8,21 @@ jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
 }));
 
 jest.mock("@/core/config/firebase", () => ({
-  auth: { currentUser: { uid: "user-1", isAnonymous: false, email: "pierre@example.com" } },
+  auth: {
+    currentUser: {
+      uid: "user-1",
+      isAnonymous: false,
+      email: "pierre@example.com",
+      emailVerified: true,
+    },
+  },
   clientPortalAuth: {
-    currentUser: { uid: "user-1", isAnonymous: false, email: "pierre@example.com" },
+    currentUser: {
+      uid: "user-1",
+      isAnonymous: false,
+      email: "pierre@example.com",
+      emailVerified: true,
+    },
   },
   firestore: {},
   isConfigured: true,
@@ -20,9 +32,21 @@ jest.mock("firebase/auth", () => ({
   onAuthStateChanged: jest.fn(
     (
       _auth: unknown,
-      cb: (user: { uid: string; email: string; isAnonymous: boolean } | null) => void
+      cb: (
+        user: {
+          uid: string;
+          email: string;
+          isAnonymous: boolean;
+          emailVerified: boolean;
+        } | null
+      ) => void
     ) => {
-      cb({ uid: "user-1", email: "pierre@example.com", isAnonymous: false });
+      cb({
+        uid: "user-1",
+        email: "pierre@example.com",
+        isAnonymous: false,
+        emailVerified: true,
+      });
       return jest.fn();
     }
   ),
