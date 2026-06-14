@@ -22,33 +22,39 @@ const STATUS_LABELS: Record<string, string> = {
 export async function sendPortalStatusUpdateEmailAdmin(params: {
   db: admin.firestore.Firestore;
   interventionId: string;
-  iv: Pick<
-    Intervention,
-    | "status"
-    | "companyId"
-    | "clientEmail"
-    | "clientFirstName"
-    | "portalAccessToken"
-    | "title"
-    | "problem"
-    | "createdByUid"
+  /** Champs connus ; les autres sont relus depuis Firestore si besoin. */
+  iv?: Partial<
+    Pick<
+      Intervention,
+      | "status"
+      | "companyId"
+      | "clientEmail"
+      | "clientFirstName"
+      | "portalAccessToken"
+      | "title"
+      | "problem"
+      | "createdByUid"
+    >
   >;
   fromStatus: Intervention["status"];
   toStatus: Intervention["status"];
 }): Promise<boolean> {
   if (params.fromStatus === params.toStatus) return false;
 
-  const email = (params.iv.clientEmail ?? "").trim();
-  const companyId = String(params.iv.companyId ?? "").trim();
-  const token = params.iv.portalAccessToken?.trim();
+  const snap = await params.db.collection("interventions").doc(params.interventionId).get();
+  if (!snap.exists) return false;
+
+  const iv = { id: snap.id, ...snap.data(), ...params.iv } as Intervention;
+
+  const email = (iv.clientEmail ?? "").trim();
+  const companyId = String(iv.companyId ?? "").trim();
+  const token = iv.portalAccessToken?.trim();
   if (!email || !companyId || !token || !isGmailConfigured()) return false;
 
   const label = STATUS_LABELS[params.toStatus ?? ""] ?? "Mise à jour de votre dossier";
   const portalUrl = buildPortalSuiviUrl(token);
-  const problem = (params.iv.title || params.iv.problem || "Votre intervention").trim();
-  const hello = params.iv.clientFirstName?.trim()
-    ? `Bonjour ${params.iv.clientFirstName.trim()},`
-    : "Bonjour,";
+  const problem = (iv.title || iv.problem || "Votre intervention").trim();
+  const hello = iv.clientFirstName?.trim() ? `Bonjour ${iv.clientFirstName.trim()},` : "Bonjour,";
 
   const result = await sendInterventionEmail({
     interventionId: params.interventionId,
@@ -64,8 +70,9 @@ export async function sendPortalStatusUpdateEmailAdmin(params: {
       "",
       "— BELGMAP",
     ].join("\n"),
-    sentByUid: params.iv.createdByUid ?? "portal",
+    sentByUid: iv.createdByUid ?? "portal",
     sentVia: "portal_status_update",
+    attachDocumentType: "none",
   });
 
   return result.ok;

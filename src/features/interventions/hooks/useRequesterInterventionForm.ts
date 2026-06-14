@@ -473,8 +473,10 @@ export function useRequesterInterventionForm() {
       }
 
       const portalUser =
-        profile.type === "login" && auth?.currentUser && !auth.currentUser.isAnonymous
-          ? auth.currentUser
+        (profile.type === "login" || profile.type === "register") &&
+        clientPortalAuth?.currentUser &&
+        !clientPortalAuth.currentUser.isAnonymous
+          ? clientPortalAuth.currentUser
           : null;
       let clientFirstRaw = profile.firstName.trim();
       let clientLastRaw = profile.lastName.trim();
@@ -484,7 +486,10 @@ export function useRequesterInterventionForm() {
         clientLastRaw = parts.slice(1).join(" ");
       }
       const clientPhoneRaw = profile.phone.trim() || (portalUser?.phoneNumber ?? "").trim();
-      const clientEmailRaw = profile.email.trim() || (portalUser?.email ?? "").trim();
+      const clientEmailRaw =
+        profile.email.trim() ||
+        clientAccountFields?.email.trim() ||
+        (portalUser?.email ?? user.email ?? "").trim();
 
       const { portalAccessFields } =
         await import("@/features/interventions/ensurePortalAccessToken");
@@ -638,9 +643,24 @@ export function useRequesterInterventionForm() {
       const notifyPortalAccess = async () => {
         if (!clientEmailRaw) return;
         try {
-          await fetchWithAuth(`/api/interventions/${newDocRef.id}/portal-access-notify`, {
-            method: "POST",
-          });
+          const res = await fetchWithAuth(
+            `/api/interventions/${newDocRef.id}/portal-access-notify`,
+            { method: "POST" },
+            { user }
+          );
+          const body = (await res.json().catch(() => ({}))) as {
+            error?: string;
+            emailSent?: boolean;
+          };
+          if (!res.ok) {
+            throw new Error(body.error ?? `HTTP ${res.status}`);
+          }
+          if (body.emailSent === false) {
+            logger.warn("Portal access welcome email not sent", {
+              interventionId: newDocRef.id,
+              to: clientEmailRaw,
+            });
+          }
         } catch (notifyError) {
           logger.warn("Portal access notify failed", {
             error: notifyError instanceof Error ? notifyError.message : String(notifyError),
@@ -658,7 +678,7 @@ export function useRequesterInterventionForm() {
           duration: 12_000,
         });
       } else {
-        if (clientEmailRaw) void notifyPortalAccess();
+        void notifyPortalAccess();
         toast.success(String(t("requester.toasts.request_saved")));
       }
     } catch (e) {

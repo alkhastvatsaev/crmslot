@@ -119,13 +119,13 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
                 category="all"
                 loading={loading}
               />
-            ) : (
+            ) : companyId ? (
               <CompanyStockProWorkspace
                 companyId={companyId}
                 metrics={metrics}
                 isPreviewCatalog={false}
               />
-            ))}
+            ) : null)}
         </section>
       }
       right={

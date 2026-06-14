@@ -79,6 +79,8 @@ const firestore = app ? getOrInitFirestore(app) : null;
 const auth = app ? getAuth(app) : null;
 /** Auth portail client (hub société) — session isolée du CRM admin sur le même onglet. */
 const clientPortalAuth = clientPortalApp ? getAuth(clientPortalApp) : null;
+/** Firestore lié à `clientPortalAuth` (même jeton que la connexion portail client). */
+const clientPortalFirestore = clientPortalApp ? getOrInitFirestore(clientPortalApp) : null;
 const storage = app ? getStorage(app) : null;
 
 /** Persistence IndexedDB : utile en prod PWA ; en dev/HMR elle amplifie les races listener (assertion ca9). */
@@ -92,4 +94,14 @@ if (typeof window !== "undefined" && firestore && process.env.NODE_ENV === "prod
   });
 }
 
-export { app, clientPortalApp, db, firestore, auth, clientPortalAuth, storage, isConfigured };
+export {
+  app,
+  clientPortalApp,
+  db,
+  firestore,
+  clientPortalFirestore,
+  auth,
+  clientPortalAuth,
+  storage,
+  isConfigured,
+};

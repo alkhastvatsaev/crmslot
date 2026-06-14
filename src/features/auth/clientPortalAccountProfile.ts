@@ -1,6 +1,6 @@
 import type { User } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { firestore, isConfigured } from "@/core/config/firebase";
+import { clientPortalFirestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
 import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
@@ -116,10 +116,10 @@ export async function loadClientPortalAccountFields(
   uid: string,
   authEmail?: string | null
 ): Promise<ClientPortalAccountFields | null> {
-  if (!isConfigured || !firestore) return null;
+  if (!isConfigured || !clientPortalFirestore) return null;
 
   try {
-    const snap = await getDoc(doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid));
+    const snap = await getDoc(doc(clientPortalFirestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid));
     if (!snap.exists()) return null;
     return parseClientPortalAccountDoc(snap.data() as Record<string, unknown>, authEmail);
   } catch (e) {
@@ -135,7 +135,9 @@ export async function saveClientPortalAccountFields(
   uid: string,
   fields: ClientPortalAccountFields
 ): Promise<void> {
-  if (!isConfigured || !firestore) return;
+  if (!isConfigured || !clientPortalFirestore) {
+    throw new Error("Client portal Firestore unavailable");
+  }
 
   const firstName = fields.firstName.trim();
   const lastName = fields.lastName.trim();
@@ -143,8 +145,9 @@ export async function saveClientPortalAccountFields(
 
   try {
     await setDoc(
-      doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid),
+      doc(clientPortalFirestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid),
       {
+        uid,
         firstName: firstName || null,
         lastName: lastName || null,
         phone: fields.phone.trim() || null,

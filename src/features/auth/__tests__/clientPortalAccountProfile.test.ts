@@ -12,7 +12,7 @@ import type { RequesterProfile } from "@/features/interventions/context/Requeste
 
 jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
-  firestore: {},
+  clientPortalFirestore: {},
 }));
 
 jest.mock("firebase/firestore", () => ({
@@ -160,6 +160,7 @@ describe("saveClientPortalAccountFields", () => {
     expect(mockSetDoc).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
+        uid: "uid-1",
         firstName: "Alice",
         lastName: "Dupont",
         displayName: "Alice Dupont",

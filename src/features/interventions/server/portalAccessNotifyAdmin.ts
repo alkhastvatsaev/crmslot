@@ -100,8 +100,16 @@ export async function notifyPortalAccessAdmin(params: {
       bodyText: mail.bodyText,
       sentByUid: iv.createdByUid ?? "portal",
       sentVia: "portal_access_welcome",
+      attachDocumentType: "none",
     });
     emailSent = result.ok;
+    if (!result.ok) {
+      logger.warn("[portalAccessNotifyAdmin] welcome email failed", {
+        interventionId: params.interventionId,
+        to: email,
+        error: result.error,
+      });
+    }
   }
 
   return { emailSent, portalUrl, portalAccessCode };

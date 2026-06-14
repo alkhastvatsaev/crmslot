@@ -17,8 +17,8 @@ import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLay
 import { HUB_RAIL_BODY_CLASS, HubSegmentedControl } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-/** Même pas que la grille desktop (`DASHBOARD_DESKTOP_PANEL_GAP_CLASS`) — rythme équidistant. */
-const railGap = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
+/** Rails hub — remplissent la hauteur vitre sans marge basse (évite le rectangle blanc). */
+const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
@@ -72,14 +72,14 @@ export default function CompanyHubPage() {
     <section
       id={COMPANY_HUB_ANCHOR_WORKSPACE}
       data-testid="company-hub-rail-demande"
-      className={`${railGap} scroll-mt-2`}
+      className={`${railBody} scroll-mt-2`}
     >
       <RequesterProfilePanel />
     </section>
   );
 
   const centerPanel = (
-    <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railGap} scroll-mt-2`}>
+    <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railBody} scroll-mt-2`}>
       <RequesterInterventionPanel />
     </section>
   );
