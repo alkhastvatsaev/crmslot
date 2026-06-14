@@ -9,6 +9,9 @@ jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
 
 jest.mock("@/core/config/firebase", () => ({
   auth: { currentUser: { uid: "user-1", isAnonymous: false, email: "pierre@example.com" } },
+  clientPortalAuth: {
+    currentUser: { uid: "user-1", isAnonymous: false, email: "pierre@example.com" },
+  },
   firestore: {},
   isConfigured: true,
 }));
