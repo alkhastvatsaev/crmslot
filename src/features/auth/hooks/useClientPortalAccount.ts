@@ -27,11 +27,14 @@ export function useClientPortalAccount() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const loadedUidRef = useRef<string | null>(null);
+  const fieldsRef = useRef(fields);
+  fieldsRef.current = fields;
 
   const isAuthenticated = isVerifiedClientPortalUser(authUser);
 
   const syncFields = useCallback(
     (next: ClientPortalAccountFields) => {
+      fieldsRef.current = next;
       setFields(next);
       setClientAccountFields(next);
       setProfile((prev) => mergeRequesterProfileFromAccount(prev, next));
@@ -51,7 +54,9 @@ export function useClientPortalAccount() {
   useEffect(() => {
     if (!isAuthenticated || !authUser) {
       loadedUidRef.current = null;
-      setFields(emptyClientPortalAccountFields());
+      const empty = emptyClientPortalAccountFields();
+      fieldsRef.current = empty;
+      setFields(empty);
       setClientAccountFields(null);
       setLoading(false);
       return;
@@ -82,6 +87,7 @@ export function useClientPortalAccount() {
     (key: keyof ClientPortalAccountFields, value: string) => {
       setFields((prev) => {
         const next = { ...prev, [key]: value };
+        fieldsRef.current = next;
         setClientAccountFields(next);
         setProfile((p) => mergeRequesterProfileFromAccount(p, next));
         return next;
@@ -94,20 +100,22 @@ export function useClientPortalAccount() {
     if (!authUser || !isAuthenticated) return;
     setSaving(true);
     try {
-      await saveClientPortalAccountFields(authUser.uid, fields);
+      await saveClientPortalAccountFields(authUser.uid, fieldsRef.current);
       toast.success(String(t("requester.account.save_success")));
     } catch {
       toast.error(String(t("requester.account.save_failed")));
     } finally {
       setSaving(false);
     }
-  }, [authUser, fields, isAuthenticated, t]);
+  }, [authUser, isAuthenticated, t]);
 
   const handleSignOut = useCallback(async () => {
     if (!clientPortalAuth) return;
     await signOut(clientPortalAuth);
     loadedUidRef.current = null;
-    setFields(emptyClientPortalAccountFields());
+    const empty = emptyClientPortalAccountFields();
+    fieldsRef.current = empty;
+    setFields(empty);
     setClientAccountFields(null);
   }, [setClientAccountFields]);
 

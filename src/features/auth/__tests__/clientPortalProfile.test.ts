@@ -7,7 +7,7 @@ import {
 
 jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
-  firestore: {},
+  clientPortalFirestore: {},
 }));
 
 jest.mock("firebase/firestore", () => ({

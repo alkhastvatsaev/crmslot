@@ -1,8 +1,7 @@
 "use client";
 
-import { Loader2, LogOut, Mail, MapPin, Phone, User } from "lucide-react";
-import type { AnimationControls } from "framer-motion";
-import { motion } from "framer-motion";
+import { Loader2, LogOut, Mail, Phone, User } from "lucide-react";
+import { motion, type useAnimation } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { HUB_RADIUS, HUB_SURFACE } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,7 @@ export type RequesterClientAccountPanelProps = {
   handleSignOut: () => Promise<void>;
   saving: boolean;
   validationFailedCount: number;
-  shakeControls: AnimationControls;
+  shakeControls: ReturnType<typeof useAnimation>;
 };
 
 const inputClass = cn(
@@ -46,8 +45,6 @@ export default function RequesterClientAccountPanel({
       data-testid="requester-client-account-panel"
       className="flex min-h-0 flex-1 flex-col gap-4"
     >
-      <p className="text-sm font-bold text-slate-800">{t("requester.account.title")}</p>
-
       <div className="flex flex-col gap-2.5 rounded-[24px] border border-black/[0.05] bg-white/70 p-3 shadow-[0_18px_44px_-28px_rgba(15,23,42,0.2)]">
         <motion.div
           animate={isInvalid(fields.firstName) ? shakeControls : undefined}
@@ -137,21 +134,6 @@ export default function RequesterClientAccountPanel({
             className={cn(inputClass, isInvalid(fields.phone) && "placeholder:text-red-300")}
           />
         </motion.div>
-
-        <div className={cn(glassRow, "items-start")}>
-          <span className={iconRail}>
-            <MapPin className="h-5 w-5 opacity-70" />
-          </span>
-          <textarea
-            data-testid="requester-account-address"
-            placeholder={t("requester.profile.usual_address_optional")}
-            value={fields.address}
-            rows={2}
-            onChange={(e) => updateField("address", e.target.value)}
-            onBlur={() => void persistAccount()}
-            className={cn(inputClass, "min-h-[4.5rem] resize-none py-2.5")}
-          />
-        </div>
       </div>
 
       <button
@@ -159,7 +141,7 @@ export default function RequesterClientAccountPanel({
         data-testid="requester-account-signout"
         disabled={saving}
         onClick={() => void handleSignOut()}
-        className="mt-auto flex w-full items-center justify-center gap-2 rounded-[14px] border border-black/[0.08] bg-white px-4 py-3 text-[14px] font-bold text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50"
+        className="mt-auto shrink-0 flex w-full items-center justify-center gap-2 rounded-[14px] border border-black/[0.08] bg-white px-4 py-3 text-[14px] font-bold text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50"
       >
         {saving ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

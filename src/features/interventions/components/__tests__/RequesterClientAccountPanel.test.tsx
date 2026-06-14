@@ -29,7 +29,7 @@ describe("RequesterClientAccountPanel", () => {
     expect(screen.getByTestId("requester-client-account-panel")).toBeInTheDocument();
     expect(screen.getByTestId("requester-account-first-name")).toHaveValue("Alice");
     expect(screen.getByTestId("requester-account-email")).toHaveValue("alice@example.be");
-    expect(screen.getByTestId("requester-account-address")).toHaveValue("Rue de la Loi 1");
+    expect(screen.queryByTestId("requester-account-address")).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByTestId("requester-account-phone"), {
       target: { value: "+32 471 11 11 11" },

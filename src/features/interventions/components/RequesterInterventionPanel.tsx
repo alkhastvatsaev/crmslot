@@ -32,6 +32,10 @@ const stepVariants = {
 
 const springTransition = { type: "spring", bounce: 0, duration: 0.4 } as const;
 
+/** Calque d’étape — remplit la zone au-dessus du footer stepper (jamais en overlay). */
+const stepLayerClass =
+  "absolute inset-0 overflow-y-auto custom-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]";
+
 export default function RequesterInterventionPanel() {
   const {
     requestData,
@@ -162,10 +166,9 @@ export default function RequesterInterventionPanel() {
   return (
     <div
       data-testid="requester-intervention-panel"
-      className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-white"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      {/* Body with AnimatePresence */}
-      <div className="relative flex-1 overflow-hidden">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           {/* ── Step 0: Problem template grid ─────────────────────────────── */}
           {currentStep === 0 && (
@@ -176,7 +179,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col justify-center overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={cn(stepLayerClass, "flex flex-col justify-center px-8 py-3")}
             >
               <RequesterStepTemplates
                 problemTemplateId={problemTemplateId}
@@ -195,7 +198,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col items-center justify-center p-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={cn(stepLayerClass, "flex flex-col items-center justify-center px-8 py-6")}
               role="region"
               aria-labelledby="requester-step1-title"
             >
@@ -223,7 +226,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col gap-6 px-10 py-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={cn(stepLayerClass, "flex flex-col gap-6 px-8 py-6")}
             >
               <div className="flex flex-col gap-4 mt-1">
                 <h2 className="text-center text-xl font-bold text-slate-800">
@@ -321,7 +324,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col gap-6 px-10 py-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className={cn(stepLayerClass, "flex flex-col gap-6 px-8 py-4")}
             >
               <div className="flex flex-col gap-6">
                 <h2 className="text-center text-xl font-bold text-slate-800 px-2">
@@ -353,7 +356,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex min-h-0 flex-col overflow-hidden px-4 py-3"
+              className={cn(stepLayerClass, "flex min-h-0 flex-col overflow-hidden px-8 py-3")}
               onKeyDown={showSubmitSuccess ? undefined : trySubmitOnEnter}
             >
               {showSubmitSuccess ? (
@@ -429,9 +432,9 @@ export default function RequesterInterventionPanel() {
           )}
         </AnimatePresence>
       </div>
-      <div className="shrink-0">
+      <footer className="shrink-0 px-8 pb-4 pt-1" data-testid="requester-intervention-stepper">
         <RequesterInterventionStepperHeader />
-      </div>
+      </footer>
     </div>
   );
 }

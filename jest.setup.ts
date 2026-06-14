@@ -379,6 +379,7 @@ jest.mock("@/core/config/firebase", () => ({
   clientPortalApp: {},
   db: {},
   firestore: {},
+  clientPortalFirestore: {},
   auth: { currentUser: null },
   clientPortalAuth: { currentUser: null },
   storage: {},

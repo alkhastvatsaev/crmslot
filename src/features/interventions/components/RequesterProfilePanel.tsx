@@ -7,8 +7,7 @@ import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAcc
 import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
 import RequesterClientAccountPanel from "@/features/interventions/components/RequesterClientAccountPanel";
 import { useRequesterHub, RequesterType } from "../context/RequesterHubContext";
-import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { HUB_FONT_OUTFIT, HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
+import { HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 import { motion, useAnimation } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -60,11 +59,8 @@ export default function RequesterProfilePanel() {
   };
 
   return (
-    <div
-      data-testid="requester-profile-panel"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
-    >
-      <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-4`}>
+    <div data-testid="requester-profile-panel" className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <HubSegmentedControl
           value={profile.type}
           onChange={(id) => handleTypeChange(id as RequesterType)}
@@ -93,10 +89,7 @@ export default function RequesterProfilePanel() {
         />
 
         {profile.type === "login" || profile.type === "register" ? (
-          <div
-            data-testid="requester-login-rail"
-            className="min-h-0 flex-1 flex flex-col overflow-hidden"
-          >
+          <div data-testid="requester-login-rail" className="flex min-h-0 flex-1 flex-col">
             {accountLoading && isAuthenticated ? (
               <div
                 data-testid="requester-client-account-loading"
@@ -122,7 +115,7 @@ export default function RequesterProfilePanel() {
             )}
           </div>
         ) : (
-          <>
+          <div className="flex min-h-0 flex-1 flex-col gap-4">
             <div className="flex flex-col gap-2.5 rounded-[24px] border border-black/[0.05] bg-white/70 p-3 shadow-[0_18px_44px_-28px_rgba(15,23,42,0.2)]">
               <motion.div
                 animate={isInvalid(profile.firstName) ? shakeControls : undefined}
@@ -232,7 +225,7 @@ export default function RequesterProfilePanel() {
                 />
               </motion.div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
