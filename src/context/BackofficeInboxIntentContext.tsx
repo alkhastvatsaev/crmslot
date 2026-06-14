@@ -11,14 +11,24 @@ type BackofficeInboxIntentApi = {
   /** Ouvre l’onglet chat sur un dossier (ex. clic mission rail gauche). */
   pendingChatInterventionId: string | null;
   setPendingChatInterventionId: (id: string | null) => void;
+  /** Onglet actif inbox carte (mobile : gating Firestore Documents). */
+  activeInboxTab: "chat" | "requests" | "reports" | "documents" | null;
+  setActiveInboxTab: (tab: "chat" | "requests" | "reports" | "documents" | null) => void;
 };
 
 const BackofficeInboxIntentContext = createContext<BackofficeInboxIntentApi | null>(null);
 
 export function BackofficeInboxIntentProvider({ children }: { children: ReactNode }) {
   const [pendingInboxId, setPendingInboxIdState] = useState<string | null>(null);
-  const [selectedInboxInterventionId, setSelectedInboxInterventionIdState] = useState<string | null>(null);
-  const [pendingChatInterventionId, setPendingChatInterventionIdState] = useState<string | null>(null);
+  const [selectedInboxInterventionId, setSelectedInboxInterventionIdState] = useState<
+    string | null
+  >(null);
+  const [pendingChatInterventionId, setPendingChatInterventionIdState] = useState<string | null>(
+    null
+  );
+  const [activeInboxTab, setActiveInboxTabState] = useState<
+    "chat" | "requests" | "reports" | "documents" | null
+  >(null);
 
   const setPendingInboxId = useCallback((id: string | null) => {
     setPendingInboxIdState(id?.trim() ? id.trim() : null);
@@ -32,6 +42,13 @@ export function BackofficeInboxIntentProvider({ children }: { children: ReactNod
     setPendingChatInterventionIdState(id?.trim() ? id.trim() : null);
   }, []);
 
+  const setActiveInboxTab = useCallback(
+    (tab: "chat" | "requests" | "reports" | "documents" | null) => {
+      setActiveInboxTabState(tab);
+    },
+    []
+  );
+
   const value = useMemo(
     () => ({
       pendingInboxId,
@@ -40,6 +57,8 @@ export function BackofficeInboxIntentProvider({ children }: { children: ReactNod
       setSelectedInboxInterventionId,
       pendingChatInterventionId,
       setPendingChatInterventionId,
+      activeInboxTab,
+      setActiveInboxTab,
     }),
     [
       pendingInboxId,
@@ -48,18 +67,24 @@ export function BackofficeInboxIntentProvider({ children }: { children: ReactNod
       setSelectedInboxInterventionId,
       pendingChatInterventionId,
       setPendingChatInterventionId,
-    ],
+      activeInboxTab,
+      setActiveInboxTab,
+    ]
   );
 
   return (
-    <BackofficeInboxIntentContext.Provider value={value}>{children}</BackofficeInboxIntentContext.Provider>
+    <BackofficeInboxIntentContext.Provider value={value}>
+      {children}
+    </BackofficeInboxIntentContext.Provider>
   );
 }
 
 export function useBackofficeInboxIntent(): BackofficeInboxIntentApi {
   const ctx = useContext(BackofficeInboxIntentContext);
   if (!ctx) {
-    throw new Error("useBackofficeInboxIntent doit être utilisé sous BackofficeInboxIntentProvider.");
+    throw new Error(
+      "useBackofficeInboxIntent doit être utilisé sous BackofficeInboxIntentProvider."
+    );
   }
   return ctx;
 }

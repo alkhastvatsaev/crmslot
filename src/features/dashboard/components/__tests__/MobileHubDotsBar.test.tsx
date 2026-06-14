@@ -1,5 +1,9 @@
-import { render, screen } from "@/test-utils/render";
+import { fireEvent, render, screen } from "@/test-utils/render";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
+import {
+  DashboardPageSelectorProvider,
+  useDashboardPageSelector,
+} from "@/features/dashboard/DashboardPageSelectorContext";
 import {
   MobileHubRailProvider,
   useMobileHubRailRegistration,
@@ -42,13 +46,51 @@ describe("MobileHubDotsBar", () => {
   it("affiche les dots sous le shell quand un hub multi-rails est actif", () => {
     render(
       <MobileHubRailProvider>
-        <RegisterDots activeRail="right" />
-        <MobileHubDotsBar />
+        <DashboardPageSelectorProvider>
+          <RegisterDots activeRail="right" />
+          <MobileHubDotsBar />
+        </DashboardPageSelectorProvider>
       </MobileHubRailProvider>
     );
 
     expect(screen.getByTestId("mobile-hub-dots-bar")).toBeInTheDocument();
     expect(document.querySelectorAll(".mobile-hub-dot")).toHaveLength(3);
     expect(document.querySelector(".mobile-hub-dot--active")).toBeInTheDocument();
+  });
+
+  it("garde les dots visibles quand le sélecteur de pages masque le hub", () => {
+    function SelectorToggle() {
+      const { toggle } = useDashboardPageSelector();
+      return (
+        <button type="button" data-testid="toggle-selector" onClick={toggle}>
+          toggle
+        </button>
+      );
+    }
+
+    const { rerender } = render(
+      <MobileHubRailProvider>
+        <DashboardPageSelectorProvider>
+          <RegisterDots activeRail="center" visible />
+          <MobileHubDotsBar />
+          <SelectorToggle />
+        </DashboardPageSelectorProvider>
+      </MobileHubRailProvider>
+    );
+
+    expect(screen.getByTestId("mobile-hub-dots-bar")).toBeInTheDocument();
+
+    rerender(
+      <MobileHubRailProvider>
+        <DashboardPageSelectorProvider>
+          <RegisterDots activeRail="center" visible={false} />
+          <MobileHubDotsBar />
+          <SelectorToggle />
+        </DashboardPageSelectorProvider>
+      </MobileHubRailProvider>
+    );
+
+    fireEvent.click(screen.getByTestId("toggle-selector"));
+    expect(screen.getByTestId("mobile-hub-dots-bar")).toBeInTheDocument();
   });
 });

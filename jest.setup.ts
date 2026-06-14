@@ -1,9 +1,9 @@
-import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'util';
-import { mockState } from './src/test-utils/mockState';
-import { resetFactorySequence } from './src/test-utils/factories';
+import "@testing-library/jest-dom";
+import { TextDecoder, TextEncoder } from "util";
+import { mockState } from "./src/test-utils/mockState";
+import { resetFactorySequence } from "./src/test-utils/factories";
 
-if (typeof global.TextDecoder === 'undefined') {
+if (typeof global.TextDecoder === "undefined") {
   global.TextDecoder = TextDecoder as typeof global.TextDecoder;
   global.TextEncoder = TextEncoder as typeof global.TextEncoder;
 }
@@ -36,7 +36,7 @@ if (typeof Element !== "undefined") {
 // --- GLOBAL MOCKS FOR AI TESTING ARCHITECTURE ---
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       prefetch: () => null,
@@ -48,7 +48,7 @@ jest.mock('next/navigation', () => ({
     };
   },
   usePathname() {
-    return '';
+    return "";
   },
   useSearchParams() {
     return new URLSearchParams();
@@ -56,7 +56,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock mapbox-gl to avoid WebGL errors in JSDOM
-jest.mock('mapbox-gl', () => ({
+jest.mock("mapbox-gl", () => ({
   Map: jest.fn(() => ({
     on: jest.fn(),
     off: jest.fn(),
@@ -93,21 +93,24 @@ jest.mock('mapbox-gl', () => ({
 
 // Mock framer-motion to skip animations
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, react/display-name */
-jest.mock('framer-motion', () => {
-  const React = require('react');
+jest.mock("framer-motion", () => {
+  const React = require("react");
   return {
     motion: {
       div: React.forwardRef((props: any, ref: any) => {
-        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
-        return React.createElement('div', { ref, ...rest });
+        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } =
+          props;
+        return React.createElement("div", { ref, ...rest });
       }),
       span: React.forwardRef((props: any, ref: any) => {
-        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
-        return React.createElement('span', { ref, ...rest });
+        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } =
+          props;
+        return React.createElement("span", { ref, ...rest });
       }),
       button: React.forwardRef((props: any, ref: any) => {
-        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
-        return React.createElement('button', { ref, ...rest });
+        const { initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } =
+          props;
+        return React.createElement("button", { ref, ...rest });
       }),
     },
     AnimatePresence: ({ children }: any) => children,
@@ -126,35 +129,43 @@ jest.mock('framer-motion', () => {
 
 // Mock react-firebase-hooks
 /* eslint-disable @typescript-eslint/no-explicit-any */
-jest.mock('react-firebase-hooks/auth', () => ({
-  useAuthState: jest.fn(() => [mockState.currentUser, false, null]),
-}), { virtual: true });
+jest.mock(
+  "react-firebase-hooks/auth",
+  () => ({
+    useAuthState: jest.fn(() => [mockState.currentUser, false, null]),
+  }),
+  { virtual: true }
+);
 
-jest.mock('react-firebase-hooks/firestore', () => ({
-  useCollectionData: jest.fn((query: any) => {
-    // Basic path extraction from mock query
-    const path = query?._path || 'default';
-    return [mockState.firestoreData[path] || [], false, null];
+jest.mock(
+  "react-firebase-hooks/firestore",
+  () => ({
+    useCollectionData: jest.fn((query: any) => {
+      // Basic path extraction from mock query
+      const path = query?._path || "default";
+      return [mockState.firestoreData[path] || [], false, null];
+    }),
+    useDocumentData: jest.fn((ref: any) => {
+      const path = ref?._path || "default";
+      return [mockState.firestoreDocs[path] || null, false, null];
+    }),
   }),
-  useDocumentData: jest.fn((ref: any) => {
-    const path = ref?._path || 'default';
-    return [mockState.firestoreDocs[path] || null, false, null];
-  }),
-}), { virtual: true });
+  { virtual: true }
+);
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 // Mock Firebase standard SDK
-jest.mock('firebase/app', () => ({
+jest.mock("firebase/app", () => ({
   initializeApp: jest.fn(),
   getApps: jest.fn(() => []),
   getApp: jest.fn(),
 }));
 
-jest.mock('firebase/database', () => ({
+jest.mock("firebase/database", () => ({
   getDatabase: jest.fn(() => ({})),
 }));
 
-jest.mock('firebase/storage', () => {
+jest.mock("firebase/storage", () => {
   const r = {
     put: jest.fn(() => Promise.resolve({ ref: { fullPath: "mock/path" } })),
     putString: jest.fn(() => Promise.resolve()),
@@ -171,15 +182,15 @@ jest.mock('firebase/storage', () => {
   };
 });
 
-jest.mock('firebase/auth', () => {
+jest.mock("firebase/auth", () => {
   const mockUser = {
-    uid: 'mock-user-123',
-    email: 'portal@test.example',
+    uid: "mock-user-123",
+    email: "portal@test.example",
     emailVerified: true,
-    displayName: 'Portal Tester',
+    displayName: "Portal Tester",
     photoURL: null,
     phoneNumber: undefined as string | undefined,
-    providerData: [{ providerId: 'google.com' }],
+    providerData: [{ providerId: "google.com" }],
   };
 
   function MockGoogleAuthProvider(this: { setCustomParameters: jest.Mock }) {
@@ -200,14 +211,14 @@ jest.mock('firebase/auth', () => {
     signInWithEmailLink: jest.fn(() =>
       Promise.resolve({
         user: {
-          uid: 'magic-user',
-          email: 'magic@test.example',
+          uid: "magic-user",
+          email: "magic@test.example",
           emailVerified: true,
           displayName: null,
           photoURL: null,
-          providerData: [{ providerId: 'password' }],
+          providerData: [{ providerId: "password" }],
         },
-      }),
+      })
     ),
     sendSignInLinkToEmail: jest.fn(() => Promise.resolve()),
     signInWithPopup: jest.fn(() =>
@@ -220,45 +231,58 @@ jest.mock('firebase/auth', () => {
           photoURL: null,
           providerData: [{ providerId: "google.com" }],
         },
-      }),
+      })
     ),
     signInWithRedirect: jest.fn(() => Promise.resolve()),
+    createUserWithEmailAndPassword: jest.fn(() =>
+      Promise.resolve({
+        user: {
+          uid: "new-user",
+          email: "new@test.example",
+          emailVerified: false,
+          displayName: null,
+          photoURL: null,
+          providerData: [{ providerId: "password" }],
+        },
+      })
+    ),
+    sendEmailVerification: jest.fn(() => Promise.resolve()),
     signInWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({
         user: {
-          uid: 'pwd-user',
-          email: 'pwd@test.example',
+          uid: "pwd-user",
+          email: "pwd@test.example",
           emailVerified: true,
           displayName: null,
           photoURL: null,
           phoneNumber: undefined,
-          providerData: [{ providerId: 'password' }],
+          providerData: [{ providerId: "password" }],
         },
-      }),
+      })
     ),
     getMultiFactorResolver: jest.fn((_auth: unknown, error: unknown) => {
       const e = error as { code?: string };
-      if (e?.code !== 'auth/multi-factor-auth-required') {
+      if (e?.code !== "auth/multi-factor-auth-required") {
         throw error;
       }
       return {
-        hints: [{ factorId: 'totp', uid: 'mf-hint' }],
+        hints: [{ factorId: "totp", uid: "mf-hint" }],
         session: {},
         resolveSignIn: jest.fn(() => Promise.resolve()),
       };
     }),
     PhoneAuthProvider: Object.assign(
       jest.fn().mockImplementation(() => ({
-        verifyPhoneNumber: jest.fn(() => Promise.resolve('mock-phone-verification-id')),
+        verifyPhoneNumber: jest.fn(() => Promise.resolve("mock-phone-verification-id")),
       })),
-      { credential: jest.fn(() => ({})) },
+      { credential: jest.fn(() => ({})) }
     ),
     PhoneMultiFactorGenerator: {
-      FACTOR_ID: 'phone',
+      FACTOR_ID: "phone",
       assertion: jest.fn(() => ({})),
     },
     TotpMultiFactorGenerator: {
-      FACTOR_ID: 'totp',
+      FACTOR_ID: "totp",
       assertionForSignIn: jest.fn(() => ({})),
     },
     signOut: jest.fn(() => Promise.resolve()),
@@ -274,7 +298,7 @@ jest.mock('firebase/auth', () => {
   };
 });
 
-jest.mock('idb', () => ({
+jest.mock("idb", () => ({
   openDB: jest.fn(async () => ({
     put: jest.fn().mockResolvedValue(undefined),
     delete: jest.fn().mockResolvedValue(undefined),
@@ -283,20 +307,20 @@ jest.mock('idb', () => ({
   })),
 }));
 
-jest.mock('firebase/firestore', () => ({
+jest.mock("firebase/firestore", () => ({
   getFirestore: jest.fn(() => ({})),
   initializeFirestore: jest.fn(() => ({})),
   enableMultiTabIndexedDbPersistence: jest.fn(() => Promise.resolve()),
   collection: jest.fn((_db, ...pathSegments) => {
-    const path = pathSegments.join('/');
+    const path = pathSegments.join("/");
     return { _path: path, id: pathSegments[pathSegments.length - 1] };
   }),
   doc: jest.fn((_db, ...pathSegments) => {
-    const path = pathSegments.join('/');
+    const path = pathSegments.join("/");
     return { _path: path, id: pathSegments[pathSegments.length - 1] };
   }),
   getDoc: jest.fn((ref) => {
-    const path = ref?._path || 'default';
+    const path = ref?._path || "default";
     const data = mockState.firestoreDocs[path];
     return Promise.resolve({
       exists: () => !!data,
@@ -304,13 +328,13 @@ jest.mock('firebase/firestore', () => ({
       id: ref.id,
     });
   }),
-  getDocFromCache: jest.fn(() => Promise.reject(new Error('no cache'))),
+  getDocFromCache: jest.fn(() => Promise.reject(new Error("no cache"))),
   getDocs: jest.fn((query) => {
-    const path = query?._path || 'default';
+    const path = query?._path || "default";
     const rows = (mockState.firestoreData[path] || []) as Array<{ id?: string }>;
     const docs = rows.map((d) => ({
       data: () => d,
-      id: d.id || 'mock-id'
+      id: d.id || "mock-id",
     }));
     return Promise.resolve({
       docs,
@@ -320,29 +344,29 @@ jest.mock('firebase/firestore', () => ({
   }),
   setDoc: jest.fn(() => Promise.resolve()),
   updateDoc: jest.fn(() => Promise.resolve()),
-  addDoc: jest.fn(() => Promise.resolve({ id: 'mock-doc' })),
+  addDoc: jest.fn(() => Promise.resolve({ id: "mock-doc" })),
   deleteDoc: jest.fn(() => Promise.resolve()),
   query: jest.fn((ref) => ref),
   where: jest.fn(),
   orderBy: jest.fn(),
   limit: jest.fn(),
-  serverTimestamp: jest.fn(() => ({ _methodName: 'serverTimestamp' })),
+  serverTimestamp: jest.fn(() => ({ _methodName: "serverTimestamp" })),
   Timestamp: {
     now: jest.fn(() => ({ toMillis: () => Date.now(), toDate: () => new Date() })),
     fromMillis: jest.fn((ms) => ({ toMillis: () => ms, toDate: () => new Date(ms) })),
   },
   onSnapshot: jest.fn((refOrQuery, callback) => {
-    const path = refOrQuery?._path || 'default';
+    const path = refOrQuery?._path || "default";
     const data = mockState.firestoreDocs[path];
     const rows = (mockState.firestoreData[path] || []) as Array<{ id?: string }>;
-    
-    if (typeof callback === 'function') {
+
+    if (typeof callback === "function") {
       callback({
         exists: () => !!data,
         data: () => data,
-        docs: rows.map((d) => ({ data: () => d, id: d.id || 'mock-id' })),
+        docs: rows.map((d) => ({ data: () => d, id: d.id || "mock-id" })),
         forEach: (cb: (doc: { data: () => unknown; id: string }) => void) =>
-          rows.forEach((d) => cb({ data: () => d, id: d.id || 'mock-id' })),
+          rows.forEach((d) => cb({ data: () => d, id: d.id || "mock-id" })),
       });
     }
     return jest.fn();
@@ -350,11 +374,13 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 // Mock the core firebase config to return the mocked instances
-jest.mock('@/core/config/firebase', () => ({
+jest.mock("@/core/config/firebase", () => ({
   app: {},
+  clientPortalApp: {},
   db: {},
   firestore: {},
   auth: { currentUser: null },
+  clientPortalAuth: { currentUser: null },
   storage: {},
   isConfigured: true,
 }));
@@ -363,67 +389,83 @@ jest.mock('@/core/config/firebase', () => ({
 // Firebase Admin SDK — available for server-side unit tests (jest-environment node).
 // Individual tests can override specific methods via jest.spyOn or jest.mock.
 // ---------------------------------------------------------------------------
-jest.mock('firebase-admin/firestore', () => ({
-  getFirestore: jest.fn(() => ({
-    collection: jest.fn(() => ({
-      doc: jest.fn(() => ({
-        get: jest.fn(async () => ({ exists: false, data: () => undefined, id: 'mock-doc' })),
-        set: jest.fn(async () => undefined),
-        update: jest.fn(async () => undefined),
-        delete: jest.fn(async () => undefined),
+jest.mock(
+  "firebase-admin/firestore",
+  () => ({
+    getFirestore: jest.fn(() => ({
+      collection: jest.fn(() => ({
+        doc: jest.fn(() => ({
+          get: jest.fn(async () => ({ exists: false, data: () => undefined, id: "mock-doc" })),
+          set: jest.fn(async () => undefined),
+          update: jest.fn(async () => undefined),
+          delete: jest.fn(async () => undefined),
+        })),
+        add: jest.fn(async (data: unknown) => ({ id: "mock-new-id", ...((data as object) ?? {}) })),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        get: jest.fn(async () => ({ docs: [], empty: true, forEach: jest.fn() })),
       })),
-      add: jest.fn(async (data: unknown) => ({ id: 'mock-new-id', ...((data as object) ?? {}) })),
-      where: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      get: jest.fn(async () => ({ docs: [], empty: true, forEach: jest.fn() })),
+      batch: jest.fn(() => ({
+        set: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+        commit: jest.fn(async () => undefined),
+      })),
+      runTransaction: jest.fn(async (fn: (t: unknown) => Promise<unknown>) => fn({})),
     })),
-    batch: jest.fn(() => ({
-      set: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      commit: jest.fn(async () => undefined),
-    })),
-    runTransaction: jest.fn(async (fn: (t: unknown) => Promise<unknown>) => fn({})),
-  })),
-  FieldValue: {
-    serverTimestamp: jest.fn(() => ({ _seconds: 0, _nanoseconds: 0 })),
-    increment: jest.fn((n: number) => ({ _increment: n })),
-    arrayUnion: jest.fn((...items: unknown[]) => ({ _arrayUnion: items })),
-    arrayRemove: jest.fn((...items: unknown[]) => ({ _arrayRemove: items })),
-    delete: jest.fn(() => ({ _delete: true })),
-  },
-  Timestamp: {
-    now: jest.fn(() => ({ toDate: () => new Date(), seconds: 0, nanoseconds: 0 })),
-    fromDate: jest.fn((d: Date) => ({ toDate: () => d, seconds: Math.floor(d.getTime() / 1000), nanoseconds: 0 })),
-    fromMillis: jest.fn((ms: number) => ({ toDate: () => new Date(ms), seconds: Math.floor(ms / 1000), nanoseconds: 0 })),
-  },
-}), { virtual: true });
+    FieldValue: {
+      serverTimestamp: jest.fn(() => ({ _seconds: 0, _nanoseconds: 0 })),
+      increment: jest.fn((n: number) => ({ _increment: n })),
+      arrayUnion: jest.fn((...items: unknown[]) => ({ _arrayUnion: items })),
+      arrayRemove: jest.fn((...items: unknown[]) => ({ _arrayRemove: items })),
+      delete: jest.fn(() => ({ _delete: true })),
+    },
+    Timestamp: {
+      now: jest.fn(() => ({ toDate: () => new Date(), seconds: 0, nanoseconds: 0 })),
+      fromDate: jest.fn((d: Date) => ({
+        toDate: () => d,
+        seconds: Math.floor(d.getTime() / 1000),
+        nanoseconds: 0,
+      })),
+      fromMillis: jest.fn((ms: number) => ({
+        toDate: () => new Date(ms),
+        seconds: Math.floor(ms / 1000),
+        nanoseconds: 0,
+      })),
+    },
+  }),
+  { virtual: true }
+);
 
 // ---------------------------------------------------------------------------
 // OpenAI — mock the SDK to avoid real API calls in unit tests.
 // Tests that need specific responses can override with jest.spyOn.
 // ---------------------------------------------------------------------------
-jest.mock('openai', () => {
-  const mockStream = {
-    [Symbol.asyncIterator]: jest.fn(async function* () {
-      yield { choices: [{ delta: { content: 'mock response' }, finish_reason: null }] };
-      yield { choices: [{ delta: {}, finish_reason: 'stop' }] };
-    }),
-    controller: { abort: jest.fn() },
-  };
+jest.mock(
+  "openai",
+  () => {
+    const mockStream = {
+      [Symbol.asyncIterator]: jest.fn(async function* () {
+        yield { choices: [{ delta: { content: "mock response" }, finish_reason: null }] };
+        yield { choices: [{ delta: {}, finish_reason: "stop" }] };
+      }),
+      controller: { abort: jest.fn() },
+    };
 
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: jest.fn(async () => mockStream),
+    return {
+      __esModule: true,
+      default: jest.fn().mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn(async () => mockStream),
+          },
         },
-      },
-    })),
-  };
-}, { virtual: true });
+      })),
+    };
+  },
+  { virtual: true }
+);
 
 // JSDOM has no Web Speech API; dictation hook checks `window.SpeechRecognition`.
 if (typeof window !== "undefined") {

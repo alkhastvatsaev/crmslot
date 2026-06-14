@@ -43,7 +43,7 @@ export const MOBILE_SHELL_CONTRACT = {
       "useMobilePageSwipe",
       "stepDashboardLinearPageIndex",
       "dashboard-page-selector-host",
-      "pages[0]",
+      "pages.slice",
       "selectorOpen",
       "MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS",
     ],

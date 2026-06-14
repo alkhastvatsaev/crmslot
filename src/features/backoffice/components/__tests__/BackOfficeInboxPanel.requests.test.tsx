@@ -73,6 +73,8 @@ jest.mock("@/context/BackofficeInboxIntentContext", () => ({
     setSelectedInboxInterventionId: jest.fn(),
     pendingChatInterventionId: null,
     setPendingChatInterventionId: jest.fn(),
+    activeInboxTab: null,
+    setActiveInboxTab: jest.fn(),
   }),
 }));
 

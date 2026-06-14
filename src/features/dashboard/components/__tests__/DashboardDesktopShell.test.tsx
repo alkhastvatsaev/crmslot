@@ -41,7 +41,7 @@ describe("DashboardDesktopShell", () => {
     expect(DASHBOARD_GALAXY_GRID_COLUMN).toBe(2);
   });
 
-  it("affiche le sélecteur de pages dans le panneau central au clic profil", () => {
+  it("affiche le sélecteur de pages dans le panneau droit au clic profil", () => {
     render(
       <DashboardPagerProvider pageCount={8}>
         <DashboardPageSelectorProvider>
@@ -58,8 +58,9 @@ describe("DashboardDesktopShell", () => {
     fireEvent.click(screen.getByTestId("user-profile-toggle"));
     const host = screen.getByTestId("dashboard-page-selector-host");
     expect(host).toBeInTheDocument();
-    expect(host).toHaveClass("dashboard-page-selector-center-slot");
-    expect(host).toHaveClass("dashboard-desktop-col--center");
+    expect(host).toHaveClass("dashboard-page-selector-right-slot");
+    expect(host).toHaveClass("dashboard-desktop-col--right");
+    expect(screen.getByTestId("dashboard-language-selector")).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-page-selector")).toHaveAttribute(
       "data-variant",
       "desktop"

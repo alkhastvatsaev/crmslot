@@ -8,6 +8,7 @@ jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: () => ({
     activeCompanyId: "demo-local-company",
     isTenantUser: true,
+    workspaceReady: true,
   }),
 }));
 

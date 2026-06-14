@@ -39,6 +39,8 @@ export interface Intervention {
   clientCompanyName?: string | null;
   clientPhone?: string | null;
   clientEmail?: string | null;
+  /** E-mail normalisé (minuscules) pour requêtes portail particulier. */
+  clientEmailNormalized?: string | null;
   urgency?: boolean;
   category?: "serrurerie" | "autre";
   problem?: string | null;
@@ -127,6 +129,8 @@ export interface Intervention {
   actualDurationMinutes?: number | null;
   /** Token UUID d'accès portail client (lecture anonyme via API route). */
   portalAccessToken?: string | null;
+  /** Code court saisi dans le portail particulier (ex. AB12 CD34). */
+  portalAccessCode?: string | null;
   /** Rappels RDV déjà envoyés (clé = 24h | 2h | 30min, valeur = ISO sentAt). */
   appointmentRemindersSent?: Partial<Record<"24h" | "2h" | "30min", string>> | null;
   /** Signature électronique à distance (Phase 10). */

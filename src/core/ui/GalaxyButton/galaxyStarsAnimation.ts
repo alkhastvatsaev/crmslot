@@ -66,6 +66,7 @@ export function startGalaxyStarsAnimation(
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return () => {};
+  ctx.imageSmoothingEnabled = true;
 
   let width = 0;
   let height = 0;
@@ -227,7 +228,12 @@ export function startGalaxyStarsAnimation(
       }
     }
 
-    if (width > 0 && height > 0 && frameIndex % Math.max(1, profile.backgroundEveryNFrames) === 0) {
+    if (
+      width > 0 &&
+      height > 0 &&
+      interactive &&
+      frameIndex % Math.max(1, profile.backgroundEveryNFrames) === 0
+    ) {
       const xPct = (currentX / width) * 100;
       const yPct = (currentY / height) * 100;
       paintGalaxyBackground(surface, xPct, yPct, variant === "avatar" ? "avatar" : "dock");

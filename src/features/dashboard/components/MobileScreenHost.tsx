@@ -20,9 +20,17 @@ type Props = {
 
 const visiblePanelClass = cn(MOBILE_SCREEN_HOST_PANEL_CLASS, MOBILE_SCREEN_HOST_PANEL_BASE_CLASS);
 
+function isMobilePageHidden(
+  pageIndex: number,
+  activeIndex: number,
+  selectorOpen: boolean
+): boolean {
+  return selectorOpen || activeIndex !== pageIndex;
+}
+
 /**
- * Affiche une page hub à la fois.
- * Page 0 (carte Mapbox) reste montée en DOM pour éviter la réinitialisation WebGL.
+ * Panneau central mobile — même invariant que `DashboardPager` desktop :
+ * toutes les pages restent montées ; seule la visibilité change (header + galaxy inchangés).
  *
  * Contrat : voir `mobileShellContract.ts` + `npm run test:mobile-shell`.
  */
@@ -30,7 +38,6 @@ export default function MobileScreenHost({ pages }: Props) {
   const hostRef = useRef<HTMLElement>(null);
   const { pageIndex, pageCount, setPageIndex } = useDashboardPager();
   const { open: selectorOpen, close: closeSelector } = useDashboardPageSelector();
-  const mapHidden = selectorOpen || pageIndex !== 0;
 
   const swipeNextPage = useCallback(() => {
     setPageIndex(stepDashboardLinearPageIndex(pageIndex, "next", pageCount));
@@ -49,18 +56,24 @@ export default function MobileScreenHost({ pages }: Props) {
       data-testid="mobile-screen-host"
       aria-live="polite"
     >
-      <div
-        className={cn(
-          MOBILE_SCREEN_HOST_PANEL_CLASS,
-          MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
-          mapHidden && "mobile-screen-host-panel--suspended"
-        )}
-        aria-hidden={mapHidden}
-        inert={mapHidden ? true : undefined}
-        data-testid="mobile-page-0"
-      >
-        {pages[0]}
-      </div>
+      {pages.slice(0, pageCount).map((page, index) => {
+        const hidden = isMobilePageHidden(index, pageIndex, selectorOpen);
+        return (
+          <div
+            key={index}
+            className={cn(
+              MOBILE_SCREEN_HOST_PANEL_CLASS,
+              MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
+              hidden && "mobile-screen-host-panel--suspended"
+            )}
+            aria-hidden={hidden}
+            inert={hidden ? true : undefined}
+            data-testid={`mobile-page-${index}`}
+          >
+            {page}
+          </div>
+        );
+      })}
 
       {selectorOpen ? (
         <div
@@ -68,10 +81,6 @@ export default function MobileScreenHost({ pages }: Props) {
           data-testid="dashboard-page-selector-host"
         >
           <DashboardPageSelector onClose={closeSelector} variant="mobile" />
-        </div>
-      ) : pageIndex !== 0 ? (
-        <div className={visiblePanelClass} data-testid={`mobile-page-${pageIndex}`}>
-          {pages[pageIndex] ?? null}
         </div>
       ) : null}
     </main>

@@ -8,7 +8,7 @@ function mockMatchMedia(matches: boolean) {
     writable: true,
     configurable: true,
     value: jest.fn().mockImplementation((query: string) => ({
-      matches,
+      matches: query.includes("prefers-reduced-motion") ? false : matches,
       media: query,
       onchange: null,
       addListener: jest.fn(),
@@ -31,11 +31,20 @@ describe("galaxyAnimationPowerPolicy", () => {
     });
   });
 
-  it("active le profil animé léger si mobilePowerSave est explicite", () => {
-    const profile = resolveGalaxyAnimationProfile({ mobilePowerSave: true });
-    expect(profile.starCount).toBe(56);
-    expect(profile.maxFps).toBe(15);
+  it("utilise le profil compact animé sur téléphone", () => {
+    mockMatchMedia(true);
+    const profile = resolveGalaxyAnimationProfile();
+    expect(profile.starCount).toBe(100);
+    expect(profile.maxFps).toBe(20);
+    expect(profile.maxDevicePixelRatio).toBe(3);
     expect(profile.interactive).toBe(false);
+  });
+
+  it("n'utilise jamais un profil statique sur mobile (hors reduced motion)", () => {
+    mockMatchMedia(true);
+    const profile = resolveGalaxyAnimationProfile({ mobilePowerSave: true });
+    expect(profile.starCount).toBeGreaterThan(0);
+    expect(profile.maxFps).toBeGreaterThan(0);
   });
 
   it("utilise 6000 étoiles sur desktop", () => {
@@ -45,14 +54,6 @@ describe("galaxyAnimationPowerPolicy", () => {
     expect(profile.interactive).toBe(true);
     expect(profile.maxFps).toBe(60);
     expect(profile.maxDevicePixelRatio).toBe(2);
-  });
-
-  it("utilise un fond statique sur téléphone (pas de canvas 60 fps)", () => {
-    mockMatchMedia(true);
-    const profile = resolveGalaxyAnimationProfile();
-    expect(profile.starCount).toBe(0);
-    expect(profile.maxFps).toBe(0);
-    expect(profile.interactive).toBe(false);
   });
 
   it("détecte iPhone comme mobile power save", () => {

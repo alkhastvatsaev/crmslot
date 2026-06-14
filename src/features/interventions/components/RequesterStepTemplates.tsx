@@ -23,9 +23,9 @@ export function RequesterStepTemplates({
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-start px-1 pt-4 pb-28">
+    <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center px-1 py-4">
       <h2 className="sr-only">{String(t("requester.intervention.step0_heading"))}</h2>
-      <div className="-translate-y-3 grid w-full max-w-[440px] grid-cols-3 gap-3 px-1">
+      <div className="mx-auto grid w-full max-w-[440px] grid-cols-3 gap-3 px-1 md:mx-0 md:max-w-none md:gap-4 md:px-4">
         {SMART_FORM_TEMPLATES.map((tpl) => {
           const selected =
             (problemTemplateId ? problemTemplateId === tpl.id : false) ||

@@ -33,10 +33,16 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { detectMobileClient } from "@/core/config/mobileClientDetection";
-import { resolveMapboxMobilePixelRatio } from "@/features/map/mapMobilePower";
+import {
+  applyMapboxPremiumBasemapConfig,
+  isMapWebGLActive,
+  markerGlowBlurClass,
+  resolveMapboxInitOptions,
+  resolveMapCameraDuration,
+} from "@/features/map/mapboxPowerProfile";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
@@ -75,25 +81,28 @@ export default function MapboxView() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
   const isMobile = useIsMobile();
-  const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
-  const mapDataActive = isMobile !== true || mapRenderActive;
   const pager = useDashboardPagerOptional();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
+  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
+  const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
+  const dashboardPageIndex = pager?.pageIndex ?? 0;
+  const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
 
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
-  const inboxIntent = useBackofficeInboxIntentOptional();
 
   // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
   const isDispatchMap = isCompanyDispatchViewer(workspace);
   const { interventions: boInterventions } = useBackOfficeInterventions(
-    isDispatchMap && mapDataActive ? (workspace?.activeCompanyId ?? null) : null
+    isDispatchMap && mapHubDataActive ? (workspace?.activeCompanyId ?? null) : null
   );
   const { interventions: techInterventions, firebaseUid: technicianUid } = useTechnicianAssignments(
     {
-      enabled: !isDispatchMap && mapDataActive,
+      enabled: !isDispatchMap && mapHubDataActive,
     }
   );
 
@@ -254,7 +263,7 @@ export default function MapboxView() {
     const container = mapContainerRef.current;
     if (!container) return;
 
-    if (isMobile === true && !mapRenderActive) {
+    if (!mapWebGLActive) {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -281,20 +290,23 @@ export default function MapboxView() {
 
       mapboxgl.accessToken = token;
       const initialCenter: [number, number] = [4.3522, 50.8466];
-      const mobileMap =
-        typeof window !== "undefined"
-          ? detectMobileClient(navigator.userAgent, window.location.search)
-          : false;
+      const mobileMap = isMobile === true;
+      const powerOptions = resolveMapboxInitOptions(mobileMap);
 
       const map = new mapboxgl.Map({
         container,
-        style: mobileMap ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/standard",
+        style: powerOptions.style,
         center: initialCenter,
         zoom: 12.5,
         pitch: 0,
         bearing: 0,
-        antialias: !mobileMap,
-        ...(mobileMap ? { pixelRatio: resolveMapboxMobilePixelRatio() } : {}),
+        antialias: powerOptions.antialias,
+        fadeDuration: powerOptions.fadeDuration,
+        refreshExpiredTiles: powerOptions.refreshExpiredTiles,
+        maxTileCacheSize: powerOptions.maxTileCacheSize,
+        renderWorldCopies: powerOptions.renderWorldCopies,
+        collectResourceTiming: powerOptions.collectResourceTiming,
+        respectPrefersReducedMotion: powerOptions.respectPrefersReducedMotion,
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],
@@ -326,13 +338,7 @@ export default function MapboxView() {
       });
 
       map.on("style.load", () => {
-        try {
-          map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
-          map.setConfigProperty("basemap", "showTransitLabels", false);
-          map.setConfigProperty("basemap", "showRoadLabels", true);
-        } catch {
-          /* style sans config basemap */
-        }
+        applyMapboxPremiumBasemapConfig(map);
       });
 
       map.on("error", (ev) => {
@@ -351,11 +357,13 @@ export default function MapboxView() {
       });
 
       sizeObserver = new ResizeObserver(() => {
-        try {
-          map.resize();
-        } catch {
-          /* ignore */
-        }
+        window.requestAnimationFrame(() => {
+          try {
+            map.resize();
+          } catch {
+            /* ignore */
+          }
+        });
       });
       sizeObserver.observe(container);
 
@@ -408,7 +416,7 @@ export default function MapboxView() {
       }
       setMapReady(false);
     };
-  }, [isMobile, mapRenderActive]);
+  }, [isMobile, mapWebGLActive]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -466,8 +474,7 @@ export default function MapboxView() {
           : isLive
             ? "rgba(59,130,246,0.50)"
             : "rgba(255,59,48,0.45)";
-      glow.className =
-        "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full blur-xl transition-all duration-500";
+      glow.className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full ${markerGlowBlurClass(isMobile === true)} transition-all duration-500`;
       glow.style.backgroundColor = glowColor;
       el.appendChild(glow);
 
@@ -491,7 +498,12 @@ export default function MapboxView() {
       el.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelectedMission(mission);
-        map.flyTo({ center: mission.coordinates as [number, number], zoom: 17, pitch: 0 });
+        map.flyTo({
+          center: mission.coordinates as [number, number],
+          zoom: 17,
+          pitch: 0,
+          duration: resolveMapCameraDuration(isMobile === true, "marker"),
+        });
       });
 
       const marker = new mapboxgl.Marker({ element: el })
@@ -511,7 +523,7 @@ export default function MapboxView() {
         markersRef.current[`technician-${tech.id}`] = marker;
       }
     }
-  }, [visibleMissions, mapReady, isDispatchMap]);
+  }, [visibleMissions, mapReady, isDispatchMap, isMobile]);
 
   const handleMobileMapResize = React.useCallback((rail: MobileHubRail) => {
     if (rail !== "center") return;
@@ -568,7 +580,11 @@ export default function MapboxView() {
       .map((m) => m.coordinates as [number, number]);
     if (coords.length === 0) return;
     if (coords.length === 1) {
-      map.flyTo({ center: coords[0], zoom: 15, duration: 800 });
+      map.flyTo({
+        center: coords[0],
+        zoom: 15,
+        duration: resolveMapCameraDuration(true, "marker"),
+      });
       return;
     }
     const lngs = coords.map((c) => c[0]);
@@ -577,10 +593,12 @@ export default function MapboxView() {
       [Math.min(...lngs), Math.min(...lats)],
       [Math.max(...lngs), Math.max(...lats)],
     ];
-    map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 800 });
+    map.fitBounds(bounds, {
+      padding: 60,
+      maxZoom: 15,
+      duration: resolveMapCameraDuration(true, "bounds"),
+    });
   }, [visibleMissions, isMobile, mapReady]);
-
-  const dashboardPageIndex = pager?.pageIndex ?? 0;
 
   useEffect(() => {
     if (dashboardPageIndex !== 0) return;
@@ -609,7 +627,7 @@ export default function MapboxView() {
         center: mission.coordinates,
         zoom: 17,
         pitch: 0,
-        duration: 1500,
+        duration: resolveMapCameraDuration(isMobile === true, "marker"),
       });
     }
   };
@@ -617,13 +635,12 @@ export default function MapboxView() {
   const handleRecenter = () => {
     if (!mapRef.current) return;
 
-    // Recentrer directement sur Bruxelles avec un zoom global
     mapRef.current.flyTo({
-      center: [4.3522, 50.8466], // Coordonnées de Bruxelles
-      zoom: 12.5, // Niveau de zoom pour voir toute la ville
+      center: [4.3522, 50.8466],
+      zoom: 12.5,
       pitch: 0,
       bearing: 0,
-      duration: 2000,
+      duration: resolveMapCameraDuration(isMobile === true, "recenter"),
       essential: true,
     });
   };

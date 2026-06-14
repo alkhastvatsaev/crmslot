@@ -22,6 +22,7 @@ import { SMART_FORM_MAX_PHOTOS } from "@/features/interventions/hooks/useSmartFo
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
 import { RequesterStepTemplates } from "./RequesterStepTemplates";
 import { RequesterStepVoice } from "./RequesterStepVoice";
+import RequesterSubmittedDossierBanner from "./RequesterSubmittedDossierBanner";
 
 const stepVariants = {
   initial: { opacity: 0, x: 20, filter: "blur(4px)" },
@@ -39,6 +40,8 @@ export default function RequesterInterventionPanel() {
     setCurrentStep,
     isSubmitting,
     validationFailedCount,
+    lastSubmittedPortalAccessCode,
+    setLastSubmittedPortalAccessCode,
   } = useRequesterHub();
 
   const { t, language } = useTranslation();
@@ -135,6 +138,7 @@ export default function RequesterInterventionPanel() {
   }, [currentStep, canSubmit, isSubmitting, handleSubmit]);
 
   const handleProblemSelect = (tpl: SmartFormTemplate) => {
+    setLastSubmittedPortalAccessCode(null);
     const labelText = String(t(tpl.label));
     const seedText = String(t(tpl.seed));
     setRequestData((prev) => ({
@@ -145,6 +149,15 @@ export default function RequesterInterventionPanel() {
     }));
     setCurrentStep(1); // Auto-advance
   };
+
+  const showSubmitSuccess = Boolean(
+    lastSubmittedPortalAccessCode &&
+    currentStep === 4 &&
+    !isSubmitting &&
+    !problemLabel.trim() &&
+    !description.trim() &&
+    !interventionAddress.trim()
+  );
 
   return (
     <div
@@ -163,7 +176,7 @@ export default function RequesterInterventionPanel() {
               animate="animate"
               exit="exit"
               transition={springTransition}
-              className="absolute inset-0 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className="absolute inset-0 flex flex-col justify-center overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             >
               <RequesterStepTemplates
                 problemTemplateId={problemTemplateId}
@@ -333,7 +346,7 @@ export default function RequesterInterventionPanel() {
           {/* ── Step 4: Address + submit ──────────────────────────────────── */}
           {currentStep === 4 && (
             <motion.div
-              key="step4"
+              key={showSubmitSuccess ? "step4-success" : "step4"}
               data-testid="requester-step4"
               variants={stepVariants}
               initial="initial"
@@ -341,71 +354,77 @@ export default function RequesterInterventionPanel() {
               exit="exit"
               transition={springTransition}
               className="absolute inset-0 flex min-h-0 flex-col overflow-hidden px-4 py-3"
-              onKeyDown={trySubmitOnEnter}
+              onKeyDown={showSubmitSuccess ? undefined : trySubmitOnEnter}
             >
-              <div className="flex min-h-0 flex-1 flex-col justify-between gap-3">
-                <div className="flex min-h-0 flex-1 flex-col gap-1 rounded-[24px] border border-black/5 bg-white p-3 shadow-sm">
-                  <div className="flex shrink-0 items-center gap-2">
-                    <div className="relative flex-1">
-                      <SmartFormAddressAutocomplete
-                        value={interventionAddress}
-                        onValueChange={(val) =>
-                          setRequestData((prev) => ({ ...prev, interventionAddress: val }))
-                        }
-                        onPlaceSelect={(formatted, loc) =>
-                          setRequestData((prev) => ({
-                            ...prev,
-                            interventionAddress: formatted,
-                            interventionLatLng: loc,
-                          }))
-                        }
+              {showSubmitSuccess ? (
+                <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-2">
+                  <RequesterSubmittedDossierBanner dossierNumber={lastSubmittedPortalAccessCode!} />
+                </div>
+              ) : (
+                <div className="flex min-h-0 flex-1 flex-col justify-between gap-3">
+                  <div className="flex min-h-0 flex-1 flex-col gap-1 rounded-[24px] border border-black/5 bg-white p-3 shadow-sm">
+                    <div className="flex shrink-0 items-center gap-2">
+                      <div className="relative flex-1">
+                        <SmartFormAddressAutocomplete
+                          value={interventionAddress}
+                          onValueChange={(val) =>
+                            setRequestData((prev) => ({ ...prev, interventionAddress: val }))
+                          }
+                          onPlaceSelect={(formatted, loc) =>
+                            setRequestData((prev) => ({
+                              ...prev,
+                              interventionAddress: formatted,
+                              interventionLatLng: loc,
+                            }))
+                          }
+                          disabled={locatingAddress}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={fillAddressFromGeolocation}
                         disabled={locatingAddress}
-                      />
+                        aria-label={String(t("requester.intervention.locate_aria"))}
+                        className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] bg-slate-100 transition-colors hover:bg-slate-200 disabled:opacity-50"
+                      >
+                        {locatingAddress ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                        ) : (
+                          <MapPin className="h-4 w-4 text-slate-800" />
+                        )}
+                      </button>
                     </div>
+
+                    <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
+                      <SmartFormAddressMiniMap
+                        address={interventionAddress}
+                        placeLatLng={interventionLatLng}
+                        className="h-full min-h-[140px] w-full !border-none"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 pb-1">
                     <button
                       type="button"
-                      onClick={fillAddressFromGeolocation}
-                      disabled={locatingAddress}
-                      aria-label={String(t("requester.intervention.locate_aria"))}
-                      className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] bg-slate-100 transition-colors hover:bg-slate-200 disabled:opacity-50"
+                      data-testid="intervention-submit-btn"
+                      disabled={!canSubmit}
+                      onClick={handleSubmit}
+                      className="mx-auto flex w-fit min-w-[280px] items-center justify-center gap-2 rounded-[16px] bg-black px-8 py-4 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                     >
-                      {locatingAddress ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      {isSubmitting ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        <MapPin className="h-4 w-4 text-slate-800" />
+                        <>
+                          <SendHorizontal className="h-5 w-5" />
+                          {String(t("requester.intervention.submit_request"))}
+                        </>
                       )}
                     </button>
                   </div>
-
-                  <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
-                    <SmartFormAddressMiniMap
-                      address={interventionAddress}
-                      placeLatLng={interventionLatLng}
-                      className="h-full min-h-[140px] w-full !border-none"
-                    />
-                    <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />
-                  </div>
                 </div>
-
-                <div className="shrink-0 pb-1">
-                  <button
-                    type="button"
-                    data-testid="intervention-submit-btn"
-                    disabled={!canSubmit}
-                    onClick={handleSubmit}
-                    className="mx-auto flex w-fit min-w-[280px] items-center justify-center gap-2 rounded-[16px] bg-black px-8 py-4 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <>
-                        <SendHorizontal className="h-5 w-5" />
-                        {String(t("requester.intervention.submit_request"))}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

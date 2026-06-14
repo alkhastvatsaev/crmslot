@@ -21,7 +21,7 @@ import {
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
+import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 type Props = { slotIndex?: number };
@@ -37,8 +37,7 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
   const workspace = useCompanyWorkspaceOptional();
   const pager = useDashboardPagerOptional();
   const pageActive = pager == null || pager.pageIndex === slotIndex;
-  const companyId =
-    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : "");
+  const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
 
   const { interventions, loading, isPreviewCatalog } = useCompanyBillingInterventions(
     companyId || null
@@ -46,14 +45,23 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
 
   const metrics = useMemo(() => computeBillingHubMetrics(interventions), [interventions]);
 
-  const gate = !companyId ? (
-    <div
-      data-testid="billing-hub-gate"
-      className="flex min-h-0 flex-1 items-center justify-center px-6 text-center text-[13px] text-amber-800"
-    >
-      {t("billingHub.company_required")}
-    </div>
-  ) : null;
+  const gate =
+    companyPhase === "loading" ? (
+      <div
+        data-testid="billing-hub-loading"
+        className="flex min-h-0 flex-1 items-center justify-center px-6"
+        aria-busy="true"
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600" />
+      </div>
+    ) : companyPhase === "missing" ? (
+      <div
+        data-testid="billing-hub-gate"
+        className="flex min-h-0 flex-1 items-center justify-center px-6 text-center text-[13px] text-amber-800"
+      >
+        {t("billingHub.company_required")}
+      </div>
+    ) : null;
 
   return (
     <AdaptiveTriplePanelLayout

@@ -21,6 +21,7 @@ function Consumer() {
     <div>
       <span data-testid="company-id">{ctx.activeCompanyId || "empty"}</span>
       <span data-testid="is-tenant">{String(ctx.isTenantUser)}</span>
+      <span data-testid="workspace-ready">{String(ctx.workspaceReady)}</span>
     </div>
   );
 }
@@ -100,6 +101,7 @@ describe("CompanyWorkspaceContext", () => {
   });
 
   it("ne souscrit pas Firestore avant l'auth (authLoading)", () => {
+    window.localStorage.removeItem("belmap_active_company_id");
     // Make onAuthStateChanged not fire immediately — simulate loading
     const { onAuthStateChanged } = jest.requireMock("firebase/auth") as {
       onAuthStateChanged: jest.Mock;
@@ -114,7 +116,8 @@ describe("CompanyWorkspaceContext", () => {
 
     // No memberships snapshot should have been triggered
     expect(mockOnSnapshot).not.toHaveBeenCalled();
-    // activeCompanyId stays empty while loading
+    expect(screen.getByTestId("workspace-ready").textContent).toBe("false");
+    // activeCompanyId stays empty while loading (sans id localStorage)
     expect(screen.getByTestId("company-id").textContent).toBe("empty");
   });
 });

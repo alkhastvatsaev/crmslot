@@ -12,6 +12,7 @@ import {
   dashboardTripleCenterShellClass,
   DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
+import DashboardLanguageSelector from "@/features/dashboard/components/DashboardLanguageSelector";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -88,7 +89,10 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
         data-variant={variant}
         aria-label="Navigation"
       >
-        <div className="dashboard-page-selector-inner">{grid}</div>
+        <div className="dashboard-page-selector-inner">
+          <DashboardLanguageSelector variant="desktop" />
+          {grid}
+        </div>
       </section>
     );
   }
@@ -102,6 +106,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
       sectionDataVariant={variant}
       sectionProps={{ "aria-label": "Navigation" }}
     >
+      <DashboardLanguageSelector variant="mobile" />
       {grid}
     </MobileCentralPanelFrame>
   );

@@ -1,10 +1,25 @@
 "use client";
 
-import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
+import { useEffect, useState } from "react";
+import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
+import {
+  useMobileHubRailSnapshot,
+  type MobileHubRailRegistration,
+} from "@/features/dashboard/MobileHubRailContext";
 import { MOBILE_HUB_DOTS_BAR_CLASS } from "@/core/ui/dashboardMobileLayout";
 
 export default function MobileHubDotsBar() {
-  const snapshot = useMobileHubRailSnapshot();
+  const visibleSnapshot = useMobileHubRailSnapshot();
+  const pageSelectorOpen = useDashboardPageSelectorOptional()?.open ?? false;
+  const [lastSnapshot, setLastSnapshot] = useState<MobileHubRailRegistration | null>(null);
+
+  useEffect(() => {
+    if (visibleSnapshot) {
+      setLastSnapshot(visibleSnapshot);
+    }
+  }, [visibleSnapshot]);
+
+  const snapshot = visibleSnapshot ?? (pageSelectorOpen ? lastSnapshot : null);
   if (!snapshot || snapshot.rails.length <= 1) return null;
 
   const activeIndex = snapshot.rails.indexOf(snapshot.activeRail);

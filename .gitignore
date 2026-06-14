@@ -69,6 +69,12 @@ scratch/
 # Photos de test (images téléchargées manuellement, pas du code)
 photos portes/
 
+# Playwright MCP snapshots et screenshots ad-hoc
+.playwright-mcp/
+mobile-*.png
+app-state.png
+after-reload.png
+
 # Copies macOS (fichiers "nom 2.ext", "nom 3.ext" créés par macOS)
 * [0-9].*
 * [0-9][0-9].*

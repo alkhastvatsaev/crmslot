@@ -124,5 +124,21 @@ export async function transitionInterventionStatusAdmin(
       });
   }
 
+  if (fromStatus !== toStatus) {
+    void import("@/features/interventions/server/portalStatusUpdateEmailAdmin")
+      .then(({ sendPortalStatusUpdateEmailAdmin }) =>
+        sendPortalStatusUpdateEmailAdmin({
+          db,
+          interventionId,
+          iv,
+          fromStatus,
+          toStatus,
+        })
+      )
+      .catch(() => {
+        // E-mail portail client — best effort.
+      });
+  }
+
   return { id: eventRef.id, ...eventPayload };
 }
