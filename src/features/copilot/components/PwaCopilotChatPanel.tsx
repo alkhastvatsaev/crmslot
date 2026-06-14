@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { usePwaCopilotAgentBridgeOptional } from "@/context/PwaCopilotAgentBridgeContext";
 import type { CopilotChatMessage, WorkspaceCopilotSnapshot } from "@/features/copilot/types";
 
 type Props = {
@@ -33,11 +33,13 @@ export default function PwaCopilotChatPanel({
   onExternalPromptConsumed,
 }: Props) {
   const { t } = useTranslation();
+  const bridge = usePwaCopilotAgentBridgeOptional();
+  const registerHandlers = bridge?.registerHandlers ?? (() => {});
   const [messages, setMessages] = useState<CopilotChatMessage[]>(() => [welcomeMessage(t)]);
-  const [draft, setDraft] = useState("");
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const sendTextRef = useRef<(text: string) => Promise<void>>(async () => {});
 
   useEffect(() => {
     setMessages([welcomeMessage(t)]);
@@ -66,7 +68,6 @@ export default function PwaCopilotChatPanel({
 
       const history = [...messages.filter((m) => m.id !== "welcome"), userMsg];
       setMessages((prev) => [...prev, userMsg]);
-      setDraft("");
       setTyping(true);
       setError(null);
 
@@ -119,7 +120,27 @@ export default function PwaCopilotChatPanel({
     [messages, snapshot, t, typing]
   );
 
-  const send = useCallback(() => void sendText(draft), [draft, sendText]);
+  sendTextRef.current = sendText;
+
+  const bridgeSendMessage = useCallback((text: string) => {
+    void sendTextRef.current(text);
+  }, []);
+
+  const bridgeReset = useCallback(() => {
+    setMessages([welcomeMessage(t)]);
+    setError(null);
+  }, [t]);
+
+  const disabledInput = typing || loadingSnapshot || !snapshot;
+
+  useEffect(() => {
+    registerHandlers({
+      sendMessage: bridgeSendMessage,
+      resetConversation: bridgeReset,
+      disabled: disabledInput,
+    });
+    return () => registerHandlers(null);
+  }, [bridgeSendMessage, bridgeReset, disabledInput, registerHandlers]);
 
   useEffect(() => {
     if (!externalPrompt?.trim()) return;
@@ -127,37 +148,11 @@ export default function PwaCopilotChatPanel({
     onExternalPromptConsumed?.();
   }, [externalPrompt, onExternalPromptConsumed, sendText]);
 
-  const disabledInput = typing || loadingSnapshot || !snapshot;
-
   return (
     <div
       data-testid="pwa-copilot-chat-panel"
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
-      <div className="flex shrink-0 items-center gap-2 border-b border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-md">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-500/25">
-          <Bot className="h-5 w-5" aria-hidden />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-bold text-slate-900">{t("copilot.title")}</p>
-          <p className="truncate text-[11px] text-slate-500">
-            {snapshot?.company.name
-              ? t("copilot.subtitle_company").replace("{name}", snapshot.company.name)
-              : loadingSnapshot
-                ? t("copilot.loading_context")
-                : t("copilot.no_company")}
-          </p>
-        </div>
-        {snapshot ? (
-          <span
-            data-testid="pwa-copilot-context-badge"
-            className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-800"
-          >
-            {t("copilot.context_live")}
-          </span>
-        ) : null}
-      </div>
-
       {error ? (
         <p
           className="shrink-0 bg-amber-50 px-4 py-2 text-[12px] text-amber-900"
@@ -201,47 +196,6 @@ export default function PwaCopilotChatPanel({
             </div>
           </div>
         ) : null}
-      </div>
-
-      <div className="shrink-0 border-t border-slate-200/80 bg-white/80 p-3 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <label htmlFor="pwa-copilot-input" className="sr-only">
-            {t("copilot.input_label")}
-          </label>
-          <div className="flex min-w-0 flex-1 items-center rounded-[18px] border border-slate-200 bg-white shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20">
-            <textarea
-              id="pwa-copilot-input"
-              data-testid="pwa-copilot-input"
-              rows={1}
-              value={draft}
-              disabled={disabledInput}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send();
-                }
-              }}
-              placeholder={t("copilot.input_placeholder")}
-              className="min-h-12 max-h-28 flex-1 resize-none overflow-y-auto bg-transparent px-4 py-3 text-[13px] leading-[18px] text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
-            />
-          </div>
-          <button
-            type="button"
-            data-testid="pwa-copilot-send"
-            onClick={() => void send()}
-            disabled={!draft.trim() || disabledInput}
-            className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition",
-              !draft.trim() || disabledInput
-                ? "cursor-not-allowed text-slate-400 opacity-40"
-                : "text-indigo-600 hover:bg-indigo-500/10"
-            )}
-            aria-label={t("copilot.send_aria")}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </button>
-        </div>
       </div>
     </div>
   );

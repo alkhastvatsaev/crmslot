@@ -10,7 +10,9 @@
   --mobile-galaxy-height: 3.5rem;
   --mobile-panel-radius: 1.125rem;
   --mobile-panel-gap: 0.75rem;
-  --mobile-body-pad-y: var(--mobile-panel-gap);
+  /** Espacement vertical uniforme : profil · panneau · dots · galaxy */
+  --mobile-stack-gap: var(--mobile-panel-gap);
+  --mobile-body-pad-y: var(--mobile-stack-gap);
   --mobile-tab-active: rgb(37 99 235);
   --mobile-tab-inactive: rgb(148 163 184);
 }
@@ -20,6 +22,7 @@
   inset: 0;
   display: flex;
   flex-direction: column;
+  gap: var(--mobile-stack-gap);
   width: 100%;
   height: 100dvh;
   min-height: 0;
@@ -50,11 +53,55 @@
   z-index: 30;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.25rem;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ── Header ─────────────────────────────────────────────── */
+
+/* ── Grille slot (profil header + galaxy dock) ───────────── */
+
+.mobile-shell-slot-grid {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  grid-template-columns: var(--mobile-shell-pad-x) minmax(0, 1fr) var(--mobile-shell-pad-x);
+}
+
+.mobile-profile-bar {
+  padding-block: 0;
+}
+
+.mobile-profile-bar-chrome {
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+  height: var(--mobile-galaxy-height);
+  position: relative;
+}
+
+.mobile-header-rail-host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: var(--mobile-galaxy-height);
+  overflow: hidden;
+}
+
+.mobile-header-rail-layer {
+  display: flex;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.mobile-profile-chip {
+  width: 100%;
+  height: 100%;
+  min-height: var(--mobile-galaxy-height);
+  max-width: none;
+  justify-content: center;
+  border-radius: 24px;
+}
 
 .mobile-top-bar {
   display: flex;
@@ -127,35 +174,24 @@
   letter-spacing: 0.06em;
 }
 
-/* ── Page selector (overlay sur le body) ────────────────── */
+/* ── Page selector (panneau central) ───────────────────── */
 
+/* Même gabarit que MobileHubLayout : layout parent + panel flex (pas de marge propre). */
 .mobile-page-selector {
-  position: absolute;
-  inset: 0;
-  z-index: 25;
-  background: rgb(255 255 255);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 1.5rem var(--mobile-shell-pad-x);
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.97);
-  transition:
-    opacity 0.22s ease,
-    transform 0.22s ease;
-}
-
-.mobile-page-selector[data-open="true"] {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .mobile-page-selector-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
+  flex: 1;
+  align-content: center;
+  height: 100%;
+  min-height: 0;
+  padding: 0.875rem;
+  box-sizing: border-box;
 }
 
 .mobile-page-selector-item {
@@ -326,12 +362,13 @@
 /* ── Contenu hub ────────────────────────────────────────── */
 
 .mobile-screen-host {
+  position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-block: var(--mobile-body-pad-y);
 }
 
 .mobile-screen-host-panel {
@@ -340,6 +377,30 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.mobile-screen-host-panel--base {
+  position: relative;
+  z-index: 1;
+}
+
+.mobile-screen-host-panel--suspended {
+  visibility: hidden;
+  content-visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.mobile-screen-host-panel--selector {
+  position: relative;
+  z-index: 2;
+}
+
+[data-mobile-shell][data-page-selector-open="true"] #map,
+[data-mobile-shell][data-page-selector-open="true"] .mapboxgl-canvas,
+[data-mobile-shell][data-page-selector-open="true"] .mapboxgl-map {
+  pointer-events: none !important;
 }
 
 .mobile-hub-layout {
@@ -400,6 +461,50 @@
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.05);
 }
 
+.mobile-hub-panel--animated {
+  overflow: hidden;
+}
+
+.mobile-hub-rail-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translate3d(var(--mobile-hub-rail-x, 0), 0, 0) scale(0.992);
+  transition:
+    transform 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+    visibility 0s linear 0.32s;
+  will-change: transform, opacity;
+}
+
+.mobile-hub-rail-layer--before {
+  --mobile-hub-rail-x: -1.125rem;
+}
+
+.mobile-hub-rail-layer--after {
+  --mobile-hub-rail-x: 1.125rem;
+}
+
+.mobile-hub-rail-layer--active {
+  --mobile-hub-rail-x: 0;
+  z-index: 2;
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-hub-rail-layer {
+    transition: opacity 0.12s ease;
+    transform: none !important;
+  }
+}
+
 .mobile-hub-panel-inner {
   display: flex;
   min-height: 0;
@@ -418,7 +523,15 @@
   padding: 0.875rem;
 }
 
-/* ── Hub dots (indicateur de position) ─────────────────── */
+/* ── Hub dots (indicateur rail — sous le galaxy dock) ─ */
+
+.mobile-hub-dots-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
 
 .mobile-hub-dots {
   display: flex;
@@ -442,89 +555,6 @@
 .mobile-hub-dot--active {
   width: 1rem;
   background: rgb(100 116 139);
-}
-
-/* ── Map swipe lock overlay ─────────────────────────────── */
-
-.mobile-map-swipe-lock {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  border-radius: inherit;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: none;
-}
-
-.mobile-map-swipe-lock-ripple {
-  position: absolute;
-  width: 4rem;
-  height: 4rem;
-  margin-left: -2rem;
-  margin-top: -2rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.3);
-  pointer-events: none;
-  z-index: 11;
-  animation: map-lock-ripple 0.65s ease-out forwards;
-}
-
-@keyframes map-lock-ripple {
-  0% {
-    transform: scale(0.4);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-.mobile-map-swipe-lock-badge {
-  position: absolute;
-  bottom: 0.875rem;
-  right: 0.875rem;
-  z-index: 12;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9999px;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: rgba(255, 255, 255, 0.9);
-  border: none;
-  cursor: pointer;
-  pointer-events: auto;
-  animation: map-lock-badge-in 0.18s ease-out;
-}
-
-@keyframes map-lock-badge-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.mobile-map-swipe-lock-hint {
-  position: absolute;
-  top: 0.625rem;
-  right: 0.625rem;
-  z-index: 11;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 9999px;
-  background: rgba(0, 0, 0, 0.25);
-  color: rgba(255, 255, 255, 0.7);
-  pointer-events: none;
 }
 
 /* ── Tab bar ────────────────────────────────────────────── */
@@ -582,22 +612,20 @@
 /* ── Galaxy dock (compact) ───────────────────────────────── */
 
 .mobile-galaxy-dock {
-  display: grid;
-  width: 100%;
   min-height: 0;
   max-height: var(--mobile-galaxy-height);
-  align-items: center;
   overflow: hidden;
-  grid-template-columns: var(--mobile-shell-pad-x) minmax(0, 1fr) var(--mobile-shell-pad-x);
 }
 
 .mobile-galaxy-dock-chrome {
   grid-column: 2;
   width: 100%;
   min-width: 0;
+  height: var(--mobile-galaxy-height);
+  min-height: var(--mobile-galaxy-height);
   max-height: var(--mobile-galaxy-height);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   overflow: hidden;
 }
 
@@ -616,6 +644,9 @@
 
 .mobile-header-chip--interactive {
   cursor: pointer;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
 }
 
 .mobile-header-chip--interactive:active {
@@ -659,8 +690,17 @@
   width: 100%;
   max-width: 100%;
   height: var(--mobile-galaxy-height);
-  min-height: 0;
+  min-height: var(--mobile-galaxy-height);
   max-height: var(--mobile-galaxy-height);
+}
+
+[data-mobile-shell] .galaxy-button-container {
+  min-height: var(--mobile-galaxy-height);
+}
+
+[data-mobile-shell] .premium-btn .galaxy-stars-canvas {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 [data-mobile-shell] .chatbot-galaxy-composer {

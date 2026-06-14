@@ -36,7 +36,8 @@
   backface-visibility: hidden;
 }
 
-#stars-canvas {
+#stars-canvas,
+.galaxy-stars-canvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -45,6 +46,8 @@
   pointer-events: none;
   z-index: 0;
   border-radius: inherit; /* Assure que le canvas respecte l'arrondi */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .btn-content {
@@ -169,13 +172,65 @@
   opacity: 0.38;
 }
 
+.galaxy-button-container.chatbot-galaxy-composer .chatbot-galaxy-composer-input-wrap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 2.75rem;
+}
+
+.galaxy-button-container.chatbot-galaxy-composer .chatbot-galaxy-composer-fake-caret {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 2px;
+  height: 1.125em;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  pointer-events: none;
+  animation: chatbot-galaxy-composer-caret-blink 1.05s step-end infinite;
+}
+
+@keyframes chatbot-galaxy-composer-caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .galaxy-button-container.chatbot-galaxy-composer .chatbot-galaxy-composer-input {
   display: block;
+  flex: 1;
+  align-self: stretch;
   width: 100%;
   max-height: 6rem;
-  min-height: 0;
+  min-height: 2.75rem;
   margin: 0;
   resize: none;
+  text-align: center;
+  color: #fff;
+  caret-color: #fff;
+  cursor: text;
+  -webkit-text-fill-color: #fff;
+}
+
+.galaxy-button-container.chatbot-galaxy-composer .chatbot-galaxy-composer-input--fake-caret {
+  color: transparent !important;
+  caret-color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.galaxy-button-container.chatbot-galaxy-composer .chatbot-galaxy-composer-input:focus {
+  outline: none;
 }
 
 /* Orbe Chatbot (bulles chat) — galaxie 32×32, bords estompés vers transparent */

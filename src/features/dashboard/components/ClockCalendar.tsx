@@ -2,32 +2,42 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDateContext } from "@/context/DateContext";
+import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
-export default function ClockCalendar({ compact = false }: { compact?: boolean }) {
+type ClockCalendarProps = {
+  compact?: boolean;
+  /** Clic sur date/heure → grille de pages (mobile header). */
+  interactive?: boolean;
+};
+
+export default function ClockCalendar({
+  compact = false,
+  interactive = false,
+}: ClockCalendarProps) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
-  const { language, tValue } = useTranslation();
+  const { language } = useTranslation();
 
   const locale = language === "nl" ? "nl-NL" : language === "en" ? "en-GB" : "fr-FR";
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTime(new Date());
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    const timer = setInterval(() => setTime(new Date()), 10_000);
     return () => clearInterval(timer);
   }, [selectedDate]);
 
-  const timeString =
-    time?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) ||
-    "";
+  const timeString = time?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) || "";
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: "short",
     month: "short",
     day: "numeric",
   };
   const dateString = selectedDate.toLocaleDateString(locale, dateOptions).replace(/\./g, "") || "";
+
+  const pageSelector = useDashboardPageSelectorOptional();
 
   const changeDay = (e: React.MouseEvent, delta: number) => {
     e.stopPropagation();
@@ -36,37 +46,63 @@ export default function ClockCalendar({ compact = false }: { compact?: boolean }
     setSelectedDate(newDate);
   };
 
+  const compactDateTime = (
+    <>
+      <span
+        data-testid="date-display"
+        className="min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800"
+      >
+        {dateString}
+      </span>
+      <span className="h-4 w-px shrink-0 bg-slate-300" aria-hidden />
+      <span
+        data-testid="time-display"
+        className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800"
+      >
+        {timeString}
+      </span>
+    </>
+  );
+
   if (compact) {
     return (
       <div
-        id="dynamic-widget"
         data-testid="clock-calendar-widget"
-        className="mobile-header-chip w-full justify-between gap-1 px-2"
+        className={cn(
+          "mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-between gap-2 px-4"
+        )}
       >
         <button
           data-testid="prev-day-btn"
           onClick={(e) => changeDay(e, -1)}
-          className="rounded-full p-1.5 text-slate-400 hover:text-slate-700"
+          className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 text-xs font-medium text-slate-700">
-          <span data-testid="date-display" className="truncate uppercase tracking-wide">
-            {dateString}
-          </span>
-          <span className="h-3 w-px shrink-0 bg-slate-300" aria-hidden />
-          <span data-testid="time-display" className="shrink-0 tabular-nums">
-            {timeString}
-          </span>
-        </div>
+        {interactive && pageSelector ? (
+          <button
+            type="button"
+            data-testid="clock-calendar-toggle"
+            className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
+            aria-label="Ouvrir la navigation"
+            aria-expanded={pageSelector.open}
+            onClick={() => pageSelector.toggle()}
+          >
+            {compactDateTime}
+          </button>
+        ) : (
+          <div className="flex min-w-0 flex-1 flex-row items-center justify-center gap-4">
+            {compactDateTime}
+          </div>
+        )}
         <button
           data-testid="next-day-btn"
           onClick={(e) => changeDay(e, 1)}
-          className="rounded-full p-1.5 text-slate-400 hover:text-slate-700"
+          className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
     );

@@ -69,9 +69,7 @@ describe("TechnicianDashboardListPanel", () => {
   });
 
   it("shows assignment offer card for assigned mission awaiting response", () => {
-    render(
-      <TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />,
-    );
+    render(<TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />);
 
     expect(screen.getByTestId("technician-dashboard-list")).toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-offer-offer-42")).toBeInTheDocument();
@@ -87,14 +85,12 @@ describe("TechnicianDashboardListPanel", () => {
       firebaseUid: techUid,
     });
 
-    render(
-      <TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />,
-    );
+    render(<TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />);
 
     expect(screen.queryByTestId(/^technician-assignment-offer-/)).not.toBeInTheDocument();
   });
 
-  it("shows reopen control for done archived missions and calls reopen helper", async () => {
+  it("shows completed missions in the main list with reopen control", async () => {
     const onSelect = jest.fn();
     mockAssignments.mockReturnValue({
       interventions: [doneArchived],
@@ -105,15 +101,14 @@ describe("TechnicianDashboardListPanel", () => {
 
     render(<TechnicianDashboardListPanel selectedCaseId={null} onSelect={onSelect} />);
 
-    fireEvent.click(screen.getByTestId("technician-dashboard-archives-toggle"));
-
+    expect(screen.getByTestId("technician-case-done-99")).toBeInTheDocument();
     const reopenBtn = await screen.findByTestId("technician-case-reopen-done-99");
     expect(reopenBtn).toBeInTheDocument();
     fireEvent.click(reopenBtn);
 
     await waitFor(() => {
       expect(mockReopen).toHaveBeenCalledWith(
-        expect.objectContaining({ iv: expect.objectContaining({ id: "done-99" }) }),
+        expect.objectContaining({ iv: expect.objectContaining({ id: "done-99" }) })
       );
     });
     expect(onSelect).toHaveBeenCalledWith("done-99");
@@ -129,8 +124,6 @@ describe("TechnicianDashboardListPanel", () => {
 
     render(<TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />);
 
-    fireEvent.click(screen.getByTestId("technician-dashboard-archives-toggle"));
-
     expect(screen.queryByTestId("technician-case-reopen-done-pdf")).not.toBeInTheDocument();
   });
 
@@ -143,8 +136,6 @@ describe("TechnicianDashboardListPanel", () => {
     });
 
     render(<TechnicianDashboardListPanel selectedCaseId={null} onSelect={jest.fn()} />);
-
-    fireEvent.click(screen.getByTestId("technician-dashboard-archives-toggle"));
 
     expect(screen.queryByTestId("technician-case-reopen-inv-1")).not.toBeInTheDocument();
   });

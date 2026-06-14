@@ -11,6 +11,10 @@ jest.mock("@/features/map/GalaxyLayerBridgeContext", () => ({
 
 const mapGalaxyTranscriptionProps: { hideDockStrip?: boolean }[] = [];
 
+jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
+  useIsMobile: jest.fn(() => false),
+}));
+
 jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
   default: (props: { hideDockStrip?: boolean }) => {
@@ -34,6 +38,11 @@ jest.mock("@/features/billingHub/components/BillingHubGalaxyComposer", () => ({
   default: () => <div data-testid="billing-hub-galaxy-composer" />,
 }));
 
+jest.mock("@/features/copilot/components/PwaCopilotGalaxyComposer", () => ({
+  __esModule: true,
+  default: () => <div data-testid="pwa-copilot-galaxy-composer" />,
+}));
+
 import { screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
@@ -41,6 +50,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 
 describe("DashboardGalaxyLayer", () => {
   beforeEach(() => {
@@ -67,11 +77,20 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows billing composer on billing page", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={BILLING_HUB_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={8} initialPageIndex={BILLING_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
     expect(screen.getByTestId("billing-hub-galaxy-composer")).toBeInTheDocument();
+  });
+
+  it("shows copilot composer on assistant IA page", () => {
+    render(
+      <DashboardPagerProvider pageCount={8} initialPageIndex={OFFLINE_HUB_SLOT_INDEX}>
+        <DashboardGalaxyLayer />
+      </DashboardPagerProvider>
+    );
+    expect(screen.getByTestId("pwa-copilot-galaxy-composer")).toBeInTheDocument();
   });
 
   it("shows no agent composer on map page and keeps map galaxy dock", () => {

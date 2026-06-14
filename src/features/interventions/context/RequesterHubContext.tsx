@@ -1,8 +1,17 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  emptyClientPortalAccountFields,
+  type ClientPortalAccountFields,
+} from "@/features/auth/clientPortalAccountProfile";
+import {
+  readPortalAccessSession,
+  writePortalAccessSession,
+  type PortalAccessSession,
+} from "@/features/interventions/portalAccessSession";
 
-export type RequesterType = "particulier" | "login";
+export type RequesterType = "particulier" | "login" | "register";
 
 export interface RequesterProfile {
   type: RequesterType;
@@ -11,6 +20,8 @@ export interface RequesterProfile {
   companyName: string;
   phone: string;
   email: string;
+  /** Adresse habituelle — compte client connecté (onglet Connexion). */
+  usualAddress: string;
   defaultLatLng?: { lat: number; lng: number };
   accessCode: string;
 }
@@ -42,19 +53,28 @@ interface RequesterHubContextValue {
   /** Dernier dossier Firestore créé (hub société — historique). */
   lastSubmittedInterventionId: string | null;
   setLastSubmittedInterventionId: (id: string | null) => void;
+  /** Numéro de dossier (code portail) affiché après envoi. */
+  lastSubmittedPortalAccessCode: string | null;
+  setLastSubmittedPortalAccessCode: (code: string | null) => void;
   /** Ouverture suivi depuis notification push (`bmClientCase`). */
   pendingTrackingInterventionId: string | null;
   setPendingTrackingInterventionId: (id: string | null) => void;
+  /** Profil compte client connecté (rail gauche — source de vérité pour la validation). */
+  clientAccountFields: ClientPortalAccountFields | null;
+  setClientAccountFields: (fields: ClientPortalAccountFields | null) => void;
   /** Force l’onglet droit du hub société (push / retour paiement). */
   portalRightTab: "tracking" | "chat" | "invoice" | "documents" | "timeline" | null;
   setPortalRightTab: (
     tab: "tracking" | "chat" | "invoice" | "documents" | "timeline" | null
   ) => void;
+  portalAccessSession: PortalAccessSession | null;
+  setPortalAccessSession: (session: PortalAccessSession | null) => void;
   isSubmitting: boolean;
   setIsSubmitting: (val: boolean) => void;
   validationFailedCount: number;
   triggerValidation: () => void;
   resetRequestOnly: () => void;
+  resetRequestAfterSubmit: () => void;
   resetAll: () => void;
 }
 
@@ -65,6 +85,7 @@ const defaultProfile: RequesterProfile = {
   companyName: "",
   phone: "",
   email: "",
+  usualAddress: "",
   accessCode: "",
 };
 
@@ -95,12 +116,21 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   const [lastSubmittedInterventionId, setLastSubmittedInterventionId] = useState<string | null>(
     null
   );
+  const [lastSubmittedPortalAccessCode, setLastSubmittedPortalAccessCode] = useState<string | null>(
+    null
+  );
   const [pendingTrackingInterventionId, setPendingTrackingInterventionId] = useState<string | null>(
+    null
+  );
+  const [clientAccountFields, setClientAccountFields] = useState<ClientPortalAccountFields | null>(
     null
   );
   const [portalRightTab, setPortalRightTab] = useState<
     "tracking" | "chat" | "invoice" | "documents" | "timeline" | null
   >(null);
+  const [portalAccessSession, setPortalAccessSessionState] = useState<PortalAccessSession | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationFailedCount, setValidationFailedCount] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -115,6 +145,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
           requestData?: InterventionRequestData;
           lastSubmittedRequest?: InterventionRequestData | null;
           lastSubmittedInterventionId?: string | null;
+          lastSubmittedPortalAccessCode?: string | null;
         };
         if (parsed.profile) {
           const p = parsed.profile;
@@ -131,12 +162,21 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         if (typeof parsed.lastSubmittedInterventionId === "string") {
           setLastSubmittedInterventionId(parsed.lastSubmittedInterventionId);
         }
+        if (typeof parsed.lastSubmittedPortalAccessCode === "string") {
+          setLastSubmittedPortalAccessCode(parsed.lastSubmittedPortalAccessCode);
+        }
       }
     } catch {
       // ignore
     }
     setIsHydrated(true);
+    setPortalAccessSessionState(readPortalAccessSession());
   }, []);
+
+  const setPortalAccessSession = (session: PortalAccessSession | null) => {
+    setPortalAccessSessionState(session);
+    writePortalAccessSession(session);
+  };
 
   // Save to local storage on change
   useEffect(() => {
@@ -144,12 +184,25 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ profile, requestData, lastSubmittedRequest, lastSubmittedInterventionId })
+        JSON.stringify({
+          profile,
+          requestData,
+          lastSubmittedRequest,
+          lastSubmittedInterventionId,
+          lastSubmittedPortalAccessCode,
+        })
       );
     } catch {
       // ignore
     }
-  }, [profile, requestData, lastSubmittedRequest, lastSubmittedInterventionId, isHydrated]);
+  }, [
+    profile,
+    requestData,
+    lastSubmittedRequest,
+    lastSubmittedInterventionId,
+    lastSubmittedPortalAccessCode,
+    isHydrated,
+  ]);
 
   const triggerValidation = () => setValidationFailedCount((v) => v + 1);
 
@@ -159,12 +212,21 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
     setValidationFailedCount(0);
   };
 
+  const resetRequestAfterSubmit = () => {
+    setRequestData(defaultRequestData);
+    setCurrentStep(4);
+    setValidationFailedCount(0);
+  };
+
   const resetAll = () => {
     setProfile(defaultProfile);
     setRequestData(defaultRequestData);
     setCurrentStep(0);
     setLastSubmittedRequest(null);
     setLastSubmittedInterventionId(null);
+    setLastSubmittedPortalAccessCode(null);
+    setPortalAccessSession(null);
+    setClientAccountFields(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -181,15 +243,22 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         setLastSubmittedRequest,
         lastSubmittedInterventionId,
         setLastSubmittedInterventionId,
+        lastSubmittedPortalAccessCode,
+        setLastSubmittedPortalAccessCode,
         pendingTrackingInterventionId,
         setPendingTrackingInterventionId,
+        clientAccountFields,
+        setClientAccountFields,
         portalRightTab,
         setPortalRightTab,
+        portalAccessSession,
+        setPortalAccessSession,
         isSubmitting,
         setIsSubmitting,
         validationFailedCount,
         triggerValidation,
         resetRequestOnly,
+        resetRequestAfterSubmit,
         resetAll,
       }}
     >

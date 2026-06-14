@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, type KeyboardEvent } from "react";
-import { Building2, Mail, Phone, User, UserRound } from "lucide-react";
+import { Mail, Phone, User } from "lucide-react";
 import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPanel";
+import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAccount";
 import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
+import RequesterClientAccountPanel from "@/features/interventions/components/RequesterClientAccountPanel";
 import { useRequesterHub, RequesterType } from "../context/RequesterHubContext";
-import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
-import { HUB_FONT_OUTFIT, HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
+import { HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 import { motion, useAnimation } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -24,6 +25,15 @@ const glassRow = cn("flex items-center gap-3 transition-colors duration-300", HU
 
 export default function RequesterProfilePanel() {
   const { profile, setProfile, validationFailedCount, currentStep } = useRequesterHub();
+  const {
+    isAuthenticated,
+    loading: accountLoading,
+    fields: accountFields,
+    updateField,
+    persistAccount,
+    handleSignOut,
+    saving: accountSaving,
+  } = useClientPortalAccount();
   const { t } = useTranslation();
   const shakeControls = useAnimation();
   useEffect(() => {
@@ -49,11 +59,8 @@ export default function RequesterProfilePanel() {
   };
 
   return (
-    <div
-      data-testid="requester-profile-panel"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
-    >
-      <div className={`${GLASS_PANEL_BODY_SCROLL_COMPACT} flex flex-col gap-4`}>
+    <div data-testid="requester-profile-panel" className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <HubSegmentedControl
           value={profile.type}
           onChange={(id) => handleTypeChange(id as RequesterType)}
@@ -64,28 +71,51 @@ export default function RequesterProfilePanel() {
               id: "login",
               label: t("requester.profile.type_login"),
               testId: "requester-type-login",
-              icon: <Building2 className="h-4 w-4" />,
+              activeAccent: "slate",
+            },
+            {
+              id: "register",
+              label: t("requester.profile.type_register"),
+              testId: "requester-type-register",
               activeAccent: "slate",
             },
             {
               id: "particulier",
               label: t("requester.profile.type_individual"),
               testId: "requester-type-particulier",
-              icon: <UserRound className="h-4 w-4" />,
               activeAccent: "slate",
             },
           ]}
         />
 
-        {profile.type === "login" ? (
-          <div
-            data-testid="requester-login-rail"
-            className="min-h-0 flex-1 flex flex-col overflow-hidden"
-          >
-            <ClientPortalAuthPanel authRailMode />
+        {profile.type === "login" || profile.type === "register" ? (
+          <div data-testid="requester-login-rail" className="flex min-h-0 flex-1 flex-col">
+            {accountLoading && isAuthenticated ? (
+              <div
+                data-testid="requester-client-account-loading"
+                className="flex flex-1 items-center justify-center py-10"
+              >
+                <span className="sr-only">{t("requester.account.loading")}</span>
+              </div>
+            ) : isAuthenticated ? (
+              <RequesterClientAccountPanel
+                fields={accountFields}
+                updateField={updateField}
+                persistAccount={persistAccount}
+                handleSignOut={handleSignOut}
+                saving={accountSaving}
+                validationFailedCount={validationFailedCount}
+                shakeControls={shakeControls}
+              />
+            ) : (
+              <ClientPortalAuthPanel
+                authRailMode
+                authTab={profile.type === "register" ? "register" : "login"}
+              />
+            )}
           </div>
         ) : (
-          <>
+          <div className="flex min-h-0 flex-1 flex-col gap-4">
             <div className="flex flex-col gap-2.5 rounded-[24px] border border-black/[0.05] bg-white/70 p-3 shadow-[0_18px_44px_-28px_rgba(15,23,42,0.2)]">
               <motion.div
                 animate={isInvalid(profile.firstName) ? shakeControls : undefined}
@@ -187,7 +217,7 @@ export default function RequesterProfilePanel() {
                 </span>
                 <input
                   type="email"
-                  placeholder="Mail"
+                  placeholder={t("requester.profile.email_required")}
                   value={profile.email}
                   onKeyDown={onEnterSubmit}
                   onChange={(e) => setProfile((prev) => ({ ...prev, email: e.target.value }))}
@@ -195,7 +225,7 @@ export default function RequesterProfilePanel() {
                 />
               </motion.div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

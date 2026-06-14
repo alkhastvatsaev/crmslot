@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { useCarouselPageAnalytics } from "@/features/analytics/hooks/useCarouselPageAnalytics";
 import { stepDashboardCarouselNavIndex } from "@/features/dashboard/dashboardCarouselRegistry";
 
 export type DashboardPagerApi = {
@@ -27,7 +21,11 @@ type ProviderProps = {
   initialPageIndex?: number;
 };
 
-export function DashboardPagerProvider({ children, pageCount, initialPageIndex = 0 }: ProviderProps) {
+export function DashboardPagerProvider({
+  children,
+  pageCount,
+  initialPageIndex = 0,
+}: ProviderProps) {
   const safeCount = Math.max(2, Math.floor(pageCount));
 
   const [pageIndex, setPageIndexState] = useState(initialPageIndex);
@@ -37,7 +35,7 @@ export function DashboardPagerProvider({ children, pageCount, initialPageIndex =
       const clamped = Math.min(Math.max(0, index), safeCount - 1);
       setPageIndexState(clamped);
     },
-    [safeCount],
+    [safeCount]
   );
 
   const goNext = useCallback(() => {
@@ -48,14 +46,14 @@ export function DashboardPagerProvider({ children, pageCount, initialPageIndex =
     setPageIndexState((p) => stepDashboardCarouselNavIndex(p, "prev"));
   }, []);
 
+  useCarouselPageAnalytics(pageIndex, safeCount);
+
   const value = useMemo(
     () => ({ pageIndex, pageCount: safeCount, setPageIndex, goNext, goPrev }),
-    [pageIndex, safeCount, setPageIndex, goNext, goPrev],
+    [pageIndex, safeCount, setPageIndex, goNext, goPrev]
   );
 
-  return (
-    <DashboardPagerContext.Provider value={value}>{children}</DashboardPagerContext.Provider>
-  );
+  return <DashboardPagerContext.Provider value={value}>{children}</DashboardPagerContext.Provider>;
 }
 
 export function useDashboardPager(): DashboardPagerApi {

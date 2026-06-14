@@ -97,6 +97,14 @@ const TOOL_LABELS: Record<string, string> = {
   focus_stock_item: "Focus stock",
   focus_billing_case: "Focus facturation",
   open_crm_dossier: "Ouvrir dossier",
+  trigger_accounting_export: "Export comptable CSV",
+  trigger_payroll_export: "Export feuilles de temps",
+  list_vehicle_stock: "Stock véhicule",
+  add_vehicle_stock_item: "Ajout stock véhicule",
+  update_vehicle_stock_item: "Mise à jour stock véhicule",
+  diagnose_equipment_photo: "Diagnostic IA photo",
+  parse_voice_job_closure: "Clôture vocale IA",
+  get_contract_churn_risks: "Risque résiliation contrats",
 };
 
 export type OpenAIRunResult =
@@ -247,11 +255,11 @@ export async function runChatbotOpenAI(params: {
       tool: "search_lecot_products",
       label: TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot",
     });
-    const preResult = await executeChatbotTool(
-      "search_lecot_products",
-      preArgs,
-      params.toolCtx
-    ).catch((err: unknown) => ({ error: err instanceof Error ? err.message : "Erreur outil" }));
+    const preResult = await executeChatbotTool("search_lecot_products", preArgs, {
+      ...params.toolCtx,
+      openAIApiKey: params.apiKey,
+      openAIModelName: params.modelName,
+    }).catch((err: unknown) => ({ error: err instanceof Error ? err.message : "Erreur outil" }));
     params.emit({ type: "tool_end", tool: "search_lecot_products" });
     if (preResult && typeof preResult === "object") {
       const suggestions = (preResult as { suggestions?: unknown }).suggestions;
@@ -460,6 +468,8 @@ export async function runChatbotOpenAI(params: {
           const result = await executeChatbotTool(call.name, call.arguments, {
             ...params.toolCtx,
             lastUserText: params.toolCtx.lastUserText ?? lastUserText,
+            openAIApiKey: params.apiKey,
+            openAIModelName: params.modelName,
           });
           return { call, result };
         } catch (err) {

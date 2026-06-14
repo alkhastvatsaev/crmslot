@@ -8,6 +8,7 @@ jest.mock("@/context/CompanyWorkspaceContext", () => ({
     activeCompanyId: "demo-local-company",
     isTenantUser: true,
     firebaseUid: "uid-test",
+    workspaceReady: true,
   }),
 }));
 
@@ -48,22 +49,38 @@ jest.mock("@/features/crmHistory/hooks/useCompanyIvanaChatFeed", () => ({
   useCompanyIvanaChatFeed: () => ({ messages: [], loading: false }),
 }));
 
-jest.mock("@/features/crmHistory/hooks/useCrmActivityFeed", () => ({
-  useCrmActivityFeed: () => ({
-    events: [
-      {
-        id: "feed-e1",
-        type: "intervention_created",
-        ts: Date.now(),
-        interventionId: "iv-feed",
-        interventionTitle: "Test dossier",
-        clientName: "Client test",
-      },
-    ],
-    loading: false,
-    refreshing: false,
-    feedError: null,
+jest.mock("@/context/CrmHistoryAgentBridgeContext", () => ({
+  useCrmHistoryAgentBridgeOptional: () => null,
+}));
+
+jest.mock("@/features/crmHistory/hooks/useCrmHistoryAgent", () => ({
+  useCrmHistoryAgent: () => ({
+    messages: [],
+    thinking: false,
+    sendMessage: jest.fn(),
+    resetConversation: jest.fn(),
+    enabled: false,
   }),
+}));
+
+const mockUseCrmActivityFeed = jest.fn((..._args: unknown[]) => ({
+  events: [
+    {
+      id: "feed-e1",
+      type: "intervention_created",
+      ts: Date.now(),
+      interventionId: "iv-feed",
+      interventionTitle: "Test dossier",
+      clientName: "Client test",
+    },
+  ],
+  loading: false,
+  refreshing: false,
+  feedError: null,
+}));
+
+jest.mock("@/features/crmHistory/hooks/useCrmActivityFeed", () => ({
+  useCrmActivityFeed: (...args: unknown[]) => mockUseCrmActivityFeed(...args),
 }));
 
 const mockSetPendingInboxId = jest.fn();
@@ -98,6 +115,19 @@ function renderCrmPage() {
 describe("CrmHistoryPage", () => {
   beforeEach(() => {
     mockSetPendingInboxId.mockClear();
+    mockUseCrmActivityFeed.mockClear();
+  });
+
+  it("filtre le feed sur la date du calendrier (panel haut gauche)", () => {
+    const calendarDate = new Date("2026-06-06");
+    renderCrmPage();
+    expect(mockUseCrmActivityFeed).toHaveBeenCalledWith(
+      "demo-local-company",
+      "all",
+      "all",
+      "",
+      calendarDate
+    );
   });
 
   it("renders history agent left rail and center feed", () => {

@@ -32,6 +32,7 @@ export function applyTypeFilter(
     return events.filter(
       (e) =>
         e.type.startsWith("intervention_") ||
+        e.type === "time_entry_recorded" ||
         e.type === "chatbot_intervention_status" ||
         e.type === "chatbot_timeline_comment" ||
         e.type === "chatbot_write_action" ||

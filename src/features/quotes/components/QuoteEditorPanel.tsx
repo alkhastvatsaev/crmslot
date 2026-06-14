@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { Plus, Trash2, Send, Save } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
-import { createQuote, updateQuote, updateQuoteStatus } from "../quoteFirestore";
+import { createQuote, updateQuote } from "../quoteFirestore";
 import QuoteStatusBadge from "./QuoteStatusBadge";
 import type { Quote, QuoteLine } from "../types";
 
@@ -47,6 +48,40 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
   const updateLine = (i: number, patch: Partial<QuoteLine>) =>
     setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
 
+  const sendQuoteEmail = async (quoteId: string, statusBefore: string) => {
+    if (!clientEmail.trim()) {
+      toast.error(String(t("quotes.error_no_email")));
+      return false;
+    }
+    const res = await fetchWithAuth(
+      `/api/companies/${encodeURIComponent(companyId)}/quotes/${encodeURIComponent(quoteId)}/send`,
+      { method: "POST" }
+    );
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+    if (!res.ok || !data.ok) {
+      toast.error(data.error ?? String(t("quotes.toast_send_email_failed")));
+      return false;
+    }
+    await logCrmCompanyAction({
+      companyId,
+      kind: "quote_status_changed",
+      actorUid: workspace?.firebaseUid ?? "system",
+      actorRole: "dispatcher",
+      statusBefore,
+      statusAfter: "sent",
+      note: notes.trim() || undefined,
+      intervention: {
+        id: quoteId,
+        title: `Devis ${quoteId.substring(0, 8)}`,
+        status: "sent",
+        clientName: clientName.trim() || undefined,
+        clientCompanyName: clientName.trim() || undefined,
+        address: "",
+      },
+    });
+    return true;
+  };
+
   const handleSave = async (andSend = false) => {
     if (!firestore || !companyId) return;
     const validLines = lines.filter((l) => l.description.trim());
@@ -56,7 +91,12 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
     }
     setBusy(true);
     try {
+      let quoteId: string;
+      let statusBefore: string;
+
       if (quote) {
+        quoteId = quote.id;
+        statusBefore = quote.status;
         await updateQuote(firestore, companyId, quote.id, {
           lines: validLines,
           notes: notes.trim() || null,
@@ -64,29 +104,9 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
           clientName: clientName.trim() || null,
           clientEmail: clientEmail.trim() || null,
         });
-        if (andSend && quote.status !== "sent") {
-          await updateQuoteStatus(firestore, companyId, quote.id, "sent");
-          await logCrmCompanyAction({
-            companyId,
-            kind: "quote_status_changed",
-            actorUid: workspace?.firebaseUid ?? "system",
-            actorRole: "dispatcher",
-            statusBefore: quote.status,
-            statusAfter: "sent",
-            note: notes.trim() || undefined,
-            intervention: {
-              id: quote.id,
-              title: `Devis ${quote.id.substring(0, 8)}`,
-              status: "sent",
-              clientName: clientName.trim() || undefined,
-              clientCompanyName: clientName.trim() || undefined,
-              address: "",
-            },
-          });
-        }
-        onSaved?.(quote.id);
       } else {
-        const id = await createQuote(firestore, companyId, {
+        statusBefore = "draft";
+        quoteId = await createQuote(firestore, companyId, {
           lines: validLines,
           notes: notes.trim() || null,
           validityDays,
@@ -104,37 +124,24 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
           note: notes.trim() || undefined,
           statusAfter: "draft",
           intervention: {
-            id: id,
-            title: `Devis ${id.substring(0, 8)}`,
+            id: quoteId,
+            title: `Devis ${quoteId.substring(0, 8)}`,
             status: "draft",
             clientName: clientName.trim() || undefined,
             clientCompanyName: clientName.trim() || undefined,
             address: "",
           },
         });
-        if (andSend) {
-          await updateQuoteStatus(firestore, companyId, id, "sent");
-          await logCrmCompanyAction({
-            companyId,
-            kind: "quote_status_changed",
-            actorUid: workspace?.firebaseUid ?? "system",
-            actorRole: "dispatcher",
-            statusBefore: "draft",
-            statusAfter: "sent",
-            note: notes.trim() || undefined,
-            intervention: {
-              id: id,
-              title: `Devis ${id.substring(0, 8)}`,
-              status: "sent",
-              clientName: clientName.trim() || undefined,
-              clientCompanyName: clientName.trim() || undefined,
-              address: "",
-            },
-          });
-        }
-        onSaved?.(id);
       }
-      toast.success(andSend ? String(t("quotes.toast_sent")) : String(t("quotes.toast_saved")));
+
+      if (andSend) {
+        const sent = await sendQuoteEmail(quoteId, statusBefore);
+        if (!sent) return;
+        toast.success(String(t("quotes.toast_sent_email")));
+      } else {
+        toast.success(String(t("quotes.toast_saved")));
+      }
+      onSaved?.(quoteId);
     } catch {
       toast.error(String(t("common.error")));
     } finally {

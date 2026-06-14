@@ -1,9 +1,17 @@
 "use client";
 
-import { useRef, useState, useCallback, type ReactNode } from "react";
+import { useRef, useState, useCallback, useEffect, useId, useMemo, type ReactNode } from "react";
 import { MOBILE_HUB_RAILS, type MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
-import MobileMapSwipeLock from "@/features/dashboard/components/MobileMapSwipeLock";
+import { useMobileHubPanelVisible } from "@/features/dashboard/hooks/useMobileHubPanelVisible";
+import { useMobileHubRailRegistration } from "@/features/dashboard/MobileHubRailContext";
+import {
+  MOBILE_HUB_PANEL_ANIMATED_CLASS,
+  MOBILE_HUB_RAIL_LAYER_CLASS,
+  mobileHubRailLayerSideClass,
+  stepMobileHubRail,
+} from "@/features/dashboard/mobileHubRailMotion";
+import { cn } from "@/lib/utils";
 import {
   MOBILE_HUB_LAYOUT_CLASS,
   MOBILE_HUB_PANEL_CLASS,
@@ -25,9 +33,9 @@ type Props = {
   rightTestId?: string;
   panelPadding?: boolean;
   sideScroll?: boolean;
-  /** Active l'overlay de verrouillage carte sur le panneau centre. */
-  centerHasSwipeLock?: boolean;
   onRailChange?: (rail: MobileHubRail) => void;
+  /** Mode contrôlé : force le rail actif depuis l'extérieur. */
+  activeRail?: MobileHubRail;
 };
 
 const RAIL_PANEL: Record<MobileHubRail, keyof Pick<Props, "left" | "center" | "right">> = {
@@ -58,10 +66,13 @@ export default function MobileHubLayout({
   rightTestId,
   panelPadding = true,
   sideScroll = true,
-  centerHasSwipeLock = false,
   onRailChange,
+  activeRail,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const registrationId = useId();
+  const setRegistration = useMobileHubRailRegistration();
+  const panelVisible = useMobileHubPanelVisible(rootRef);
   const [rail, setRail] = useState<MobileHubRail>("center");
 
   const panels = { left, center, right };
@@ -76,7 +87,10 @@ export default function MobileHubLayout({
     right: rightLabel,
   };
 
-  const availableRails = MOBILE_HUB_RAILS.filter((r) => !!panels[RAIL_PANEL[r]]);
+  const availableRails = useMemo(
+    () => MOBILE_HUB_RAILS.filter((r) => !!panels[RAIL_PANEL[r]]),
+    [panels.left, panels.center, panels.right]
+  );
 
   const pickRail = useCallback(
     (next: MobileHubRail) => {
@@ -87,54 +101,79 @@ export default function MobileHubLayout({
   );
 
   const navigateLeft = useCallback(() => {
-    const idx = availableRails.indexOf(rail);
-    if (idx < availableRails.length - 1) pickRail(availableRails[idx + 1]);
+    if (availableRails.length <= 1) return;
+    pickRail(stepMobileHubRail(availableRails, rail, "next"));
   }, [availableRails, rail, pickRail]);
 
   const navigateRight = useCallback(() => {
-    const idx = availableRails.indexOf(rail);
-    if (idx > 0) pickRail(availableRails[idx - 1]);
+    if (availableRails.length <= 1) return;
+    pickRail(stepMobileHubRail(availableRails, rail, "prev"));
   }, [availableRails, rail, pickRail]);
 
-  // Swipe désactivé quand l'overlay carte est déverrouillé (géré par MobileMapSwipeLock)
-  const swipeDisabled = centerHasSwipeLock && rail === "center";
-  usePanelSwipe(rootRef, navigateLeft, navigateRight, swipeDisabled);
+  useEffect(() => {
+    if (activeRail && activeRail !== rail) pickRail(activeRail);
+    // pickRail change uniquement si onRailChange change — stable en pratique
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeRail]);
 
-  const innerClass =
-    panelPadding && sideScroll && rail !== "center"
-      ? `${MOBILE_HUB_PANEL_INNER_SCROLL_CLASS} mobile-hub-panel-inner--padded`
-      : panelPadding
-        ? MOBILE_HUB_PANEL_INNER_PADDED_CLASS
-        : sideScroll && rail !== "center"
-          ? MOBILE_HUB_PANEL_INNER_SCROLL_CLASS
-          : MOBILE_HUB_PANEL_INNER_CLASS;
+  usePanelSwipe(rootRef, navigateLeft, navigateRight);
 
-  const content = panels[RAIL_PANEL[rail]];
+  const innerClassFor = useCallback(
+    (railKey: MobileHubRail) => {
+      if (panelPadding && sideScroll && railKey !== "center") {
+        return `${MOBILE_HUB_PANEL_INNER_SCROLL_CLASS} mobile-hub-panel-inner--padded`;
+      }
+      if (panelPadding) return MOBILE_HUB_PANEL_INNER_PADDED_CLASS;
+      if (sideScroll && railKey !== "center") return MOBILE_HUB_PANEL_INNER_SCROLL_CLASS;
+      return MOBILE_HUB_PANEL_INNER_CLASS;
+    },
+    [panelPadding, sideScroll]
+  );
+
+  useEffect(() => {
+    if (availableRails.length <= 1) {
+      setRegistration(registrationId, null);
+      return;
+    }
+    setRegistration(registrationId, {
+      rails: availableRails,
+      activeRail: rail,
+      visible: panelVisible,
+      requestRail: pickRail,
+    });
+    return () => setRegistration(registrationId, null);
+  }, [availableRails, panelVisible, pickRail, rail, registrationId, setRegistration]);
 
   return (
     <div ref={rootRef} className={MOBILE_HUB_LAYOUT_CLASS} data-testid={rootTestId}>
-      {availableRails.length > 1 && (
-        <div className="mobile-hub-dots" aria-hidden>
-          {availableRails.map((r) => (
-            <div
-              key={r}
-              className={`mobile-hub-dot${rail === r ? " mobile-hub-dot--active" : ""}`}
-            />
-          ))}
-        </div>
-      )}
-
       <section
-        aria-label={labels[rail]}
-        data-testid={testIds[rail]}
-        className={MOBILE_HUB_PANEL_CLASS}
-        style={{ position: "relative" }}
-      >
-        <div className={innerClass}>{content}</div>
-
-        {centerHasSwipeLock && rail === "center" && (
-          <MobileMapSwipeLock onSwipeLeft={navigateLeft} onSwipeRight={navigateRight} />
+        className={cn(
+          MOBILE_HUB_PANEL_CLASS,
+          availableRails.length > 1 && MOBILE_HUB_PANEL_ANIMATED_CLASS
         )}
+        style={{ position: "relative" }}
+        aria-label={labels[rail]}
+      >
+        {availableRails.map((railKey) => {
+          const active = rail === railKey;
+          return (
+            <div
+              key={railKey}
+              aria-label={labels[railKey]}
+              aria-hidden={!active}
+              data-testid={testIds[railKey]}
+              data-mobile-hub-rail={railKey}
+              data-mobile-hub-rail-active={active ? "true" : "false"}
+              className={cn(
+                innerClassFor(railKey),
+                MOBILE_HUB_RAIL_LAYER_CLASS,
+                mobileHubRailLayerSideClass(railKey, rail, availableRails)
+              )}
+            >
+              {panels[RAIL_PANEL[railKey]]}
+            </div>
+          );
+        })}
       </section>
     </div>
   );

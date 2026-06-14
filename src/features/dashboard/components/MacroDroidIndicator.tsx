@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { firestore as db } from "@/core/config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, firestore as db } from "@/core/config/firebase";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,6 +11,12 @@ const SESSION_LAST_PROCESSED = "belgmap_macrodroid_last_processed_at";
 export default function MacroDroidIndicator() {
   const [statusData, setStatusData] = useState<Record<string, unknown> | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    if (!auth) return;
+    return onAuthStateChanged(auth, (u) => setAuthed(!!u));
+  }, []);
   /** Déduplique l’affichage : nouvel enregistrement = nouveau `lastProcessedAt` côté serveur */
   const lastProcessedShownRef = useRef<string | null>(null);
 
@@ -23,7 +30,7 @@ export default function MacroDroidIndicator() {
   }, []);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db || !authed) return;
 
     const unsub = onSnapshot(doc(db, "ai_status", "macrodroid"), (docSnap) => {
       if (!docSnap.exists()) return;
@@ -40,8 +47,7 @@ export default function MacroDroidIndicator() {
 
       if (st !== "ready") return;
 
-      const transcript =
-        typeof data.transcript === "string" ? data.transcript.trim() : "";
+      const transcript = typeof data.transcript === "string" ? data.transcript.trim() : "";
       if (!transcript) return;
 
       const processedKey =
@@ -62,7 +68,7 @@ export default function MacroDroidIndicator() {
     });
 
     return () => unsub();
-  }, []);
+  }, [authed]);
 
   const transcript =
     statusData && typeof statusData.transcript === "string" ? statusData.transcript.trim() : null;
@@ -112,11 +118,15 @@ export default function MacroDroidIndicator() {
             <div className="relative z-10 mt-auto flex shrink-0 items-center justify-between border-t border-emerald-500/20 px-6 pb-6 pt-4">
               <div className="flex flex-col">
                 <span className="text-[9px] font-mono font-bold text-emerald-400/60">ENGINE</span>
-                <span className="text-[10px] font-bold text-white">OpenAI Transcribe + dispatch</span>
+                <span className="text-[10px] font-bold text-white">
+                  OpenAI Transcribe + dispatch
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 {typeof statusData.phone === "string" && statusData.phone.trim() !== "" && (
-                  <span className="text-[9px] font-mono text-emerald-400/40">{statusData.phone}</span>
+                  <span className="text-[9px] font-mono text-emerald-400/40">
+                    {statusData.phone}
+                  </span>
                 )}
                 <div className="rounded border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-400">
                   VERIFIED

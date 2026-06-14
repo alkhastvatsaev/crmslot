@@ -27,16 +27,25 @@ import {
   formatScheduledTimeOnly,
   dailyMissionCardToneFromStatus,
   interventionMatchesTab,
+  interventionVisibleInTechnicianMissionList,
   isInterventionReleasedToTechnicianField,
   isInterventionVisibleOnTechnicianMap,
 } from "@/features/interventions/technicianSchedule";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { detectMobileClient } from "@/core/config/mobileClientDetection";
-import { resolveMapboxMobilePixelRatio } from "@/features/map/mapMobilePower";
+import {
+  applyMapboxPremiumBasemapConfig,
+  isMapWebGLActive,
+  markerGlowBlurClass,
+  resolveMapboxInitOptions,
+  resolveMapCameraDuration,
+} from "@/features/map/mapboxPowerProfile";
+import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { missionStableKey } from "@/features/map/missionStableKey";
 import { MAP_DEMO_TECHNICIAN_MARKERS } from "@/features/map/mapDemoTechnicianMarkers";
 import { createTechnicianVanMarkerElement } from "@/features/map/mapTechnicianMarkerDom";
@@ -73,22 +82,29 @@ export default function MapboxView() {
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
   const isMobile = useIsMobile();
   const pager = useDashboardPagerOptional();
+  const inboxIntent = useBackofficeInboxIntentOptional();
+  const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
+  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
+  const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
+  const dashboardPageIndex = pager?.pageIndex ?? 0;
+  const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
 
   const { selectedDate } = useDateContext();
   const workspace = useCompanyWorkspaceOptional();
-  const inboxIntent = useBackofficeInboxIntentOptional();
 
   // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
   const isDispatchMap = isCompanyDispatchViewer(workspace);
   const { interventions: boInterventions } = useBackOfficeInterventions(
-    isDispatchMap ? (workspace?.activeCompanyId ?? null) : null
+    isDispatchMap && mapHubDataActive ? (workspace?.activeCompanyId ?? null) : null
   );
-  const { interventions: techInterventions } = useTechnicianAssignments({
-    enabled: !isDispatchMap,
-  });
+  const { interventions: techInterventions, firebaseUid: technicianUid } = useTechnicianAssignments(
+    {
+      enabled: !isDispatchMap && mapHubDataActive,
+    }
+  );
 
   const firestoreInterventions = isDispatchMap ? boInterventions : techInterventions;
 
@@ -97,6 +113,7 @@ export default function MapboxView() {
   const [mapBootError, setMapBootError] = useState<"token" | "load" | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [routeLine, setRouteLine] = useState<Array<[number, number]>>([]);
+  const requestMobileHubRail = useRequestMobileHubRail();
   const selectedDateStr = useMemo(() => selectedDate.toLocaleDateString("en-CA"), [selectedDate]);
 
   const allMissions = useMemo(() => {
@@ -108,7 +125,11 @@ export default function MapboxView() {
           ? isInterventionReleasedToTechnicianField(iv)
           : isInterventionVisibleOnTechnicianMap(iv)
       )
-      .filter((iv) => interventionMatchesTab(iv, "today", selectedDate))
+      .filter((iv) =>
+        isDispatchMap
+          ? interventionMatchesTab(iv, "today", selectedDate)
+          : interventionVisibleInTechnicianMissionList(iv, "today", technicianUid, selectedDate)
+      )
       .filter(interventionHasMapCoordinates)
       .map((iv) => {
         let numericId = 0;
@@ -152,7 +173,15 @@ export default function MapboxView() {
       return Number(m[1]) * 60 + Number(m[2]);
     };
     return [...deduped].sort((a, b) => score(a.time) - score(b.time));
-  }, [liveMissions, firestoreInterventions, selectedDateStr, selectedDate, isDispatchMap, t]);
+  }, [
+    liveMissions,
+    firestoreInterventions,
+    selectedDateStr,
+    selectedDate,
+    isDispatchMap,
+    technicianUid,
+    t,
+  ]);
 
   const visibleMissions = useMemo(
     () => allMissions.filter((m) => !archivedKeys.has(missionStableKey(m))),
@@ -232,7 +261,18 @@ export default function MapboxView() {
 
   useEffect(() => {
     const container = mapContainerRef.current;
-    if (!container || mapRef.current) return;
+    if (!container) return;
+
+    if (!mapWebGLActive) {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        setMapReady(false);
+      }
+      return;
+    }
+
+    if (mapRef.current) return;
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() ?? "";
     if (!token) {
@@ -250,20 +290,23 @@ export default function MapboxView() {
 
       mapboxgl.accessToken = token;
       const initialCenter: [number, number] = [4.3522, 50.8466];
-      const mobileMap =
-        typeof window !== "undefined"
-          ? detectMobileClient(navigator.userAgent, window.location.search)
-          : false;
+      const mobileMap = isMobile === true;
+      const powerOptions = resolveMapboxInitOptions(mobileMap);
 
       const map = new mapboxgl.Map({
         container,
-        style: mobileMap ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/standard",
+        style: powerOptions.style,
         center: initialCenter,
         zoom: 12.5,
         pitch: 0,
         bearing: 0,
-        antialias: !mobileMap,
-        ...(mobileMap ? { pixelRatio: resolveMapboxMobilePixelRatio() } : {}),
+        antialias: powerOptions.antialias,
+        fadeDuration: powerOptions.fadeDuration,
+        refreshExpiredTiles: powerOptions.refreshExpiredTiles,
+        maxTileCacheSize: powerOptions.maxTileCacheSize,
+        renderWorldCopies: powerOptions.renderWorldCopies,
+        collectResourceTiming: powerOptions.collectResourceTiming,
+        respectPrefersReducedMotion: powerOptions.respectPrefersReducedMotion,
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],
@@ -295,13 +338,7 @@ export default function MapboxView() {
       });
 
       map.on("style.load", () => {
-        try {
-          map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
-          map.setConfigProperty("basemap", "showTransitLabels", false);
-          map.setConfigProperty("basemap", "showRoadLabels", true);
-        } catch {
-          /* style sans config basemap */
-        }
+        applyMapboxPremiumBasemapConfig(map);
       });
 
       map.on("error", (ev) => {
@@ -320,11 +357,13 @@ export default function MapboxView() {
       });
 
       sizeObserver = new ResizeObserver(() => {
-        try {
-          map.resize();
-        } catch {
-          /* ignore */
-        }
+        window.requestAnimationFrame(() => {
+          try {
+            map.resize();
+          } catch {
+            /* ignore */
+          }
+        });
       });
       sizeObserver.observe(container);
 
@@ -377,7 +416,7 @@ export default function MapboxView() {
       }
       setMapReady(false);
     };
-  }, []);
+  }, [isMobile, mapWebGLActive]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -435,8 +474,7 @@ export default function MapboxView() {
           : isLive
             ? "rgba(59,130,246,0.50)"
             : "rgba(255,59,48,0.45)";
-      glow.className =
-        "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full blur-xl transition-all duration-500";
+      glow.className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full ${markerGlowBlurClass(isMobile === true)} transition-all duration-500`;
       glow.style.backgroundColor = glowColor;
       el.appendChild(glow);
 
@@ -460,7 +498,12 @@ export default function MapboxView() {
       el.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelectedMission(mission);
-        map.flyTo({ center: mission.coordinates as [number, number], zoom: 17, pitch: 0 });
+        map.flyTo({
+          center: mission.coordinates as [number, number],
+          zoom: 17,
+          pitch: 0,
+          duration: resolveMapCameraDuration(isMobile === true, "marker"),
+        });
       });
 
       const marker = new mapboxgl.Marker({ element: el })
@@ -480,17 +523,23 @@ export default function MapboxView() {
         markersRef.current[`technician-${tech.id}`] = marker;
       }
     }
-  }, [visibleMissions, mapReady, isDispatchMap]);
+  }, [visibleMissions, mapReady, isDispatchMap, isMobile]);
 
   const handleMobileMapResize = React.useCallback((rail: MobileHubRail) => {
     if (rail !== "center") return;
     const map = mapRef.current;
     if (!map) return;
-    try {
-      map.resize();
-    } catch {
-      /* ignore */
-    }
+    const resize = () => {
+      try {
+        map.resize();
+      } catch {
+        /* ignore */
+      }
+    };
+    resize();
+    requestAnimationFrame(resize);
+    window.setTimeout(resize, 100);
+    window.setTimeout(resize, 520);
   }, []);
 
   useEffect(() => {
@@ -522,7 +571,34 @@ export default function MapboxView() {
     }
   }, [routeLine, mapReady]);
 
-  const dashboardPageIndex = pager?.pageIndex ?? 0;
+  useEffect(() => {
+    if (!isMobile || !mapReady) return;
+    const map = mapRef.current;
+    if (!map) return;
+    const coords = visibleMissions
+      .filter((m) => m.coordinates && isValidMissionCoordinates(m.coordinates as [number, number]))
+      .map((m) => m.coordinates as [number, number]);
+    if (coords.length === 0) return;
+    if (coords.length === 1) {
+      map.flyTo({
+        center: coords[0],
+        zoom: 15,
+        duration: resolveMapCameraDuration(true, "marker"),
+      });
+      return;
+    }
+    const lngs = coords.map((c) => c[0]);
+    const lats = coords.map((c) => c[1]);
+    const bounds: mapboxgl.LngLatBoundsLike = [
+      [Math.min(...lngs), Math.min(...lats)],
+      [Math.max(...lngs), Math.max(...lats)],
+    ];
+    map.fitBounds(bounds, {
+      padding: 60,
+      maxZoom: 15,
+      duration: resolveMapCameraDuration(true, "bounds"),
+    });
+  }, [visibleMissions, isMobile, mapReady]);
 
   useEffect(() => {
     if (dashboardPageIndex !== 0) return;
@@ -542,6 +618,7 @@ export default function MapboxView() {
 
   const handleMissionClick = (mission: Mission) => {
     setSelectedMission(mission);
+    if (isMobile) requestMobileHubRail("center");
     if (inboxIntent) {
       inboxIntent.setPendingChatInterventionId(missionStableKey(mission));
     }
@@ -550,7 +627,7 @@ export default function MapboxView() {
         center: mission.coordinates,
         zoom: 17,
         pitch: 0,
-        duration: 1500,
+        duration: resolveMapCameraDuration(isMobile === true, "marker"),
       });
     }
   };
@@ -558,13 +635,12 @@ export default function MapboxView() {
   const handleRecenter = () => {
     if (!mapRef.current) return;
 
-    // Recentrer directement sur Bruxelles avec un zoom global
     mapRef.current.flyTo({
-      center: [4.3522, 50.8466], // Coordonnées de Bruxelles
-      zoom: 12.5, // Niveau de zoom pour voir toute la ville
+      center: [4.3522, 50.8466],
+      zoom: 12.5,
       pitch: 0,
       bearing: 0,
-      duration: 2000,
+      duration: resolveMapCameraDuration(isMobile === true, "recenter"),
       essential: true,
     });
   };
@@ -706,6 +782,7 @@ export default function MapboxView() {
         centerLabel={String(t("map.mobile.rail_map"))}
         rightLabel={String(t("map.mobile.rail_inbox"))}
         panelPadding={false}
+        sideScroll={false}
         onRailChange={handleMobileMapResize}
         left={
           <DailyMissions
@@ -719,13 +796,7 @@ export default function MapboxView() {
             {mapPanelInner}
           </div>
         }
-        right={
-          dashboardPageIndex === 0 ? (
-            <BackOfficeInboxPanel dayMissions={visibleMissions} />
-          ) : (
-            <RequesterTrackingPanel />
-          )
-        }
+        right={<BackOfficeInboxPanel dayMissions={visibleMissions} />}
       />
     );
   }

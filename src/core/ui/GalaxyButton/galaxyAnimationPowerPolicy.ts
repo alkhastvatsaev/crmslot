@@ -1,5 +1,7 @@
 import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
 
+export const GALAXY_STAR_COUNT = 6000;
+
 export type GalaxyAnimationProfile = {
   starCount: number;
   maxFps: number;
@@ -7,7 +9,6 @@ export type GalaxyAnimationProfile = {
   pauseWhenHidden: boolean;
   interactive: boolean;
   baseSpeed: number;
-  /** Met à jour le dégradé CSS tous les N frames (1 = chaque frame). */
   backgroundEveryNFrames: number;
 };
 
@@ -28,6 +29,34 @@ export function isMobilePowerSaveClient(
   if (hasMatchMedia("(pointer: coarse)")) return true;
   if (hasMatchMedia("(max-width: 768px)")) return true;
   return isPhoneUserAgent(userAgent);
+}
+
+function defaultProfile(starCount: number): GalaxyAnimationProfile {
+  return {
+    starCount,
+    maxFps: 60,
+    maxDevicePixelRatio: 2,
+    pauseWhenHidden: true,
+    interactive: true,
+    baseSpeed: 1,
+    backgroundEveryNFrames: 1,
+  };
+}
+
+function mobileProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
+  return {
+    /** Compact dock (≤120 étoiles, ≤20 fps) — fluide sur iPhone sans RAM excessive. */
+    starCount: 100,
+    maxFps: 20,
+    /** Retina net — l’ancien plafond à 1 provoquait le rendu pixelisé. */
+    maxDevicePixelRatio: 3,
+    pauseWhenHidden: true,
+    /** Pas de parallax / boost vitesse au toucher — évite le lag au clic. */
+    interactive: false,
+    baseSpeed: 0.5,
+    backgroundEveryNFrames: 12,
+    ...overrides,
+  };
 }
 
 export function resolveGalaxyAnimationProfile(
@@ -54,26 +83,8 @@ export function resolveGalaxyAnimationProfile(
         : isMobilePowerSaveClient();
 
   if (mobile) {
-    return {
-      starCount: 120,
-      maxFps: 20,
-      maxDevicePixelRatio: 1,
-      pauseWhenHidden: true,
-      interactive: false,
-      baseSpeed: 0.5,
-      backgroundEveryNFrames: 8,
-      ...overrides,
-    };
+    return mobileProfile(overrides);
   }
 
-  return {
-    starCount: 6000,
-    maxFps: 60,
-    maxDevicePixelRatio: 2,
-    pauseWhenHidden: true,
-    interactive: true,
-    baseSpeed: 1,
-    backgroundEveryNFrames: 1,
-    ...overrides,
-  };
+  return { ...defaultProfile(GALAXY_STAR_COUNT), ...overrides };
 }

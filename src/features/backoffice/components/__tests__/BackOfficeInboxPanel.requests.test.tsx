@@ -73,6 +73,8 @@ jest.mock("@/context/BackofficeInboxIntentContext", () => ({
     setSelectedInboxInterventionId: jest.fn(),
     pendingChatInterventionId: null,
     setPendingChatInterventionId: jest.fn(),
+    activeInboxTab: null,
+    setActiveInboxTab: jest.fn(),
   }),
 }));
 
@@ -130,6 +132,7 @@ const pendingRequest: Intervention = {
 function mockTenantWorkspace() {
   mockWorkspace.mockReturnValue({
     isTenantUser: true,
+    workspaceReady: true,
     activeCompanyId: "co-1",
     memberships: [{ companyId: "co-1", companyName: "Test Co", role: "admin" }],
     firebaseUid: "ivana-uid",

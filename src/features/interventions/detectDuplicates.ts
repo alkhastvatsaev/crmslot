@@ -1,17 +1,18 @@
 import type { Intervention } from "@/features/interventions/types";
+import {
+  clientIdentitiesConflict,
+  clientIdentityMatchHints,
+  extractClientIdentityFromIntervention,
+  jaccardTokenSimilarity,
+  normalizeAddressForDedupe,
+  type DuplicateClientIdentity,
+} from "@/features/interventions/duplicateDetectionCore";
 
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9À-ɏ\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function tokenOverlap(a: string, b: string): number {
-  const ta = new Set(normalize(a).split(" ").filter((t) => t.length > 2));
-  const tb = new Set(normalize(b).split(" ").filter((t) => t.length > 2));
-  if (ta.size === 0 || tb.size === 0) return 0;
-  let shared = 0;
-  ta.forEach((t) => { if (tb.has(t)) shared++; });
-  return shared / Math.min(ta.size, tb.size);
-}
+export type DuplicateCandidate = {
+  address: string;
+  problem: string;
+  client?: DuplicateClientIdentity;
+};
 
 export interface DuplicateMatch {
   intervention: Intervention;
@@ -19,26 +20,46 @@ export interface DuplicateMatch {
   reason: string;
 }
 
-/** Score 0–1. Threshold 0.6 → probable doublon. */
+function tokenOverlap(a: string, b: string): number {
+  const ta = normalizeAddressForDedupe(a)
+    .split(" ")
+    .filter((w) => w.length > 2);
+  const tb = normalizeAddressForDedupe(b)
+    .split(" ")
+    .filter((w) => w.length > 2);
+  if (ta.length === 0 || tb.length === 0) return 0;
+  return jaccardTokenSimilarity(a, b);
+}
+
+/** Score 0–1. Threshold 0.6 → probable doublon. Ignore si client clairement différent. */
 export function findPotentialDuplicates(
-  candidate: { address: string; problem: string },
+  candidate: DuplicateCandidate,
   existing: Intervention[],
-  threshold = 0.6,
+  threshold = 0.6
 ): DuplicateMatch[] {
   const results: DuplicateMatch[] = [];
+  const candidateClient = candidate.client ?? {};
 
   for (const iv of existing) {
     if (iv.status === "cancelled") continue;
 
+    const existingClient = extractClientIdentityFromIntervention(iv);
+    if (clientIdentitiesConflict(candidateClient, existingClient)) continue;
+
     const addrScore = tokenOverlap(candidate.address, iv.address ?? "");
-    const probScore = tokenOverlap(candidate.problem, (iv.problem ?? iv.title) ?? "");
+    const probScore = tokenOverlap(candidate.problem, iv.problem ?? iv.title ?? "");
 
     const score = addrScore * 0.6 + probScore * 0.4;
     if (score >= threshold) {
       const reasons: string[] = [];
       if (addrScore >= 0.6) reasons.push("adresse similaire");
       if (probScore >= 0.6) reasons.push("problème similaire");
-      results.push({ intervention: iv, score, reason: reasons.join(" + ") });
+      reasons.push(...clientIdentityMatchHints(candidateClient, existingClient));
+      results.push({
+        intervention: iv,
+        score,
+        reason: reasons.join(" + ") || "demande similaire",
+      });
     }
   }
 

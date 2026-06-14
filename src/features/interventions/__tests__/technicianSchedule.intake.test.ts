@@ -40,7 +40,7 @@ describe("technicianSchedule intake gate", () => {
       isInterventionVisibleOnTechnicianMap({
         ...iv("in_progress"),
         technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
-      }),
+      })
     ).toBe(true);
   });
 });
@@ -79,5 +79,27 @@ describe("interventionVisibleInTechnicianMissionList", () => {
       scheduledTime: "14:00",
     };
     expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(true);
+  });
+
+  it("keeps missions completed today visible even if not scheduled today", () => {
+    const row = {
+      ...iv("done"),
+      assignedTechnicianUid: techUid,
+      scheduledDate: "2030-01-01",
+      scheduledTime: "09:00",
+      completedAt: "2026-05-16T15:00:00.000Z",
+    };
+    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(true);
+  });
+
+  it("hides done missions completed on another day when not scheduled today", () => {
+    const row = {
+      ...iv("done"),
+      assignedTechnicianUid: techUid,
+      scheduledDate: "2030-01-01",
+      scheduledTime: "09:00",
+      completedAt: "2026-05-10T15:00:00.000Z",
+    };
+    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(false);
   });
 });

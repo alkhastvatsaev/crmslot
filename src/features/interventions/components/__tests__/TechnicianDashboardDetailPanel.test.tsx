@@ -6,7 +6,7 @@ import type { Intervention } from "@/features/interventions/types";
 jest.mock("@/features/interventions/useInterventionLive", () => ({
   useInterventionLive: jest.fn(),
   useInterventionLiveSource: jest.fn(
-    (_caseId: string | null, live?: Intervention | null) => live ?? null,
+    (_caseId: string | null, live?: Intervention | null) => live ?? null
   ),
 }));
 
@@ -41,15 +41,15 @@ function iv(partial: Partial<Intervention> = {}): Intervention {
 
 describe("TechnicianDashboardDetailPanel", () => {
   it("shows scroll region and description without finish overlay layer", () => {
-    render(
-      <TechnicianDashboardDetailPanel caseId="iv-detail-1" liveIntervention={iv()} />,
-    );
+    render(<TechnicianDashboardDetailPanel caseId="iv-detail-1" liveIntervention={iv()} />);
 
     expect(screen.getByTestId("technician-dashboard-detail")).toBeInTheDocument();
     const body = screen.getByTestId("technician-detail-scroll");
     expect(body).toBeInTheDocument();
     expect(body).toHaveClass("overflow-hidden");
-    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent("Cylindre cassé");
+    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent(
+      "Cylindre cassé"
+    );
     expect(screen.getByTestId("technician-detail-client-name")).toBeInTheDocument();
     expect(screen.queryByTestId("technician-finish-job-layer")).not.toBeInTheDocument();
     expect(screen.getByTestId("mission-action-bar")).toBeInTheDocument();
@@ -61,16 +61,38 @@ describe("TechnicianDashboardDetailPanel", () => {
         caseId="iv-detail-1"
         technicianUid="demo-tech-local"
         liveIntervention={iv({ status: "assigned", assignedTechnicianUid: "demo-tech-local" })}
-      />,
+      />
     );
 
     expect(screen.queryByTestId("technician-assignment-detail-banner")).not.toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-respond-bar")).toBeInTheDocument();
     expect(screen.getByTestId("technician-assignment-accept")).toBeInTheDocument();
     expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
-    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent("Cylindre cassé");
-    expect(screen.getByTestId("technician-detail-client-name")).toHaveClass("technician-detail-client-name");
+    expect(screen.getByTestId("technician-detail-description-text")).toHaveTextContent(
+      "Cylindre cassé"
+    );
+    expect(screen.getByTestId("technician-detail-client-name")).toHaveClass(
+      "technician-detail-client-name"
+    );
     expect(screen.queryByText("Description")).not.toBeInTheDocument();
+  });
+
+  it("shows IVANA rejection banner when report was sent back", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          reportRejectionReason: "Photos manquantes",
+          reportRejectedAt: "2026-05-16T12:00:00.000Z",
+        })}
+      />
+    );
+
+    expect(screen.getByTestId("technician-report-rejected-banner")).toHaveTextContent(
+      "Photos manquantes"
+    );
+    expect(screen.getByTestId("mission-action-bar")).toBeInTheDocument();
   });
 
   it("shows edit report CTA for done mission amendable by technician", () => {
@@ -83,7 +105,7 @@ describe("TechnicianDashboardDetailPanel", () => {
           assignedTechnicianUid: "demo-tech-local",
           completedAt: "2026-05-16T10:00:00.000Z",
         })}
-      />,
+      />
     );
 
     expect(screen.getByTestId("technician-detail-done-badge")).toBeInTheDocument();

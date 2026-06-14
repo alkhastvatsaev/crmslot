@@ -1,10 +1,4 @@
-import {
-  collection,
-  doc,
-  type Firestore,
-  writeBatch,
-  type WriteBatch,
-} from "firebase/firestore";
+import { collection, doc, type Firestore, writeBatch, type WriteBatch } from "firebase/firestore";
 import type { Intervention } from "@/features/interventions/types";
 import {
   actorMayTransition,
@@ -16,15 +10,17 @@ import type {
   InterventionStatusEvent,
   TransitionActor,
 } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { dispatchStatusNotifications } from "@/features/notifications/dispatchStatusNotifications";
+import {
+  loadClientNotificationPreferences,
+  loadStaffNotificationPreferences,
+} from "@/features/notifications/loadNotificationPreferences";
 
 export type TransitionInterventionStatusParams = {
   db: Firestore;
   interventionId: string;
-  iv: Pick<
-    Intervention,
-    "status" | "assignedTechnicianUid" | "createdByUid" | "companyId"
-  >;
+  iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "createdByUid" | "companyId">;
   toStatus: Intervention["status"];
   actor: TransitionActor;
   note?: string;
@@ -33,7 +29,17 @@ export type TransitionInterventionStatusParams = {
   /** Si false, n’écrit pas les alertes inbox (tests / offline). */
   writeInboxAlerts?: boolean;
   /** Données intervention complètes pour les notifications email (optionnel). */
-  interventionSnapshot?: Pick<Intervention, "clientName" | "clientFirstName" | "clientLastName" | "clientPhone" | "address" | "title" | "scheduledDate" | "scheduledTime">;
+  interventionSnapshot?: Pick<
+    Intervention,
+    | "clientName"
+    | "clientFirstName"
+    | "clientLastName"
+    | "clientPhone"
+    | "address"
+    | "title"
+    | "scheduledDate"
+    | "scheduledTime"
+  >;
   /** Nom du technicien assigné (affiché dans les emails). */
   technicianName?: string;
 };
@@ -41,7 +47,7 @@ export type TransitionInterventionStatusParams = {
 function appendStatusEventToBatch(
   batch: WriteBatch,
   db: Firestore,
-  event: Omit<InterventionStatusEvent, "id">,
+  event: Omit<InterventionStatusEvent, "id">
 ): string {
   const eventRef = doc(collection(db, "interventions", event.interventionId, "status_events"));
   batch.set(eventRef, {
@@ -68,7 +74,7 @@ function appendInboxAlertsToBatch(
     actorUid: string;
     targets: string[];
     at: string;
-  },
+  }
 ): void {
   for (const targetUid of params.targets) {
     const alertRef = doc(collection(db, "users", targetUid, "intervention_alerts"));
@@ -88,7 +94,7 @@ function appendInboxAlertsToBatch(
  * Met à jour le statut, le responsable courant, journalise l’événement et notifie les parties prenantes.
  */
 export async function transitionInterventionStatus(
-  params: TransitionInterventionStatusParams,
+  params: TransitionInterventionStatusParams
 ): Promise<InterventionStatusEvent> {
   const {
     db,
@@ -150,17 +156,71 @@ export async function transitionInterventionStatus(
 
   await batch.commit();
 
-  // Fire-and-forget email/SMS notifications (never blocks the workflow)
-  if (writeInboxAlerts && params.interventionSnapshot) {
-    void dispatchStatusNotifications({
-      fromStatus,
-      toStatus,
-      intervention: {
-        id: interventionId,
-        ...params.interventionSnapshot,
-      },
-      technicianName: params.technicianName,
+  const companyId = iv.companyId?.trim();
+  if (companyId && fromStatus !== toStatus) {
+    void fetchWithAuth(
+      `/api/interventions/${encodeURIComponent(interventionId)}/dispatch-status-webhook`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fromStatus, toStatus, at }),
+      }
+    ).catch(() => {
+      // Webhooks sortants ne doivent jamais bloquer la transition.
     });
+  }
+
+  // Fire-and-forget email/SMS notifications (never blocks the workflow)
+  const notificationSnapshot = params.interventionSnapshot;
+  if (writeInboxAlerts && notificationSnapshot) {
+    void (async () => {
+      let clientPreferences = null;
+      let technicianPreferences = null;
+      let dispatcherPreferences = null;
+      const clientUid = iv.createdByUid?.trim();
+      const techUid = iv.assignedTechnicianUid?.trim();
+      if (clientUid) {
+        try {
+          clientPreferences = await loadClientNotificationPreferences(db, clientUid);
+        } catch {
+          // Préférences absentes → comportement historique (tout activé).
+        }
+      }
+      if (techUid) {
+        try {
+          technicianPreferences = await loadStaffNotificationPreferences(db, techUid);
+        } catch {
+          // idem
+        }
+      }
+      if (actor.uid?.trim()) {
+        try {
+          dispatcherPreferences = await loadStaffNotificationPreferences(db, actor.uid.trim());
+        } catch {
+          // idem
+        }
+      }
+      const snapshot = notificationSnapshot;
+      await dispatchStatusNotifications({
+        fromStatus,
+        toStatus,
+        intervention: {
+          id: interventionId,
+          title: snapshot.title ?? "",
+          address: snapshot.address ?? "",
+          clientName: snapshot.clientName,
+          clientFirstName: snapshot.clientFirstName,
+          clientLastName: snapshot.clientLastName,
+          clientPhone: snapshot.clientPhone,
+          scheduledDate: snapshot.scheduledDate,
+          scheduledTime: snapshot.scheduledTime,
+        },
+        technicianName: params.technicianName,
+        clientPreferences,
+        technicianPreferences,
+        dispatcherPreferences,
+      });
+    })();
   }
 
   return { id: eventId, ...eventPayload };

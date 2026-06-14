@@ -55,9 +55,7 @@ export const DASHBOARD_HEADER_HEIGHT_PX = 70;
 export const DASHBOARD_VIEWPORT_MIN_WIDTH_PX = 768;
 
 export const DASHBOARD_TRACK_MIN_WIDTH_PX =
-  DASHBOARD_RAIL_MIN_WIDTH_PX * 2 +
-  DASHBOARD_CENTER_MIN_WIDTH_PX +
-  DASHBOARD_GRID_GAP_PX * 2;
+  DASHBOARD_RAIL_MIN_WIDTH_PX * 2 + DASHBOARD_CENTER_MIN_WIDTH_PX + DASHBOARD_GRID_GAP_PX * 2;
 
 /** @deprecated */
 export const DASHBOARD_CANVAS_MIN_WIDTH_PX = DASHBOARD_TRACK_MIN_WIDTH_PX;
@@ -93,9 +91,6 @@ export const DASHBOARD_DESKTOP_STACK_HEADER_CLASS = "dashboard-desktop-stack-hea
 export const DASHBOARD_DESKTOP_STACK_BODY_CLASS = "dashboard-desktop-stack-body";
 
 export const DASHBOARD_DESKTOP_OVERLAY_ROOT_CLASS = "dashboard-desktop-overlay-root";
-
-/** Flèches prev/next — au-dessus du pager (z-30), dans les gouttières latérales. */
-export const DASHBOARD_DESKTOP_PAGER_CONTROLS_CLASS = "dashboard-desktop-pager-controls";
 
 /** Same grid template as header/body; chrome is column 2 (map rail). */
 export const DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS = "dashboard-desktop-galaxy-dock";
@@ -147,7 +142,8 @@ export const DASHBOARD_DESKTOP_PAGER_OFFSET_CLASS = "";
 export const DASHBOARD_DESKTOP_HEADER_WRAPPER_CLASS = DASHBOARD_DESKTOP_STACK_HEADER_CLASS;
 
 /** Rails fill grid row height */
-export const DASHBOARD_DESKTOP_RAIL_HEIGHT_CLASS = "h-full min-h-[min(56dvh,680px)] max-h-[min(72dvh,760px)]";
+export const DASHBOARD_DESKTOP_RAIL_HEIGHT_CLASS =
+  "h-full min-h-[min(56dvh,680px)] max-h-[min(72dvh,760px)]";
 
 export const dashboardHeaderPanelShellClass = glassPanelShellClass({
   bg: "bg-white/70",

@@ -208,6 +208,25 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      /** Webhooks sortants (flag outboundWebhooks) — admin société (secret non lisible par collaborateurs). */
+      match /webhookEndpoints/{endpointId} {
+        allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
+        allow create: if canAccessCompanyHubData(companyId)
+          && userRoleInCompany(companyId) == 'admin'
+          && request.resource.data.companyId == companyId
+          && request.resource.data.keys().hasAll(['url', 'secret', 'events', 'isActive']);
+        allow update: if canAccessCompanyHubData(companyId)
+          && userRoleInCompany(companyId) == 'admin'
+          && request.resource.data.companyId == companyId;
+        allow delete: if false;
+      }
+
+      /** Journal livraisons webhooks — lecture admin, écriture Admin SDK uniquement. */
+      match /webhookDeliveries/{deliveryId} {
+        allow read: if userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin';
+        allow write: if false;
+      }
+
       /** Feuilles de temps technicien — propriétaire ou staff société. */
       match /timeEntries/{entryId} {
         allow read: if isAuthed()
@@ -240,6 +259,18 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/companies/$(companyId)).data.createdByUid == request.auth.uid
         && request.resource.data.keys().hasAll(['role', 'joinedAt', 'companyName']);
       allow update, delete: if false;
+    }
+
+    /** Préférences notifications staff — doc racine `users/{uid}`. */
+    match /users/{userId} {
+      allow read: if isAuthed() && request.auth.uid == userId;
+      allow create: if isAuthed()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['notificationPreferences']);
+      allow update: if isAuthed()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notificationPreferences']);
+      allow delete: if false;
     }
 
     /** Jetons Web Push FCM — uniquement le propriétaire Auth peut les gérer. */

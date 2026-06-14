@@ -1,6 +1,8 @@
 import {
+  canConsumeVerticalScroll,
   isMobileStripCentered,
   resolveMobileScrollAxis,
+  shouldRouteVerticalSwipeToPage,
 } from "@/features/dashboard/mobileNestedScrollGesture";
 
 describe("mobileNestedScrollGesture", () => {
@@ -15,6 +17,32 @@ describe("mobileNestedScrollGesture", () => {
 
     it("verrouille horizontal si dx domine", () => {
       expect(resolveMobileScrollAxis(24, 6)).toBe("x");
+    });
+  });
+
+  describe("shouldRouteVerticalSwipeToPage", () => {
+    function scrollable(top: number, height = 200, total = 600) {
+      const el = document.createElement("div");
+      Object.defineProperty(el, "clientHeight", { configurable: true, value: height });
+      Object.defineProperty(el, "scrollHeight", { configurable: true, value: total });
+      el.scrollTop = top;
+      return el;
+    }
+
+    it("autorise le swipe sans panneau scrollable", () => {
+      expect(shouldRouteVerticalSwipeToPage(null, -60)).toBe(true);
+    });
+
+    it("autorise page suivante en bas de liste + swipe haut", () => {
+      const el = scrollable(400);
+      expect(shouldRouteVerticalSwipeToPage(el, -60)).toBe(true);
+      expect(canConsumeVerticalScroll(el, -60)).toBe(false);
+    });
+
+    it("bloque au milieu de liste", () => {
+      const el = scrollable(200);
+      expect(shouldRouteVerticalSwipeToPage(el, -60)).toBe(false);
+      expect(shouldRouteVerticalSwipeToPage(el, 60)).toBe(false);
     });
   });
 

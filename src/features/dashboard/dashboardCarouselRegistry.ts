@@ -3,6 +3,7 @@ import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstant
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
+import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 
 /** Rôle affiché sous le nom dans le header (clé i18n `profiles.roles.*`). */
 export type DashboardCarouselRoleKey = "back_office" | "client" | "technician" | "admin";
@@ -25,13 +26,14 @@ export type DashboardCarouselPageDef = {
     | "spotlight.nav_gmail"
     | "spotlight.nav_feature_hub"
     | "spotlight.nav_crm_history"
-    | "spotlight.nav_billing_hub";
+    | "spotlight.nav_billing_hub"
+    | "spotlight.nav_offline";
   guideTitle: string;
   guideHint: string;
 };
 
 /**
- * Source unique — ordre = carrousel `src/app/page.tsx` (7 pages, sans Chatbot).
+ * Source unique — ordre = carrousel `src/app/page.tsx` (8 pages, sans Chatbot).
  * Toute entrée UI (header IVANA/GMAIL/…, spotlight, aide page) doit s’y caler.
  */
 export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
@@ -94,11 +96,20 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideTitle: "Gmail",
     guideHint: "Boîte mail PWA et pièces jointes.",
   },
+  {
+    slotIndex: OFFLINE_HUB_SLOT_INDEX,
+    inCarouselNav: false,
+    profileName: "ASSISTANT IA",
+    profileRoleKey: "technician",
+    spotlightLabelKey: "spotlight.nav_offline",
+    guideTitle: "Assistant IA",
+    guideHint: "Copilote IA — dossiers, clients, suggestions intelligentes et chat contextuel.",
+  },
 ] as const;
 
 export const DASHBOARD_CAROUSEL_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGES.length;
 
-/** Indices accessibles par flèches carrousel (header + `DashboardPagerControls`). */
+/** Indices accessibles par navigation carrousel séquentielle (`goNext` / `goPrev`). */
 export const DASHBOARD_CAROUSEL_NAV_SLOT_INDICES: readonly number[] =
   DASHBOARD_CAROUSEL_PAGES.filter((page) => page.inCarouselNav !== false).map(
     (page) => page.slotIndex
@@ -146,6 +157,18 @@ export function stepDashboardCarouselNavIndex(
   return nav[(pos - 1 + nav.length) % nav.length] ?? pageIndex;
 }
 
+/** Swipe mobile : toutes les pages 0…N−1 (aligné tab bar / sélecteur). */
+export function stepDashboardLinearPageIndex(
+  pageIndex: number,
+  direction: "next" | "prev",
+  pageCount: number = DASHBOARD_CAROUSEL_PAGE_COUNT
+): number {
+  const count = Math.max(1, Math.floor(pageCount));
+  const clamped = Math.min(Math.max(0, pageIndex), count - 1);
+  if (direction === "next") return (clamped + 1) % count;
+  return (clamped - 1 + count) % count;
+}
+
 /** Vérifie que les constantes hub correspondent aux indices du registre. */
 export function assertDashboardCarouselSlotAlignment(): void {
   const expected = [
@@ -156,6 +179,7 @@ export function assertDashboardCarouselSlotAlignment(): void {
     CRM_HISTORY_SLOT_INDEX,
     BILLING_HUB_SLOT_INDEX,
     GMAIL_HUB_SLOT_INDEX,
+    OFFLINE_HUB_SLOT_INDEX,
   ];
   DASHBOARD_CAROUSEL_PAGES.forEach((page, i) => {
     if (page.slotIndex !== i) {

@@ -66,7 +66,7 @@ export function CompanyHubInvoiceTab({ interventionId }: Props) {
   const { t } = useTranslation();
   const chatbotCtx = useChatbotContextOptional();
   const { profile } = useRequesterHub();
-  const { interventions, loading } = useRequesterPortalInterventions(profile.lastName);
+  const { interventions, loading } = useRequesterPortalInterventions(profile);
 
   const activeIntervention = useMemo(() => {
     if (interventionId) {

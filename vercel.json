@@ -8,6 +8,18 @@
     {
       "path": "/api/maintenance/generate-due",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/appointment-reminders",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/auto-agent",
+      "schedule": "0 9 * * *"
     }
   ]
 }

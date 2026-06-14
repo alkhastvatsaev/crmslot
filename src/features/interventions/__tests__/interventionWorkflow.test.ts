@@ -49,9 +49,7 @@ describe("interventionWorkflow", () => {
 
   it("allows technician to reopen done → in_progress", () => {
     expect(canTransitionInterventionStatus("done", "in_progress")).toBe(true);
-    expect(
-      actorMayTransition({ uid: "t1", role: "technician" }, "done", "in_progress"),
-    ).toBe(true);
+    expect(actorMayTransition({ uid: "t1", role: "technician" }, "done", "in_progress")).toBe(true);
     const owner = resolveOwnerAfterTransition("in_progress", {
       assignedTechnicianUid: "tech-1",
       createdByUid: "creator-1",
@@ -59,35 +57,30 @@ describe("interventionWorkflow", () => {
     expect(owner).toEqual({ currentOwnerUid: "tech-1", currentOwnerRole: "technician" });
   });
 
+  it("allows technician to invoice after done", () => {
+    expect(canTransitionInterventionStatus("done", "invoiced")).toBe(true);
+    expect(actorMayTransition({ uid: "t1", role: "technician" }, "done", "invoiced")).toBe(true);
+  });
+
+  it("allows dispatcher to send done report back to technician", () => {
+    expect(actorMayTransition({ uid: "d1", role: "dispatcher" }, "done", "in_progress")).toBe(true);
+  });
+
   it("restricts technician transitions", () => {
-    expect(
-      actorMayTransition(
-        { uid: "t1", role: "technician" },
-        "en_route",
-        "in_progress",
-      ),
-    ).toBe(true);
-    expect(
-      actorMayTransition(
-        { uid: "t1", role: "technician" },
-        "pending",
-        "assigned",
-      ),
-    ).toBe(false);
-    expect(
-      actorMayTransition(
-        { uid: "d1", role: "dispatcher" },
-        "pending",
-        "assigned",
-      ),
-    ).toBe(true);
+    expect(actorMayTransition({ uid: "t1", role: "technician" }, "en_route", "in_progress")).toBe(
+      true
+    );
+    expect(actorMayTransition({ uid: "t1", role: "technician" }, "pending", "assigned")).toBe(
+      false
+    );
+    expect(actorMayTransition({ uid: "d1", role: "dispatcher" }, "pending", "assigned")).toBe(true);
   });
 
   it("notifies assignee on assignment", () => {
     const targets = statusChangeNotificationTargets(
       { assignedTechnicianUid: "tech-1", createdByUid: "client-1" },
       "assigned",
-      "dispatcher-1",
+      "dispatcher-1"
     );
     expect(targets).toContain("tech-1");
     expect(targets).not.toContain("dispatcher-1");

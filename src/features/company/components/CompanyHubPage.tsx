@@ -17,20 +17,28 @@ import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLay
 import { HUB_RAIL_BODY_CLASS, HubSegmentedControl } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-/** Même pas que la grille desktop (`DASHBOARD_DESKTOP_PANEL_GAP_CLASS`) — rythme équidistant. */
-const railGap = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS} pb-4`;
+/** Rails hub — remplissent la hauteur vitre sans marge basse (évite le rectangle blanc). */
+const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
-import { CompanyHubTimelineTab } from "@/features/company/components/CompanyHubTimelineTab";
-import { CompanyHubDocumentsTab } from "@/features/company/components/CompanyHubDocumentsTab";
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
-type CompanyHubRightCategory = "tracking" | "chat" | "invoice" | "timeline" | "documents";
+type CompanyHubRightCategory = "tracking" | "chat" | "invoice";
+
+const PORTAL_RIGHT_TABS: readonly CompanyHubRightCategory[] = ["tracking", "chat", "invoice"];
+
+function normalizePortalRightTab(
+  tab: "tracking" | "chat" | "invoice" | "documents" | "timeline"
+): CompanyHubRightCategory {
+  return PORTAL_RIGHT_TABS.includes(tab as CompanyHubRightCategory)
+    ? (tab as CompanyHubRightCategory)
+    : "tracking";
+}
 
 /** Interface Demandeur (Page 2) — Qui demande, Que faut-il réparer, Où en est ma demande. */
 export default function CompanyHubPage() {
-  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("documents");
+  const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("tracking");
   const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
   const { logNote } = useActivityLog();
@@ -46,7 +54,7 @@ export default function CompanyHubPage() {
   useEffect(() => {
     if (!portalRightTab) return;
     scheduleEffectUpdate(() => {
-      setRightCategory(portalRightTab as CompanyHubRightCategory);
+      setRightCategory(normalizePortalRightTab(portalRightTab));
       setPortalRightTab(null);
     });
   }, [portalRightTab, setPortalRightTab]);
@@ -64,14 +72,14 @@ export default function CompanyHubPage() {
     <section
       id={COMPANY_HUB_ANCHOR_WORKSPACE}
       data-testid="company-hub-rail-demande"
-      className={`${railGap} scroll-mt-2`}
+      className={`${railBody} scroll-mt-2`}
     >
       <RequesterProfilePanel />
     </section>
   );
 
   const centerPanel = (
-    <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railGap} scroll-mt-2`}>
+    <section id={COMPANY_HUB_ANCHOR_SMART_FORM} className={`${railBody} scroll-mt-2`}>
       <RequesterInterventionPanel />
     </section>
   );
@@ -109,18 +117,6 @@ export default function CompanyHubPage() {
             testId: "company-hub-right-tab-invoice",
             activeAccent: "slate",
           },
-          {
-            id: "documents",
-            label: t("company_hub.right_tabs.documents"),
-            testId: "company-hub-right-tab-documents",
-            activeAccent: "rose",
-          },
-          {
-            id: "timeline",
-            label: t("company_hub.right_tabs.timeline"),
-            testId: "company-hub-right-tab-timeline",
-            activeAccent: "emerald",
-          },
         ]}
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden" role="tabpanel">
@@ -133,12 +129,8 @@ export default function CompanyHubPage() {
             chatCompanyId={ivanaChatCompanyId}
             chatInterventionId={portalCaseId}
           />
-        ) : rightCategory === "invoice" ? (
-          <CompanyHubInvoiceTab interventionId={portalCaseId} />
-        ) : rightCategory === "documents" ? (
-          <CompanyHubDocumentsTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
         ) : (
-          <CompanyHubTimelineTab interventionId={portalCaseId} companyId={ivanaChatCompanyId} />
+          <CompanyHubInvoiceTab interventionId={portalCaseId} />
         )}
       </div>
     </section>

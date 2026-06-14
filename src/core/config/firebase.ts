@@ -39,6 +39,14 @@ const isConfigured = !!firebaseConfig.projectId;
 
 const app = isConfigured ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)) : null;
 
+/** Auth CRM / back-office — ne pas utiliser pour la connexion client hub société. */
+const CLIENT_PORTAL_APP_NAME = "clientPortal";
+const clientPortalApp = app
+  ? getApps().some((a) => a.name === CLIENT_PORTAL_APP_NAME)
+    ? getApp(CLIENT_PORTAL_APP_NAME)
+    : initializeApp(firebaseConfig, CLIENT_PORTAL_APP_NAME)
+  : null;
+
 const db: Database | null = app && realtimeDatabaseUrl ? getDatabase(app) : null;
 
 /**
@@ -69,6 +77,10 @@ function getOrInitFirestore(firebaseApp: FirebaseApp): Firestore {
 const firestore = app ? getOrInitFirestore(app) : null;
 
 const auth = app ? getAuth(app) : null;
+/** Auth portail client (hub société) — session isolée du CRM admin sur le même onglet. */
+const clientPortalAuth = clientPortalApp ? getAuth(clientPortalApp) : null;
+/** Firestore lié à `clientPortalAuth` (même jeton que la connexion portail client). */
+const clientPortalFirestore = clientPortalApp ? getOrInitFirestore(clientPortalApp) : null;
 const storage = app ? getStorage(app) : null;
 
 /** Persistence IndexedDB : utile en prod PWA ; en dev/HMR elle amplifie les races listener (assertion ca9). */
@@ -82,4 +94,14 @@ if (typeof window !== "undefined" && firestore && process.env.NODE_ENV === "prod
   });
 }
 
-export { app, db, firestore, auth, storage, isConfigured };
+export {
+  app,
+  clientPortalApp,
+  db,
+  firestore,
+  clientPortalFirestore,
+  auth,
+  clientPortalAuth,
+  storage,
+  isConfigured,
+};

@@ -32,7 +32,7 @@ type CompletionUploadParams = {
 };
 
 async function uploadCompletionAssets(
-  params: CompletionUploadParams,
+  params: CompletionUploadParams
 ): Promise<{ photoUrls: string[]; sigUrl: string }> {
   const { interventionId, photoDataUrls, signaturePngDataUrl } = params;
   const st = storage;
@@ -57,9 +57,9 @@ async function uploadCompletionAssets(
           return getDownloadURL(r);
         })(),
         UPLOAD_FILE_TIMEOUT_MS,
-        `Envoi photo ${i + 1}`,
+        `Envoi photo ${i + 1}`
       );
-    }),
+    })
   );
 
   const sigBlob = dataUrlToBlob(signaturePngDataUrl);
@@ -70,7 +70,7 @@ async function uploadCompletionAssets(
       return getDownloadURL(sigRef);
     })(),
     UPLOAD_FILE_TIMEOUT_MS,
-    "Envoi signature",
+    "Envoi signature"
   );
 
   return { photoUrls, sigUrl };
@@ -101,7 +101,7 @@ export async function performCompletionAmend(params: CompletionUploadParams): Pr
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
-      },
+      }
     );
     const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
     if (!res.ok) {
@@ -113,7 +113,7 @@ export async function performCompletionAmend(params: CompletionUploadParams): Pr
   await withTimeout(
     updateDoc(doc(fs, "interventions", interventionId), patch),
     FIRESTORE_UPDATE_TIMEOUT_MS,
-    "Mise à jour du rapport",
+    "Mise à jour du rapport"
   );
 }
 
@@ -160,10 +160,12 @@ export async function performCompletionUpload(params: CompletionUploadParams): P
         completionSignatureUrl: sigUrl,
         completedAt,
         completedByUid: uid,
+        reportRejectionReason: null,
+        reportRejectedAt: null,
       },
       writeInboxAlerts: false,
     }),
     FIRESTORE_UPDATE_TIMEOUT_MS,
-    "Mise à jour du dossier",
+    "Mise à jour du dossier"
   );
 }

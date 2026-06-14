@@ -11,11 +11,13 @@ import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
+import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
 import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuthEffects";
@@ -30,6 +32,7 @@ import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext"
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
 import { CrmHistoryAgentBridgeProvider } from "@/context/CrmHistoryAgentBridgeContext";
 import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeContext";
+import { PwaCopilotAgentBridgeProvider } from "@/context/PwaCopilotAgentBridgeContext";
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
@@ -90,6 +93,11 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
   loading: () => null,
 });
 
+const OfflineHubPage = dynamic(
+  () => import("@/features/offline/components/TechnicianOfflineHubPage"),
+  { ssr: false, loading: () => null }
+);
+
 const desktopHeader = (
   <>
     <aside
@@ -106,12 +114,12 @@ const desktopHeader = (
     <aside
       className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
     >
-      <UserProfile />
+      <UserProfile interactive />
     </aside>
   </>
 );
 
-/** Écran d'accueil — **7 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail. */
+/** Écran d'accueil — **8 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail · Assistant IA. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
 
@@ -140,6 +148,9 @@ export default function Dashboard() {
       <ErrorBoundary key="gmail-hub" name="gmail-hub">
         <GmailHubPage slotIndex={GMAIL_HUB_SLOT_INDEX} />
       </ErrorBoundary>,
+      <ErrorBoundary key="offline-hub" name="offline-hub">
+        <OfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
     ],
     []
   );
@@ -153,64 +164,70 @@ export default function Dashboard() {
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={dashboardPages.length}>
-                <ChatbotProvider>
-                  <RequesterHubProvider>
-                    <ClientPortalPushProvider>
-                      <TechnicianQueryProvider>
-                        <OfflineSyncProvider>
-                          <TechnicianCaseIntentProvider>
-                            <BackofficeInboxIntentProvider>
-                              <CompanyStockIntentProvider>
-                                <CompanyStockAgentBridgeProvider>
-                                  <CrmHistoryAgentBridgeProvider>
-                                    <BillingHubAgentBridgeProvider>
-                                      <BillingHubIntentProvider>
-                                        <TechnicianBackofficeReportBridgeProvider>
-                                          <TechnicianFinishJobProvider>
-                                            <Suspense fallback={null}>
-                                              <TechnicianNotificationBootstrap />
-                                            </Suspense>
-                                            <ClientPortalAuthEffects />
-                                            <Suspense fallback={null}>
-                                              <ClientPortalNotificationBootstrap />
-                                              <ClientPortalPaymentReturnEffects />
-                                            </Suspense>
-                                            <AuthActivityLogger />
-                                            <ActivityLogPageObserver />
+                <DashboardPageSelectorProvider>
+                  <ChatbotProvider>
+                    <RequesterHubProvider>
+                      <ClientPortalPushProvider>
+                        <TechnicianQueryProvider>
+                          <OfflineSyncProvider>
+                            <TechnicianCaseIntentProvider>
+                              <BackofficeInboxIntentProvider>
+                                <CompanyStockIntentProvider>
+                                  <CompanyStockAgentBridgeProvider>
+                                    <CrmHistoryAgentBridgeProvider>
+                                      <BillingHubAgentBridgeProvider>
+                                        <PwaCopilotAgentBridgeProvider>
+                                          <BillingHubIntentProvider>
+                                            <TechnicianBackofficeReportBridgeProvider>
+                                              <TechnicianFinishJobProvider>
+                                                <Suspense fallback={null}>
+                                                  <TechnicianNotificationBootstrap />
+                                                </Suspense>
+                                                <ClientPortalAuthEffects />
+                                                <Suspense fallback={null}>
+                                                  <ClientPortalNotificationBootstrap />
+                                                  <ClientPortalPaymentReturnEffects />
+                                                </Suspense>
+                                                <AuthActivityLogger />
+                                                <ActivityLogPageObserver />
 
-                                            {isMobile === null ? (
-                                              <div
-                                                data-testid="mobile-detection-loading"
-                                                className="flex min-h-dvh items-center justify-center bg-slate-50"
-                                              >
-                                                <div
-                                                  className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
-                                                  aria-hidden
-                                                />
-                                              </div>
-                                            ) : isMobile ? (
-                                              <MobileShell pages={dashboardPages} />
-                                            ) : (
-                                              <DashboardDesktopShell
-                                                header={desktopHeader}
-                                                pager={<DashboardPager pages={dashboardPages} />}
-                                                galaxy={<DashboardGalaxyLayer />}
-                                              />
-                                            )}
-                                          </TechnicianFinishJobProvider>
-                                        </TechnicianBackofficeReportBridgeProvider>
-                                      </BillingHubIntentProvider>
-                                    </BillingHubAgentBridgeProvider>
-                                  </CrmHistoryAgentBridgeProvider>
-                                </CompanyStockAgentBridgeProvider>
-                              </CompanyStockIntentProvider>
-                            </BackofficeInboxIntentProvider>
-                          </TechnicianCaseIntentProvider>
-                        </OfflineSyncProvider>
-                      </TechnicianQueryProvider>
-                    </ClientPortalPushProvider>
-                  </RequesterHubProvider>
-                </ChatbotProvider>
+                                                {isMobile === null ? (
+                                                  <div
+                                                    data-testid="mobile-detection-loading"
+                                                    className="flex min-h-dvh items-center justify-center bg-slate-50"
+                                                  >
+                                                    <div
+                                                      className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
+                                                      aria-hidden
+                                                    />
+                                                  </div>
+                                                ) : isMobile ? (
+                                                  <MobileShell pages={dashboardPages} />
+                                                ) : (
+                                                  <DashboardDesktopShell
+                                                    header={desktopHeader}
+                                                    pager={
+                                                      <DashboardPager pages={dashboardPages} />
+                                                    }
+                                                    galaxy={<DashboardGalaxyLayer />}
+                                                  />
+                                                )}
+                                              </TechnicianFinishJobProvider>
+                                            </TechnicianBackofficeReportBridgeProvider>
+                                          </BillingHubIntentProvider>
+                                        </PwaCopilotAgentBridgeProvider>
+                                      </BillingHubAgentBridgeProvider>
+                                    </CrmHistoryAgentBridgeProvider>
+                                  </CompanyStockAgentBridgeProvider>
+                                </CompanyStockIntentProvider>
+                              </BackofficeInboxIntentProvider>
+                            </TechnicianCaseIntentProvider>
+                          </OfflineSyncProvider>
+                        </TechnicianQueryProvider>
+                      </ClientPortalPushProvider>
+                    </RequesterHubProvider>
+                  </ChatbotProvider>
+                </DashboardPageSelectorProvider>
               </DashboardPagerProvider>
             </GalaxyLayerBridgeProvider>
           </CompanyWorkspaceProvider>

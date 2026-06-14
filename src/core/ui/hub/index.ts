@@ -13,8 +13,8 @@ export {
   type HubBadgeAccent,
 } from "@/core/ui/hub/hubTheme";
 export { default as HubActionBar } from "@/core/ui/hub/HubActionBar";
-export { default as HubButton, hubButtonClassName } from "@/core/ui/hub/HubButton";
-export type { HubButtonVariant } from "@/core/ui/hub/HubButton";
+export { hubButtonClassName, type HubButtonVariant } from "@/core/ui/hub/hubButtonClassName";
+export { default as HubButton } from "@/core/ui/hub/HubButton";
 export { default as HubCard } from "@/core/ui/hub/HubCard";
 export { default as HubDetailHeader } from "@/core/ui/hub/HubDetailHeader";
 export { default as HubFilterChips } from "@/core/ui/hub/HubFilterChips";

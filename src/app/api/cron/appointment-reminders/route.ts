@@ -1,0 +1,82 @@
+import "@/core/config/firebase-admin";
+import { NextResponse } from "next/server";
+import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
+import {
+  buildReminderMessage,
+  findDueReminders,
+} from "@/features/notifications/appointmentReminders";
+import type { Intervention } from "@/features/interventions/types";
+
+export const runtime = "nodejs";
+
+/**
+ * GET /api/cron/appointment-reminders — rappels client 24h / 2h / 30min avant RDV.
+ * Auth : Bearer CRON_SECRET (Vercel Cron).
+ */
+export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  const bearer = request.headers.get("authorization")?.trim();
+  const headerSecret = request.headers.get("x-cron-secret")?.trim();
+  const isAuthorizedCron =
+    Boolean(cronSecret) && (bearer === `Bearer ${cronSecret}` || headerSecret === cronSecret);
+
+  if (!isAuthorizedCron) {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
+  if (!isFirebaseAdminReady()) {
+    return NextResponse.json(
+      { ok: false, error: "Firebase Admin not configured" },
+      { status: 503 }
+    );
+  }
+
+  const db = getAdminDb();
+  const snap = await db
+    .collection("interventions")
+    .where("status", "in", ["assigned", "en_route", "in_progress"])
+    .get();
+
+  const interventions = snap.docs.map((d) => ({ ...(d.data() as Intervention), id: d.id }));
+  const due = findDueReminders(interventions);
+  let sent = 0;
+
+  for (const candidate of due) {
+    const reminderType = candidate.reminderType;
+    const interventionId = candidate.intervention.id;
+    const msg = buildReminderMessage(candidate);
+    try {
+      const base =
+        process.env.NEXT_PUBLIC_BASE_URL ??
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+      const res = await fetch(`${base}/api/notifications/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: "sms",
+          recipientRole: "client",
+          subjectKey: "appointment_reminder",
+          bodyKey: "appointment_reminder_body",
+          variables: {
+            subject: msg.subject,
+            body: msg.body,
+            clientPhone: candidate.intervention.clientPhone ?? "",
+          },
+        }),
+      });
+      if (res.ok) {
+        sent += 1;
+        const sentAt = new Date().toISOString();
+        await db
+          .collection("interventions")
+          .doc(interventionId)
+          .update({
+            [`appointmentRemindersSent.${reminderType}`]: sentAt,
+          });
+      }
+    } catch {
+      // Ne pas bloquer le cron sur un échec d'envoi.
+    }
+  }
+
+  return NextResponse.json({ ok: true, due: due.length, sent });
+}

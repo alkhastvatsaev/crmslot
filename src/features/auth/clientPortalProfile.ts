@@ -1,6 +1,6 @@
 import type { User } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { firestore, isConfigured } from "@/core/config/firebase";
+import { clientPortalFirestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
 
@@ -35,9 +35,9 @@ export async function syncClientPortalProfile(
   user: User,
   options?: SyncClientPortalProfileOptions
 ): Promise<void> {
-  if (!isConfigured || !firestore || user.isAnonymous) return;
+  if (!isConfigured || !clientPortalFirestore || user.isAnonymous) return;
 
-  const ref = doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid);
+  const ref = doc(clientPortalFirestore, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid);
   let existingCompanyId: string | null = null;
   let existingRole = "client";
 
@@ -66,7 +66,7 @@ export async function syncClientPortalProfile(
       {
         uid: user.uid,
         email: user.email ?? null,
-        displayName: user.displayName ?? user.email?.split("@")[0] ?? null,
+        displayName: user.displayName ?? null,
         photoURL: user.photoURL ?? null,
         ...companyPayload,
         role: existingRole,
