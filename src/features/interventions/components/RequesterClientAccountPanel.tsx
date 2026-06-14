@@ -110,6 +110,7 @@ export default function RequesterClientAccountPanel({
             placeholder={t("requester.profile.email_required")}
             value={fields.email}
             readOnly
+            autoComplete="off"
             className={cn(inputClass, "text-slate-600")}
           />
         </div>

@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { toast } from "sonner";
 import { render, screen } from "@/test-utils/render";
+import { renderWithPager } from "@/test-utils/renderWithPager";
 import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPanel";
 import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
 
@@ -56,6 +57,21 @@ describe("ClientPortalAuthPanel", () => {
     expect(screen.getByTestId("client-portal-password")).toBeInTheDocument();
     expect(screen.queryByTestId("client-portal-magic-send")).not.toBeInTheDocument();
     expect(screen.queryByText(/smart link/i)).not.toBeInTheDocument();
+  });
+
+  it("does not mount credential fields in auth rail when carousel is on map page", () => {
+    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 8, {
+      initialPageIndex: 0,
+    });
+    expect(screen.queryByTestId("client-portal-password")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("client-portal-email")).not.toBeInTheDocument();
+  });
+
+  it("mounts credential fields in auth rail when carousel is on company hub", () => {
+    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 8, {
+      initialPageIndex: 1,
+    });
+    expect(screen.getByTestId("client-portal-password")).toBeInTheDocument();
   });
 
   it("shows confirm password field on register tab", () => {

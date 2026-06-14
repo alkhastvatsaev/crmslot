@@ -21,7 +21,6 @@ import {
   DASHBOARD_DESKTOP_STACK_HEADER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
-import DashboardPagerControls from "@/features/dashboard/components/DashboardPagerControls";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 
 type Props = {
@@ -111,8 +110,6 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
               </div>
             </div>
           ) : null}
-
-          <DashboardPagerControls />
         </div>
       </div>
     </div>

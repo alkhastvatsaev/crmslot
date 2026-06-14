@@ -5,14 +5,20 @@ async function openSpotlight(page: import("@playwright/test").Page) {
 }
 
 test.describe("Dashboard carousel", () => {
-  test("navigates across carousel pages (skips company and technician)", async ({ page }) => {
+  test("navigates across hub pages via spotlight (skips company and technician)", async ({
+    page,
+  }) => {
     await page.goto("/");
 
     await expect(page.locator('[data-testid="dashboard-pager-root"]')).toBeVisible();
     await expect(page.locator('[data-testid="dashboard-page-home"]')).toBeVisible();
 
-    const next = page.locator('[data-testid="dashboard-pager-next"]');
-    await next.click();
+    const gotoPage = async (navIndex: number) => {
+      await openSpotlight(page);
+      await page.locator(`[data-testid="nav-item-${navIndex}"]`).click();
+    };
+
+    await gotoPage(3);
     await expect(page.locator('[data-testid="dashboard-page-3"]')).toBeVisible({
       timeout: 20_000,
     });
@@ -20,7 +26,7 @@ test.describe("Dashboard carousel", () => {
       timeout: 20_000,
     });
 
-    await next.click();
+    await gotoPage(4);
     await expect(page.locator('[data-testid="dashboard-page-4"]')).toBeVisible({
       timeout: 20_000,
     });
@@ -28,7 +34,7 @@ test.describe("Dashboard carousel", () => {
       timeout: 20_000,
     });
 
-    await next.click();
+    await gotoPage(5);
     await expect(page.locator('[data-testid="dashboard-page-5"]')).toBeVisible({
       timeout: 20_000,
     });
@@ -36,7 +42,7 @@ test.describe("Dashboard carousel", () => {
       timeout: 20_000,
     });
 
-    await page.locator('[data-testid="dashboard-pager-prev"]').click();
+    await gotoPage(3);
     await expect(page.locator('[data-testid="dashboard-pager-slot-3-panel-center"]')).toBeVisible();
   });
 

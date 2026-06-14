@@ -7,6 +7,8 @@ import { clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 import { HubSegmentedControl } from "@/core/ui/hub";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
 import { mfaHintKind } from "@/features/auth/clientPortalPasswordMfa";
 import GmailGoogleConnectButton from "@/features/gmail/components/GmailGoogleConnectButton";
 import {
@@ -30,6 +32,10 @@ export default function ClientPortalAuthPanel({
   authTab: authTabProp,
 }: ClientPortalAuthPanelProps) {
   const { t } = useTranslation();
+  const pager = useDashboardPagerOptional();
+  /** Carrousel : évite email+password dans le DOM hors page société (Safari Keychain au démarrage). */
+  const mountCredentialFields =
+    !authRailMode || pager == null || pager.pageIndex === COMPANY_HUB_PAGE_INDEX;
 
   const {
     email,
@@ -72,19 +78,24 @@ export default function ClientPortalAuthPanel({
     );
   }
 
-  const authFormContent = (
-    <div className="flex w-full flex-col gap-3">
+  const authFormContent = mountCredentialFields ? (
+    <form
+      className="flex w-full flex-col gap-3"
+      autoComplete="off"
+      onSubmit={(e) => e.preventDefault()}
+    >
       <label htmlFor="client-portal-email-input" className="sr-only">
         {t("auth.email_label")}
       </label>
       <input
         id="client-portal-email-input"
         type="email"
+        name="client-portal-email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder={String(t("auth.email_label"))}
         data-testid="client-portal-email"
-        autoComplete="email"
+        autoComplete="off"
         className="w-full rounded-[14px] border border-black/[0.06] bg-white px-4 py-3 text-[14px] font-medium text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15 shadow-sm"
       />
       <label htmlFor="client-portal-password-input" className="sr-only">
@@ -93,6 +104,7 @@ export default function ClientPortalAuthPanel({
       <input
         id="client-portal-password-input"
         type="password"
+        name="client-portal-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={String(t("auth.password_label"))}
@@ -108,6 +120,7 @@ export default function ClientPortalAuthPanel({
           <input
             id="client-portal-password-confirm"
             type="password"
+            name="client-portal-password-confirm"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder={String(t("auth.confirm_password_label"))}
@@ -156,8 +169,8 @@ export default function ClientPortalAuthPanel({
       </div>
 
       <div id="client-portal-recaptcha-container" className="sr-only" aria-hidden />
-    </div>
-  );
+    </form>
+  ) : null;
 
   const mfaPanel =
     mfaResolver && mfaResolver.hints[mfaHintIndex] ? (
@@ -295,10 +308,12 @@ export default function ClientPortalAuthPanel({
           </div>
         </div>
       ) : authRailMode ? (
-        <div className="flex w-full flex-col gap-4">
-          {authFormContent}
-          {mfaPanel}
-        </div>
+        mountCredentialFields ? (
+          <div className="flex w-full flex-col gap-4">
+            {authFormContent}
+            {mfaPanel}
+          </div>
+        ) : null
       ) : (
         <div className="flex flex-col items-center gap-5 rounded-[24px] border border-black/[0.06] bg-gradient-to-b from-white/96 via-white/90 to-slate-50/85 px-6 py-8 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.12)] backdrop-blur-xl">
           <div className="w-full text-center">

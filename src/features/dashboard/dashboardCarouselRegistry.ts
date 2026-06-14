@@ -109,7 +109,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
 
 export const DASHBOARD_CAROUSEL_PAGE_COUNT = DASHBOARD_CAROUSEL_PAGES.length;
 
-/** Indices accessibles par flèches carrousel (header + `DashboardPagerControls`). */
+/** Indices accessibles par navigation carrousel séquentielle (`goNext` / `goPrev`). */
 export const DASHBOARD_CAROUSEL_NAV_SLOT_INDICES: readonly number[] =
   DASHBOARD_CAROUSEL_PAGES.filter((page) => page.inCarouselNav !== false).map(
     (page) => page.slotIndex
