@@ -15,9 +15,6 @@ import TechnicianHubPage from "@/features/interventions/components/TechnicianHub
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
-import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
-import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
-import ChatbotGalaxyComposer from "@/features/chatbot/components/ChatbotGalaxyComposer";
 
 /** Index unique dans cette shell (une seule page — pas le carrousel 8 hubs). */
 export const TECHNICIAN_MOBILE_APP_SLOT_INDEX = 0;
@@ -37,30 +34,20 @@ export default function TechnicianMobileApp() {
               <OfflineSyncProvider>
                 <TechnicianCaseIntentProvider>
                   <TechnicianFinishJobProvider>
-                    <ChatbotProvider>
-                      <TechnicianNotificationBootstrap />
-                      <LayoutShellProvider mode="mobile">
-                        <MobileHubRailProvider>
-                          <div
-                            className="technician-mobile-app flex h-dvh flex-col overflow-hidden bg-slate-50"
-                            data-testid="technician-mobile-app"
-                          >
-                            <StagingPreviewBanner />
-                            <header className="technician-mobile-app__header flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 py-2">
-                              <ClockCalendar compact interactive />
-                            </header>
-                            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                              <ErrorBoundary name="technician-mobile-hub">
-                                <TechnicianHubPage slotIndex={TECHNICIAN_MOBILE_APP_SLOT_INDEX} />
-                              </ErrorBoundary>
-                            </div>
-                            <footer className="technician-mobile-app__galaxy-dock shrink-0 bg-slate-950">
-                              <ChatbotGalaxyComposer />
-                            </footer>
-                          </div>
-                        </MobileHubRailProvider>
-                      </LayoutShellProvider>
-                    </ChatbotProvider>
+                    <TechnicianNotificationBootstrap />
+                    <LayoutShellProvider mode="mobile">
+                      <MobileHubRailProvider>
+                        <div
+                          className="technician-mobile-app flex h-dvh flex-col overflow-hidden bg-slate-50"
+                          data-testid="technician-mobile-app"
+                        >
+                          <StagingPreviewBanner />
+                          <ErrorBoundary name="technician-mobile-hub">
+                            <TechnicianHubPage slotIndex={TECHNICIAN_MOBILE_APP_SLOT_INDEX} />
+                          </ErrorBoundary>
+                        </div>
+                      </MobileHubRailProvider>
+                    </LayoutShellProvider>
                   </TechnicianFinishJobProvider>
                 </TechnicianCaseIntentProvider>
               </OfflineSyncProvider>
