@@ -41,6 +41,8 @@ import {
   resolveMapCameraDuration,
 } from "@/features/map/mapboxPowerProfile";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
+import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocation";
+import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
@@ -80,7 +82,10 @@ export default function MapboxView() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
-  const isMobile = useIsMobile();
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const isMobileClient = useIsMobile();
+  const mobileHubLayout = useMobileHubLayout();
+  const isMobile = mobileHubLayout || isMobileClient === true;
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
@@ -571,6 +576,47 @@ export default function MapboxView() {
     }
   }, [routeLine, mapReady]);
 
+  const userLocation = useNativeUserLocation(mapReady && mapHubDataActive);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    if (!userLocation) {
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+      return;
+    }
+
+    const lngLat: [number, number] = [userLocation.longitude, userLocation.latitude];
+
+    if (!userMarkerRef.current) {
+      const el = document.createElement("div");
+      el.setAttribute("data-testid", "map-user-puck");
+      el.style.width = "18px";
+      el.style.height = "18px";
+      el.style.borderRadius = "50%";
+      el.style.background = "#2563eb";
+      el.style.border = "3px solid rgba(255,255,255,0.95)";
+      el.style.boxShadow = "0 0 0 4px rgba(37,99,235,0.18), 0 2px 6px rgba(0,0,0,0.25)";
+      el.style.pointerEvents = "none";
+      userMarkerRef.current = new mapboxgl.Marker({ element: el, anchor: "center" })
+        .setLngLat(lngLat)
+        .addTo(map);
+    } else {
+      userMarkerRef.current.setLngLat(lngLat);
+    }
+  }, [userLocation, mapReady, mapHubDataActive]);
+
+  useEffect(() => {
+    return () => {
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     if (!isMobile || !mapReady) return;
     const map = mapRef.current;
@@ -774,7 +820,7 @@ export default function MapboxView() {
     </div>
   );
 
-  if (isMobile) {
+  if (mobileHubLayout) {
     return (
       <MobileHubLayout
         rootTestId="mobile-map-triple"

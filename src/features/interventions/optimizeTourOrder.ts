@@ -11,17 +11,12 @@ function distanceKm(a: LatLng, b: LatLng): number {
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const h =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) *
-      Math.cos((b.lat * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
+    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.asin(Math.sqrt(h));
 }
 
 /** Nearest-neighbor greedy tour from `start`. Returns reordered interventions. */
-export function optimizeTourOrder(
-  interventions: Intervention[],
-  start: LatLng,
-): Intervention[] {
+export function optimizeTourOrder(interventions: Intervention[], start: LatLng): Intervention[] {
   const withCoords = interventions.filter((iv) => iv.location?.lat && iv.location?.lng);
   const withoutCoords = interventions.filter((iv) => !iv.location?.lat || !iv.location?.lng);
 
@@ -47,7 +42,11 @@ export function optimizeTourOrder(
   return [...ordered, ...withoutCoords];
 }
 
-export function getCurrentPosition(): Promise<LatLng> {
+export async function getCurrentPosition(): Promise<LatLng> {
+  const { getCurrentNativePosition } = await import("@/core/native/nativeGeolocation");
+  const native = await getCurrentNativePosition().catch(() => null);
+  if (native) return { lat: native.latitude, lng: native.longitude };
+
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error("Geolocation not supported"));
@@ -56,7 +55,7 @@ export function getCurrentPosition(): Promise<LatLng> {
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => reject(err),
-      { timeout: 8000, maximumAge: 60000 },
+      { timeout: 8000, maximumAge: 60000 }
     );
   });
 }
