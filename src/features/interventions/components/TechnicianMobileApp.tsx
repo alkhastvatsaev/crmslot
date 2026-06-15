@@ -12,15 +12,23 @@ import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvi
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import TechnicianNotificationBootstrap from "@/features/notifications/components/TechnicianNotificationBootstrap";
 import TechnicianHubPage from "@/features/interventions/components/TechnicianHubPage";
+import TechnicianMobileShell from "@/features/interventions/components/TechnicianMobileShell";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
+import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
+import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 
 /** Index unique dans cette shell (une seule page — pas le carrousel 8 hubs). */
 export const TECHNICIAN_MOBILE_APP_SLOT_INDEX = 0;
 
+/** Une page logique pour le dock Galaxy (index 0 = transcription / chatbot carte). */
+const TECHNICIAN_MOBILE_PAGE_COUNT = 1;
+
 /**
- * App terrain allégée — missions, clôture, offline.
+ * App terrain — missions, clôture, offline + chrome mobile (calendrier · Galaxy).
  * Route : `/m/technician` (Capacitor Android entreprise).
  */
 export default function TechnicianMobileApp() {
@@ -30,28 +38,35 @@ export default function TechnicianMobileApp() {
         <TechnicianLoginGate>
           <DevServiceWorkerCleanup />
           <CompanyWorkspaceProvider>
-            <TechnicianQueryProvider>
-              <OfflineSyncProvider>
-                <TechnicianCaseIntentProvider>
-                  <TechnicianFinishJobProvider>
-                    <TechnicianNotificationBootstrap />
-                    <LayoutShellProvider mode="mobile">
-                      <MobileHubRailProvider>
-                        <div
-                          className="technician-mobile-app flex h-dvh flex-col overflow-hidden bg-slate-50"
-                          data-testid="technician-mobile-app"
-                        >
-                          <StagingPreviewBanner />
-                          <ErrorBoundary name="technician-mobile-hub">
-                            <TechnicianHubPage slotIndex={TECHNICIAN_MOBILE_APP_SLOT_INDEX} />
-                          </ErrorBoundary>
-                        </div>
-                      </MobileHubRailProvider>
-                    </LayoutShellProvider>
-                  </TechnicianFinishJobProvider>
-                </TechnicianCaseIntentProvider>
-              </OfflineSyncProvider>
-            </TechnicianQueryProvider>
+            <GalaxyLayerBridgeProvider>
+              <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
+                <DashboardPageSelectorProvider>
+                  <ChatbotProvider>
+                    <TechnicianQueryProvider>
+                      <OfflineSyncProvider>
+                        <TechnicianCaseIntentProvider>
+                          <TechnicianFinishJobProvider>
+                            <TechnicianNotificationBootstrap />
+                            <LayoutShellProvider mode="mobile">
+                              <MobileHubRailProvider>
+                                <TechnicianMobileShell>
+                                  <StagingPreviewBanner />
+                                  <ErrorBoundary name="technician-mobile-hub">
+                                    <TechnicianHubPage
+                                      slotIndex={TECHNICIAN_MOBILE_APP_SLOT_INDEX}
+                                    />
+                                  </ErrorBoundary>
+                                </TechnicianMobileShell>
+                              </MobileHubRailProvider>
+                            </LayoutShellProvider>
+                          </TechnicianFinishJobProvider>
+                        </TechnicianCaseIntentProvider>
+                      </OfflineSyncProvider>
+                    </TechnicianQueryProvider>
+                  </ChatbotProvider>
+                </DashboardPageSelectorProvider>
+              </DashboardPagerProvider>
+            </GalaxyLayerBridgeProvider>
           </CompanyWorkspaceProvider>
         </TechnicianLoginGate>
       </DesktopOnlyGate>

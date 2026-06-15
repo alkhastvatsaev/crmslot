@@ -6,6 +6,7 @@ test.describe("App terrain /m/technician", () => {
 
     await expect(page).toHaveTitle(/crmslot/i);
     await expect(page.getByTestId("technician-mobile-app")).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByTestId("mobile-shell")).not.toBeVisible();
+    await expect(page.getByTestId("technician-mobile-header-calendar")).toBeVisible();
+    await expect(page.getByTestId("technician-mobile-shell-footer")).toBeVisible();
   });
 });
