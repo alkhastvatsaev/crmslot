@@ -2,8 +2,9 @@ import { renderHook } from "@testing-library/react";
 import { useGeofenceMonitor } from "@/features/geofence/useGeofenceMonitor";
 import type { Intervention } from "@/features/interventions/types";
 
-const mockWatchPosition = jest.fn(() => 42);
-const mockClearWatch = jest.fn();
+type WatchArgs = [PositionCallback, PositionErrorCallback | undefined, PositionOptions | undefined];
+const mockWatchPosition = jest.fn<number, WatchArgs>(() => 42);
+const mockClearWatch = jest.fn<void, [number]>();
 
 beforeAll(() => {
   Object.defineProperty(global.navigator, "geolocation", {
@@ -25,8 +26,8 @@ describe("useGeofenceMonitor — consommation énergie", () => {
   it("appelle watchPosition avec enableHighAccuracy quand enabled=true", () => {
     renderHook(() => useGeofenceMonitor([], { enabled: true }));
     expect(mockWatchPosition).toHaveBeenCalledTimes(1);
-    const opts = mockWatchPosition.mock.calls[0][2];
-    expect(opts.enableHighAccuracy).toBe(true);
+    const opts = mockWatchPosition.mock.calls[0]?.[2];
+    expect(opts?.enableHighAccuracy).toBe(true);
   });
 
   it("nettoie le watch à l'unmount (pas de GPS zombie)", () => {
@@ -44,7 +45,7 @@ describe("useGeofenceMonitor — consommation énergie", () => {
     const { rerender } = renderHook(
       ({ missions }: { missions: Intervention[] }) =>
         useGeofenceMonitor(missions, { enabled: false }),
-      { initialProps: { missions: [] } }
+      { initialProps: { missions: [] as Intervention[] } }
     );
     rerender({ missions: [mission] });
     expect(mockWatchPosition).not.toHaveBeenCalled();
