@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth, clientPortalAuth } from "@/core/config/firebase";
 import { useNativePushRegistration } from "@/features/notifications/useNativePushRegistration";
+import { registerNativePushClickHandler } from "@/core/native/nativePushClickHandler";
 
 function wrap(
   rawAuth: typeof auth | typeof clientPortalAuth
@@ -16,5 +18,16 @@ function wrap(
 export default function NativePushBootstrap() {
   useNativePushRegistration({ audience: "technician", auth: wrap(auth) });
   useNativePushRegistration({ audience: "client", auth: wrap(clientPortalAuth) });
+
+  useEffect(() => {
+    let unlisten: (() => void) | null = null;
+    void registerNativePushClickHandler().then((fn) => {
+      unlisten = fn;
+    });
+    return () => {
+      unlisten?.();
+    };
+  }, []);
+
   return null;
 }
