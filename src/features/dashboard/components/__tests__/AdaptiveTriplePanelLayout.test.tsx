@@ -2,8 +2,8 @@ import React from "react";
 import { render, screen } from "@/test-utils/render";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 
-jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
-  useIsMobile: () => true,
+jest.mock("@/context/LayoutShellContext", () => ({
+  useMobileHubLayout: () => true,
 }));
 
 jest.mock("@/features/dashboard/MobileHubRailContext", () => ({

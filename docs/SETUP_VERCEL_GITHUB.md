@@ -32,36 +32,36 @@ Ajoute **chaque** variable pour **Production** et **Preview** (recommandé).
 
 ### Obligatoires (app fonctionnelle)
 
-| Variable | Où la trouver |
-|----------|----------------|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Console → Project settings → General |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | idem (`xxx.firebaseapp.com`) |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | idem |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | idem |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | idem |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | idem |
-| `NEXT_PUBLIC_MAPBOX_TOKEN` | [mapbox.com](https://account.mapbox.com/) → Access tokens |
+| Variable                                   | Où la trouver                                             |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY`             | Firebase Console → Project settings → General             |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`         | idem (`xxx.firebaseapp.com`)                              |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID`          | idem                                                      |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`      | idem                                                      |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | idem                                                      |
+| `NEXT_PUBLIC_FIREBASE_APP_ID`              | idem                                                      |
+| `NEXT_PUBLIC_MAPBOX_TOKEN`                 | [mapbox.com](https://account.mapbox.com/) → Access tokens |
 
 ### Staging / démo (recommandé sur preview)
 
-| Variable | Valeur |
-|----------|--------|
+| Variable                      | Valeur |
+| ----------------------------- | ------ |
 | `NEXT_PUBLIC_STAGING_PREVIEW` | `true` |
 
 Puis dans **Firebase Console → Authentication → Sign-in method** : activer **Anonymous**.
 
 ### Production (sécurité + audio + Twilio)
 
-| Variable | Usage |
-|----------|--------|
-| `UPLOAD_AUTO_PROCESS_SECRET` | Chaîne aléatoire longue (uploads bureau) |
-| `AUDIO_DISPATCH_SECRET` | Chaîne aléatoire (MacroDroid → header `x-audio-dispatch-secret`) |
-| `TWILIO_ACCOUNT_SID` | Console Twilio |
-| `TWILIO_AUTH_TOKEN` | Console Twilio |
-| `TWILIO_PHONE_NUMBER` | Numéro Twilio (+32…) |
-| `TWILIO_WEBHOOK_PUBLIC_URL` | `https://TON-DOMAINE.vercel.app` (sans slash final) |
-| `OPENAI_API_KEY` | Transcription / suggestions |
-| `FIREBASE_ADMIN` via JSON | Voir étape 2b |
+| Variable                     | Usage                                                            |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `UPLOAD_AUTO_PROCESS_SECRET` | Chaîne aléatoire longue (uploads bureau)                         |
+| `AUDIO_DISPATCH_SECRET`      | Chaîne aléatoire (MacroDroid → header `x-audio-dispatch-secret`) |
+| `TWILIO_ACCOUNT_SID`         | Console Twilio                                                   |
+| `TWILIO_AUTH_TOKEN`          | Console Twilio                                                   |
+| `TWILIO_PHONE_NUMBER`        | Numéro Twilio (+32…)                                             |
+| `TWILIO_WEBHOOK_PUBLIC_URL`  | `https://TON-DOMAINE.vercel.app` (sans slash final)              |
+| `OPENAI_API_KEY`             | Transcription / suggestions                                      |
+| `FIREBASE_ADMIN` via JSON    | Voir étape 2b                                                    |
 
 Générer des secrets :
 
@@ -77,21 +77,21 @@ openssl rand -hex 32
 
 Variables exactes attendues par le code (`src/core/config/firebase-admin.ts`) :
 
-| Variable Vercel | Source dans le JSON service account |
-|-----------------|-------------------------------------|
-| `FIREBASE_PROJECT_ID` | `project_id` |
-| `FIREBASE_CLIENT_EMAIL` | `client_email` |
-| `FIREBASE_PRIVATE_KEY` | `private_key` (coller telle quelle ; les `\n` sont gérés) |
+| Variable Vercel         | Source dans le JSON service account                       |
+| ----------------------- | --------------------------------------------------------- |
+| `FIREBASE_PROJECT_ID`   | `project_id`                                              |
+| `FIREBASE_CLIENT_EMAIL` | `client_email`                                            |
+| `FIREBASE_PRIVATE_KEY`  | `private_key` (coller telle quelle ; les `\n` sont gérés) |
 
 Tu peux aussi définir `FIREBASE_PROJECT_ID` = même valeur que `NEXT_PUBLIC_FIREBASE_PROJECT_ID`.
 
 ### Optionnelles
 
-| Variable | Usage |
-|----------|--------|
-| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Envoi devis par email |
-| `STRIPE_SECRET_KEY` | Paiements |
-| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Autocomplete adresses |
+| Variable                                      | Usage                     |
+| --------------------------------------------- | ------------------------- |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD`           | Envoi devis par email     |
+| `STRIPE_SECRET_KEY`                           | Paiements                 |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`             | Autocomplete adresses     |
 | `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID` | UID technicien par défaut |
 
 Vérifier localement avant deploy :
@@ -107,6 +107,27 @@ npm run verify:env:prod
 1. **Deployments → Redeploy** (ou push sur `main` si Git connecté).
 2. Note l’URL : `https://belgmap-xxx.vercel.app` (ou domaine custom).
 3. Mets à jour `TWILIO_WEBHOOK_PUBLIC_URL` avec cette URL exacte, puis **redéploie**.
+
+### PWA (service worker + « Ajouter à l’écran d’accueil »)
+
+Le domaine public **doit répondre en HTTP 200** sur `/`, `/manifest.json` et `/sw.js` **sans redirection 307/308** vers un autre hôte. Sinon le navigateur refuse d’enregistrer le service worker (origine différente).
+
+Vérification après déploiement :
+
+```bash
+npm run smoke:url -- https://VOTRE-DOMAINE.vercel.app
+```
+
+Dans Vercel → **Settings → Domains** : attache le domaine au **même projet** que le déploiement BELGMAP ; supprime toute règle de redirect domaine → autre projet.
+
+Variables utiles :
+
+| Variable                         | Usage                                          |
+| -------------------------------- | ---------------------------------------------- |
+| `PUBLIC_APP_URL`                 | Même URL que le domaine PWA (push FCM, Stripe) |
+| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | Notifications push Web                         |
+
+Les fichiers `public/sw.js` et `public/workbox-*.js` sont **générés au build** (`next-pwa`) — ne pas les committer.
 
 ### Twilio (webhooks vocaux)
 
@@ -158,12 +179,12 @@ Le script affiche `VERCEL_ORG_ID` et `VERCEL_PROJECT_ID`.
 
 Repo GitHub → **Settings → Secrets and variables → Actions → New repository secret**
 
-| Nom du secret | Valeur |
-|---------------|--------|
-| `VERCEL_TOKEN` | Token de l’étape 4 |
-| `VERCEL_ORG_ID` | Team / User ID |
-| `VERCEL_PROJECT_ID` | Project ID |
-| `PRODUCTION_URL` | `https://ton-domaine.vercel.app` (smoke hebdo) |
+| Nom du secret       | Valeur                                         |
+| ------------------- | ---------------------------------------------- |
+| `VERCEL_TOKEN`      | Token de l’étape 4                             |
+| `VERCEL_ORG_ID`     | Team / User ID                                 |
+| `VERCEL_PROJECT_ID` | Project ID                                     |
+| `PRODUCTION_URL`    | `https://ton-domaine.vercel.app` (smoke hebdo) |
 
 ---
 
@@ -196,14 +217,14 @@ Manuel :
 
 ## Dépannage rapide
 
-| Problème | Piste |
-|----------|--------|
-| Build Vercel échoue | Logs deploy ; lancer `npm run ci` en local |
-| API 503 | Firebase Admin manquant sur Vercel |
-| API 401 partout | Normal sans login ; l’app utilise Firebase Auth |
-| Twilio 403 | `TWILIO_WEBHOOK_PUBLIC_URL` doit matcher l’URL publique exacte |
-| MacroDroid 403 | Header `x-audio-dispatch-secret` = `AUDIO_DISPATCH_SECRET` |
-| E2E OK mais prod KO | Variables seulement en Preview, pas Production |
+| Problème            | Piste                                                          |
+| ------------------- | -------------------------------------------------------------- |
+| Build Vercel échoue | Logs deploy ; lancer `npm run ci` en local                     |
+| API 503             | Firebase Admin manquant sur Vercel                             |
+| API 401 partout     | Normal sans login ; l’app utilise Firebase Auth                |
+| Twilio 403          | `TWILIO_WEBHOOK_PUBLIC_URL` doit matcher l’URL publique exacte |
+| MacroDroid 403      | Header `x-audio-dispatch-secret` = `AUDIO_DISPATCH_SECRET`     |
+| E2E OK mais prod KO | Variables seulement en Preview, pas Production                 |
 
 ---
 
