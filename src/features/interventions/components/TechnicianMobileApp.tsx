@@ -38,7 +38,7 @@ export default function TechnicianMobileApp() {
                     <LayoutShellProvider mode="mobile">
                       <MobileHubRailProvider>
                         <div
-                          className="technician-mobile-app flex min-h-dvh flex-col bg-slate-50"
+                          className="technician-mobile-app flex h-dvh flex-col overflow-hidden bg-slate-50"
                           data-testid="technician-mobile-app"
                         >
                           <StagingPreviewBanner />

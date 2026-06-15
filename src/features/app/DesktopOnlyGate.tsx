@@ -55,7 +55,7 @@ export default function DesktopOnlyGate({ children }: { children: React.ReactNod
     return (
       <div
         data-testid="desktop-only-gate-loading"
-        className="flex min-h-dvh items-center justify-center bg-slate-50"
+        className="flex h-dvh items-center justify-center overflow-hidden bg-slate-50"
       >
         <div
           className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
@@ -68,7 +68,7 @@ export default function DesktopOnlyGate({ children }: { children: React.ReactNod
   return (
     <div
       data-testid="desktop-only-gate-blocked"
-      className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-slate-50 px-6 text-center"
+      className="flex h-dvh flex-col items-center justify-center gap-3 overflow-hidden bg-slate-50 px-6 text-center"
     >
       <p className="text-lg font-semibold text-slate-800">Version desktop uniquement</p>
       <p className="max-w-md text-sm leading-relaxed text-slate-600">
