@@ -7,6 +7,10 @@ export type ClientRecord = {
   companyName?: string | null;
   phone?: string | null;
   email?: string | null;
+  /** Opt-in notifications email transactionnelles (par défaut true). */
+  emailNotifications?: boolean | null;
+  /** Token unsubscribe RGPD — généré à la première notif si absent. */
+  unsubscribeToken?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 };

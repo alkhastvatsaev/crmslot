@@ -1,6 +1,8 @@
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { notifyClientPaymentReceived } from "@/core/services/notifications/clientPaymentPush";
+import { notifyClient } from "@/core/services/email/clientNotifications/notifyClient";
+import { buildClientPaymentReceivedEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
 import { logCrmInterventionActionAdmin } from "@/features/crmHistory/logCrmInterventionActionAdmin";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -43,6 +45,29 @@ export async function markInterventionPaidAdmin(
 
   const createdByUid = typeof data.createdByUid === "string" ? data.createdByUid : null;
   await notifyClientPaymentReceived(interventionId, createdByUid).catch(() => {});
+
+  if (companyId) {
+    const payload = buildClientPaymentReceivedEmail({
+      interventionId,
+      iv: {
+        clientFirstName: typeof data.clientFirstName === "string" ? data.clientFirstName : null,
+        title: typeof data.title === "string" ? data.title : null,
+        problem: typeof data.problem === "string" ? data.problem : null,
+        portalAccessToken:
+          typeof data.portalAccessToken === "string" ? data.portalAccessToken : null,
+      },
+      amount: typeof data.invoiceAmount === "number" ? data.invoiceAmount : null,
+      currency: typeof data.invoiceCurrency === "string" ? data.invoiceCurrency : null,
+    });
+    await notifyClient({
+      interventionId,
+      companyId,
+      clientId: typeof data.clientId === "string" ? data.clientId : null,
+      fallbackEmail: typeof data.clientEmail === "string" ? data.clientEmail : null,
+      sentByUid: createdByUid ?? "system",
+      ...payload,
+    }).catch(() => {});
+  }
 
   if (companyId) {
     void import("@/features/integrations/server/dispatchCompanyWebhooksAdmin")
