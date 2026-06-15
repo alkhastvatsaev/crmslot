@@ -35,6 +35,7 @@ const DERIVED = {
   TWILIO_WEBHOOK_PUBLIC_URL: "https://crmslot.vercel.app",
   PUBLIC_APP_URL: "https://crmslot.vercel.app",
   NEXT_PUBLIC_BASE_URL: "https://crmslot.vercel.app",
+  GOOGLE_REDIRECT_URI: "https://crmslot.vercel.app/api/integrations/gmail/callback",
 };
 
 function parseEnvFile(filePath) {
@@ -141,12 +142,13 @@ for (const key of SYNC_KEYS) {
 }
 
 for (const [key, value] of Object.entries(DERIVED)) {
-  if (vercelNames.has(key) && local[key]?.trim()) {
+  const resolved = key === "GOOGLE_REDIRECT_URI" ? value : local[key]?.trim() || value;
+  if (vercelNames.has(key) && key !== "GOOGLE_REDIRECT_URI" && local[key]?.trim()) {
     skipped++;
     continue;
   }
   console.log(`  + ${key} — dérivé`);
-  if (upsertVercelEnv(key, local[key]?.trim() || value)) updated++;
+  if (upsertVercelEnv(key, resolved)) updated++;
 }
 
 console.log(`\n✅ ${updated} variable(s) synchronisée(s), ${skipped} ignorée(s).`);
