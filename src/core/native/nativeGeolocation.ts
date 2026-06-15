@@ -33,6 +33,13 @@ export async function watchNativePosition(
 ): Promise<(() => Promise<void>) | null> {
   if (!isCapacitorNative()) return null;
   const { Geolocation } = await import("@capacitor/geolocation");
+
+  const perm = await Geolocation.checkPermissions();
+  if (perm.location !== "granted") {
+    const req = await Geolocation.requestPermissions({ permissions: ["location"] });
+    if (req.location !== "granted") return null;
+  }
+
   const watchId = await Geolocation.watchPosition(
     { enableHighAccuracy: true, timeout: 15_000 },
     (pos, err) => {
