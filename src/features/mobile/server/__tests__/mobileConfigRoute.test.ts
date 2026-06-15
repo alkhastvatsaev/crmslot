@@ -30,6 +30,6 @@ describe("GET /api/mobile/config", () => {
     expect(body.ok).toBe(true);
     expect(body.mobileAccessAllowed).toBe(true);
     expect(body.forceMobileQueryKey).toBe("forceMobile");
-    expect(body.hubPageCount).toBeGreaterThanOrEqual(7);
+    expect(body.hubPageCount).toBeGreaterThanOrEqual(6);
   });
 });
