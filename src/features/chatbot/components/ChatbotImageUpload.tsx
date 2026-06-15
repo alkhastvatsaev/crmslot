@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { captureNativePhotoFile } from "@/core/native/photoCapture";
 
 const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 
@@ -47,8 +49,17 @@ export default function ChatbotImageUpload({ onImageSelected, disabled, classNam
         type="button"
         data-testid="chatbot-image-upload"
         disabled={disabled}
-        onClick={(e) => {
+        onClick={async (e) => {
           e.stopPropagation();
+          if (isCapacitorNative()) {
+            const photo = await captureNativePhotoFile("prompt");
+            if (photo && photo.file.size <= MAX_BYTES) {
+              onImageSelected(photo.dataUrl, photo.mimeType);
+            } else if (photo) {
+              alert("Image trop grande (max 2 Mo).");
+            }
+            return;
+          }
           inputRef.current?.click();
         }}
         aria-label="Joindre une image"

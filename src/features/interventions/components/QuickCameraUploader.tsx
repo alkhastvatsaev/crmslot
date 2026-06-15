@@ -3,8 +3,10 @@
 import { logger } from "@/core/logger";
 
 import React, { useRef, useState } from "react";
-import { Camera, Upload, X, Loader2 } from "lucide-react";
+import { Camera, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { captureNativePhotoFile } from "@/core/native/photoCapture";
 
 interface QuickCameraUploaderProps {
   onPhotoTaken: (file: File, compressedDataUrl: string) => void;
@@ -28,7 +30,54 @@ export default function QuickCameraUploader({
   const [preview, setPreview] = useState<string | null>(null);
   const [isCompressing, setIsCompressing] = useState(false);
 
-  const handleCaptureClick = () => {
+  const compressFile = async (file: File): Promise<{ file: File; dataUrl: string }> => {
+    const bitmap = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    const MAX_WIDTH = 1200;
+    const MAX_HEIGHT = 1200;
+    let width = bitmap.width;
+    let height = bitmap.height;
+    if (width > height) {
+      if (width > MAX_WIDTH) {
+        height *= MAX_WIDTH / width;
+        width = MAX_WIDTH;
+      }
+    } else if (height > MAX_HEIGHT) {
+      width *= MAX_HEIGHT / height;
+      height = MAX_HEIGHT;
+    }
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("canvas 2d unavailable");
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    const compressed = new File([blob], file.name || "photo.jpg", { type: "image/jpeg" });
+    return { file: compressed, dataUrl };
+  };
+
+  const handleCaptureClick = async () => {
+    if (isCapacitorNative()) {
+      const photo = await captureNativePhotoFile("camera");
+      if (!photo) return;
+      setIsCompressing(true);
+      try {
+        const compressed = await compressFile(photo.file);
+        setPreview(compressed.dataUrl);
+        onPhotoTaken(compressed.file, compressed.dataUrl);
+      } catch (err) {
+        logger.error("Erreur de compression native :", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        setPreview(photo.dataUrl);
+        onPhotoTaken(photo.file, photo.dataUrl);
+      } finally {
+        setIsCompressing(false);
+      }
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -39,53 +88,18 @@ export default function QuickCameraUploader({
     setIsCompressing(true);
 
     try {
-      // Compression basique avec Canvas
-      const bitmap = await createImageBitmap(file);
-      const canvas = document.createElement("canvas");
-      const MAX_WIDTH = 1200;
-      const MAX_HEIGHT = 1200;
-
-      let width = bitmap.width;
-      let height = bitmap.height;
-
-      if (width > height) {
-        if (width > MAX_WIDTH) {
-          height *= MAX_WIDTH / width;
-          width = MAX_WIDTH;
-        }
-      } else {
-        if (height > MAX_HEIGHT) {
-          width *= MAX_HEIGHT / height;
-          height = MAX_HEIGHT;
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(bitmap, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
-        setPreview(dataUrl);
-
-        // Convertir le dataUrl en fichier (optionnel, selon l'implémentation de l'upload Firebase)
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-        const compressedFile = new File([blob], file.name, { type: "image/jpeg" });
-
-        onPhotoTaken(compressedFile, dataUrl);
-      }
+      const compressed = await compressFile(file);
+      setPreview(compressed.dataUrl);
+      onPhotoTaken(compressed.file, compressed.dataUrl);
     } catch (err) {
       logger.error("Erreur de compression :", {
         error: err instanceof Error ? err.message : String(err),
       });
-      // Fallback
       const fallbackUrl = URL.createObjectURL(file);
       setPreview(fallbackUrl);
       onPhotoTaken(file, fallbackUrl);
     } finally {
       setIsCompressing(false);
-      // Reset input
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
