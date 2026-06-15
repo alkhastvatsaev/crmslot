@@ -37,6 +37,7 @@ yarn-error.log*
 
 # Testing & Coverage
 coverage/
+!coverage/baseline.json
 .nyc_output/
 test-results/
 playwright-report/
