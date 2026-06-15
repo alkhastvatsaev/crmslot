@@ -80,8 +80,14 @@ function defaultWebDownload(input: SaveDocumentInput): SaveDocumentResult {
 
 const PROD_DEPS: SaveOrShareDeps = {
   isNative: isCapacitorNative,
-  loadFilesystem: async () => import("@capacitor/filesystem"),
-  loadShare: async () => import("@capacitor/share"),
+  loadFilesystem: async () =>
+    (await import("@capacitor/filesystem")) as unknown as Awaited<
+      ReturnType<SaveOrShareDeps["loadFilesystem"]>
+    >,
+  loadShare: async () =>
+    (await import("@capacitor/share")) as unknown as Awaited<
+      ReturnType<SaveOrShareDeps["loadShare"]>
+    >,
 };
 
 /**

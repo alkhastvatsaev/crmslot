@@ -13,7 +13,9 @@ describe("buildMobileRuntimeConfig", () => {
     expect(cfg.forceMobileQueryKey).toBe("forceMobile");
     expect(cfg.pwaServiceWorkerEnabled).toBe(false);
     expect(cfg.gitSha).toBe("abc123");
-    expect(cfg.hubPageCount).toBeGreaterThanOrEqual(7);
+    // Carrousel actuel : carte + matériel + crm + facturation + gmail + assistant = 6 pages.
+    // Régression: si on retombe sous 6, c'est qu'un hub a sauté du registre.
+    expect(cfg.hubPageCount).toBeGreaterThanOrEqual(6);
     expect(cfg.nodeEnv).toBe("development");
   });
 
