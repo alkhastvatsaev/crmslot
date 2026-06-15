@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { collection, limit, onSnapshot, query, where } from "firebase/firestore";
+import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
 import {
   demoMaterialOrdersForCompany,
@@ -30,7 +31,7 @@ export function useCompanyMaterialOrdersRecent(companyId: string | null) {
   const [loading, setLoading] = useState(Boolean(companyId));
 
   useEffect(() => {
-    if (!companyId || !firestore) {
+    if (!companyId || !firestore || isDemoTenantCompanyId(companyId)) {
       setLiveOrders([]);
       setLoading(false);
       return;
@@ -39,7 +40,7 @@ export function useCompanyMaterialOrdersRecent(companyId: string | null) {
     const q = query(
       collection(firestore, MATERIAL_ORDERS_COLLECTION),
       where("companyId", "==", companyId),
-      limit(RECENT_LIMIT),
+      limit(RECENT_LIMIT)
     );
     return onSnapshot(
       q,
@@ -53,7 +54,7 @@ export function useCompanyMaterialOrdersRecent(companyId: string | null) {
       () => {
         setLiveOrders([]);
         setLoading(false);
-      },
+      }
     );
   }, [companyId]);
 
@@ -61,11 +62,7 @@ export function useCompanyMaterialOrdersRecent(companyId: string | null) {
 
   const orders = useMemo(() => {
     const base =
-      liveOrders.length > 0
-        ? liveOrders
-        : companyId
-          ? demoMaterialOrdersForCompany(companyId)
-          : [];
+      liveOrders.length > 0 ? liveOrders : companyId ? demoMaterialOrdersForCompany(companyId) : [];
     return base.filter((o) => !dismissedDemoIds.has(o.id));
   }, [liveOrders, companyId, dismissedDemoIds]);
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
+import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import {
   DEMO_COMPANY_ID,
   devUiPreviewEnabled,
@@ -27,6 +28,12 @@ export function useBackOfficeInterventions(companyId: string | null) {
     if (noFirestore || !cidForEffect) return () => {};
 
     const cid = cidForEffect;
+    if (isDemoTenantCompanyId(cid)) {
+      setInterventions([]);
+      setLoadedCid(cid);
+      setError(null);
+      return () => {};
+    }
     const q = query(collection(firestore!, "interventions"), where("companyId", "==", cid));
 
     let unsub: (() => void) | undefined;

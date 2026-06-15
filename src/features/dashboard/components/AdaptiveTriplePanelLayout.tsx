@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileHubLayout } from "@/context/LayoutShellContext";
 
 type Props = ComponentProps<typeof DashboardTriplePanelLayout> & {
   /** Libellés courts pour le segment mobile (≠ aria desktop). */
@@ -26,10 +26,10 @@ export default function AdaptiveTriplePanelLayout({
   rightPadding = true,
   ...props
 }: Props) {
-  const isMobile = useIsMobile();
+  const mobileHubLayout = useMobileHubLayout();
   const panelPadding = centerPadding && rightPadding;
 
-  if (isMobile) {
+  if (mobileHubLayout) {
     return (
       <MobileHubLayout
         rootTestId={props.rootTestId}
