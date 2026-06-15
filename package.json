@@ -56,11 +56,18 @@
     "check:technician-uids": "node scripts/sync-technician-auth-uids.mjs --check",
     "list:technician-uids": "node scripts/sync-technician-auth-uids.mjs --list",
     "deploy:firestore-rules": "firebase deploy --only firestore:rules",
+    "cap:sync": "cap sync",
+    "cap:sync:ios": "cap sync ios",
+    "cap:sync:android": "cap sync android",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android",
+    "cap:icons": "npx @capacitor/assets generate --iconBackgroundColor '#09090B' --splashBackgroundColor '#09090B' --android --ios",
     "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@capacitor-firebase/messaging": "^8.3.0",
+    "@capacitor/android": "^8.4.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/camera": "^8.2.0",
     "@capacitor/cli": "^7.6.6",
