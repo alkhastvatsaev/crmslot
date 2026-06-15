@@ -30,8 +30,8 @@ export type OfflineSyncContextValue = {
 const OfflineSyncContext = createContext<OfflineSyncContextValue | null>(null);
 
 export function OfflineSyncProvider({ children }: { children: ReactNode }) {
-  const [navigatorOnline, setNavigatorOnline] = useState(
-    () => typeof navigator !== "undefined" ? navigator.onLine : true,
+  const [navigatorOnline, setNavigatorOnline] = useState(() =>
+    typeof navigator !== "undefined" ? navigator.onLine : true
   );
   const [pendingCompletionCount, setPendingCompletionCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -70,7 +70,9 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
       if (report.uploaded > 0) {
         toast.success("Synchronisation terminée", {
           description:
-            report.uploaded === 1 ? "1 intervention mise à jour." : `${report.uploaded} interventions mises à jour.`,
+            report.uploaded === 1
+              ? "1 intervention mise à jour."
+              : `${report.uploaded} interventions mises à jour.`,
         });
       }
     } finally {
@@ -127,6 +129,48 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional once on mount
   }, []);
 
+  /** Retry périodique (60s) — déclenche flush si la queue contient des items en cooldown devenus dus. */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const intervalId = window.setInterval(() => {
+      if (!navigator.onLine) return;
+      void (async () => {
+        const n = await getCompletionQueueLength();
+        if (n > 0) await runFlushWithToasts();
+      })();
+    }, 60_000);
+    return () => window.clearInterval(intervalId);
+  }, [runFlushWithToasts]);
+
+  /** Capacitor : flush quand l'app revient au premier plan (sortie de background). */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let unlisten: (() => void) | null = null;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const { isCapacitorNative } = await import("@/core/native/capacitorRuntime");
+        if (!isCapacitorNative()) return;
+        const { App } = await import("@capacitor/app");
+        if (cancelled) return;
+        const handle = await App.addListener("appStateChange", ({ isActive }) => {
+          if (isActive && navigator.onLine) {
+            void runFlushWithToasts();
+          }
+        });
+        unlisten = () => handle.remove();
+      } catch {
+        /* Capacitor app plugin indisponible — ok en web pur. */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [runFlushWithToasts]);
+
   const value = useMemo(
     () => ({
       navigatorOnline,
@@ -136,7 +180,14 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
       flushNow,
       refreshPendingCount,
     }),
-    [navigatorOnline, pendingCompletionCount, isSyncing, lastFlushReport, flushNow, refreshPendingCount],
+    [
+      navigatorOnline,
+      pendingCompletionCount,
+      isSyncing,
+      lastFlushReport,
+      flushNow,
+      refreshPendingCount,
+    ]
   );
 
   return <OfflineSyncContext.Provider value={value}>{children}</OfflineSyncContext.Provider>;
