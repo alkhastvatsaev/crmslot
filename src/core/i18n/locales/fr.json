@@ -893,7 +893,16 @@
     "google_redirect": "Redirection vers Google…",
     "google_provider_disabled": "Google non activé",
     "google_provider_disabled_hint": "Firebase Console → Authentication → Google : activer le fournisseur.",
-    "google_account_conflict": "Ce compte existe déjà avec une autre méthode de connexion."
+    "google_account_conflict": "Ce compte existe déjà avec une autre méthode de connexion.",
+    "forgot_password": "Mot de passe oublié ?",
+    "reset_email_sent": "Lien de réinitialisation envoyé",
+    "reset_email_failed": "Envoi impossible — vérifiez l'adresse",
+    "show_password": "Afficher",
+    "hide_password": "Masquer",
+    "technician_space_title": "Espace technicien",
+    "technician_space_subtitle": "Connectez-vous pour accéder à vos missions",
+    "demo_account_label": "Compte démo",
+    "demo_account_hint": "Cliquez pour pré-remplir les identifiants démo"
   },
   "requester": {
     "profile": {

@@ -893,7 +893,16 @@
     "google_redirect": "Redirecting to Google…",
     "google_provider_disabled": "Google sign-in not enabled",
     "google_provider_disabled_hint": "Firebase Console → Authentication → enable the Google provider.",
-    "google_account_conflict": "This account already exists with a different sign-in method."
+    "google_account_conflict": "This account already exists with a different sign-in method.",
+    "forgot_password": "Forgot password?",
+    "reset_email_sent": "Password reset link sent",
+    "reset_email_failed": "Could not send — check the address",
+    "show_password": "Show",
+    "hide_password": "Hide",
+    "technician_space_title": "Technician space",
+    "technician_space_subtitle": "Sign in to access your missions",
+    "demo_account_label": "Demo account",
+    "demo_account_hint": "Tap to fill demo credentials"
   },
   "requester": {
     "profile": {
