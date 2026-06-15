@@ -1,0 +1,8640 @@
+{
+  "src/app/api/demo/client-audio/route.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/app/api/demo/client-audio/file/[name]/route.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/app/landing/page.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/app/suivi/[token]/page.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/app/widget/[companyId]/page.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/avatar.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/badge.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/button.tsx": {
+    "statements": {
+      "pct": 75.86
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 75.86
+    }
+  },
+  "src/components/ui/card.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/dialog.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/input.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/components/ui/label.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/select.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/separator.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/sheet.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/components/ui/slide-action.tsx": {
+    "statements": {
+      "pct": 75.91
+    },
+    "branches": {
+      "pct": 45.71
+    },
+    "functions": {
+      "pct": 40
+    },
+    "lines": {
+      "pct": 75.91
+    }
+  },
+  "src/components/ui/tabs.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/context/BackofficeInboxIntentContext.tsx": {
+    "statements": {
+      "pct": 34.78
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 34.78
+    }
+  },
+  "src/context/BillingHubIntentContext.tsx": {
+    "statements": {
+      "pct": 96.55
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 96.55
+    }
+  },
+  "src/context/CompanyStockIntentContext.tsx": {
+    "statements": {
+      "pct": 89.52
+    },
+    "branches": {
+      "pct": 77.77
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 89.52
+    }
+  },
+  "src/context/CompanyWorkspaceContext.tsx": {
+    "statements": {
+      "pct": 23.5
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 23.5
+    }
+  },
+  "src/context/DateContext.tsx": {
+    "statements": {
+      "pct": 85.29
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 85.29
+    }
+  },
+  "src/context/OfflineSyncContext.tsx": {
+    "statements": {
+      "pct": 23.52
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 23.52
+    }
+  },
+  "src/context/TechnicianBackofficeReportBridgeContext.tsx": {
+    "statements": {
+      "pct": 39.25
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 39.25
+    }
+  },
+  "src/context/TechnicianCaseIntentContext.tsx": {
+    "statements": {
+      "pct": 40
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 40
+    }
+  },
+  "src/context/TechnicianFinishJobContext.tsx": {
+    "statements": {
+      "pct": 43.47
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 43.47
+    }
+  },
+  "src/core/featureFlags.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/useFeatureFlags.ts": {
+    "statements": {
+      "pct": 95.83
+    },
+    "branches": {
+      "pct": 78.57
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.83
+    }
+  },
+  "src/core/api/fetchWithAuth.ts": {
+    "statements": {
+      "pct": 88.57
+    },
+    "branches": {
+      "pct": 22.22
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 88.57
+    }
+  },
+  "src/core/api/routeAuth.ts": {
+    "statements": {
+      "pct": 85.03
+    },
+    "branches": {
+      "pct": 72.97
+    },
+    "functions": {
+      "pct": 88.88
+    },
+    "lines": {
+      "pct": 85.03
+    }
+  },
+  "src/core/api/twilioWebhook.ts": {
+    "statements": {
+      "pct": 42.3
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 42.3
+    }
+  },
+  "src/core/config/devUiPreview.ts": {
+    "statements": {
+      "pct": 95.65
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 95.65
+    }
+  },
+  "src/core/config/firebase-admin.ts": {
+    "statements": {
+      "pct": 50.81
+    },
+    "branches": {
+      "pct": 40
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 50.81
+    }
+  },
+  "src/core/config/firebase.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/config/mobileAccess.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/config/presentationMode.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/i18n/I18nContext.tsx": {
+    "statements": {
+      "pct": 88.18
+    },
+    "branches": {
+      "pct": 79.31
+    },
+    "functions": {
+      "pct": 87.5
+    },
+    "lines": {
+      "pct": 88.18
+    }
+  },
+  "src/core/maps/mapboxReverseGeocode.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/audio-decision-store.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/audio-route-helpers.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/downloadTwilioRecording.ts": {
+    "statements": {
+      "pct": 92.59
+    },
+    "branches": {
+      "pct": 85.71
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.59
+    }
+  },
+  "src/core/services/audio/ffmpeg-wav-buffer.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/ingestCallAudioBuffer.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/intervention-json-path.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/pick-upload-blob-from-form-data.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/process-upload-jobs.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/read-audio-upload-body.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/resolve-upload-by-basename.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/run-process-upload-job.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/transcript-sidecar.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/transcription.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/transcription.types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/audio/upload-organization.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/email/buildMimeEmail.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/services/email/gmailApiClient.ts": {
+    "statements": {
+      "pct": 28.57
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 28.57
+    }
+  },
+  "src/core/services/email/gmailHubScopes.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/services/email/gmailHubSession.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/email/gmailMessageBody.ts": {
+    "statements": {
+      "pct": 93.2
+    },
+    "branches": {
+      "pct": 84.37
+    },
+    "functions": {
+      "pct": 90
+    },
+    "lines": {
+      "pct": 93.2
+    }
+  },
+  "src/core/services/email/gmailOAuthConfig.ts": {
+    "statements": {
+      "pct": 62.35
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 25
+    },
+    "lines": {
+      "pct": 62.35
+    }
+  },
+  "src/core/services/email/gmailOAuthStore.ts": {
+    "statements": {
+      "pct": 34.04
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 34.04
+    }
+  },
+  "src/core/services/email/interventionEmailAttachOptions.ts": {
+    "statements": {
+      "pct": 80
+    },
+    "branches": {
+      "pct": 80
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 80
+    }
+  },
+  "src/core/services/email/interventionEmailPdfAttachment.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/services/email/sendGmailThreadReply.ts": {
+    "statements": {
+      "pct": 25.2
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 25.2
+    }
+  },
+  "src/core/services/email/sendInterventionEmail.ts": {
+    "statements": {
+      "pct": 73.26
+    },
+    "branches": {
+      "pct": 61.36
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 73.26
+    }
+  },
+  "src/core/services/email/sendViaGmailApi.ts": {
+    "statements": {
+      "pct": 24.67
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 24.67
+    }
+  },
+  "src/core/services/notifications/clientPaymentPush.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/ui/FieldIconButton.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/ui/GlassPanel.tsx": {
+    "statements": {
+      "pct": 98.38
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.38
+    }
+  },
+  "src/core/ui/ScaleToFitContainer.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/ui/dashboardDesktopLayout.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/ui/fieldMissionStatus.ts": {
+    "statements": {
+      "pct": 15.38
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 15.38
+    }
+  },
+  "src/core/ui/glassPanelChrome.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/core/ui/GalaxyButton/GalaxyButton.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/core/ui/GalaxyButton/galaxyStarsAnimation.ts": {
+    "statements": {
+      "pct": 16.58
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 16.58
+    }
+  },
+  "src/core/ui/Waveform/Waveform.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/ai/aiAssistantConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/ai/chatbotGeminiTools.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/app/DesktopOnlyGate.tsx": {
+    "statements": {
+      "pct": 75
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 75
+    }
+  },
+  "src/features/auth/clientPortalConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/auth/clientPortalGoogleSignIn.ts": {
+    "statements": {
+      "pct": 60.31
+    },
+    "branches": {
+      "pct": 57.14
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 60.31
+    }
+  },
+  "src/features/auth/clientPortalPasswordMfa.ts": {
+    "statements": {
+      "pct": 37.68
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 37.68
+    }
+  },
+  "src/features/auth/clientPortalProfile.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/auth/components/ClientPortalAuthEffects.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/auth/components/ClientPortalAuthPanel.tsx": {
+    "statements": {
+      "pct": 51.25
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 19.04
+    },
+    "lines": {
+      "pct": 51.25
+    }
+  },
+  "src/features/auth/components/ClientPortalPaymentReturnEffects.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/auth/components/LoginOverlay.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/applyBackofficeTechnicianAssignmentAdmin.ts": {
+    "statements": {
+      "pct": 96.49
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 96.49
+    }
+  },
+  "src/features/backoffice/applyBackofficeTechnicianAssignmentClient.ts": {
+    "statements": {
+      "pct": 26.41
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 26.41
+    }
+  },
+  "src/features/backoffice/applyBackofficeTechnicianAssignmentShared.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/assignInterventionFromBackoffice.ts": {
+    "statements": {
+      "pct": 66.66
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 66.66
+    }
+  },
+  "src/features/backoffice/assignInterventionServerAuth.ts": {
+    "statements": {
+      "pct": 91.17
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 91.17
+    }
+  },
+  "src/features/backoffice/backOfficeHubExample.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/backofficeBuckets.ts": {
+    "statements": {
+      "pct": 51.06
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 25
+    },
+    "lines": {
+      "pct": 51.06
+    }
+  },
+  "src/features/backoffice/backofficeConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/backofficeFilters.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/backofficeHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/backofficeHubNavigation.ts": {
+    "statements": {
+      "pct": 45
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 45
+    }
+  },
+  "src/features/backoffice/chatDayMissionRow.ts": {
+    "statements": {
+      "pct": 84.61
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 84.61
+    }
+  },
+  "src/features/backoffice/exportInterventionsCSV.ts": {
+    "statements": {
+      "pct": 76.85
+    },
+    "branches": {
+      "pct": 70
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 76.85
+    }
+  },
+  "src/features/backoffice/filterInterventionsByCompany.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/interventionHistory.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/ivanaChatFirestore.ts": {
+    "statements": {
+      "pct": 42.51
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 42.51
+    }
+  },
+  "src/features/backoffice/ivanaChatPortalBridge.ts": {
+    "statements": {
+      "pct": 68.75
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 68.75
+    }
+  },
+  "src/features/backoffice/ivanaChatStorage.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/mergeReportCompletionMedia.ts": {
+    "statements": {
+      "pct": 98.14
+    },
+    "branches": {
+      "pct": 73.91
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.14
+    }
+  },
+  "src/features/backoffice/openBackofficeIntervention.ts": {
+    "statements": {
+      "pct": 35.71
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 35.71
+    }
+  },
+  "src/features/backoffice/timeHelpers.ts": {
+    "statements": {
+      "pct": 76.47
+    },
+    "branches": {
+      "pct": 47.05
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 76.47
+    }
+  },
+  "src/features/backoffice/todayActivity.ts": {
+    "statements": {
+      "pct": 84.61
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 84.61
+    }
+  },
+  "src/features/backoffice/todayChatClients.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 90.9
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/useBackOfficeHubSelectedIntervention.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 62.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/useBackOfficeInterventions.ts": {
+    "statements": {
+      "pct": 93.93
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.93
+    }
+  },
+  "src/features/backoffice/useResolvedInterventionAudio.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/BackOfficeDashboardPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/BackOfficeHubExampleRails.tsx": {
+    "statements": {
+      "pct": 77.39
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 77.39
+    }
+  },
+  "src/features/backoffice/components/BackOfficeHubPage.tsx": {
+    "statements": {
+      "pct": 92.59
+    },
+    "branches": {
+      "pct": 77.77
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.59
+    }
+  },
+  "src/features/backoffice/components/BackOfficeHubPanelShell.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/backoffice/components/BackOfficeInboxPanel.tsx": {
+    "statements": {
+      "pct": 54.25
+    },
+    "branches": {
+      "pct": 42.5
+    },
+    "functions": {
+      "pct": 25.64
+    },
+    "lines": {
+      "pct": 54.25
+    }
+  },
+  "src/features/backoffice/components/ChatDayClientsPicker.tsx": {
+    "statements": {
+      "pct": 92.77
+    },
+    "branches": {
+      "pct": 62.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.77
+    }
+  },
+  "src/features/backoffice/components/DailyOperationsKpi.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/IncomingClientRequestsPanel.tsx": {
+    "statements": {
+      "pct": 74.57
+    },
+    "branches": {
+      "pct": 50.98
+    },
+    "functions": {
+      "pct": 35.71
+    },
+    "lines": {
+      "pct": 74.57
+    }
+  },
+  "src/features/backoffice/components/InterventionAuditTrail.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/IvanaClientChatPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/MaterialOrderManagement.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/backoffice/components/RequestDetailAudioPlayer.tsx": {
+    "statements": {
+      "pct": 8.19
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 8.19
+    }
+  },
+  "src/features/billing/appendBillingPdfFooter.ts": {
+    "statements": {
+      "pct": 71.05
+    },
+    "branches": {
+      "pct": 44.44
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 71.05
+    }
+  },
+  "src/features/billing/billingPdfBranding.ts": {
+    "statements": {
+      "pct": 58.71
+    },
+    "branches": {
+      "pct": 42.85
+    },
+    "functions": {
+      "pct": 40
+    },
+    "lines": {
+      "pct": 58.71
+    }
+  },
+  "src/features/billing/billingPdfTheme.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/billing/buildBillingPdfDocument.ts": {
+    "statements": {
+      "pct": 97.71
+    },
+    "branches": {
+      "pct": 63.15
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.71
+    }
+  },
+  "src/features/billing/exportAccountingCsv.ts": {
+    "statements": {
+      "pct": 86.13
+    },
+    "branches": {
+      "pct": 53.33
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 86.13
+    }
+  },
+  "src/features/billing/generateQuotePdf.ts": {
+    "statements": {
+      "pct": 76.78
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 60
+    },
+    "lines": {
+      "pct": 76.78
+    }
+  },
+  "src/features/billing/loadBillingPdfBrandingForIntervention.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/billing/smartBillingTemplates.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/billing/components/AccountingExportButton.tsx": {
+    "statements": {
+      "pct": 71.69
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 71.69
+    }
+  },
+  "src/features/billing/components/BillingLineSuggestions.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/billing/components/InvoiceBillingPanel.tsx": {
+    "statements": {
+      "pct": 88
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 14.28
+    },
+    "lines": {
+      "pct": 88
+    }
+  },
+  "src/features/billingHub/billingHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/billingHub/billingHubMetrics.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 68.18
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/billingHub/filterBillingHub.ts": {
+    "statements": {
+      "pct": 67.3
+    },
+    "branches": {
+      "pct": 44.44
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 67.3
+    }
+  },
+  "src/features/billingHub/components/BillingHubCenterPanel.tsx": {
+    "statements": {
+      "pct": 93.14
+    },
+    "branches": {
+      "pct": 42.1
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 93.14
+    }
+  },
+  "src/features/billingHub/components/BillingHubFilterBar.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/billingHub/components/BillingHubLeftRail.tsx": {
+    "statements": {
+      "pct": 98.9
+    },
+    "branches": {
+      "pct": 63.63
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 98.9
+    }
+  },
+  "src/features/billingHub/components/BillingHubPage.tsx": {
+    "statements": {
+      "pct": 90.24
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90.24
+    }
+  },
+  "src/features/billingHub/components/BillingHubRightAssistPanel.tsx": {
+    "statements": {
+      "pct": 77.02
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 77.02
+    }
+  },
+  "src/features/billingHub/hooks/useCompanyBillingInterventions.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/calendar/calendarConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/calendar/calendarDeepLinks.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/calendar/calendarGrid.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/calendar/icsEvent.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/calendar/interventionScheduleRange.ts": {
+    "statements": {
+      "pct": 65.51
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 65.51
+    }
+  },
+  "src/features/calendar/schedulingEngine.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/calendar/components/InterventionCalendarPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/catalog/catalogFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/catalog/lecotApiSearch.ts": {
+    "statements": {
+      "pct": 86.58
+    },
+    "branches": {
+      "pct": 53.12
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 86.58
+    }
+  },
+  "src/features/catalog/lecotCatalog.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/catalog/lecotGuestInfoFromFirestore.ts": {
+    "statements": {
+      "pct": 18.18
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 18.18
+    }
+  },
+  "src/features/catalog/lecotOrderFlags.ts": {
+    "statements": {
+      "pct": 67.74
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 67.74
+    }
+  },
+  "src/features/catalog/lecotPlaywrightScraper.ts": {
+    "statements": {
+      "pct": 10.49
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 10.49
+    }
+  },
+  "src/features/catalog/lecotShopConfig.ts": {
+    "statements": {
+      "pct": 85.36
+    },
+    "branches": {
+      "pct": 76.92
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 85.36
+    }
+  },
+  "src/features/catalog/lecotSupplierOrder.ts": {
+    "statements": {
+      "pct": 75.94
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 75.94
+    }
+  },
+  "src/features/catalog/loadCompanyCatalog.ts": {
+    "statements": {
+      "pct": 37.5
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 37.5
+    }
+  },
+  "src/features/catalog/mapCompanyCatalogProduct.ts": {
+    "statements": {
+      "pct": 65.21
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 65.21
+    }
+  },
+  "src/features/catalog/productQuickAdd.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/catalog/searchCatalogProducts.ts": {
+    "statements": {
+      "pct": 97
+    },
+    "branches": {
+      "pct": 87.09
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97
+    }
+  },
+  "src/features/catalog/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/catalog/useCompanyCatalog.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/catalog/useLecotProductSearch.ts": {
+    "statements": {
+      "pct": 89.77
+    },
+    "branches": {
+      "pct": 64.7
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 89.77
+    }
+  },
+  "src/features/catalog/components/CompanyCatalogPanel.tsx": {
+    "statements": {
+      "pct": 66.66
+    },
+    "branches": {
+      "pct": 22.22
+    },
+    "functions": {
+      "pct": 14.28
+    },
+    "lines": {
+      "pct": 66.66
+    }
+  },
+  "src/features/catalog/components/ProductQuickAddBar.tsx": {
+    "statements": {
+      "pct": 96.22
+    },
+    "branches": {
+      "pct": 76.47
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 96.22
+    }
+  },
+  "src/features/chatbot/ChatbotContext.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/chatbot-address-disambiguation.ts": {
+    "statements": {
+      "pct": 87.35
+    },
+    "branches": {
+      "pct": 71.27
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 87.35
+    }
+  },
+  "src/features/chatbot/chatbot-billing-parse.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 81.48
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-billing-resolve.ts": {
+    "statements": {
+      "pct": 43.83
+    },
+    "branches": {
+      "pct": 77.77
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 43.83
+    }
+  },
+  "src/features/chatbot/chatbot-billing.ts": {
+    "statements": {
+      "pct": 76
+    },
+    "branches": {
+      "pct": 52
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 76
+    }
+  },
+  "src/features/chatbot/chatbot-client-document.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/chatbot-client-email.ts": {
+    "statements": {
+      "pct": 88.69
+    },
+    "branches": {
+      "pct": 53.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 88.69
+    }
+  },
+  "src/features/chatbot/chatbot-confirm-utterance.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-conversation-context.ts": {
+    "statements": {
+      "pct": 95.53
+    },
+    "branches": {
+      "pct": 84.7
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.53
+    }
+  },
+  "src/features/chatbot/chatbot-document-action-handler.ts": {
+    "statements": {
+      "pct": 65.77
+    },
+    "branches": {
+      "pct": 56
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 65.77
+    }
+  },
+  "src/features/chatbot/chatbot-document-preview-ui.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-document-side-effect.ts": {
+    "statements": {
+      "pct": 83.78
+    },
+    "branches": {
+      "pct": 64.81
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 83.78
+    }
+  },
+  "src/features/chatbot/chatbot-document.ts": {
+    "statements": {
+      "pct": 80.95
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 80.95
+    }
+  },
+  "src/features/chatbot/chatbot-email-attach.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 76.92
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-email-intent.ts": {
+    "statements": {
+      "pct": 93.54
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.54
+    }
+  },
+  "src/features/chatbot/chatbot-gemini.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/chatbot-gmail.ts": {
+    "statements": {
+      "pct": 96.34
+    },
+    "branches": {
+      "pct": 36.36
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 96.34
+    }
+  },
+  "src/features/chatbot/chatbot-greeting.ts": {
+    "statements": {
+      "pct": 96.15
+    },
+    "branches": {
+      "pct": 37.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 96.15
+    }
+  },
+  "src/features/chatbot/chatbot-intervention-source.ts": {
+    "statements": {
+      "pct": 54.23
+    },
+    "branches": {
+      "pct": 56.25
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 54.23
+    }
+  },
+  "src/features/chatbot/chatbot-latency.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 71.42
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-lecot-demo.ts": {
+    "statements": {
+      "pct": 93.15
+    },
+    "branches": {
+      "pct": 85
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 93.15
+    }
+  },
+  "src/features/chatbot/chatbot-lecot-follow-up.ts": {
+    "statements": {
+      "pct": 64.92
+    },
+    "branches": {
+      "pct": 61.76
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 64.92
+    }
+  },
+  "src/features/chatbot/chatbot-lecot-instant-order.ts": {
+    "statements": {
+      "pct": 83.62
+    },
+    "branches": {
+      "pct": 67.39
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 83.62
+    }
+  },
+  "src/features/chatbot/chatbot-lecot-url.ts": {
+    "statements": {
+      "pct": 90
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90
+    }
+  },
+  "src/features/chatbot/chatbot-lecot.ts": {
+    "statements": {
+      "pct": 68.19
+    },
+    "branches": {
+      "pct": 58.18
+    },
+    "functions": {
+      "pct": 93.33
+    },
+    "lines": {
+      "pct": 68.19
+    }
+  },
+  "src/features/chatbot/chatbot-logger.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/chatbot-message-markdown.tsx": {
+    "statements": {
+      "pct": 65.51
+    },
+    "branches": {
+      "pct": 80
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 65.51
+    }
+  },
+  "src/features/chatbot/chatbot-message-trim.ts": {
+    "statements": {
+      "pct": 57.73
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 60
+    },
+    "lines": {
+      "pct": 57.73
+    }
+  },
+  "src/features/chatbot/chatbot-navigation.ts": {
+    "statements": {
+      "pct": 35.71
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 35.71
+    }
+  },
+  "src/features/chatbot/chatbot-openai.ts": {
+    "statements": {
+      "pct": 20.73
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 20.73
+    }
+  },
+  "src/features/chatbot/chatbot-order-side-effect.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-order-sync.ts": {
+    "statements": {
+      "pct": 92.3
+    },
+    "branches": {
+      "pct": 22.22
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.3
+    }
+  },
+  "src/features/chatbot/chatbot-post-tool-reply.ts": {
+    "statements": {
+      "pct": 53.33
+    },
+    "branches": {
+      "pct": 16.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 53.33
+    }
+  },
+  "src/features/chatbot/chatbot-pwa-intent.ts": {
+    "statements": {
+      "pct": 85.28
+    },
+    "branches": {
+      "pct": 56.25
+    },
+    "functions": {
+      "pct": 81.81
+    },
+    "lines": {
+      "pct": 85.28
+    }
+  },
+  "src/features/chatbot/chatbot-pwa-route.ts": {
+    "statements": {
+      "pct": 68.11
+    },
+    "branches": {
+      "pct": 40
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 68.11
+    }
+  },
+  "src/features/chatbot/chatbot-quick-actions.ts": {
+    "statements": {
+      "pct": 90.38
+    },
+    "branches": {
+      "pct": 94.73
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90.38
+    }
+  },
+  "src/features/chatbot/chatbot-route-handler.ts": {
+    "statements": {
+      "pct": 86.87
+    },
+    "branches": {
+      "pct": 76
+    },
+    "functions": {
+      "pct": 83.33
+    },
+    "lines": {
+      "pct": 86.87
+    }
+  },
+  "src/features/chatbot/chatbot-snapshot-prompt.ts": {
+    "statements": {
+      "pct": 48.38
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 48.38
+    }
+  },
+  "src/features/chatbot/chatbot-sse.ts": {
+    "statements": {
+      "pct": 78.65
+    },
+    "branches": {
+      "pct": 78.57
+    },
+    "functions": {
+      "pct": 88.88
+    },
+    "lines": {
+      "pct": 78.65
+    }
+  },
+  "src/features/chatbot/chatbot-stored-messages.ts": {
+    "statements": {
+      "pct": 77.94
+    },
+    "branches": {
+      "pct": 68.42
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 77.94
+    }
+  },
+  "src/features/chatbot/chatbot-supplier-orders-side-effect.ts": {
+    "statements": {
+      "pct": 97.36
+    },
+    "branches": {
+      "pct": 90.9
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.36
+    }
+  },
+  "src/features/chatbot/chatbot-system-prompt.ts": {
+    "statements": {
+      "pct": 89.83
+    },
+    "branches": {
+      "pct": 14.28
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 89.83
+    }
+  },
+  "src/features/chatbot/chatbot-tool-executor.ts": {
+    "statements": {
+      "pct": 71.72
+    },
+    "branches": {
+      "pct": 41.12
+    },
+    "functions": {
+      "pct": 75.75
+    },
+    "lines": {
+      "pct": 71.72
+    }
+  },
+  "src/features/chatbot/chatbot-tool-routing.ts": {
+    "statements": {
+      "pct": 93
+    },
+    "branches": {
+      "pct": 74.28
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93
+    }
+  },
+  "src/features/chatbot/chatbot-tools.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/chatbot-types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/chatbot-workspace-search.ts": {
+    "statements": {
+      "pct": 91.61
+    },
+    "branches": {
+      "pct": 58.62
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 91.61
+    }
+  },
+  "src/features/chatbot/chatbotInvoiceRows.ts": {
+    "statements": {
+      "pct": 95.74
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.74
+    }
+  },
+  "src/features/chatbot/chatbotOrderClientLabels.ts": {
+    "statements": {
+      "pct": 90.9
+    },
+    "branches": {
+      "pct": 85.71
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 90.9
+    }
+  },
+  "src/features/chatbot/chatbotPdfDb.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/compactChatbotToolResult.ts": {
+    "statements": {
+      "pct": 63.58
+    },
+    "branches": {
+      "pct": 44.44
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 63.58
+    }
+  },
+  "src/features/chatbot/fetchChatbotPwaRegistry.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/filterChatbotDocuments.ts": {
+    "statements": {
+      "pct": 97.84
+    },
+    "branches": {
+      "pct": 72.97
+    },
+    "functions": {
+      "pct": 94.73
+    },
+    "lines": {
+      "pct": 97.84
+    }
+  },
+  "src/features/chatbot/serrAI-tools.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/serrAI-types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/supplierOrderDemoProgress.ts": {
+    "statements": {
+      "pct": 97.77
+    },
+    "branches": {
+      "pct": 71.42
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.77
+    }
+  },
+  "src/features/chatbot/components/ChatbotChat.tsx": {
+    "statements": {
+      "pct": 75.58
+    },
+    "branches": {
+      "pct": 85.71
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 75.58
+    }
+  },
+  "src/features/chatbot/components/ChatbotContextRail.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/components/ChatbotConversationsRail.tsx": {
+    "statements": {
+      "pct": 89.1
+    },
+    "branches": {
+      "pct": 68.75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 89.1
+    }
+  },
+  "src/features/chatbot/components/ChatbotDocumentsRightPanel.tsx": {
+    "statements": {
+      "pct": 94.52
+    },
+    "branches": {
+      "pct": 61.11
+    },
+    "functions": {
+      "pct": 90.9
+    },
+    "lines": {
+      "pct": 94.52
+    }
+  },
+  "src/features/chatbot/components/ChatbotGalaxyComposer.tsx": {
+    "statements": {
+      "pct": 75.73
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 12.5
+    },
+    "lines": {
+      "pct": 75.73
+    }
+  },
+  "src/features/chatbot/components/ChatbotGalaxyOrb.tsx": {
+    "statements": {
+      "pct": 80.76
+    },
+    "branches": {
+      "pct": 57.14
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 80.76
+    }
+  },
+  "src/features/chatbot/components/ChatbotInvoicesPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/components/ChatbotOrdersLeftRail.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/components/ChatbotPage.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/components/ChatbotPdfPreviewOverlay.tsx": {
+    "statements": {
+      "pct": 80.76
+    },
+    "branches": {
+      "pct": 14.28
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 80.76
+    }
+  },
+  "src/features/chatbot/components/ChatbotPdfPreviewPanel.tsx": {
+    "statements": {
+      "pct": 52.94
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 52.94
+    }
+  },
+  "src/features/chatbot/components/ChatbotQuickActions.tsx": {
+    "statements": {
+      "pct": 98.21
+    },
+    "branches": {
+      "pct": 90
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.21
+    }
+  },
+  "src/features/chatbot/components/ChatbotRightRail.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/components/ChatbotSupplierOrdersPanel.tsx": {
+    "statements": {
+      "pct": 74.11
+    },
+    "branches": {
+      "pct": 68.42
+    },
+    "functions": {
+      "pct": 76.92
+    },
+    "lines": {
+      "pct": 74.11
+    }
+  },
+  "src/features/chatbot/components/SerrAIChat.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/components/SupplierOrderDemoProgress.tsx": {
+    "statements": {
+      "pct": 87.09
+    },
+    "branches": {
+      "pct": 95.23
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 87.09
+    }
+  },
+  "src/features/chatbot/hooks/useChatbot.ts": {
+    "statements": {
+      "pct": 69.04
+    },
+    "branches": {
+      "pct": 56.12
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 69.04
+    }
+  },
+  "src/features/chatbot/hooks/useChatbotDocumentPreview.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/hooks/useChatbotDocumentTileThumbnails.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/hooks/useChatbotInvoicesPanel.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/hooks/useChatbotSupplierOrdersPanel.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/chatbot/testFixtures/chatbotWorkspaceSnapshot.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/testFixtures/readSseJsonLines.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/training/appendChatbotTrainingLog.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/chatbot/training/extractChatbotTrainingTurn.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/checklist/checklistFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/checklist/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/checklist/components/InterventionChecklistPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/claims/claimsFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/claims/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/claims/components/ClaimPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/clients/clientCrmOfflineCache.ts": {
+    "statements": {
+      "pct": 81.81
+    },
+    "branches": {
+      "pct": 41.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 81.81
+    }
+  },
+  "src/features/clients/clientDisplayName.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/clients/clientFirestore.ts": {
+    "statements": {
+      "pct": 37.77
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 28.57
+    },
+    "lines": {
+      "pct": 37.77
+    }
+  },
+  "src/features/clients/clientInterventions.ts": {
+    "statements": {
+      "pct": 93.61
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.61
+    }
+  },
+  "src/features/clients/exportClientsCsv.ts": {
+    "statements": {
+      "pct": 68.96
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 68.96
+    }
+  },
+  "src/features/clients/linkInterventionToClient.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 85.71
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/clients/parseClientsCsv.ts": {
+    "statements": {
+      "pct": 98.01
+    },
+    "branches": {
+      "pct": 69.56
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.01
+    }
+  },
+  "src/features/clients/recurringContracts.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/clients/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/clients/useClientInterventions.ts": {
+    "statements": {
+      "pct": 90
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90
+    }
+  },
+  "src/features/clients/useClientSites.ts": {
+    "statements": {
+      "pct": 71.79
+    },
+    "branches": {
+      "pct": 42.85
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 71.79
+    }
+  },
+  "src/features/clients/useClients.ts": {
+    "statements": {
+      "pct": 50
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 50
+    }
+  },
+  "src/features/clients/components/ClientInterventionsPanel.tsx": {
+    "statements": {
+      "pct": 63.63
+    },
+    "branches": {
+      "pct": 28.57
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 63.63
+    }
+  },
+  "src/features/clients/components/ClientsCrmPanel.tsx": {
+    "statements": {
+      "pct": 63.85
+    },
+    "branches": {
+      "pct": 67.74
+    },
+    "functions": {
+      "pct": 7.69
+    },
+    "lines": {
+      "pct": 63.85
+    }
+  },
+  "src/features/clients/components/InterventionClientLinkPanel.tsx": {
+    "statements": {
+      "pct": 84.04
+    },
+    "branches": {
+      "pct": 59.37
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 84.04
+    }
+  },
+  "src/features/clients/components/RecurringContractsPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/clients/components/SiteQrCodePanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/commissions/commissionFirestore.ts": {
+    "statements": {
+      "pct": 44.03
+    },
+    "branches": {
+      "pct": 70.58
+    },
+    "functions": {
+      "pct": 35.71
+    },
+    "lines": {
+      "pct": 44.03
+    }
+  },
+  "src/features/commissions/computeInterventionCommission.ts": {
+    "statements": {
+      "pct": 19.04
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 19.04
+    }
+  },
+  "src/features/commissions/engine.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/commissions/formatCommissionAuditAt.ts": {
+    "statements": {
+      "pct": 13.33
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 13.33
+    }
+  },
+  "src/features/commissions/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/commissions/useCommissionRules.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/commissions/useInterventionCommission.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/commissions/components/CommissionDashboard.tsx": {
+    "statements": {
+      "pct": 83.02
+    },
+    "branches": {
+      "pct": 57.57
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 83.02
+    }
+  },
+  "src/features/commissions/components/CommissionHistoryPanel.tsx": {
+    "statements": {
+      "pct": 91.22
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 91.22
+    }
+  },
+  "src/features/commissions/components/CommissionOverrideModal.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/commissions/components/CommissionTechnicianSelect.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/commissions/components/InterventionCommissionAuditList.tsx": {
+    "statements": {
+      "pct": 43.85
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 43.85
+    }
+  },
+  "src/features/commissions/components/InterventionCommissionPanel.tsx": {
+    "statements": {
+      "pct": 65.59
+    },
+    "branches": {
+      "pct": 64.7
+    },
+    "functions": {
+      "pct": 28.57
+    },
+    "lines": {
+      "pct": 65.59
+    }
+  },
+  "src/features/commissions/components/InterventionInvoiceAmountField.tsx": {
+    "statements": {
+      "pct": 95.34
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.34
+    }
+  },
+  "src/features/communications/whatsappNotifications.ts": {
+    "statements": {
+      "pct": 85
+    },
+    "branches": {
+      "pct": 21.42
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 85
+    }
+  },
+  "src/features/communications/components/CentralizedTimeline.tsx": {
+    "statements": {
+      "pct": 98.38
+    },
+    "branches": {
+      "pct": 86.95
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.38
+    }
+  },
+  "src/features/company/companyHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/company/companyHubNavigation.ts": {
+    "statements": {
+      "pct": 95
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 95
+    }
+  },
+  "src/features/company/isCompanyDispatchViewer.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/company/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/company/components/CompanyHubDocumentsTab.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/company/components/CompanyHubPage.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/company/components/CompanyHubTimelineTab.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/company/components/CompanySpacePanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/company/components/CompanyWorkspaceSwitcher.tsx": {
+    "statements": {
+      "pct": 39.47
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 39.47
+    }
+  },
+  "src/features/company/components/MultiCompanyOverviewPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/copilot/buildWorkspaceCopilotSnapshot.ts": {
+    "statements": {
+      "pct": 98.41
+    },
+    "branches": {
+      "pct": 72.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 98.41
+    }
+  },
+  "src/features/copilot/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/copilot/components/PwaCopilotChatPanel.tsx": {
+    "statements": {
+      "pct": 63.78
+    },
+    "branches": {
+      "pct": 36.84
+    },
+    "functions": {
+      "pct": 40
+    },
+    "lines": {
+      "pct": 63.78
+    }
+  },
+  "src/features/copilot/components/PwaCopilotContextSummary.tsx": {
+    "statements": {
+      "pct": 83.56
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 83.56
+    }
+  },
+  "src/features/copilot/components/PwaCopilotSuggestions.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/copilot/hooks/useWorkspaceCopilotSnapshot.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/crmHistory/crmActivityFilters.ts": {
+    "statements": {
+      "pct": 93.33
+    },
+    "branches": {
+      "pct": 97.14
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.33
+    }
+  },
+  "src/features/crmHistory/crmActivitySynthesizer.ts": {
+    "statements": {
+      "pct": 79.87
+    },
+    "branches": {
+      "pct": 53.65
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 79.87
+    }
+  },
+  "src/features/crmHistory/crmActivityTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/crmHistory/crmHistoryConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/crmHistory/components/CrmHistoryAiRail.tsx": {
+    "statements": {
+      "pct": 96.87
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 96.87
+    }
+  },
+  "src/features/crmHistory/components/CrmHistoryCenterFeed.tsx": {
+    "statements": {
+      "pct": 98.82
+    },
+    "branches": {
+      "pct": 86.84
+    },
+    "functions": {
+      "pct": 85.71
+    },
+    "lines": {
+      "pct": 98.82
+    }
+  },
+  "src/features/crmHistory/components/CrmHistoryLeftRail.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 80
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/crmHistory/components/CrmHistoryPage.tsx": {
+    "statements": {
+      "pct": 95.69
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.69
+    }
+  },
+  "src/features/crmHistory/hooks/useCompanyCommissionsFeed.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/crmHistory/hooks/useCompanyEmailsFeed.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/crmHistory/hooks/useCrmActivityFeed.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dashboard/companyKpi.ts": {
+    "statements": {
+      "pct": 86.95
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 86.95
+    }
+  },
+  "src/features/dashboard/dashboardPageGuide.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/dashboardPagerContext.tsx": {
+    "statements": {
+      "pct": 88.57
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 88.57
+    }
+  },
+  "src/features/dashboard/quoteRequestsOrder.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/quoteRequestsPanelId.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/AutoProcessUploads.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/ClockCalendar.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/CompanyKpiPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/DailyMissions.tsx": {
+    "statements": {
+      "pct": 87.41
+    },
+    "branches": {
+      "pct": 40
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 87.41
+    }
+  },
+  "src/features/dashboard/components/DashboardDesktopShell.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 16.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dashboard/components/DashboardKpiStrip.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dashboard/components/DashboardPager.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/DashboardPagerControls.tsx": {
+    "statements": {
+      "pct": 66.07
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 66.07
+    }
+  },
+  "src/features/dashboard/components/DashboardSecondaryPlaceholder.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/DashboardTriplePanelLayout.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dashboard/components/MacroDroidIndicator.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/QuoteRequests.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dashboard/components/SpotlightSearch.tsx": {
+    "statements": {
+      "pct": 79.35
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 20
+    },
+    "lines": {
+      "pct": 79.35
+    }
+  },
+  "src/features/dashboard/components/UserProfile.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dev/DevPreviewAnonymousAuth.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dev/StagingPreviewBanner.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dev/demoBillingInterventions.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dev/demoCompanyStock.ts": {
+    "statements": {
+      "pct": 97.95
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 97.95
+    }
+  },
+  "src/features/dev/demoInterventions.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dispatch/aiStripAnchor.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dispatch/algorithm.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dispatch/calendarUtils.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dispatch/rankTechniciansForIntervention.ts": {
+    "statements": {
+      "pct": 97.43
+    },
+    "branches": {
+      "pct": 84.21
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.43
+    }
+  },
+  "src/features/dispatch/technicianAssignUid.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 85.71
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/dispatch/useAiStripInsetRect.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dispatch/components/AiAssistant.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dispatch/components/DispatchWeekCalendar.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/dispatch/components/TechnicianAssignPicker.tsx": {
+    "statements": {
+      "pct": 87.53
+    },
+    "branches": {
+      "pct": 74.32
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 87.53
+    }
+  },
+  "src/features/emails/interventionEmailFirestore.ts": {
+    "statements": {
+      "pct": 79.31
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 79.31
+    }
+  },
+  "src/features/emails/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/emails/useInterventionEmails.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/emails/components/InterventionEmailPanel.tsx": {
+    "statements": {
+      "pct": 84.21
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 41.66
+    },
+    "lines": {
+      "pct": 84.21
+    }
+  },
+  "src/features/equipment/equipmentFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/equipment/equipmentQr.ts": {
+    "statements": {
+      "pct": 84.21
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 84.21
+    }
+  },
+  "src/features/equipment/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/equipment/components/EquipmentPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/equipment/components/EquipmentQrButton.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/equipment/components/EquipmentStatusBadge.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/featureHub/companyStockAutopilot.ts": {
+    "statements": {
+      "pct": 88.15
+    },
+    "branches": {
+      "pct": 69.69
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 88.15
+    }
+  },
+  "src/features/featureHub/companyStockAutopilotRun.ts": {
+    "statements": {
+      "pct": 24.24
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 24.24
+    }
+  },
+  "src/features/featureHub/companyStockCategories.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/companyStockChatbot.ts": {
+    "statements": {
+      "pct": 30.76
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 30.76
+    }
+  },
+  "src/features/featureHub/companyStockMetrics.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 84.61
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/featureHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/featureHubNavigation.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/featureHub/filterCompanyStock.ts": {
+    "statements": {
+      "pct": 90.21
+    },
+    "branches": {
+      "pct": 76.92
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90.21
+    }
+  },
+  "src/features/featureHub/seedCompanyStockCatalog.ts": {
+    "statements": {
+      "pct": 22.72
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 22.72
+    }
+  },
+  "src/features/featureHub/components/CompanyStockAutopilotButton.tsx": {
+    "statements": {
+      "pct": 72.61
+    },
+    "branches": {
+      "pct": 16.66
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 72.61
+    }
+  },
+  "src/features/featureHub/components/CompanyStockCategoryBreakdown.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/components/CompanyStockCenterPanel.tsx": {
+    "statements": {
+      "pct": 72.97
+    },
+    "branches": {
+      "pct": 35.29
+    },
+    "functions": {
+      "pct": 10
+    },
+    "lines": {
+      "pct": 72.97
+    }
+  },
+  "src/features/featureHub/components/CompanyStockChatbotRail.tsx": {
+    "statements": {
+      "pct": 81.11
+    },
+    "branches": {
+      "pct": 56.25
+    },
+    "functions": {
+      "pct": 14.28
+    },
+    "lines": {
+      "pct": 81.11
+    }
+  },
+  "src/features/featureHub/components/CompanyStockFilterBar.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 92.85
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/components/CompanyStockLeftRail.tsx": {
+    "statements": {
+      "pct": 95.83
+    },
+    "branches": {
+      "pct": 77.77
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 95.83
+    }
+  },
+  "src/features/featureHub/components/CompanyStockProWorkspace.tsx": {
+    "statements": {
+      "pct": 17.91
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 17.91
+    }
+  },
+  "src/features/featureHub/components/FeatureHubPage.tsx": {
+    "statements": {
+      "pct": 91.66
+    },
+    "branches": {
+      "pct": 21.42
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 91.66
+    }
+  },
+  "src/features/featureHub/hooks/useCompanyMaterialOrdersRecent.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/featureHub/hooks/useCompanyStockAutopilot.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 81.25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/featureHub/hooks/useCompanyStockItems.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/featureHub/hooks/useCompanySupplierOrdersRecent.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/geofence/geofenceConstants.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/geofence/geofenceUtils.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/geofence/useGeofenceMonitor.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/geofence/components/GeofenceArrivalToast.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/gmail/gmailHubAttachmentBlob.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/gmail/gmailHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/gmail/gmailHubMappers.ts": {
+    "statements": {
+      "pct": 52
+    },
+    "branches": {
+      "pct": 16.66
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 52
+    }
+  },
+  "src/features/gmail/gmailHubTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/gmail/gmailHubUi.ts": {
+    "statements": {
+      "pct": 87.5
+    },
+    "branches": {
+      "pct": 34.78
+    },
+    "functions": {
+      "pct": 87.5
+    },
+    "lines": {
+      "pct": 87.5
+    }
+  },
+  "src/features/gmail/gmailRouteCompany.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 88.88
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/gmail/pdfJsClient.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/gmail/renderPdfThumbnail.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/gmail/useGmailHub.ts": {
+    "statements": {
+      "pct": 64.15
+    },
+    "branches": {
+      "pct": 40.81
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 64.15
+    }
+  },
+  "src/features/gmail/useGmailHubKeyboard.ts": {
+    "statements": {
+      "pct": 48.48
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 48.48
+    }
+  },
+  "src/features/gmail/useGmailHubLinkIntervention.ts": {
+    "statements": {
+      "pct": 47.82
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 47.82
+    }
+  },
+  "src/features/gmail/useGmailPdfAttachmentPreviews.ts": {
+    "statements": {
+      "pct": 97.32
+    },
+    "branches": {
+      "pct": 65.21
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.32
+    }
+  },
+  "src/features/gmail/components/GmailGoogleConnectButton.tsx": {
+    "statements": {
+      "pct": 89.88
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 89.88
+    }
+  },
+  "src/features/gmail/components/GmailHubAttachments.tsx": {
+    "statements": {
+      "pct": 93.52
+    },
+    "branches": {
+      "pct": 54.54
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.52
+    }
+  },
+  "src/features/gmail/components/GmailHubAvatar.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/gmail/components/GmailHubInboxList.tsx": {
+    "statements": {
+      "pct": 67.48
+    },
+    "branches": {
+      "pct": 57.69
+    },
+    "functions": {
+      "pct": 18.18
+    },
+    "lines": {
+      "pct": 67.48
+    }
+  },
+  "src/features/gmail/components/GmailHubLinkInterventionPanel.tsx": {
+    "statements": {
+      "pct": 76.8
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 80
+    },
+    "lines": {
+      "pct": 76.8
+    }
+  },
+  "src/features/gmail/components/GmailHubPage.tsx": {
+    "statements": {
+      "pct": 61.97
+    },
+    "branches": {
+      "pct": 67.85
+    },
+    "functions": {
+      "pct": 7.14
+    },
+    "lines": {
+      "pct": 61.97
+    }
+  },
+  "src/features/gmail/components/GmailHubReaderPane.tsx": {
+    "statements": {
+      "pct": 73.44
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 28.57
+    },
+    "lines": {
+      "pct": 73.44
+    }
+  },
+  "src/features/gmail/components/GmailHubSetupPanel.tsx": {
+    "statements": {
+      "pct": 93.93
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 93.93
+    }
+  },
+  "src/features/gmail/components/GmailHubSidebar.tsx": {
+    "statements": {
+      "pct": 83.55
+    },
+    "branches": {
+      "pct": 70
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 83.55
+    }
+  },
+  "src/features/inbox/inboxFirestore.ts": {
+    "statements": {
+      "pct": 33.33
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 16.66
+    },
+    "lines": {
+      "pct": 33.33
+    }
+  },
+  "src/features/inbox/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/inbox/components/InboxBell.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/assignInterventionToTechnician.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/buildInterventionReportPdf.ts": {
+    "statements": {
+      "pct": 89.47
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 89.47
+    }
+  },
+  "src/features/interventions/categoryChecklist.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/clientAudioUpload.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/completionPhotoUrls.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 90.9
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/completionUpload.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/completionUploadCore.ts": {
+    "statements": {
+      "pct": 14.89
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 14.89
+    }
+  },
+  "src/features/interventions/compressImageToDataUrl.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/defaultAssignedTechnicianUid.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/detectDuplicates.ts": {
+    "statements": {
+      "pct": 47.82
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 47.82
+    }
+  },
+  "src/features/interventions/duplicateAlertActions.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/duplicateAlertTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/duplicateDetectionCore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/finishJobCapture.ts": {
+    "statements": {
+      "pct": 9.09
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 9.09
+    }
+  },
+  "src/features/interventions/finishJobConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/googleMapsPlacesLoader.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/hooks.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/interventionDescriptionText.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/interventionDuplicateConstants.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/interventionLocation.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/invoiceConstants.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/invoiceEligibility.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/mapTechnicianMissions.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/missionActionBar.ts": {
+    "statements": {
+      "pct": 92.04
+    },
+    "branches": {
+      "pct": 93.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.04
+    }
+  },
+  "src/features/interventions/optimizeTourOrder.ts": {
+    "statements": {
+      "pct": 80.64
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 80.64
+    }
+  },
+  "src/features/interventions/patchTechnicianAssignmentInCache.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/portalToken.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/recordDuplicateAlertIfNeeded.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/resolveInterventionClientName.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 47.61
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/respondToTechnicianAssignment.ts": {
+    "statements": {
+      "pct": 58.51
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 58.51
+    }
+  },
+  "src/features/interventions/slaUtils.ts": {
+    "statements": {
+      "pct": 90.16
+    },
+    "branches": {
+      "pct": 54.54
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90.16
+    }
+  },
+  "src/features/interventions/smartFormReverseGeocode.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/smartInterventionConstants.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/submitClientRating.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/suggestBillingLines.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 81.25
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/technicianAssignmentActions.ts": {
+    "statements": {
+      "pct": 86.81
+    },
+    "branches": {
+      "pct": 87.5
+    },
+    "functions": {
+      "pct": 85.71
+    },
+    "lines": {
+      "pct": 86.81
+    }
+  },
+  "src/features/interventions/technicianAssignmentServerAuth.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/technicianAssignmentsFilter.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/technicianCaseFetch.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/technicianDashboardConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/technicianHubNavigation.ts": {
+    "statements": {
+      "pct": 56
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 56
+    }
+  },
+  "src/features/interventions/technicianSchedule.ts": {
+    "statements": {
+      "pct": 70.88
+    },
+    "branches": {
+      "pct": 63.33
+    },
+    "functions": {
+      "pct": 84.61
+    },
+    "lines": {
+      "pct": 70.88
+    }
+  },
+  "src/features/interventions/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/useAudioRecorder.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/useBrowserSpeechDictation.ts": {
+    "statements": {
+      "pct": 16
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 16
+    }
+  },
+  "src/features/interventions/useInterventionLive.ts": {
+    "statements": {
+      "pct": 47.36
+    },
+    "branches": {
+      "pct": 69.23
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 47.36
+    }
+  },
+  "src/features/interventions/useOpenDuplicateAlerts.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/useTechnicianAssignments.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/useTechnicianMissionDayAnchor.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/AdminValidationPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/BillingLineSuggestions.tsx": {
+    "statements": {
+      "pct": 35.55
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 35.55
+    }
+  },
+  "src/features/interventions/components/CategoryFinishChecklist.tsx": {
+    "statements": {
+      "pct": 29.31
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 29.31
+    }
+  },
+  "src/features/interventions/components/ClientRatingPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/DuplicateAlertsPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/DuplicateAlertsQueue.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/DuplicateWarningBanner.tsx": {
+    "statements": {
+      "pct": 85.93
+    },
+    "branches": {
+      "pct": 37.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 85.93
+    }
+  },
+  "src/features/interventions/components/FinishJobStepIndicator.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/components/InterventionCaseTimeline.tsx": {
+    "statements": {
+      "pct": 82.6
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 82.6
+    }
+  },
+  "src/features/interventions/components/InterventionCommandPalette.tsx": {
+    "statements": {
+      "pct": 25.64
+    },
+    "branches": {
+      "pct": 80
+    },
+    "functions": {
+      "pct": 11.11
+    },
+    "lines": {
+      "pct": 25.64
+    }
+  },
+  "src/features/interventions/components/InterventionInvoiceButton.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/InterventionPdfButton.tsx": {
+    "statements": {
+      "pct": 24.13
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 24.13
+    }
+  },
+  "src/features/interventions/components/MissionActionBar.tsx": {
+    "statements": {
+      "pct": 88.48
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 88.48
+    }
+  },
+  "src/features/interventions/components/QuickCameraUploader.tsx": {
+    "statements": {
+      "pct": 13.28
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 13.28
+    }
+  },
+  "src/features/interventions/components/RequesterInterventionPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/RequesterInterventionStepperHeader.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/RequesterPaymentPanel.tsx": {
+    "statements": {
+      "pct": 70
+    },
+    "branches": {
+      "pct": 54.54
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 70
+    }
+  },
+  "src/features/interventions/components/RequesterPortalEnrichment.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/RequesterProfilePanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/RequesterPushNotificationButton.tsx": {
+    "statements": {
+      "pct": 83.72
+    },
+    "branches": {
+      "pct": 28.57
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 83.72
+    }
+  },
+  "src/features/interventions/components/RequesterTrackingPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SlaBadge.tsx": {
+    "statements": {
+      "pct": 97.05
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.05
+    }
+  },
+  "src/features/interventions/components/SmartActionFAB.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SmartFormAddressAutocomplete.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SmartFormAddressMiniMap.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SmartInterventionRequestForm.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SmartTimeSlotPicker.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/SwipeableInterventionCard.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/TechnicianAssignmentOfferCard.tsx": {
+    "statements": {
+      "pct": 83.95
+    },
+    "branches": {
+      "pct": 11.11
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 83.95
+    }
+  },
+  "src/features/interventions/components/TechnicianAssignmentRespondBar.tsx": {
+    "statements": {
+      "pct": 87.36
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 87.36
+    }
+  },
+  "src/features/interventions/components/TechnicianBillingLinesForm.tsx": {
+    "statements": {
+      "pct": 9.16
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 9.16
+    }
+  },
+  "src/features/interventions/components/TechnicianDashboardDetailPanel.tsx": {
+    "statements": {
+      "pct": 52.05
+    },
+    "branches": {
+      "pct": 58.33
+    },
+    "functions": {
+      "pct": 12.5
+    },
+    "lines": {
+      "pct": 52.05
+    }
+  },
+  "src/features/interventions/components/TechnicianDashboardImagesPanel.tsx": {
+    "statements": {
+      "pct": 52.91
+    },
+    "branches": {
+      "pct": 25
+    },
+    "functions": {
+      "pct": 16.66
+    },
+    "lines": {
+      "pct": 52.91
+    }
+  },
+  "src/features/interventions/components/TechnicianDashboardListPanel.tsx": {
+    "statements": {
+      "pct": 45.97
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 20
+    },
+    "lines": {
+      "pct": 45.97
+    }
+  },
+  "src/features/interventions/components/TechnicianDayPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/TechnicianFinishJobPanel.tsx": {
+    "statements": {
+      "pct": 73.77
+    },
+    "branches": {
+      "pct": 65
+    },
+    "functions": {
+      "pct": 12.5
+    },
+    "lines": {
+      "pct": 73.77
+    }
+  },
+  "src/features/interventions/components/TechnicianHubPage.tsx": {
+    "statements": {
+      "pct": 86.93
+    },
+    "branches": {
+      "pct": 38.88
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 86.93
+    }
+  },
+  "src/features/interventions/components/TechnicianInvoiceAutomationPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/components/TechnicianSignaturePad.tsx": {
+    "statements": {
+      "pct": 8.16
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 8.16
+    }
+  },
+  "src/features/interventions/components/UnifiedInterventionDrawer.tsx": {
+    "statements": {
+      "pct": 88.79
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 88.79
+    }
+  },
+  "src/features/interventions/config/terrainTemplates.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/context/RequesterHubContext.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/hooks/useAvailableSlots.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/timeline/addInterventionTimelineComment.ts": {
+    "statements": {
+      "pct": 16.12
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 16.12
+    }
+  },
+  "src/features/interventions/timeline/interventionTimelineTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/timeline/mergeInterventionTimeline.ts": {
+    "statements": {
+      "pct": 99.34
+    },
+    "branches": {
+      "pct": 84.09
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 99.34
+    }
+  },
+  "src/features/interventions/timeline/useInterventionTimeline.ts": {
+    "statements": {
+      "pct": 60.1
+    },
+    "branches": {
+      "pct": 57.14
+    },
+    "functions": {
+      "pct": 42.85
+    },
+    "lines": {
+      "pct": 60.1
+    }
+  },
+  "src/features/interventions/workflow/coerceAdminExtraPatch.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/interventions/workflow/interventionWorkflow.ts": {
+    "statements": {
+      "pct": 94.73
+    },
+    "branches": {
+      "pct": 53.57
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 94.73
+    }
+  },
+  "src/features/interventions/workflow/interventionWorkflowTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/workflow/transitionInterventionFromTechnician.ts": {
+    "statements": {
+      "pct": 73.21
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 73.21
+    }
+  },
+  "src/features/interventions/workflow/transitionInterventionStatus.ts": {
+    "statements": {
+      "pct": 27.54
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 27.54
+    }
+  },
+  "src/features/interventions/workflow/transitionInterventionStatusAdmin.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/workflow/useInterventionStatusEvents.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/interventions/workflow/workflowActor.ts": {
+    "statements": {
+      "pct": 70
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 70
+    }
+  },
+  "src/features/maintenance/generateDueInterventions.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/maintenance/maintenanceFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/maintenance/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/maintenance/components/ContractCard.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/maintenance/components/MaintenanceContractPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/GalaxyLayerBridgeContext.tsx": {
+    "statements": {
+      "pct": 51.35
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 51.35
+    }
+  },
+  "src/features/map/missionStableKey.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/map/missionTypes.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/useMapArchivedMissions.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/DashboardGalaxyLayer.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/MapGalaxyTranscriptionLayer.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/MapTranscriptionActionsPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/MapTranscriptionOverlay.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/MapboxView.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/map/components/transcriptionFormInference.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/materials/createMaterialOrder.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 83.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/materials/generateMaterialOrderPdf.ts": {
+    "statements": {
+      "pct": 88.57
+    },
+    "branches": {
+      "pct": 20
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 88.57
+    }
+  },
+  "src/features/materials/materialOrderFirestore.ts": {
+    "statements": {
+      "pct": 56.96
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 56.96
+    }
+  },
+  "src/features/materials/stockFirestore.ts": {
+    "statements": {
+      "pct": 52.38
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 52.38
+    }
+  },
+  "src/features/materials/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/materials/useMaterialOrders.ts": {
+    "statements": {
+      "pct": 77.77
+    },
+    "branches": {
+      "pct": 33.33
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 77.77
+    }
+  },
+  "src/features/materials/components/InterventionMaterialOrdersPanel.tsx": {
+    "statements": {
+      "pct": 97.1
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 83.33
+    },
+    "lines": {
+      "pct": 97.1
+    }
+  },
+  "src/features/materials/components/MaterialOrderForm.tsx": {
+    "statements": {
+      "pct": 88.13
+    },
+    "branches": {
+      "pct": 76
+    },
+    "functions": {
+      "pct": 41.17
+    },
+    "lines": {
+      "pct": 88.13
+    }
+  },
+  "src/features/materials/components/OmniSearchLecot.tsx": {
+    "statements": {
+      "pct": 58.46
+    },
+    "branches": {
+      "pct": 30.76
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 58.46
+    }
+  },
+  "src/features/materials/components/StockManagementPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/newHub/newHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/newHub/components/NewHubPage.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/notes/notesFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notes/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/notes/components/QuickNotesPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/ClientPortalPushContext.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/appointmentReminders.ts": {
+    "statements": {
+      "pct": 99.23
+    },
+    "branches": {
+      "pct": 65.38
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 99.23
+    }
+  },
+  "src/features/notifications/clientNotificationUrls.ts": {
+    "statements": {
+      "pct": 87.5
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 87.5
+    }
+  },
+  "src/features/notifications/dispatchStatusNotifications.ts": {
+    "statements": {
+      "pct": 82.72
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 50
+    },
+    "lines": {
+      "pct": 82.72
+    }
+  },
+  "src/features/notifications/fcmWebPush.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/firebasePublicConfig.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/notificationConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/notifications/statusNotificationRules.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/notifications/technicianNotificationUrls.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/useClientPortalPushMessaging.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/useTechnicianPushMessaging.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/components/ClientPortalNotificationBootstrap.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/components/TechnicianNotificationBootstrap.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/notifications/components/TechnicianPushNotificationPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/TechnicianQueryProvider.tsx": {
+    "statements": {
+      "pct": 57.4
+    },
+    "branches": {
+      "pct": 60
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 57.4
+    }
+  },
+  "src/features/offline/bridgedReportsDb.ts": {
+    "statements": {
+      "pct": 42.1
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 42.1
+    }
+  },
+  "src/features/offline/completionConflict.ts": {
+    "statements": {
+      "pct": 90
+    },
+    "branches": {
+      "pct": 75
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90
+    }
+  },
+  "src/features/offline/completionQueueDb.ts": {
+    "statements": {
+      "pct": 50
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 50
+    }
+  },
+  "src/features/offline/completionSync.ts": {
+    "statements": {
+      "pct": 83.83
+    },
+    "branches": {
+      "pct": 60.86
+    },
+    "functions": {
+      "pct": 77.77
+    },
+    "lines": {
+      "pct": 83.83
+    }
+  },
+  "src/features/offline/offlineHubConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/offline/offlineHubExample.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/offlineHubNavigation.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/offlineSyncConstants.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/technicianQueryKeys.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/offline/terrainMissionsCache.ts": {
+    "statements": {
+      "pct": 92.45
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 92.45
+    }
+  },
+  "src/features/offline/components/OfflineHubExampleRails.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/components/TechnicianConnectivityBar.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/offline/components/TechnicianOfflineHubPage.tsx": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/offline/components/TechnicianOfflineSyncPanel.tsx": {
+    "statements": {
+      "pct": 81.88
+    },
+    "branches": {
+      "pct": 38.88
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 81.88
+    }
+  },
+  "src/features/quotes/quoteFirestore.ts": {
+    "statements": {
+      "pct": 75.78
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 71.42
+    },
+    "lines": {
+      "pct": 75.78
+    }
+  },
+  "src/features/quotes/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/quotes/components/QuoteEditorPanel.tsx": {
+    "statements": {
+      "pct": 8.09
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 8.09
+    }
+  },
+  "src/features/quotes/components/QuoteListPanel.tsx": {
+    "statements": {
+      "pct": 10.75
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 10.75
+    }
+  },
+  "src/features/quotes/components/QuoteStatusBadge.tsx": {
+    "statements": {
+      "pct": 55
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 55
+    }
+  },
+  "src/features/reminders/interventionReminders.ts": {
+    "statements": {
+      "pct": 69.49
+    },
+    "branches": {
+      "pct": 12.5
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 69.49
+    }
+  },
+  "src/features/reminders/useBackofficeReminderPush.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/reminders/components/InterventionRemindersPanel.tsx": {
+    "statements": {
+      "pct": 32.69
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 32.69
+    }
+  },
+  "src/features/scheduling/interventionOccupiedRange.ts": {
+    "statements": {
+      "pct": 67.44
+    },
+    "branches": {
+      "pct": 57.14
+    },
+    "functions": {
+      "pct": 75
+    },
+    "lines": {
+      "pct": 67.44
+    }
+  },
+  "src/features/scheduling/pickRecommendedSlot.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/scheduling/proposeAvailableSlots.ts": {
+    "statements": {
+      "pct": 77.77
+    },
+    "branches": {
+      "pct": 66.66
+    },
+    "functions": {
+      "pct": 66.66
+    },
+    "lines": {
+      "pct": 77.77
+    }
+  },
+  "src/features/scheduling/scheduleConflicts.ts": {
+    "statements": {
+      "pct": 97.4
+    },
+    "branches": {
+      "pct": 55.55
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 97.4
+    }
+  },
+  "src/features/scheduling/schedulingConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/scheduling/updateInterventionSchedule.ts": {
+    "statements": {
+      "pct": 36.23
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 36.23
+    }
+  },
+  "src/features/scheduling/components/ProposedScheduleSlots.tsx": {
+    "statements": {
+      "pct": 95.23
+    },
+    "branches": {
+      "pct": 80
+    },
+    "functions": {
+      "pct": 33.33
+    },
+    "lines": {
+      "pct": 95.23
+    }
+  },
+  "src/features/scheduling/components/ScheduleConflictBanner.tsx": {
+    "statements": {
+      "pct": 34.14
+    },
+    "branches": {
+      "pct": 50
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 34.14
+    }
+  },
+  "src/features/scheduling/components/ScheduleDragBoard.tsx": {
+    "statements": {
+      "pct": 90
+    },
+    "branches": {
+      "pct": 61.53
+    },
+    "functions": {
+      "pct": 14.28
+    },
+    "lines": {
+      "pct": 90
+    }
+  },
+  "src/features/sla/computeSla.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 95.83
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/sla/slaConfig.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/sla/components/SlaStatusBadge.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/stock/stockFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/stock/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/stock/components/StockAlertBadge.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/stock/components/VehicleStockPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/suppliers/generateSupplierOrderPdf.ts": {
+    "statements": {
+      "pct": 90.9
+    },
+    "branches": {
+      "pct": 30.76
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 90.9
+    }
+  },
+  "src/features/suppliers/supplierFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/suppliers/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/suppliers/components/SupplierOrderCard.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/suppliers/components/SupplierOrderPanel.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/technicians/demoTechnicianCatalog.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/technicians/hooks.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/technicians/skillConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/technicians/technicianLabConstants.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/technicians/types.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/technicians/withTechnicianAuthUid.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/timetracking/timetrackingFirestore.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/features/timetracking/types.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/features/timetracking/components/TimeTrackingWidget.tsx": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/lib/utils.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/utils/dailyMockAssignments.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/utils/genderDetection.ts": {
+    "statements": {
+      "pct": 55.67
+    },
+    "branches": {
+      "pct": 9.09
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 55.67
+    }
+  },
+  "src/utils/generateIcal.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/utils/generateInterventionReport.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/utils/generateQuotePdf.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/utils/mockMissions.ts": {
+    "statements": {
+      "pct": 0
+    },
+    "branches": {
+      "pct": 0
+    },
+    "functions": {
+      "pct": 0
+    },
+    "lines": {
+      "pct": 0
+    }
+  },
+  "src/utils/scheduleEffectUpdate.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 100
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  },
+  "src/utils/stringUtils.ts": {
+    "statements": {
+      "pct": 100
+    },
+    "branches": {
+      "pct": 84.61
+    },
+    "functions": {
+      "pct": 100
+    },
+    "lines": {
+      "pct": 100
+    }
+  }
+}
