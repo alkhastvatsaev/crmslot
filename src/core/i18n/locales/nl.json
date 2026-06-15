@@ -893,7 +893,16 @@
     "google_redirect": "Doorverwijzing naar Google…",
     "google_provider_disabled": "Google niet geactiveerd",
     "google_provider_disabled_hint": "Firebase Console → Authentication → Google-provider inschakelen.",
-    "google_account_conflict": "Dit account bestaat al met een andere aanmeldmethode."
+    "google_account_conflict": "Dit account bestaat al met een andere aanmeldmethode.",
+    "forgot_password": "Wachtwoord vergeten?",
+    "reset_email_sent": "Resetlink verzonden",
+    "reset_email_failed": "Verzenden mislukt — controleer het adres",
+    "show_password": "Tonen",
+    "hide_password": "Verbergen",
+    "technician_space_title": "Technicusruimte",
+    "technician_space_subtitle": "Meld je aan voor toegang tot je missies",
+    "demo_account_label": "Demo-account",
+    "demo_account_hint": "Tik om demo-gegevens in te vullen"
   },
   "requester": {
     "profile": {
