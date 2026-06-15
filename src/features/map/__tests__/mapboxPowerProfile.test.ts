@@ -29,11 +29,11 @@ describe("mapboxPowerProfile", () => {
     expect(resolveMapCameraDuration(false, "marker")).toBeGreaterThan(400);
   });
 
-  it("coupe WebGL hors page carte ou rail latéral mobile", () => {
+  it("coupe WebGL hors page carte", () => {
     expect(isMapWebGLActive(false, 0, false)).toBe(true);
     expect(isMapWebGLActive(false, 2, false)).toBe(false);
     expect(isMapWebGLActive(true, 0, true)).toBe(true);
-    expect(isMapWebGLActive(true, 0, false)).toBe(false);
+    expect(isMapWebGLActive(true, 0, false)).toBe(true);
     expect(isMapWebGLActive(true, 3, true)).toBe(false);
   });
 });

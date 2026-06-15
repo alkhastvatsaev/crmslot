@@ -88,15 +88,14 @@ export function markerGlowBlurClass(isMobile: boolean): string {
 }
 
 /**
- * WebGL actif : page carte visible + (desktop ou rail centre mobile).
- * Démonte la carte sur les autres pages hub ou rails latéraux.
+ * WebGL actif : page carte visible. Démonte uniquement sur les autres pages hub.
  */
 export function isMapWebGLActive(
   isMobile: boolean | null,
   dashboardPageIndex: number,
   mapCenterRailActive: boolean
 ): boolean {
-  if (dashboardPageIndex !== 0) return false;
-  if (isMobile === true) return mapCenterRailActive;
-  return true;
+  void isMobile;
+  void mapCenterRailActive;
+  return dashboardPageIndex === 0;
 }

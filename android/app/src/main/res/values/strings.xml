@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">CRMSLOT</string>
-    <string name="title_activity_main">CRMSLOT</string>
+    <string name="app_name">Technicien</string>
+    <string name="title_activity_main">Technicien</string>
     <string name="package_name">com.crmslot.app</string>
     <string name="custom_url_scheme">com.crmslot.app</string>
 </resources>
