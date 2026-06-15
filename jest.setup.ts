@@ -247,6 +247,7 @@ jest.mock("firebase/auth", () => {
       })
     ),
     sendEmailVerification: jest.fn(() => Promise.resolve()),
+    sendPasswordResetEmail: jest.fn(() => Promise.resolve()),
     signInWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({
         user: {
@@ -286,6 +287,21 @@ jest.mock("firebase/auth", () => {
       assertionForSignIn: jest.fn(() => ({})),
     },
     signOut: jest.fn(() => Promise.resolve()),
+    setPersistence: jest.fn(() => Promise.resolve()),
+    browserLocalPersistence: {},
+    signInAnonymously: jest.fn(() =>
+      Promise.resolve({
+        user: {
+          uid: "anon-user",
+          isAnonymous: true,
+          email: null,
+          emailVerified: false,
+          displayName: null,
+          photoURL: null,
+          providerData: [],
+        },
+      })
+    ),
     RecaptchaVerifier: jest.fn(() => ({
       clear: jest.fn(),
       render: jest.fn(() => Promise.resolve()),
