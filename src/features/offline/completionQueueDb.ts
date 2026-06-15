@@ -6,12 +6,21 @@ export type CompletionQueueRecord = {
   photoDataUrls: string[];
   signaturePngDataUrl: string;
   queuedAtMs: number;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  /** Tentatives d'envoi déjà effectuées (incrémenté à chaque échec). */
+  attemptCount?: number;
+  /** Timestamp epoch après lequel l'item est éligible à un retry. */
+  nextAttemptAtMs?: number;
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
 };
 
 const DB_NAME = "bm-tech-offline-v1";
 const STORE = "completion-queue";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -24,6 +33,7 @@ function getDb(): Promise<IDBPDatabase> {
       if (!db.objectStoreNames.contains(STORE)) {
         db.createObjectStore(STORE, { keyPath: "localId" });
       }
+      // v2 : ajoute attemptCount / nextAttemptAtMs aux records existants (rétro-compatible).
     },
   });
   return dbPromise;

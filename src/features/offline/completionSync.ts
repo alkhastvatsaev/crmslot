@@ -9,6 +9,7 @@ import {
   completionQueueCount,
   type CompletionQueueRecord,
 } from "@/features/offline/completionQueueDb";
+import { isRetryDue, nextRetryAfter } from "@/features/offline/completionRetryBackoff";
 import { performCompletionUpload } from "@/features/interventions/completionUploadCore";
 
 const listeners = new Set<() => void>();
@@ -145,6 +146,8 @@ export type FlushCompletionReport = {
   uploaded: number;
   skippedConflict: number;
   failed: number;
+  /** Items présents mais en cooldown (backoff exponentiel après échec). */
+  deferred: number;
   lastError?: string;
 };
 
@@ -152,7 +155,12 @@ export type FlushCompletionReport = {
 export async function flushCompletionQueue(
   onConflictSkip?: (interventionId: string) => void
 ): Promise<FlushCompletionReport> {
-  const report: FlushCompletionReport = { uploaded: 0, skippedConflict: 0, failed: 0 };
+  const report: FlushCompletionReport = {
+    uploaded: 0,
+    skippedConflict: 0,
+    failed: 0,
+    deferred: 0,
+  };
 
   if (typeof window === "undefined" || !firestore || !navigator.onLine) {
     return report;
@@ -164,9 +172,15 @@ export async function flushCompletionQueue(
   const FLUSH_ITEM_TIMEOUT_MS = 180_000;
 
   const rows = await completionQueueGetAll().catch(() => [] as CompletionQueueRecord[]);
+  const now = Date.now();
   const sorted = [...rows].sort((a, b) => a.queuedAtMs - b.queuedAtMs);
 
   for (const rec of sorted) {
+    if (!isRetryDue(rec, now)) {
+      report.deferred += 1;
+      continue;
+    }
+
     try {
       const timeoutPromise = new Promise<"timeout">((resolve) =>
         setTimeout(() => resolve("timeout"), FLUSH_ITEM_TIMEOUT_MS)
@@ -215,6 +229,20 @@ export async function flushCompletionQueue(
       });
       report.failed += 1;
       report.lastError = err instanceof Error ? err.message : String(err);
+
+      // Backoff exponentiel : on persiste la tentative + le prochain créneau éligible.
+      const attemptCount = (rec.attemptCount ?? 0) + 1;
+      try {
+        await completionQueuePut({
+          ...rec,
+          attemptCount,
+          nextAttemptAtMs: nextRetryAfter(attemptCount, Date.now()),
+        });
+      } catch (persistErr) {
+        logger.warn(`Failed to persist retry schedule for ${rec.interventionId}`, {
+          error: persistErr instanceof Error ? persistErr.message : String(persistErr),
+        });
+      }
     }
   }
 
