@@ -299,28 +299,71 @@ Parcours déjà couverts : dispatch, assignation back-office, hub technicien, pa
 
 ## 7. Commandes utiles
 
-| Action                 | Commande                                                                                |
-| ---------------------- | --------------------------------------------------------------------------------------- |
-| Tout le chatbot        | `npm run test:chatbot`                                                                  |
-| Tout interventions     | `npm run test:interventions`                                                            |
-| Chatbot + coverage     | `npm run test:chatbot:coverage` (seuils chatbot : lancer `npm run test:coverage` en CI) |
-| E2E chatbot            | `npm run test:e2e:chatbot`                                                              |
-| E2E facturation        | `npm run test:e2e:invoice`                                                              |
-| E2E hub société        | `npm run test:e2e:company`                                                              |
-| E2E clôture technicien | `npm run test:e2e:technician`                                                           |
-| E2E offline sync       | `npm run test:e2e:offline`                                                              |
-| E2E matrice API auth   | `npm run test:e2e:api-matrix`                                                           |
-| Matériel + catalogue   | `npm run test:feature-hub`                                                              |
-| Gmail                  | `npm run test:gmail`                                                                    |
-| CRM                    | `npm run test:crm`                                                                      |
-| Billing hub            | `npm run test:billing-hub`                                                              |
-| Webhooks               | `npm run test:webhooks`                                                                 |
-| Régénérer routes API   | `npm run generate:api-routes`                                                           |
-| Un fichier             | `npx jest src/features/chatbot/__tests__/chatbot-local-intent.test.ts --no-coverage`    |
-| CI locale              | `npm run test:ci`                                                                       |
-| Coverage               | `npm run test:coverage`                                                                 |
-| E2E                    | `npm run test:e2e`                                                                      |
-| CI complet             | `npm run ci` / `npm run ci:all`                                                         |
+| Action                   | Commande                                                                                |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| Tout le chatbot          | `npm run test:chatbot`                                                                  |
+| Tout interventions       | `npm run test:interventions`                                                            |
+| Chatbot + coverage       | `npm run test:chatbot:coverage` (seuils chatbot : lancer `npm run test:coverage` en CI) |
+| E2E chatbot              | `npm run test:e2e:chatbot`                                                              |
+| E2E facturation          | `npm run test:e2e:invoice`                                                              |
+| E2E hub société          | `npm run test:e2e:company`                                                              |
+| E2E clôture technicien   | `npm run test:e2e:technician`                                                           |
+| E2E offline sync         | `npm run test:e2e:offline`                                                              |
+| E2E matrice API auth     | `npm run test:e2e:api-matrix`                                                           |
+| Matériel + catalogue     | `npm run test:feature-hub`                                                              |
+| Gmail                    | `npm run test:gmail`                                                                    |
+| CRM                      | `npm run test:crm`                                                                      |
+| Billing hub              | `npm run test:billing-hub`                                                              |
+| Webhooks                 | `npm run test:webhooks`                                                                 |
+| Régénérer routes API     | `npm run generate:api-routes`                                                           |
+| Un fichier               | `npx jest src/features/chatbot/__tests__/chatbot-local-intent.test.ts --no-coverage`    |
+| CI locale                | `npm run test:ci`                                                                       |
+| Coverage                 | `npm run test:coverage`                                                                 |
+| E2E                      | `npm run test:e2e`                                                                      |
+| CI complet               | `npm run ci` / `npm run ci:all`                                                         |
+| Garde-fou agent (rapide) | `npm run test:agent-check` (typecheck + eslint + jest fichiers modifiés)                |
+| Ratchet coverage         | `npm run coverage:ratchet` (échoue si baisse > 0.5pt vs baseline)                       |
+| Mettre à jour baseline   | `npm run coverage:ratchet:update`                                                       |
+| Lister fichiers < 50%    | `npm run coverage:uncovered`                                                            |
+| Contract tests Zod       | `npm run test:contract`                                                                 |
+
+---
+
+## 7bis. Architecture agent-first (Phases 12-15, 2026-06-15)
+
+Quatre phases ajoutées pour faciliter la maintenance par agents IA (Claude / Cursor / Codex) sans seuils stricts qui empêchent l'itération.
+
+### Phase 12 — Garde-fous agent
+
+- `scripts/agent-test-check.mjs` : typecheck + lint sur les fichiers modifiés + `jest --findRelatedTests`.
+- `npm run test:agent-check` : à exécuter avant chaque push.
+- `docs/AGENT_TEST_RECIPES.md` : 10 patterns (pur, hook, context, UI, route API, workflow Firestore, bridge natif, outil chatbot, migration DB, régression bug fixé).
+- **Règle d'or** : tout bug fixé → un test qui échoue sans le fix, avec commentaire `// Régression : <desc> — <YYYY-MM-DD>`.
+
+### Phase 13 — Coverage ratchet (pas de baisse)
+
+- `scripts/check-coverage-ratchet.mjs` : compare `coverage/coverage-summary.json` vs `coverage/baseline.json`.
+- Échoue si une métrique d'un fichier baisse de plus de 0.5 pt vs baseline (tolérance arrondi V8).
+- `.github/workflows/coverage-ratchet.yml` : récupère le baseline depuis `main` sur chaque PR.
+- Commandes : `npm run coverage:ratchet`, `npm run coverage:ratchet:update`, `npm run coverage:uncovered`.
+- **Pourquoi** : permet d'ajouter du code sans tests _temporairement_ tant qu'on ne casse rien d'existant — mais on ne peut jamais régresser sur les fichiers déjà couverts.
+
+### Phase 14 — Contract tests Zod
+
+- `src/core/api/schemas/` : source de vérité unique pour les contrats client/server (`notifications`, `interventions`, `auth`).
+- `tests/contract/*.contract.test.ts` : valide schémas (entrée + sortie) avant que la route ne soit invoquée.
+- `/api/notifications/send` consomme `SendNotificationRequestSchema.safeParse` → 400 + `issues` si KO.
+- `npm run test:contract` : tourne les contrats rapidement.
+- **Prochaines routes à couvrir** : `/api/interventions/[id]/validate-report`, `/api/ai/chatbot`.
+
+### Phase 15 — Bridges natifs Capacitor en injection de deps
+
+- Pattern : chaque fonction expose un `deps` paramètre optionnel (prod par défaut, stubs en test).
+- `nativeDocumentSave` : `SaveOrShareDeps { isNative, loadFilesystem, loadShare, webDownload }`.
+- `nativeGeolocation` : `NativeGeolocationDeps { isNative, loadPlugin: () => GeolocationPlugin }`.
+- `nativePushClickHandler` : `NativePushClickHandlerDeps { isNative, loadPlugin, dispatch }`.
+- **Avantage** : pas besoin de `jest.mock("@capacitor/foo")` qui crashe en jsdom — les tests passent des objets typés directement.
+- Voir `docs/AGENT_TEST_RECIPES.md` §7 pour le pattern complet.
 
 ---
 
