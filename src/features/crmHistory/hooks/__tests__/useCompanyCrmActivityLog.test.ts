@@ -22,6 +22,12 @@ jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
 }));
 
+jest.mock("@/core/config/demoTenantFirestore", () => ({
+  isDemoTenantCompanyId: (companyId: string | null | undefined) =>
+    (companyId ?? "").trim() === "demo-local-company",
+  isDemoTechnicianPreviewUid: () => false,
+}));
+
 jest.mock("@/core/config/devUiPreview", () => ({
   DEMO_COMPANY_ID: "demo-local-company",
 }));
@@ -32,11 +38,11 @@ describe("useCompanyCrmActivityLog", () => {
     mockOnSnapshot.mockReturnValue(jest.fn());
   });
 
-  it("subscribes to crm_activity for demo company (journal commandes matériel)", async () => {
+  it("skips Firestore for demo company in staging preview", async () => {
     renderHook(() => useCompanyCrmActivityLog(DEMO_COMPANY_ID));
 
     await waitFor(() => {
-      expect(mockOnSnapshot).toHaveBeenCalled();
+      expect(mockOnSnapshot).not.toHaveBeenCalled();
     });
   });
 

@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { collection, limit, onSnapshot, query, where, type Firestore } from "firebase/firestore";
+import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
-import { buildChatbotInvoiceRows, type ChatbotInvoiceRow } from "@/features/chatbot/chatbotInvoiceRows";
+import {
+  buildChatbotInvoiceRows,
+  type ChatbotInvoiceRow,
+} from "@/features/chatbot/chatbotInvoiceRows";
 import type { Intervention } from "@/features/interventions/types";
 
 export function useChatbotInvoicesPanel(companyId: string | null, enabled: boolean) {
@@ -11,7 +15,7 @@ export function useChatbotInvoicesPanel(companyId: string | null, enabled: boole
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !companyId || !firestore) {
+    if (!enabled || !companyId || !firestore || isDemoTenantCompanyId(companyId)) {
       setInvoices([]);
       setLoading(false);
       return;
@@ -22,20 +26,20 @@ export function useChatbotInvoicesPanel(companyId: string | null, enabled: boole
     const q = query(
       collection(db, "interventions"),
       where("companyId", "==", companyId),
-      limit(80),
+      limit(80)
     );
 
     return onSnapshot(
       q,
       (snap) => {
-        const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Intervention));
+        const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
         setInvoices(buildChatbotInvoiceRows(rows).slice(0, 40));
         setLoading(false);
       },
       () => {
         setInvoices([]);
         setLoading(false);
-      },
+      }
     );
   }, [companyId, enabled]);
 

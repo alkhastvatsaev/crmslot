@@ -89,8 +89,9 @@ export default function RequesterTrackingPanel() {
     });
   }, [pendingTrackingInterventionId, setPendingTrackingInterventionId]);
 
-  const draftTitle = requestData.problemLabel.trim() || requestData.description.trim();
-  const hasDraft = Boolean(draftTitle || requestData.interventionAddress.trim());
+  const draftTitle =
+    (requestData.problemLabel ?? "").trim() || (requestData.description ?? "").trim();
+  const hasDraft = Boolean(draftTitle || (requestData.interventionAddress ?? "").trim());
   const isComposingNewRequest =
     hasDraft && !selectedId && !pendingTrackingInterventionId && !isSubmitting;
 

@@ -50,6 +50,7 @@ import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { LayoutShellProvider } from "@/context/LayoutShellContext";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -202,15 +203,19 @@ export default function Dashboard() {
                                                     />
                                                   </div>
                                                 ) : isMobile ? (
-                                                  <MobileShell pages={dashboardPages} />
+                                                  <LayoutShellProvider mode="mobile">
+                                                    <MobileShell pages={dashboardPages} />
+                                                  </LayoutShellProvider>
                                                 ) : (
-                                                  <DashboardDesktopShell
-                                                    header={desktopHeader}
-                                                    pager={
-                                                      <DashboardPager pages={dashboardPages} />
-                                                    }
-                                                    galaxy={<DashboardGalaxyLayer />}
-                                                  />
+                                                  <LayoutShellProvider mode="desktop">
+                                                    <DashboardDesktopShell
+                                                      header={desktopHeader}
+                                                      pager={
+                                                        <DashboardPager pages={dashboardPages} />
+                                                      }
+                                                      galaxy={<DashboardGalaxyLayer />}
+                                                    />
+                                                  </LayoutShellProvider>
                                                 )}
                                               </TechnicianFinishJobProvider>
                                             </TechnicianBackofficeReportBridgeProvider>

@@ -45,36 +45,52 @@ describe("useBackOfficeInterventions demo company on configured Firebase", () =>
     jest.clearAllMocks();
   });
 
-  it("uses live Firestore rows for demo-local-company when present", async () => {
-    mockOnSnapshot.mockImplementation(((_q, onNext) => {
-      (onNext as (snap: { docs: { id: string; data: () => object }[] }) => void)({
-        docs: [{ id: "live-1", data: () => row("live-1") }],
-      });
-      return jest.fn();
-    }) as typeof onSnapshot);
-
+  it("skips Firestore for demo-local-company and serves in-memory demo rows", async () => {
     const { result } = renderHook(() => useBackOfficeInterventions(DEMO_COMPANY_ID));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", DEMO_COMPANY_ID);
-    expect(result.current.interventions.map((r) => r.id)).toEqual(["live-1"]);
+    expect(mockOnSnapshot).not.toHaveBeenCalled();
+    expect(result.current.interventions).toEqual(demoInterventionsForCompany(DEMO_COMPANY_ID));
   });
 
-  it("falls back to in-memory demo rows only when Firestore is empty", async () => {
+  it("uses live Firestore rows for real tenant companies", async () => {
+    mockOnSnapshot.mockImplementation(((_q, onNext) => {
+      (onNext as (snap: { docs: { id: string; data: () => object }[] }) => void)({
+        docs: [
+          {
+            id: "live-1",
+            data: () => ({ ...row("live-1"), companyId: "acme-live-co" }),
+          },
+        ],
+      });
+      return jest.fn();
+    }) as typeof onSnapshot);
+
+    const { result } = renderHook(() => useBackOfficeInterventions("acme-live-co"));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+      expect(result.current.interventions.map((r) => r.id)).toEqual(["live-1"]);
+    });
+
+    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "acme-live-co");
+  });
+
+  it("returns empty list for real company when Firestore is empty", async () => {
     mockOnSnapshot.mockImplementation(((_q, onNext) => {
       (onNext as (snap: { docs: { id: string; data: () => object }[] }) => void)({ docs: [] });
       return jest.fn();
     }) as typeof onSnapshot);
 
-    const { result } = renderHook(() => useBackOfficeInterventions(DEMO_COMPANY_ID));
+    const { result } = renderHook(() => useBackOfficeInterventions("acme-empty-co"));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.interventions).toEqual(demoInterventionsForCompany(DEMO_COMPANY_ID));
+    expect(result.current.interventions).toEqual([]);
   });
 });

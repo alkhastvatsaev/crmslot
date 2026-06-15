@@ -32,40 +32,46 @@ export default function MacroDroidIndicator() {
   useEffect(() => {
     if (!db || !authed) return;
 
-    const unsub = onSnapshot(doc(db, "ai_status", "macrodroid"), (docSnap) => {
-      if (!docSnap.exists()) return;
+    const unsub = onSnapshot(
+      doc(db, "ai_status", "macrodroid"),
+      (docSnap) => {
+        if (!docSnap.exists()) return;
 
-      const data = docSnap.data();
-      if (!data) return;
+        const data = docSnap.data();
+        if (!data) return;
 
-      const st = data.status;
-      if (st === "waiting" || st === "processing") {
-        setIsPanelOpen(false);
-        setStatusData(null);
-        return;
+        const st = data.status;
+        if (st === "waiting" || st === "processing") {
+          setIsPanelOpen(false);
+          setStatusData(null);
+          return;
+        }
+
+        if (st !== "ready") return;
+
+        const transcript = typeof data.transcript === "string" ? data.transcript.trim() : "";
+        if (!transcript) return;
+
+        const processedKey =
+          (typeof data.lastProcessedAt === "string" && data.lastProcessedAt) ||
+          (typeof data.updatedAt === "string" && data.updatedAt) ||
+          "";
+        if (processedKey && lastProcessedShownRef.current === processedKey) return;
+
+        lastProcessedShownRef.current = processedKey || null;
+        try {
+          if (processedKey) sessionStorage.setItem(SESSION_LAST_PROCESSED, processedKey);
+        } catch {
+          /* ignore */
+        }
+
+        setStatusData(data);
+        setIsPanelOpen(true);
+      },
+      () => {
+        /* permission-denied ou doc absent — ignorer */
       }
-
-      if (st !== "ready") return;
-
-      const transcript = typeof data.transcript === "string" ? data.transcript.trim() : "";
-      if (!transcript) return;
-
-      const processedKey =
-        (typeof data.lastProcessedAt === "string" && data.lastProcessedAt) ||
-        (typeof data.updatedAt === "string" && data.updatedAt) ||
-        "";
-      if (processedKey && lastProcessedShownRef.current === processedKey) return;
-
-      lastProcessedShownRef.current = processedKey || null;
-      try {
-        if (processedKey) sessionStorage.setItem(SESSION_LAST_PROCESSED, processedKey);
-      } catch {
-        /* ignore */
-      }
-
-      setStatusData(data);
-      setIsPanelOpen(true);
-    });
+    );
 
     return () => unsub();
   }, [authed]);

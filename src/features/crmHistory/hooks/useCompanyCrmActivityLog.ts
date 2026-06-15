@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { logger } from "@/core/logger";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
+import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { CompanyCrmActivityDoc } from "../crmActivityLog";
@@ -16,7 +17,7 @@ export function useCompanyCrmActivityLog(companyId: string | null) {
 
   useEffect(() => {
     const cid = (companyId ?? "").trim();
-    if (!cid || !isConfigured || !firestore) {
+    if (!cid || !isConfigured || !firestore || isDemoTenantCompanyId(cid)) {
       setRows([]);
       setLoading(false);
       setError(null);

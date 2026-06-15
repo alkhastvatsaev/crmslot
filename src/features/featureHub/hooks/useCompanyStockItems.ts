@@ -1,10 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  demoStockItemsForCompany,
-  isDemoStockItemId,
-} from "@/features/dev/demoCompanyStock";
+import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
+import { demoStockItemsForCompany, isDemoStockItemId } from "@/features/dev/demoCompanyStock";
 import { subscribeStockItems, type StockItem } from "@/features/materials/stockFirestore";
 
 export function useCompanyStockItems(companyId: string | null) {
@@ -13,7 +11,7 @@ export function useCompanyStockItems(companyId: string | null) {
   const [loading, setLoading] = useState(Boolean(companyId));
 
   useEffect(() => {
-    if (!companyId) {
+    if (!companyId || isDemoTenantCompanyId(companyId)) {
       setLiveItems([]);
       setLoading(false);
       return;
@@ -29,11 +27,7 @@ export function useCompanyStockItems(companyId: string | null) {
 
   const items = useMemo(() => {
     const base =
-      liveItems.length > 0
-        ? liveItems
-        : companyId
-          ? demoStockItemsForCompany(companyId)
-          : [];
+      liveItems.length > 0 ? liveItems : companyId ? demoStockItemsForCompany(companyId) : [];
     return base.map((row) => {
       const patch = demoOverrides[row.id];
       return patch ? { ...row, ...patch } : row;
@@ -51,7 +45,7 @@ export function useCompanyStockItems(companyId: string | null) {
       if (!row) return;
       patchDemoItem(id, { quantity: Math.max(0, row.quantity + delta) });
     },
-    [items, patchDemoItem],
+    [items, patchDemoItem]
   );
 
   return {

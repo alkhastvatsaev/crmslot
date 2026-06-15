@@ -254,4 +254,31 @@ describe("RequesterTrackingPanel", () => {
       );
     });
   });
+
+  it("tolerates legacy requestData without string fields from localStorage", async () => {
+    mockUseRequesterHub.mockReturnValue({
+      isSubmitting: false,
+      requestData: {} as never,
+      lastSubmittedRequest: null,
+      lastSubmittedInterventionId: null,
+      profile: {
+        firstName: "Pierre",
+        lastName: "Martin",
+        companyName: "",
+        type: "login",
+        phone: "",
+        email: "pierre@example.com",
+      },
+      pendingTrackingInterventionId: null,
+      setPendingTrackingInterventionId: jest.fn(),
+      portalAccessSession: null,
+      lastSubmittedPortalAccessCode: null,
+    });
+
+    await renderPanel();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("tracking-one-page")).toBeInTheDocument();
+    });
+  });
 });
