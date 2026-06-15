@@ -40,6 +40,12 @@ import {
   resolveMapboxInitOptions,
   resolveMapCameraDuration,
 } from "@/features/map/mapboxPowerProfile";
+import {
+  destroyMapboxMap,
+  pauseMapboxMap,
+  resolveMapboxLifecycleMode,
+  resumeMapboxMap,
+} from "@/features/map/mapboxMapLifecycle";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocation";
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
@@ -266,18 +272,7 @@ export default function MapboxView() {
 
   useEffect(() => {
     const container = mapContainerRef.current;
-    if (!container) return;
-
-    if (!mapWebGLActive) {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        setMapReady(false);
-      }
-      return;
-    }
-
-    if (mapRef.current) return;
+    if (!container || !mapWebGLActive || mapRef.current) return;
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() ?? "";
     if (!token) {
@@ -288,9 +283,10 @@ export default function MapboxView() {
     let cancelled = false;
     let sizeObserver: ResizeObserver | null = null;
     let onVisibilityChange: (() => void) | null = null;
+    let waitObserver: ResizeObserver | null = null;
 
     const attachMap = () => {
-      if (cancelled || mapRef.current) return;
+      if (cancelled || mapRef.current || !mapWebGLActive) return;
       if (container.clientWidth < 2 || container.clientHeight < 2) return;
 
       mapboxgl.accessToken = token;
@@ -374,54 +370,60 @@ export default function MapboxView() {
 
       onVisibilityChange = () => {
         if (document.hidden) {
-          try {
-            map.stop();
-          } catch {
-            /* ignore */
-          }
+          pauseMapboxMap(map);
           return;
         }
-        try {
-          map.resize();
-        } catch {
-          /* ignore */
-        }
+        resumeMapboxMap(map);
       };
       document.addEventListener("visibilitychange", onVisibilityChange);
     };
 
     attachMap();
     if (!mapRef.current) {
-      const waitObserver = new ResizeObserver(() => attachMap());
+      waitObserver = new ResizeObserver(() => attachMap());
       waitObserver.observe(container);
-      return () => {
-        cancelled = true;
-        waitObserver.disconnect();
-        sizeObserver?.disconnect();
-        if (onVisibilityChange) {
-          document.removeEventListener("visibilitychange", onVisibilityChange);
-        }
-        if (mapRef.current) {
-          mapRef.current.remove();
-          mapRef.current = null;
-        }
-        setMapReady(false);
-      };
     }
 
     return () => {
       cancelled = true;
+      waitObserver?.disconnect();
       sizeObserver?.disconnect();
       if (onVisibilityChange) {
         document.removeEventListener("visibilitychange", onVisibilityChange);
       }
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-      setMapReady(false);
     };
   }, [isMobile, mapWebGLActive]);
+
+  /** Mobile : pause WebGL (tuiles en cache). Desktop : détruit si hub masqué. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!mapWebGLActive) {
+      if (resolveMapboxLifecycleMode(isMobile) === "pause") {
+        pauseMapboxMap(map);
+      } else {
+        destroyMapboxMap(map);
+        mapRef.current = null;
+        setMapReady(false);
+      }
+      return;
+    }
+
+    if (isMobile) {
+      resumeMapboxMap(map);
+    }
+  }, [isMobile, mapWebGLActive]);
+
+  useEffect(() => {
+    return () => {
+      const map = mapRef.current;
+      if (!map) return;
+      destroyMapboxMap(map);
+      mapRef.current = null;
+      setMapReady(false);
+    };
+  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
