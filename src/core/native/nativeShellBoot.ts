@@ -30,7 +30,7 @@ export async function bootNativeShell(): Promise<void> {
 
   await Network.addListener("networkStatusChange", (status) => {
     window.dispatchEvent(
-      new CustomEvent("belgmap:network", {
+      new CustomEvent("crmslot:network", {
         detail: { connected: status.connected, type: status.connectionType },
       })
     );

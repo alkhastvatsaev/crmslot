@@ -9,7 +9,10 @@ import { auth, app, firestore, isConfigured } from "@/core/config/firebase";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
-import { navigateCompanyHub, COMPANY_HUB_ANCHOR_CLIENT_PORTAL } from "@/features/company/companyHubNavigation";
+import {
+  navigateCompanyHub,
+  COMPANY_HUB_ANCHOR_CLIENT_PORTAL,
+} from "@/features/company/companyHubNavigation";
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
 import {
   type FcmUiStatus,
@@ -28,7 +31,7 @@ export type ClientPortalPushApi = {
 
 export function useClientPortalPushMessaging(
   vapidKey: string | undefined,
-  opts?: { enabled?: boolean },
+  opts?: { enabled?: boolean }
 ): ClientPortalPushApi {
   const enabled = opts?.enabled !== false;
   const pager = useDashboardPagerOptional();
@@ -48,7 +51,7 @@ export function useClientPortalPushMessaging(
       setPendingTrackingInterventionId(id);
       setPortalRightTab("tracking");
     },
-    [pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab],
+    [pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab]
   );
 
   const attachForegroundListener = useCallback(() => {
@@ -56,11 +59,12 @@ export function useClientPortalPushMessaging(
     unsubForegroundRef.current?.();
     const messaging = getMessaging(app);
     unsubForegroundRef.current = onMessage(messaging, (payload) => {
-      const title = payload.notification?.title ?? "BelgMap";
+      const title = payload.notification?.title ?? "CRMSLOT";
       const body = payload.notification?.body ?? "";
       toast.message(title, { description: body });
       const pushType = typeof payload.data?.type === "string" ? payload.data.type : "";
-      const id = typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
+      const id =
+        typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
       if (pushType === "payment_received" || pushType === "status_change") {
         openTrackingFromPayload(id);
       }
@@ -82,7 +86,7 @@ export function useClientPortalPushMessaging(
       setLastError(null);
       attachForegroundListener();
     },
-    [vapidKey, attachForegroundListener],
+    [vapidKey, attachForegroundListener]
   );
 
   useEffect(() => {
@@ -92,7 +96,14 @@ export function useClientPortalPushMessaging(
     const db = firestore;
     const firebaseAuth = auth;
 
-    if (!enabled || !isConfigured || !app || !db || !firebaseAuth || !isFirebasePublicConfigured()) {
+    if (
+      !enabled ||
+      !isConfigured ||
+      !app ||
+      !db ||
+      !firebaseAuth ||
+      !isFirebasePublicConfigured()
+    ) {
       scheduleEffectUpdate(() => setStatus("unsupported"));
       return () => {};
     }
@@ -119,7 +130,7 @@ export function useClientPortalPushMessaging(
           }
 
           const profileSnap = await getDoc(
-            doc(firestore!, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid),
+            doc(firestore!, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid)
           ).catch(() => null);
           if (!profileSnap?.exists()) {
             setStatus("not_client");
@@ -169,7 +180,7 @@ export function useClientPortalPushMessaging(
     if (!app || !firestore || !vapidKey?.trim()) return;
 
     const profileSnap = await getDoc(doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid)).catch(
-      () => null,
+      () => null
     );
     if (!profileSnap?.exists()) {
       setStatus("not_client");

@@ -12,7 +12,7 @@ import {
 } from "@/features/crmHistory/crmHistoryAgentSnapshot";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 
-const STORAGE_KEY = "belmap-crm-history-agent-v1";
+const STORAGE_KEY = "crmslot-crm-history-agent-v1";
 
 type Options = {
   companyId: string;

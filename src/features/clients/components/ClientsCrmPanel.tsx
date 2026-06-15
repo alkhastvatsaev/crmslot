@@ -496,7 +496,7 @@ export default function ClientsCrmPanel() {
                   onClick={() => {
                     if (typeof sessionStorage !== "undefined") {
                       sessionStorage.setItem(
-                        "belgmap_prefill_client",
+                        "crmslot_prefill_client",
                         JSON.stringify({
                           clientId: selected.id,
                           clientName: buildClientDisplayName(selected),

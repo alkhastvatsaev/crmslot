@@ -1,6 +1,6 @@
-# Chantiers complexes — BELGMAP (PWA)
+# Chantiers complexes — CRMSLOT (PWA)
 
-Document de référence sur les **plus gros travaux** à prévoir pour faire passer BELGMAP d’un prototype riche à une **PWA métier fiable en production**.
+Document de référence sur les **plus gros travaux** à prévoir pour faire passer CRMSLOT d’un prototype riche à une **PWA métier fiable en production**.
 
 Dernière mise à jour : mai 2026.
 
@@ -10,14 +10,14 @@ Dernière mise à jour : mai 2026.
 
 ## Synthèse en une phrase
 
-| Priorité | Chantier | Nature du travail |
-|----------|----------|-------------------|
-| **1** | Cycle métier **multi-tenant** de bout en bout | Large, transversal, risque sécurité / données |
-| **2** | **Clôture terrain hors-ligne** + conflits | Algorithmique, edge cases réseau |
-| **3** | **Hub technicien mobile-first** | Refonte UX / navigation majeure |
-| **4** | Pipeline **Twilio + IA** | Intégrations + secrets + idempotence |
-| **5** | **Portail client** (suivi + chat) | Auth + règles Firestore + temps réel |
-| **6** | **Facturation auto** | Déjà amorcée (Cloud Functions) — dépend surtout des étapes avant |
+| Priorité | Chantier                                      | Nature du travail                                                |
+| -------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| **1**    | Cycle métier **multi-tenant** de bout en bout | Large, transversal, risque sécurité / données                    |
+| **2**    | **Clôture terrain hors-ligne** + conflits     | Algorithmique, edge cases réseau                                 |
+| **3**    | **Hub technicien mobile-first**               | Refonte UX / navigation majeure                                  |
+| **4**    | Pipeline **Twilio + IA**                      | Intégrations + secrets + idempotence                             |
+| **5**    | **Portail client** (suivi + chat)             | Auth + règles Firestore + temps réel                             |
+| **6**    | **Facturation auto**                          | Déjà amorcée (Cloud Functions) — dépend surtout des étapes avant |
 
 ---
 
@@ -39,13 +39,13 @@ Faire tourner de bout en bout, **en prod**, le parcours :
 
 ### Ce qui rend le chantier difficile
 
-| Dimension | État actuel | Travail restant |
-|-----------|-------------|-----------------|
-| **Sécurité** | Rules détaillées | Deux mondes : utilisateurs **portail société** (custom claims) vs autres profils ; règle simplifiée permettant encore la lecture globale des interventions pour certains comptes hors portail |
-| **Auth / tenant** | Sync claims + memberships | Chaque persona doit avoir le bon token, la société active, et des requêtes Firestore qui **passent** les rules (souvent : écran vide = 1 requête refusée) |
-| **Assignation** | UI dispatch | Lier chaque technicien Firestore à un **vrai `authUid`** (champ `Technician.authUid`), pas seulement `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID` |
-| **Données** | Mode démo / staging preview | Bascule prod : `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY`, fin des seeds partagés (`mock-day-*`, `demo-tech-local`) |
-| **Tests** | Jest unitaires sur modules critiques | **E2E** manquants : invite → login → demande → assign → accept → done → invoiced |
+| Dimension         | État actuel                          | Travail restant                                                                                                                                                                               |
+| ----------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sécurité**      | Rules détaillées                     | Deux mondes : utilisateurs **portail société** (custom claims) vs autres profils ; règle simplifiée permettant encore la lecture globale des interventions pour certains comptes hors portail |
+| **Auth / tenant** | Sync claims + memberships            | Chaque persona doit avoir le bon token, la société active, et des requêtes Firestore qui **passent** les rules (souvent : écran vide = 1 requête refusée)                                     |
+| **Assignation**   | UI dispatch                          | Lier chaque technicien Firestore à un **vrai `authUid`** (champ `Technician.authUid`), pas seulement `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID`                                            |
+| **Données**       | Mode démo / staging preview          | Bascule prod : `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY`, fin des seeds partagés (`mock-day-*`, `demo-tech-local`)                                                                                |
+| **Tests**         | Jest unitaires sur modules critiques | **E2E** manquants : invite → login → demande → assign → accept → done → invoiced                                                                                                              |
 
 ### Fichiers clés
 
@@ -200,13 +200,13 @@ flowchart LR
 
 ## Variables d’environnement liées
 
-| Variable | Rôle |
-|----------|------|
-| `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY` | Masquer missions démo en prod |
-| `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID` | UID Firebase du technicien par défaut |
-| `NEXT_PUBLIC_STAGING_PREVIEW` | Reproduire l’UI démo sur Vercel staging |
-| `NEXT_PUBLIC_PRESENTATION_PRIVACY_MODE` | Floutage démo commerciale |
-| Firebase Admin (serveur) | Claims, webhooks, routes API protégées |
+| Variable                                      | Rôle                                    |
+| --------------------------------------------- | --------------------------------------- |
+| `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY`         | Masquer missions démo en prod           |
+| `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID` | UID Firebase du technicien par défaut   |
+| `NEXT_PUBLIC_STAGING_PREVIEW`                 | Reproduire l’UI démo sur Vercel staging |
+| `NEXT_PUBLIC_PRESENTATION_PRIVACY_MODE`       | Floutage démo commerciale               |
+| Firebase Admin (serveur)                      | Claims, webhooks, routes API protégées  |
 
 Voir aussi `.env.example` et `docs/SETUP_VERCEL_GITHUB.md`.
 

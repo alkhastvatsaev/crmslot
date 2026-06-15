@@ -1,6 +1,6 @@
 import type { Intervention } from "@/features/interventions/types";
 
-const STORAGE_PREFIX = "belgmap_terrain_missions_";
+const STORAGE_PREFIX = "crmslot_terrain_missions_";
 
 export type TerrainMissionCacheRow = Pick<
   Intervention,
@@ -30,7 +30,7 @@ export function readTerrainMissionsCache(technicianUid: string): TerrainMissionC
 
 export function writeTerrainMissionsCache(
   technicianUid: string,
-  interventions: Intervention[],
+  interventions: Intervention[]
 ): void {
   if (typeof window === "undefined" || !technicianUid.trim()) return;
   const rows: TerrainMissionCacheRow[] = interventions.slice(0, 80).map((iv) => ({

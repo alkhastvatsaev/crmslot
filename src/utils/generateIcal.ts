@@ -2,18 +2,21 @@ import type { Intervention } from "@/features/interventions/types";
 
 function icsDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return d
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
 }
 
 function icsEscape(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 }
 
-export function generateIcal(interventions: Intervention[], calName = "BELGMAP"): void {
+export function generateIcal(interventions: Intervention[], calName = "CRMSLOT"): void {
   const lines: string[] = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//BELGMAP//FR",
+    "PRODID:-//CRMSLOT//FR",
     `X-WR-CALNAME:${calName}`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
@@ -31,7 +34,7 @@ export function generateIcal(interventions: Intervention[], calName = "BELGMAP")
     const durationMin = iv.estimatedDurationMinutes ?? 60;
     const end = new Date(
       new Date(`${iv.scheduledDate ?? iv.createdAt}T${iv.scheduledTime ?? "08:00"}:00`).getTime() +
-        durationMin * 60_000,
+        durationMin * 60_000
     )
       .toISOString()
       .replace(/[-:]/g, "")
@@ -40,25 +43,32 @@ export function generateIcal(interventions: Intervention[], calName = "BELGMAP")
     const summary = icsEscape(iv.title || iv.problem || "Intervention");
     const location = icsEscape(iv.address ?? "");
     const desc = icsEscape(
-      [iv.problem, iv.clientName ?? [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ")].filter(Boolean).join(" — "),
+      [
+        iv.problem,
+        iv.clientName ?? [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" "),
+      ]
+        .filter(Boolean)
+        .join(" — ")
     );
 
     lines.push(
       "BEGIN:VEVENT",
-      `UID:belgmap-${iv.id}@belgmap`,
+      `UID:crmslot-${iv.id}@crmslot`,
       `DTSTAMP:${icsDate(new Date().toISOString())}`,
       `DTSTART:${start}`,
       `DTEND:${end}`,
       `SUMMARY:${summary}`,
       location ? `LOCATION:${location}` : "",
       desc ? `DESCRIPTION:${desc}` : "",
-      "END:VEVENT",
+      "END:VEVENT"
     );
   }
 
   lines.push("END:VCALENDAR");
 
-  const blob = new Blob([lines.filter(Boolean).join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const blob = new Blob([lines.filter(Boolean).join("\r\n")], {
+    type: "text/calendar;charset=utf-8",
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

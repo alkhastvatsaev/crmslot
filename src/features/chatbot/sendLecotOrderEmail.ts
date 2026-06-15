@@ -56,7 +56,7 @@ function buildHtml(input: LecotOrderEmailInput): string {
 <div style="max-width:620px;margin:32px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
   <div style="background:#1a1a2e;padding:20px 28px">
     <h1 style="margin:0;color:#fff;font-size:20px;font-weight:600">Bon de commande</h1>
-    <p style="margin:4px 0 0;color:#aab;font-size:12px">Transmis via BELGMAP</p>
+    <p style="margin:4px 0 0;color:#aab;font-size:12px">Transmis via CRMSLOT</p>
   </div>
   <div style="padding:24px 28px">
     <p style="margin:0 0 4px;font-size:13px;color:#555"><strong>Date :</strong> ${date}</p>
@@ -81,7 +81,7 @@ function buildHtml(input: LecotOrderEmailInput): string {
       </tfoot>
     </table>
     ${notesBlock}
-    <p style="margin:24px 0 0;font-size:12px;color:#aaa">Ce bon de commande a été généré automatiquement par BELGMAP.</p>
+    <p style="margin:24px 0 0;font-size:12px;color:#aaa">Ce bon de commande a été généré automatiquement par CRMSLOT.</p>
   </div>
 </div>
 </body>
@@ -104,7 +104,7 @@ function buildText(input: LecotOrderEmailInput): string {
     "",
     `Total HT : ${formatEur(input.totalCents)}`,
     input.notes ? `\nNotes : ${input.notes}` : "",
-    "\nCe bon de commande a été généré par BELGMAP.",
+    "\nCe bon de commande a été généré par CRMSLOT.",
   ]
     .filter((l) => l !== undefined)
     .join("\n");
@@ -128,7 +128,7 @@ export async function sendLecotOrderEmail(
       ? `Bon de commande Lecot — ${input.clientName} — réf. ${ref}`
       : `Bon de commande Lecot — réf. ${ref}`;
 
-    const messageId = `<lecot-order-${input.orderId}-${Date.now()}@belgmap>`;
+    const messageId = `<lecot-order-${input.orderId}-${Date.now()}@crmslot>`;
 
     await sendViaGmailApi({
       to: LECOT_EMAIL,

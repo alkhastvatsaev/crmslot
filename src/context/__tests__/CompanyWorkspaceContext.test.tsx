@@ -101,7 +101,7 @@ describe("CompanyWorkspaceContext", () => {
   });
 
   it("ne souscrit pas Firestore avant l'auth (authLoading)", () => {
-    window.localStorage.removeItem("belmap_active_company_id");
+    window.localStorage.removeItem("crmslot_active_company_id");
     // Make onAuthStateChanged not fire immediately — simulate loading
     const { onAuthStateChanged } = jest.requireMock("firebase/auth") as {
       onAuthStateChanged: jest.Mock;

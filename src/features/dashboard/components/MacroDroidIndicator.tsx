@@ -6,7 +6,7 @@ import { auth, firestore as db } from "@/core/config/firebase";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const SESSION_LAST_PROCESSED = "belgmap_macrodroid_last_processed_at";
+const SESSION_LAST_PROCESSED = "crmslot_macrodroid_last_processed_at";
 
 export default function MacroDroidIndicator() {
   const [statusData, setStatusData] = useState<Record<string, unknown> | null>(null);

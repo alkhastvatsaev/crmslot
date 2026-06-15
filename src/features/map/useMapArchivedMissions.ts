@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-const STORAGE_KEY = "belgmap_map_archived_missions_v1";
+const STORAGE_KEY = "crmslot_map_archived_missions_v1";
 
 function loadKeys(): Set<string> {
   if (typeof window === "undefined") return new Set();

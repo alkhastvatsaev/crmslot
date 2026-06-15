@@ -6,7 +6,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
 import type { Intervention } from "@/features/interventions/types";
 
-const STORAGE_KEY = "belgmap_bo_reminder_push_day";
+const STORAGE_KEY = "crmslot_bo_reminder_push_day";
 
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
@@ -36,7 +36,7 @@ export function useBackofficeReminderPush(interventions: Intervention[]): void {
       const body = String(t("reminders.push_body")).replace("{count}", String(reminders.length));
       try {
         // eslint-disable-next-line no-new
-        new Notification(String(t("reminders.push_title")), { body, tag: "belgmap-bo-reminders" });
+        new Notification(String(t("reminders.push_title")), { body, tag: "crmslot-bo-reminders" });
         localStorage.setItem(STORAGE_KEY, day);
         firedRef.current = true;
       } catch {

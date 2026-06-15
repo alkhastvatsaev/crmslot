@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import FirebaseCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,6 +8,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // TODO: remplacer par GoogleService-Info.plist + FirebaseApp.configure() une fois l'app iOS enregistrée dans la console Firebase.
+        if FirebaseApp.app() == nil {
+            let bundlePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")
+            if let bundlePath = bundlePath, let opts = FirebaseOptions(contentsOfFile: bundlePath) {
+                FirebaseApp.configure(options: opts)
+            } else {
+                let opts = FirebaseOptions(
+                    googleAppID: "1:889606998232:ios:0000000000000000000000",
+                    gcmSenderID: "889606998232"
+                )
+                opts.apiKey = "AIzaSyAjuKU7qjM3ZaoFysgwj7eVdWZFXSxQFMk"
+                opts.projectID = "belgique-72708"
+                opts.storageBucket = "belgique-72708.firebasestorage.app"
+                opts.bundleID = Bundle.main.bundleIdentifier ?? "com.crmslot.app"
+                FirebaseApp.configure(options: opts)
+            }
+        }
         return true
     }
 

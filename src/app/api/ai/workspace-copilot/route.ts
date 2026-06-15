@@ -15,7 +15,7 @@ const MAX_USER_CHARS = 4000;
 function buildSystemPrompt(snapshot: WorkspaceCopilotSnapshot): string {
   const lang = snapshot.locale === "en" ? "English" : snapshot.locale === "nl" ? "Dutch" : "French";
 
-  return `You are BELGMAP Copilot, the integrated AI assistant inside the BELGMAP field-service PWA (locksmith / technical interventions).
+  return `You are CRMSLOT Copilot, the integrated AI assistant inside the CRMSLOT field-service PWA (locksmith / technical interventions).
 
 You receive a JSON snapshot of the active company workspace: clients, interventions (dossiers), statuses, billing/payment hints, offline queue size, and network state. This snapshot is the source of truth for factual answers about "what is happening" in the app.
 

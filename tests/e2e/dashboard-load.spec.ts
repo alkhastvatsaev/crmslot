@@ -4,7 +4,7 @@ test.describe("Dashboard Rail System Layout", () => {
   test("loads the dashboard and renders the 3 main panels correctly", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page).toHaveTitle(/testbelgiquepwa|crmslot|belgmap/i);
+    await expect(page).toHaveTitle(/testbelgiquepwa|crmslot|crmslot/i);
 
     const header = page.locator('header[data-testid="dashboard-global-header"]');
     await expect(header).toBeVisible();

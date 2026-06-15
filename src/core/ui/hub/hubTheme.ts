@@ -1,5 +1,5 @@
 /**
- * BELGMAP hub UI tokens — inner rails inside `GlassPanel` shells.
+ * CRMSLOT hub UI tokens — inner rails inside `GlassPanel` shells.
  * Shell chrome (24px glass) lives in `panel-tokens.css` + `glassPanelChrome.ts`.
  */
 

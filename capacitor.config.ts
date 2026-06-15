@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
-  appId: "com.belgmap.app",
+  appId: "com.crmslot.app",
   appName: "CRMSLOT",
   webDir: "capacitor-shell",
   server: {
@@ -16,10 +16,12 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 100,
+      launchAutoHide: false,
       backgroundColor: "#0a0a0a",
-      showSpinner: false,
+      showSpinner: true,
       iosSpinnerStyle: "small",
+      spinnerColor: "#ffffff",
       splashFullScreen: true,
       splashImmersive: true,
     },

@@ -6,7 +6,6 @@ function pad2(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-
 export function formatIcsUtc(dt: Date): string {
   return `${dt.getUTCFullYear()}${pad2(dt.getUTCMonth() + 1)}${pad2(dt.getUTCDate())}T${pad2(dt.getUTCHours())}${pad2(dt.getUTCMinutes())}${pad2(dt.getUTCSeconds())}Z`;
 }
@@ -27,7 +26,7 @@ function foldIcsLine(line: string): string {
   return out;
 }
 
-export function buildInterventionIcs(iv: Intervention, uidSuffix = "belmap"): string {
+export function buildInterventionIcs(iv: Intervention, uidSuffix = "crmslot"): string {
   const range = getInterventionScheduledRange(iv);
   if (!range) return "";
 

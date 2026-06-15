@@ -46,13 +46,26 @@ export function buildInterventionReportPdf(intervention: Intervention): Uint8Arr
 
   // Info bloc
   const infos: [string, string][] = [
-    ["Client", intervention.clientName ?? (`${intervention.clientFirstName ?? ""} ${intervention.clientLastName ?? ""}`.trim() || "—")],
+    [
+      "Client",
+      intervention.clientName ??
+        (`${intervention.clientFirstName ?? ""} ${intervention.clientLastName ?? ""}`.trim() ||
+          "—"),
+    ],
     ["Adresse", intervention.address ?? "—"],
     ["Catégorie", intervention.category ?? "—"],
     ["Statut", intervention.status],
     ["Date création", formatDate(intervention.createdAt)],
-    ["Date intervention", intervention.scheduledDate ? `${intervention.scheduledDate} ${intervention.scheduledTime ?? ""}`.trim() : "—"],
-    ["Durée réelle", intervention.actualDurationMinutes ? `${intervention.actualDurationMinutes} min` : "—"],
+    [
+      "Date intervention",
+      intervention.scheduledDate
+        ? `${intervention.scheduledDate} ${intervention.scheduledTime ?? ""}`.trim()
+        : "—",
+    ],
+    [
+      "Durée réelle",
+      intervention.actualDurationMinutes ? `${intervention.actualDurationMinutes} min` : "—",
+    ],
     ["Clôturé le", formatDate(intervention.completedAt)],
   ];
 
@@ -143,9 +156,9 @@ export function buildInterventionReportPdf(intervention: Intervention): Uint8Arr
   doc.setFontSize(8);
   doc.setTextColor(150);
   doc.text(
-    `Généré le ${formatDate(new Date().toISOString())}  •  BELGMAP`,
+    `Généré le ${formatDate(new Date().toISOString())}  •  CRMSLOT`,
     margin,
-    pageHeight - 10,
+    pageHeight - 10
   );
 
   return new Uint8Array(doc.output("arraybuffer"));

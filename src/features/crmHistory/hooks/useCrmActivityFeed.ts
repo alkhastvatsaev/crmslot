@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BELGMAP_CRM_ORDERS_CHANGED_EVENT } from "../crmOrdersChangedEvent";
+import { CRMSLOT_CRM_ORDERS_CHANGED_EVENT } from "../crmOrdersChangedEvent";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { useCompanyMaterialOrdersRecent } from "@/features/featureHub/hooks/useCompanyMaterialOrdersRecent";
 import { useCompanySupplierOrdersRecent } from "@/features/featureHub/hooks/useCompanySupplierOrdersRecent";
@@ -37,8 +37,8 @@ export function useCrmActivityFeed(
 
   useEffect(() => {
     const onOrdersChanged = () => setOrdersRevision((n) => n + 1);
-    window.addEventListener(BELGMAP_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
-    return () => window.removeEventListener(BELGMAP_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
+    window.addEventListener(CRMSLOT_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
+    return () => window.removeEventListener(CRMSLOT_CRM_ORDERS_CHANGED_EVENT, onOrdersChanged);
   }, []);
 
   const feedCompanyId = companyId;

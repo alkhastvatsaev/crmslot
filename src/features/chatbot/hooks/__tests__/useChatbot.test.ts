@@ -12,7 +12,7 @@ const mockEnsureRightPanelOpen = jest.fn();
 const mockOpenSupplierOrdersPanel = jest.fn();
 const mockRefreshRegistry = jest.fn();
 
-const STORAGE_KEY = "belmap-chatbot-v2:uid-test:co-test";
+const STORAGE_KEY = "crmslot-chatbot-v2:uid-test:co-test";
 const snapshot = buildChatbotTestSnapshot();
 
 const mockWorkspace = {
@@ -177,7 +177,7 @@ describe("useChatbot", () => {
       streamResponse([
         { type: "text", delta: "Bonjour !" },
         { type: "done", apiMessages: [{ role: "assistant", content: "Bonjour !" }] },
-      ]),
+      ])
     );
 
     const { result } = renderHook(() => useChatbot(), { wrapper });
@@ -189,11 +189,10 @@ describe("useChatbot", () => {
     await waitFor(() => {
       expect(mockFetchWithAuth).toHaveBeenCalledWith(
         "/api/ai/chatbot",
-        expect.objectContaining({ method: "POST" }),
+        expect.objectContaining({ method: "POST" })
       );
     });
   });
-
 
   it("opens document preview on document_preview stream event", async () => {
     mockFetchWithAuth.mockResolvedValue(
@@ -204,7 +203,7 @@ describe("useChatbot", () => {
           documentType: "invoice",
         },
         { type: "done", apiMessages: [] },
-      ]),
+      ])
     );
 
     const { result } = renderHook(() => useChatbot(), { wrapper });
@@ -236,7 +235,7 @@ describe("useChatbot", () => {
         { type: "text", delta: assistantText },
         { type: "quick_actions", actions: lecotActions },
         { type: "done", apiMessages: [{ role: "assistant", content: assistantText }] },
-      ]),
+      ])
     );
 
     const { result } = renderHook(() => useChatbot(), { wrapper });
@@ -251,8 +250,11 @@ describe("useChatbot", () => {
       expect(last?.role).toBe("assistant");
       expect(last?.actions).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ id: "lecot-order-1-LEC-2001", payload: lecotActions[0].payload }),
-        ]),
+          expect.objectContaining({
+            id: "lecot-order-1-LEC-2001",
+            payload: lecotActions[0].payload,
+          }),
+        ])
       );
     });
   });
@@ -270,7 +272,7 @@ describe("useChatbot", () => {
           documentType: "invoice",
         },
         { type: "done", apiMessages: [{ role: "assistant", content: assistantText }] },
-      ]),
+      ])
     );
 
     const { result } = renderHook(() => useChatbot(), { wrapper });
@@ -283,11 +285,9 @@ describe("useChatbot", () => {
       expect(result.current.streaming).toBe(false);
       expect(mockFetchWithAuth).toHaveBeenCalledWith(
         "/api/ai/chatbot",
-        expect.objectContaining({ method: "POST" }),
+        expect.objectContaining({ method: "POST" })
       );
       expect(mockOpenDocumentPreview).toHaveBeenCalledWith("iv-fourche", "invoice", true);
     });
   });
-
-
 });

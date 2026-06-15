@@ -78,7 +78,7 @@ async function readStream(res: Response, onEvent: (ev: ChatbotStreamEvent) => vo
 
 // ── Storage ──────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "belmap-material-agent-v1";
+const STORAGE_KEY = "crmslot-material-agent-v1";
 
 function loadApiHistory(uid: string, companyId: string): unknown[] {
   if (typeof window === "undefined") return [];

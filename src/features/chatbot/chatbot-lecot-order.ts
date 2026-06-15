@@ -216,7 +216,7 @@ export async function orderLecotPartsForChatbot(
 
   if (lecotDemoOrdersEnabled()) {
     const demoReference = buildLecotDemoReference(orderRef.id);
-    const demoNote = `Simulation démo BELGMAP — ${demoReference}. Compte Lecot pro non connecté ; aucun envoi réel.`;
+    const demoNote = `Simulation démo CRMSLOT — ${demoReference}. Compte Lecot pro non connecté ; aucun envoi réel.`;
     await orderRef.update({
       status: "sent",
       isDemo: true,

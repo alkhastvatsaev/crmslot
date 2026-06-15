@@ -52,10 +52,10 @@ export default function CarouselUsagePanel() {
     if (!enabled) return;
     refresh();
     const onUpdate = () => refresh();
-    window.addEventListener("belgmap-carousel-usage-updated", onUpdate);
+    window.addEventListener("crmslot-carousel-usage-updated", onUpdate);
     window.addEventListener("storage", onUpdate);
     return () => {
-      window.removeEventListener("belgmap-carousel-usage-updated", onUpdate);
+      window.removeEventListener("crmslot-carousel-usage-updated", onUpdate);
       window.removeEventListener("storage", onUpdate);
     };
   }, [enabled, refresh]);
@@ -68,7 +68,7 @@ export default function CarouselUsagePanel() {
     const empty = emptyCarouselUsageSnapshot();
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(CAROUSEL_USAGE_STORAGE_KEY);
-      window.dispatchEvent(new CustomEvent("belgmap-carousel-usage-updated"));
+      window.dispatchEvent(new CustomEvent("crmslot-carousel-usage-updated"));
     }
     setRows(carouselUsageRows(empty));
   };

@@ -21,14 +21,20 @@ function safeDate(val: unknown): Date | null {
 }
 
 function fmt(d: Date | null) {
-  return d ? d.toLocaleDateString("fr-BE", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+  return d
+    ? d.toLocaleDateString("fr-BE", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : "—";
 }
 
 export async function POST(req: NextRequest) {
   const authResult = await requireAuthenticatedUser(req);
   if ("response" in authResult) return authResult.response;
 
-  const body = await req.json() as { message?: string; companyId?: string; history?: ChatMessage[] };
+  const body = (await req.json()) as {
+    message?: string;
+    companyId?: string;
+    history?: ChatMessage[];
+  };
   const { message, companyId, history = [] } = body;
 
   if (!message?.trim() || !companyId) {
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
     return new Response(
       "⚠️ OPENAI_API_KEY non configurée. Ajoutez-la dans vos variables d'environnement.",
-      { headers: { "Content-Type": "text/plain; charset=utf-8" } },
+      { headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
 
@@ -46,26 +52,19 @@ export async function POST(req: NextRequest) {
   const today = new Date().toISOString().slice(0, 10);
 
   const [ivSnap, techSnap, stockSnap] = await Promise.allSettled([
-    db.collection("interventions")
+    db
+      .collection("interventions")
       .where("companyId", "==", companyId)
       .orderBy("createdAt", "desc")
       .limit(120)
       .get(),
-    db.collection("technicians")
-      .where("companyId", "==", companyId)
-      .limit(30)
-      .get(),
-    db.collection("stock_items")
-      .where("companyId", "==", companyId)
-      .limit(50)
-      .get(),
+    db.collection("technicians").where("companyId", "==", companyId).limit(30).get(),
+    db.collection("stock_items").where("companyId", "==", companyId).limit(50).get(),
   ]);
 
   type IvData = Record<string, unknown>;
   const interventions: IvData[] =
-    ivSnap.status === "fulfilled"
-      ? ivSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }))
-      : [];
+    ivSnap.status === "fulfilled" ? ivSnap.value.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
 
   type TechData = Record<string, unknown>;
   const technicians: TechData[] =
@@ -80,20 +79,27 @@ export async function POST(req: NextRequest) {
       : [];
 
   const todayIvs = interventions.filter(
-    (iv) => iv.scheduledDate === today || iv.requestedDate === today,
+    (iv) => iv.scheduledDate === today || iv.requestedDate === today
   );
   const pending = interventions.filter((iv) => ["pending"].includes(String(iv.status)));
-  const assigned = interventions.filter((iv) => ["assigned", "en_route", "in_progress", "waiting_material"].includes(String(iv.status)));
+  const assigned = interventions.filter((iv) =>
+    ["assigned", "en_route", "in_progress", "waiting_material"].includes(String(iv.status))
+  );
   const done = interventions.filter((iv) => String(iv.status) === "done");
   const invoiced = interventions.filter((iv) => String(iv.status) === "invoiced");
 
   const totalRevenue = interventions.reduce((sum, iv) => {
-    const lines = Array.isArray(iv.billingLines) ? iv.billingLines as Array<{ unitPriceCents?: number; quantity?: number }> : [];
+    const lines = Array.isArray(iv.billingLines)
+      ? (iv.billingLines as Array<{ unitPriceCents?: number; quantity?: number }>)
+      : [];
     return sum + lines.reduce((s, l) => s + ((l.unitPriceCents ?? 0) * (l.quantity ?? 1)) / 100, 0);
   }, 0);
 
   const lowStock = stockItems.filter(
-    (s) => typeof s.quantity === "number" && typeof s.alertThreshold === "number" && s.quantity <= s.alertThreshold,
+    (s) =>
+      typeof s.quantity === "number" &&
+      typeof s.alertThreshold === "number" &&
+      s.quantity <= s.alertThreshold
   );
 
   const ivLine = (iv: IvData) => {
@@ -105,7 +111,7 @@ export async function POST(req: NextRequest) {
     return `[${iv.status}] ${d} | ${client} | ${addr} | ${prob} | tech:${tech}`;
   };
 
-  const systemPrompt = `Tu es l'assistant IA de BELGMAP — un logiciel de gestion d'interventions terrain (plomberie, électricité, etc.).
+  const systemPrompt = `Tu es l'assistant IA de CRMSLOT — un logiciel de gestion d'interventions terrain (plomberie, électricité, etc.).
 Tu as accès en temps réel aux données de l'entreprise. Réponds toujours en français, de façon concise et utile.
 Date du jour : ${today}
 

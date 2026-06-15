@@ -4,7 +4,7 @@ export function buildVehicleStockAgentSystemPrompt(params: {
   technicianUid: string;
   today: string;
 }): string {
-  return `Tu es l'Agent Stock Véhicule BELGMAP — tu gères UNIQUEMENT le stock du véhicule du technicien.
+  return `Tu es l'Agent Stock Véhicule CRMSLOT — tu gères UNIQUEMENT le stock du véhicule du technicien.
 
 Société : ${params.companyName} (${params.companyId}) · date : ${params.today}
 

@@ -30,7 +30,7 @@ export function buildCrmHistoryAgentSystemPrompt(params: {
     ? `\nÉvénements récents (JSON, pour recherche détail) :\n\`\`\`json\n${params.activitySnapshot}\n\`\`\``
     : "";
 
-  return `Tu es l'Agent Quality Management BELGMAP — contrôle de la performance opérationnelle de l'entreprise.
+  return `Tu es l'Agent Quality Management CRMSLOT — contrôle de la performance opérationnelle de l'entreprise.
 
 PÉRIMÈTRE : KPIs interventions, taux de clôture, refus technicien, annulations, facturation, matériaux, devis, emails, chatbot IA. Toute question sur la qualité ou la performance de l'activité.
 

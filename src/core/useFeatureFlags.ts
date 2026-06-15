@@ -6,15 +6,15 @@ import {
   DEFAULT_FEATURE_FLAGS,
   featureFlagsFromEnv,
   mergeFeatureFlags,
-  type BelgmapFeatureFlags,
+  type CrmslotFeatureFlags,
 } from "@/core/featureFlags";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 
-export function useFeatureFlags(): BelgmapFeatureFlags {
+export function useFeatureFlags(): CrmslotFeatureFlags {
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
-  const [remote, setRemote] = useState<Partial<BelgmapFeatureFlags> | null>(null);
+  const [remote, setRemote] = useState<Partial<CrmslotFeatureFlags> | null>(null);
 
   useEffect(() => {
     const firebaseUid = workspace?.firebaseUid;
@@ -31,7 +31,7 @@ export function useFeatureFlags(): BelgmapFeatureFlags {
           setRemote(null);
           return;
         }
-        setRemote(raw as Partial<BelgmapFeatureFlags>);
+        setRemote(raw as Partial<CrmslotFeatureFlags>);
       },
       () => setRemote(null)
     );
@@ -40,7 +40,7 @@ export function useFeatureFlags(): BelgmapFeatureFlags {
   return useMemo(() => mergeFeatureFlags(featureFlagsFromEnv(), remote), [remote]);
 }
 
-export function useFeatureFlag<K extends keyof BelgmapFeatureFlags>(key: K): boolean {
+export function useFeatureFlag<K extends keyof CrmslotFeatureFlags>(key: K): boolean {
   const flags = useFeatureFlags();
   return flags[key];
 }

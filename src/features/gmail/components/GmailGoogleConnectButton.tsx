@@ -34,7 +34,7 @@ const BRAND_ASSETS = {
 /** Délai court pour voir l’animation avant redirection OAuth. */
 const PRESS_FEEDBACK_MS = 140;
 
-/** Bouton Google pré-approuvé (asset officiel) — clic → OAuth BELGMAP. */
+/** Bouton Google pré-approuvé (asset officiel) — clic → OAuth CRMSLOT. */
 export default function GmailGoogleConnectButton({
   onClick,
   disabled,

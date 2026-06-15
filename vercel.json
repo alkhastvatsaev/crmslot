@@ -30,6 +30,10 @@
   ],
   "crons": [
     {
+      "path": "/api/cron/keep-warm",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/maintenance/generate-due",
       "schedule": "0 6 * * *"
     },

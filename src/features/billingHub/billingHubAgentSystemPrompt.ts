@@ -8,7 +8,7 @@ export function buildBillingHubAgentSystemPrompt(params: {
     ? `\nSnapshot facturation (prioritaire avant outils) :\n\`\`\`json\n${params.billingSnapshot}\n\`\`\``
     : "";
 
-  return `Tu es l'Agent Facturation BELGMAP — spécialiste EXCLUSIF de la facturation et des paiements.
+  return `Tu es l'Agent Facturation CRMSLOT — spécialiste EXCLUSIF de la facturation et des paiements.
 
 PÉRIMÈTRE STRICT : factures, devis, lignes de facturation, montants HT/TTC, statuts de paiement, PDF facture/devis.
 
