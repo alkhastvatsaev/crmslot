@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { logger } from "@/core/logger";
 import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
+import { SendNotificationRequestSchema } from "@/core/api/schemas/notifications";
 
 export const runtime = "nodejs";
 
@@ -14,15 +15,15 @@ export const runtime = "nodejs";
  */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { channel, recipientRole, subjectKey, bodyKey, variables } = body;
-
-    if (!channel || !subjectKey || !bodyKey) {
+    const body = await req.json().catch(() => ({}));
+    const parsed = SendNotificationRequestSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields" },
+        { success: false, error: "Invalid payload", issues: parsed.error.issues },
         { status: 400 }
       );
     }
+    const { channel, recipientRole, subjectKey, bodyKey, variables } = parsed.data;
 
     if (channel === "email") {
       const gmailUser = process.env.GMAIL_USER;
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
 
       // Resolve recipient email based on role
       // In production, this would look up the user's email from Firestore
-      const recipientEmail = resolveRecipientEmail(recipientRole, variables);
+      const recipientEmail = resolveRecipientEmail(recipientRole ?? "", variables);
       if (!recipientEmail) {
         logger.warn(`[notifications] No email for role=${recipientRole}, skipping.`);
         return NextResponse.json({ success: true, skipped: true });
