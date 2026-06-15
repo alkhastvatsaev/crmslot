@@ -13,6 +13,7 @@ Un seul clone Git, deux outils possibles en même temps. Ce fichier est la **sou
 | E — Hub partagé          | `src/app/page.tsx` (switch mobile/desktop uniquement), `src/context/**`                                        | _coordination_       | `cursor/mobile-corrections`            |
 | **F-UI — Mobile shell**  | `dashboard-mobile-layout.css`, `Mobile*.tsx`, `UserProfile`, `AdaptiveTriplePanelLayout`, hubs (layout mobile) | **Claude Code**      | `cursor/mobile-corrections`            |
 | **F-infra — Mobile app** | `useIsMobile`, `mobileAccess.ts`, `DesktopOnlyGate`, PWA/manifest, ngrok, tests E2E mobile                     | **Cursor**           | `cursor/mobile-corrections`            |
+| **G — App terrain**      | `src/app/m/technician/**`, `TechnicianMobileApp.tsx`                                                           | **Cursor**           | `cursor/m-technician-app`              |
 
 **Règle d’or** : un fichier = un propriétaire à la fois. Si les deux outils doivent toucher le même fichier, enchaîner (pas en parallèle) ou utiliser un worktree.
 
