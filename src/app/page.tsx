@@ -1,6 +1,7 @@
 "use client";
-import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import SpotlightSearch from "@/features/dashboard/components/SpotlightSearch";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import UserProfile from "@/features/dashboard/components/UserProfile";
@@ -124,7 +125,17 @@ const desktopHeader = (
 /** Écran d'accueil — **8 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail · Assistant IA. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
-  const { isTechnicianAccount } = useAccountRole();
+  const router = useRouter();
+  const { isTechnicianAccount, isLoading: isAccountRoleLoading } = useAccountRole();
+
+  // Mobile + compte technicien → route dédiée /m/technician (shell allégé sans le carrousel 8 hubs).
+  // Desktop : on laisse les techniciens sur le dashboard normal (cas dispatcher-technicien).
+  useEffect(() => {
+    if (isAccountRoleLoading) return;
+    if (isMobile !== true) return;
+    if (!isTechnicianAccount) return;
+    router.replace("/m/technician");
+  }, [isAccountRoleLoading, isMobile, isTechnicianAccount, router]);
 
   const dashboardPages = useMemo(() => {
     const adminMap = (

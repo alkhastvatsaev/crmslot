@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "889606998232",
+    "firebase_url": "https://belgique-72708-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "belgique-72708",
+    "storage_bucket": "belgique-72708.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889606998232:android:851ccd32867fa1562dafad",
+        "android_client_info": {
+          "package_name": "com.crmslot.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3gZyNTOmsDC6Iy1CoIjpL7sg6x1f8HXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

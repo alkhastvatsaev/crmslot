@@ -1,6 +1,6 @@
 "use client";
 
-import LoginOverlay from "@/features/auth/components/LoginOverlay";
+import TechnicianLoginGate from "@/features/auth/components/TechnicianLoginGate";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
@@ -27,7 +27,7 @@ export default function TechnicianMobileApp() {
   return (
     <DateProvider>
       <DesktopOnlyGate>
-        <LoginOverlay>
+        <TechnicianLoginGate>
           <DevServiceWorkerCleanup />
           <CompanyWorkspaceProvider>
             <TechnicianQueryProvider>
@@ -53,7 +53,7 @@ export default function TechnicianMobileApp() {
               </OfflineSyncProvider>
             </TechnicianQueryProvider>
           </CompanyWorkspaceProvider>
-        </LoginOverlay>
+        </TechnicianLoginGate>
       </DesktopOnlyGate>
     </DateProvider>
   );
