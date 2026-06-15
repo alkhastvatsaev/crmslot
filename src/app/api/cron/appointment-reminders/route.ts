@@ -5,6 +5,8 @@ import {
   buildReminderMessage,
   findDueReminders,
 } from "@/features/notifications/appointmentReminders";
+import { notifyClient } from "@/core/services/email/clientNotifications/notifyClient";
+import { buildClientAppointmentReminderEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
 import type { Intervention } from "@/features/interventions/types";
 
 export const runtime = "nodejs";
@@ -75,6 +77,37 @@ export async function GET(request: Request) {
       }
     } catch {
       // Ne pas bloquer le cron sur un échec d'envoi.
+    }
+
+    // Email companion (best-effort, ne bloque pas le cron)
+    try {
+      const fullSnap = await db.collection("interventions").doc(interventionId).get();
+      const full = (fullSnap.data() ?? {}) as Intervention;
+      const companyId = String(full.companyId ?? "").trim();
+      if (companyId) {
+        const payload = buildClientAppointmentReminderEmail({
+          interventionId,
+          iv: {
+            clientFirstName: full.clientFirstName ?? null,
+            title: full.title ?? null,
+            problem: full.problem ?? null,
+            address: full.address ?? null,
+            portalAccessToken: full.portalAccessToken ?? null,
+          },
+          whenLabel: msg.subject || msg.body,
+          reminderType,
+        });
+        await notifyClient({
+          interventionId,
+          companyId,
+          clientId: full.clientId ?? null,
+          fallbackEmail: full.clientEmail ?? null,
+          sentByUid: "cron-appointment-reminder",
+          ...payload,
+        });
+      }
+    } catch {
+      // best-effort
     }
   }
 
