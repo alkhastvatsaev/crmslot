@@ -7,15 +7,59 @@ export type NativeCoords = {
   timestamp: number;
 };
 
-export async function getCurrentNativePosition(): Promise<NativeCoords | null> {
-  if (!isCapacitorNative()) return null;
-  const { Geolocation } = await import("@capacitor/geolocation");
-  const perm = await Geolocation.checkPermissions();
-  if (perm.location !== "granted") {
-    const req = await Geolocation.requestPermissions({ permissions: ["location"] });
-    if (req.location !== "granted") return null;
-  }
-  const pos = await Geolocation.getCurrentPosition({
+type Permission = "granted" | "denied" | "prompt";
+
+export type GeolocationPlugin = {
+  checkPermissions: () => Promise<{ location: Permission }>;
+  requestPermissions: (opts: { permissions: ["location"] }) => Promise<{ location: Permission }>;
+  getCurrentPosition: (opts: {
+    enableHighAccuracy?: boolean;
+    timeout?: number;
+    maximumAge?: number;
+  }) => Promise<{
+    timestamp: number;
+    coords: { latitude: number; longitude: number; accuracy: number };
+  }>;
+  watchPosition: (
+    opts: { enableHighAccuracy?: boolean; timeout?: number },
+    callback: (
+      pos: {
+        timestamp: number;
+        coords: { latitude: number; longitude: number; accuracy: number };
+      } | null,
+      err: unknown
+    ) => void
+  ) => Promise<string>;
+  clearWatch: (opts: { id: string }) => Promise<void>;
+};
+
+export type NativeGeolocationDeps = {
+  isNative: () => boolean;
+  loadPlugin: () => Promise<GeolocationPlugin>;
+};
+
+const PROD_DEPS: NativeGeolocationDeps = {
+  isNative: isCapacitorNative,
+  loadPlugin: async () => {
+    const mod = await import("@capacitor/geolocation");
+    return mod.Geolocation as unknown as GeolocationPlugin;
+  },
+};
+
+async function ensurePermission(plugin: GeolocationPlugin): Promise<boolean> {
+  const perm = await plugin.checkPermissions();
+  if (perm.location === "granted") return true;
+  const req = await plugin.requestPermissions({ permissions: ["location"] });
+  return req.location === "granted";
+}
+
+export async function getCurrentNativePosition(
+  deps: NativeGeolocationDeps = PROD_DEPS
+): Promise<NativeCoords | null> {
+  if (!deps.isNative()) return null;
+  const plugin = await deps.loadPlugin();
+  if (!(await ensurePermission(plugin))) return null;
+  const pos = await plugin.getCurrentPosition({
     enableHighAccuracy: true,
     timeout: 10_000,
     maximumAge: 5_000,
@@ -29,18 +73,14 @@ export async function getCurrentNativePosition(): Promise<NativeCoords | null> {
 }
 
 export async function watchNativePosition(
-  onUpdate: (coords: NativeCoords) => void
+  onUpdate: (coords: NativeCoords) => void,
+  deps: NativeGeolocationDeps = PROD_DEPS
 ): Promise<(() => Promise<void>) | null> {
-  if (!isCapacitorNative()) return null;
-  const { Geolocation } = await import("@capacitor/geolocation");
+  if (!deps.isNative()) return null;
+  const plugin = await deps.loadPlugin();
+  if (!(await ensurePermission(plugin))) return null;
 
-  const perm = await Geolocation.checkPermissions();
-  if (perm.location !== "granted") {
-    const req = await Geolocation.requestPermissions({ permissions: ["location"] });
-    if (req.location !== "granted") return null;
-  }
-
-  const watchId = await Geolocation.watchPosition(
+  const watchId = await plugin.watchPosition(
     { enableHighAccuracy: true, timeout: 15_000 },
     (pos, err) => {
       if (err || !pos) return;
@@ -52,5 +92,5 @@ export async function watchNativePosition(
       });
     }
   );
-  return () => Geolocation.clearWatch({ id: watchId });
+  return () => plugin.clearWatch({ id: watchId });
 }
