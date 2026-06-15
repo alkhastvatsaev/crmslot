@@ -3,10 +3,11 @@ import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
   appId: "com.belgmap.app",
-  appName: "BelgMap",
+  appName: "CRMSLOT",
   webDir: "capacitor-shell",
   server: {
-    url: "https://pwabelgium.vercel.app",
+    // Doit pointer vers un domaine qui sert l'app en 200 (pas de 307 vers un autre hôte — casse la PWA).
+    url: process.env.CAPACITOR_SERVER_URL?.trim() || "https://crmslot.vercel.app",
     cleartext: false,
   },
   ios: {

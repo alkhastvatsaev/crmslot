@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@capacitor-firebase/messaging": "^8.3.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/camera": "^8.2.0",
     "@capacitor/cli": "^7.6.6",

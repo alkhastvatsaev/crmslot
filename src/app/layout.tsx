@@ -12,13 +12,18 @@ const outfit = Outfit({
 const appGitSha = process.env.NEXT_PUBLIC_APP_GIT_SHA ?? "";
 
 export const metadata: Metadata = {
-  title: "BELGMAP",
+  title: "CRMSLOT",
   description: "Plateforme de gestion d'interventions de serrurerie en Belgique",
+  applicationName: "CRMSLOT",
   manifest: "/manifest.json",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "BELGMAP",
+    title: "CRMSLOT",
   },
   ...(appGitSha
     ? {
@@ -41,6 +46,7 @@ export const viewport: Viewport = {
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
+import NativePushBootstrap from "@/features/notifications/NativePushBootstrap";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -53,6 +59,7 @@ export default function RootLayout({
     <html lang="fr" className={cn(outfit.variable, geist.variable)} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <NativeShellBootstrap />
+        <NativePushBootstrap />
         <I18nProvider>{children}</I18nProvider>
         <Toaster position="top-center" theme="light" richColors closeButton />
       </body>

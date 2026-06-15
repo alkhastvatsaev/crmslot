@@ -76,23 +76,32 @@ export async function resolvePushServiceWorkerRegistration(): Promise<ServiceWor
   ]);
 }
 
-export function tokenDocId(token: string): string {
+export type FcmPlatform = "web" | "ios" | "android";
+
+const PLATFORM_PREFIX: Record<FcmPlatform, string> = {
+  web: "w",
+  ios: "i",
+  android: "a",
+};
+
+export function tokenDocId(token: string, platform: FcmPlatform = "web"): string {
   let h = 0;
   for (let i = 0; i < token.length; i++) {
     h = (Math.imul(31, h) + token.charCodeAt(i)) | 0;
   }
-  return `w_${Math.abs(h).toString(36)}`;
+  return `${PLATFORM_PREFIX[platform]}_${Math.abs(h).toString(36)}`;
 }
 
 export async function persistFcmToken(
   uid: string,
   token: string,
-  audience: "technician" | "client"
+  audience: "technician" | "client",
+  platform: FcmPlatform = "web"
 ): Promise<void> {
   if (!firestore) throw new Error("Firestore indisponible");
-  await setDoc(doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token)), {
+  await setDoc(doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token, platform)), {
     token,
-    platform: "web",
+    platform,
     audience,
     updatedAt: serverTimestamp(),
   });
