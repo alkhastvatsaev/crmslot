@@ -63,6 +63,10 @@
     "cap:open:ios": "cap open ios",
     "cap:open:android": "cap open android",
     "cap:icons": "npx @capacitor/assets generate --iconBackgroundColor '#09090B' --splashBackgroundColor '#09090B' --android --ios",
+    "cap:sync:terrain": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync",
+    "cap:sync:terrain:ios": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync ios",
+    "cap:sync:terrain:android": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync android",
+    "test:e2e:technician-app": "playwright test tests/e2e/technician-mobile-app.spec.ts --project=mobile-shell",
     "prepare": "husky"
   },
   "dependencies": {
