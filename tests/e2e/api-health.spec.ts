@@ -6,6 +6,6 @@ test.describe("API health", () => {
     expect(res.ok()).toBeTruthy();
     const body = (await res.json()) as { ok?: boolean; service?: string };
     expect(body.ok).toBe(true);
-    expect(body.service).toBe("belgmap");
+    expect(body.service).toBe("crmslot");
   });
 });

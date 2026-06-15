@@ -15,7 +15,7 @@ Guide pas à pas — une fois configuré, le déploiement se fait en **1 clic** 
 ## Étape 1 — Projet Vercel
 
 1. Va sur [vercel.com/new](https://vercel.com/new).
-2. **Import Git Repository** → choisis le repo `BELGMAP` (ou le nom de ton fork).
+2. **Import Git Repository** → choisis le repo `CRMSLOT` (ou le nom de ton fork).
 3. Framework : **Next.js** (détecté automatiquement).
 4. **Root Directory** : laisse vide (racine du repo).
 5. **Build Command** : `npm run build` (déjà dans `vercel.json`).
@@ -105,7 +105,7 @@ npm run verify:env:prod
 ## Étape 3 — Premier déploiement Vercel
 
 1. **Deployments → Redeploy** (ou push sur `main` si Git connecté).
-2. Note l’URL : `https://belgmap-xxx.vercel.app` (ou domaine custom).
+2. Note l’URL : `https://crmslot-xxx.vercel.app` (ou domaine custom).
 3. Mets à jour `TWILIO_WEBHOOK_PUBLIC_URL` avec cette URL exacte, puis **redéploie**.
 
 ### PWA (service worker + « Ajouter à l’écran d’accueil »)
@@ -118,7 +118,7 @@ Vérification après déploiement :
 npm run smoke:url -- https://VOTRE-DOMAINE.vercel.app
 ```
 
-Dans Vercel → **Settings → Domains** : attache le domaine au **même projet** que le déploiement BELGMAP ; supprime toute règle de redirect domaine → autre projet.
+Dans Vercel → **Settings → Domains** : attache le domaine au **même projet** que le déploiement CRMSLOT ; supprime toute règle de redirect domaine → autre projet.
 
 Variables utiles :
 
@@ -154,7 +154,7 @@ Les enregistrements utilisent automatiquement
 
 ```bash
 npm i -g vercel@latest
-cd "/chemin/vers/BELGMAP_ULTRA_CLEAN 2"
+cd "/chemin/vers/CRMSLOT_ULTRA_CLEAN 2"
 vercel login
 vercel link
 ```
@@ -170,7 +170,7 @@ Le script affiche `VERCEL_ORG_ID` et `VERCEL_PROJECT_ID`.
 ### Token Vercel
 
 1. [vercel.com/account/tokens](https://vercel.com/account/tokens)
-2. **Create** → nom `github-actions-belgmap` → scope Full Account (ou projet limité).
+2. **Create** → nom `github-actions-crmslot` → scope Full Account (ou projet limité).
 3. Copie le token (affiché une seule fois).
 
 ---

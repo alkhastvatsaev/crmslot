@@ -1,4 +1,8 @@
-import type { SupplierOrder, SupplierOrderLine, SupplierOrderStatus } from "@/features/suppliers/types";
+import type {
+  SupplierOrder,
+  SupplierOrderLine,
+  SupplierOrderStatus,
+} from "@/features/suppliers/types";
 
 export type LecotOrderToolResult = {
   supplierOrderId: string;
@@ -26,7 +30,7 @@ export function buildLecotDemoReference(orderId: string): string {
 /** Aperçu panneau droit — affiché avant sync Firestore (ou si règles / index en échec). */
 export function buildSupplierOrderPreviewFromToolResult(
   companyId: string,
-  result: LecotOrderToolResult,
+  result: LecotOrderToolResult
 ): SupplierOrder {
   const now = new Date().toISOString();
   const lines: SupplierOrderLine[] = (result.lines ?? []).map((l) => {
@@ -53,7 +57,7 @@ export function buildSupplierOrderPreviewFromToolResult(
       : "draft";
 
   const notes = result.demoMode
-    ? `Simulation démo BELGMAP — ${result.demoReference ?? result.supplierOrderId}. Compte Lecot pro non connecté ; aucun envoi réel.`
+    ? `Simulation démo CRMSLOT — ${result.demoReference ?? result.supplierOrderId}. Compte Lecot pro non connecté ; aucun envoi réel.`
     : null;
 
   return {

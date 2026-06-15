@@ -1,4 +1,7 @@
-import { appendChatbotTrainingLog, isChatbotTrainingLogEnabled } from "@/features/chatbot/training/appendChatbotTrainingLog";
+import {
+  appendChatbotTrainingLog,
+  isChatbotTrainingLogEnabled,
+} from "@/features/chatbot/training/appendChatbotTrainingLog";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
 
 jest.mock("@/core/config/firebase-admin", () => ({
@@ -127,7 +130,7 @@ describe("appendChatbotTrainingLog", () => {
     expect(payload.userMessage).toBe("Question ?");
     expect(payload.assistantMessage).toBe("Réponse.");
     expect(payload.hadToolRounds).toBe(true);
-    expect(payload.source).toBe("belgmap_openai_chatbot");
+    expect(payload.source).toBe("crmslot_openai_chatbot");
     expect(payload.createdAt).toBe("MOCK_SERVER_TS");
   });
 
@@ -185,7 +188,7 @@ describe("appendChatbotTrainingLog", () => {
         modelName: "m",
         conversationId: null,
         turn: { userMessage: "a", assistantMessage: "b", hadToolRounds: false },
-      }),
+      })
     ).resolves.toBeUndefined();
 
     expect(errSpy).toHaveBeenCalled();

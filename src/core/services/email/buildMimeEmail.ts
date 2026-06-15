@@ -26,7 +26,7 @@ export function buildMimeMultipartEmail(params: {
   references?: string;
   attachment: MimeAttachment;
 }): string {
-  const boundary = `belgmap_${crypto.randomUUID().replace(/-/g, "")}`;
+  const boundary = `crmslot_${crypto.randomUUID().replace(/-/g, "")}`;
   const htmlB64 = chunkBase64(Buffer.from(params.bodyHtml, "utf8").toString("base64"));
   const attachB64 = chunkBase64(params.attachment.content.toString("base64"));
 

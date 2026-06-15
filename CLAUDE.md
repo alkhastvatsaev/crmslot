@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-BELGMAP. Plan mode gros diff. @fichier:ligne. Tests → AGENTS.md si besoin.
+CRMSLOT. Plan mode gros diff. @fichier:ligne. Tests → AGENTS.md si besoin.
 
 ## Travail parallèle avec Cursor
 
@@ -36,6 +36,7 @@ npm run ci               # lint:ci + test:ci + build (pipeline complet)
 ## Architecture
 
 ### Structure principale
+
 - `src/app/` — pages Next.js App Router + `api/` route handlers
 - `src/features/` — modules métier (map, interventions, chatbot, billing, catalog…)
 - `src/core/` — config Firebase, helpers API, i18n, feature flags, UI partagée
@@ -44,6 +45,7 @@ npm run ci               # lint:ci + test:ci + build (pipeline complet)
 - `tests/e2e/` — Playwright
 
 ### Carrousel de pages (DashboardPager)
+
 L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerProvider`. Chaque "slot" est un index constant défini dans un fichier `*Constants.ts` du feature concerné. Les pages sont assemblées dans `src/app/page.tsx`.
 
 **7 pages actuelles (0-based)** :
@@ -62,11 +64,13 @@ L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerPr
 **Intent contexts** (communication inter-pages) : chaque feature qui doit envoyer un focus/prompt au Chatbot ou à une autre page utilise un context léger dans `src/context/` (ex. `CompanyStockIntentContext`, `BackofficeInboxIntentContext`, `TechnicianCaseIntentContext`). Tous wrappés dans `src/app/page.tsx`.
 
 ### Auth & API routes
+
 - **Client → API** : `fetchWithAuth` (`src/core/api/fetchWithAuth.ts`) injecte le token Firebase Bearer.
 - **API routes** : `requireAuthenticatedUser` de `src/core/api/routeAuth.ts` vérifie le token via Firebase Admin. Toutes les routes sensibles exigent ce guard sauf exceptions documentées dans README.
 - Routes API : `export const runtime = "nodejs"` obligatoire (pas edge).
 
 ### Firebase
+
 - **Client** : `src/core/config/firebase.ts` — Firestore avec `experimentalForceLongPolling` (Vercel/Node), Auth, Storage. RTDB optionnelle via `NEXT_PUBLIC_FIREBASE_DATABASE_URL`.
 - **Admin** : `src/core/config/firebase-admin.ts` — initialisé une seule fois, importé en tête de chaque route API qui en a besoin.
 - **Collections principales** : `interventions`, `clients`, `companies`, `stockItems`, `material_orders`, `companies/{id}/supplierOrders`, `companies/{id}/featureFlags`.
@@ -74,6 +78,7 @@ L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerPr
 - Jamais de fichiers `* 2.ts` / `* 2.tsx` — signe de doublon macOS à supprimer immédiatement.
 
 ### Chatbot (OpenAI + outils Firebase Admin)
+
 Pipeline SSE : `POST /api/ai/chatbot` → `runChatbotOpenAI` → stream d'événements `ChatbotStreamEvent`.
 
 - **Outils** : définis dans `chatbot-tools.ts` (schema JSON Schema), exécutés serveur dans `chatbot-tool-executor.ts` via `executeChatbotTool`.
@@ -84,10 +89,13 @@ Pipeline SSE : `POST /api/ai/chatbot` → `runChatbotOpenAI` → stream d'évén
 - Pour ajouter un outil : (1) déclarer dans `chatbot-tools.ts`, (2) ajouter le case dans `chatbot-tool-executor.ts`, (3) si write → ajouter dans `CHATBOT_WRITE_TOOLS`, (4) mettre à jour `TOOL_LABELS` dans `chatbot-openai.ts`, (5) documenter dans le system prompt.
 
 ### Feature flags
+
 `src/core/featureFlags.ts` — flags `NEXT_PUBLIC_FF_*` (build-time) surchargeables par Firestore `companies/{id}/featureFlags`. `lecotProductSearch` et `supplierPortal` concernent Lecot.
 
 ### Tests
+
 Règles complètes dans `AGENTS.md`. Points essentiels :
+
 - Tests Jest colocalisés dans `__tests__/` à côté du fichier source.
 - Utiliser `render` de `src/test-utils/render.tsx` (alias `renderWithProviders`).
 - `renderWithPager` uniquement si le composant dépend de `DashboardPagerProvider`.

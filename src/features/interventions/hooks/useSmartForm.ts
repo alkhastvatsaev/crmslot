@@ -262,9 +262,9 @@ export function useSmartForm() {
   // -------------------------------------------------------------------------
   useEffect(() => {
     if (typeof sessionStorage === "undefined") return;
-    const raw = sessionStorage.getItem("belgmap_prefill_client");
+    const raw = sessionStorage.getItem("crmslot_prefill_client");
     if (!raw) return;
-    sessionStorage.removeItem("belgmap_prefill_client");
+    sessionStorage.removeItem("crmslot_prefill_client");
     try {
       const prefill = JSON.parse(raw) as {
         clientName?: string;
@@ -286,9 +286,9 @@ export function useSmartForm() {
     } catch {
       /* ignore */
     }
-    const savRaw = sessionStorage.getItem("belgmap_prefill_sav");
+    const savRaw = sessionStorage.getItem("crmslot_prefill_sav");
     if (savRaw) {
-      sessionStorage.removeItem("belgmap_prefill_sav");
+      sessionStorage.removeItem("crmslot_prefill_sav");
       setParentInterventionId(savRaw.trim());
     }
   }, []);

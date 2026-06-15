@@ -1,4 +1,4 @@
-# Architecture de tests — BELGMAP
+# Architecture de tests — CRMSLOT
 
 Document de référence pour réduire les régressions et guider les agents (Cursor, Codex, etc.).  
 Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichier décrit **l’état actuel**, la **cible** et un **plan par phases**.

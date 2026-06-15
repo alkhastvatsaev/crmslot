@@ -1,6 +1,6 @@
 import type { ClientRecord } from "./types";
 
-const STORAGE_PREFIX = "belgmap_crm_clients_";
+const STORAGE_PREFIX = "crmslot_crm_clients_";
 
 export function readClientsOfflineCache(companyId: string): ClientRecord[] {
   if (typeof window === "undefined") return [];
@@ -17,7 +17,10 @@ export function readClientsOfflineCache(companyId: string): ClientRecord[] {
 export function writeClientsOfflineCache(companyId: string, clients: ClientRecord[]): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(`${STORAGE_PREFIX}${companyId.trim()}`, JSON.stringify(clients.slice(0, 200)));
+    localStorage.setItem(
+      `${STORAGE_PREFIX}${companyId.trim()}`,
+      JSON.stringify(clients.slice(0, 200))
+    );
   } catch {
     /* quota */
   }

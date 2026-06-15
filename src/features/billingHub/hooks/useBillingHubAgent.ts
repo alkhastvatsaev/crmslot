@@ -14,7 +14,7 @@ import { auth } from "@/core/config/firebase";
 import type { BillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import type { Intervention } from "@/features/interventions/types";
 
-const STORAGE_KEY = "belmap-billing-hub-agent-v1";
+const STORAGE_KEY = "crmslot-billing-hub-agent-v1";
 
 type Options = {
   companyId: string;

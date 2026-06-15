@@ -2,7 +2,10 @@
 
 import { ClipboardList, ExternalLink, Wrench } from "lucide-react";
 import { toast } from "sonner";
-import { navigateCompanyHub, COMPANY_HUB_ANCHOR_SMART_FORM } from "@/features/company/companyHubNavigation";
+import {
+  navigateCompanyHub,
+  COMPANY_HUB_ANCHOR_SMART_FORM,
+} from "@/features/company/companyHubNavigation";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
@@ -16,7 +19,11 @@ type Props = {
   clientId: string;
 };
 
-function formatInterventionDate(iv: { scheduledDate?: string | null; date?: string | null; createdAt?: string }): string {
+function formatInterventionDate(iv: {
+  scheduledDate?: string | null;
+  date?: string | null;
+  createdAt?: string;
+}): string {
   const raw = iv.scheduledDate?.trim() || iv.date?.trim() || iv.createdAt?.trim() || "";
   if (!raw) return "—";
   const d = new Date(raw);
@@ -32,7 +39,10 @@ export default function ClientInterventionsPanel({ companyId, clientId }: Props)
   const { interventions, loading } = useClientInterventions(companyId, clientId);
 
   return (
-    <section data-testid="client-interventions-panel" className="mt-4 border-t border-slate-100 pt-3">
+    <section
+      data-testid="client-interventions-panel"
+      className="mt-4 border-t border-slate-100 pt-3"
+    >
       <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-slate-400">
         <ClipboardList className="h-3.5 w-3.5" />
         {t("crm.interventions_title")}
@@ -79,16 +89,18 @@ export default function ClientInterventionsPanel({ companyId, clientId }: Props)
                     data-testid={`client-intervention-sav-${iv.id}`}
                     onClick={() => {
                       if (typeof sessionStorage !== "undefined") {
-                        sessionStorage.setItem("belgmap_prefill_sav", iv.id);
+                        sessionStorage.setItem("crmslot_prefill_sav", iv.id);
                         sessionStorage.setItem(
-                          "belgmap_prefill_client",
+                          "crmslot_prefill_client",
                           JSON.stringify({
-                            clientName: [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") || iv.clientName,
+                            clientName:
+                              [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") ||
+                              iv.clientName,
                             phone: iv.clientPhone,
                             email: iv.clientEmail,
                             clientId,
                             parentInterventionId: iv.id,
-                          }),
+                          })
                         );
                       }
                       navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_SMART_FORM);

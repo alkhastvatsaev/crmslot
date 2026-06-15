@@ -27,7 +27,10 @@ export type { FcmUiStatus };
 /**
  * Enregistre le jeton FCM sous `users/{uid}/fcm_tokens/{id}` et écoute les messages au premier plan.
  */
-export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: { enabled?: boolean }) {
+export function useTechnicianPushMessaging(
+  vapidKey: string | undefined,
+  opts?: { enabled?: boolean }
+) {
   const enabled = opts?.enabled !== false;
   const pager = useDashboardPagerOptional();
   const { setPendingCaseId } = useTechnicianCaseIntent();
@@ -43,7 +46,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
       setPendingCaseId(interventionId.trim());
     },
-    [pager, setPendingCaseId],
+    [pager, setPendingCaseId]
   );
 
   const attachForegroundListener = useCallback(() => {
@@ -53,11 +56,12 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
 
     const messaging = getMessaging(app);
     unsubForegroundRef.current = onMessage(messaging, (payload) => {
-      const title = payload.notification?.title ?? "BelgMap";
+      const title = payload.notification?.title ?? "CRMSLOT";
       const body = payload.notification?.body ?? "";
       toast.message(title, { description: body });
       const pushType = typeof payload.data?.type === "string" ? payload.data.type : "";
-      const id = typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
+      const id =
+        typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
       if (pushType === "daily_reminder" || pushType === "appointment_reminder") return;
       if (id?.trim()) openCaseFromPayload(id.trim());
     });
@@ -81,7 +85,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
       setLastError(null);
       attachForegroundListener();
     },
-    [vapidKey, attachForegroundListener],
+    [vapidKey, attachForegroundListener]
   );
 
   useEffect(() => {
@@ -188,10 +192,7 @@ export function useTechnicianPushMessaging(vapidKey: string | undefined, opts?: 
     }
   }, [vapidKey, syncTokenForUser]);
 
-  return useMemo(
-    () => ({ status, lastError, registerPush }),
-    [status, lastError, registerPush],
-  );
+  return useMemo(() => ({ status, lastError, registerPush }), [status, lastError, registerPush]);
 }
 
 /** Supprime un jeton en base lorsque l’utilisateur révoque les notifications (best-effort). */

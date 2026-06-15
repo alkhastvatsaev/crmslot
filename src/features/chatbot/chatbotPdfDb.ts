@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from "idb";
 import { logger } from "@/core/logger";
 import type { ChatbotDocumentKind } from "./chatbot-document";
 
-const DB_NAME = "belgmap-pdfs-cache";
+const DB_NAME = "crmslot-pdfs-cache";
 const DB_VERSION = 1;
 const STORE_NAME = "pdf_blobs";
 

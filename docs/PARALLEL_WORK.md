@@ -99,7 +99,7 @@ Suppression après usage : `git worktree remove ../testbelgium-claude`
 2. Commit sur **ta** branche uniquement.
 3. Mettre à jour le tableau « Propriétaire session » ci-dessus (ou le vider).
 
-## Repo BELGMAP
+## Repo CRMSLOT
 
 - Pas de fichiers `* 2.ts` / `* 2.tsx` (doublons macOS → supprimer).
 - Tests colocalisés `__tests__/` — voir `AGENTS.md`.

@@ -1,4 +1,4 @@
-# Checklist production BELGMAP
+# Checklist production CRMSLOT
 
 Cocher avant d’ouvrir l’app aux vrais clients / techniciens. Détail : [PLAN_STRATEGIQUE.md](./PLAN_STRATEGIQUE.md).
 
@@ -65,7 +65,7 @@ Cocher avant d’ouvrir l’app aux vrais clients / techniciens. Détail : [PLAN
 
 ## Sign-off
 
-| Rôle | Nom | Date |
-|------|-----|------|
-| Dev | | |
-| Métier | | |
+| Rôle   | Nom | Date |
+| ------ | --- | ---- |
+| Dev    |     |      |
+| Métier |     |      |

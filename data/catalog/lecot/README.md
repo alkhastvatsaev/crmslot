@@ -1,4 +1,4 @@
-# Catalogue Lecot (PWA BELGMAP)
+# Catalogue Lecot (PWA CRMSLOT)
 
 ## Démonstration client (CRM)
 
@@ -21,8 +21,8 @@ Ce dossier contient le **catalogue local** utilisé par :
 
 ## Fichier principal
 
-| Fichier | Rôle |
-|--------|------|
+| Fichier         | Rôle                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------- |
 | `products.json` | Tableau d’objets `{ sku, label, unitPriceCents, category? }`. **SKU unique** obligatoire. |
 
 Après modification de `products.json`, relancer le build / dev pour recharger le bundle.

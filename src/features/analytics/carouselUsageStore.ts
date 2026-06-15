@@ -1,6 +1,6 @@
 import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
 
-export const CAROUSEL_USAGE_STORAGE_KEY = "belgmap_carousel_usage_v1";
+export const CAROUSEL_USAGE_STORAGE_KEY = "crmslot_carousel_usage_v1";
 
 export type CarouselPageUsage = {
   pageId: string;
@@ -117,7 +117,7 @@ export function saveCarouselUsageSnapshot(snapshot: CarouselUsageSnapshot): void
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(CAROUSEL_USAGE_STORAGE_KEY, JSON.stringify(snapshot));
-    window.dispatchEvent(new CustomEvent("belgmap-carousel-usage-updated"));
+    window.dispatchEvent(new CustomEvent("crmslot-carousel-usage-updated"));
   } catch {
     // Quota / mode privé — analytics ne doit pas casser l'UI.
   }

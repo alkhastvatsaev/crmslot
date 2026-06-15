@@ -189,7 +189,7 @@ export function generateInterventionReport(iv: Intervention): void {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
   doc.setTextColor(...C.border);
-  doc.text("Document généré automatiquement par BELGMAP", pw / 2, fh, { align: "center" });
+  doc.text("Document généré automatiquement par CRMSLOT", pw / 2, fh, { align: "center" });
 
   const clientLabel = clientName(iv).replace(/\s+/g, "_").slice(0, 30);
   doc.save(`Rapport_${clientLabel}_${iv.id.slice(0, 8)}.pdf`);

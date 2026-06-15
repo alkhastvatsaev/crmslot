@@ -22,7 +22,7 @@ export type { LecotImageLookupInput } from "@/features/catalog/lecotProductImage
 const HTML_FETCH_HEADERS = {
   Accept: "text/html,application/xhtml+xml",
   "User-Agent":
-    "Mozilla/5.0 (compatible; BelgmapStock/1.0; +https://belgmap.app) AppleWebKit/537.36",
+    "Mozilla/5.0 (compatible; CrmslotStock/1.0; +https://crmslot.app) AppleWebKit/537.36",
 };
 
 function cacheKey(input: LecotImageLookupInput): string {

@@ -16,8 +16,8 @@ export async function deliverWebhook(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Belgmap-Signature": signature,
-        "X-Belgmap-Event": payload.event,
+        "X-Crmslot-Signature": signature,
+        "X-Crmslot-Event": payload.event,
       },
       body,
     });

@@ -20,7 +20,7 @@ jest.mock("@/features/dashboard/dashboardPagerContext", () => ({
 }));
 
 jest.mock("@/context/CompanyStockIntentContext", () => ({
-  BELGMAP_FOCUS_STOCK_HUB_EVENT: "belgmap:focus-stock-hub",
+  CRMSLOT_FOCUS_STOCK_HUB_EVENT: "crmslot:focus-stock-hub",
   useCompanyStockIntentOptional: () => ({ applyFocus: mockApplyFocus }),
 }));
 
@@ -92,7 +92,9 @@ describe("useHubAgentStreamHandler", () => {
   });
 
   it("open_crm_dossier sets pending inbox and navigates", () => {
-    const { navigateBackOfficeHub } = jest.requireMock("@/features/backoffice/backofficeHubNavigation") as {
+    const { navigateBackOfficeHub } = jest.requireMock(
+      "@/features/backoffice/backofficeHubNavigation"
+    ) as {
       navigateBackOfficeHub: jest.Mock;
     };
     const handler = renderHandler();
@@ -122,7 +124,9 @@ describe("useHubAgentStreamHandler", () => {
   });
 
   it("supplier_orders_panel opens panel and dispatches CRM event", () => {
-    const { dispatchCrmOrdersChanged } = jest.requireMock("@/features/crmHistory/crmOrdersChangedEvent") as {
+    const { dispatchCrmOrdersChanged } = jest.requireMock(
+      "@/features/crmHistory/crmOrdersChangedEvent"
+    ) as {
       dispatchCrmOrdersChanged: jest.Mock;
     };
     const handler = renderHandler({ companyId: "co-test" });
@@ -130,7 +134,7 @@ describe("useHubAgentStreamHandler", () => {
     expect(mockOpenSupplierOrdersPanel).toHaveBeenCalledWith("so-2", null, undefined);
     expect(mockEnsureRightPanelOpen).toHaveBeenCalled();
     expect(dispatchCrmOrdersChanged).toHaveBeenCalledWith(
-      expect.objectContaining({ companyId: "co-test", supplierOrderId: "so-2" }),
+      expect.objectContaining({ companyId: "co-test", supplierOrderId: "so-2" })
     );
   });
 

@@ -2,8 +2,14 @@
 
 import { initializeApp, type FirebaseOptions } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
-import { firebasePublicConfig, isFirebasePublicConfigured } from "../src/features/notifications/firebasePublicConfig";
-import { BM_TECH_CASE_PARAM, BM_TECH_REMINDER_PARAM } from "../src/features/notifications/notificationConstants";
+import {
+  firebasePublicConfig,
+  isFirebasePublicConfigured,
+} from "../src/features/notifications/firebasePublicConfig";
+import {
+  BM_TECH_CASE_PARAM,
+  BM_TECH_REMINDER_PARAM,
+} from "../src/features/notifications/notificationConstants";
 import { parseTechnicianNotificationSearchParams } from "../src/features/notifications/technicianNotificationUrls";
 
 declare let self: ServiceWorkerGlobalScope;
@@ -15,7 +21,7 @@ function bootMessaging(): void {
   const messaging = getMessaging(app);
 
   onBackgroundMessage(messaging, (payload) => {
-    const title = payload.notification?.title ?? "BelgMap";
+    const title = payload.notification?.title ?? "CRMSLOT";
     const body = payload.notification?.body ?? "";
     const data = payload.data ?? {};
 
@@ -58,11 +64,13 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      const existing = clientList.find((c) => c.url.startsWith(self.location.origin)) as WindowClient | undefined;
+      const existing = clientList.find((c) => c.url.startsWith(self.location.origin)) as
+        | WindowClient
+        | undefined;
       if (existing?.navigate) {
         return existing.navigate(targetUrl).then(() => existing.focus());
       }
       return self.clients.openWindow(targetUrl);
-    }),
+    })
   );
 });

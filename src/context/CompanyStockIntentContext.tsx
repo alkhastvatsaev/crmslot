@@ -31,7 +31,7 @@ type CompanyStockIntentApi = {
 
 const CompanyStockIntentContext = createContext<CompanyStockIntentApi | null>(null);
 
-export const BELGMAP_FOCUS_STOCK_HUB_EVENT = "belgmap-focus-stock-hub";
+export const CRMSLOT_FOCUS_STOCK_HUB_EVENT = "crmslot-focus-stock-hub";
 
 export function CompanyStockIntentProvider({ children }: { children: ReactNode }) {
   const [filter, setFilterState] = useState<CompanyStockFilter>("all");
@@ -60,8 +60,8 @@ export function CompanyStockIntentProvider({ children }: { children: ReactNode }
       if (!detail) return;
       applyFocus(detail);
     };
-    window.addEventListener(BELGMAP_FOCUS_STOCK_HUB_EVENT, onFocus);
-    return () => window.removeEventListener(BELGMAP_FOCUS_STOCK_HUB_EVENT, onFocus);
+    window.addEventListener(CRMSLOT_FOCUS_STOCK_HUB_EVENT, onFocus);
+    return () => window.removeEventListener(CRMSLOT_FOCUS_STOCK_HUB_EVENT, onFocus);
   }, [applyFocus]);
 
   const value = useMemo(
@@ -86,11 +86,13 @@ export function CompanyStockIntentProvider({ children }: { children: ReactNode }
       pendingChatPrompt,
       setPendingChatPrompt,
       applyFocus,
-    ],
+    ]
   );
 
   return (
-    <CompanyStockIntentContext.Provider value={value}>{children}</CompanyStockIntentContext.Provider>
+    <CompanyStockIntentContext.Provider value={value}>
+      {children}
+    </CompanyStockIntentContext.Provider>
   );
 }
 

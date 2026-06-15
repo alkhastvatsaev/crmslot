@@ -37,7 +37,7 @@ export function buildChatbotSystemPrompt(params: {
         ? `\nTOUR ACTUEL — COMMANDE LECOT : catalogue / order_lecot_parts. Pas d'email sauf demande explicite.\n`
         : "";
 
-  return `Assistant BELGMAP (serrurerie BE). Français, concis (2–4 phrases). Pas d'invention d'id/montants.
+  return `Assistant CRMSLOT (serrurerie BE). Français, concis (2–4 phrases). Pas d'invention d'id/montants.
 
 Société : ${params.companyName} (${params.companyId}) · rôle : ${roleLabel} · date : ${params.today}
 ${focusLine}${turnLine}

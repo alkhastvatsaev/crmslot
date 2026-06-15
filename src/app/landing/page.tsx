@@ -64,13 +64,15 @@ export default function LandingPage() {
             CRM · Field Services · Ordres de travail
           </div>
           <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
-            Gérez vos interventions<br />
+            Gérez vos interventions
+            <br />
             <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
               de A à Z
             </span>
           </h1>
           <p className="mb-10 text-lg text-slate-400 max-w-xl mx-auto">
-            De la demande client à la facture — une seule plateforme pour toutes vos interventions terrain.
+            De la demande client à la facture — une seule plateforme pour toutes vos interventions
+            terrain.
           </p>
           <Link
             href="/"
@@ -119,12 +121,14 @@ export default function LandingPage() {
               <h3 className="mb-1 font-semibold text-white">Facturation</h3>
               <p className="mb-3 text-xs text-slate-400">Liée directement au dossier</p>
               <ul className="space-y-1">
-                {["Facture liée au dossier", "Statut paiement", "Historique financier"].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-slate-300">
-                    <span className="h-1 w-1 rounded-full bg-emerald-400 shrink-0" />
-                    {item}
-                  </li>
-                ))}
+                {["Facture liée au dossier", "Statut paiement", "Historique financier"].map(
+                  (item) => (
+                    <li key={item} className="flex items-center gap-2 text-sm text-slate-300">
+                      <span className="h-1 w-1 rounded-full bg-emerald-400 shrink-0" />
+                      {item}
+                    </li>
+                  )
+                )}
               </ul>
             </div>
             <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
@@ -147,7 +151,9 @@ export default function LandingPage() {
       {/* Pain points */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-3xl rounded-2xl border border-red-500/20 bg-red-500/5 p-8">
-          <h2 className="mb-6 text-xl font-semibold text-slate-200">Ce qu&apos;ils ne veulent plus</h2>
+          <h2 className="mb-6 text-xl font-semibold text-slate-200">
+            Ce qu&apos;ils ne veulent plus
+          </h2>
           <div className="space-y-3">
             {painPoints.map((p) => (
               <div key={p} className="flex items-center gap-3 text-slate-400">
@@ -162,7 +168,9 @@ export default function LandingPage() {
       {/* Roadmap */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-8 text-center text-xl font-semibold text-slate-200">En développement</h2>
+          <h2 className="mb-8 text-center text-xl font-semibold text-slate-200">
+            En développement
+          </h2>
           <div className="flex flex-wrap justify-center gap-2">
             {roadmap.map((item) => (
               <span
@@ -180,7 +188,9 @@ export default function LandingPage() {
       <section className="px-6 pb-28 text-center">
         <div className="mx-auto max-w-xl">
           <h2 className="mb-4 text-2xl font-bold text-white">Prêt à démarrer ?</h2>
-          <p className="mb-8 text-slate-400">Accédez à votre espace de gestion d&apos;interventions.</p>
+          <p className="mb-8 text-slate-400">
+            Accédez à votre espace de gestion d&apos;interventions.
+          </p>
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90"
@@ -193,7 +203,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 px-6 py-8 text-center text-xs text-slate-600">
-        BELGMAP — Plateforme de gestion d&apos;interventions terrain · Belgique
+        CRMSLOT — Plateforme de gestion d&apos;interventions terrain · Belgique
       </footer>
     </main>
   );

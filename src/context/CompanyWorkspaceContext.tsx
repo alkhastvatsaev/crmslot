@@ -16,7 +16,7 @@ import { recoverMainAuthFromClientPortalLeak } from "@/features/auth/recoverMain
 import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
-const ACTIVE_COMPANY_STORAGE_KEY = "belmap_active_company_id";
+const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
 
 const DEMO_MEMBERSHIP: CompanyMembershipRow = {
   companyId: DEMO_COMPANY_ID,

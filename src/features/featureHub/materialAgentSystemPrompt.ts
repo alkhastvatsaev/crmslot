@@ -16,7 +16,7 @@ export function buildMaterialAgentSystemPrompt(params: {
 
   const stockOrderBlock = `\nCommandes stock société : page Matériel = réappro entreprise, pas un dossier client. Pour order_lecot_parts, utilise **${params.companyName}** comme clientName (réappro stock). Ne demande JAMAIS le nom d'un client — commande directement dès que l'article est identifié.`;
 
-  return `Tu es l'Agent Matériel BELGMAP — spécialiste EXCLUSIF du stock et des commandes matériel.
+  return `Tu es l'Agent Matériel CRMSLOT — spécialiste EXCLUSIF du stock et des commandes matériel.
 
 PÉRIMÈTRE STRICT : stock, inventaire, alertes de seuil, commandes matériel, catalogue Lecot, réapprovisionnement.
 

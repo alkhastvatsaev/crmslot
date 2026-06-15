@@ -40,9 +40,9 @@ import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
-import { BELGMAP_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
+import { CRMSLOT_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
 
-const STORAGE_PREFIX = "belmap-chatbot-v2";
+const STORAGE_PREFIX = "crmslot-chatbot-v2";
 function loadConversations(key: string): ChatbotConversation[] {
   if (typeof window === "undefined") return [];
   try {
@@ -318,7 +318,7 @@ export function useChatbot() {
         pager?.setPageIndex(FEATURE_HUB_SLOT_INDEX);
         if (typeof window !== "undefined") {
           window.dispatchEvent(
-            new CustomEvent(BELGMAP_FOCUS_STOCK_HUB_EVENT, {
+            new CustomEvent(CRMSLOT_FOCUS_STOCK_HUB_EVENT, {
               detail: {
                 stockItemId: ev.stockItemId ?? null,
                 filter: ev.filter,

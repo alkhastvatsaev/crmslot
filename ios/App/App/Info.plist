@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>BelgMap</string>
+        <string>CRMSLOT</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -46,21 +46,21 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>BelgMap utilise votre position pour afficher les interventions et techniciens à proximité.</string>
+	<string>CRMSLOT utilise votre position pour afficher les interventions et techniciens à proximité.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>BelgMap suit la position des techniciens en intervention pour les missions actives.</string>
+	<string>CRMSLOT suit la position des techniciens en intervention pour les missions actives.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>BelgMap utilise la caméra pour scanner les codes QR, photographier les pannes et joindre des preuves aux interventions.</string>
+	<string>CRMSLOT utilise la caméra pour scanner les codes QR, photographier les pannes et joindre des preuves aux interventions.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BelgMap accède à votre galerie pour joindre des photos aux interventions.</string>
+	<string>CRMSLOT accède à votre galerie pour joindre des photos aux interventions.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>BelgMap enregistre les documents générés (devis, factures) dans votre galerie.</string>
+	<string>CRMSLOT enregistre les documents générés (devis, factures) dans votre galerie.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>BelgMap utilise le micro pour les notes vocales du chatbot.</string>
+	<string>CRMSLOT utilise le micro pour les notes vocales du chatbot.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>BelgMap utilise Face ID pour sécuriser l'accès à votre espace.</string>
+	<string>CRMSLOT utilise Face ID pour sécuriser l'accès à votre espace.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>BelgMap accède aux contacts pour faciliter la création de clients.</string>
+	<string>CRMSLOT accède aux contacts pour faciliter la création de clients.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

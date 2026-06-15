@@ -63,7 +63,7 @@ async function fetchPageHtmlWithBackoff(pageUrl: string, attempts = 4): Promise<
       last = await fetch(pageUrl, {
         headers: {
           Accept: "text/html,application/xhtml+xml",
-          "User-Agent": "Mozilla/5.0 (compatible; BelgmapStock/1.0) AppleWebKit/537.36",
+          "User-Agent": "Mozilla/5.0 (compatible; CrmslotStock/1.0) AppleWebKit/537.36",
         },
       });
       if (!RETRYABLE_STATUS.has(last.status)) return last;

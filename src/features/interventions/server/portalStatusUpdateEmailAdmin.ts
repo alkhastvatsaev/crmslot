@@ -60,7 +60,7 @@ export async function sendPortalStatusUpdateEmailAdmin(params: {
     interventionId: params.interventionId,
     companyId,
     to: email,
-    subject: `Suivi BELGMAP — ${label}`,
+    subject: `Suivi CRMSLOT — ${label}`,
     bodyText: [
       hello,
       "",
@@ -68,7 +68,7 @@ export async function sendPortalStatusUpdateEmailAdmin(params: {
       "",
       `Suivre en ligne : ${portalUrl}`,
       "",
-      "— BELGMAP",
+      "— CRMSLOT",
     ].join("\n"),
     sentByUid: iv.createdByUid ?? "portal",
     sentVia: "portal_status_update",

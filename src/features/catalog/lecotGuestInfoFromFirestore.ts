@@ -41,7 +41,7 @@ export async function loadLecotGuestInfo(companyId: string): Promise<LecotGuestI
     lastName:
       process.env.LECOT_CONTACT_LAST_NAME?.trim() ||
       pick(d, "contactLastName", "ownerLastName", "signerLastName") ||
-      "Belgmap",
+      "Crmslot",
     companyName: pick(d, "name", "displayName", "companyName") || "Société",
     email:
       process.env.LECOT_CONTACT_EMAIL?.trim() ||

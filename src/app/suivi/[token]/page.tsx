@@ -40,7 +40,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ token: string }>;
 }): Promise<Metadata> {
-  return { title: "Suivi de votre intervention — BELGMAP" };
+  return { title: "Suivi de votre intervention — CRMSLOT" };
 }
 
 async function fetchPortalData(token: string): Promise<PortalInterventionSummary | null> {
@@ -93,7 +93,7 @@ export default async function PortalTrackingPage({
         {/* Header */}
         <div className="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-black/5">
           <p className="text-[12px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
-            BELGMAP
+            CRMSLOT
           </p>
           <h1 className="text-[22px] font-black text-slate-900">Suivi de votre intervention</h1>
           <p className="mt-1 text-[14px] text-slate-500">Bonjour {clientName}</p>

@@ -1,4 +1,4 @@
-# Matrice d'automatisation — BELGMAP
+# Matrice d'automatisation — CRMSLOT
 
 Référence rapide : quelle commande lancer selon la zone modifiée.
 
