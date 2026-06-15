@@ -244,7 +244,7 @@ export default function AdminValidationPanel() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              generateInterventionReport(iv);
+                              void generateInterventionReport(iv);
                             }}
                             className="mt-2 w-full py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
                           >
