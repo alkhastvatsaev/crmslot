@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { logger } from "@/core/logger";
+import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
+
+export const runtime = "nodejs";
 
 /**
  * POST /api/notifications/send
@@ -63,9 +66,20 @@ export async function POST(req: Request) {
     }
 
     if (channel === "push") {
-      // Placeholder for FCM integration
-      logger.info("[notifications] Push channel not yet configured:", { subjectKey });
-      return NextResponse.json({ success: true, skipped: true, channel: "push" });
+      const uid = variables?.recipientUid?.trim();
+      if (!uid) {
+        logger.warn("[notifications] push send sans recipientUid", { subjectKey });
+        return NextResponse.json({ success: true, skipped: true, reason: "no-uid" });
+      }
+
+      const title = interpolateTemplate(subjectKey, variables);
+      const body = stripHtml(buildEmailHtml(bodyKey, variables)).slice(0, 220);
+      const data: Record<string, string> = {};
+      if (variables?.caseId) data.bmTechCase = variables.caseId;
+      if (variables?.reminderId) data.bmTechReminder = variables.reminderId;
+
+      const report = await sendNativePushToUser({ uid, title, body, data });
+      return NextResponse.json({ success: true, channel: "push", ...report });
     }
 
     return NextResponse.json(
@@ -104,6 +118,15 @@ function resolveRecipientEmail(role: string, variables: Record<string, string>):
     return variables.technicianEmail || null;
   }
   return null;
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function interpolateTemplate(key: string, vars: Record<string, string>): string {
