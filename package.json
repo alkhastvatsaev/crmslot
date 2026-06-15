@@ -32,6 +32,7 @@
     "coverage:ratchet:update": "node scripts/check-coverage-ratchet.mjs --update",
     "coverage:uncovered": "node scripts/check-coverage-ratchet.mjs --list-uncovered",
     "test:contract": "jest tests/contract --no-coverage",
+    "test:untested": "node scripts/list-untested-modules.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ci": "CI=true playwright test",
     "test:e2e:chatbot": "playwright test tests/e2e/chatbot-local-intent.spec.ts",
