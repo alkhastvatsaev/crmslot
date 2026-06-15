@@ -1,8 +1,25 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useCarouselPageAnalytics } from "@/features/analytics/hooks/useCarouselPageAnalytics";
 import { stepDashboardCarouselNavIndex } from "@/features/dashboard/dashboardCarouselRegistry";
+
+function readInitialPageIndexFromUrl(): number | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("initialPageIndex");
+  if (!raw) return null;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n)) return null;
+  return n;
+}
 
 export type DashboardPagerApi = {
   pageIndex: number;
@@ -29,6 +46,13 @@ export function DashboardPagerProvider({
   const safeCount = Math.max(2, Math.floor(pageCount));
 
   const [pageIndex, setPageIndexState] = useState(initialPageIndex);
+
+  useEffect(() => {
+    const fromUrl = readInitialPageIndexFromUrl();
+    if (fromUrl === null) return;
+    const clamped = Math.min(Math.max(0, fromUrl), safeCount - 1);
+    setPageIndexState(clamped);
+  }, [safeCount]);
 
   const setPageIndex = useCallback(
     (index: number) => {
