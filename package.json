@@ -66,7 +66,9 @@
     "cap:sync:terrain": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync",
     "cap:sync:terrain:ios": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync ios",
     "cap:sync:terrain:android": "CAPACITOR_SERVER_URL=https://crmslot.vercel.app/m/technician cap sync android",
-    "test:e2e:technician-app": "playwright test tests/e2e/technician-mobile-app.spec.ts --project=mobile-shell",
+    "test:e2e:technician-app": "playwright test tests/e2e/technician-mobile-app.spec.ts --project=technician-app",
+    "test:native-infra": "jest src/core/native src/features/interventions/__tests__/technicianHubNavigation.test.ts src/features/notifications/__tests__/technicianNotificationIntent.test.ts --no-coverage",
+    "cap:install:android:debug": "cd android && ../scripts/gradlew-with-jbr.sh installDebug",
     "prepare": "husky"
   },
   "dependencies": {
@@ -77,6 +79,7 @@
     "@capacitor/camera": "^8.2.0",
     "@capacitor/cli": "^7.6.6",
     "@capacitor/core": "^8.4.0",
+    "@capacitor/filesystem": "^8.1.2",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.4.0",

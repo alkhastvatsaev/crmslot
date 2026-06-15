@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { Intervention } from "@/features/interventions/types";
+import { saveOrShareDocument } from "@/core/native/nativeDocumentSave";
 
 const C = {
   primary: [15, 23, 42] as [number, number, number],
@@ -27,7 +28,7 @@ function stars(n?: number | null) {
   return "★".repeat(n) + "☆".repeat(5 - n);
 }
 
-export function generateInterventionReport(iv: Intervention): void {
+export function generateInterventionReport(iv: Intervention): Promise<unknown> {
   const doc = new jsPDF();
   const pw = doc.internal.pageSize.width;
 
@@ -192,5 +193,12 @@ export function generateInterventionReport(iv: Intervention): void {
   doc.text("Document généré automatiquement par CRMSLOT", pw / 2, fh, { align: "center" });
 
   const clientLabel = clientName(iv).replace(/\s+/g, "_").slice(0, 30);
-  doc.save(`Rapport_${clientLabel}_${iv.id.slice(0, 8)}.pdf`);
+  const filename = `Rapport_${clientLabel}_${iv.id.slice(0, 8)}.pdf`;
+  const bytes = new Uint8Array(doc.output("arraybuffer") as ArrayBuffer);
+  return saveOrShareDocument({
+    filename,
+    bytes,
+    mimeType: "application/pdf",
+    shareTitle: `Rapport intervention — ${clientLabel}`,
+  });
 }
