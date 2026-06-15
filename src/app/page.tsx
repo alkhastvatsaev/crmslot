@@ -51,6 +51,7 @@ import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLo
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
+import { useAccountRole } from "@/features/auth/useAccountRole";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -123,38 +124,80 @@ const desktopHeader = (
 /** Écran d'accueil — **8 pages** : carte · société · technicien · Matériel · CRM · Facturation · Gmail · Assistant IA. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
+  const { isTechnicianAccount } = useAccountRole();
 
-  const dashboardPages = useMemo(
-    () => [
+  const dashboardPages = useMemo(() => {
+    const adminMap = (
       <ErrorBoundary key="map" name="map">
         <MapboxView />
         <MacroDroidIndicator />
         <AutoProcessUploads />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const secondary = (
       <ErrorBoundary key="secondary" name="secondary">
         <DashboardSecondaryPlaceholder />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const technicianHub = (
       <ErrorBoundary key="technician-hub" name="technician-hub">
         <TechnicianHubPage slotIndex={TECHNICIAN_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const featureHub = (
       <ErrorBoundary key="feature-hub" name="feature-hub">
         <FeatureHubPage slotIndex={FEATURE_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const crmHistory = (
       <ErrorBoundary key="crm-history" name="crm-history">
         <CrmHistoryPage slotIndex={CRM_HISTORY_SLOT_INDEX} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const billingHub = (
       <ErrorBoundary key="billing-hub" name="billing-hub">
         <BillingHubPage slotIndex={BILLING_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const gmailHub = (
       <ErrorBoundary key="gmail-hub" name="gmail-hub">
         <GmailHubPage slotIndex={GMAIL_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
+    );
+    const offlineHub = (
       <ErrorBoundary key="offline-hub" name="offline-hub">
         <OfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
-    ],
-    []
-  );
+      </ErrorBoundary>
+    );
+
+    // Compte technicien : on garde les indices de slot fixes (pour ne pas casser
+    // les setPageIndex globaux) mais on remplace les pages admin par des fragments
+    // vides — leurs chunks dynamic() ne se chargent jamais sur ce compte.
+    if (isTechnicianAccount) {
+      const empty = <React.Fragment key="empty" />;
+      return [
+        adminMap, // 0 — carte (utile au tech en mobile pour situer sa tournée)
+        empty, // 1 — espace société (admin)
+        technicianHub, // 2
+        empty, // 3 — matériel (admin)
+        empty, // 4 — CRM history (admin)
+        empty, // 5 — billing (admin)
+        empty, // 6 — gmail (admin)
+        offlineHub, // 7 — offline hub (technicien)
+      ];
+    }
+
+    return [
+      adminMap,
+      secondary,
+      technicianHub,
+      featureHub,
+      crmHistory,
+      billingHub,
+      gmailHub,
+      offlineHub,
+    ];
+  }, [isTechnicianAccount]);
 
   return (
     <DateProvider>
