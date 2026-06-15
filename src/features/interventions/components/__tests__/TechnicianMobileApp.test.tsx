@@ -1,7 +1,7 @@
 import { render, screen } from "@/test-utils/render";
 import TechnicianMobileApp from "@/features/interventions/components/TechnicianMobileApp";
 
-jest.mock("@/features/auth/components/LoginOverlay", () => ({
+jest.mock("@/features/auth/components/TechnicianLoginGate", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -11,6 +11,11 @@ jest.mock("@/features/interventions/components/TechnicianHubPage", () => ({
   default: ({ slotIndex }: { slotIndex: number }) => (
     <div data-testid={`technician-hub-slot-${slotIndex}`} />
   ),
+}));
+
+jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
+  __esModule: true,
+  default: () => <div data-testid="technician-galaxy-layer" />,
 }));
 
 jest.mock("@/features/app/DesktopOnlyGate", () => ({
@@ -34,9 +39,12 @@ jest.mock("@/features/notifications/components/TechnicianNotificationBootstrap",
 }));
 
 describe("TechnicianMobileApp", () => {
-  it("monte la shell terrain sans le carrousel 8 pages", () => {
+  it("monte la shell terrain avec calendrier, hub et galaxy dock", () => {
     render(<TechnicianMobileApp />);
     expect(screen.getByTestId("technician-mobile-app")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-header-calendar")).toBeInTheDocument();
     expect(screen.getByTestId("technician-hub-slot-0")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-shell-footer")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-galaxy-layer")).toBeInTheDocument();
   });
 });
