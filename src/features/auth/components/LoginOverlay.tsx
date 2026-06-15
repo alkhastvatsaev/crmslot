@@ -3,10 +3,14 @@ import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { auth } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword } from "firebase/auth";
 
 import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+
+const NATIVE_DEMO_EMAIL = "demo@crmslot.app";
+const NATIVE_DEMO_PASSWORD = "Demo1234!";
 
 export default function LoginOverlay({ children }: { children: React.ReactNode }) {
   const [loadingState, setLoadingState] = useState<"checking" | "ready">("checking");
@@ -45,15 +49,17 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
         setLoadingState("ready");
       } else {
         try {
-          const cred = await signInAnonymously(auth!);
+          const cred = isCapacitorNative()
+            ? await signInWithEmailAndPassword(auth!, NATIVE_DEMO_EMAIL, NATIVE_DEMO_PASSWORD)
+            : await signInAnonymously(auth!);
           await syncClientPortalProfile(cred.user);
           setIsAuthenticated(true);
           setLoadingState("ready");
         } catch (e) {
-          logger.error("[LoginOverlay] Anonymous sign-in failed", {
+          logger.error("[LoginOverlay] Sign-in failed", {
             error: e instanceof Error ? e.message : String(e),
           });
-          // If anonymous fails (e.g. offline), we still let them in for the demo UI
+          // If sign-in fails (e.g. offline), we still let them in for the demo UI
           setIsAuthenticated(true);
           setLoadingState("ready");
         }

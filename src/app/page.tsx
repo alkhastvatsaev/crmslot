@@ -48,6 +48,7 @@ import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesk
 import MobileShell from "@/features/dashboard/components/MobileShell";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
@@ -130,10 +131,12 @@ export default function Dashboard() {
 
   // Mobile + compte technicien → route dédiée /m/technician (shell allégé sans le carrousel 8 hubs).
   // Desktop : on laisse les techniciens sur le dashboard normal (cas dispatcher-technicien).
+  // APK Capacitor : on garde le dashboard complet (MobileShell) — pas de redirect.
   useEffect(() => {
     if (isAccountRoleLoading) return;
     if (isMobile !== true) return;
     if (!isTechnicianAccount) return;
+    if (isCapacitorNative()) return;
     router.replace("/m/technician");
   }, [isAccountRoleLoading, isMobile, isTechnicianAccount, router]);
 
