@@ -70,4 +70,30 @@ describe("useBackOfficeInterventions tenant scope", () => {
 
     expect(result.current.interventions.map((r) => r.id)).toEqual(["keep"]);
   });
+
+  it("runs one Firestore listener per company id (rules-safe, no `in` query)", async () => {
+    let call = 0;
+    mockOnSnapshot.mockImplementation(((_q, onNext) => {
+      const companyId = call === 0 ? "co-a" : "demo-local-company";
+      call += 1;
+      (onNext as (snap: { docs: { id: string; data: () => object }[] }) => void)({
+        docs: [{ id: companyId, data: () => row(companyId, companyId) }],
+      });
+      return jest.fn();
+    }) as typeof onSnapshot);
+
+    const { result } = renderHook(() => useBackOfficeInterventions(["co-a", "demo-local-company"]));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "co-a");
+    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "demo-local-company");
+    expect(mockOnSnapshot).toHaveBeenCalledTimes(2);
+    expect(result.current.interventions.map((r) => r.id).sort()).toEqual([
+      "co-a",
+      "demo-local-company",
+    ]);
+  });
 });

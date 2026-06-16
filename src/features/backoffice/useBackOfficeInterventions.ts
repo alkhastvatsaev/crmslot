@@ -25,6 +25,10 @@ function normalizeCompanyIds(companyId: BackOfficeInterventionsCompanyScope): st
   return [...new Set(companyId.map((c) => c.trim()).filter(Boolean))];
 }
 
+function companyScopeKey(companyId: BackOfficeInterventionsCompanyScope): string {
+  return normalizeCompanyIds(companyId).join("|");
+}
+
 function filterInterventionsByCompanyIds(
   companyIds: readonly string[],
   rows: Intervention[]
@@ -35,16 +39,24 @@ function filterInterventionsByCompanyIds(
   return rows.filter((row) => allowed.has((row.companyId ?? "").trim()));
 }
 
+function mergeInterventionRows(byCompany: Record<string, Intervention[]>): Intervention[] {
+  const merged = new Map<string, Intervention>();
+  for (const rows of Object.values(byCompany)) {
+    for (const row of rows) merged.set(row.id, row);
+  }
+  return [...merged.values()];
+}
+
 export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCompanyScope) {
-  const cidList = useMemo(() => normalizeCompanyIds(companyId), [companyId]);
-  const cidKey = cidList.join("|");
+  const cidKey = companyScopeKey(companyId);
+  const cidList = useMemo(() => (cidKey ? cidKey.split("|") : []), [cidKey]);
 
   const isDemoCompany =
     devUiPreviewEnabled && cidList.length === 1 && cidList[0] === DEMO_COMPANY_ID;
   const noFirestore = !isConfigured || !firestore;
 
-  const [interventions, setInterventions] = useState<Intervention[]>([]);
-  const [loadedCidKey, setLoadedCidKey] = useState<string | null>(null);
+  const [rowsByCompany, setRowsByCompany] = useState<Record<string, Intervention[]>>({});
+  const [loadedCompanyKeys, setLoadedCompanyKeys] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,47 +64,63 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
 
     const onlyDemoTenant = cidList.length === 1 && isDemoTenantCompanyId(cidList[0]!);
     if (onlyDemoTenant) {
-      setInterventions([]);
-      setLoadedCidKey(cidKey);
+      setRowsByCompany({});
+      setLoadedCompanyKeys(cidKey);
       setError(null);
       return () => {};
     }
 
-    const q =
-      cidList.length === 1
-        ? query(collection(firestore!, "interventions"), where("companyId", "==", cidList[0]!))
-        : query(
-            collection(firestore!, "interventions"),
-            where("companyId", "in", cidList.slice(0, 10))
-          );
+    setRowsByCompany({});
+    setLoadedCompanyKeys("");
+    setError(null);
 
-    let unsub: (() => void) | undefined;
+    const loaded = new Set<string>();
+    const unsubs: Array<() => void> = [];
     const timeout = setTimeout(() => {
-      unsub = onSnapshot(
-        q,
-        (snap) => {
-          const raw = stripKnownSyntheticInterventions(
-            snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
-          );
-          setInterventions(filterInterventionsByCompanyIds(cidList, raw));
-          setLoadedCidKey(cidKey);
-          setError(null);
-        },
-        (e) => {
-          logger.error("Back-office interventions snapshot:", {
-            error: e instanceof Error ? e.message : String(e),
-          });
-          setError(e.message || "Erreur Firestore");
-          setLoadedCidKey(cidKey);
-        }
-      );
+      for (const cid of cidList) {
+        const q = query(collection(firestore!, "interventions"), where("companyId", "==", cid));
+        const unsub = onSnapshot(
+          q,
+          (snap) => {
+            const raw = stripKnownSyntheticInterventions(
+              snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
+            );
+            setRowsByCompany((prev) => ({
+              ...prev,
+              [cid]: filterInterventionsByCompany(cid, raw),
+            }));
+            loaded.add(cid);
+            if (loaded.size === cidList.length) {
+              setLoadedCompanyKeys(cidKey);
+            }
+            setError(null);
+          },
+          (e) => {
+            logger.error("Back-office interventions snapshot:", {
+              companyId: cid,
+              error: e instanceof Error ? e.message : String(e),
+            });
+            setError(e.message || "Erreur Firestore");
+            loaded.add(cid);
+            if (loaded.size === cidList.length) {
+              setLoadedCompanyKeys(cidKey);
+            }
+          }
+        );
+        unsubs.push(unsub);
+      }
     }, 10);
 
     return () => {
       clearTimeout(timeout);
-      if (unsub) unsub();
+      for (const unsub of unsubs) unsub();
     };
   }, [cidKey, cidList, noFirestore]);
+
+  const interventions = useMemo(
+    () => filterInterventionsByCompanyIds(cidList, mergeInterventionRows(rowsByCompany)),
+    [cidList, rowsByCompany]
+  );
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
 
@@ -105,6 +133,6 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
     return { interventions: displayInterventions, loading: false, error: null, firebaseUid };
   }
 
-  const loading = loadedCidKey !== cidKey;
+  const loading = loadedCompanyKeys !== cidKey;
   return { interventions: displayInterventions, loading, error, firebaseUid };
 }
