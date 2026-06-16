@@ -1,6 +1,10 @@
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { DEMO_COMPANY_ID, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
+import {
+  getE2eSeedCompanyId,
+  getE2eSeedTechnicianUid,
+  isE2eSeedAllowed,
+} from "@/features/interventions/server/e2eSeedConfig";
 import type { QuoteLine } from "@/features/quotes/types";
 
 export const E2E_PORTAL_QUOTE_INTERVENTION_ID = "e2e-portal-quote";
@@ -51,7 +55,7 @@ export async function e2eSeedPortalQuoteAdmin(
     time: "14:00",
     status: isDone ? "done" : "assigned",
     location: { lat: 50.834, lng: 4.356 },
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     problem: "Devis portail — seed Playwright",
     clientName: "Client Portail E2E",
     clientFirstName: "Client",
@@ -59,14 +63,14 @@ export async function e2eSeedPortalQuoteAdmin(
     clientEmail: "e2e-portal-client@example.com",
     clientPhone: "0470998877",
     category: "serrurerie",
-    assignedTechnicianUid: DEMO_TECHNICIAN_UID,
+    assignedTechnicianUid: getE2eSeedTechnicianUid(),
     portalAccessToken: portalToken,
     statusUpdatedAt: now,
     paymentStatus: "unpaid",
     ...(isDone
       ? {
           completedAt: now,
-          completedByUid: DEMO_TECHNICIAN_UID,
+          completedByUid: getE2eSeedTechnicianUid(),
           completionPhotoUrls: ["https://placehold.co/400x300/png?text=E2E"],
           completionSignatureUrl: "https://placehold.co/320x120/png?text=Sign",
         }
@@ -98,12 +102,12 @@ export async function e2eSeedPortalQuoteAdmin(
   const expiresAt = new Date(Date.now() + 30 * 86400_000).toISOString();
   const quoteRef = db
     .collection("companies")
-    .doc(DEMO_COMPANY_ID)
+    .doc(getE2eSeedCompanyId())
     .collection("quotes")
     .doc(E2E_PORTAL_QUOTE_DOC_ID);
 
   await quoteRef.set({
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     interventionId,
     status: "sent",
     lines: E2E_QUOTE_LINES,
@@ -122,7 +126,7 @@ export async function e2eSeedPortalQuoteAdmin(
 
   return {
     interventionId,
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     portalToken,
     quoteId: E2E_PORTAL_QUOTE_DOC_ID,
     scenario,

@@ -42,15 +42,12 @@ Ajoute **chaque** variable pour **Production** et **Preview** (recommandé).
 | `NEXT_PUBLIC_FIREBASE_APP_ID`              | idem                                                      |
 | `NEXT_PUBLIC_MAPBOX_TOKEN`                 | [mapbox.com](https://account.mapbox.com/) → Access tokens |
 
-### Staging / démo (recommandé sur preview)
-
-| Variable                      | Valeur |
-| ----------------------------- | ------ |
-| `NEXT_PUBLIC_STAGING_PREVIEW` | `true` |
-
-Puis dans **Firebase Console → Authentication → Sign-in method** : activer **Anonymous**.
-
 ### Production (sécurité + audio + Twilio)
+
+| Variable                                       | Usage                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------- |
+| `NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID` | **Obligatoire** — société Firestore des demandes portail client |
+| `NEXT_PUBLIC_ALLOW_MOBILE`                     | `true` si PWA / Capacitor actifs                                |
 
 | Variable                     | Usage                                                            |
 | ---------------------------- | ---------------------------------------------------------------- |

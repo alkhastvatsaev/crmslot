@@ -1,21 +1,10 @@
-import { signInAnonymously } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 
-/**
- * Sauvegarde fichiers sous `.demo-data/` ou `/public` : OK en `next dev` uniquement.
- * Sur Vercel (serverless), le disque n’est pas persistant ni partagé → toujours utiliser Firebase Storage.
- */
-export function allowDemoFilesystemAudio(): boolean {
-  return process.env.NODE_ENV === "development";
-}
-
 async function ensureUserForAudioUpload() {
   if (!isConfigured || !auth) return null;
-  if (auth.currentUser) return auth.currentUser;
-  const cred = await signInAnonymously(auth);
-  return cred.user;
+  return auth.currentUser;
 }
 
 function extFromBlob(blob: Blob): string {
@@ -26,7 +15,7 @@ function extFromBlob(blob: Blob): string {
   return "webm";
 }
 
-/** Upload vocal vers Firebase Storage (production / Vercel). */
+/** Upload vocal vers Firebase Storage. */
 export async function uploadInterventionAudioToFirebase(blob: Blob): Promise<{
   url: string;
   storagePath: string;
@@ -51,12 +40,11 @@ export async function uploadInterventionAudioToFirebase(blob: Blob): Promise<{
   }
 }
 
-/** N’inscrit pas d’URL `/api/demo/...` en prod (illisible après déploiement). */
+/** URLs audio persistables en intervention (HTTPS ou data URI courte). */
 export function isPersistableClientAudioUrl(url: string | null | undefined): boolean {
   const u = (url ?? "").trim();
   if (!u) return false;
   if (u.startsWith("https://") || u.startsWith("http://")) return true;
   if (u.startsWith("data:")) return u.length < 980_000;
-  if (u.startsWith("/api/demo/") && allowDemoFilesystemAudio()) return true;
   return false;
 }

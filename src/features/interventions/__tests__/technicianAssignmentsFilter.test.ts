@@ -1,13 +1,12 @@
 import type { Intervention } from "@/features/interventions/types";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import {
   buildTechnicianInterventionList,
   filterInterventionsReleasedToTechnician,
 } from "@/features/interventions/technicianAssignmentsFilter";
 
-function iv(
-  partial: Partial<Intervention> & Pick<Intervention, "status">,
-): Intervention {
+const TECH_UID = "tech-uid-1";
+
+function iv(partial: Partial<Intervention> & Pick<Intervention, "status">): Intervention {
   return {
     id: partial.id ?? "x",
     title: "Test",
@@ -19,16 +18,14 @@ function iv(
 }
 
 describe("filterInterventionsReleasedToTechnician", () => {
-  const techUid = getDefaultAssignedTechnicianUid();
+  const techUid = TECH_UID;
 
   it("drops pending intake dossiers", () => {
     const rows = [
       iv({ id: "p1", status: "pending" }),
       iv({ id: "a1", status: "assigned", assignedTechnicianUid: techUid }),
     ];
-    expect(filterInterventionsReleasedToTechnician(rows, techUid).map((r) => r.id)).toEqual([
-      "a1",
-    ]);
+    expect(filterInterventionsReleasedToTechnician(rows, techUid).map((r) => r.id)).toEqual(["a1"]);
   });
 
   it("keeps only missions assigned to the active technician uid", () => {
@@ -45,14 +42,14 @@ describe("filterInterventionsReleasedToTechnician", () => {
     expect(
       filterInterventionsReleasedToTechnician(
         [iv({ status: "assigned", assignedTechnicianUid: techUid })],
-        null,
-      ),
+        null
+      )
     ).toEqual([]);
   });
 });
 
 describe("buildTechnicianInterventionList", () => {
-  const techUid = getDefaultAssignedTechnicianUid();
+  const techUid = TECH_UID;
 
   it("returns only released firestore rows for the technician", () => {
     const firestoreRows = [

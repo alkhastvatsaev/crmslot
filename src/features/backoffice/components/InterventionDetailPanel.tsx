@@ -21,7 +21,6 @@ import {
   isInterventionInBackofficeRequestsQueue,
   isInterventionPendingBackOfficeIntake,
 } from "@/features/interventions/technicianSchedule";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import type { Intervention } from "@/features/interventions/types";
 import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
@@ -302,7 +301,7 @@ export default function InterventionDetailPanel({
                       className={cn(
                         "w-full h-full object-cover",
                         !isInterventionInBackofficeRequestsQueue(selectedItem) &&
-                          (PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled) &&
+                          PRESENTATION_PRIVACY_MODE &&
                           "blur-lg"
                       )}
                     />

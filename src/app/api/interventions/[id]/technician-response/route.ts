@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
-import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
-import { isServerDevUiPreview } from "@/features/backoffice/assignInterventionServerAuth";
+import { blockIfProduction, requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import type { Intervention } from "@/features/interventions/types";
 import {
   acceptTechnicianAssignmentInProgressPatch,
@@ -24,16 +23,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const auth = await requireAuthenticatedUserOrLocalDev(request);
   if ("response" in auth) return auth.response;
 
-  if (!isServerDevUiPreview()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Route réservée au mode développement local. En production, répondez via Firestore client + règles déployées.",
-      },
-      { status: 403 }
-    );
-  }
+  const blocked = blockIfProduction();
+  if (blocked) return blocked;
 
   const { id } = await context.params;
   const interventionId = id?.trim();

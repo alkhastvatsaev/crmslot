@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import { isSyntheticInterventionId } from "@/core/config/devUiPreview";
+import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
 
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";

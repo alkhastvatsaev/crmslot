@@ -18,13 +18,13 @@ export type LecotOrderToolResult = {
     unitPriceCents?: number;
     unitPriceEur?: number;
   }>;
-  demoMode?: boolean;
-  demoReference?: string;
+  previewReference?: string;
+  isPreview?: boolean;
 };
 
-export function buildLecotDemoReference(orderId: string): string {
+export function buildLecotPreviewReference(orderId: string): string {
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  return `DEMO-LECOT-${stamp}-${orderId.slice(0, 6).toUpperCase()}`;
+  return `PREVIEW-LECOT-${stamp}-${orderId.slice(0, 6).toUpperCase()}`;
 }
 
 /** Aperçu panneau droit — affiché avant sync Firestore (ou si règles / index en échec). */
@@ -46,18 +46,17 @@ export function buildSupplierOrderPreviewFromToolResult(
     };
   });
 
-  const status: SupplierOrderStatus = result.demoMode
-    ? "sent"
-    : result.status === "sent" ||
-        result.status === "draft" ||
-        result.status === "confirmed" ||
-        result.status === "delivered" ||
-        result.status === "cancelled"
+  const status: SupplierOrderStatus =
+    result.status === "sent" ||
+    result.status === "draft" ||
+    result.status === "confirmed" ||
+    result.status === "delivered" ||
+    result.status === "cancelled"
       ? result.status
       : "draft";
 
-  const notes = result.demoMode
-    ? `Simulation démo CRMSLOT — ${result.demoReference ?? result.supplierOrderId}. Compte Lecot pro non connecté ; aucun envoi réel.`
+  const notes = result.isPreview
+    ? `Aperçu commande — ${result.previewReference ?? result.supplierOrderId}. Compte Lecot pro non connecté ; aucun envoi réel.`
     : null;
 
   return {
@@ -72,7 +71,7 @@ export function buildSupplierOrderPreviewFromToolResult(
     createdAt: now,
     updatedAt: now,
     sentAt: status === "sent" ? now : null,
-    isDemo: Boolean(result.demoMode),
+    isDemo: Boolean(result.isPreview),
     interventionId: result.interventionId?.trim() || undefined,
     clientName: result.clientName?.trim() || undefined,
   };

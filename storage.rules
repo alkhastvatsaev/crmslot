@@ -46,8 +46,7 @@ service firebase.storage {
         && request.resource.size < 8 * 1024 * 1024
         && request.resource.contentType.matches('image/.*')
         && (
-          companyId == 'demo-local-company'
-          || firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)/company_memberships/$(companyId))
+          firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)/company_memberships/$(companyId))
           || (
             firestore.exists(/databases/(default)/documents/client_portal_profiles/$(request.auth.uid))
             && firestore.get(/databases/(default)/documents/client_portal_profiles/$(request.auth.uid)).data.companyId == companyId

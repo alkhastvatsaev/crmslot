@@ -35,9 +35,7 @@ export default function CompanyStockAutopilotButton({
     if (running) return;
     setRunning(true);
     try {
-      const { approved } = await runStockAutopilotPlan(firestore, plan, pager, {
-        onDemoOrderApproved,
-      });
+      const { approved } = await runStockAutopilotPlan(firestore, plan, pager);
       if (approved > 0) {
         toast.success(`${approved} ${t("companyStock.autopilot_approved_toast")}`);
       }

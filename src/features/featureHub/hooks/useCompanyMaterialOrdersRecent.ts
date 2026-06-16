@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, limit, onSnapshot, query, where } from "firebase/firestore";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
-import {
-  demoMaterialOrdersForCompany,
-  isDemoMaterialOrderId,
-} from "@/features/dev/demoCompanyStock";
 import {
   MATERIAL_ORDERS_COLLECTION,
   type MaterialOrderDoc,
@@ -24,15 +19,14 @@ function parseOrderMs(raw: unknown): number {
   return Number.isFinite(t) ? t : 0;
 }
 
-/** Dernières commandes matériel — Firestore + aperçu métier si vide. */
+/** Dernières commandes matériel — Firestore uniquement. */
 export function useCompanyMaterialOrdersRecent(companyId: string | null) {
-  const [liveOrders, setLiveOrders] = useState<MaterialOrderDoc[]>([]);
-  const [dismissedDemoIds, setDismissedDemoIds] = useState<Set<string>>(() => new Set());
+  const [orders, setOrders] = useState<MaterialOrderDoc[]>([]);
   const [loading, setLoading] = useState(Boolean(companyId));
 
   useEffect(() => {
-    if (!companyId || !firestore || isDemoTenantCompanyId(companyId)) {
-      setLiveOrders([]);
+    if (!companyId || !firestore) {
+      setOrders([]);
       setLoading(false);
       return;
     }
@@ -48,28 +42,17 @@ export function useCompanyMaterialOrdersRecent(companyId: string | null) {
         const rows = snap.docs
           .map((d) => ({ id: d.id, ...(d.data() as Omit<MaterialOrderDoc, "id">) }))
           .sort((a, b) => parseOrderMs(b.createdAt) - parseOrderMs(a.createdAt));
-        setLiveOrders(rows);
+        setOrders(rows);
         setLoading(false);
       },
       () => {
-        setLiveOrders([]);
+        setOrders([]);
         setLoading(false);
       }
     );
   }, [companyId]);
 
-  const isPreviewOrders = liveOrders.length === 0 && Boolean(companyId);
+  const dismissDemoOrder = (_orderId: string) => {};
 
-  const orders = useMemo(() => {
-    const base =
-      liveOrders.length > 0 ? liveOrders : companyId ? demoMaterialOrdersForCompany(companyId) : [];
-    return base.filter((o) => !dismissedDemoIds.has(o.id));
-  }, [liveOrders, companyId, dismissedDemoIds]);
-
-  const dismissDemoOrder = (orderId: string) => {
-    if (!isDemoMaterialOrderId(orderId)) return;
-    setDismissedDemoIds((prev) => new Set(prev).add(orderId));
-  };
-
-  return { orders, loading, isPreviewOrders, dismissDemoOrder };
+  return { orders, loading, isPreviewOrders: false, dismissDemoOrder };
 }

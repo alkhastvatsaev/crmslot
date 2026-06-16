@@ -11,7 +11,6 @@ import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
 import { useGmailHubLinkIntervention } from "@/features/gmail/useGmailHubLinkIntervention";
 import { useGmailCreateIntervention } from "@/features/gmail/hooks/useGmailCreateIntervention";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
@@ -34,8 +33,7 @@ export default function GmailHubPage({ slotIndex = GMAIL_HUB_SLOT_INDEX }: Props
   const pager = useDashboardPagerOptional();
   const workspace = useCompanyWorkspaceOptional();
   const { logEmail } = useActivityLog();
-  const companyId =
-    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+  const companyId = (workspace?.activeCompanyId ?? "").trim() || null;
   /** Sans pager (tests) : chargement immédiat ; avec pager : uniquement quand la page est visible. */
   const pageActive = pager == null || pager.pageIndex === slotIndex;
   const [linkPanelOpen, setLinkPanelOpen] = useState(false);

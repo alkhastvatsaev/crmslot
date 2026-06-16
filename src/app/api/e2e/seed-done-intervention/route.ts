@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { blockIfProduction } from "@/core/api/routeAuth";
-import { isServerDevUiPreview } from "@/features/backoffice/assignInterventionServerAuth";
+import { isE2eSeedAllowed } from "@/features/interventions/server/e2eSeedConfig";
 import { e2eSeedDoneInterventionAdmin } from "@/features/interventions/server/e2eSeedDoneIntervention";
 import { logger } from "@/core/logger";
 
@@ -12,7 +12,7 @@ type Body = { interventionId?: string };
 
 function seedAllowed(): boolean {
   if (blockIfProduction() !== null) return false;
-  if (!isServerDevUiPreview()) return false;
+  if (!isE2eSeedAllowed()) return false;
   return Boolean(admin.apps.length);
 }
 

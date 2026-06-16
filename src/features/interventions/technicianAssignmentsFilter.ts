@@ -1,4 +1,4 @@
-import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { matchesAssignedTechnician } from "@/features/interventions/technicianAssignmentActions";
 import { isInterventionReleasedToTechnicianField } from "@/features/interventions/technicianSchedule";
@@ -6,7 +6,7 @@ import { isInterventionReleasedToTechnicianField } from "@/features/intervention
 /** Dossiers visibles par le technicien après le goulot IVANA + correspondance UID. */
 export function filterInterventionsReleasedToTechnician(
   rows: Intervention[],
-  technicianUid: string | null | undefined,
+  technicianUid: string | null | undefined
 ): Intervention[] {
   const uid = (technicianUid ?? "").trim();
   if (!uid) return [];
@@ -29,6 +29,6 @@ export function buildTechnicianInterventionList({
   technicianUid,
 }: BuildTechnicianInterventionListOptions): Intervention[] {
   return stripKnownSyntheticInterventions(
-    filterInterventionsReleasedToTechnician(firestoreInterventions, technicianUid),
+    filterInterventionsReleasedToTechnician(firestoreInterventions, technicianUid)
   );
 }

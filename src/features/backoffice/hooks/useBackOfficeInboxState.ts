@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { doc, deleteDoc } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { isSyntheticInterventionId } from "@/core/config/devUiPreview";
+import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { useDateContext } from "@/context/DateContext";

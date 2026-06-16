@@ -1,4 +1,4 @@
-import { DEMO_COMPANY_STOCK_CATALOG } from "@/features/dev/demoCompanyStock";
+import { LOCKSMITH_STOCK_SEED_CATALOG } from "@/features/catalog/locksmithStockSeedCatalog";
 import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
 import { normalizeLecotImageLookupKey } from "@/features/catalog/lecotProductImageCache";
 import {
@@ -19,7 +19,7 @@ function hasOverlayImage(reference: string, lecotSku?: string | null): boolean {
 
 function stockRowForReference(reference: string) {
   const key = normalizeLecotImageLookupKey(reference);
-  return DEMO_COMPANY_STOCK_CATALOG.find(
+  return LOCKSMITH_STOCK_SEED_CATALOG.find(
     (row) => normalizeLecotImageLookupKey(row.reference) === key
   );
 }
@@ -59,7 +59,7 @@ function matchStockByLabel(label: string): StockCatalogImageMatch | null {
   const query = label.trim();
   if (query.length < 8) return null;
 
-  const ranked = DEMO_COMPANY_STOCK_CATALOG.map((row) => ({
+  const ranked = LOCKSMITH_STOCK_SEED_CATALOG.map((row) => ({
     row,
     score: labelOverlapScore(query, row.description),
   }))

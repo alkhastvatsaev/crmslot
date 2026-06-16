@@ -13,16 +13,9 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { recoverMainAuthFromClientPortalLeak } from "@/features/auth/recoverMainAuthFromClientPortalLeak";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
-
-const DEMO_MEMBERSHIP: CompanyMembershipRow = {
-  companyId: DEMO_COMPANY_ID,
-  companyName: "Société démo (sans Firebase)",
-  role: "admin",
-};
 
 export type CompanyWorkspaceApi = {
   firebaseUid: string | null;
@@ -50,10 +43,8 @@ export function CompanyWorkspaceProvider({
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
   const [memberships, setMemberships] = useState<CompanyMembershipRow[]>([]);
   const [activeCompanyId, setActiveCompanyIdState] = useState(initialActiveCompanyId ?? "");
-  // Blocks companyId exposure until Firebase auth + memberships have resolved (prevents pre-auth Firestore queries).
   const [authLoading, setAuthLoading] = useState(isConfigured && !!auth);
   const [membershipsReady, setMembershipsReady] = useState(!isConfigured || !auth);
-  // Bloque les listeners Firestore tant que les custom claims n'ont pas été synchronisés (sinon permission-denied silencieux après login frais).
   const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
 
   const persistActiveId = useCallback((id: string) => {
@@ -95,7 +86,6 @@ export function CompanyWorkspaceProvider({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMemberships([]);
       setActiveCompanyIdState("");
-      // No user → no memberships to wait for; mark ready so demo mode can activate.
       setMembershipsReady(true);
       return () => {};
     }
@@ -147,23 +137,7 @@ export function CompanyWorkspaceProvider({
     };
   }, [firebaseUid]);
 
-  // Demo mode ONLY when Firebase is not configured — never for an authenticated user without memberships.
-  const anonymousPreviewUser =
-    devUiPreviewEnabled &&
-    Boolean(firebaseUid) &&
-    Boolean(auth?.currentUser?.isAnonymous) &&
-    membershipsReady &&
-    memberships.length === 0;
-
-  const demoTenantActive =
-    devUiPreviewEnabled && (!isConfigured || !firestore || !firebaseUid || anonymousPreviewUser);
-
-  const effectiveMemberships = useMemo(
-    () => (demoTenantActive ? [DEMO_MEMBERSHIP] : memberships),
-    [demoTenantActive, memberships]
-  );
-
-  const claimsGatePending = !demoTenantActive && memberships.length > 0 && !claimsInitialSyncDone;
+  const claimsGatePending = memberships.length > 0 && !claimsInitialSyncDone;
 
   const effectiveActiveCompanyId = useMemo(() => {
     if (authLoading || !membershipsReady || claimsGatePending) {
@@ -173,11 +147,10 @@ export function CompanyWorkspaceProvider({
       }
       return "";
     }
-    return demoTenantActive ? DEMO_COMPANY_ID : activeCompanyId;
-  }, [authLoading, membershipsReady, demoTenantActive, activeCompanyId, claimsGatePending]);
+    return activeCompanyId;
+  }, [authLoading, membershipsReady, activeCompanyId, claimsGatePending]);
 
   const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
-    if (demoTenantActive) return false;
     if (!auth?.currentUser || memberships.length === 0 || !activeCompanyId) return false;
     try {
       const idToken = await auth.currentUser.getIdToken(false);
@@ -193,17 +166,11 @@ export function CompanyWorkspaceProvider({
     } catch {
       return false;
     }
-  }, [activeCompanyId, memberships.length, demoTenantActive]);
+  }, [activeCompanyId, memberships.length]);
 
   useEffect(() => {
-    if (demoTenantActive) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setClaimsInitialSyncDone(true);
-      return;
-    }
     if (!firebaseUid || memberships.length === 0 || !activeCompanyId) return;
     if (!claimsInitialSyncDone) {
-      // 1ère sync : immédiate + gate workspaceReady (sinon listeners attachés avec token sans claims).
       void refreshClaimsSilent().finally(() => setClaimsInitialSyncDone(true));
       return;
     }
@@ -216,35 +183,31 @@ export function CompanyWorkspaceProvider({
     memberships.length,
     activeCompanyId,
     refreshClaimsSilent,
-    demoTenantActive,
     claimsInitialSyncDone,
   ]);
 
   const activeRole: CompanyRole | null = useMemo(() => {
-    return effectiveMemberships.find((m) => m.companyId === effectiveActiveCompanyId)?.role ?? null;
-  }, [effectiveMemberships, effectiveActiveCompanyId]);
+    return memberships.find((m) => m.companyId === effectiveActiveCompanyId)?.role ?? null;
+  }, [memberships, effectiveActiveCompanyId]);
 
   const value = useMemo(
     (): CompanyWorkspaceApi => ({
       firebaseUid,
-      memberships: effectiveMemberships,
+      memberships,
       activeCompanyId: effectiveActiveCompanyId,
       setActiveCompanyId,
       activeRole,
       workspaceReady: !authLoading && membershipsReady && !claimsGatePending,
-      isTenantUser:
-        authLoading || !membershipsReady ? false : demoTenantActive || memberships.length > 0,
+      isTenantUser: !authLoading && membershipsReady && memberships.length > 0,
       refreshClaimsSilent,
     }),
     [
       firebaseUid,
-      effectiveMemberships,
+      memberships,
       effectiveActiveCompanyId,
       setActiveCompanyId,
       activeRole,
       refreshClaimsSilent,
-      memberships.length,
-      demoTenantActive,
       authLoading,
       membershipsReady,
       claimsGatePending,
@@ -262,7 +225,6 @@ export function useCompanyWorkspace(): CompanyWorkspaceApi {
   return ctx;
 }
 
-/** Hors provider (tests) → null ; comportement dispatch « interne » par défaut. */
 export function useCompanyWorkspaceOptional(): CompanyWorkspaceApi | null {
   return useContext(CompanyWorkspaceContext);
 }

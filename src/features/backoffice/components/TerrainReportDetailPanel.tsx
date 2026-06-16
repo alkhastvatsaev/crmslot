@@ -9,7 +9,6 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { auth } from "@/core/config/firebase";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import type { Intervention } from "@/features/interventions/types";
 import type {
@@ -198,7 +197,7 @@ export default function TerrainReportDetailPanel({
                   alt=""
                   className={cn(
                     "w-full h-full object-cover",
-                    PRESENTATION_PRIVACY_MODE || devUiPreviewEnabled ? "blur-lg" : null
+                    PRESENTATION_PRIVACY_MODE ? "blur-lg" : null
                   )}
                 />
               </div>

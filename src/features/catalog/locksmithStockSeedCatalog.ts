@@ -1,14 +1,11 @@
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import type { StockItem } from "@/features/materials/stockFirestore";
 
 const NOW = "2026-05-21T12:00:00.000Z";
 
-/** Catalogue serrurerie réaliste — affiché si stock Firestore vide (démo / onboarding). */
-export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
+/** Catalogue serrurerie injecté via `seedCompanyStockCatalog` (onboarding stock vide). */
+export const LOCKSMITH_STOCK_SEED_CATALOG: Omit<StockItem, "companyId">[] = [
   {
-    id: "demo-stock-cyl-sec",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-cyl-sec",
     reference: "CYL-EURO-80",
     lecotSku: "LEC-CYL-2012",
     description: "Cylindre européen 80 mm sécurité",
@@ -18,8 +15,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-cyl-70",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-cyl-70",
     reference: "CYL-EURO-70",
     lecotSku: "LEC-CYL-2008",
     description: "Cylindre européen 70 mm",
@@ -29,8 +25,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-barillet",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-barillet",
     reference: "BAR-A2P",
     lecotSku: "LEC-CYL-2013",
     description: "Barillet A2P 5 goupilles",
@@ -40,8 +35,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-cremone",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-cremone",
     reference: "CREM-3PT",
     lecotSku: "LEC-SER-1001",
     description: "Crémone multipoint 3 points",
@@ -51,8 +45,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-gache",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-gache",
     reference: "GACH-ELEC",
     lecotSku: "LEC-CTL-4003",
     description: "Gâche électrique réversible",
@@ -62,8 +55,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-serrure",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-serrure",
     reference: "SERR-APL",
     lecotSku: "LEC-SER-1014",
     description: "Serrure applique A2P",
@@ -73,8 +65,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-cle-badge",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-cle-badge",
     reference: "BADGE-125",
     lecotSku: "LEC-CTL-4024",
     description: "Badge RFID 125 kHz",
@@ -84,8 +75,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-telecommande",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-telecommande",
     reference: "TELE-4CH",
     lecotSku: "LEC-CTL-4048",
     description: "Télécommande portail 4 canaux",
@@ -95,8 +85,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-vis",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-vis",
     reference: "VIS-INOX-6",
     lecotSku: "LEC-CNS-6051",
     description: "Vis inox M6 × 40 (boîte 100)",
@@ -106,8 +95,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-gond",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-gond",
     reference: "GOND-REN",
     lecotSku: "LEC-QUI-3060",
     description: "Gond renforcé paumelle lourde",
@@ -117,8 +105,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-joint",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-joint",
     reference: "JOINT-EPDM",
     lecotSku: "LEC-QUI-3042",
     description: "Joint EPDM porte blindée",
@@ -128,8 +115,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-lubrif",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-lubrif",
     reference: "LUB-CYL",
     lecotSku: "LEC-CNS-6037",
     description: "Lubrifiant cylindre 400 ml",
@@ -139,8 +125,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-gants",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-gants",
     reference: "GANT-NIT",
     lecotSku: "LEC-OUT-7044",
     description: "Gants nitrile (boîte 100)",
@@ -150,8 +135,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
     updatedAt: NOW,
   },
   {
-    id: "demo-stock-lecot",
-    companyId: DEMO_COMPANY_ID,
+    id: "seed-stock-lecot",
     reference: "LECOT-POIG",
     lecotSku: "LEC-QUI-3001",
     description: "Poignée de porte Lecot inox",
@@ -162,51 +146,7 @@ export const DEMO_COMPANY_STOCK_CATALOG: StockItem[] = [
   },
 ];
 
-export const DEMO_COMPANY_MATERIAL_ORDERS: MaterialOrderDoc[] = [
-  {
-    id: "demo-mo-1",
-    companyId: DEMO_COMPANY_ID,
-    interventionId: "INT-24051",
-    clientName: "M. Dupont",
-    technicianUid: "demo-tech-local",
-    partsRequested: [
-      { description: "Cylindre européen 80 mm sécurité", quantity: 2, reference: "CYL-EURO-80" },
-      { description: "Gâche électrique réversible", quantity: 1, reference: "GACH-ELEC" },
-    ],
-    urgency: "high",
-    status: "pending",
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-  {
-    id: "demo-mo-2",
-    companyId: DEMO_COMPANY_ID,
-    interventionId: "INT-24048",
-    clientName: "Martin SPRL",
-    technicianUid: "demo-tech-local",
-    partsRequested: [
-      { description: "Barillet A2P 5 goupilles", quantity: 1, reference: "BAR-A2P" },
-    ],
-    urgency: "normal",
-    status: "pending",
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-];
-
-export function isDemoStockItemId(id: string): boolean {
-  return id.startsWith("demo-stock-");
-}
-
-export function isDemoMaterialOrderId(id: string): boolean {
-  return id.startsWith("demo-mo-");
-}
-
-/** Catalogue pour toute société sans stock (aperçu métier). */
-export function demoStockItemsForCompany(companyId: string): StockItem[] {
-  return DEMO_COMPANY_STOCK_CATALOG.map((row) => ({ ...row, companyId }));
-}
-
-export function demoMaterialOrdersForCompany(companyId: string): MaterialOrderDoc[] {
-  return DEMO_COMPANY_MATERIAL_ORDERS.map((row) => ({ ...row, companyId }));
+/** Références catalogue pour résolution d'images produit (overlay Lecot). */
+export function locksmithStockCatalogRows(): StockItem[] {
+  return LOCKSMITH_STOCK_SEED_CATALOG.map((row) => ({ ...row, companyId: "" }));
 }

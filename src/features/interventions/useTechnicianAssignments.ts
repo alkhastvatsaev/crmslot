@@ -1,14 +1,11 @@
 "use client";
 
-import { logger } from "@/core/logger";
-
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { isDemoTechnicianPreviewUid } from "@/core/config/demoTenantFirestore";
-import { DEMO_TECHNICIAN_UID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
+import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
 import { buildTechnicianInterventionList } from "@/features/interventions/technicianAssignmentsFilter";
@@ -36,9 +33,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
 
-  const [firebaseUid, setFirebaseUid] = useState<string | null>(() =>
-    noFirebaseAuth && devUiPreviewEnabled ? getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID) : null
-  );
+  const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
 
@@ -110,11 +105,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
     const unsubAuth = onAuthStateChanged(auth!, (user) => {
       clearSnap();
 
-      const rawAuthUid =
-        devUiPreviewEnabled && (!user || user.isAnonymous)
-          ? DEMO_TECHNICIAN_UID
-          : (user?.uid ?? null);
-      const technicianUid = getTechnicianAssignmentUid(rawAuthUid);
+      const technicianUid = getTechnicianAssignmentUid(user?.uid ?? null);
 
       queryClient.removeQueries({
         predicate: (q) =>
@@ -133,13 +124,6 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       setFirebaseUid(technicianUid);
       setSnapshotReady(false);
       setError(null);
-
-      if (isDemoTechnicianPreviewUid(technicianUid)) {
-        queryClient.setQueryData([TECHNICIAN_ASSIGNMENTS_QUERY_KEY, technicianUid], []);
-        setSnapshotReady(true);
-        setError(null);
-        return;
-      }
 
       const db = firestore!;
 

@@ -12,11 +12,6 @@ import {
   signInTechnicianWithEmail,
   technicianEmailSignInErrorFeedback,
 } from "@/features/auth/technicianEmailSignIn";
-import { isCapacitorNative } from "@/core/native/capacitorRuntime";
-
-const DEMO_EMAIL = "demo@crmslot.app";
-const DEMO_PASSWORD = "Demo1234!";
-
 export default function TechnicianLoginPanel() {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
@@ -25,8 +20,6 @@ export default function TechnicianLoginPanel() {
   const [busy, setBusy] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
-
-  const showDemoHint = isCapacitorNative();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -84,12 +77,6 @@ export default function TechnicianLoginPanel() {
     } finally {
       setResetting(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setEmail(DEMO_EMAIL);
-    setPassword(DEMO_PASSWORD);
-    setInlineError(null);
   };
 
   const submitting = busy || resetting;
@@ -206,22 +193,6 @@ export default function TechnicianLoginPanel() {
             )}
           </button>
         </form>
-
-        {showDemoHint ? (
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            disabled={submitting}
-            data-testid="technician-login-demo"
-            className="mt-5 flex w-full flex-col items-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-[12px] text-slate-600 transition hover:border-blue-300 hover:bg-blue-50 disabled:opacity-60"
-          >
-            <span className="font-semibold uppercase tracking-wide text-[10px] text-slate-500">
-              {t("auth.demo_account_label")}
-            </span>
-            <span className="text-slate-700">{DEMO_EMAIL}</span>
-            <span className="text-[10.5px] text-slate-400">{t("auth.demo_account_hint")}</span>
-          </button>
-        ) : null}
       </div>
     </div>
   );

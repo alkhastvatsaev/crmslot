@@ -75,7 +75,11 @@ for (const group of requiredGroups) {
   }
 }
 
-const optional = ["NEXT_PUBLIC_STAGING_PREVIEW", "STRIPE_SECRET_KEY", "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"];
+const optional = [
+  "NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID",
+  "STRIPE_SECRET_KEY",
+  "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
+];
 const optionalSet = optional.filter(isSet);
 if (optionalSet.length) {
   console.log(`\n  ℹ️  Optionnelles présentes: ${optionalSet.join(", ")}`);
@@ -91,6 +95,16 @@ if (tier === "production" && !isSet(defaultTechUid)) {
   );
 } else if (isSet(defaultTechUid)) {
   console.log(`  ✅ assignation (${defaultTechUid})`);
+}
+
+const portalCompanyId = "NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID";
+if (tier === "production" && !isSet(portalCompanyId)) {
+  failed = true;
+  console.log(`  ❌ portail client — manquant: ${portalCompanyId}`);
+} else if (isSet(portalCompanyId)) {
+  console.log(`  ✅ portail client (${portalCompanyId})`);
+} else if (tier === "staging") {
+  console.log(`  ⚠️  portail client — ${portalCompanyId} absent (recommandé avant Preview)`);
 }
 
 const realOnly = "NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY";

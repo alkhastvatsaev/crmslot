@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { collection, limit, onSnapshot, query, where, type Firestore } from "firebase/firestore";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
 import {
   buildChatbotInvoiceRows,
@@ -15,7 +14,7 @@ export function useChatbotInvoicesPanel(companyId: string | null, enabled: boole
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !companyId || !firestore || isDemoTenantCompanyId(companyId)) {
+    if (!enabled || !companyId || !firestore) {
       setInvoices([]);
       setLoading(false);
       return;

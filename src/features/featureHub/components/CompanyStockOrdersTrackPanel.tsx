@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { isDemoMaterialOrderId } from "@/features/dev/demoCompanyStock";
 import SupplierOrderDemoProgress from "@/features/chatbot/components/SupplierOrderDemoProgress";
 import {
   updateMaterialOrderStatus,
@@ -80,9 +79,7 @@ export default function CompanyStockOrdersTrackPanel({
     async (orderId: string) => {
       setApprovingId(orderId);
       try {
-        if (isDemoMaterialOrderId(orderId)) {
-          onDismissDemoOrder?.(orderId);
-        } else if (firestore) {
+        if (firestore) {
           await updateMaterialOrderStatus(firestore, orderId, "ordered" as MaterialOrder["status"]);
         }
         toast.success(String(t("companyStock.order_approved")));

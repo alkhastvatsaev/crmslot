@@ -3,10 +3,6 @@ import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/aut
 import TechnicianLoginPanel from "@/features/auth/components/TechnicianLoginPanel";
 import { render } from "@/test-utils/render";
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: false,
-}));
-
 jest.mock("@/core/native/capacitorRuntime", () => ({
   isCapacitorNative: jest.fn(() => false),
 }));
@@ -70,24 +66,14 @@ describe("TechnicianLoginPanel — polish (login UI propre + branding)", () => {
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
-  it("démo hint absent hors Capacitor", () => {
+  it("n'affiche pas de raccourci démo (web ni Capacitor)", () => {
     isCapacitorNative.mockReturnValue(false);
     render(<TechnicianLoginPanel />);
     expect(screen.queryByTestId("technician-login-demo")).not.toBeInTheDocument();
-  });
 
-  it("démo hint affiché en Capacitor + clic remplit les champs", () => {
     isCapacitorNative.mockReturnValue(true);
     render(<TechnicianLoginPanel />);
-    const hint = screen.getByTestId("technician-login-demo");
-    expect(hint).toBeInTheDocument();
-    fireEvent.click(hint);
-    expect((screen.getByTestId("technician-login-email") as HTMLInputElement).value).toBe(
-      "demo@crmslot.app"
-    );
-    expect((screen.getByTestId("technician-login-password") as HTMLInputElement).value).toBe(
-      "Demo1234!"
-    );
+    expect(screen.queryByTestId("technician-login-demo")).not.toBeInTheDocument();
   });
 
   it("efface l'error inline quand l'utilisateur soumet à nouveau correctement", async () => {

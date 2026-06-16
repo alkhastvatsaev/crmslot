@@ -1,6 +1,10 @@
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { DEMO_COMPANY_ID, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
+import {
+  getE2eSeedCompanyId,
+  getE2eSeedTechnicianUid,
+  isE2eSeedAllowed,
+} from "@/features/interventions/server/e2eSeedConfig";
 
 export const E2E_DONE_INTERVENTION_ID = "e2e-invoice-validation";
 
@@ -28,7 +32,7 @@ export async function e2eSeedDoneInterventionAdmin(
     time: "10:00",
     status: "done",
     location: { lat: 50.8466, lng: 4.3528 },
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     problem: "Porte bloquée — seed Playwright facturation",
     clientName: "Client E2E",
     clientFirstName: "Client",
@@ -36,9 +40,9 @@ export async function e2eSeedDoneInterventionAdmin(
     clientEmail: "e2e-invoice-client@example.com",
     clientPhone: "0470123456",
     category: "serrurerie",
-    assignedTechnicianUid: DEMO_TECHNICIAN_UID,
+    assignedTechnicianUid: getE2eSeedTechnicianUid(),
     completedAt: now,
-    completedByUid: DEMO_TECHNICIAN_UID,
+    completedByUid: getE2eSeedTechnicianUid(),
     completionPhotoUrls: [
       "https://placehold.co/400x300/png?text=E2E+Photo",
       "https://placehold.co/400x300/png?text=E2E+Photo+2",
@@ -83,7 +87,7 @@ export async function e2eSeedDoneInterventionAdmin(
 
   return {
     interventionId,
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     reset: existing.exists,
   };
 }

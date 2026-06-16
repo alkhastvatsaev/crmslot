@@ -1,15 +1,4 @@
 import type { CompanyWorkspaceApi } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
-
-/** Même logique que `devUiPreviewEnabled`, évaluée à l'appel (tests + staging Vercel). */
-function isStagingStylePreviewActive(): boolean {
-  if (process.env.NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW === "true") return false;
-  return (
-    process.env.NODE_ENV === "development" ||
-    process.env.NEXT_PUBLIC_STAGING_PREVIEW === "true" ||
-    process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW === "true"
-  );
-}
 
 /** Société cible des demandes portail client (`NEXT_PUBLIC_*`, build-time). */
 export function readClientPortalDefaultCompanyIdFromEnv(): string {
@@ -23,10 +12,7 @@ export type ResolveClientPortalInterventionCompanyIdInput = {
   linkedPortalCompanyId?: string | null;
 };
 
-/**
- * Société Firestore pour une nouvelle demande client.
- * N'utilise jamais `demo-local-company` : en staging Vercel sans env, l'admin ne voyait pas les dossiers.
- */
+/** Société Firestore pour une nouvelle demande client (jamais de société fictive). */
 export function resolveClientPortalInterventionCompanyId(
   input: ResolveClientPortalInterventionCompanyIdInput
 ): string | null {
@@ -42,11 +28,7 @@ export function resolveClientPortalInterventionCompanyId(
   return null;
 }
 
-/**
- * Sociétés à écouter dans l'inbox IVANA (carte / dispatch).
- * Inclut la société portail par défaut si l'admin y appartient, et `demo-local-company` en preview staging
- * pour récupérer les demandes créées avant correction ou sans env.
- */
+/** Sociétés à écouter dans l'inbox IVANA (carte / dispatch). */
 export function resolveBackofficeInboxCompanyIds(
   workspace:
     | Pick<CompanyWorkspaceApi, "isTenantUser" | "activeCompanyId" | "memberships">
@@ -64,10 +46,6 @@ export function resolveBackofficeInboxCompanyIds(
   const ids = new Set<string>();
   if (active && membershipIds.has(active)) ids.add(active);
   if (envDefault && membershipIds.has(envDefault)) ids.add(envDefault);
-
-  if (isStagingStylePreviewActive() && membershipIds.size > 0) {
-    ids.add(DEMO_COMPANY_ID);
-  }
 
   if (ids.size === 0 && active) ids.add(active);
 

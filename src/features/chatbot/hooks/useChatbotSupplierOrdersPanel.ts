@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, limit, onSnapshot, query, where, type Firestore } from "firebase/firestore";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { fetchChatbotPwaRegistry } from "@/features/chatbot/fetchChatbotPwaRegistry";
@@ -77,13 +76,7 @@ export function useChatbotSupplierOrdersPanel(
   }, [companyId, firebaseUid]);
 
   useEffect(() => {
-    if (
-      !dataEnabled ||
-      !companyId ||
-      !firebaseUid ||
-      firebaseUid === "anon" ||
-      isDemoTenantCompanyId(companyId)
-    ) {
+    if (!dataEnabled || !companyId || !firebaseUid || firebaseUid === "anon") {
       setSupplierOrdersBase([]);
       setMaterialOrders([]);
       return;
@@ -102,15 +95,7 @@ export function useChatbotSupplierOrdersPanel(
   }, [dataEnabled, panel.open, companyId, firebaseUid, refreshRegistry]);
 
   useEffect(() => {
-    if (
-      !panel.open ||
-      !companyId ||
-      !firebaseUid ||
-      firebaseUid === "anon" ||
-      !firestore ||
-      isDemoTenantCompanyId(companyId)
-    )
-      return;
+    if (!panel.open || !companyId || !firebaseUid || firebaseUid === "anon" || !firestore) return;
     const db = firestore as Firestore;
     const q = query(
       collection(db, "material_orders"),

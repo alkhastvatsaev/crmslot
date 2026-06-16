@@ -4,10 +4,6 @@ import TechnicianLoginPanel from "@/features/auth/components/TechnicianLoginPane
 import TechnicianLoginGate from "@/features/auth/components/TechnicianLoginGate";
 import { render } from "@/test-utils/render";
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: false,
-}));
-
 describe("TechnicianLoginPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();

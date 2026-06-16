@@ -4,32 +4,32 @@ import {
 } from "@/features/interventions/technicianAssignmentServerAuth";
 import type { Intervention } from "@/features/interventions/types";
 
-jest.mock("@/features/backoffice/assignInterventionServerAuth", () => ({
-  isServerDevUiPreview: () => true,
-}));
-
-jest.mock("@/features/interventions/defaultAssignedTechnicianUid", () => ({
-  getDefaultAssignedTechnicianUid: () => "demo-tech-local",
-}));
+const TECH_UID = "tech-uid-1";
 
 function iv(
-  partial: Partial<Pick<Intervention, "status" | "assignedTechnicianUid" | "technicianAcceptedAt">> = {},
+  partial: Partial<
+    Pick<Intervention, "status" | "assignedTechnicianUid" | "technicianAcceptedAt">
+  > = {}
 ): Pick<Intervention, "status" | "assignedTechnicianUid" | "technicianAcceptedAt"> {
   return {
     status: "assigned",
-    assignedTechnicianUid: "demo-tech-local",
+    assignedTechnicianUid: TECH_UID,
     ...partial,
   };
 }
 
 describe("assertTechnicianMayRespondToAssignment", () => {
-  it("allows demo assignee with any auth uid in dev preview", () => {
-    expect(assertTechnicianMayRespondToAssignment(iv(), "anonymous-uid-xyz")).toBe(true);
+  it("allows assignee when auth uid matches", () => {
+    expect(assertTechnicianMayRespondToAssignment(iv(), TECH_UID)).toBe(true);
+  });
+
+  it("rejects when auth uid does not match assignee", () => {
+    expect(assertTechnicianMayRespondToAssignment(iv(), "other-uid")).toBe(false);
   });
 
   it("rejects when status is not awaiting response", () => {
-    expect(assertTechnicianMayRespondToAssignment(iv({ status: "en_route" }), "demo-tech-local")).toBe(
-      false,
+    expect(assertTechnicianMayRespondToAssignment(iv({ status: "en_route" }), TECH_UID)).toBe(
+      false
     );
   });
 
@@ -37,17 +37,17 @@ describe("assertTechnicianMayRespondToAssignment", () => {
     expect(
       assertTechnicianMayRespondToAssignment(
         iv({ status: "in_progress", technicianAcceptedAt: undefined }),
-        "demo-tech-local",
-      ),
+        TECH_UID
+      )
     ).toBe(true);
   });
 
-  it("allows en_route updates for demo assignee", () => {
+  it("allows en_route updates when auth uid matches assignee", () => {
     expect(
       assertTechnicianMayUpdateAssignedIntervention(
-        iv({ status: "en_route", assignedTechnicianUid: "demo-tech-local" }),
-        "anonymous-uid",
-      ),
+        iv({ status: "en_route", assignedTechnicianUid: TECH_UID }),
+        TECH_UID
+      )
     ).toBe(true);
   });
 });

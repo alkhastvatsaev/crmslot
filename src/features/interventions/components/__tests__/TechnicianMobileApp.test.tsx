@@ -28,7 +28,7 @@ jest.mock("@/features/dev/DevServiceWorkerCleanup", () => ({
   default: () => null,
 }));
 
-jest.mock("@/features/dev/StagingPreviewBanner", () => ({
+jest.mock("@/features/app/WorkspaceRequiredPanel", () => ({
   __esModule: true,
   default: () => null,
 }));

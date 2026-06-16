@@ -2,12 +2,6 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { useAccountRole } from "@/features/auth/useAccountRole";
 import { mockState } from "@/test-utils/mockState";
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: false,
-  DEMO_COMPANY_ID: "demo-co",
-  DEMO_TECHNICIAN_UID: "demo-tech",
-}));
-
 jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
   auth: {} as object,

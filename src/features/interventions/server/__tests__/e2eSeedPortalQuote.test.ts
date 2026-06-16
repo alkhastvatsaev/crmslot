@@ -15,6 +15,21 @@ jest.mock("firebase-admin/firestore", () => ({
 }));
 
 describe("e2eSeedPortalQuoteAdmin", () => {
+  const prevCompany = process.env.E2E_SEED_COMPANY_ID;
+  const prevTech = process.env.E2E_SEED_TECHNICIAN_UID;
+
+  beforeAll(() => {
+    process.env.E2E_SEED_COMPANY_ID = "co-test";
+    process.env.E2E_SEED_TECHNICIAN_UID = "tech-uid-1";
+  });
+
+  afterAll(() => {
+    if (prevCompany === undefined) delete process.env.E2E_SEED_COMPANY_ID;
+    else process.env.E2E_SEED_COMPANY_ID = prevCompany;
+    if (prevTech === undefined) delete process.env.E2E_SEED_TECHNICIAN_UID;
+    else process.env.E2E_SEED_TECHNICIAN_UID = prevTech;
+  });
+
   it("crée un dossier assigned et un devis sent", async () => {
     const ivSet = jest.fn(async () => {});
     const ivUpdate = jest.fn(async () => {});

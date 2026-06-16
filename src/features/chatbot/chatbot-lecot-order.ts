@@ -3,7 +3,7 @@ import { logger } from "@/core/logger";
 import { loadCompanyCatalogProducts } from "@/features/catalog/loadCompanyCatalog";
 import { lecotDemoOrdersEnabled } from "@/features/catalog/lecotOrderFlags";
 import { submitLecotSupplierOrder } from "@/features/catalog/lecotSupplierOrder";
-import { buildLecotDemoReference } from "@/features/chatbot/chatbot-lecot-demo";
+import { buildLecotPreviewReference } from "@/features/chatbot/chatbot-lecot-preview";
 import { registerSupplierOrderInIntervention } from "@/features/chatbot/chatbot-order-sync";
 import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
 import {
@@ -215,7 +215,7 @@ export async function orderLecotPartsForChatbot(
   }));
 
   if (lecotDemoOrdersEnabled()) {
-    const demoReference = buildLecotDemoReference(orderRef.id);
+    const demoReference = buildLecotPreviewReference(orderRef.id);
     const demoNote = `Simulation démo CRMSLOT — ${demoReference}. Compte Lecot pro non connecté ; aucun envoi réel.`;
     await orderRef.update({
       status: "sent",

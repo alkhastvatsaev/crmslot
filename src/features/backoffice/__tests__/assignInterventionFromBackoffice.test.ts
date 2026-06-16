@@ -1,60 +1,39 @@
+"use client";
+
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
-import type { Intervention } from "@/features/interventions/types";
-
-jest.mock("@/core/api/fetchWithAuth");
-jest.mock("@/features/interventions/workflow/transitionInterventionStatus", () => ({
-  transitionInterventionStatus: jest.fn(async () => ({ id: "evt" })),
-}));
-
-jest.mock("@/core/config/devUiPreview", () => ({
-  ...jest.requireActual("@/core/config/devUiPreview"),
-  devUiPreviewEnabled: true,
-}));
+import { applyBackofficeTechnicianAssignmentClient } from "@/features/backoffice/applyBackofficeTechnicianAssignmentClient";
+import { makeIntervention } from "@/test-utils/factories";
 
 jest.mock("@/core/config/firebase", () => ({
+  auth: { currentUser: { uid: "actor-uid" } },
   firestore: {},
-  auth: { currentUser: { uid: "u1" } },
-  isConfigured: true,
 }));
 
-const mockFetch = fetchWithAuth as jest.MockedFunction<typeof fetchWithAuth>;
-const mockTransition = transitionInterventionStatus as jest.MockedFunction<
-  typeof transitionInterventionStatus
->;
+jest.mock("@/features/backoffice/applyBackofficeTechnicianAssignmentClient", () => ({
+  applyBackofficeTechnicianAssignmentClient: jest.fn(async () => undefined),
+}));
 
-const row: Intervention = {
-  id: "iv-1",
-  companyId: "demo-local-company",
-  title: "Test",
-  address: "Bruxelles",
-  time: "10:00",
-  status: "pending",
-  location: { lat: 50.85, lng: 4.35 },
-};
+const mockApply = applyBackofficeTechnicianAssignmentClient as jest.MockedFunction<
+  typeof applyBackofficeTechnicianAssignmentClient
+>;
 
 describe("assignInterventionFromBackoffice", () => {
   beforeEach(() => {
-    mockFetch.mockReset();
-    mockTransition.mockClear();
+    jest.clearAllMocks();
   });
 
-  it("uses dev API route when devUiPreviewEnabled", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ ok: true }),
-    } as Response);
-
+  it("uses client Firestore path", async () => {
+    const row = makeIntervention({ id: "iv-1" });
     await assignInterventionFromBackoffice("iv-1", row, "tech-uid", {
-      scheduledDate: "2026-05-21",
+      scheduledDate: "2026-06-16",
       scheduledTime: "14:00",
     });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/interventions/iv-1/assign",
-      expect.objectContaining({ method: "POST" }),
+    expect(mockApply).toHaveBeenCalledWith(
+      "iv-1",
+      row,
+      "tech-uid",
+      "actor-uid",
+      expect.objectContaining({ scheduledDate: "2026-06-16" })
     );
-    expect(mockTransition).not.toHaveBeenCalled();
   });
 });

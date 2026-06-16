@@ -4,15 +4,6 @@ import { CompanyWorkspaceProvider, useCompanyWorkspace } from "@/context/Company
 import { mockState } from "@/test-utils/mockState";
 import { onSnapshot } from "firebase/firestore";
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: true,
-  DEMO_COMPANY_ID: "demo-local-company",
-  stagingPreviewEnabled: false,
-  isSyntheticInterventionId: jest.fn(() => false),
-  stripKnownSyntheticInterventions: jest.fn((r: unknown[]) => r),
-  excludeSyntheticInterventions: jest.fn((r: unknown[]) => r),
-}));
-
 const mockOnSnapshot = onSnapshot as jest.MockedFunction<typeof onSnapshot>;
 
 function Consumer() {
@@ -56,26 +47,6 @@ describe("CompanyWorkspaceContext", () => {
       // Should NOT be demo-local-company — user is authenticated
       expect(screen.getByTestId("company-id").textContent).toBe("empty");
       expect(screen.getByTestId("is-tenant").textContent).toBe("false");
-    });
-  });
-
-  it("expose demo-local-company quand non authentifié (devUiPreviewEnabled=true)", async () => {
-    // No authenticated user
-    mockState.currentUser = null;
-
-    render(
-      <CompanyWorkspaceProvider>
-        <Consumer />
-      </CompanyWorkspaceProvider>
-    );
-
-    await act(async () => {
-      jest.advanceTimersByTime(20);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId("company-id").textContent).toBe("demo-local-company");
-      expect(screen.getByTestId("is-tenant").textContent).toBe("true");
     });
   });
 

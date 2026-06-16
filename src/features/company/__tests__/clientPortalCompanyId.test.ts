@@ -1,4 +1,3 @@
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import {
   readClientPortalDefaultCompanyIdFromEnv,
   resolveBackofficeInboxCompanyIds,
@@ -86,7 +85,7 @@ describe("resolveBackofficeInboxCompanyIds", () => {
     ).toEqual(expect.arrayContaining(["co-active", "co-portal"]));
   });
 
-  it("includes demo-local-company in staging preview for tenant admins", () => {
+  it("returns only tenant company ids without demo fallback", () => {
     process.env.NEXT_PUBLIC_STAGING_PREVIEW = "true";
     expect(
       resolveBackofficeInboxCompanyIds({
@@ -94,6 +93,6 @@ describe("resolveBackofficeInboxCompanyIds", () => {
         activeCompanyId: "co-live",
         memberships: [{ companyId: "co-live", role: "admin" }],
       } as never)
-    ).toEqual(expect.arrayContaining(["co-live", DEMO_COMPANY_ID]));
+    ).toEqual(["co-live"]);
   });
 });

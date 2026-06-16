@@ -6,9 +6,14 @@ import { DateProvider } from "@/context/DateContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Intervention } from "@/features/interventions/types";
 import BackOfficeInboxPanel from "@/features/backoffice/components/BackOfficeInboxPanel";
+
+const TEST_TECH_UID = "tech-uid-1";
+
+jest.mock("@/features/interventions/defaultAssignedTechnicianUid", () => ({
+  getDefaultAssignedTechnicianUid: () => TEST_TECH_UID,
+}));
 
 jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: jest.fn(),
@@ -45,7 +50,7 @@ jest.mock("@/features/technicians/hooks", () => ({
         initial: "M",
         vehicle: "Van",
         status: "available",
-        authUid: getDefaultAssignedTechnicianUid(),
+        authUid: TEST_TECH_UID,
         location: { lat: 50.848, lng: 4.352 },
       },
     ],
@@ -181,7 +186,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
           ...pendingRequest,
           id: "req-assigned-stuck",
           status: "assigned",
-          assignedTechnicianUid: getDefaultAssignedTechnicianUid(),
+          assignedTechnicianUid: TEST_TECH_UID,
         },
       ],
       loading: false,
@@ -233,7 +238,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
 
     await waitFor(() => expect(mockAssign).toHaveBeenCalledTimes(1));
     expect(mockAssign.mock.calls[0]?.[0]).toBe("req-inbox-1");
-    expect(mockAssign.mock.calls[0]?.[2]).toBe(getDefaultAssignedTechnicianUid());
+    expect(mockAssign.mock.calls[0]?.[2]).toBe(TEST_TECH_UID);
   });
 
   it("affiche le picker même si location absente (repli coordonnées)", async () => {

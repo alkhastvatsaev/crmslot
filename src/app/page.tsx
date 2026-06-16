@@ -14,7 +14,7 @@ import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstant
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
-import StagingPreviewBanner from "@/features/dev/StagingPreviewBanner";
+import WorkspaceRequiredPanel from "@/features/app/WorkspaceRequiredPanel";
 import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
 import MobileShell from "@/features/dashboard/components/MobileShell";
 import AdminDashboardProviders from "@/features/dashboard/AdminDashboardProviders";
@@ -74,7 +74,7 @@ const desktopHeader = (
     <div
       className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
     >
-      <StagingPreviewBanner />
+      <WorkspaceRequiredPanel />
       <SpotlightSearch />
     </div>
     <aside

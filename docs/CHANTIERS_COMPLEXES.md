@@ -200,13 +200,13 @@ flowchart LR
 
 ## Variables d’environnement liées
 
-| Variable                                      | Rôle                                    |
-| --------------------------------------------- | --------------------------------------- |
-| `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY`         | Masquer missions démo en prod           |
-| `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID` | UID Firebase du technicien par défaut   |
-| `NEXT_PUBLIC_STAGING_PREVIEW`                 | Reproduire l’UI démo sur Vercel staging |
-| `NEXT_PUBLIC_PRESENTATION_PRIVACY_MODE`       | Floutage démo commerciale               |
-| Firebase Admin (serveur)                      | Claims, webhooks, routes API protégées  |
+| Variable                                       | Rôle                                                                         |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY`          | Masquer missions démo en prod                                                |
+| `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID`  | UID Firebase du technicien par défaut                                        |
+| `NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID` | Société Firestore des demandes portail (remplace l’ancien mode staging démo) |
+| `NEXT_PUBLIC_PRESENTATION_PRIVACY_MODE`        | Floutage démo commerciale                                                    |
+| Firebase Admin (serveur)                       | Claims, webhooks, routes API protégées                                       |
 
 Voir aussi `.env.example` et `docs/SETUP_VERCEL_GITHUB.md`.
 

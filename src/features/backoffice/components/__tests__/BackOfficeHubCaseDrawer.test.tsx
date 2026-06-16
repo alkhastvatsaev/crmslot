@@ -44,15 +44,17 @@ describe("BackOfficeHubPage panels", () => {
     mockInboxIntent.selectedInboxInterventionId = null;
   });
 
-  it("shows example content in all panels when no dossier is selected", () => {
+  it("shows empty selection in all panels when no dossier is selected", () => {
     render(<BackOfficeHubPage slotIndex={BACKOFFICE_HUB_SLOT_INDEX} />, { pageCount: 4 });
     expect(screen.getByTestId("backoffice-hub-panel-timeline")).toBeInTheDocument();
-    expect(screen.getByTestId("backoffice-hub-example-timeline")).toBeInTheDocument();
+    expect(screen.getAllByTestId("backoffice-hub-empty-selection").length).toBeGreaterThanOrEqual(
+      3
+    );
+    expect(screen.queryByTestId("backoffice-hub-example-timeline")).not.toBeInTheDocument();
     expect(screen.getByTestId("backoffice-hub-panel-center")).toBeInTheDocument();
     expect(screen.queryByTestId("backoffice-hub-example-emails")).not.toBeInTheDocument();
-    expect(screen.getByTestId("backoffice-hub-example-materials")).toBeInTheDocument();
-    expect(screen.getByTestId("backoffice-hub-example-billing")).toBeInTheDocument();
-    expect(screen.getAllByText(/exemple|sample|voorbeeld/i).length).toBeGreaterThan(0);
+    expect(screen.queryByTestId("backoffice-hub-example-materials")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("backoffice-hub-example-billing")).not.toBeInTheDocument();
   });
 
   it("renders live timeline when a dossier is selected", () => {

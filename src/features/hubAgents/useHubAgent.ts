@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
@@ -110,15 +109,14 @@ export type UseHubAgentConfig = {
 export function useHubAgent(config: UseHubAgentConfig) {
   const workspace = useCompanyWorkspaceOptional();
   const rawId = (workspace?.activeCompanyId ?? "").trim();
-  const resolvedId = rawId || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+  const resolvedId = rawId || workspace?.activeCompanyId?.trim() || null;
   const companyId = config.companyId || resolvedId || "";
   const uid = workspace?.firebaseUid ?? "anon";
   const companyName =
-    workspace?.memberships?.find((m) => m.companyId === companyId)?.companyName ??
-    (companyId === DEMO_COMPANY_ID ? "Société démo" : null);
+    workspace?.memberships?.find((m) => m.companyId === companyId)?.companyName ?? null;
   const role = workspace?.activeRole ?? null;
 
-  const agentEnabled = (config.enabled !== false) && Boolean(companyId);
+  const agentEnabled = config.enabled !== false && Boolean(companyId);
 
   const storageKey = useMemo(() => `${uid}:${companyId}`, [uid, companyId]);
   const prevKeyRef = useRef(storageKey);
@@ -126,7 +124,9 @@ export function useHubAgent(config: UseHubAgentConfig) {
   const [messages, setMessages] = useState<HubAgentMessage[]>([]);
   const [thinking, setThinking] = useState(false);
 
-  const apiHistoryRef = useRef<unknown[]>(companyId ? loadApiHistory(config.storageKey, uid, companyId) : []);
+  const apiHistoryRef = useRef<unknown[]>(
+    companyId ? loadApiHistory(config.storageKey, uid, companyId) : []
+  );
 
   if (prevKeyRef.current !== storageKey) {
     prevKeyRef.current = storageKey;
@@ -178,7 +178,7 @@ export function useHubAgent(config: UseHubAgentConfig) {
               companyName: companyName ?? companyId,
               role,
               messages: nextApi,
-            }),
+            })
           ),
         });
 
@@ -213,7 +213,7 @@ export function useHubAgent(config: UseHubAgentConfig) {
         setThinking(false);
       }
     },
-    [agentEnabled, thinking, companyId, companyName, role, config, pushMsg],
+    [agentEnabled, thinking, companyId, companyName, role, config, pushMsg]
   );
 
   return {

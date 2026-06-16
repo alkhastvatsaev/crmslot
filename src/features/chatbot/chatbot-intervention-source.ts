@@ -1,5 +1,5 @@
 import type * as admin from "firebase-admin";
-import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 
 export function parseCreatedAtMs(data: Record<string, unknown>): number {
   const raw = data.createdAt ?? data.statusUpdatedAt ?? data.scheduledDate;
@@ -14,7 +14,9 @@ export function parseCreatedAtMs(data: Record<string, unknown>): number {
   return 0;
 }
 
-export function sortInterventionsByRecency(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+export function sortInterventionsByRecency(
+  rows: Record<string, unknown>[]
+): Record<string, unknown>[] {
   return [...rows].sort((a, b) => parseCreatedAtMs(b) - parseCreatedAtMs(a));
 }
 
@@ -29,7 +31,7 @@ const CACHE_TTL_MS = 45_000;
 export async function fetchInterventionsForCompany(
   firestore: admin.firestore.Firestore,
   companyId: string,
-  limit = 100,
+  limit = 100
 ): Promise<Record<string, unknown>[]> {
   const cacheKey = `${companyId}:${limit}`;
   const cached = _interventionCache.get(cacheKey);
@@ -42,9 +44,10 @@ export async function fetchInterventionsForCompany(
     .get();
 
   const rows = sortInterventionsByRecency(
-    stripKnownSyntheticInterventions(
-      snap.docs.map((d) => ({ id: d.id, ...d.data() })),
-    ) as Record<string, unknown>[],
+    stripKnownSyntheticInterventions(snap.docs.map((d) => ({ id: d.id, ...d.data() }))) as Record<
+      string,
+      unknown
+    >[]
   );
 
   _interventionCache.set(cacheKey, { rows, expiry: Date.now() + CACHE_TTL_MS });

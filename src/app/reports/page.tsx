@@ -6,14 +6,12 @@ import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useC
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 
 export default function ReportsPage() {
   const { t } = useTranslation();
   const enabled = useFeatureFlag("analyticsReports");
   const workspace = useCompanyWorkspaceOptional();
-  const companyId =
-    (workspace?.activeCompanyId ?? "").trim() || (workspace?.isTenantUser ? DEMO_COMPANY_ID : "");
+  const companyId = (workspace?.activeCompanyId ?? "").trim();
   const { interventions, loading } = useCompanyBillingInterventions(companyId || null);
 
   if (!enabled) {
