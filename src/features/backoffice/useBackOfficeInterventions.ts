@@ -14,27 +14,57 @@ import { demoInterventionsForCompany } from "@/features/dev/demoInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
 
-export function useBackOfficeInterventions(companyId: string | null) {
-  const cidForEffect = (companyId ?? "").trim();
+export type BackOfficeInterventionsCompanyScope = string | readonly string[] | null;
 
-  const isDemoCompany = devUiPreviewEnabled && cidForEffect === DEMO_COMPANY_ID;
+function normalizeCompanyIds(companyId: BackOfficeInterventionsCompanyScope): string[] {
+  if (!companyId) return [];
+  if (typeof companyId === "string") {
+    const trimmed = companyId.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  return [...new Set(companyId.map((c) => c.trim()).filter(Boolean))];
+}
+
+function filterInterventionsByCompanyIds(
+  companyIds: readonly string[],
+  rows: Intervention[]
+): Intervention[] {
+  if (companyIds.length === 0) return [];
+  if (companyIds.length === 1) return filterInterventionsByCompany(companyIds[0]!, rows);
+  const allowed = new Set(companyIds);
+  return rows.filter((row) => allowed.has((row.companyId ?? "").trim()));
+}
+
+export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCompanyScope) {
+  const cidList = useMemo(() => normalizeCompanyIds(companyId), [companyId]);
+  const cidKey = cidList.join("|");
+
+  const isDemoCompany =
+    devUiPreviewEnabled && cidList.length === 1 && cidList[0] === DEMO_COMPANY_ID;
   const noFirestore = !isConfigured || !firestore;
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
-  const [loadedCid, setLoadedCid] = useState<string | null>(null);
+  const [loadedCidKey, setLoadedCidKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (noFirestore || !cidForEffect) return () => {};
+    if (noFirestore || cidList.length === 0) return () => {};
 
-    const cid = cidForEffect;
-    if (isDemoTenantCompanyId(cid)) {
+    const onlyDemoTenant = cidList.length === 1 && isDemoTenantCompanyId(cidList[0]!);
+    if (onlyDemoTenant) {
       setInterventions([]);
-      setLoadedCid(cid);
+      setLoadedCidKey(cidKey);
       setError(null);
       return () => {};
     }
-    const q = query(collection(firestore!, "interventions"), where("companyId", "==", cid));
+
+    const q =
+      cidList.length === 1
+        ? query(collection(firestore!, "interventions"), where("companyId", "==", cidList[0]!))
+        : query(
+            collection(firestore!, "interventions"),
+            where("companyId", "in", cidList.slice(0, 10))
+          );
 
     let unsub: (() => void) | undefined;
     const timeout = setTimeout(() => {
@@ -44,8 +74,8 @@ export function useBackOfficeInterventions(companyId: string | null) {
           const raw = stripKnownSyntheticInterventions(
             snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
           );
-          setInterventions(filterInterventionsByCompany(cid, raw));
-          setLoadedCid(cid);
+          setInterventions(filterInterventionsByCompanyIds(cidList, raw));
+          setLoadedCidKey(cidKey);
           setError(null);
         },
         (e) => {
@@ -53,7 +83,7 @@ export function useBackOfficeInterventions(companyId: string | null) {
             error: e instanceof Error ? e.message : String(e),
           });
           setError(e.message || "Erreur Firestore");
-          setLoadedCid(cid);
+          setLoadedCidKey(cidKey);
         }
       );
     }, 10);
@@ -62,19 +92,19 @@ export function useBackOfficeInterventions(companyId: string | null) {
       clearTimeout(timeout);
       if (unsub) unsub();
     };
-  }, [cidForEffect, noFirestore]);
+  }, [cidKey, cidList, noFirestore]);
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
 
   const displayInterventions = useMemo(() => {
     if (!isDemoCompany || interventions.length > 0) return interventions;
-    return demoInterventionsForCompany(cidForEffect);
-  }, [interventions, isDemoCompany, cidForEffect]);
+    return demoInterventionsForCompany(cidList[0] ?? DEMO_COMPANY_ID);
+  }, [interventions, isDemoCompany, cidList]);
 
-  if (!cidForEffect || noFirestore) {
+  if (cidList.length === 0 || noFirestore) {
     return { interventions: displayInterventions, loading: false, error: null, firebaseUid };
   }
 
-  const loading = loadedCid !== cidForEffect;
+  const loading = loadedCidKey !== cidKey;
   return { interventions: displayInterventions, loading, error, firebaseUid };
 }
