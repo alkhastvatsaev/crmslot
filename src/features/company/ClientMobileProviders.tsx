@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import LoginOverlay from "@/features/auth/components/LoginOverlay";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
@@ -14,6 +13,7 @@ import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuth
 import ClientPortalNotificationBootstrap from "@/features/notifications/components/ClientPortalNotificationBootstrap";
 import ClientPortalPaymentReturnEffects from "@/features/auth/components/ClientPortalPaymentReturnEffects";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
+import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 
 const CLIENT_MOBILE_PAGE_COUNT = 1;
 
@@ -28,20 +28,22 @@ export default function ClientMobileProviders({ children }: Props) {
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
         <CompanyWorkspaceProvider>
-          <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
-            <DashboardPageSelectorProvider>
-              <RequesterHubProvider>
-                <ClientPortalPushProvider>
-                  <ClientPortalAuthEffects />
-                  <Suspense fallback={null}>
-                    <ClientPortalNotificationBootstrap />
-                    <ClientPortalPaymentReturnEffects />
-                  </Suspense>
-                  <LoginOverlay>{children}</LoginOverlay>
-                </ClientPortalPushProvider>
-              </RequesterHubProvider>
-            </DashboardPageSelectorProvider>
-          </DashboardPagerProvider>
+          <GalaxyLayerBridgeProvider>
+            <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
+              <DashboardPageSelectorProvider>
+                <RequesterHubProvider>
+                  <ClientPortalPushProvider>
+                    <ClientPortalAuthEffects />
+                    <Suspense fallback={null}>
+                      <ClientPortalNotificationBootstrap />
+                      <ClientPortalPaymentReturnEffects />
+                    </Suspense>
+                    {children}
+                  </ClientPortalPushProvider>
+                </RequesterHubProvider>
+              </DashboardPageSelectorProvider>
+            </DashboardPagerProvider>
+          </GalaxyLayerBridgeProvider>
         </CompanyWorkspaceProvider>
       </DesktopOnlyGate>
     </DateProvider>
