@@ -19,7 +19,6 @@ import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
-import DevPreviewAnonymousAuth from "@/features/dev/DevPreviewAnonymousAuth";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
@@ -37,7 +36,6 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
       <DesktopOnlyGate>
         <LoginOverlay>
           <DevServiceWorkerCleanup />
-          <DevPreviewAnonymousAuth />
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={pageCount}>

@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Intervention } from "@/features/interventions/types";
 import { useTechnicianAssignments } from "@/features/interventions/useTechnicianAssignments";
 import TechnicianDashboardListPanel from "@/features/interventions/components/TechnicianDashboardListPanel";
@@ -26,7 +25,7 @@ const mockReopen = reopenTechnicianCompletedIntervention as jest.MockedFunction<
   typeof reopenTechnicianCompletedIntervention
 >;
 
-const techUid = getDefaultAssignedTechnicianUid();
+const techUid = "tech-uid-1";
 
 const assignedOffer: Intervention = {
   id: "offer-42",

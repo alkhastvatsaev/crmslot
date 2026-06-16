@@ -33,7 +33,6 @@ jest.mock("@/features/interventions/smartFormReverseGeocode", () => ({
 
 jest.mock("@/features/interventions/clientAudioUpload", () => ({
   uploadInterventionAudioToFirebase: jest.fn(() => Promise.resolve(null)),
-  allowDemoFilesystemAudio: jest.fn(() => false),
   isPersistableClientAudioUrl: jest.fn((url: string | null) => !!url),
 }));
 
@@ -87,11 +86,6 @@ jest.mock("@/context/CompanyWorkspaceContext", () => ({
 
 jest.mock("@/context/BackofficeInboxIntentContext", () => ({
   useBackofficeInboxIntentOptional: jest.fn(() => null),
-}));
-
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: false,
-  DEMO_COMPANY_ID: "demo-company",
 }));
 
 jest.mock("@/features/interventions/useBrowserSpeechDictation", () => ({

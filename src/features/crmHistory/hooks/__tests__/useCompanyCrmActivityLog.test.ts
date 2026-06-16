@@ -3,7 +3,6 @@
  */
 import { renderHook, waitFor } from "@testing-library/react";
 import { useCompanyCrmActivityLog } from "../useCompanyCrmActivityLog";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 
 const mockOnSnapshot = jest.fn();
 const mockQuery = jest.fn();
@@ -22,24 +21,14 @@ jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
 }));
 
-jest.mock("@/core/config/demoTenantFirestore", () => ({
-  isDemoTenantCompanyId: (companyId: string | null | undefined) =>
-    (companyId ?? "").trim() === "demo-local-company",
-  isDemoTechnicianPreviewUid: () => false,
-}));
-
-jest.mock("@/core/config/devUiPreview", () => ({
-  DEMO_COMPANY_ID: "demo-local-company",
-}));
-
 describe("useCompanyCrmActivityLog", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockOnSnapshot.mockReturnValue(jest.fn());
   });
 
-  it("skips Firestore for demo company in staging preview", async () => {
-    renderHook(() => useCompanyCrmActivityLog(DEMO_COMPANY_ID));
+  it("skips Firestore when company id is empty", async () => {
+    renderHook(() => useCompanyCrmActivityLog(null));
 
     await waitFor(() => {
       expect(mockOnSnapshot).not.toHaveBeenCalled();

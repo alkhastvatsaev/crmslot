@@ -9,7 +9,6 @@ import type { AudioUploadSidecar } from "@/core/services/audio/transcription.typ
 import { addDoc, collection } from "firebase/firestore";
 import { extractClientNameFromText, extractDateTimeFromText } from "./transcriptionFormInference";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import {
   DASHBOARD_PANEL_CHROME_BLUR,
   DASHBOARD_PANEL_CHROME_BORDER,
@@ -290,8 +289,7 @@ export default function MapTranscriptionActionsPanel({
         workspace?.isTenantUser && workspace.activeCompanyId
           ? workspace.activeCompanyId
           : undefined;
-      const interventionCompanyId =
-        tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : undefined);
+      const interventionCompanyId = tenantCompanyId;
       const res = await fetchWithAuth("/api/interventions/from-audio", {
         method: "POST",
         headers: { "content-type": "application/json" },

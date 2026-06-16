@@ -34,10 +34,10 @@ describe("resolveHubCompanyId", () => {
     });
   });
 
-  it("retombe sur demo quand tenant sans id explicite", () => {
+  it("signale missing quand tenant sans activeCompanyId", () => {
     expect(resolveHubCompanyId(workspace({ isTenantUser: true }))).toEqual({
-      companyId: "demo-local-company",
-      phase: "ready",
+      companyId: null,
+      phase: "missing",
     });
   });
 

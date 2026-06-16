@@ -16,9 +16,8 @@ jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
 }));
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  ...jest.requireActual("@/core/config/devUiPreview"),
-  devUiPreviewEnabled: false,
+jest.mock("@/core/config/syntheticInterventions", () => ({
+  ...jest.requireActual("@/core/config/syntheticInterventions"),
   stripKnownSyntheticInterventions: (rows: Intervention[]) => rows,
 }));
 
@@ -74,7 +73,7 @@ describe("useBackOfficeInterventions tenant scope", () => {
   it("runs one Firestore listener per company id (rules-safe, no `in` query)", async () => {
     let call = 0;
     mockOnSnapshot.mockImplementation(((_q, onNext) => {
-      const companyId = call === 0 ? "co-a" : "demo-local-company";
+      const companyId = call === 0 ? "co-a" : "co-b";
       call += 1;
       (onNext as (snap: { docs: { id: string; data: () => object }[] }) => void)({
         docs: [{ id: companyId, data: () => row(companyId, companyId) }],
@@ -82,18 +81,15 @@ describe("useBackOfficeInterventions tenant scope", () => {
       return jest.fn();
     }) as typeof onSnapshot);
 
-    const { result } = renderHook(() => useBackOfficeInterventions(["co-a", "demo-local-company"]));
+    const { result } = renderHook(() => useBackOfficeInterventions(["co-a", "co-b"]));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
 
     expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "co-a");
-    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "demo-local-company");
+    expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "co-b");
     expect(mockOnSnapshot).toHaveBeenCalledTimes(2);
-    expect(result.current.interventions.map((r) => r.id).sort()).toEqual([
-      "co-a",
-      "demo-local-company",
-    ]);
+    expect(result.current.interventions.map((r) => r.id).sort()).toEqual(["co-a", "co-b"]);
   });
 });

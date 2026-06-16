@@ -2,7 +2,7 @@ import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
 import { lookupOverlayImageUrl } from "@/features/catalog/lecotProductImageResolve";
 import { labelOverlapScore } from "@/features/catalog/lecotProductImageMatch";
 import { lookupLecotProductImageIndexUrlByLabel } from "@/features/catalog/lecotProductImageIndex";
-import { DEMO_COMPANY_STOCK_CATALOG } from "@/features/dev/demoCompanyStock";
+import { LOCKSMITH_STOCK_SEED_CATALOG } from "@/features/catalog/locksmithStockSeedCatalog";
 
 /** Clé stable pour indexer les vignettes par libellé article. */
 export function normalizeProductLabelKey(label: string): string {
@@ -22,7 +22,7 @@ function stockRowByExactLabel(label: string) {
   const key = normalizeProductLabelKey(label);
   if (!key) return null;
   return (
-    DEMO_COMPANY_STOCK_CATALOG.find((row) => normalizeProductLabelKey(row.description) === key) ??
+    LOCKSMITH_STOCK_SEED_CATALOG.find((row) => normalizeProductLabelKey(row.description) === key) ??
     null
   );
 }
@@ -37,7 +37,7 @@ function stockRowByLabelOverlap(label: string) {
   const query = label.trim();
   if (query.length < 10) return null;
 
-  const ranked = DEMO_COMPANY_STOCK_CATALOG.map((row) => ({
+  const ranked = LOCKSMITH_STOCK_SEED_CATALOG.map((row) => ({
     row,
     score: labelOverlapScore(query, row.description),
   }))

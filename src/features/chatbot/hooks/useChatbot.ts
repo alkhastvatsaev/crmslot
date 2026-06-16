@@ -8,7 +8,6 @@ import {
 } from "@/features/chatbot/chatbot-address-disambiguation";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { useWorkspaceCopilotSnapshot } from "@/features/copilot/hooks/useWorkspaceCopilotSnapshot";
 import type {
   ChatbotConversation,
@@ -114,10 +113,7 @@ async function readChatbotStream(
 function resolveCompanyId(
   workspace: ReturnType<typeof useCompanyWorkspaceOptional>
 ): string | null {
-  const id = (workspace?.activeCompanyId ?? "").trim();
-  if (id) return id;
-  if (workspace?.isTenantUser) return DEMO_COMPANY_ID;
-  return null;
+  return (workspace?.activeCompanyId ?? "").trim() || null;
 }
 
 export function useChatbot() {
@@ -158,8 +154,7 @@ export function useChatbot() {
 
   const invoicesPanelApi = useChatbotInvoicesPanel(companyId, documentLibraryEnabled);
   const companyName =
-    workspace?.memberships.find((m) => m.companyId === companyId)?.companyName ??
-    (companyId === DEMO_COMPANY_ID ? "Société démo" : null);
+    workspace?.memberships.find((m) => m.companyId === companyId)?.companyName ?? null;
   const role = workspace?.activeRole ?? null;
   const { snapshot: workspaceSnapshot } = useWorkspaceCopilotSnapshot({
     enabled: chatbotBackgroundEnabled,

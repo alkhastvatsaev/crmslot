@@ -4,10 +4,6 @@ import { render, screen, waitFor } from "@/test-utils/render";
 import DesktopOnlyGate, { isPhoneClassDevice } from "@/features/app/DesktopOnlyGate";
 import { fetchMobileRuntimeConfig } from "@/features/mobile/fetchMobileRuntimeConfig";
 
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: false,
-}));
-
 jest.mock("@/core/config/mobileAccess", () => ({
   mobileAccessAllowed: false,
 }));
@@ -15,6 +11,13 @@ jest.mock("@/core/config/mobileAccess", () => ({
 jest.mock("@/features/mobile/fetchMobileRuntimeConfig", () => ({
   fetchMobileRuntimeConfig: jest.fn(),
 }));
+
+jest.mock("@/core/native/capacitorRuntime", () => ({
+  isCapacitorNative: jest.fn(() => false),
+}));
+
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+const isCapacitorNativeMock = isCapacitorNative as jest.MockedFunction<typeof isCapacitorNative>;
 
 const fetchMobileRuntimeConfigMock = fetchMobileRuntimeConfig as jest.MockedFunction<
   typeof fetchMobileRuntimeConfig
@@ -52,6 +55,7 @@ describe("DesktopOnlyGate prod-like", () => {
 
   beforeEach(() => {
     fetchMobileRuntimeConfigMock.mockReset();
+    isCapacitorNativeMock.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -105,6 +109,25 @@ describe("DesktopOnlyGate prod-like", () => {
       expect(screen.getByTestId("child")).toBeInTheDocument();
     });
     expect(fetchMobileRuntimeConfigMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("bypasses gate when running inside Capacitor WebView", async () => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: "Mozilla/5.0 (Linux; Android 14)",
+      configurable: true,
+    });
+    isCapacitorNativeMock.mockReturnValue(true);
+
+    render(
+      <DesktopOnlyGate>
+        <span data-testid="child">ok</span>
+      </DesktopOnlyGate>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("child")).toBeInTheDocument();
+    });
+    expect(fetchMobileRuntimeConfigMock).not.toHaveBeenCalled();
   });
 
   it("blocks phone when runtime config denies mobile access", async () => {

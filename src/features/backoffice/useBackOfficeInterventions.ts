@@ -4,13 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
-import {
-  DEMO_COMPANY_ID,
-  devUiPreviewEnabled,
-  stripKnownSyntheticInterventions,
-} from "@/core/config/devUiPreview";
-import { demoInterventionsForCompany } from "@/features/dev/demoInterventions";
+import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
 
@@ -50,9 +44,6 @@ function mergeInterventionRows(byCompany: Record<string, Intervention[]>): Inter
 export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCompanyScope) {
   const cidKey = companyScopeKey(companyId);
   const cidList = useMemo(() => (cidKey ? cidKey.split("|") : []), [cidKey]);
-
-  const isDemoCompany =
-    devUiPreviewEnabled && cidList.length === 1 && cidList[0] === DEMO_COMPANY_ID;
   const noFirestore = !isConfigured || !firestore;
 
   const [rowsByCompany, setRowsByCompany] = useState<Record<string, Intervention[]>>({});
@@ -61,14 +52,6 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
 
   useEffect(() => {
     if (noFirestore || cidList.length === 0) return () => {};
-
-    const onlyDemoTenant = cidList.length === 1 && isDemoTenantCompanyId(cidList[0]!);
-    if (onlyDemoTenant) {
-      setRowsByCompany({});
-      setLoadedCompanyKeys(cidKey);
-      setError(null);
-      return () => {};
-    }
 
     setRowsByCompany({});
     setLoadedCompanyKeys("");
@@ -123,16 +106,11 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
   );
 
   const firebaseUid = auth?.currentUser?.uid ?? null;
-
-  const displayInterventions = useMemo(() => {
-    if (!isDemoCompany || interventions.length > 0) return interventions;
-    return demoInterventionsForCompany(cidList[0] ?? DEMO_COMPANY_ID);
-  }, [interventions, isDemoCompany, cidList]);
+  const loading = cidList.length > 0 && loadedCompanyKeys !== cidKey;
 
   if (cidList.length === 0 || noFirestore) {
-    return { interventions: displayInterventions, loading: false, error: null, firebaseUid };
+    return { interventions, loading: false, error: null, firebaseUid };
   }
 
-  const loading = loadedCompanyKeys !== cidKey;
-  return { interventions: displayInterventions, loading, error, firebaseUid };
+  return { interventions, loading, error, firebaseUid };
 }

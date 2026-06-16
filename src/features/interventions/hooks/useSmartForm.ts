@@ -13,7 +13,7 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { onAuthStateChanged, signInAnonymously, type User } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { toast } from "sonner";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
@@ -30,7 +30,6 @@ import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmIntervent
 import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
 import type { Intervention } from "@/features/interventions/types";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useAudioRecorder } from "@/features/interventions/useAudioRecorder";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -136,19 +135,6 @@ async function ensureUserForInterventionSubmit(): Promise<User | null> {
   }
   const existing = auth.currentUser;
   if (existing) return existing;
-  if (devUiPreviewEnabled) {
-    try {
-      const cred = await signInAnonymously(auth);
-      return cred.user;
-    } catch (e) {
-      logger.error("signInAnonymously", { error: e instanceof Error ? e.message : String(e) });
-      toast.error("Connexion anonyme refusée", {
-        description:
-          "Firebase Console → Authentication → Sign-in method : activez « Anonyme ». Vérifiez aussi .env.local.",
-      });
-      return null;
-    }
-  }
   toast.error("Connectez-vous pour envoyer", {
     description: "Utilisez la connexion par téléphone en haut de l'écran ou le portail client.",
   });
@@ -203,7 +189,7 @@ export function useSmartForm() {
   const workspace = useCompanyWorkspaceOptional();
   const tenantCompanyId =
     workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
-  const interventionCompanyId = tenantCompanyId ?? (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
+  const interventionCompanyId = tenantCompanyId;
 
   const stored = typeof window !== "undefined" ? loadStorageDraft() : null;
   const initialPayload = stored ? { ...emptyDraft(), ...stored.payload } : emptyDraft();

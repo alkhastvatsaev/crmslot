@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { firestore, auth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { stripKnownSyntheticInterventions } from "@/core/config/devUiPreview";
+import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Intervention } from "./types";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";

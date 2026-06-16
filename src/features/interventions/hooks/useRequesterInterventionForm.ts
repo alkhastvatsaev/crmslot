@@ -22,7 +22,6 @@ import { findPotentialDuplicates } from "@/features/interventions/detectDuplicat
 import type { Intervention } from "@/features/interventions/types";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
 import {
-  allowDemoFilesystemAudio,
   isPersistableClientAudioUrl,
   uploadInterventionAudioToFirebase,
 } from "@/features/interventions/clientAudioUpload";
@@ -156,43 +155,8 @@ export function useRequesterInterventionForm() {
           return;
         }
 
-        if (!allowDemoFilesystemAudio()) {
-          toast.error(String(t("requester.toasts.voice_save_failed_title")), {
-            description: String(t("requester.toasts.voice_save_failed_desc")),
-          });
-          return;
-        }
-
-        const formData = new FormData();
-        const mime = blob.type || "audio/webm";
-        const ext = mime.includes("mp4")
-          ? "m4a"
-          : mime.includes("ogg")
-            ? "ogg"
-            : mime.includes("wav")
-              ? "wav"
-              : "webm";
-        formData.append("audio", blob, `message.${ext}`);
-
-        const res = await fetchWithAuth("/api/demo/client-audio", {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) throw new Error(String(t("requester.toasts.server_error")));
-
-        const json = (await res.json().catch(() => null)) as {
-          url?: string;
-          storagePath?: string;
-        } | null;
-        const savedName =
-          json?.url?.split("/").pop() || json?.storagePath?.split("/").pop() || `message.${ext}`;
-
-        if (json?.url) {
-          setRequestData((prev) => ({ ...prev, audioUrl: json.url ?? prev.audioUrl }));
-        }
-
-        toast.success(String(t("requester.intervention.audio_recorded_toast")), {
-          description: savedName,
+        toast.error(String(t("requester.toasts.voice_save_failed_title")), {
+          description: String(t("requester.toasts.voice_save_failed_desc")),
         });
       } catch (e) {
         logger.error("Échec de la sauvegarde audio", {
@@ -397,36 +361,16 @@ export function useRequesterInterventionForm() {
         return;
       }
 
-      // Démo / filet de sécurité : l'URL peut arriver après le blob (fetch async dans handleAudioRecorded).
-      let demoAudioUrlForDoc = (requestData.audioUrl ?? "").trim() || null;
-      if (!isPersistableClientAudioUrl(demoAudioUrlForDoc)) {
-        demoAudioUrlForDoc = null;
+      let audioUrlForDoc = (requestData.audioUrl ?? "").trim() || null;
+      if (!isPersistableClientAudioUrl(audioUrlForDoc)) {
+        audioUrlForDoc = null;
       }
       const blobForAudio = requestData.audioBlob;
-      if (blobForAudio && blobForAudio.size > 0 && !demoAudioUrlForDoc) {
+      if (blobForAudio && blobForAudio.size > 0 && !audioUrlForDoc) {
         try {
           const quick = await uploadInterventionAudioToFirebase(blobForAudio);
           if (quick?.url) {
-            demoAudioUrlForDoc = quick.url;
-          } else if (allowDemoFilesystemAudio()) {
-            const formData = new FormData();
-            const mime = blobForAudio.type || "audio/webm";
-            const ext = mime.includes("mp4")
-              ? "m4a"
-              : mime.includes("ogg")
-                ? "ogg"
-                : mime.includes("wav")
-                  ? "wav"
-                  : "webm";
-            formData.append("audio", blobForAudio, `message.${ext}`);
-            const res = await fetchWithAuth("/api/demo/client-audio", {
-              method: "POST",
-              body: formData,
-            });
-            if (res.ok) {
-              const json = (await res.json()) as { url?: string };
-              demoAudioUrlForDoc = (json.url ?? "").trim() || null;
-            }
+            audioUrlForDoc = quick.url;
           }
         } catch (e) {
           logger.error("Persist vocal at submit failed", {
@@ -515,8 +459,8 @@ export function useRequesterInterventionForm() {
         ...(clientEmailRaw ? { clientEmailNormalized: normalizePortalEmail(clientEmailRaw) } : {}),
         ...(interventionDate ? { requestedDate: interventionDate } : {}),
         ...(interventionTime ? { requestedTime: interventionTime } : {}),
-        ...(demoAudioUrlForDoc && isPersistableClientAudioUrl(demoAudioUrlForDoc)
-          ? { audioUrl: demoAudioUrlForDoc }
+        ...(audioUrlForDoc && isPersistableClientAudioUrl(audioUrlForDoc)
+          ? { audioUrl: audioUrlForDoc }
           : {}),
       });
 
@@ -541,34 +485,6 @@ export function useRequesterInterventionForm() {
             const mime = audioBlob.type || "audio/webm";
             const ext = mime.includes("mp4") ? "m4a" : "webm";
 
-            const persistDemoFallback = async () => {
-              if (!allowDemoFilesystemAudio()) return;
-              try {
-                const formData = new FormData();
-                formData.append("audio", audioBlob, `message.${ext}`);
-                const res = await fetchWithAuth("/api/demo/client-audio", {
-                  method: "POST",
-                  body: formData,
-                });
-                if (!res.ok) return;
-                const json = (await res.json()) as { url?: string; mimeType?: string };
-                if (json.url) {
-                  await setDoc(
-                    newDocRef,
-                    {
-                      audioUrl: json.url,
-                      audioMimeType: json.mimeType ?? mime,
-                    },
-                    { merge: true }
-                  );
-                }
-              } catch (e) {
-                logger.error("Audio demo fallback failed", {
-                  error: e instanceof Error ? e.message : String(e),
-                });
-              }
-            };
-
             if (storage) {
               try {
                 const storagePath = `interventions_audio/${user.uid}/${Date.now()}.${ext}`;
@@ -589,10 +505,7 @@ export function useRequesterInterventionForm() {
                 logger.error("Audio upload failed (Storage)", {
                   error: err instanceof Error ? err.message : String(err),
                 });
-                await persistDemoFallback();
               }
-            } else {
-              await persistDemoFallback();
             }
           }
 

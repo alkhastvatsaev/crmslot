@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
-import { getAdminDb } from "@/core/config/firebase-admin";
-import { DEMO_COMPANY_ID, isSyntheticInterventionId } from "@/core/config/devUiPreview";
+import { config } from "dotenv";
+
+config({ path: ".env.local" });
+
+import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
+
+const DEMO_LOCAL_COMPANY = "demo-local-company";
 
 type DryRun = boolean;
 
@@ -12,13 +17,14 @@ function chunk<T>(arr: T[], size: number): T[][] {
 
 async function deleteDocsByRefs(
   refs: FirebaseFirestore.DocumentReference[],
-  opts: { dryRun: DryRun; label: string },
+  opts: { dryRun: DryRun; label: string }
 ) {
   if (refs.length === 0) return;
   console.log(`[${opts.label}] matched: ${refs.length}`);
   if (opts.dryRun) return;
 
   for (const group of chunk(refs, 450)) {
+    const { getAdminDb } = await import("@/core/config/firebase-admin");
     const batch = getAdminDb().batch();
     for (const r of group) batch.delete(r);
     await batch.commit();
@@ -30,6 +36,7 @@ async function main() {
 
   console.log(`cleanupDemoData starting (dryRun=${dryRun})`);
 
+  const { getAdminDb } = await import("@/core/config/firebase-admin");
   const db = getAdminDb();
 
   // 1) Interventions: delete any doc under demo company OR known synthetic IDs (mock-day-*, 1/2/3, demo-mission-backoffice-only…)
@@ -38,7 +45,7 @@ async function main() {
   // a) By companyId = demo-local-company
   const snapByCompany = await db
     .collection("interventions")
-    .where("companyId", "==", DEMO_COMPANY_ID)
+    .where("companyId", "==", DEMO_LOCAL_COMPANY)
     .get();
   snapByCompany.docs.forEach((d) => interventionRefs.push(d.ref));
 
@@ -51,7 +58,9 @@ async function main() {
   }
 
   // De-dup refs
-  const uniqInterventionRefs = Array.from(new Map(interventionRefs.map((r) => [r.path, r])).values());
+  const uniqInterventionRefs = Array.from(
+    new Map(interventionRefs.map((r) => [r.path, r])).values()
+  );
   await deleteDocsByRefs(uniqInterventionRefs, { dryRun, label: "interventions" });
 
   // 2) Duplicate alerts: delete demo company alerts OR alerts referencing synthetic intervention IDs
@@ -59,7 +68,7 @@ async function main() {
 
   const snapAlertsByCompany = await db
     .collection("intervention_duplicate_alerts")
-    .where("companyId", "==", DEMO_COMPANY_ID)
+    .where("companyId", "==", DEMO_LOCAL_COMPANY)
     .get();
   snapAlertsByCompany.docs.forEach((d) => alertRefs.push(d.ref));
 
@@ -78,7 +87,7 @@ async function main() {
   const chatRefs: FirebaseFirestore.DocumentReference[] = [];
   const snapChatByCompany = await db
     .collection("portal_ivana_chat_messages")
-    .where("companyId", "==", DEMO_COMPANY_ID)
+    .where("companyId", "==", DEMO_LOCAL_COMPANY)
     .get();
   snapChatByCompany.docs.forEach((d) => chatRefs.push(d.ref));
   await deleteDocsByRefs(chatRefs, { dryRun, label: "portal_ivana_chat_messages" });
@@ -87,7 +96,7 @@ async function main() {
   const siteRefs: FirebaseFirestore.DocumentReference[] = [];
   const snapSitesByCompany = await db
     .collection("sites")
-    .where("companyId", "==", DEMO_COMPANY_ID)
+    .where("companyId", "==", DEMO_LOCAL_COMPANY)
     .get();
   snapSitesByCompany.docs.forEach((d) => siteRefs.push(d.ref));
   await deleteDocsByRefs(siteRefs, { dryRun, label: "sites" });
@@ -95,7 +104,7 @@ async function main() {
   const clientRefs: FirebaseFirestore.DocumentReference[] = [];
   const snapClientsByCompany = await db
     .collection("clients")
-    .where("companyId", "==", DEMO_COMPANY_ID)
+    .where("companyId", "==", DEMO_LOCAL_COMPANY)
     .get();
   snapClientsByCompany.docs.forEach((d) => clientRefs.push(d.ref));
   await deleteDocsByRefs(clientRefs, { dryRun, label: "clients" });
@@ -104,7 +113,7 @@ async function main() {
   console.log(
     dryRun
       ? "Dry-run only: nothing was deleted. Re-run without --dry-run to delete."
-      : "Deletion completed.",
+      : "Deletion completed."
   );
 }
 
@@ -112,4 +121,3 @@ main().catch((e) => {
   console.error("cleanupDemoData failed:", e);
   process.exit(1);
 });
-

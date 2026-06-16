@@ -2,7 +2,7 @@ import type { SupplierOrder } from "@/features/suppliers/types";
 import {
   buildSupplierOrderPreviewFromToolResult,
   type LecotOrderToolResult,
-} from "@/features/chatbot/chatbot-lecot-demo";
+} from "@/features/chatbot/chatbot-lecot-preview";
 
 export type ChatbotSupplierOrdersPanelPayload = {
   highlightOrderId: string;
@@ -11,16 +11,20 @@ export type ChatbotSupplierOrdersPanelPayload = {
   previewOrder?: SupplierOrder;
 };
 
-function isLecotOrderToolResult(result: unknown): result is LecotOrderToolResult & { ok?: boolean } {
+function isLecotOrderToolResult(
+  result: unknown
+): result is LecotOrderToolResult & { ok?: boolean } {
   if (!result || typeof result !== "object" || "error" in (result as object)) return false;
   const r = result as { ok?: boolean; supplierOrderId?: string; lines?: unknown };
-  return r.ok !== false && Boolean(String(r.supplierOrderId ?? "").trim()) && Array.isArray(r.lines);
+  return (
+    r.ok !== false && Boolean(String(r.supplierOrderId ?? "").trim()) && Array.isArray(r.lines)
+  );
 }
 
 /** Ouvre le panneau commandes après `order_lecot_parts` réussi. */
 export function extractSupplierOrdersPanelFromResult(
   result: unknown,
-  companyId?: string,
+  companyId?: string
 ): ChatbotSupplierOrdersPanelPayload | null {
   if (!isLecotOrderToolResult(result)) return null;
 

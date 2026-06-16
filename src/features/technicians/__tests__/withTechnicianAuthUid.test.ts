@@ -1,26 +1,17 @@
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: true,
-}));
-
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Technician } from "@/features/technicians/types";
 
-const base: Technician = {
-  id: "2",
-  name: "Thomas",
-  initial: "T",
-  vehicle: "Van",
-  status: "available",
-  location: { lat: 50.85, lng: 4.35 },
-};
-
 describe("withTechnicianAuthUid", () => {
-  it("keeps existing authUid", () => {
-    expect(withTechnicianAuthUid({ ...base, authUid: "firebase-abc" }).authUid).toBe("firebase-abc");
-  });
-
-  it("fills default when missing in dev preview", () => {
-    expect(withTechnicianAuthUid(base).authUid).toBe(getDefaultAssignedTechnicianUid());
+  it("returns technician unchanged", () => {
+    const tech: Technician = {
+      id: "t1",
+      name: "Tech",
+      authUid: "uid-1",
+      status: "available",
+      location: { lat: 0, lng: 0 },
+      initial: "T",
+      vehicle: "van-1",
+    };
+    expect(withTechnicianAuthUid(tech)).toEqual(tech);
   });
 });

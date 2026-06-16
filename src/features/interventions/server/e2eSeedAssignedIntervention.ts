@@ -1,6 +1,9 @@
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { DEMO_COMPANY_ID, DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
+import {
+  getE2eSeedCompanyId,
+  getE2eSeedTechnicianUid,
+} from "@/features/interventions/server/e2eSeedConfig";
 
 export const E2E_ASSIGNED_INTERVENTION_ID = "e2e-technician-finish";
 
@@ -32,7 +35,7 @@ export async function e2eSeedAssignedInterventionAdmin(
     status: "in_progress",
     technicianAcceptedAt: now,
     location: { lat: 50.8466, lng: 4.3528 },
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     problem: "Porte bloquée — seed Playwright clôture",
     clientName: "Client E2E Clôture",
     clientFirstName: "Client",
@@ -40,7 +43,7 @@ export async function e2eSeedAssignedInterventionAdmin(
     clientEmail: "e2e-finish-client@example.com",
     clientPhone: "0470123456",
     category: "serrurerie",
-    assignedTechnicianUid: DEMO_TECHNICIAN_UID,
+    assignedTechnicianUid: getE2eSeedTechnicianUid(),
     assignedAt: now,
     statusUpdatedAt: now,
     completionPhotoUrls: FieldValue.delete(),
@@ -71,7 +74,7 @@ export async function e2eSeedAssignedInterventionAdmin(
 
   return {
     interventionId,
-    companyId: DEMO_COMPANY_ID,
+    companyId: getE2eSeedCompanyId(),
     reset: existing.exists,
   };
 }

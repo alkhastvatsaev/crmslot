@@ -88,21 +88,15 @@ service cloud.firestore {
           || tenantClaimsIncludeCompany(companyId)
           || clientPortalLinkedToCompany(companyId)
           || allowedUsersPhoneMatchesIvanaCompany(companyId)
-          || companyId == 'demo-local-company'
         );
     }
 
-    /**
-     * Back-office / Historique CRM : membership, jetons bmTenants, ou société démo staging.
-     * Sous-collections `companies/{id}/…` : le `companyId` du chemin suffit pour la démo.
-     */
     function canAccessCompanyHubData(companyId) {
       return companyId is string
         && companyId.size() > 0
         && (
           userBelongsToCompany(companyId)
           || tenantClaimsIncludeCompany(companyId)
-          || companyId == 'demo-local-company'
         );
     }
 
@@ -326,29 +320,10 @@ service cloud.firestore {
         && resource.data.createdByUid == request.auth.uid;
     }
 
-    /**
-     * Seeds partagés staging / dev (`demo-local-company`, `demo-tech-local`).
-     * Retirer en prod stricte quand plus aucun doc de démo en base.
-     */
-    function canReadInterventionDemoStaging() {
-      return isAuthed()
-        && (
-          (
-            interventionHasTenantScope(resource.data)
-            && resource.data.companyId == 'demo-local-company'
-          )
-          || (
-            resource.data.keys().hasAny(['assignedTechnicianUid'])
-            && resource.data.assignedTechnicianUid == 'demo-tech-local'
-          )
-        );
-    }
-
     function interventionCreateTenantAllowed(data) {
       return !data.keys().hasAny(['companyId'])
         || !(data.companyId is string)
         || data.companyId.size() == 0
-        || data.companyId == 'demo-local-company'
         || tenantClaimsIncludeCompany(data.companyId)
         || userBelongsToCompany(data.companyId)
         || clientPortalLinkedToCompany(data.companyId)
@@ -410,21 +385,6 @@ service cloud.firestore {
         && interventionSensitiveBillingUnchanged();
     }
 
-    /** Staging : technicien démo (assignations `demo-tech-local`). */
-    function canUpdateInterventionDemoAssignee() {
-      return resource.data.keys().hasAny(['assignedTechnicianUid'])
-        && resource.data.assignedTechnicianUid == 'demo-tech-local'
-        && interventionSensitiveBillingUnchanged();
-    }
-
-    /** Dev / staging : IVANA anonyme peut assigner les demandes `demo-local-company`. */
-    function canUpdateInterventionDemoStaging() {
-      return isAuthed()
-        && interventionHasTenantScope(resource.data)
-        && resource.data.companyId == 'demo-local-company'
-        && interventionSensitiveBillingUnchanged();
-    }
-
     function canDeleteInterventionAsAdmin() {
       return interventionHasTenantScope(resource.data)
         && (
@@ -455,7 +415,6 @@ service cloud.firestore {
         ])
         && (
           tenantClaimsIncludeCompany(resource.data.companyId)
-          || resource.data.companyId == 'demo-local-company'
         );
 
       allow create: if isAuthed()
@@ -476,7 +435,6 @@ service cloud.firestore {
         && request.resource.data.newInterventionId == alertId
         && (
           tenantClaimsIncludeCompany(request.resource.data.companyId)
-          || request.resource.data.companyId == 'demo-local-company'
         );
 
       allow update: if isAuthed()
@@ -514,7 +472,6 @@ service cloud.firestore {
       allow read: if canReadInterventionViaMembership();
       allow read: if canReadInterventionAsAssignee();
       allow read: if canReadInterventionAsCreator();
-      allow read: if canReadInterventionDemoStaging();
 
       allow create: if isAuthed()
         && request.resource.data.keys().hasAny(['createdByUid'])
@@ -525,8 +482,6 @@ service cloud.firestore {
         canUpdateInterventionAsTenantStaff()
         || canUpdateInterventionViaMembershipStaff()
         || canUpdateInterventionAsAssignee()
-        || canUpdateInterventionDemoAssignee()
-        || canUpdateInterventionDemoStaging()
       );
 
       allow delete: if isAuthed() && canDeleteInterventionAsAdmin();

@@ -226,40 +226,12 @@ export function useClientPortalAuth({
     try {
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-      if (authRailMode) {
-        const demoLink = `${origin}/?demo_login=${encodeURIComponent(email.trim())}`;
-        try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(demoLink);
-          } else {
-            const textArea = document.createElement("textarea");
-            textArea.value = demoLink;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            textArea.style.top = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            document.execCommand("copy");
-            textArea.remove();
-          }
-          toast.success("Lien copié dans le presse-papier !", {
-            description: "Prêt à être collé pour la démo.",
-          });
-        } catch (clipboardErr) {
-          logger.error("Clipboard error", {
-            error: clipboardErr instanceof Error ? clipboardErr.message : String(clipboardErr),
-          });
-          toast.success("Lien de démo généré : " + demoLink);
-        }
-      } else {
-        await sendSignInLinkToEmail(clientPortalAuth, email.trim(), {
-          url: `${origin}/`,
-          handleCodeInApp: true,
-        });
-        window.localStorage.setItem(EMAIL_LINK_STORAGE_KEY, email.trim());
-        toast.success(t("auth.link_sent"), { description: t("auth.check_inbox") });
-      }
+      await sendSignInLinkToEmail(clientPortalAuth, email.trim(), {
+        url: `${origin}/`,
+        handleCodeInApp: true,
+      });
+      window.localStorage.setItem(EMAIL_LINK_STORAGE_KEY, email.trim());
+      toast.success(t("auth.link_sent"), { description: t("auth.check_inbox") });
     } catch (e) {
       logger.error("[ClientPortalAuthPanel] sendSignInLinkToEmail", {
         error: e instanceof Error ? e.message : String(e),

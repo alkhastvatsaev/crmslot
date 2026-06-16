@@ -1,26 +1,20 @@
 /** Politique DesktopOnlyGate — logique pure (testable sans React). */
 
 export function shouldBypassDesktopOnlyGate(
-  devUiPreviewEnabled: boolean,
   buildTimeMobileAccessAllowed: boolean,
   runtimeMobileAccessAllowed: boolean | null = null
 ): boolean {
-  if (devUiPreviewEnabled || buildTimeMobileAccessAllowed) return true;
+  if (buildTimeMobileAccessAllowed) return true;
   return runtimeMobileAccessAllowed === true;
 }
 
 export function shouldBlockPhoneOnDesktopOnlyGate(
-  devUiPreviewEnabled: boolean,
   buildTimeMobileAccessAllowed: boolean,
   isPhone: boolean,
   runtimeMobileAccessAllowed: boolean | null = null
 ): boolean {
   if (!isPhone) return false;
-  return !shouldBypassDesktopOnlyGate(
-    devUiPreviewEnabled,
-    buildTimeMobileAccessAllowed,
-    runtimeMobileAccessAllowed
-  );
+  return !shouldBypassDesktopOnlyGate(buildTimeMobileAccessAllowed, runtimeMobileAccessAllowed);
 }
 
 /** Bootstrap runtime via GET /api/mobile/config (prod sans rebuild client). */

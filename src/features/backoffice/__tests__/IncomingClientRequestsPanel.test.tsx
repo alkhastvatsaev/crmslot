@@ -3,9 +3,14 @@ import { render, screen } from "@/test-utils/render";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import type { Intervention } from "@/features/interventions/types";
 import IncomingClientRequestsPanel from "@/features/backoffice/components/IncomingClientRequestsPanel";
+
+const TEST_TECH_UID = "tech-uid-1";
+
+jest.mock("@/features/interventions/defaultAssignedTechnicianUid", () => ({
+  getDefaultAssignedTechnicianUid: () => TEST_TECH_UID,
+}));
 
 jest.mock("@/features/backoffice/assignInterventionFromBackoffice", () => ({
   assignInterventionFromBackoffice: jest.fn(async () => undefined),
@@ -42,7 +47,7 @@ jest.mock("@/features/technicians/hooks", () => ({
         initial: "M",
         vehicle: "Van",
         status: "available",
-        authUid: getDefaultAssignedTechnicianUid(),
+        authUid: TEST_TECH_UID,
         location: { lat: 50.848, lng: 4.352 },
       },
     ],
@@ -119,6 +124,6 @@ describe("IncomingClientRequestsPanel", () => {
 
     await waitFor(() => expect(mockAssign).toHaveBeenCalledTimes(1), { timeout: 3000 });
     expect(mockAssign.mock.calls[0]?.[0]).toBe("req-1");
-    expect(mockAssign.mock.calls[0]?.[2]).toBe(getDefaultAssignedTechnicianUid());
+    expect(mockAssign.mock.calls[0]?.[2]).toBe(TEST_TECH_UID);
   });
 });

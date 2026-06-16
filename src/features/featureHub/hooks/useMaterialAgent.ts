@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { DEMO_COMPANY_ID } from "@/core/config/devUiPreview";
 import { isCompanyStockAgentInScope } from "@/features/featureHub/companyStockAgentScope";
 import type {
   CompanyStockAgentContext,
@@ -146,12 +145,11 @@ type Options = {
 export function useMaterialAgent(ctx: CompanyStockAgentContext, options?: Options) {
   const workspace = useCompanyWorkspaceOptional();
   const rawId = (workspace?.activeCompanyId ?? "").trim();
-  const resolvedId = rawId || (workspace?.isTenantUser ? DEMO_COMPANY_ID : null);
+  const resolvedId = rawId || workspace?.activeCompanyId?.trim() || null;
   const companyId = ctx.companyId || resolvedId || "";
   const uid = workspace?.firebaseUid ?? "anon";
   const companyName =
-    workspace?.memberships?.find((m) => m.companyId === companyId)?.companyName ??
-    (companyId === DEMO_COMPANY_ID ? "Société démo" : null);
+    workspace?.memberships?.find((m) => m.companyId === companyId)?.companyName ?? null;
   const role = workspace?.activeRole ?? null;
 
   const agentEnabled = options?.enabled !== false && Boolean(companyId);

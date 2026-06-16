@@ -1,8 +1,6 @@
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { auth, firestore, storage } from "@/core/config/firebase";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { dataUrlToBlob } from "@/features/interventions/finishJobCapture";
 import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import type { Intervention } from "@/features/interventions/types";
@@ -91,24 +89,8 @@ export async function performCompletionAmend(params: CompletionUploadParams): Pr
     completionPhotoUrls: photoUrls,
     completionSignatureUrl: sigUrl,
     billingLines: billingLines ?? undefined,
-    statusUpdatedAt: devUiPreviewEnabled ? new Date().toISOString() : serverTimestamp(),
+    statusUpdatedAt: serverTimestamp(),
   };
-
-  if (devUiPreviewEnabled) {
-    const res = await fetchWithAuth(
-      `/api/interventions/${encodeURIComponent(interventionId)}/completion-amend`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      }
-    );
-    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
-    if (!res.ok) {
-      throw new Error(data.error || "Mise à jour du rapport refusée");
-    }
-    return;
-  }
 
   await withTimeout(
     updateDoc(doc(fs, "interventions", interventionId), patch),
@@ -143,7 +125,7 @@ export async function performCompletionUpload(params: CompletionUploadParams): P
   });
 
   const uid = user.uid;
-  const completedAt = devUiPreviewEnabled ? new Date().toISOString() : serverTimestamp();
+  const completedAt = serverTimestamp();
 
   await withTimeout(
     transitionInterventionFromTechnician({
@@ -158,14 +140,12 @@ export async function performCompletionUpload(params: CompletionUploadParams): P
       extraPatch: {
         completionPhotoUrls: photoUrls,
         completionSignatureUrl: sigUrl,
+        billingLines: billingLines ?? undefined,
         completedAt,
         completedByUid: uid,
-        reportRejectionReason: null,
-        reportRejectedAt: null,
       },
-      writeInboxAlerts: false,
     }),
     FIRESTORE_UPDATE_TIMEOUT_MS,
-    "Mise à jour du dossier"
+    "Clôture intervention"
   );
 }

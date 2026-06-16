@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, ImagePlus, X } from "lucide-react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { toast } from "sonner";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { cn } from "@/lib/utils";
@@ -89,9 +88,7 @@ export default function IvanaClientChatPanel({
   const sessionStartTimeRef = useRef<number>(Date.now());
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
-  const firestoreSyncEnabled =
-    Boolean(companyIdTrimmed && isConfigured && firestore) &&
-    !isDemoTenantCompanyId(companyIdTrimmed);
+  const firestoreSyncEnabled = Boolean(companyIdTrimmed && isConfigured && firestore);
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
   const storageKey = useMemo(() => `${STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`, [user?.uid]);

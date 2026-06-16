@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { logger } from "@/core/logger";
 import { collectionGroup, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
@@ -17,7 +16,7 @@ export function useCompanyStatusEventsFeed(companyId: string | null) {
 
   useEffect(() => {
     const cid = (companyId ?? "").trim();
-    if (!cid || !isConfigured || !firestore || isDemoTenantCompanyId(cid)) {
+    if (!cid || !isConfigured || !firestore) {
       setEvents([]);
       setLoading(false);
       setError(null);

@@ -55,8 +55,6 @@ import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { missionStableKey } from "@/features/map/missionStableKey";
-import { MAP_DEMO_TECHNICIAN_MARKERS } from "@/features/map/mapDemoTechnicianMarkers";
-import { createTechnicianVanMarkerElement } from "@/features/map/mapTechnicianMarkerDom";
 import { useMapArchivedMissions } from "@/features/map/useMapArchivedMissions";
 import {
   DASHBOARD_DESKTOP_COL_CLASS,
@@ -520,16 +518,6 @@ export default function MapboxView() {
       const markerKey = mission.key ?? String(mission.id);
       markersRef.current[markerKey] = marker;
     });
-
-    if (isDispatchMap) {
-      for (const tech of MAP_DEMO_TECHNICIAN_MARKERS) {
-        const el = createTechnicianVanMarkerElement(tech.name);
-        const marker = new mapboxgl.Marker({ element: el, anchor: "bottom" })
-          .setLngLat(tech.coordinates)
-          .addTo(map);
-        markersRef.current[`technician-${tech.id}`] = marker;
-      }
-    }
   }, [visibleMissions, mapReady, isDispatchMap, isMobile]);
 
   const handleMobileMapResize = React.useCallback((rail: MobileHubRail) => {

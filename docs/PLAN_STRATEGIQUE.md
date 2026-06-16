@@ -189,7 +189,7 @@ Si vous déléguez à un agent IA **sans clic utilisateur**, prioriser dans cet 
 | Phase          | Variables                                                                                                                                                           |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dev local      | `NODE_ENV=development`, preview UI par défaut                                                                                                                       |
-| Staging Vercel | `NEXT_PUBLIC_STAGING_PREVIEW=true`, `NEXT_PUBLIC_ALLOW_MOBILE=true` (test)                                                                                          |
+| Staging Vercel | `NEXT_PUBLIC_ALLOW_MOBILE=true`, `NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID` (société cliente)                                                                   |
 | Production     | `NEXT_PUBLIC_REAL_INTERVENTIONS_ONLY=true`, `NEXT_PUBLIC_PRESENTATION_PRIVACY_MODE=false`, `NEXT_PUBLIC_DEFAULT_ASSIGNED_TECHNICIAN_UID`, Firebase Admin sur Vercel |
 
 ---
@@ -220,12 +220,12 @@ firebase deploy --only firestore:rules
 
 ## Glossaire rapide
 
-| Terme               | Signification                                                          |
-| ------------------- | ---------------------------------------------------------------------- |
-| **bmTenants**       | Custom claim : `["companyId:admin", ...]`                              |
-| **Tenant**          | Société (`companyId`) isolée                                           |
-| **P0 métier**       | Modules listés dans `AGENTS.md` (assignation, filtre, carte, schedule) |
-| **Staging preview** | `NEXT_PUBLIC_STAGING_PREVIEW=true` — données démo sur Vercel           |
+| Terme              | Signification                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| **bmTenants**      | Custom claim : `["companyId:admin", ...]`                                                    |
+| **Tenant**         | Société (`companyId`) isolée                                                                 |
+| **P0 métier**      | Modules listés dans `AGENTS.md` (assignation, filtre, carte, schedule)                       |
+| **Portail client** | `NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID` — société Firestore des demandes `/m/demande` |
 
 ---
 

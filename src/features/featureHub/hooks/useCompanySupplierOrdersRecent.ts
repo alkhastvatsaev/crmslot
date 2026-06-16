@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isDemoTenantCompanyId } from "@/core/config/demoTenantFirestore";
 import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { subscribeSupplierOrders } from "@/features/suppliers/supplierFirestore";
@@ -14,7 +13,7 @@ export function useCompanySupplierOrdersRecent(companyId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!companyId || !firestore || isDemoTenantCompanyId(companyId)) {
+    if (!companyId || !firestore) {
       setOrders([]);
       setLoading(false);
       setError(null);

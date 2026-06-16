@@ -1,54 +1,58 @@
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import type { Intervention } from "@/features/interventions/types";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 
-jest.mock("@/core/api/fetchWithAuth", () => ({
-  fetchWithAuth: jest.fn(),
-}));
-
-jest.mock("@/core/config/devUiPreview", () => ({
-  devUiPreviewEnabled: true,
+jest.mock("@/core/config/firebase", () => ({
+  firestore: {},
+  auth: { currentUser: { uid: "tech-uid-1" } },
 }));
 
 jest.mock("@/features/interventions/workflow/transitionInterventionStatus", () => ({
   transitionInterventionStatus: jest.fn(),
 }));
 
-const mockFetch = fetchWithAuth as jest.MockedFunction<typeof fetchWithAuth>;
+const mockTransition = transitionInterventionStatus as jest.MockedFunction<
+  typeof transitionInterventionStatus
+>;
 
-const iv: Pick<
-  Intervention,
-  "status" | "assignedTechnicianUid" | "createdByUid" | "companyId"
-> = {
+const iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "createdByUid" | "companyId"> = {
   status: "en_route",
-  assignedTechnicianUid: "demo-tech-local",
+  assignedTechnicianUid: "tech-uid-1",
   createdByUid: "creator-1",
-  companyId: "demo-local-company",
+  companyId: "co-test",
+};
+
+const mockStatusEvent = {
+  id: "evt-1",
+  interventionId: "iv-42",
+  fromStatus: "en_route" as const,
+  toStatus: "in_progress" as const,
+  actorUid: "tech-uid-1",
+  actorRole: "technician" as const,
+  at: "2026-06-16T12:00:00.000Z",
 };
 
 describe("transitionInterventionFromTechnician", () => {
   beforeEach(() => {
-    mockFetch.mockReset();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ ok: true }),
-    } as Response);
+    mockTransition.mockReset();
+    mockTransition.mockResolvedValue(mockStatusEvent);
   });
 
-  it("posts en_route → in_progress to transition API in dev preview", async () => {
+  it("calls transitionInterventionStatus with authenticated technician actor", async () => {
     await transitionInterventionFromTechnician({
       interventionId: "iv-42",
       iv,
       toStatus: "in_progress",
     });
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/interventions/iv-42/transition",
+    expect(mockTransition).toHaveBeenCalledWith(
       expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify({ toStatus: "in_progress", note: undefined, extraPatch: undefined }),
-      }),
+        interventionId: "iv-42",
+        iv,
+        toStatus: "in_progress",
+        actor: { uid: "tech-uid-1", role: "technician" },
+        note: undefined,
+        extraPatch: undefined,
+      })
     );
-    expect(transitionInterventionStatus).not.toHaveBeenCalled();
   });
 });

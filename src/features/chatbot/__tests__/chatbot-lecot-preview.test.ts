@@ -1,4 +1,4 @@
-import { buildSupplierOrderPreviewFromToolResult } from "@/features/chatbot/chatbot-lecot-demo";
+import { buildSupplierOrderPreviewFromToolResult } from "@/features/chatbot/chatbot-lecot-preview";
 
 describe("buildSupplierOrderPreviewFromToolResult", () => {
   it("includes clientName on preview order for right panel", () => {

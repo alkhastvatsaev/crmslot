@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
 import { mobileAccessAllowed } from "@/core/config/mobileAccess";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { fetchMobileRuntimeConfig } from "@/features/mobile/fetchMobileRuntimeConfig";
 import {
   resolveRuntimeMobileAccessAllowed,
@@ -23,11 +23,16 @@ function initialGatePhase(buildBypass: boolean): GatePhase {
 }
 
 export default function DesktopOnlyGate({ children }: { children: React.ReactNode }) {
-  const buildBypass = shouldBypassDesktopOnlyGate(devUiPreviewEnabled, mobileAccessAllowed);
+  const buildBypass = shouldBypassDesktopOnlyGate(mobileAccessAllowed);
   const [phase, setPhase] = useState<GatePhase>(() => initialGatePhase(buildBypass));
 
   useEffect(() => {
     if (buildBypass) return;
+
+    if (isCapacitorNative()) {
+      setPhase("allowed");
+      return;
+    }
 
     let cancelled = false;
 

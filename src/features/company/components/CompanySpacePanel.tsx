@@ -30,7 +30,6 @@ import {
 import { toast } from "sonner";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspace } from "@/context/CompanyWorkspaceContext";
-import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_SMART_FORM,
@@ -277,7 +276,7 @@ export default function CompanySpacePanel() {
     return memberships.find((m) => m.companyId === activeCompanyId)?.companyName ?? "";
   }, [memberships, activeCompanyId]);
 
-  if (!isConfigured && !devUiPreviewEnabled) {
+  if (!isConfigured) {
     return (
       <PanelShell>
         <OfflineGlyph

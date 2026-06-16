@@ -1,6 +1,4 @@
 import type { Intervention } from "@/features/interventions/types";
-import { DEMO_TECHNICIAN_UID } from "@/core/config/devUiPreview";
-import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
 import {
   acceptTechnicianAssignmentPatch,
   acceptTechnicianAssignmentInProgressPatch,
@@ -11,9 +9,7 @@ import {
   matchesAssignedTechnician,
 } from "@/features/interventions/technicianAssignmentActions";
 
-function iv(
-  partial: Partial<Intervention> & Pick<Intervention, "status">,
-): Intervention {
+function iv(partial: Partial<Intervention> & Pick<Intervention, "status">): Intervention {
   return {
     id: "x",
     title: "Test",
@@ -29,20 +25,20 @@ describe("technicianAssignmentActions", () => {
     expect(
       isTechnicianAssignmentAwaitingResponse(
         iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(true);
     expect(
       isTechnicianAssignmentAwaitingResponse(
         iv({ status: "assigned", assignedTechnicianUid: "tech-2" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
     expect(
       isTechnicianAssignmentAwaitingResponse(
         iv({ status: "en_route", assignedTechnicianUid: "tech-1" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
   });
 
@@ -65,26 +61,28 @@ describe("technicianAssignmentActions", () => {
           assignedTechnicianUid: "tech-1",
           technicianAcceptedAt: null,
         }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(true);
   });
 
-  it("matches default back-office technician uid in demo", () => {
-    const defaultUid = getDefaultAssignedTechnicianUid();
+  it("matches only exact assigned technician uid", () => {
     expect(
       matchesAssignedTechnician(
-        iv({ status: "assigned", assignedTechnicianUid: defaultUid }),
-        DEMO_TECHNICIAN_UID,
-      ),
+        iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
+        "tech-1"
+      )
     ).toBe(true);
+    expect(
+      matchesAssignedTechnician(
+        iv({ status: "assigned", assignedTechnicianUid: "tech-assigned" }),
+        "tech-other"
+      )
+    ).toBe(false);
   });
 
   it("decline returns dossier to IVANA pending queue", () => {
-    const patch = declineTechnicianAssignmentPatch(
-      "tech-1",
-      new Date("2026-05-16T12:00:00Z"),
-    );
+    const patch = declineTechnicianAssignmentPatch("tech-1", new Date("2026-05-16T12:00:00Z"));
     expect(patch.status).toBe("pending");
     expect(patch.assignedTechnicianUid).toBeNull();
     expect(patch.technicianDeclinedByUid).toBe("tech-1");
@@ -94,18 +92,15 @@ describe("technicianAssignmentActions", () => {
     expect(
       matchesAssignedTechnician(
         iv({ status: "assigned", assignedTechnicianUid: "tech-assigned" }),
-        "tech-other",
-      ),
+        "tech-other"
+      )
     ).toBe(false);
   });
 
   it("matchesAssignedTechnician is false when uid or assignment is empty", () => {
     expect(matchesAssignedTechnician(iv({ status: "assigned" }), "tech-1")).toBe(false);
     expect(
-      matchesAssignedTechnician(
-        iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
-        null,
-      ),
+      matchesAssignedTechnician(iv({ status: "assigned", assignedTechnicianUid: "tech-1" }), null)
     ).toBe(false);
   });
 
@@ -113,8 +108,8 @@ describe("technicianAssignmentActions", () => {
     expect(
       isTechnicianAssignmentAwaitingResponse(
         iv({ status: "assigned", assignedTechnicianUid: "tech-2" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
   });
 
@@ -123,44 +118,48 @@ describe("technicianAssignmentActions", () => {
     expect(
       isTechnicianActiveFieldMission(
         iv({ status: "en_route", assignedTechnicianUid: "tech-2" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
 
     // Should be true for en_route and waiting_material
     expect(
       isTechnicianActiveFieldMission(
         iv({ status: "en_route", assignedTechnicianUid: "tech-1" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(true);
     expect(
       isTechnicianActiveFieldMission(
         iv({ status: "waiting_material", assignedTechnicianUid: "tech-1" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(true);
 
     // Should be true for in_progress ONLY if acceptedAt is present
     expect(
       isTechnicianActiveFieldMission(
-        iv({ status: "in_progress", assignedTechnicianUid: "tech-1", technicianAcceptedAt: "2026-05-16T12:00:00Z" }),
-        "tech-1",
-      ),
+        iv({
+          status: "in_progress",
+          assignedTechnicianUid: "tech-1",
+          technicianAcceptedAt: "2026-05-16T12:00:00Z",
+        }),
+        "tech-1"
+      )
     ).toBe(true);
     expect(
       isTechnicianActiveFieldMission(
         iv({ status: "in_progress", assignedTechnicianUid: "tech-1", technicianAcceptedAt: null }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
 
     // Should be false for other statuses
     expect(
       isTechnicianActiveFieldMission(
         iv({ status: "assigned", assignedTechnicianUid: "tech-1" }),
-        "tech-1",
-      ),
+        "tech-1"
+      )
     ).toBe(false);
   });
 
@@ -168,20 +167,5 @@ describe("technicianAssignmentActions", () => {
     const patch = acceptTechnicianAssignmentInProgressPatch(new Date("2026-05-16T12:00:00Z"));
     expect(patch.status).toBe("en_route");
     expect(patch.technicianAcceptedAt).toBe("2026-05-16T12:00:00.000Z");
-  });
-
-  it("getTechnicianAssignmentUid maps demo auth uid to default technician in dev preview", async () => {
-    const prev = process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW;
-    process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW = "true";
-    jest.resetModules();
-    const actions = await import("@/features/interventions/technicianAssignmentActions");
-    const { getDefaultAssignedTechnicianUid: defaultUid } = await import(
-      "@/features/interventions/defaultAssignedTechnicianUid",
-    );
-    expect(actions.getTechnicianAssignmentUid(DEMO_TECHNICIAN_UID)).toBe(defaultUid());
-    expect(actions.getTechnicianAssignmentUid("real-tech-uid")).toBe("real-tech-uid");
-    jest.resetModules();
-    if (prev === undefined) delete process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW;
-    else process.env.NEXT_PUBLIC_FORCE_DEV_UI_PREVIEW = prev;
   });
 });
