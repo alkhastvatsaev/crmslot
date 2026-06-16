@@ -1,16 +1,16 @@
 {
-  "name": "CRMSLOT Admin",
-  "short_name": "Admin",
-  "description": "Back-office et pilotage CRMSLOT",
-  "start_url": "/",
+  "name": "CRMSLOT Demande",
+  "short_name": "Demande",
+  "description": "Formulaire et suivi client CRMSLOT",
+  "start_url": "/m/demande",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "lang": "fr",
   "dir": "ltr",
-  "id": "/",
-  "background_color": "#09090B",
-  "theme_color": "#09090B",
+  "id": "/m/demande",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
   "icons": [
     {
       "src": "/icon-192.png",
