@@ -5,7 +5,6 @@ import { auth } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword } from "firebase/auth";
 
-import { syncClientPortalProfile } from "@/features/auth/clientPortalProfile";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 
@@ -38,21 +37,15 @@ export default function LoginOverlay({ children }: { children: React.ReactNode }
 
     const unsubscribe = onAuthStateChanged(auth!, async (user) => {
       if (user) {
-        try {
-          await syncClientPortalProfile(user);
-        } catch (e) {
-          logger.error("[LoginOverlay] sync error", {
-            error: e instanceof Error ? e.message : String(e),
-          });
-        }
         setIsAuthenticated(true);
         setLoadingState("ready");
       } else {
         try {
-          const cred = isCapacitorNative()
-            ? await signInWithEmailAndPassword(auth!, NATIVE_DEMO_EMAIL, NATIVE_DEMO_PASSWORD)
-            : await signInAnonymously(auth!);
-          await syncClientPortalProfile(cred.user);
+          if (isCapacitorNative()) {
+            await signInWithEmailAndPassword(auth!, NATIVE_DEMO_EMAIL, NATIVE_DEMO_PASSWORD);
+          } else {
+            await signInAnonymously(auth!);
+          }
           setIsAuthenticated(true);
           setLoadingState("ready");
         } catch (e) {
