@@ -53,6 +53,8 @@ export function CompanyWorkspaceProvider({
   // Blocks companyId exposure until Firebase auth + memberships have resolved (prevents pre-auth Firestore queries).
   const [authLoading, setAuthLoading] = useState(isConfigured && !!auth);
   const [membershipsReady, setMembershipsReady] = useState(!isConfigured || !auth);
+  // Bloque les listeners Firestore tant que les custom claims n'ont pas été synchronisés (sinon permission-denied silencieux après login frais).
+  const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
 
   const persistActiveId = useCallback((id: string) => {
     if (typeof window !== "undefined") {
@@ -72,7 +74,11 @@ export function CompanyWorkspaceProvider({
   useEffect(() => {
     if (!auth) return () => {};
     return onAuthStateChanged(auth, (u) => {
-      setFirebaseUid(u?.uid ?? null);
+      setFirebaseUid((prev) => {
+        const next = u?.uid ?? null;
+        if (prev !== next) setClaimsInitialSyncDone(false);
+        return next;
+      });
       setAuthLoading(false);
     });
   }, []);
@@ -157,16 +163,18 @@ export function CompanyWorkspaceProvider({
     [demoTenantActive, memberships]
   );
 
+  const claimsGatePending = !demoTenantActive && memberships.length > 0 && !claimsInitialSyncDone;
+
   const effectiveActiveCompanyId = useMemo(() => {
-    if (authLoading || !membershipsReady) {
+    if (authLoading || !membershipsReady || claimsGatePending) {
       if (typeof window !== "undefined") {
         const stored = window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim();
-        if (stored) return stored;
+        if (stored && !claimsGatePending) return stored;
       }
       return "";
     }
     return demoTenantActive ? DEMO_COMPANY_ID : activeCompanyId;
-  }, [authLoading, membershipsReady, demoTenantActive, activeCompanyId]);
+  }, [authLoading, membershipsReady, demoTenantActive, activeCompanyId, claimsGatePending]);
 
   const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
     if (demoTenantActive) return false;
@@ -188,13 +196,29 @@ export function CompanyWorkspaceProvider({
   }, [activeCompanyId, memberships.length, demoTenantActive]);
 
   useEffect(() => {
-    if (demoTenantActive) return;
+    if (demoTenantActive) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setClaimsInitialSyncDone(true);
+      return;
+    }
     if (!firebaseUid || memberships.length === 0 || !activeCompanyId) return;
+    if (!claimsInitialSyncDone) {
+      // 1ère sync : immédiate + gate workspaceReady (sinon listeners attachés avec token sans claims).
+      void refreshClaimsSilent().finally(() => setClaimsInitialSyncDone(true));
+      return;
+    }
     const t = setTimeout(() => {
       void refreshClaimsSilent();
     }, 400);
     return () => clearTimeout(t);
-  }, [firebaseUid, memberships.length, activeCompanyId, refreshClaimsSilent, demoTenantActive]);
+  }, [
+    firebaseUid,
+    memberships.length,
+    activeCompanyId,
+    refreshClaimsSilent,
+    demoTenantActive,
+    claimsInitialSyncDone,
+  ]);
 
   const activeRole: CompanyRole | null = useMemo(() => {
     return effectiveMemberships.find((m) => m.companyId === effectiveActiveCompanyId)?.role ?? null;
@@ -207,7 +231,7 @@ export function CompanyWorkspaceProvider({
       activeCompanyId: effectiveActiveCompanyId,
       setActiveCompanyId,
       activeRole,
-      workspaceReady: !authLoading && membershipsReady,
+      workspaceReady: !authLoading && membershipsReady && !claimsGatePending,
       isTenantUser:
         authLoading || !membershipsReady ? false : demoTenantActive || memberships.length > 0,
       refreshClaimsSilent,
@@ -223,6 +247,7 @@ export function CompanyWorkspaceProvider({
       demoTenantActive,
       authLoading,
       membershipsReady,
+      claimsGatePending,
     ]
   );
 
