@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";
 import { auth, clientPortalFirestore, firestore, isConfigured } from "@/core/config/firebase";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
+import { isCrmTenantAuthUser } from "@/features/auth/recoverMainAuthFromClientPortalLeak";
 
 export type AccountRole = "admin" | "technician" | "client" | "unknown";
 
@@ -15,6 +16,8 @@ export type AccountRoleState = {
   isTechnicianAccount: boolean;
   /** Profil portail client (`client_portal_profiles`) — redirect `/m/demande`. */
   isClientPortalAccount: boolean;
+  /** Société CRM (`company_memberships` ou claims `bmTenants`) — reste sur le back-office. */
+  isCrmTenantAccount: boolean;
   /** En cours de résolution (Firebase Auth + Firestore lookup). */
   isLoading: boolean;
 };
@@ -23,6 +26,7 @@ const DEFAULT_STATE: AccountRoleState = {
   role: "unknown",
   isTechnicianAccount: false,
   isClientPortalAccount: false,
+  isCrmTenantAccount: false,
   isLoading: true,
 };
 
@@ -38,6 +42,27 @@ async function hasClientPortalProfile(uid: string): Promise<boolean> {
   }
 }
 
+async function hasCompanyMembership(uid: string): Promise<boolean> {
+  if (!isConfigured || !firestore) return false;
+  try {
+    const snap = await getDocs(collection(firestore, "users", uid, "company_memberships"));
+    return !snap.empty;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveCrmTenantAccount(user: User): Promise<boolean> {
+  if (user.isAnonymous) return false;
+  try {
+    const token = await user.getIdTokenResult();
+    if (isCrmTenantAuthUser(user, token.claims as Record<string, unknown>)) return true;
+  } catch {
+    /* ignore */
+  }
+  return hasCompanyMembership(user.uid);
+}
+
 /**
  * Détecte technicien terrain vs portail client vs admin back-office.
  * Utilisé pour router vers `/m/technician`, `/m/demande` ou le dashboard admin.
@@ -49,6 +74,7 @@ export function useAccountRole(): AccountRoleState {
           role: "admin",
           isTechnicianAccount: false,
           isClientPortalAccount: false,
+          isCrmTenantAccount: true,
           isLoading: false,
         }
       : DEFAULT_STATE
@@ -61,6 +87,7 @@ export function useAccountRole(): AccountRoleState {
         role: "admin",
         isTechnicianAccount: false,
         isClientPortalAccount: false,
+        isCrmTenantAccount: false,
         isLoading: false,
       });
       return;
@@ -74,25 +101,36 @@ export function useAccountRole(): AccountRoleState {
           role: "unknown",
           isTechnicianAccount: false,
           isClientPortalAccount: false,
+          isCrmTenantAccount: false,
           isLoading: false,
         });
         return;
       }
       setState((prev) => ({ ...prev, isLoading: true }));
       try {
-        const [techSnap, isClient] = await Promise.all([
+        const [techSnap, isClient, isCrmTenant] = await Promise.all([
           getDocs(
             query(collection(firestore!, "technicians"), where("authUid", "==", user.uid), limit(1))
           ),
           hasClientPortalProfile(user.uid),
+          resolveCrmTenantAccount(user),
         ]);
         if (cancelled) return;
         const isTech = !techSnap.empty;
-        const role: AccountRole = isTech ? "technician" : isClient ? "client" : "admin";
+        const satelliteTechnician = isTech && !isCrmTenant;
+        const satelliteClient = isClient && !isTech && !isCrmTenant;
+        const role: AccountRole = isCrmTenant
+          ? "admin"
+          : isTech
+            ? "technician"
+            : isClient
+              ? "client"
+              : "admin";
         setState({
           role,
-          isTechnicianAccount: isTech,
-          isClientPortalAccount: isClient && !isTech,
+          isTechnicianAccount: satelliteTechnician,
+          isClientPortalAccount: satelliteClient,
+          isCrmTenantAccount: isCrmTenant,
           isLoading: false,
         });
       } catch {
@@ -101,6 +139,7 @@ export function useAccountRole(): AccountRoleState {
           role: "admin",
           isTechnicianAccount: false,
           isClientPortalAccount: false,
+          isCrmTenantAccount: false,
           isLoading: false,
         });
       }

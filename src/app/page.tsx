@@ -96,7 +96,10 @@ export default function Dashboard() {
   } = useAccountRole();
 
   const satelliteAppRedirectPending =
-    !isAccountRoleLoading && !isCapacitorNative() && (isTechnicianAccount || isClientPortalAccount);
+    !isAccountRoleLoading &&
+    isMobile === true &&
+    !isCapacitorNative() &&
+    (isTechnicianAccount || isClientPortalAccount);
 
   useEffect(() => {
     if (!satelliteAppRedirectPending) return;
