@@ -17,6 +17,8 @@ import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeCo
 import { PwaCopilotAgentBridgeProvider } from "@/context/PwaCopilotAgentBridgeContext";
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
+import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
+import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import DevPreviewAnonymousAuth from "@/features/dev/DevPreviewAnonymousAuth";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
@@ -50,9 +52,13 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                 <BillingHubIntentProvider>
                                   <TechnicianBackofficeReportBridgeProvider>
                                     <OfflineSyncProvider>
-                                      <AuthActivityLogger />
-                                      <ActivityLogPageObserver />
-                                      {children}
+                                      <TechnicianQueryProvider>
+                                        <RequesterHubProvider>
+                                          <AuthActivityLogger />
+                                          <ActivityLogPageObserver />
+                                          {children}
+                                        </RequesterHubProvider>
+                                      </TechnicianQueryProvider>
                                     </OfflineSyncProvider>
                                   </TechnicianBackofficeReportBridgeProvider>
                                 </BillingHubIntentProvider>
