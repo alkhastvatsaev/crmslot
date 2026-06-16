@@ -30,13 +30,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: PWA_ADMIN_SHORT_NAME,
   },
-  ...(appGitSha
-    ? {
-        other: {
-          "application-git-sha": appGitSha,
-        },
-      }
-    : {}),
+  other: {
+    google: "notranslate",
+    ...(appGitSha ? { "application-git-sha": appGitSha } : {}),
+  },
 };
 
 export const viewport: Viewport = {
@@ -61,8 +58,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={cn(outfit.variable, geist.variable)} suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html
+      lang="fr"
+      translate="no"
+      className={cn("notranslate", outfit.variable, geist.variable)}
+      suppressHydrationWarning
+    >
+      <body className="notranslate" suppressHydrationWarning>
         <NativeShellBootstrap />
         <NativePushBootstrap />
         <I18nProvider>{children}</I18nProvider>
