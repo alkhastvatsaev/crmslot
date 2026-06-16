@@ -36,6 +36,7 @@ export const MOBILE_SHELL_CONTRACT = {
     "src/features/dashboard/components/MobileScreenHost.tsx",
     "src/features/dashboard/components/MobileShell.tsx",
     "src/app/page.tsx",
+    "src/features/dashboard/AdminDashboardProviders.tsx",
   ] as const,
   guardedSourceSnippets: {
     "src/features/dashboard/components/MobileScreenHost.tsx": [
@@ -66,11 +67,10 @@ export const MOBILE_SHELL_CONTRACT = {
       "MobileHeaderRailLayout",
       "ClockCalendar compact",
     ],
-    "src/app/page.tsx": [
+    "src/app/page.tsx": ["AdminDashboardProviders", "MobileShell", "DashboardDesktopShell"],
+    "src/features/dashboard/AdminDashboardProviders.tsx": [
       "DashboardPageSelectorProvider",
       "DashboardPagerProvider",
-      "MobileShell",
-      "DashboardDesktopShell",
     ],
     "src/app/dashboard-mobile-layout.css": [
       "--mobile-stack-gap",

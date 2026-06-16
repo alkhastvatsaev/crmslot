@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
+import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
 import {
   DASHBOARD_MOBILE_NAV_ICONS,
   MOBILE_TAB_I18N,
@@ -13,6 +13,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 export default function MobileTabBar() {
   const { pageIndex, setPageIndex } = useDashboardPager();
   const { t } = useTranslation();
+  const hubPages = getDashboardCarouselHubPages();
   const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function MobileTabBar() {
       aria-label={String(t("mobile.tab_bar_label"))}
     >
       <div ref={stripRef} className="mobile-tab-bar-strip">
-        {DASHBOARD_CAROUSEL_PAGES.map((page) => {
+        {hubPages.map((page) => {
           const Icon = DASHBOARD_MOBILE_NAV_ICONS[page.spotlightLabelKey];
           const active = pageIndex === page.slotIndex;
           const labelKey = MOBILE_TAB_I18N[page.spotlightLabelKey];

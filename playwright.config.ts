@@ -85,6 +85,26 @@ export default defineConfig({
       },
     },
     {
+      name: "technician-app",
+      testMatch: /technician-mobile-app\.spec\.ts/,
+      use: {
+        ...devices["Pixel 7"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "client-app",
+      testMatch: /client-mobile-app\.spec\.ts/,
+      use: {
+        ...devices["iPhone 13"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
       name: "desktop-gate-prod",
       testMatch: /desktop-only-gate-prod\.spec\.ts/,
       grepInvert: /@desktop/,

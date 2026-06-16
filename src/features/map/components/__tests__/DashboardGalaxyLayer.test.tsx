@@ -59,7 +59,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows stock composer on material page", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -68,7 +68,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows CRM history composer on history page", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={CRM_HISTORY_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={CRM_HISTORY_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -77,7 +77,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows billing composer on billing page", () => {
     render(
-      <DashboardPagerProvider pageCount={8} initialPageIndex={BILLING_HUB_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={BILLING_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -86,7 +86,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows copilot composer on assistant IA page", () => {
     render(
-      <DashboardPagerProvider pageCount={8} initialPageIndex={OFFLINE_HUB_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={OFFLINE_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -95,7 +95,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("shows no agent composer on map page and keeps map galaxy dock", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={0}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={0}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -105,9 +105,9 @@ describe("DashboardGalaxyLayer", () => {
     expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
   });
 
-  it("shows no agent composer on company hub page", () => {
+  it("shows no agent composer on Gmail page", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={1}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={4}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );
@@ -117,7 +117,7 @@ describe("DashboardGalaxyLayer", () => {
 
   it("hides map dock strip when a page composer is shown", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
+      <DashboardPagerProvider pageCount={6} initialPageIndex={FEATURE_HUB_SLOT_INDEX}>
         <DashboardGalaxyLayer />
       </DashboardPagerProvider>
     );

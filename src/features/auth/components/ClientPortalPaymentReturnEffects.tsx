@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
-import { navigateCompanyHub, COMPANY_HUB_ANCHOR_CLIENT_PORTAL } from "@/features/company/companyHubNavigation";
+import {
+  navigateCompanyHub,
+  COMPANY_HUB_ANCHOR_CLIENT_PORTAL,
+} from "@/features/company/companyHubNavigation";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 
 /** Retour Stripe après paiement — toast + hub société (onglet suivi). */
@@ -33,7 +35,6 @@ export default function ClientPortalPaymentReturnEffects() {
       setPortalRightTab("tracking");
     }
 
-    pager?.setPageIndex(COMPANY_HUB_PAGE_INDEX);
     navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
 
     const next = new URLSearchParams(searchParams.toString());

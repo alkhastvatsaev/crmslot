@@ -1,4 +1,3 @@
-import { COMPANY_HUB_RAIL_DEMANDE_LABEL } from "@/features/company/companyHubConstants";
 import {
   DASHBOARD_CAROUSEL_PAGES,
   getDashboardCarouselPage,
@@ -11,15 +10,10 @@ export type DashboardPageMeta = {
 };
 
 /** Dérivé du registre carrousel — garder en sync avec `dashboardCarouselRegistry.ts`. */
-export const DASHBOARD_PAGE_GUIDE: DashboardPageMeta[] = DASHBOARD_CAROUSEL_PAGES.map((page) => {
-  if (page.slotIndex === 1) {
-    return {
-      title: page.guideTitle,
-      hint: `Triptyque : ${COMPANY_HUB_RAIL_DEMANDE_LABEL} (gauche) · organisation & invitations (centre) · portail client (droite).`,
-    };
-  }
-  return { title: page.guideTitle, hint: page.guideHint };
-});
+export const DASHBOARD_PAGE_GUIDE: DashboardPageMeta[] = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
+  title: page.guideTitle,
+  hint: page.guideHint,
+}));
 
 export function getDashboardPageGuide(pageIndex: number): DashboardPageMeta | null {
   const page = getDashboardCarouselPage(pageIndex);

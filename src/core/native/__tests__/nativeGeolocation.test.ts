@@ -7,8 +7,8 @@ import {
 
 function makePlugin(overrides: Partial<GeolocationPlugin> = {}): GeolocationPlugin {
   return {
-    checkPermissions: jest.fn(async () => ({ location: "granted" })),
-    requestPermissions: jest.fn(async () => ({ location: "granted" })),
+    checkPermissions: jest.fn(async () => ({ location: "granted" as const })),
+    requestPermissions: jest.fn(async () => ({ location: "granted" as const })),
     getCurrentPosition: jest.fn(async () => ({
       timestamp: 123,
       coords: { latitude: 50.85, longitude: 4.35, accuracy: 10 },
@@ -36,8 +36,8 @@ describe("getCurrentNativePosition", () => {
 
   it("demande la permission si pas accordée", async () => {
     const plugin = makePlugin({
-      checkPermissions: jest.fn(async () => ({ location: "prompt" })),
-      requestPermissions: jest.fn(async () => ({ location: "granted" })),
+      checkPermissions: jest.fn(async () => ({ location: "prompt" as const })),
+      requestPermissions: jest.fn(async () => ({ location: "granted" as const })),
     });
     const result = await getCurrentNativePosition(makeDeps(plugin));
     expect(plugin.requestPermissions).toHaveBeenCalled();
@@ -46,8 +46,8 @@ describe("getCurrentNativePosition", () => {
 
   it("retourne null si permission refusée", async () => {
     const plugin = makePlugin({
-      checkPermissions: jest.fn(async () => ({ location: "prompt" })),
-      requestPermissions: jest.fn(async () => ({ location: "denied" })),
+      checkPermissions: jest.fn(async () => ({ location: "prompt" as const })),
+      requestPermissions: jest.fn(async () => ({ location: "denied" as const })),
     });
     const result = await getCurrentNativePosition(makeDeps(plugin));
     expect(result).toBeNull();

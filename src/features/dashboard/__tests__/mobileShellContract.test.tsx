@@ -91,15 +91,15 @@ describe("mobileShellContract — navigation profil", () => {
   });
 
   it("navigue et ferme le sélecteur", () => {
-    renderMobileShell([<div key="0">Map</div>, <div key="1">Hub</div>, <div key="2">Tech</div>]);
+    renderMobileShell([<div key="0">Map</div>, <div key="1">Material</div>]);
 
     fireEvent.click(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.profileToggle));
-    fireEvent.click(screen.getByTestId("dashboard-page-selector-item-2"));
+    fireEvent.click(screen.getByTestId("dashboard-page-selector-item-1"));
 
     expect(
       screen.queryByTestId(MOBILE_SHELL_CONTRACT.testIds.pageSelector)
     ).not.toBeInTheDocument();
-    expect(screen.getByTestId("mobile-page-2")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-page-1")).toBeInTheDocument();
   });
 });
 

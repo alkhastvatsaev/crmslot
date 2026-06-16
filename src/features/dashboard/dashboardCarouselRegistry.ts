@@ -2,7 +2,6 @@ import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstant
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
-import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
 import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 
 /** Rôle affiché sous le nom dans le header (clé i18n `profiles.roles.*`). */
@@ -33,8 +32,8 @@ export type DashboardCarouselPageDef = {
 };
 
 /**
- * Source unique — ordre = carrousel `src/app/page.tsx` (8 pages, sans Chatbot).
- * Toute entrée UI (header IVANA/GMAIL/…, spotlight, aide page) doit s’y caler.
+ * Source unique — ordre = carrousel admin `src/app/page.tsx` (6 pages).
+ * Portail client : `/m/demande` · terrain : `/m/technician`.
  */
 export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   {
@@ -46,25 +45,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Galaxy, audio, recherche — vue opérationnelle principale.",
   },
   {
-    slotIndex: 1,
-    inCarouselNav: false,
-    profileName: "SOCIÉTÉ BX",
-    profileRoleKey: "client",
-    spotlightLabelKey: "spotlight.nav_company",
-    guideTitle: "Espace société",
-    guideHint: "Demandeur, organisation et portail client.",
-  },
-  {
-    slotIndex: 2,
-    inCarouselNav: false,
-    profileName: "MANSOUR",
-    profileRoleKey: "technician",
-    spotlightLabelKey: "spotlight.nav_technician",
-    guideTitle: "Technicien",
-    guideHint: "Missions, hors-ligne, clôture et notifications terrain.",
-  },
-  {
-    slotIndex: 3,
+    slotIndex: FEATURE_HUB_SLOT_INDEX,
     profileName: "MATÉRIEL",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_feature_hub",
@@ -72,7 +53,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Stock, commandes Lecot et agent matériel.",
   },
   {
-    slotIndex: 4,
+    slotIndex: CRM_HISTORY_SLOT_INDEX,
     profileName: "QUALITY MANAGEMENT",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_crm_history",
@@ -80,7 +61,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Fil d’activité et agent historique.",
   },
   {
-    slotIndex: 5,
+    slotIndex: BILLING_HUB_SLOT_INDEX,
     profileName: "FACTURATION",
     profileRoleKey: "back_office",
     spotlightLabelKey: "spotlight.nav_billing_hub",
@@ -88,7 +69,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Factures, impayés, documents et agent facturation.",
   },
   {
-    slotIndex: 6,
+    slotIndex: GMAIL_HUB_SLOT_INDEX,
     inCarouselNav: false,
     profileName: "GMAIL",
     profileRoleKey: "back_office",
@@ -173,8 +154,6 @@ export function stepDashboardLinearPageIndex(
 export function assertDashboardCarouselSlotAlignment(): void {
   const expected = [
     0,
-    1,
-    TECHNICIAN_HUB_SLOT_INDEX,
     FEATURE_HUB_SLOT_INDEX,
     CRM_HISTORY_SLOT_INDEX,
     BILLING_HUB_SLOT_INDEX,
@@ -202,6 +181,11 @@ if (process.env.NODE_ENV !== "production") {
 export function getDashboardCarouselPage(pageIndex: number): DashboardCarouselPageDef | null {
   if (pageIndex < 0 || pageIndex >= DASHBOARD_CAROUSEL_PAGE_COUNT) return null;
   return DASHBOARD_CAROUSEL_PAGES[pageIndex] ?? null;
+}
+
+/** Tab bar / sélecteur / drawer — alias du registre admin (apps séparées hors carrousel). */
+export function getDashboardCarouselHubPages(): readonly DashboardCarouselPageDef[] {
+  return DASHBOARD_CAROUSEL_PAGES;
 }
 
 export function clampDashboardCarouselPageIndex(pageIndex: number, pageCount: number): number {

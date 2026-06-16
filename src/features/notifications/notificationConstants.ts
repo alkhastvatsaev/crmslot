@@ -1,7 +1,7 @@
-import { TECHNICIAN_HUB_SLOT_INDEX } from "@/features/interventions/technicianDashboardConstants";
+import { TECHNICIAN_MOBILE_APP_SLOT_INDEX } from "@/features/interventions/technicianMobileAppConstants";
 
-/** Panneau push du hub technicien (droite du triptyque). */
-export const PUSH_NOTIFICATIONS_SLOT_INDEX = TECHNICIAN_HUB_SLOT_INDEX;
+/** Panneau push — app terrain. */
+export const PUSH_NOTIFICATIONS_SLOT_INDEX = TECHNICIAN_MOBILE_APP_SLOT_INDEX;
 
 /** Paramètres d’URL pour ouverture depuis une notification Web Push. */
 export const BM_TECH_CASE_PARAM = "bmTechCase";
