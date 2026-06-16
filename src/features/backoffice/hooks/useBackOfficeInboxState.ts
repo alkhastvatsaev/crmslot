@@ -51,18 +51,30 @@ import {
 } from "@/features/scheduling/proposeAvailableSlots";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
+import {
+  readClientPortalDefaultCompanyIdFromEnv,
+  resolveBackofficeInboxCompanyIds,
+} from "@/features/company/clientPortalCompanyId";
 
 export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const { logIntervention } = useActivityLog();
-  const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
+  const inboxCompanyIds = useMemo(() => resolveBackofficeInboxCompanyIds(workspace), [workspace]);
+  const cid = inboxCompanyIds[0] ?? null;
   const isMobile = useIsMobile();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
   const powerGate = useMobileMapPagePowerGate(activeTab);
-  const inboxFirestoreEnabled = Boolean(cid) && (isMobile !== true || powerGate.inboxDataActive);
-  const { interventions, loading } = useBackOfficeInterventions(inboxFirestoreEnabled ? cid : null);
+  const inboxFirestoreEnabled =
+    inboxCompanyIds.length > 0 &&
+    (isMobile !== true ||
+      powerGate.inboxDataActive ||
+      activeTab === "requests" ||
+      activeTab === "reports");
+  const { interventions, loading } = useBackOfficeInterventions(
+    inboxFirestoreEnabled ? inboxCompanyIds : null
+  );
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
   const bridgedTerrainReports = useMemo(
     () => terrainBridge?.reports ?? [],
@@ -201,13 +213,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const [assignPickerOpen, setAssignPickerOpen] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
 
-  const envDefaultCompanyId = useMemo(
-    () =>
-      typeof process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID === "string"
-        ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim()
-        : "",
-    []
-  );
+  const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
 
   const ivanaChatCompanyId = (cid ?? envDefaultCompanyId) || null;
 

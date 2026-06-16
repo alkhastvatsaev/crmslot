@@ -23,14 +23,17 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import SlaStatusBadge from "@/features/sla/components/SlaStatusBadge";
+import { resolveBackofficeInboxCompanyIds } from "@/features/company/clientPortalCompanyId";
 
 export default function IncomingClientRequestsPanel() {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const slaEnabled = useFeatureFlag("slaTracker");
 
-  const cid = workspace?.isTenantUser ? workspace.activeCompanyId : null;
-  const { interventions, loading } = useBackOfficeInterventions(cid);
+  const inboxCompanyIds = resolveBackofficeInboxCompanyIds(workspace);
+  const { interventions, loading } = useBackOfficeInterventions(
+    inboxCompanyIds.length > 0 ? inboxCompanyIds : null
+  );
 
   const [selectedRequest, setSelectedRequest] = useState<Intervention | null>(null);
   const { resolvedAudioUrl } = useResolvedInterventionAudio(selectedRequest);

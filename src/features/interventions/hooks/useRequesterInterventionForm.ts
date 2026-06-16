@@ -11,7 +11,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { DEMO_COMPANY_ID, devUiPreviewEnabled } from "@/core/config/devUiPreview";
+import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { compressImageToDataUrl } from "@/features/interventions/compressImageToDataUrl";
 import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
@@ -119,16 +119,11 @@ export function useRequesterInterventionForm() {
   const locale = language === "nl" ? "nl-BE" : language === "en" ? "en-GB" : "fr-BE";
   const [locatingAddress, setLocatingAddress] = useState(false);
 
-  const portalDefaultCompanyId =
-    typeof process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID === "string"
-      ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim()
-      : "";
   const tenantCompanyId =
     workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
-  const interventionCompanyId =
-    tenantCompanyId ??
-    (portalDefaultCompanyId || null) ??
-    (devUiPreviewEnabled ? DEMO_COMPANY_ID : null);
+  const interventionCompanyId = resolveClientPortalInterventionCompanyId({
+    tenantActiveCompanyId: tenantCompanyId,
+  });
 
   const {
     problemTemplateId,
