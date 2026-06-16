@@ -6,8 +6,7 @@ const mockSetPageIndex = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mockReplace }),
-  useSearchParams: () =>
-    new URLSearchParams("payment=success&interventionId=iv-pay-1"),
+  useSearchParams: () => new URLSearchParams("payment=success&interventionId=iv-pay-1"),
 }));
 
 jest.mock("sonner", () => ({
@@ -31,15 +30,26 @@ jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
   }),
 }));
 
+const mockNavigateCompanyHub = jest.fn();
+
+jest.mock("@/features/company/companyHubNavigation", () => ({
+  ...jest.requireActual("@/features/company/companyHubNavigation"),
+  navigateCompanyHub: (...args: unknown[]) => mockNavigateCompanyHub(...args),
+}));
+
 describe("ClientPortalPaymentReturnEffects", () => {
   beforeEach(() => {
     mockReplace.mockClear();
     mockSetPageIndex.mockClear();
+    mockNavigateCompanyHub.mockClear();
   });
 
   it("navigates to company hub and cleans URL on payment success", () => {
     render(<ClientPortalPaymentReturnEffects />);
-    expect(mockSetPageIndex).toHaveBeenCalledWith(1);
+    expect(mockNavigateCompanyHub).toHaveBeenCalledWith(
+      expect.objectContaining({ setPageIndex: mockSetPageIndex }),
+      "company-hub-client-portal"
+    );
     expect(mockSetPendingTrackingInterventionId).toHaveBeenCalledWith("iv-pay-1");
     expect(mockSetPortalRightTab).toHaveBeenCalledWith("tracking");
     expect(mockReplace).toHaveBeenCalled();

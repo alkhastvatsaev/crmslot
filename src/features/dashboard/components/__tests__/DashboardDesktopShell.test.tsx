@@ -13,7 +13,7 @@ import UserProfile from "@/features/dashboard/components/UserProfile";
 describe("DashboardDesktopShell", () => {
   it("renders galaxy dock in center grid slot (column 2)", () => {
     render(
-      <DashboardPagerProvider pageCount={8}>
+      <DashboardPagerProvider pageCount={6}>
         <DashboardPageSelectorProvider>
           <DashboardDesktopShell
             header={<span data-testid="shell-header">header</span>}
@@ -43,7 +43,7 @@ describe("DashboardDesktopShell", () => {
 
   it("affiche le sélecteur de pages dans le panneau droit au clic profil", () => {
     render(
-      <DashboardPagerProvider pageCount={8}>
+      <DashboardPagerProvider pageCount={6}>
         <DashboardPageSelectorProvider>
           <DashboardDesktopShell
             header={<UserProfile interactive />}

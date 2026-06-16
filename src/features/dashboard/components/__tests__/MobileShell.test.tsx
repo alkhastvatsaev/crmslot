@@ -35,7 +35,7 @@ describe("MobileShell", () => {
   });
 
   it("affiche le sélecteur dans le panneau central au clic profil", () => {
-    renderMobileShell([<div key="0">A</div>, <div key="1">B</div>, <div key="2">C</div>]);
+    renderMobileShell([<div key="0">A</div>, <div key="1">B</div>]);
 
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
     expect(screen.getByTestId("mobile-page-0")).toBeInTheDocument();
@@ -45,8 +45,8 @@ describe("MobileShell", () => {
     expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
     expect(screen.getByText("A").closest("[aria-hidden='true']")).toBeTruthy();
 
-    fireEvent.click(screen.getByTestId("dashboard-page-selector-item-2"));
+    fireEvent.click(screen.getByTestId("dashboard-page-selector-item-1"));
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
-    expect(screen.getByTestId("mobile-page-2")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-page-1")).toBeInTheDocument();
   });
 });

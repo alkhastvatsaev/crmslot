@@ -7,6 +7,7 @@ import { auth, isConfigured } from "@/core/config/firebase";
 import { devUiPreviewEnabled } from "@/core/config/devUiPreview";
 import { logger } from "@/core/logger";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { ensureNativeAuthPersistence } from "@/core/native/nativeAuthPersistence";
 import { signInTechnicianWithEmail } from "@/features/auth/technicianEmailSignIn";
 import TechnicianLoginPanel from "@/features/auth/components/TechnicianLoginPanel";
 
@@ -34,6 +35,8 @@ export default function TechnicianLoginGate({ children }: { children: React.Reac
       setPhase("ready");
       return;
     }
+
+    void ensureNativeAuthPersistence(auth);
 
     if (devUiPreviewEnabled) {
       if (!auth.currentUser) {

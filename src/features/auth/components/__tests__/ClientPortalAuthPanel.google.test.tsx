@@ -60,7 +60,8 @@ describe("ClientPortalAuthPanel", () => {
   });
 
   it("does not mount credential fields in auth rail when carousel is on map page", () => {
-    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 8, {
+    window.history.pushState({}, "", "/");
+    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 6, {
       initialPageIndex: 0,
     });
     expect(screen.queryByTestId("client-portal-password")).not.toBeInTheDocument();
@@ -68,8 +69,9 @@ describe("ClientPortalAuthPanel", () => {
   });
 
   it("mounts credential fields in auth rail when carousel is on company hub", () => {
-    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 8, {
-      initialPageIndex: 1,
+    window.history.pushState({}, "", "/m/demande");
+    renderWithPager(<ClientPortalAuthPanel authRailMode authTab="login" />, 1, {
+      initialPageIndex: 0,
     });
     expect(screen.getByTestId("client-portal-password")).toBeInTheDocument();
   });

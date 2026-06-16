@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { HubSegmentedControl } from "@/core/ui/hub";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
+import { isClientMobileAppPath } from "@/features/company/clientMobileAppConstants";
 import { mfaHintKind } from "@/features/auth/clientPortalPasswordMfa";
 import GmailGoogleConnectButton from "@/features/gmail/components/GmailGoogleConnectButton";
 import {
@@ -33,9 +34,13 @@ export default function ClientPortalAuthPanel({
 }: ClientPortalAuthPanelProps) {
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
-  /** Carrousel : évite email+password dans le DOM hors page société (Safari Keychain au démarrage). */
-  const mountCredentialFields =
-    !authRailMode || pager == null || pager.pageIndex === COMPANY_HUB_PAGE_INDEX;
+  /** Carrousel : évite email+password dans le DOM hors page portail client (Safari Keychain). */
+  const onClientPortalHub =
+    typeof window !== "undefined" &&
+    isClientMobileAppPath(window.location.pathname) &&
+    pager != null &&
+    pager.pageIndex === COMPANY_HUB_PAGE_INDEX;
+  const mountCredentialFields = !authRailMode || pager == null || onClientPortalHub;
 
   const {
     email,

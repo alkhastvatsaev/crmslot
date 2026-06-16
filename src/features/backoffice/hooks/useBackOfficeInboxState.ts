@@ -39,17 +39,11 @@ import {
   missionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
 import type { Mission } from "@/features/map/missionTypes";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import {
-  navigateTechnicianHub,
-  TECHNICIAN_HUB_ANCHOR_MISSIONS,
-} from "@/features/interventions/technicianHubNavigation";
 import { useBackofficeReminderPush } from "@/features/reminders/useBackofficeReminderPush";
 import {
   proposeAvailableSlotsForTechnician,
@@ -74,8 +68,6 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     () => terrainBridge?.reports ?? [],
     [terrainBridge?.reports]
   );
-  const pager = useDashboardPagerOptional();
-  const { setPendingCaseId } = useTechnicianCaseIntent();
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
   useBackofficeReminderPush(interventions);
 
@@ -315,8 +307,6 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         toast.success(t("backoffice.toasts.request_assigned"));
         setAssignPickerOpen(false);
         setSelectedItemId(null);
-        setPendingCaseId(id);
-        navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
         return;
       }
       if (!row) {
@@ -327,8 +317,6 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
       toast.success(t("backoffice.toasts.request_assigned"));
       setAssignPickerOpen(false);
       setSelectedItemId(null);
-      setPendingCaseId(id);
-      navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS);
     } catch (e) {
       const code =
         typeof e === "object" && e !== null && "code" in e

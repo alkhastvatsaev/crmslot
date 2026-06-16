@@ -8,7 +8,7 @@ jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
 jest.mock("@/features/dashboard/dashboardPagerContext", () => ({
   useDashboardPagerOptional: jest.fn(() => ({
     pageIndex: 0,
-    pageCount: 8,
+    pageCount: 6,
     setPageIndex: jest.fn(),
   })),
 }));
@@ -33,7 +33,7 @@ describe("useMobileMapPagePowerGate", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseIsMobile.mockReturnValue(true);
-    mockUseDashboardPager.mockReturnValue({ pageIndex: 0, pageCount: 8, setPageIndex: jest.fn() });
+    mockUseDashboardPager.mockReturnValue({ pageIndex: 0, pageCount: 6, setPageIndex: jest.fn() });
     mockUseMobileHubRailSnapshot.mockReturnValue({
       rails: ["left", "center", "right"],
       activeRail: "center",
@@ -65,7 +65,7 @@ describe("useMobileMapPagePowerGate", () => {
   });
 
   it("coupe tout quand une autre page hub est affichée", () => {
-    mockUseDashboardPager.mockReturnValue({ pageIndex: 3, pageCount: 8, setPageIndex: jest.fn() });
+    mockUseDashboardPager.mockReturnValue({ pageIndex: 3, pageCount: 6, setPageIndex: jest.fn() });
     const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
     expect(result.current.mapPageVisible).toBe(false);
     expect(result.current.mapHubDataActive).toBe(false);

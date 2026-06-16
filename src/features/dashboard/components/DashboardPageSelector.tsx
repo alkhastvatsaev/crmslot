@@ -1,6 +1,6 @@
 "use client";
 
-import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
+import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
 import { DASHBOARD_MOBILE_NAV_ICONS } from "@/features/dashboard/dashboardMobileNav";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
@@ -22,6 +22,7 @@ type Props = {
 
 export default function DashboardPageSelector({ onClose, variant = "mobile" }: Props) {
   const { pageIndex, setPageIndex } = useDashboardPager();
+  const hubPages = getDashboardCarouselHubPages();
   const isDesktop = variant === "desktop";
 
   const navigate = (index: number) => {
@@ -37,7 +38,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
       )}
       aria-label="Navigation"
     >
-      {DASHBOARD_CAROUSEL_PAGES.map((page) => {
+      {hubPages.map((page) => {
         const Icon = DASHBOARD_MOBILE_NAV_ICONS[page.spotlightLabelKey];
         const active = pageIndex === page.slotIndex;
         return (

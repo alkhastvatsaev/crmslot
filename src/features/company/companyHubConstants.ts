@@ -1,8 +1,13 @@
-/** Index page carrousel (`DashboardPager`) — hub société triptyque (formulaire, organisation, portail client). */
-export const COMPANY_HUB_PAGE_INDEX = 1;
+import { CLIENT_MOBILE_APP_SLOT_INDEX } from "@/features/company/clientMobileAppConstants";
 
-/** Numéro de page « humain » du carrousel (1 = carte, 2 = hub société, …). */
-export const COMPANY_HUB_CAROUSEL_HUMAN_INDEX = COMPANY_HUB_PAGE_INDEX + 1;
+/**
+ * Index pager dans la shell `/m/demande` (plus dans le carrousel admin).
+ * Alias historique — préférer `CLIENT_MOBILE_APP_SLOT_INDEX`.
+ */
+export const COMPANY_HUB_PAGE_INDEX = CLIENT_MOBILE_APP_SLOT_INDEX;
+
+/** Numéro de page « humain » dans l’app client (1-based). */
+export const COMPANY_HUB_CAROUSEL_HUMAN_INDEX = 1;
 
 /**
  * Nom du rail gauche du hub société (`SmartInterventionRequestForm`).

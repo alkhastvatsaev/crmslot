@@ -1,21 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import {
-  BM_TECH_CASE_PARAM,
-  BM_TECH_REMINDER_PARAM,
-} from "@/features/notifications/notificationConstants";
-import { parseTechnicianNotificationSearchParams } from "@/features/notifications/technicianNotificationUrls";
-import {
-  navigateTechnicianHub,
-  TECHNICIAN_HUB_ANCHOR_MISSIONS,
-} from "@/features/interventions/technicianHubNavigation";
-import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+  applyTechnicianNotificationIntent,
+  parseTechnicianNotificationSearchParams,
+  TECHNICIAN_NOTIFICATION_INTENT_EVENT,
+} from "@/features/notifications/technicianNotificationIntent";
+import type { TechnicianNotificationIntent } from "@/features/notifications/technicianNotificationUrls";
 
-/** Traite `bmTechCase` / `bmTechReminder` après clic sur une notification push (service worker). */
+/** Traite `bmTechCase` / `bmTechReminder` (URL ou clic notif native Capacitor). */
 export default function TechnicianNotificationBootstrap() {
   const router = useRouter();
   const pathname = usePathname();
@@ -23,26 +19,34 @@ export default function TechnicianNotificationBootstrap() {
   const pager = useDashboardPagerOptional();
   const { setPendingCaseId } = useTechnicianCaseIntent();
 
+  const handleIntent = useCallback(
+    (intent: TechnicianNotificationIntent, fromUrl: boolean) => {
+      applyTechnicianNotificationIntent(intent, {
+        pathname,
+        pager,
+        setPendingCaseId,
+        router,
+        searchParams: fromUrl ? searchParams : undefined,
+      });
+    },
+    [pathname, pager, router, searchParams, setPendingCaseId]
+  );
+
   useEffect(() => {
     const intent = parseTechnicianNotificationSearchParams(searchParams);
     if (intent.kind === "none") return;
+    handleIntent(intent, true);
+  }, [searchParams, handleIntent]);
 
-    navigateTechnicianHub(pager, TECHNICIAN_HUB_ANCHOR_MISSIONS, { pathname });
-
-    if (intent.kind === "case") {
-      setPendingCaseId(intent.caseId);
-    }
-
-    const next = new URLSearchParams(searchParams.toString());
-    next.delete(BM_TECH_CASE_PARAM);
-    next.delete(BM_TECH_REMINDER_PARAM);
-    const qs = next.toString();
-
-    const basePath = pathname.startsWith(TECHNICIAN_MOBILE_APP_ROUTE)
-      ? TECHNICIAN_MOBILE_APP_ROUTE
-      : "/";
-    router.replace(qs ? `${basePath}?${qs}` : basePath, { scroll: false });
-  }, [searchParams, router, pathname, pager, setPendingCaseId]);
+  useEffect(() => {
+    const onNativeIntent = (event: Event) => {
+      const intent = (event as CustomEvent<TechnicianNotificationIntent>).detail;
+      if (!intent || intent.kind === "none") return;
+      handleIntent(intent, false);
+    };
+    window.addEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, onNativeIntent);
+    return () => window.removeEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, onNativeIntent);
+  }, [handleIntent]);
 
   return null;
 }

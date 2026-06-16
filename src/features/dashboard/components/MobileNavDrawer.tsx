@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
+import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
 import { DASHBOARD_MOBILE_NAV_ICONS } from "@/features/dashboard/dashboardMobileNav";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -16,6 +16,7 @@ type Props = {
 export default function MobileNavDrawer({ open, onClose, profileName, profileRoleKey }: Props) {
   const { pageIndex, setPageIndex } = useDashboardPager();
   const { t } = useTranslation();
+  const hubPages = getDashboardCarouselHubPages();
 
   useEffect(() => {
     if (!open) return;
@@ -57,7 +58,7 @@ export default function MobileNavDrawer({ open, onClose, profileName, profileRol
         </div>
 
         <nav className="mobile-nav-drawer-grid">
-          {DASHBOARD_CAROUSEL_PAGES.map((page) => {
+          {hubPages.map((page) => {
             const Icon = DASHBOARD_MOBILE_NAV_ICONS[page.spotlightLabelKey];
             const active = pageIndex === page.slotIndex;
             return (
