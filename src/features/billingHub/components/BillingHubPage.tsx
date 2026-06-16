@@ -1,9 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
+import BillingHubAgentPanel from "@/features/billingHub/components/BillingHubAgentPanel";
 import BillingHubCenterPanel from "@/features/billingHub/components/BillingHubCenterPanel";
 import ChatbotRightRail from "@/features/chatbot/components/ChatbotRightRail";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
 import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
@@ -12,22 +15,28 @@ import {
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 
 type Props = { slotIndex?: number };
 
-const chatbotShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
+const agentShell = `flex min-h-0 flex-1 flex-col scroll-mt-2 overflow-hidden p-3 ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 const mainShell = `flex min-h-0 flex-1 flex-col scroll-mt-2 overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
+const documentsRailShell = `flex min-h-0 flex-1 flex-col ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
-/** Hub facturation — gauche = chatbot · centre = liste · droite vide. */
+/** Hub facturation — gauche = agent chatbot · centre = liste · droite = documents PDF. */
 export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const pager = useDashboardPagerOptional();
+  const pageActive = pager == null || pager.pageIndex === slotIndex;
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
 
   const { interventions, loading, isPreviewCatalog } = useCompanyBillingInterventions(
     companyId || null
   );
+
+  const metrics = useMemo(() => computeBillingHubMetrics(interventions), [interventions]);
 
   const gate =
     companyPhase === "loading" ? (
@@ -60,8 +69,16 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
       rightPadding={false}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
       left={
-        <section className={chatbotShell} data-testid="billing-hub-chatbot-rail">
-          <ChatbotRightRail />
+        <section className={agentShell} data-testid="billing-hub-chatbot-rail">
+          {companyId ? (
+            <BillingHubAgentPanel
+              companyId={companyId}
+              interventions={interventions}
+              metrics={metrics}
+              loading={loading}
+              pageActive={pageActive}
+            />
+          ) : null}
         </section>
       }
       center={
@@ -77,10 +94,11 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
       }
       right={
         <section
-          className="flex min-h-0 flex-1 flex-col"
-          data-testid="billing-hub-detail-rail"
-          aria-hidden
-        />
+          className={`${documentsRailShell} min-h-0 overflow-hidden`}
+          data-testid="billing-hub-documents-rail"
+        >
+          <ChatbotRightRail />
+        </section>
       }
     />
   );
