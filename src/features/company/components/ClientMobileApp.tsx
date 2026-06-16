@@ -21,7 +21,10 @@ export default function ClientMobileApp() {
           <ClientMobileShell>
             <StagingPreviewBanner />
             <ErrorBoundary name="client-mobile-hub">
-              <div data-testid={`client-mobile-page-${CLIENT_MOBILE_APP_SLOT_INDEX}`}>
+              <div
+                data-testid={`client-mobile-page-${CLIENT_MOBILE_APP_SLOT_INDEX}`}
+                className="flex min-h-0 flex-1 flex-col overflow-hidden"
+              >
                 <CompanyHubPage />
               </div>
             </ErrorBoundary>
