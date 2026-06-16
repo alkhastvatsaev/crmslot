@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Geist } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/core/i18n/I18nContext";
+import {
+  PWA_ADMIN_SHORT_NAME,
+  PWA_ADMIN_TITLE,
+  PWA_MANIFEST_ADMIN,
+} from "@/core/pwa/pwaSatelliteManifests";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -12,10 +17,10 @@ const outfit = Outfit({
 const appGitSha = process.env.NEXT_PUBLIC_APP_GIT_SHA ?? "";
 
 export const metadata: Metadata = {
-  title: "CRMSLOT",
-  description: "Plateforme de gestion d'interventions de serrurerie en Belgique",
-  applicationName: "CRMSLOT",
-  manifest: "/manifest.json",
+  title: PWA_ADMIN_TITLE,
+  description: "Back-office et pilotage des interventions",
+  applicationName: PWA_ADMIN_SHORT_NAME,
+  manifest: PWA_MANIFEST_ADMIN,
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
@@ -23,7 +28,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "CRMSLOT",
+    title: PWA_ADMIN_SHORT_NAME,
   },
   ...(appGitSha
     ? {
