@@ -1,22 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isIphoneUserAgent } from "@/core/config/mobileClientDetection";
+import { isAppleOAuthClient } from "@/core/config/mobileClientDetection";
 
-function detectIphoneClient(): boolean {
+function detectAppleOAuthClient(): boolean {
   if (typeof window === "undefined") return false;
-  return isIphoneUserAgent(navigator.userAgent);
+  return isAppleOAuthClient({
+    userAgent: navigator.userAgent,
+    maxTouchPoints: navigator.maxTouchPoints,
+  });
 }
 
-/** null pendant le SSR, puis true sur iPhone/iPod uniquement. */
-export function useIsIphoneClient(): boolean | null {
-  const [isIphone, setIsIphone] = useState<boolean | null>(() =>
-    typeof window === "undefined" ? null : detectIphoneClient()
+/** null pendant le SSR, puis true sur iPhone/iPod ou Mac bureau. */
+export function useIsAppleOAuthClient(): boolean | null {
+  const [showApple, setShowApple] = useState<boolean | null>(() =>
+    typeof window === "undefined" ? null : detectAppleOAuthClient()
   );
 
   useEffect(() => {
-    setIsIphone(detectIphoneClient());
+    setShowApple(detectAppleOAuthClient());
   }, []);
 
-  return isIphone;
+  return showApple;
 }
+
+/** @deprecated Utiliser `useIsAppleOAuthClient`. */
+export const useIsIphoneClient = useIsAppleOAuthClient;
