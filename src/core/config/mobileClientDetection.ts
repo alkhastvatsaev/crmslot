@@ -12,6 +12,11 @@ export function isPhoneUserAgent(userAgent: string): boolean {
   return false;
 }
 
+/** iPhone / iPod uniquement — pour Sign in with Apple (pas Android ni iPad). */
+export function isIphoneUserAgent(userAgent: string): boolean {
+  return /iPhone|iPod/i.test(userAgent || "");
+}
+
 export function detectMobileClient(userAgent: string, locationSearch: string): boolean {
   return isForceMobileQuery(locationSearch) || isPhoneUserAgent(userAgent);
 }
