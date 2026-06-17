@@ -58,7 +58,11 @@ describe("joinDefaultCompanyMembership", () => {
 
     const auth = jest.fn(() => ({ setCustomUserClaims: mockSetCustomUserClaims }));
 
-    const result = await joinDefaultCompanyMembership(db as never, auth, "uid-1");
+    const result = await joinDefaultCompanyMembership(
+      db as never,
+      auth as unknown as typeof import("firebase-admin/auth").getAuth,
+      "uid-1"
+    );
 
     expect(result).toEqual({ ok: true, companyId: "co-abc", alreadyMember: false });
     expect(membershipSet).toHaveBeenCalledWith(

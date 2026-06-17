@@ -320,7 +320,6 @@ export default function MapboxView() {
         collectResourceTiming: powerOptions.collectResourceTiming,
         respectPrefersReducedMotion: powerOptions.respectPrefersReducedMotion,
         failIfMajorPerformanceCaveat: runtimeOptions.failIfMajorPerformanceCaveat,
-        pixelRatio: runtimeOptions.pixelRatio,
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],

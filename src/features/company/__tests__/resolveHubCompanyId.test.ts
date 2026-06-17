@@ -10,6 +10,9 @@ function workspace(partial: Partial<CompanyWorkspaceApi>): CompanyWorkspaceApi {
     activeRole: null,
     workspaceReady: true,
     isTenantUser: false,
+    membershipJoinPending: false,
+    membershipJoinError: null,
+    retryDefaultCompanyJoin: async () => {},
     refreshClaimsSilent: async () => false,
     ...partial,
   };

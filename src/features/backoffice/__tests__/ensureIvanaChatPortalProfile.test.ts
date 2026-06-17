@@ -1,18 +1,21 @@
 import { ensureIvanaChatPortalProfile } from "@/features/backoffice/ensureIvanaChatPortalProfile";
 
-const setDoc = jest.fn(async () => undefined);
-const doc = jest.fn((...args: unknown[]) => ({ path: args.join("/") }));
-const serverTimestamp = jest.fn(() => ({ __ts: true }));
-
 jest.mock("firebase/firestore", () => ({
-  doc: (...args: unknown[]) => doc(...args),
-  setDoc: (...args: unknown[]) => setDoc(...args),
-  serverTimestamp: () => serverTimestamp(),
+  doc: jest.fn((_db: unknown, collection: string, uid: string) => ({
+    path: `${collection}/${uid}`,
+  })),
+  setDoc: jest.fn(async () => undefined),
+  serverTimestamp: jest.fn(() => ({ __ts: true })),
 }));
 
 jest.mock("@/features/auth/clientPortalConstants", () => ({
   CLIENT_PORTAL_PROFILE_COLLECTION: "client_portal_profiles",
 }));
+
+const { doc, setDoc } = jest.requireMock("firebase/firestore") as {
+  doc: jest.Mock;
+  setDoc: jest.Mock;
+};
 
 describe("ensureIvanaChatPortalProfile", () => {
   beforeEach(() => {
