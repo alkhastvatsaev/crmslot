@@ -12,10 +12,12 @@ import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstant
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 
+import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
+
 describe("dashboardCarouselRegistry", () => {
-  it("has 6 admin pages aligned with hub slot constants", () => {
+  it("has 7 admin pages aligned with hub slot constants", () => {
     expect(() => assertDashboardCarouselSlotAlignment()).not.toThrow();
-    expect(DASHBOARD_CAROUSEL_PAGE_COUNT).toBe(6);
+    expect(DASHBOARD_CAROUSEL_PAGE_COUNT).toBe(7);
   });
 
   it("maps Feature hub to index 1 and Gmail to index 4", () => {
@@ -24,6 +26,7 @@ describe("dashboardCarouselRegistry", () => {
     expect(BILLING_HUB_SLOT_INDEX).toBe(3);
     expect(getDashboardCarouselPage(1)?.profileName).toBe("MATÉRIEL");
     expect(getDashboardCarouselPage(4)?.profileName).toBe("GMAIL");
+    expect(getDashboardCarouselPage(TEAM_HUB_SLOT_INDEX)?.profileName).toBe("ÉQUIPE");
   });
 
   it("does not include removed Chatbot profile", () => {
@@ -33,10 +36,11 @@ describe("dashboardCarouselRegistry", () => {
     expect(names).not.toContain("SOCIÉTÉ BX");
   });
 
-  it("excludes Gmail from carousel nav slots", () => {
-    expect(DASHBOARD_CAROUSEL_NAV_SLOT_INDICES).toEqual([0, 1, 2, 3]);
+  it("excludes Gmail from carousel nav slots but includes Team hub", () => {
+    expect(DASHBOARD_CAROUSEL_NAV_SLOT_INDICES).toEqual([0, 1, 2, 3, TEAM_HUB_SLOT_INDEX]);
     expect(stepDashboardCarouselNavIndex(0, "next")).toBe(1);
-    expect(stepDashboardCarouselNavIndex(3, "next")).toBe(0);
+    expect(stepDashboardCarouselNavIndex(3, "next")).toBe(TEAM_HUB_SLOT_INDEX);
+    expect(stepDashboardCarouselNavIndex(TEAM_HUB_SLOT_INDEX, "next")).toBe(0);
     expect(stepDashboardCarouselNavIndex(4, "prev")).toBe(3);
   });
 
@@ -44,11 +48,11 @@ describe("dashboardCarouselRegistry", () => {
     expect(getDashboardCarouselHubPages()).toHaveLength(DASHBOARD_CAROUSEL_PAGE_COUNT);
   });
 
-  it("step linear mobile parcourt les 6 pages dans l'ordre", () => {
-    expect(stepDashboardLinearPageIndex(0, "next", 6)).toBe(1);
-    expect(stepDashboardLinearPageIndex(1, "prev", 6)).toBe(0);
-    expect(stepDashboardLinearPageIndex(5, "next", 6)).toBe(0);
-    expect(stepDashboardLinearPageIndex(0, "prev", 6)).toBe(5);
-    expect(stepDashboardLinearPageIndex(1, "next", 6)).toBe(2);
+  it("step linear mobile parcourt les 7 pages dans l'ordre", () => {
+    expect(stepDashboardLinearPageIndex(0, "next", 7)).toBe(1);
+    expect(stepDashboardLinearPageIndex(1, "prev", 7)).toBe(0);
+    expect(stepDashboardLinearPageIndex(6, "next", 7)).toBe(0);
+    expect(stepDashboardLinearPageIndex(0, "prev", 7)).toBe(6);
+    expect(stepDashboardLinearPageIndex(1, "next", 7)).toBe(2);
   });
 });

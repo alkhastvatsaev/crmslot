@@ -3,6 +3,7 @@ import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstant
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
+import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 
 /** Rôle affiché sous le nom dans le header (clé i18n `profiles.roles.*`). */
 export type DashboardCarouselRoleKey = "back_office" | "client" | "technician" | "admin";
@@ -26,13 +27,14 @@ export type DashboardCarouselPageDef = {
     | "spotlight.nav_feature_hub"
     | "spotlight.nav_crm_history"
     | "spotlight.nav_billing_hub"
+    | "spotlight.nav_team_hub"
     | "spotlight.nav_offline";
   guideTitle: string;
   guideHint: string;
 };
 
 /**
- * Source unique — ordre = carrousel admin `src/app/page.tsx` (6 pages).
+ * Source unique — ordre = carrousel admin `src/app/page.tsx` (7 pages).
  * Portail client : `/m/demande` · terrain : `/m/technician`.
  */
 export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
@@ -85,6 +87,14 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     spotlightLabelKey: "spotlight.nav_offline",
     guideTitle: "Assistant IA",
     guideHint: "Copilote IA — dossiers, clients, suggestions intelligentes et chat contextuel.",
+  },
+  {
+    slotIndex: TEAM_HUB_SLOT_INDEX,
+    profileName: "ÉQUIPE",
+    profileRoleKey: "admin",
+    spotlightLabelKey: "spotlight.nav_team_hub",
+    guideTitle: "Équipe",
+    guideHint: "Employés, techniciens, rôles et accès terrain.",
   },
 ] as const;
 
@@ -159,6 +169,7 @@ export function assertDashboardCarouselSlotAlignment(): void {
     BILLING_HUB_SLOT_INDEX,
     GMAIL_HUB_SLOT_INDEX,
     OFFLINE_HUB_SLOT_INDEX,
+    TEAM_HUB_SLOT_INDEX,
   ];
   DASHBOARD_CAROUSEL_PAGES.forEach((page, i) => {
     if (page.slotIndex !== i) {

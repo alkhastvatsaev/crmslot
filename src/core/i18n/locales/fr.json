@@ -830,6 +830,39 @@
       "right": "documents"
     }
   },
+  "teamHub": {
+    "title": "Équipe",
+    "subtitle": "Employés et techniciens de votre société",
+    "company_required": "Sélectionnez une société active.",
+    "empty": "Aucun employé pour ce filtre.",
+    "no_email": "E-mail non renseigné",
+    "select_member": "Sélectionnez un employé pour modifier son profil.",
+    "save": "Enregistrer",
+    "deactivate": "Désactiver",
+    "reactivate": "Réactiver",
+    "filter": {
+      "active": "Actifs",
+      "inactive": "Inactifs",
+      "all": "Tous"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "role": {
+      "admin": "Admin",
+      "collaborateur": "Technicien"
+    },
+    "fields": {
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "email": "E-mail",
+      "vehicle": "Véhicule"
+    },
+    "aria": {
+      "page": "Page"
+    }
+  },
   "spotlight": {
     "search_placeholder": "Rechercher...",
     "map_action_title": "Carte",
@@ -848,6 +881,7 @@
     "nav_feature_hub": "Matériel",
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Facturation",
+    "nav_team_hub": "Équipe",
     "open_aria": "Ouvrir la recherche",
     "active_label": "Actif",
     "nav_group_heading": "Navigation"
@@ -2053,6 +2087,7 @@
     "tab_material": "Matériel",
     "tab_crm": "CRM",
     "tab_billing": "Factures",
+    "tab_team": "Équipe",
     "rail_segment_label": "Panneaux de la page",
     "rail_left": "Gauche",
     "rail_center": "Centre",

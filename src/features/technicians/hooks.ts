@@ -1,11 +1,23 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import { logger } from "@/core/logger";
 import { firestore, auth, isConfigured } from "@/core/config/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { Technician } from "./types";
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
 
+function isAssignableTechnician(tech: Technician, companyId: string | null): boolean {
+  if (tech.active === false) return false;
+  const techCompanyId = (tech.companyId ?? "").trim();
+  if (companyId && techCompanyId && techCompanyId !== companyId) return false;
+  return true;
+}
+
 export function useTechnicians() {
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId = (workspace?.activeCompanyId ?? "").trim() || null;
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,9 +50,9 @@ export function useTechnicians() {
               (snapshot) => {
                 if (!active) return;
 
-                const parsed = snapshot.docs.map((d) =>
-                  withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician)
-                );
+                const parsed = snapshot.docs
+                  .map((d) => withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician))
+                  .filter((tech) => isAssignableTechnician(tech, companyId));
                 setTechnicians(parsed);
                 setLoading(false);
               },
@@ -83,7 +95,7 @@ export function useTechnicians() {
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
-  }, []);
+  }, [companyId]);
 
-  return { technicians, loading };
+  return useMemo(() => ({ technicians, loading }), [technicians, loading]);
 }

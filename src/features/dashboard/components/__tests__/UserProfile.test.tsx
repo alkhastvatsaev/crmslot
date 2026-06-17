@@ -9,7 +9,7 @@ import {
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 
 describe("UserProfile", () => {
-  it("shows one profile per carousel page (6 admin hubs)", () => {
+  it("shows one profile per carousel page (7 admin hubs)", () => {
     expect(appProfiles).toHaveLength(DASHBOARD_CAROUSEL_PAGE_COUNT);
     expect(appProfiles.map((p) => p.name)).toEqual([
       "IVANA",
@@ -18,6 +18,7 @@ describe("UserProfile", () => {
       "FACTURATION",
       "GMAIL",
       "ASSISTANT IA",
+      "ÉQUIPE",
     ]);
   });
 
