@@ -901,6 +901,8 @@
     "hide_password": "Verbergen",
     "technician_space_title": "Technicusruimte",
     "technician_space_subtitle": "Meld je aan voor toegang tot je missies",
+    "admin_space_title": "Beheerdersruimte",
+    "admin_space_subtitle": "Meld je aan voor toegang tot het dashboard",
     "demo_account_label": "Demo-account",
     "demo_account_hint": "Tik om demo-gegevens in te vullen"
   },
