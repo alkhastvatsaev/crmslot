@@ -21,6 +21,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: adminCtx.error }, { status: adminCtx.status });
   }
 
-  const staff = await listCompanyStaff(db, admin.auth, adminCtx.companyId);
-  return NextResponse.json({ ok: true, staff });
+  try {
+    const staff = await listCompanyStaff(db, admin.auth, adminCtx.companyId);
+    return NextResponse.json({ ok: true, staff });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message.trim()
+        : "Impossible de charger l'équipe.";
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
 }
