@@ -75,4 +75,21 @@ describe("LoginOverlay (admin)", () => {
     fireEvent.click(screen.getByTestId("admin-login-submit"));
     await waitFor(() => expect(screen.getByTestId("admin-login-error")).toBeInTheDocument());
   });
+
+  it("shows register tab with confirm password field", async () => {
+    (onAuthStateChanged as jest.Mock).mockImplementation((_auth, cb) => {
+      cb(null);
+      return jest.fn();
+    });
+
+    render(
+      <LoginOverlay>
+        <div />
+      </LoginOverlay>
+    );
+
+    await waitFor(() => expect(screen.getByTestId("admin-login-tab-register")).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId("admin-login-tab-register"));
+    expect(screen.getByTestId("admin-login-confirm-password")).toBeInTheDocument();
+  });
 });

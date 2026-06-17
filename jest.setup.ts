@@ -247,6 +247,7 @@ jest.mock("firebase/auth", () => {
       })
     ),
     sendEmailVerification: jest.fn(() => Promise.resolve()),
+    deleteUser: jest.fn(() => Promise.resolve()),
     sendPasswordResetEmail: jest.fn(() => Promise.resolve()),
     signInWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({
