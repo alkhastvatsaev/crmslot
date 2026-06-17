@@ -4,6 +4,7 @@ import {
   provisionTechnicianStaffRecord,
   type TechnicianStaffProfile,
 } from "@/features/company/server/provisionTechnicianStaff";
+import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 import { readDefaultStaffCompanyIdFromEnv } from "@/features/company/server/readDefaultStaffCompanyId";
 
 export type JoinDefaultCompanyOptions = {
@@ -82,6 +83,7 @@ export async function joinDefaultCompanyMembership(
 
   if (!existing.exists) {
     await membershipRef.set({
+      companyId,
       role: membershipRole,
       joinedAt: FieldValue.serverTimestamp(),
       companyName,
@@ -89,6 +91,8 @@ export async function joinDefaultCompanyMembership(
   } else if (staffKind === "admin" && (existing.data()?.role as string) !== "admin") {
     await membershipRef.update({ role: "admin" });
   }
+
+  await upsertCompanyStaffDirectoryEntry(db, companyId, uid, membershipRole);
 
   if (staffKind === "technician") {
     const profile = await resolveTechnicianProfile(auth, uid, options?.technicianProfile);
