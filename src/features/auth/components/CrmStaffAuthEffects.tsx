@@ -1,0 +1,57 @@
+"use client";
+
+import { useEffect } from "react";
+import { getRedirectResult } from "firebase/auth";
+import { toast } from "sonner";
+import { auth, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
+import { useTranslation } from "@/core/i18n/I18nContext";
+import {
+  CrmStaffJoinCompanyError,
+  completeCrmStaffOAuthSession,
+} from "@/features/auth/crmEmailRegister";
+import { crmStaffOAuthSignInErrorFeedback } from "@/features/auth/crmStaffOAuthSignIn";
+
+/** Finalise OAuth redirect (Google / Apple) pour l'auth CRM staff. */
+export default function CrmStaffAuthEffects() {
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!auth || !isConfigured || typeof window === "undefined") return;
+
+    void (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (!result?.user) return;
+        await completeCrmStaffOAuthSession(result);
+        const providerId = result.providerId?.includes("apple") ? "apple" : "google";
+        toast.success(
+          String(
+            t(providerId === "apple" ? "auth.apple_signin_success" : "auth.google_signin_success")
+          )
+        );
+      } catch (e) {
+        logger.warn("[CrmStaffAuthEffects] getRedirectResult", {
+          error: e instanceof Error ? e.message : String(e),
+        });
+        if (e instanceof CrmStaffJoinCompanyError) {
+          toast.error(e.message);
+          return;
+        }
+        const provider =
+          e !== null &&
+          typeof e === "object" &&
+          "customData" in e &&
+          (e as { customData?: { providerId?: string } }).customData?.providerId?.includes("apple")
+            ? "apple"
+            : "google";
+        const { titleKey, descriptionKey } = crmStaffOAuthSignInErrorFeedback(provider, e);
+        toast.error(String(t(titleKey)), {
+          description: descriptionKey ? String(t(descriptionKey)) : undefined,
+        });
+      }
+    })();
+  }, [t]);
+
+  return null;
+}

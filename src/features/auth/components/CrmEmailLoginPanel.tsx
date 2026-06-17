@@ -25,6 +25,8 @@ import {
   crmEmailLoginTitleKey,
   type CrmEmailLoginVariant,
 } from "@/features/auth/crmEmailLoginVariant";
+import CrmStaffOAuthButtons from "@/features/auth/components/CrmStaffOAuthButtons";
+import { useCrmStaffOAuth } from "@/features/auth/hooks/useCrmStaffOAuth";
 
 export type CrmEmailAuthTab = "login" | "register";
 
@@ -42,6 +44,8 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
   const [busy, setBusy] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
+  const { googleBusy, appleBusy, oauthBusy, handleGoogleSignIn, handleAppleSignIn } =
+    useCrmStaffOAuth({ variant, onInlineError: setInlineError });
 
   const panelTestId = crmEmailLoginTestId(variant, "panel");
   const emailTestId = crmEmailLoginTestId(variant, "email");
@@ -133,7 +137,7 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
     }
   };
 
-  const submitting = busy || resetting;
+  const submitting = busy || resetting || oauthBusy;
 
   return (
     <div
@@ -304,6 +308,15 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
             </button>
           ) : null}
         </form>
+
+        <CrmStaffOAuthButtons
+          variant={variant}
+          disabled={submitting}
+          googleBusy={googleBusy}
+          appleBusy={appleBusy}
+          onGoogleSignIn={handleGoogleSignIn}
+          onAppleSignIn={handleAppleSignIn}
+        />
       </div>
     </div>
   );

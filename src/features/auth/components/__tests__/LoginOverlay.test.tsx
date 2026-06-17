@@ -92,4 +92,21 @@ describe("LoginOverlay (admin)", () => {
     fireEvent.click(screen.getByTestId("admin-login-tab-register"));
     expect(screen.getByTestId("admin-login-confirm-password")).toBeInTheDocument();
   });
+
+  it("shows Google and Apple one-click buttons", async () => {
+    (onAuthStateChanged as jest.Mock).mockImplementation((_auth, cb) => {
+      cb(null);
+      return jest.fn();
+    });
+
+    render(
+      <LoginOverlay>
+        <div />
+      </LoginOverlay>
+    );
+
+    await waitFor(() => expect(screen.getByTestId("admin-login-oauth")).toBeInTheDocument());
+    expect(screen.getByTestId("admin-login-google")).toBeInTheDocument();
+    expect(screen.getByTestId("admin-login-apple")).toBeInTheDocument();
+  });
 });

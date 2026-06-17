@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   deleteUser,
+  getAdditionalUserInfo,
   type Auth,
   type UserCredential,
 } from "firebase/auth";
@@ -48,4 +49,14 @@ export async function registerCrmStaffAccount(params: {
   );
   const companyId = await joinDefaultCompanyAfterSignUp(cred);
   return { companyId };
+}
+
+/** Après Google / Apple : rattachement société (nouveau compte ou connexion existante). */
+export async function completeCrmStaffOAuthSession(cred: UserCredential): Promise<void> {
+  const isNewUser = getAdditionalUserInfo(cred)?.isNewUser ?? false;
+  if (isNewUser) {
+    await joinDefaultCompanyAfterSignUp(cred);
+  } else {
+    await syncDefaultCompanyMembershipAfterLogin(cred);
+  }
 }
