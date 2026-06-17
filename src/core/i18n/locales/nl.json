@@ -1231,6 +1231,17 @@
     "materials": "Materialen",
     "finish": "Afronden"
   },
+  "staff_account": {
+    "title": "Mijn account",
+    "subtitle": "Gegevens van uw CRM-account",
+    "first_name": "Voornaam",
+    "last_name": "Achternaam",
+    "email": "E-mail",
+    "company": "Bedrijf",
+    "role": "Rol",
+    "role_admin": "Beheerder",
+    "role_staff": "Medewerker"
+  },
   "map": {
     "boot_error_token": "Kaart niet beschikbaar — Mapbox-token ontbreekt",
     "boot_error_token_hint": "Voeg NEXT_PUBLIC_MAPBOX_TOKEN toe aan .env.local en herstart npm run dev.",

@@ -34,16 +34,24 @@ describe("MobileShell", () => {
     expect(screen.getByText("Hub A")).toBeInTheDocument();
   });
 
-  it("affiche le sélecteur dans le panneau central au clic profil", () => {
+  it("affiche le panneau compte dans le panneau central au clic profil", () => {
     renderMobileShell([<div key="0">A</div>, <div key="1">B</div>]);
 
-    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
     expect(screen.getByTestId("mobile-page-0")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("user-profile-toggle"));
+    expect(screen.getByTestId("dashboard-account-panel-host")).toBeInTheDocument();
+    expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
+    expect(screen.getByText("A").closest("[aria-hidden='true']")).toBeTruthy();
+  });
+
+  it("affiche le sélecteur dans le panneau central au clic calendrier", () => {
+    renderMobileShell([<div key="0">A</div>, <div key="1">B</div>]);
+
+    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
     expect(screen.getByTestId("dashboard-page-selector-host")).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
-    expect(screen.getByText("A").closest("[aria-hidden='true']")).toBeTruthy();
 
     fireEvent.click(screen.getByTestId("dashboard-page-selector-item-1"));
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();

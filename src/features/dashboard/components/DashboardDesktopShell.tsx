@@ -21,6 +21,7 @@ import {
   DASHBOARD_DESKTOP_STACK_HEADER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
+import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 
 type Props = {
@@ -35,7 +36,8 @@ type Props = {
  */
 export default function DashboardDesktopShell({ header, pager, galaxy }: Props) {
   const dashboardPager = useDashboardPagerOptional();
-  const { open: selectorOpen, close: closeSelector } = useDashboardPageSelector();
+  const { view, close: closeOverlay } = useDashboardPageSelector();
+  const overlayOpen = view !== "closed";
   const immersiveTechnicianLab =
     TECHNICIAN_LAB_IN_CAROUSEL && dashboardPager?.pageIndex === TECHNICIAN_LAB_SLOT_INDEX;
 
@@ -71,7 +73,7 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
             />
             <div className="dashboard-desktop-pager-host">
               {pager}
-              {selectorOpen && !immersiveTechnicianLab ? (
+              {overlayOpen && !immersiveTechnicianLab ? (
                 <div className="dashboard-page-selector-host" aria-hidden={false}>
                   <div
                     className={`${DASHBOARD_DESKTOP_GRID_CLASS} ${DASHBOARD_DESKTOP_GRID_FILL_CLASS} dashboard-page-selector-host-grid`}
@@ -81,14 +83,20 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
                       aria-hidden
                     />
                     <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center`}
-                      aria-hidden
-                    />
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center dashboard-account-center-slot`}
+                      data-testid="dashboard-account-panel-host"
+                    >
+                      {view === "account" ? (
+                        <DashboardAccountPanel onClose={closeOverlay} variant="desktop" />
+                      ) : null}
+                    </div>
                     <div
                       className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right dashboard-page-selector-right-slot`}
                       data-testid="dashboard-page-selector-host"
                     >
-                      <DashboardPageSelector onClose={closeSelector} variant="desktop" />
+                      {view === "pages" ? (
+                        <DashboardPageSelector onClose={closeOverlay} variant="desktop" />
+                      ) : null}
                     </div>
                   </div>
                 </div>

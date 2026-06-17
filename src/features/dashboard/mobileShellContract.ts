@@ -29,6 +29,8 @@ export const MOBILE_SHELL_CONTRACT = {
     mapPage: "mobile-page-0",
     pageSelector: "dashboard-page-selector",
     pageSelectorHost: "dashboard-page-selector-host",
+    accountPanel: "dashboard-account-panel",
+    accountPanelHost: "dashboard-account-panel-host",
     galaxyDock: "mobile-shell-galaxy",
   },
   /** Fichiers dont le comportement est verrouillé par les tests source + intégration. */
@@ -44,8 +46,9 @@ export const MOBILE_SHELL_CONTRACT = {
       "useMobilePageSwipe",
       "stepDashboardLinearPageIndex",
       "dashboard-page-selector-host",
+      "dashboard-account-panel-host",
       "pages.slice",
-      "selectorOpen",
+      "overlayOpen",
       "MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS",
     ],
     "src/features/dashboard/components/MobileShell.tsx": [

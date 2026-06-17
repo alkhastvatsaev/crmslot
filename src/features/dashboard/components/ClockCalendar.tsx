@@ -86,7 +86,7 @@ export default function ClockCalendar({
             data-testid="clock-calendar-toggle"
             className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
             aria-label="Ouvrir la navigation"
-            aria-expanded={pageSelector.open}
+            aria-expanded={pageSelector.view === "pages"}
             onClick={() => pageSelector.toggle()}
           >
             {compactDateTime}

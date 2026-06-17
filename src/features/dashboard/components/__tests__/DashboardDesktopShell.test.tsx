@@ -41,7 +41,7 @@ describe("DashboardDesktopShell", () => {
     expect(DASHBOARD_GALAXY_GRID_COLUMN).toBe(2);
   });
 
-  it("affiche le sélecteur de pages dans le panneau droit au clic profil", () => {
+  it("affiche le panneau compte au centre au clic profil", () => {
     render(
       <DashboardPagerProvider pageCount={6}>
         <DashboardPageSelectorProvider>
@@ -54,16 +54,12 @@ describe("DashboardDesktopShell", () => {
       </DashboardPagerProvider>
     );
 
-    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("user-profile-toggle"));
-    const host = screen.getByTestId("dashboard-page-selector-host");
+    const host = screen.getByTestId("dashboard-account-panel-host");
     expect(host).toBeInTheDocument();
-    expect(host).toHaveClass("dashboard-page-selector-right-slot");
-    expect(host).toHaveClass("dashboard-desktop-col--right");
-    expect(screen.getByTestId("dashboard-language-selector")).toBeInTheDocument();
-    expect(screen.getByTestId("dashboard-page-selector")).toHaveAttribute(
-      "data-variant",
-      "desktop"
-    );
+    expect(host).toHaveClass("dashboard-desktop-col--center");
+    expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
   });
 });

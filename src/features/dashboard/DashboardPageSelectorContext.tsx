@@ -2,9 +2,17 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
+export type DashboardOverlayView = "closed" | "pages" | "account";
+
 type DashboardPageSelectorContextValue = {
+  view: DashboardOverlayView;
+  /** Overlay ouvert (navigation ou compte). */
   open: boolean;
+  /** Bascule la grille de navigation (calendrier / horloge). */
   toggle: () => void;
+  toggleAccount: () => void;
+  openPages: () => void;
+  openAccount: () => void;
   close: () => void;
 };
 
@@ -13,27 +21,45 @@ const DashboardPageSelectorContext = createContext<DashboardPageSelectorContextV
 export function DashboardPageSelectorProvider({
   children,
   initialOpen = false,
+  initialView = "closed",
 }: {
   children: ReactNode;
   initialOpen?: boolean;
+  initialView?: DashboardOverlayView;
 }) {
-  const [open, setOpen] = useState(initialOpen);
+  const [view, setView] = useState<DashboardOverlayView>(initialOpen ? "pages" : initialView);
 
-  const toggle = useCallback(() => {
-    setOpen((prev) => !prev);
+  const openPages = useCallback(() => {
+    setView("pages");
+  }, []);
+
+  const openAccount = useCallback(() => {
+    setView("account");
   }, []);
 
   const close = useCallback(() => {
-    setOpen(false);
+    setView("closed");
+  }, []);
+
+  const toggle = useCallback(() => {
+    setView((prev) => (prev === "pages" ? "closed" : "pages"));
+  }, []);
+
+  const toggleAccount = useCallback(() => {
+    setView((prev) => (prev === "account" ? "closed" : "account"));
   }, []);
 
   const value = useMemo(
-    () => ({
-      open,
+    (): DashboardPageSelectorContextValue => ({
+      view,
+      open: view !== "closed",
       toggle,
+      toggleAccount,
+      openPages,
+      openAccount,
       close,
     }),
-    [open, toggle, close]
+    [view, toggle, toggleAccount, openPages, openAccount, close]
   );
 
   return (

@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
+import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { stepDashboardLinearPageIndex } from "@/features/dashboard/dashboardCarouselRegistry";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
@@ -20,12 +21,8 @@ type Props = {
 
 const visiblePanelClass = cn(MOBILE_SCREEN_HOST_PANEL_CLASS, MOBILE_SCREEN_HOST_PANEL_BASE_CLASS);
 
-function isMobilePageHidden(
-  pageIndex: number,
-  activeIndex: number,
-  selectorOpen: boolean
-): boolean {
-  return selectorOpen || activeIndex !== pageIndex;
+function isMobilePageHidden(pageIndex: number, activeIndex: number, overlayOpen: boolean): boolean {
+  return overlayOpen || activeIndex !== pageIndex;
 }
 
 /**
@@ -37,7 +34,8 @@ function isMobilePageHidden(
 export default function MobileScreenHost({ pages }: Props) {
   const hostRef = useRef<HTMLElement>(null);
   const { pageIndex, pageCount, setPageIndex } = useDashboardPager();
-  const { open: selectorOpen, close: closeSelector } = useDashboardPageSelector();
+  const { view, close: closeOverlay } = useDashboardPageSelector();
+  const overlayOpen = view !== "closed";
 
   const swipeNextPage = useCallback(() => {
     setPageIndex(stepDashboardLinearPageIndex(pageIndex, "next", pageCount));
@@ -47,7 +45,7 @@ export default function MobileScreenHost({ pages }: Props) {
     setPageIndex(stepDashboardLinearPageIndex(pageIndex, "prev", pageCount));
   }, [pageCount, pageIndex, setPageIndex]);
 
-  useMobilePageSwipe(hostRef, swipeNextPage, swipePrevPage, selectorOpen);
+  useMobilePageSwipe(hostRef, swipeNextPage, swipePrevPage, overlayOpen);
 
   return (
     <main
@@ -57,7 +55,7 @@ export default function MobileScreenHost({ pages }: Props) {
       aria-live="polite"
     >
       {pages.slice(0, pageCount).map((page, index) => {
-        const hidden = isMobilePageHidden(index, pageIndex, selectorOpen);
+        const hidden = isMobilePageHidden(index, pageIndex, overlayOpen);
         return (
           <div
             key={index}
@@ -75,12 +73,21 @@ export default function MobileScreenHost({ pages }: Props) {
         );
       })}
 
-      {selectorOpen ? (
+      {view === "pages" ? (
         <div
           className={cn(visiblePanelClass, MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS)}
           data-testid="dashboard-page-selector-host"
         >
-          <DashboardPageSelector onClose={closeSelector} variant="mobile" />
+          <DashboardPageSelector onClose={closeOverlay} variant="mobile" />
+        </div>
+      ) : null}
+
+      {view === "account" ? (
+        <div
+          className={cn(visiblePanelClass, MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS)}
+          data-testid="dashboard-account-panel-host"
+        >
+          <DashboardAccountPanel onClose={closeOverlay} variant="mobile" />
         </div>
       ) : null}
     </main>
