@@ -154,6 +154,11 @@
       "collectionGroup": "interventions",
       "queryScope": "COLLECTION",
       "fields": [{ "fieldPath": "portalAccessToken", "order": "ASCENDING" }]
+    },
+    {
+      "collectionGroup": "company_memberships",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [{ "fieldPath": "__name__", "order": "ASCENDING" }]
     }
   ],
   "fieldOverrides": []
