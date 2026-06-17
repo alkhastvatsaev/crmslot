@@ -1,0 +1,73 @@
+/* Boutons Sign in with Google / Apple — assets officiels, pleine largeur du formulaire. */
+
+.root {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: center center;
+  transition: transform 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.root:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.root:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.asset {
+  display: block;
+  width: 100%;
+  height: 40px;
+  max-width: 100%;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: center center;
+  transition:
+    transform 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.14s ease;
+}
+
+.root:hover:not(:disabled):not(.pressed) {
+  transform: scale(1.01);
+}
+
+.root:hover:not(:disabled):not(.pressed) .asset {
+  filter: brightness(0.99);
+}
+
+.root:active:not(:disabled),
+.root.pressed {
+  transform: scale(0.98);
+}
+
+.root:active:not(:disabled) .asset,
+.root.pressed .asset {
+  filter: brightness(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .asset {
+    transition: none;
+  }
+
+  .root:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .root:active:not(:disabled),
+  .root.pressed {
+    transform: none;
+  }
+}
