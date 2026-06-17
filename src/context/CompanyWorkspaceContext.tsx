@@ -13,7 +13,6 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
-import { readStaffJoinPayload } from "@/features/auth/staffJoinPayload";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
@@ -147,7 +146,7 @@ export function CompanyWorkspaceProvider({
     setMembershipJoinPending(true);
     setMembershipJoinError(null);
     try {
-      const result = await requestDefaultCompanyMembership(user, readStaffJoinPayload());
+      const result = await requestDefaultCompanyMembership(user, { staffKind: "admin" });
       if (!result.ok) {
         setMembershipJoinError(result.error);
       }
@@ -157,6 +156,17 @@ export function CompanyWorkspaceProvider({
       setMembershipJoinPending(false);
     }
   }, []);
+
+  const resolvedClaimsCompanyId = useMemo(() => {
+    const fromState = activeCompanyId.trim();
+    if (fromState) return fromState;
+    const fromMembership = memberships[0]?.companyId?.trim() ?? "";
+    if (fromMembership) return fromMembership;
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim() ?? "";
+    }
+    return "";
+  }, [activeCompanyId, memberships]);
 
   useEffect(() => {
     if (!auth || authLoading || !membershipsReady || memberships.length > 0) return;
@@ -168,12 +178,21 @@ export function CompanyWorkspaceProvider({
     setMembershipJoinError(null);
 
     void (async () => {
-      const result = await requestDefaultCompanyMembership(user, readStaffJoinPayload());
-      if (cancelled) return;
-      if (!result.ok) {
-        setMembershipJoinError(result.error);
+      try {
+        const result = await requestDefaultCompanyMembership(user, { staffKind: "admin" });
+        if (cancelled) return;
+        if (!result.ok) {
+          setMembershipJoinError(result.error);
+        }
+      } catch {
+        if (!cancelled) {
+          setMembershipJoinError("Impossible de rattacher le compte à la société.");
+        }
+      } finally {
+        if (!cancelled) {
+          setMembershipJoinPending(false);
+        }
       }
-      setMembershipJoinPending(false);
     })();
 
     return () => {
@@ -184,24 +203,24 @@ export function CompanyWorkspaceProvider({
   const claimsGatePending = memberships.length > 0 && !claimsInitialSyncDone;
 
   const effectiveActiveCompanyId = useMemo(() => {
-    if (authLoading || !membershipsReady || claimsGatePending) {
-      if (typeof window !== "undefined") {
-        const stored = window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim();
-        if (stored && !claimsGatePending) return stored;
-      }
+    if (authLoading || !membershipsReady) {
       return "";
     }
+    if (claimsGatePending) {
+      return resolvedClaimsCompanyId || activeCompanyId;
+    }
     return activeCompanyId;
-  }, [authLoading, membershipsReady, activeCompanyId, claimsGatePending]);
+  }, [authLoading, membershipsReady, activeCompanyId, claimsGatePending, resolvedClaimsCompanyId]);
 
   const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
-    if (!auth?.currentUser || memberships.length === 0 || !activeCompanyId) return false;
+    const companyId = resolvedClaimsCompanyId;
+    if (!auth?.currentUser || memberships.length === 0 || !companyId) return false;
     try {
       const idToken = await auth.currentUser.getIdToken(false);
       const res = await fetch("/api/company/sync-claims", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({ activeCompanyId }),
+        body: JSON.stringify({ activeCompanyId: companyId }),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean };
       if (!res.ok || !data.ok) return false;
@@ -210,14 +229,21 @@ export function CompanyWorkspaceProvider({
     } catch {
       return false;
     }
-  }, [activeCompanyId, memberships.length]);
+  }, [memberships.length, resolvedClaimsCompanyId]);
 
   useEffect(() => {
-    if (!firebaseUid || memberships.length === 0 || !activeCompanyId) return;
+    if (!firebaseUid || memberships.length === 0) return;
+
+    if (!resolvedClaimsCompanyId) {
+      setClaimsInitialSyncDone(true);
+      return;
+    }
+
     if (!claimsInitialSyncDone) {
       void refreshClaimsSilent().finally(() => setClaimsInitialSyncDone(true));
       return;
     }
+
     const t = setTimeout(() => {
       void refreshClaimsSilent();
     }, 400);
@@ -225,7 +251,7 @@ export function CompanyWorkspaceProvider({
   }, [
     firebaseUid,
     memberships.length,
-    activeCompanyId,
+    resolvedClaimsCompanyId,
     refreshClaimsSilent,
     claimsInitialSyncDone,
   ]);
@@ -242,7 +268,7 @@ export function CompanyWorkspaceProvider({
       setActiveCompanyId,
       activeRole,
       workspaceReady:
-        !authLoading && membershipsReady && !claimsGatePending && !membershipJoinPending,
+        !authLoading && membershipsReady && !membershipJoinPending && !claimsGatePending,
       isTenantUser: !authLoading && membershipsReady && memberships.length > 0,
       membershipJoinPending,
       membershipJoinError,
