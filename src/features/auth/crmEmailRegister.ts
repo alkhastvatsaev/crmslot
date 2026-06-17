@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
   type Auth,
+  type User,
   type UserCredential,
 } from "firebase/auth";
 
@@ -12,8 +13,12 @@ export class CrmStaffJoinCompanyError extends Error {
   }
 }
 
-export async function joinDefaultCompanyAfterSignUp(cred: UserCredential): Promise<string> {
-  const idToken = await cred.user.getIdToken();
+async function postJoinDefaultCompany(user: User): Promise<{
+  ok: boolean;
+  companyId?: string;
+  error?: string;
+}> {
+  const idToken = await user.getIdToken();
   const res = await fetch("/api/company/join-default", {
     method: "POST",
     headers: { Authorization: `Bearer ${idToken}` },
@@ -25,20 +30,39 @@ export async function joinDefaultCompanyAfterSignUp(cred: UserCredential): Promi
   };
 
   if (!res.ok || !data.ok || !data.companyId) {
+    return {
+      ok: false,
+      error:
+        typeof data.error === "string" && data.error.trim()
+          ? data.error.trim()
+          : "Impossible de rattacher le compte à la société.",
+    };
+  }
+
+  await user.getIdToken(true);
+  return { ok: true, companyId: data.companyId };
+}
+
+/** Connexion : rattachement idempotent à la société unique (ne supprime pas le compte). */
+export async function syncDefaultCompanyMembershipAfterLogin(cred: UserCredential): Promise<void> {
+  await postJoinDefaultCompany(cred.user);
+}
+
+export async function joinDefaultCompanyAfterSignUp(cred: UserCredential): Promise<string> {
+  const result = await postJoinDefaultCompany(cred.user);
+
+  if (!result.ok || !result.companyId) {
     try {
       await deleteUser(cred.user);
     } catch {
       /* compte orphelin — admin pourra lier manuellement */
     }
     throw new CrmStaffJoinCompanyError(
-      typeof data.error === "string" && data.error.trim()
-        ? data.error.trim()
-        : "Impossible de rattacher le compte à la société."
+      result.error ?? "Impossible de rattacher le compte à la société."
     );
   }
 
-  await cred.user.getIdToken(true);
-  return data.companyId;
+  return result.companyId;
 }
 
 export async function registerCrmStaffAccount(params: {

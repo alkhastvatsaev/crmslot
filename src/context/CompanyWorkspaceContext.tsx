@@ -12,7 +12,6 @@ import {
 import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { recoverMainAuthFromClientPortalLeak } from "@/features/auth/recoverMainAuthFromClientPortalLeak";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
@@ -75,13 +74,6 @@ export function CompanyWorkspaceProvider({
   }, []);
 
   useEffect(() => {
-    if (!auth || authLoading || !membershipsReady || memberships.length > 0) return;
-    const user = auth.currentUser;
-    if (!user || user.isAnonymous) return;
-    void recoverMainAuthFromClientPortalLeak(auth, user);
-  }, [authLoading, membershipsReady, memberships.length]);
-
-  useEffect(() => {
     if (!firestore || !firebaseUid || !isConfigured) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMemberships([]);
@@ -89,6 +81,10 @@ export function CompanyWorkspaceProvider({
       setMembershipsReady(true);
       return () => {};
     }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMembershipsReady(false);
+    setMemberships([]);
 
     let unsub: (() => void) | undefined;
     const timeout = setTimeout(() => {
