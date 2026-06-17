@@ -22,6 +22,8 @@ const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
 import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
+import { useClientPortalLinkedCompanyId } from "@/features/auth/hooks/useClientPortalLinkedCompanyId";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
 type CompanyHubRightCategory = "tracking" | "chat" | "invoice";
@@ -59,14 +61,17 @@ export default function CompanyHubPage() {
     });
   }, [portalRightTab, setPortalRightTab]);
 
-  const ivanaChatCompanyId = useMemo(() => {
-    if (workspace?.isTenantUser && workspace.activeCompanyId) return workspace.activeCompanyId;
-    const env =
-      typeof process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID === "string"
-        ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim()
-        : "";
-    return env || null;
-  }, [workspace?.isTenantUser, workspace?.activeCompanyId]);
+  const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
+
+  const ivanaChatCompanyId = useMemo(
+    () =>
+      resolveClientPortalInterventionCompanyId({
+        tenantActiveCompanyId:
+          workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null,
+        linkedPortalCompanyId,
+      }),
+    [workspace?.isTenantUser, workspace?.activeCompanyId, linkedPortalCompanyId]
+  );
 
   const leftPanel = (
     <section

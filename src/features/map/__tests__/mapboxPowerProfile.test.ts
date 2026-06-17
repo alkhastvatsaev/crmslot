@@ -2,6 +2,7 @@ import {
   applyMapboxPremiumBasemapConfig,
   isMapWebGLActive,
   resolveMapboxInitOptions,
+  resolveMapboxMapRuntimeOptions,
   resolveMapboxPixelRatio,
   resolveMapCameraDuration,
 } from "@/features/map/mapboxPowerProfile";
@@ -27,6 +28,16 @@ describe("mapboxPowerProfile", () => {
   it("accélère les animations caméra sur mobile", () => {
     expect(resolveMapCameraDuration(true, "bounds")).toBe(0);
     expect(resolveMapCameraDuration(false, "marker")).toBeGreaterThan(400);
+  });
+
+  it("autorise WebGL lent sur Android mobile (WebView / émulateur)", () => {
+    expect(
+      resolveMapboxMapRuntimeOptions(true, "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36")
+        .failIfMajorPerformanceCaveat
+    ).toBe(false);
+    expect(
+      resolveMapboxMapRuntimeOptions(false, "Mozilla/5.0 (Macintosh)").failIfMajorPerformanceCaveat
+    ).toBe(true);
   });
 
   it("coupe WebGL hors page carte", () => {

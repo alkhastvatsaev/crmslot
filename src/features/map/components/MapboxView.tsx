@@ -38,6 +38,7 @@ import {
   isMapWebGLActive,
   markerGlowBlurClass,
   resolveMapboxInitOptions,
+  resolveMapboxMapRuntimeOptions,
   resolveMapCameraDuration,
 } from "@/features/map/mapboxPowerProfile";
 import {
@@ -45,6 +46,7 @@ import {
   pauseMapboxMap,
   resolveMapboxLifecycleMode,
   resumeMapboxMap,
+  scheduleMapboxResizeBurst,
 } from "@/features/map/mapboxMapLifecycle";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocation";
@@ -291,6 +293,17 @@ export default function MapboxView() {
       const initialCenter: [number, number] = [4.3522, 50.8466];
       const mobileMap = isMobile === true;
       const powerOptions = resolveMapboxInitOptions(mobileMap);
+      const runtimeOptions = resolveMapboxMapRuntimeOptions(mobileMap);
+
+      if (
+        typeof mapboxgl.supported === "function" &&
+        !mapboxgl.supported({
+          failIfMajorPerformanceCaveat: runtimeOptions.failIfMajorPerformanceCaveat,
+        })
+      ) {
+        if (!cancelled) setMapBootError("load");
+        return;
+      }
 
       const map = new mapboxgl.Map({
         container,
@@ -306,6 +319,8 @@ export default function MapboxView() {
         renderWorldCopies: powerOptions.renderWorldCopies,
         collectResourceTiming: powerOptions.collectResourceTiming,
         respectPrefersReducedMotion: powerOptions.respectPrefersReducedMotion,
+        failIfMajorPerformanceCaveat: runtimeOptions.failIfMajorPerformanceCaveat,
+        pixelRatio: runtimeOptions.pixelRatio,
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],
@@ -329,11 +344,7 @@ export default function MapboxView() {
       map.on("load", () => {
         if (cancelled) return;
         setMapReady(true);
-        try {
-          map.resize();
-        } catch {
-          /* ignore */
-        }
+        scheduleMapboxResizeBurst(map);
       });
 
       map.on("style.load", () => {
@@ -524,17 +535,7 @@ export default function MapboxView() {
     if (rail !== "center") return;
     const map = mapRef.current;
     if (!map) return;
-    const resize = () => {
-      try {
-        map.resize();
-      } catch {
-        /* ignore */
-      }
-    };
-    resize();
-    requestAnimationFrame(resize);
-    window.setTimeout(resize, 100);
-    window.setTimeout(resize, 520);
+    scheduleMapboxResizeBurst(map);
   }, []);
 
   useEffect(() => {

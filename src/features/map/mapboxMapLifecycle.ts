@@ -29,3 +29,20 @@ export function destroyMapboxMap(map: { remove: () => void }): void {
     /* déjà détruit */
   }
 }
+
+/** Rafraîchit la taille du canvas après transitions layout (mobile / WebView). */
+export function scheduleMapboxResizeBurst(map: { resize: () => void }): void {
+  const resize = () => {
+    try {
+      map.resize();
+    } catch {
+      /* container caché */
+    }
+  };
+  resize();
+  if (typeof window !== "undefined") {
+    window.requestAnimationFrame(resize);
+    window.setTimeout(resize, 100);
+    window.setTimeout(resize, 520);
+  }
+}

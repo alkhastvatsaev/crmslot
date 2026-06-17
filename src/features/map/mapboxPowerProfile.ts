@@ -44,6 +44,17 @@ export type MapboxInitPowerOptions = {
   respectPrefersReducedMotion: boolean;
 };
 
+export type MapboxMapRuntimeOptions = {
+  failIfMajorPerformanceCaveat: boolean;
+  pixelRatio: number;
+};
+
+export function isAndroidUserAgent(
+  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+): boolean {
+  return /Android/i.test(userAgent);
+}
+
 export function resolveMapboxInitOptions(isMobile: boolean): MapboxInitPowerOptions {
   return {
     style: isMobile ? MAPBOX_STYLE_MOBILE : MAPBOX_STYLE_DESKTOP,
@@ -54,6 +65,18 @@ export function resolveMapboxInitOptions(isMobile: boolean): MapboxInitPowerOpti
     renderWorldCopies: false,
     collectResourceTiming: false,
     respectPrefersReducedMotion: true,
+  };
+}
+
+/** Options runtime Mapbox GL — WebView Android / émulateur souvent « slow » mais utilisable. */
+export function resolveMapboxMapRuntimeOptions(
+  isMobile: boolean,
+  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+): MapboxMapRuntimeOptions {
+  const android = isAndroidUserAgent(userAgent);
+  return {
+    failIfMajorPerformanceCaveat: !(isMobile && android),
+    pixelRatio: resolveMapboxPixelRatio(isMobile),
   };
 }
 
