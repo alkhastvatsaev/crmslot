@@ -14,6 +14,11 @@ type Props = {
   onClick: () => void;
 };
 
+const labelFont: Record<Variant, string> = {
+  google: 'Roboto, "Helvetica Neue", Arial, sans-serif',
+  apple: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif',
+};
+
 function GoogleLogo() {
   return (
     <svg aria-hidden viewBox="0 0 24 24" className="h-[18px] w-[18px]">
@@ -37,10 +42,11 @@ function GoogleLogo() {
   );
 }
 
+/** Silhouette Apple officielle — blanc sur fond noir du bouton Sign in with Apple. */
 function AppleLogo() {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-white">
-      <path d="M17.05 20.28c-.98.95-2.05 1.88-3.51 1.9-1.46.02-1.93-.86-3.6-.86-1.67 0-2.19.84-3.57.88-1.38.04-2.43-1.41-3.41-2.35C2.45 17.25.73 12.08 2.28 8.3c.77-1.75 2.14-2.86 3.64-2.89 1.43-.03 2.78.96 3.6.96.82 0 2.36-1.18 3.98-1.01.68.03 2.6.28 3.83 2.1-3.3 1.8-2.77 6.48.53 7.92-.65 1.7-1.5 3.38-2.81 4.9ZM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25Z" />
+    <svg aria-hidden viewBox="0 0 814 1000" className="h-[17px] w-[14px] fill-white">
+      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 129.9 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8-63.1 0-105.7-57.7-155.1-127.3-84.4-122.4-148.8-348.5-62.3-501.1 43.1-74.9 120.1-122.3 203.6-122.3 76.8 0 125.5 40.8 189.3 40.8 61.5 0 99.1-40.8 187.4-40.8 67.2 0 138.5 36.7 181.6 100.2-5.1 3.1-107.4 62.9-107.4 195.3-.1 148.7 126.5 200.5 129.9 201.8zM554.1 146.4c37.2-44.8 62.2-107.1 55.5-169.1-53.7 2.2-118.7 35.8-157.2 80.7-34.5 39.8-64.6 103.5-56.5 164.6 60.1 4.6 121.5-30.8 158.2-76.2z" />
     </svg>
   );
 }
@@ -50,7 +56,7 @@ const variantStyles: Record<Variant, string> = {
   apple: "border border-black bg-black text-white hover:bg-neutral-900 active:bg-neutral-800",
 };
 
-/** Bouton OAuth CRM — proportions fixes, pleine largeur, guidelines Google / Apple. */
+/** Bouton OAuth CRM — logo fixe + libellé en vraie police système. */
 export default function CrmBrandOAuthButton({
   variant,
   label,
@@ -68,7 +74,7 @@ export default function CrmBrandOAuthButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "relative flex h-11 w-full items-center justify-center rounded-xl px-12 text-[14px] font-medium leading-none shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
+        "relative flex h-11 w-full items-center justify-center rounded-xl px-12 shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
         variantStyles[variant]
       )}
     >
@@ -87,7 +93,12 @@ export default function CrmBrandOAuthButton({
           <AppleLogo />
         )}
       </span>
-      <span className="truncate">{label}</span>
+      <span
+        className="truncate text-[14px] font-medium leading-tight antialiased"
+        style={{ fontFamily: labelFont[variant] }}
+      >
+        {label}
+      </span>
     </button>
   );
 }
