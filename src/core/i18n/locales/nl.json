@@ -877,6 +877,8 @@
     "email_password_disabled": "E-mail/wachtwoord niet geactiveerd",
     "email_password_disabled_hint": "Firebase Console → Authentication → E-mail/Wachtwoord inschakelen.",
     "email_required": "Voer een e-mailadres in",
+    "first_name_required": "Voer uw voornaam in",
+    "last_name_required": "Voer uw achternaam in",
     "link_sent": "Link verzonden",
     "check_inbox": "Controleer uw inbox.",
     "send_failed": "Verzenden mislukt",

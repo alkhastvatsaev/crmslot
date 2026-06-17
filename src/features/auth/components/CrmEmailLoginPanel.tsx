@@ -16,6 +16,10 @@ import {
   syncDefaultCompanyMembershipAfterLogin,
 } from "@/features/auth/crmEmailRegister";
 import {
+  persistStaffJoinPayload,
+  staffJoinPayloadFromVariant,
+} from "@/features/auth/staffJoinPayload";
+import {
   signInTechnicianWithEmail,
   technicianEmailSignInErrorFeedback,
 } from "@/features/auth/technicianEmailSignIn";
@@ -38,6 +42,8 @@ type Props = {
 export default function CrmEmailLoginPanel({ variant }: Props) {
   const { t } = useTranslation();
   const [authTab, setAuthTab] = useState<CrmEmailAuthTab>("login");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -59,7 +65,10 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
   const emailInputId = `${variant}-login-email`;
   const passwordInputId = `${variant}-login-password`;
   const confirmPasswordInputId = `${variant}-login-confirm-password`;
+  const firstNameInputId = `${variant}-login-first-name`;
+  const lastNameInputId = `${variant}-login-last-name`;
   const logLabel = variant === "technician" ? "TechnicianLoginPanel" : "AdminLoginPanel";
+  const showTechnicianProfileFields = variant === "technician" && authTab === "register";
 
   const authErrorMessage = (e: unknown, mode: "login" | "register") => {
     const feedback =
@@ -89,15 +98,30 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
       setInlineError(String(t("auth.password_mismatch")));
       return;
     }
+    if (showTechnicianProfileFields && !firstName.trim()) {
+      setInlineError(String(t("auth.first_name_required")));
+      return;
+    }
+    if (showTechnicianProfileFields && !lastName.trim()) {
+      setInlineError(String(t("auth.last_name_required")));
+      return;
+    }
+
+    const staffJoin = staffJoinPayloadFromVariant(variant, {
+      firstName,
+      lastName,
+      email,
+    });
+    persistStaffJoinPayload(staffJoin);
 
     setBusy(true);
     try {
       if (authTab === "register") {
-        await registerCrmStaffAccount({ auth, email, password });
+        await registerCrmStaffAccount({ auth, email, password, staffJoin });
         toast.success(String(t("auth.register_success")));
       } else {
         const cred = await signInTechnicianWithEmail({ auth, email, password });
-        await syncDefaultCompanyMembershipAfterLogin(cred);
+        await syncDefaultCompanyMembershipAfterLogin(cred, staffJoin);
         toast.success(String(t("auth.signin_success")));
       }
     } catch (e) {
@@ -190,6 +214,39 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
         </div>
 
         <form className="mt-4 flex flex-col gap-3" onSubmit={handleSubmit} noValidate>
+          {showTechnicianProfileFields ? (
+            <>
+              <label htmlFor={firstNameInputId} className="sr-only">
+                {t("requester.profile.first_name")}
+              </label>
+              <input
+                id={firstNameInputId}
+                data-testid={crmEmailLoginTestId(variant, "first-name")}
+                type="text"
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder={String(t("requester.profile.first_name"))}
+                disabled={submitting}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-[14px] text-slate-900 outline-none transition focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500/30 disabled:opacity-60"
+              />
+              <label htmlFor={lastNameInputId} className="sr-only">
+                {t("requester.profile.last_name")}
+              </label>
+              <input
+                id={lastNameInputId}
+                data-testid={crmEmailLoginTestId(variant, "last-name")}
+                type="text"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder={String(t("requester.profile.last_name"))}
+                disabled={submitting}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-[14px] text-slate-900 outline-none transition focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500/30 disabled:opacity-60"
+              />
+            </>
+          ) : null}
+
           <label htmlFor={emailInputId} className="sr-only">
             {t("auth.email_label")}
           </label>

@@ -877,6 +877,8 @@
     "email_password_disabled": "Email/password sign-in not enabled",
     "email_password_disabled_hint": "Firebase Console → Authentication → enable Email/Password provider.",
     "email_required": "Enter an email address",
+    "first_name_required": "Enter your first name",
+    "last_name_required": "Enter your last name",
     "link_sent": "Link sent",
     "check_inbox": "Check your inbox.",
     "send_failed": "Could not send",

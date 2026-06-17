@@ -12,6 +12,12 @@ import {
   completeCrmStaffOAuthSession,
 } from "@/features/auth/crmEmailRegister";
 import {
+  persistStaffJoinPayload,
+  readStaffJoinPayload,
+  staffJoinPayloadFromOAuthUser,
+  staffJoinPayloadFromVariant,
+} from "@/features/auth/staffJoinPayload";
+import {
   CrmStaffOAuthRedirectPending,
   crmStaffOAuthSignInErrorFeedback,
   signInCrmStaffWithApple,
@@ -58,6 +64,7 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
       }
 
       persistCrmStaffOAuthMode(oauthMode);
+      persistStaffJoinPayload(staffJoinPayloadFromVariant(variant));
       const setBusy = provider === "google" ? setGoogleBusy : setAppleBusy;
       setBusy(true);
       try {
@@ -65,7 +72,9 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
           provider === "google"
             ? await signInCrmStaffWithGoogle(auth)
             : await signInCrmStaffWithApple(auth);
-        const outcome = await completeCrmStaffOAuthSession(cred, oauthMode, auth);
+        const staffJoin = staffJoinPayloadFromOAuthUser(variant, cred.user);
+        persistStaffJoinPayload(staffJoin);
+        const outcome = await completeCrmStaffOAuthSession(cred, oauthMode, auth, staffJoin);
         toast.success(
           String(
             outcome === "register"
@@ -101,7 +110,7 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
         setBusy(false);
       }
     },
-    [logLabel, oauthMode, onInlineError, t]
+    [logLabel, oauthMode, onInlineError, t, variant]
   );
 
   return {

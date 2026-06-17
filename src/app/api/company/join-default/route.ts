@@ -1,9 +1,37 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
-import { joinDefaultCompanyMembership } from "@/features/company/server/joinDefaultCompanyMembership";
+import {
+  joinDefaultCompanyMembership,
+  type JoinDefaultCompanyOptions,
+} from "@/features/company/server/joinDefaultCompanyMembership";
 
 export const runtime = "nodejs";
+
+function parseJoinDefaultBody(body: unknown): JoinDefaultCompanyOptions | undefined {
+  if (!body || typeof body !== "object") return undefined;
+  const record = body as Record<string, unknown>;
+  const staffKind =
+    record.staffKind === "technician"
+      ? "technician"
+      : record.staffKind === "admin"
+        ? "admin"
+        : undefined;
+  if (!staffKind) return undefined;
+
+  if (staffKind === "technician") {
+    return {
+      staffKind,
+      technicianProfile: {
+        firstName: typeof record.firstName === "string" ? record.firstName : undefined,
+        lastName: typeof record.lastName === "string" ? record.lastName : undefined,
+        email: typeof record.email === "string" ? record.email : null,
+      },
+    };
+  }
+
+  return { staffKind: "admin" };
+}
 
 /**
  * Inscription staff self-service : rattache le compte à la société unique (Admin SDK).
@@ -29,7 +57,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Token invalide." }, { status: 401 });
   }
 
-  const result = await joinDefaultCompanyMembership(admin.firestore(), admin.auth, decoded.uid);
+  let options: JoinDefaultCompanyOptions | undefined;
+  try {
+    const body = await req.json();
+    options = parseJoinDefaultBody(body);
+  } catch {
+    options = undefined;
+  }
+
+  const result = await joinDefaultCompanyMembership(
+    admin.firestore(),
+    admin.auth,
+    decoded.uid,
+    options
+  );
   if (!result.ok) {
     return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
   }

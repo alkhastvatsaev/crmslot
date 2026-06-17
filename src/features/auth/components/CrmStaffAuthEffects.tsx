@@ -12,6 +12,7 @@ import {
   completeCrmStaffOAuthSession,
 } from "@/features/auth/crmEmailRegister";
 import { consumeCrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
+import { readStaffJoinPayload } from "@/features/auth/staffJoinPayload";
 import { crmStaffOAuthSignInErrorFeedback } from "@/features/auth/crmStaffOAuthSignIn";
 
 /** Finalise OAuth redirect (Google / Apple) pour l'auth CRM staff. */
@@ -26,7 +27,8 @@ export default function CrmStaffAuthEffects() {
         const result = await getRedirectResult(auth);
         if (!result?.user) return;
         const mode = consumeCrmStaffOAuthMode();
-        const outcome = await completeCrmStaffOAuthSession(result, mode, auth);
+        const staffJoin = readStaffJoinPayload();
+        const outcome = await completeCrmStaffOAuthSession(result, mode, auth, staffJoin);
         const providerId = result.providerId?.includes("apple") ? "apple" : "google";
         toast.success(
           String(

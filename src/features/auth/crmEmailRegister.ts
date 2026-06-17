@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 import type { CrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
+import type { StaffJoinPayload } from "@/features/auth/staffJoinPayload";
 
 export class CrmStaffJoinCompanyError extends Error {
   constructor(message: string) {
@@ -27,15 +28,21 @@ export class CrmStaffOAuthModeError extends Error {
 }
 
 /** Connexion : rattachement idempotent à la société unique. */
-export async function syncDefaultCompanyMembershipAfterLogin(cred: UserCredential): Promise<void> {
-  const result = await requestDefaultCompanyMembership(cred.user);
+export async function syncDefaultCompanyMembershipAfterLogin(
+  cred: UserCredential,
+  staffJoin?: StaffJoinPayload | null
+): Promise<void> {
+  const result = await requestDefaultCompanyMembership(cred.user, staffJoin);
   if (!result.ok) {
     throw new CrmStaffJoinCompanyError(result.error);
   }
 }
 
-export async function joinDefaultCompanyAfterSignUp(cred: UserCredential): Promise<string> {
-  const result = await requestDefaultCompanyMembership(cred.user);
+export async function joinDefaultCompanyAfterSignUp(
+  cred: UserCredential,
+  staffJoin?: StaffJoinPayload | null
+): Promise<string> {
+  const result = await requestDefaultCompanyMembership(cred.user, staffJoin);
 
   if (!result.ok) {
     try {
@@ -53,13 +60,18 @@ export async function registerCrmStaffAccount(params: {
   auth: Auth;
   email: string;
   password: string;
+  staffJoin?: StaffJoinPayload;
 }): Promise<{ companyId: string }> {
   const cred = await createUserWithEmailAndPassword(
     params.auth,
     params.email.trim(),
     params.password
   );
-  const companyId = await joinDefaultCompanyAfterSignUp(cred);
+  const staffJoin: StaffJoinPayload = params.staffJoin ?? { staffKind: "admin" };
+  const companyId = await joinDefaultCompanyAfterSignUp(cred, {
+    ...staffJoin,
+    email: params.email.trim(),
+  });
   return { companyId };
 }
 
@@ -67,7 +79,8 @@ export async function registerCrmStaffAccount(params: {
 export async function completeCrmStaffOAuthSession(
   cred: UserCredential,
   mode: CrmStaffOAuthMode,
-  auth?: Auth | null
+  auth?: Auth | null,
+  staffJoin?: StaffJoinPayload | null
 ): Promise<CrmStaffOAuthMode> {
   const isNewUser = getAdditionalUserInfo(cred)?.isNewUser ?? false;
 
@@ -80,7 +93,7 @@ export async function completeCrmStaffOAuthSession(
       }
       throw new CrmStaffOAuthModeError("account_not_found");
     }
-    await syncDefaultCompanyMembershipAfterLogin(cred);
+    await syncDefaultCompanyMembershipAfterLogin(cred, staffJoin);
     return "login";
   }
 
@@ -95,6 +108,6 @@ export async function completeCrmStaffOAuthSession(
     throw new CrmStaffOAuthModeError("account_already_exists");
   }
 
-  await joinDefaultCompanyAfterSignUp(cred);
+  await joinDefaultCompanyAfterSignUp(cred, staffJoin);
   return "register";
 }

@@ -877,6 +877,8 @@
     "email_password_disabled": "Connexion e-mail / mot de passe non activée",
     "email_password_disabled_hint": "Firebase Console → Authentication → E-mail/Mot de passe : activer le fournisseur.",
     "email_required": "Saisissez une adresse e-mail",
+    "first_name_required": "Saisissez votre prénom",
+    "last_name_required": "Saisissez votre nom",
     "link_sent": "Lien envoyé",
     "check_inbox": "Vérifiez votre boîte mail.",
     "send_failed": "Envoi impossible",
