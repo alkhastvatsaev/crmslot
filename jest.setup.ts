@@ -207,6 +207,7 @@ jest.mock("firebase/auth", () => {
     GoogleAuthProvider: MockGoogleAuthProvider,
     OAuthProvider: MockOAuthProvider,
     getRedirectResult: jest.fn(() => Promise.resolve(null)),
+    getAdditionalUserInfo: jest.fn(() => ({ isNewUser: false })),
     isSignInWithEmailLink: jest.fn(() => false),
     signInWithEmailLink: jest.fn(() =>
       Promise.resolve({

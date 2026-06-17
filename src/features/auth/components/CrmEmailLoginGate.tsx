@@ -6,6 +6,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { ensureNativeAuthPersistence } from "@/core/native/nativeAuthPersistence";
 import CrmEmailLoginPanel from "@/features/auth/components/CrmEmailLoginPanel";
+import CrmStaffAuthEffects from "@/features/auth/components/CrmStaffAuthEffects";
 import {
   crmEmailLoginTestId,
   type CrmEmailLoginVariant,
@@ -55,8 +56,18 @@ export default function CrmEmailLoginGate({ variant, children }: Props) {
   }
 
   if (phase === "login") {
-    return <CrmEmailLoginPanel variant={variant} />;
+    return (
+      <>
+        <CrmStaffAuthEffects />
+        <CrmEmailLoginPanel variant={variant} />
+      </>
+    );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <CrmStaffAuthEffects />
+      {children}
+    </>
+  );
 }
