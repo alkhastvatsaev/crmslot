@@ -6,6 +6,7 @@ import {
   Package,
   Receipt,
   Sparkles,
+  Users,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -21,6 +22,7 @@ export const DASHBOARD_MOBILE_NAV_ICONS: Record<DashboardMobileNavIconKey, Lucid
   "spotlight.nav_feature_hub": Package,
   "spotlight.nav_crm_history": Sparkles,
   "spotlight.nav_billing_hub": Receipt,
+  "spotlight.nav_team_hub": Users,
   "spotlight.nav_offline": BrainCircuit,
 };
 
@@ -42,5 +44,6 @@ export const MOBILE_TAB_I18N: Record<DashboardMobileNavIconKey, string> = {
   "spotlight.nav_feature_hub": "mobile.tab_material",
   "spotlight.nav_crm_history": "mobile.tab_crm",
   "spotlight.nav_billing_hub": "mobile.tab_billing",
+  "spotlight.nav_team_hub": "mobile.tab_team",
   "spotlight.nav_offline": "mobile.tab_ai",
 };

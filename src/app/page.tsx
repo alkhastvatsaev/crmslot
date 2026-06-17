@@ -10,6 +10,7 @@ import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploa
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
+import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
@@ -64,6 +65,11 @@ const OfflineHubPage = dynamic(
   { ssr: false, loading: () => null }
 );
 
+const TeamHubPage = dynamic(() => import("@/features/teamHub/components/TeamHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
 const desktopHeader = (
   <>
     <aside
@@ -85,7 +91,7 @@ const desktopHeader = (
   </>
 );
 
-/** Dashboard admin — 6 pages · client `/m/demande` · terrain `/m/technician`. */
+/** Dashboard admin — 7 pages · client `/m/demande` · terrain `/m/technician`. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
   const router = useRouter();
@@ -127,6 +133,9 @@ export default function Dashboard() {
       </ErrorBoundary>,
       <ErrorBoundary key="offline-hub" name="offline-hub">
         <OfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="team-hub" name="team-hub">
+        <TeamHubPage slotIndex={TEAM_HUB_SLOT_INDEX} />
       </ErrorBoundary>,
     ],
     []

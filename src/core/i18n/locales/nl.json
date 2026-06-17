@@ -830,6 +830,39 @@
       "right": "documents"
     }
   },
+  "teamHub": {
+    "title": "Team",
+    "subtitle": "Medewerkers en technici van uw bedrijf",
+    "company_required": "Selecteer een actief bedrijf.",
+    "empty": "Geen medewerkers voor dit filter.",
+    "no_email": "Geen e-mail ingevuld",
+    "select_member": "Selecteer een medewerker om het profiel te bewerken.",
+    "save": "Opslaan",
+    "deactivate": "Deactiveren",
+    "reactivate": "Heractiveren",
+    "filter": {
+      "active": "Actief",
+      "inactive": "Inactief",
+      "all": "Alle"
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "role": {
+      "admin": "Admin",
+      "collaborateur": "Technieker"
+    },
+    "fields": {
+      "first_name": "Voornaam",
+      "last_name": "Achternaam",
+      "email": "E-mail",
+      "vehicle": "Voertuig"
+    },
+    "aria": {
+      "page": "Pagina"
+    }
+  },
   "spotlight": {
     "search_placeholder": "Naam",
     "map_action_title": "Kaart",
@@ -848,6 +881,7 @@
     "nav_feature_hub": "Materiaal",
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Facturatie",
+    "nav_team_hub": "Team",
     "open_aria": "Zoek openen",
     "active_label": "Actief",
     "nav_group_heading": "Navigatie"
@@ -2053,6 +2087,7 @@
     "tab_material": "Materiaal",
     "tab_crm": "CRM",
     "tab_billing": "Facturen",
+    "tab_team": "Team",
     "rail_segment_label": "Paneel van de pagina",
     "rail_left": "Links",
     "rail_center": "Midden",

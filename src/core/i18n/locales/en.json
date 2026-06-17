@@ -830,6 +830,39 @@
       "right": "documents"
     }
   },
+  "teamHub": {
+    "title": "Team",
+    "subtitle": "Employees and technicians in your company",
+    "company_required": "Select an active company.",
+    "empty": "No employees for this filter.",
+    "no_email": "No email on file",
+    "select_member": "Select an employee to edit their profile.",
+    "save": "Save",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "filter": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "all": "All"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "role": {
+      "admin": "Admin",
+      "collaborateur": "Technician"
+    },
+    "fields": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "vehicle": "Vehicle"
+    },
+    "aria": {
+      "page": "Page"
+    }
+  },
   "spotlight": {
     "search_placeholder": "Name",
     "map_action_title": "Map",
@@ -848,6 +881,7 @@
     "nav_feature_hub": "Materials",
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Billing",
+    "nav_team_hub": "Team",
     "open_aria": "Open search",
     "active_label": "Active",
     "nav_group_heading": "Navigation"
@@ -2053,6 +2087,7 @@
     "tab_material": "Stock",
     "tab_crm": "CRM",
     "tab_billing": "Billing",
+    "tab_team": "Team",
     "rail_segment_label": "Page panels",
     "rail_left": "Left",
     "rail_center": "Center",
