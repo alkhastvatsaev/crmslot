@@ -17,6 +17,8 @@ export default function WorkspaceRequiredPanel() {
 
   if (!firebaseMissing && !needsLogin && !needsMembership) return null;
 
+  const joinError = workspace.membershipJoinError;
+
   return (
     <div
       data-testid="workspace-required-banner"
@@ -26,7 +28,20 @@ export default function WorkspaceRequiredPanel() {
         ? "Configuration Firebase manquante — renseignez .env.local (voir .env.example)."
         : needsLogin
           ? "Connectez-vous avec un compte administrateur ou technicien pour accéder à l’espace société."
-          : "Aucune société associée à ce compte — contactez un administrateur pour recevoir une invitation."}
+          : joinError
+            ? `Rattachement à la société impossible : ${joinError}`
+            : "Aucune société associée à ce compte — contactez un administrateur pour recevoir une invitation."}
+      {needsMembership && joinError ? (
+        <button
+          type="button"
+          data-testid="workspace-retry-company-join"
+          className="ml-2 underline underline-offset-2"
+          disabled={workspace.membershipJoinPending}
+          onClick={() => void workspace.retryDefaultCompanyJoin()}
+        >
+          Réessayer
+        </button>
+      ) : null}
     </div>
   );
 }

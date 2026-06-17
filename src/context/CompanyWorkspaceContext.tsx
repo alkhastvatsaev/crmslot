@@ -12,6 +12,7 @@ import {
 import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
+import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
@@ -26,6 +27,10 @@ export type CompanyWorkspaceApi = {
   workspaceReady: boolean;
   /** Au moins une société — interventions filtrées + création avec tenant */
   isTenantUser: boolean;
+  /** Rattachement auto à la société unique en cours ou en échec. */
+  membershipJoinPending: boolean;
+  membershipJoinError: string | null;
+  retryDefaultCompanyJoin: () => Promise<void>;
   /** Met à jour bmTenants / bmActive côté token (sans toast). */
   refreshClaimsSilent: () => Promise<boolean>;
 };
@@ -45,6 +50,8 @@ export function CompanyWorkspaceProvider({
   const [authLoading, setAuthLoading] = useState(isConfigured && !!auth);
   const [membershipsReady, setMembershipsReady] = useState(!isConfigured || !auth);
   const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
+  const [membershipJoinPending, setMembershipJoinPending] = useState(false);
+  const [membershipJoinError, setMembershipJoinError] = useState<string | null>(null);
 
   const persistActiveId = useCallback((id: string) => {
     if (typeof window !== "undefined") {
@@ -133,6 +140,46 @@ export function CompanyWorkspaceProvider({
     };
   }, [firebaseUid]);
 
+  const retryDefaultCompanyJoin = useCallback(async () => {
+    const user = auth?.currentUser;
+    if (!user || user.isAnonymous) return;
+    setMembershipJoinPending(true);
+    setMembershipJoinError(null);
+    try {
+      const result = await requestDefaultCompanyMembership(user);
+      if (!result.ok) {
+        setMembershipJoinError(result.error);
+      }
+    } catch {
+      setMembershipJoinError("Impossible de rattacher le compte à la société.");
+    } finally {
+      setMembershipJoinPending(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!auth || authLoading || !membershipsReady || memberships.length > 0) return;
+    const user = auth.currentUser;
+    if (!user || user.isAnonymous) return;
+
+    let cancelled = false;
+    setMembershipJoinPending(true);
+    setMembershipJoinError(null);
+
+    void (async () => {
+      const result = await requestDefaultCompanyMembership(user);
+      if (cancelled) return;
+      if (!result.ok) {
+        setMembershipJoinError(result.error);
+      }
+      setMembershipJoinPending(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, membershipsReady, memberships.length, firebaseUid]);
+
   const claimsGatePending = memberships.length > 0 && !claimsInitialSyncDone;
 
   const effectiveActiveCompanyId = useMemo(() => {
@@ -193,8 +240,12 @@ export function CompanyWorkspaceProvider({
       activeCompanyId: effectiveActiveCompanyId,
       setActiveCompanyId,
       activeRole,
-      workspaceReady: !authLoading && membershipsReady && !claimsGatePending,
+      workspaceReady:
+        !authLoading && membershipsReady && !claimsGatePending && !membershipJoinPending,
       isTenantUser: !authLoading && membershipsReady && memberships.length > 0,
+      membershipJoinPending,
+      membershipJoinError,
+      retryDefaultCompanyJoin,
       refreshClaimsSilent,
     }),
     [
@@ -207,6 +258,9 @@ export function CompanyWorkspaceProvider({
       authLoading,
       membershipsReady,
       claimsGatePending,
+      membershipJoinPending,
+      membershipJoinError,
+      retryDefaultCompanyJoin,
     ]
   );
 
