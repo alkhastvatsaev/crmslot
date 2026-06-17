@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/I18nContext";
 import CrmBrandOAuthButton from "@/features/auth/components/CrmBrandOAuthButton";
+import { useIsIphoneClient } from "@/features/auth/hooks/useIsIphoneClient";
 import {
   crmEmailLoginTestId,
   type CrmEmailLoginVariant,
@@ -25,10 +26,16 @@ export default function CrmStaffOAuthButtons({
   onAppleSignIn,
 }: Props) {
   const { t } = useTranslation();
+  const isIphone = useIsIphoneClient();
   const oauthDisabled = disabled || googleBusy || appleBusy;
+  const showApple = isIphone === true;
 
   return (
-    <div className="mt-1 flex flex-col gap-2.5" data-testid={crmEmailLoginTestId(variant, "oauth")}>
+    <div
+      className="mt-1 flex flex-col gap-2.5"
+      data-testid={crmEmailLoginTestId(variant, "oauth")}
+      data-show-apple={showApple ? "true" : "false"}
+    >
       <div className="relative flex w-full items-center py-1" aria-hidden>
         <div className="h-px flex-1 bg-slate-200/90" />
         <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
@@ -46,14 +53,16 @@ export default function CrmStaffOAuthButtons({
         onClick={onGoogleSignIn}
       />
 
-      <CrmBrandOAuthButton
-        variant="apple"
-        testId={crmEmailLoginTestId(variant, "apple")}
-        label={String(t("auth.continue_with_apple"))}
-        disabled={oauthDisabled}
-        busy={appleBusy}
-        onClick={onAppleSignIn}
-      />
+      {showApple ? (
+        <CrmBrandOAuthButton
+          variant="apple"
+          testId={crmEmailLoginTestId(variant, "apple")}
+          label={String(t("auth.continue_with_apple"))}
+          disabled={oauthDisabled}
+          busy={appleBusy}
+          onClick={onAppleSignIn}
+        />
+      ) : null}
     </div>
   );
 }

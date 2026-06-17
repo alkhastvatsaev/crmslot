@@ -93,7 +93,12 @@ describe("LoginOverlay (admin)", () => {
     expect(screen.getByTestId("admin-login-confirm-password")).toBeInTheDocument();
   });
 
-  it("shows Google and Apple one-click buttons", async () => {
+  it("shows Google OAuth button on desktop", async () => {
+    Object.defineProperty(window.navigator, "userAgent", {
+      value: "Mozilla/5.0 (Macintosh; Intel Mac OS X)",
+      configurable: true,
+    });
+
     (onAuthStateChanged as jest.Mock).mockImplementation((_auth, cb) => {
       cb(null);
       return jest.fn();
@@ -107,6 +112,6 @@ describe("LoginOverlay (admin)", () => {
 
     await waitFor(() => expect(screen.getByTestId("admin-login-oauth")).toBeInTheDocument());
     expect(screen.getByTestId("admin-login-google")).toBeInTheDocument();
-    expect(screen.getByTestId("admin-login-apple")).toBeInTheDocument();
+    expect(screen.queryByTestId("admin-login-apple")).not.toBeInTheDocument();
   });
 });

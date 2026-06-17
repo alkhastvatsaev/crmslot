@@ -1,6 +1,7 @@
 import {
   detectMobileClient,
   isForceMobileQuery,
+  isIphoneUserAgent,
   isPhoneUserAgent,
 } from "@/core/config/mobileClientDetection";
 
@@ -26,6 +27,23 @@ describe("mobileClientDetection", () => {
     it("ignore iPad et desktop", () => {
       expect(isPhoneUserAgent("Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)")).toBe(false);
       expect(isPhoneUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X)")).toBe(false);
+    });
+  });
+
+  describe("isIphoneUserAgent", () => {
+    it("détecte iPhone et iPod", () => {
+      expect(isIphoneUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)")).toBe(
+        true
+      );
+      expect(isIphoneUserAgent("Mozilla/5.0 (iPod touch; CPU iPhone OS 15_0 like Mac OS X)")).toBe(
+        true
+      );
+    });
+
+    it("ignore Android, iPad et desktop", () => {
+      expect(isIphoneUserAgent("Mozilla/5.0 (Linux; Android 14; Pixel 8)")).toBe(false);
+      expect(isIphoneUserAgent("Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)")).toBe(false);
+      expect(isIphoneUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X)")).toBe(false);
     });
   });
 
