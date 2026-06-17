@@ -1,5 +1,6 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 
 export type TechnicianStaffProfile = {
   firstName?: string;
@@ -62,4 +63,6 @@ export async function provisionTechnicianStaffRecord(
   } else {
     await ref.set(patch, { merge: true });
   }
+
+  await upsertCompanyStaffDirectoryEntry(db, params.companyId, params.uid, "collaborateur");
 }

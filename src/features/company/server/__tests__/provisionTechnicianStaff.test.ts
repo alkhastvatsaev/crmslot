@@ -27,6 +27,7 @@ describe("provisionTechnicianStaff", () => {
   });
 
   it("creates technicians doc with authUid equal to firebase uid", async () => {
+    const directorySet = jest.fn().mockResolvedValue(undefined);
     const technicianSet = jest.fn();
     const technicianGet = jest.fn().mockResolvedValue({ exists: false, data: () => undefined });
     const db = {
@@ -38,6 +39,12 @@ describe("provisionTechnicianStaff", () => {
             set: technicianSet,
           })),
         };
+      }),
+      doc: jest.fn((path: string) => {
+        if (!path.startsWith("companies/co-abc/staff_directory/")) {
+          throw new Error(`unexpected ${path}`);
+        }
+        return { set: directorySet };
       }),
     };
 

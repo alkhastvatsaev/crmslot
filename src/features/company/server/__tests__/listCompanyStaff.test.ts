@@ -1,14 +1,6 @@
 /**
  * @jest-environment node
  */
-import { FieldPath } from "firebase-admin/firestore";
-
-jest.mock("firebase-admin/firestore", () => ({
-  FieldPath: {
-    documentId: jest.fn(() => "__name__"),
-  },
-}));
-
 import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 
 const mockGetUser = jest.fn();
@@ -20,15 +12,6 @@ describe("listCompanyStaff", () => {
   });
 
   it("merges membership role with technician profile", async () => {
-    const membershipDocs = [
-      {
-        ref: {
-          parent: { parent: { id: "uid-tech-1" } },
-        },
-        data: () => ({ role: "collaborateur" }),
-      },
-    ];
-
     const technicianDoc = {
       get: jest.fn().mockResolvedValue({
         exists: true,
@@ -44,17 +27,9 @@ describe("listCompanyStaff", () => {
       }),
     };
 
-    const membershipGet = jest.fn().mockResolvedValue({
-      exists: true,
-      data: () => ({ role: "collaborateur" }),
-    });
+    const staffDirectoryGet = jest.fn().mockResolvedValue({ docs: [] });
 
     const db = {
-      collectionGroup: jest.fn(() => ({
-        where: jest.fn(() => ({
-          get: jest.fn().mockResolvedValue({ docs: membershipDocs }),
-        })),
-      })),
       collection: jest.fn((name: string) => {
         if (name === "technicians") {
           return {
@@ -65,6 +40,9 @@ describe("listCompanyStaff", () => {
             })),
             doc: jest.fn(() => technicianDoc),
           };
+        }
+        if (name === "companies/co-abc/staff_directory") {
+          return { get: staffDirectoryGet };
         }
         if (name === "companies") {
           return {
@@ -77,7 +55,15 @@ describe("listCompanyStaff", () => {
       }),
       doc: jest.fn((path: string) => {
         if (path === "users/uid-tech-1/company_memberships/co-abc") {
-          return { get: membershipGet };
+          return {
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({ role: "collaborateur" }),
+            }),
+          };
+        }
+        if (path === "companies/co-abc/staff_directory/uid-tech-1") {
+          return { set: jest.fn().mockResolvedValue(undefined) };
         }
         throw new Error(path);
       }),
@@ -98,34 +84,26 @@ describe("listCompanyStaff", () => {
     });
   });
 
-  it("retourne les techniciens même si l'index collectionGroup manque", async () => {
+  it("inclut les admins listés dans staff_directory sans fiche technicien", async () => {
     const technicianDoc = {
-      get: jest.fn().mockResolvedValue({
-        exists: true,
-        data: () => ({
-          companyId: "co-abc",
-          authUid: "uid-tech-2",
-          name: "Paul Dupont",
-          active: true,
-        }),
-      }),
+      get: jest.fn().mockResolvedValue({ exists: false }),
     };
 
     const db = {
-      collectionGroup: jest.fn(() => ({
-        where: jest.fn(() => ({
-          get: jest.fn().mockRejectedValue(new Error("FAILED_PRECONDITION: missing index")),
-        })),
-      })),
       collection: jest.fn((name: string) => {
         if (name === "technicians") {
           return {
             where: jest.fn(() => ({
-              get: jest.fn().mockResolvedValue({
-                docs: [{ id: "uid-tech-2" }],
-              }),
+              get: jest.fn().mockResolvedValue({ docs: [] }),
             })),
             doc: jest.fn(() => technicianDoc),
+          };
+        }
+        if (name === "companies/co-abc/staff_directory") {
+          return {
+            get: jest.fn().mockResolvedValue({
+              docs: [{ id: "uid-admin-1" }],
+            }),
           };
         }
         if (name === "companies") {
@@ -138,25 +116,32 @@ describe("listCompanyStaff", () => {
         throw new Error(name);
       }),
       doc: jest.fn((path: string) => {
-        if (path === "users/uid-tech-2/company_memberships/co-abc") {
+        if (path === "users/uid-admin-1/company_memberships/co-abc") {
           return {
             get: jest.fn().mockResolvedValue({
               exists: true,
-              data: () => ({ role: "collaborateur" }),
+              data: () => ({ role: "admin" }),
             }),
           };
+        }
+        if (path.startsWith("companies/co-abc/staff_directory/")) {
+          return { set: jest.fn().mockResolvedValue(undefined) };
         }
         throw new Error(path);
       }),
     };
 
     const auth = jest.fn(() => ({
-      getUser: jest.fn().mockResolvedValue({ email: "paul@abc.be", displayName: "Paul Dupont" }),
+      getUser: jest.fn().mockResolvedValue({ email: "admin@abc.be", displayName: "Admin ABC" }),
     }));
 
     const staff = await listCompanyStaff(db as never, auth as never, "co-abc");
 
     expect(staff).toHaveLength(1);
-    expect(staff[0]?.uid).toBe("uid-tech-2");
+    expect(staff[0]).toMatchObject({
+      uid: "uid-admin-1",
+      role: "admin",
+      hasTechnicianProfile: false,
+    });
   });
 });
