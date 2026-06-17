@@ -54,10 +54,12 @@ export async function joinDefaultCompanyMembership(
   const existing = await membershipRef.get();
   if (!existing.exists) {
     await membershipRef.set({
-      role: "collaborateur",
+      role: "admin",
       joinedAt: FieldValue.serverTimestamp(),
       companyName,
     });
+  } else if ((existing.data()?.role as string) !== "admin") {
+    await membershipRef.update({ role: "admin" });
   }
 
   await syncTenantClaims(auth, db, uid, companyId);

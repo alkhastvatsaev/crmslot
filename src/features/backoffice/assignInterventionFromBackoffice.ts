@@ -1,26 +1,40 @@
-import { auth, firestore } from "@/core/config/firebase";
+import { auth } from "@/core/config/firebase";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import type { Intervention } from "@/features/interventions/types";
-import { applyBackofficeTechnicianAssignmentClient } from "@/features/backoffice/applyBackofficeTechnicianAssignmentClient";
 
 export type AssignInterventionSchedule = {
   scheduledDate: string;
   scheduledTime: string;
 };
 
-/** Assignation dispatch — écriture Firestore client + règles déployées. */
+/** Assignation dispatch — API serveur (Admin SDK) en prod, droits société requis. */
 export async function assignInterventionFromBackoffice(
   id: string,
-  row: Intervention,
+  _row: Intervention,
   technicianUid: string,
   schedule?: AssignInterventionSchedule
 ): Promise<void> {
-  if (!firestore) {
-    throw new Error("Firestore indisponible");
-  }
   const actorUid = auth?.currentUser?.uid?.trim();
   if (!actorUid) {
     throw Object.assign(new Error("Non connecté"), { code: "permission-denied" });
   }
 
-  await applyBackofficeTechnicianAssignmentClient(id, row, technicianUid, actorUid, schedule);
+  const res = await fetchWithAuth(`/api/interventions/${encodeURIComponent(id)}/assign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      technicianUid,
+      ...(schedule
+        ? { scheduledDate: schedule.scheduledDate, scheduledTime: schedule.scheduledTime }
+        : {}),
+    }),
+  });
+
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+  if (!res.ok || !data.ok) {
+    const message = typeof data.error === "string" ? data.error : "Assignation échouée";
+    throw Object.assign(new Error(message), {
+      code: res.status === 403 ? "permission-denied" : undefined,
+    });
+  }
 }

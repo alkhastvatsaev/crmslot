@@ -11,12 +11,15 @@ export async function assertCanAssignInterventionServer(
   if (!cid) return false;
 
   const tenants = decoded.bmTenants;
-  if (Array.isArray(tenants) && tenants.some((t) => t === `${cid}:admin`)) {
+  if (
+    Array.isArray(tenants) &&
+    tenants.some((t) => t === `${cid}:admin` || t === `${cid}:collaborateur`)
+  ) {
     return true;
   }
 
   const mem = await db.doc(`users/${uid}/company_memberships/${cid}`).get();
   if (!mem.exists) return false;
   const role = mem.data()?.role;
-  return role === "admin";
+  return role === "admin" || role === "collaborateur";
 }
