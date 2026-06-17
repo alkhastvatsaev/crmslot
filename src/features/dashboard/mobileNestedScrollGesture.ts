@@ -62,99 +62,12 @@ export function isVerticalScrollAtBottom(el: HTMLElement, epsilonPx = 8): boolea
   return maxScroll <= epsilonPx || el.scrollTop >= maxScroll - epsilonPx;
 }
 
-/** Le panneau peut encore absorber ce geste vertical (sinon → changement de page). */
+/** Le panneau peut encore absorber ce geste vertical. */
 export function canConsumeVerticalScroll(el: HTMLElement, deltaY: number): boolean {
   const maxScroll = el.scrollHeight - el.clientHeight;
   if (maxScroll <= 0) return false;
   if (deltaY > 0) return el.scrollTop > 0;
   return el.scrollTop < maxScroll - 1;
-}
-
-export function shouldRouteVerticalSwipeToPage(
-  innerScrollEl: HTMLElement | null,
-  dy: number
-): boolean {
-  if (!innerScrollEl) return true;
-  return !canConsumeVerticalScroll(innerScrollEl, dy);
-}
-
-export type MobilePageSwipeHandlers = {
-  onSwipeUp: () => void;
-  onSwipeDown: () => void;
-  isDisabled?: () => boolean;
-  swipeThresholdPx?: number;
-};
-
-/**
- * Swipe vertical → changement de page, avec relais aux bords des panneaux scrollables.
- */
-export function bindMobilePageSwipeGesture(
-  boundary: HTMLElement,
-  handlers: MobilePageSwipeHandlers
-): () => void {
-  const swipeThresholdPx = handlers.swipeThresholdPx ?? 52;
-
-  let startX = 0;
-  let startY = 0;
-  let axis: MobileScrollAxis = "none";
-  let innerScrollEl: HTMLElement | null = null;
-
-  const onTouchStart = (event: TouchEvent) => {
-    if (handlers.isDisabled?.() || event.touches.length !== 1) return;
-    axis = "none";
-    innerScrollEl = findVerticalScrollParent(event.target, boundary);
-    startX = event.touches[0].clientX;
-    startY = event.touches[0].clientY;
-  };
-
-  const onTouchMove = (event: TouchEvent) => {
-    if (handlers.isDisabled?.() || event.touches.length !== 1) return;
-    const dx = event.touches[0].clientX - startX;
-    const dy = event.touches[0].clientY - startY;
-
-    if (axis === "none") {
-      axis = resolveMobileScrollAxis(dx, dy);
-      if (axis === "none") return;
-    }
-
-    if (axis === "y" && innerScrollEl && !canConsumeVerticalScroll(innerScrollEl, dy)) {
-      event.preventDefault();
-    }
-  };
-
-  const finishGesture = (clientX: number, clientY: number) => {
-    if (handlers.isDisabled?.() || axis !== "y") return;
-    const dx = clientX - startX;
-    const dy = clientY - startY;
-    if (resolveMobileScrollAxis(dx, dy, swipeThresholdPx) !== "y") return;
-    if (!shouldRouteVerticalSwipeToPage(innerScrollEl, dy)) return;
-    if (dy < 0) handlers.onSwipeUp();
-    else if (dy > 0) handlers.onSwipeDown();
-  };
-
-  const onTouchEnd = (event: TouchEvent) => {
-    if (event.changedTouches.length !== 1) return;
-    const touch = event.changedTouches[0];
-    finishGesture(touch.clientX, touch.clientY);
-    axis = "none";
-  };
-
-  const onTouchCancel = () => {
-    axis = "none";
-  };
-
-  const capture = { capture: true } as const;
-  boundary.addEventListener("touchstart", onTouchStart, { passive: true, ...capture });
-  boundary.addEventListener("touchmove", onTouchMove, { passive: false, ...capture });
-  boundary.addEventListener("touchend", onTouchEnd, { passive: true, ...capture });
-  boundary.addEventListener("touchcancel", onTouchCancel, { passive: true, ...capture });
-
-  return () => {
-    boundary.removeEventListener("touchstart", onTouchStart, capture);
-    boundary.removeEventListener("touchmove", onTouchMove, capture);
-    boundary.removeEventListener("touchend", onTouchEnd, capture);
-    boundary.removeEventListener("touchcancel", onTouchCancel, capture);
-  };
 }
 
 /**

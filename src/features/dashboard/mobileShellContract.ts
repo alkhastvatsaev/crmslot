@@ -43,8 +43,6 @@ export const MOBILE_SHELL_CONTRACT = {
   guardedSourceSnippets: {
     "src/features/dashboard/components/MobileScreenHost.tsx": [
       "useDashboardPageSelector",
-      "useMobilePageSwipe",
-      "stepDashboardLinearPageIndex",
       "dashboard-page-selector-host",
       "dashboard-account-panel-host",
       "pages.slice",
