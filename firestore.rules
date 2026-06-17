@@ -347,12 +347,36 @@ service cloud.firestore {
       ]);
     }
 
+    /** Dispatch back-office : assignation / réassignation technicien (staff société). */
+    function staffCollaborateurCanDispatchAssign() {
+      return interventionSensitiveBillingUnchanged()
+        && request.resource.data.companyId == resource.data.companyId
+        && request.resource.data.status == 'assigned'
+        && (
+          resource.data.status == 'pending'
+          || resource.data.status == 'pending_needs_address'
+          || resource.data.status == 'assigned'
+          || (
+            resource.data.status == 'in_progress'
+            && (
+              !resource.data.keys().hasAny(['technicianAcceptedAt'])
+              || resource.data.technicianAcceptedAt == null
+              || resource.data.technicianAcceptedAt == ''
+            )
+          )
+        );
+    }
+
     function canUpdateInterventionAsTenantStaff() {
       return isCompanyPortalUser()
         && interventionHasTenantScope(resource.data)
         && tenantClaimsIncludeCompany(resource.data.companyId)
         && (
           request.auth.token.bmTenants.hasAny([resource.data.companyId + ':admin'])
+          || (
+            request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
+            && staffCollaborateurCanDispatchAssign()
+          )
           || (
             request.auth.token.bmTenants.hasAny([resource.data.companyId + ':collaborateur'])
             && resource.data.keys().hasAny(['createdByUid'])
@@ -368,6 +392,10 @@ service cloud.firestore {
         && userBelongsToCompany(resource.data.companyId)
         && (
           userRoleInCompany(resource.data.companyId) == 'admin'
+          || (
+            userRoleInCompany(resource.data.companyId) == 'collaborateur'
+            && staffCollaborateurCanDispatchAssign()
+          )
           || (
             userRoleInCompany(resource.data.companyId) == 'collaborateur'
             && resource.data.keys().hasAny(['createdByUid'])

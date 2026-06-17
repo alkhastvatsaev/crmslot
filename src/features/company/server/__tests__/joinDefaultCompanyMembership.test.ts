@@ -28,7 +28,7 @@ describe("joinDefaultCompanyMembership", () => {
     });
   });
 
-  it("creates collaborateur membership and syncs claims", async () => {
+  it("creates admin membership and syncs claims", async () => {
     const membershipSet = jest.fn();
     const companyGet = jest.fn().mockResolvedValue({
       exists: true,
@@ -36,7 +36,7 @@ describe("joinDefaultCompanyMembership", () => {
     });
     const membershipGet = jest.fn().mockResolvedValue({ exists: false });
     const membershipsSnap = {
-      docs: [{ id: "co-abc", data: () => ({ role: "collaborateur" }) }],
+      docs: [{ id: "co-abc", data: () => ({ role: "admin" }) }],
     };
     const membershipsGet = jest.fn().mockResolvedValue(membershipsSnap);
 
@@ -63,12 +63,12 @@ describe("joinDefaultCompanyMembership", () => {
     expect(result).toEqual({ ok: true, companyId: "co-abc", alreadyMember: false });
     expect(membershipSet).toHaveBeenCalledWith(
       expect.objectContaining({
-        role: "collaborateur",
+        role: "admin",
         companyName: "ABC",
       })
     );
     expect(mockSetCustomUserClaims).toHaveBeenCalledWith("uid-1", {
-      bmTenants: ["co-abc:collaborateur"],
+      bmTenants: ["co-abc:admin"],
       bmActive: "co-abc",
     });
   });
