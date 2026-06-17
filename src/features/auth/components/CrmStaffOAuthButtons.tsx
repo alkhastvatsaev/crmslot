@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/I18nContext";
+import type { CrmEmailAuthTab } from "@/features/auth/crmEmailLoginVariant";
 import CrmBrandOAuthButton from "@/features/auth/components/CrmBrandOAuthButton";
 import { useIsIphoneClient } from "@/features/auth/hooks/useIsIphoneClient";
 import {
@@ -10,6 +11,7 @@ import {
 
 type Props = {
   variant: CrmEmailLoginVariant;
+  authTab: CrmEmailAuthTab;
   disabled?: boolean;
   googleBusy?: boolean;
   appleBusy?: boolean;
@@ -19,6 +21,7 @@ type Props = {
 
 export default function CrmStaffOAuthButtons({
   variant,
+  authTab,
   disabled = false,
   googleBusy = false,
   appleBusy = false,
@@ -29,11 +32,20 @@ export default function CrmStaffOAuthButtons({
   const isIphone = useIsIphoneClient();
   const oauthDisabled = disabled || googleBusy || appleBusy;
   const showApple = isIphone === true;
+  const isRegister = authTab === "register";
+
+  const googleLabel = String(
+    t(isRegister ? "auth.oauth_google_register" : "auth.continue_with_google")
+  );
+  const appleLabel = String(
+    t(isRegister ? "auth.oauth_apple_register" : "auth.continue_with_apple")
+  );
 
   return (
     <div
       className="mt-1 flex flex-col gap-2.5"
       data-testid={crmEmailLoginTestId(variant, "oauth")}
+      data-oauth-mode={authTab}
       data-show-apple={showApple ? "true" : "false"}
     >
       <div className="relative flex w-full items-center py-1" aria-hidden>
@@ -47,7 +59,7 @@ export default function CrmStaffOAuthButtons({
       <CrmBrandOAuthButton
         variant="google"
         testId={crmEmailLoginTestId(variant, "google")}
-        label={String(t("auth.continue_with_google"))}
+        label={googleLabel}
         disabled={oauthDisabled}
         busy={googleBusy}
         onClick={onGoogleSignIn}
@@ -57,7 +69,7 @@ export default function CrmStaffOAuthButtons({
         <CrmBrandOAuthButton
           variant="apple"
           testId={crmEmailLoginTestId(variant, "apple")}
-          label={String(t("auth.continue_with_apple"))}
+          label={appleLabel}
           disabled={oauthDisabled}
           busy={appleBusy}
           onClick={onAppleSignIn}

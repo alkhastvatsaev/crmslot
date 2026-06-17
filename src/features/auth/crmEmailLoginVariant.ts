@@ -1,4 +1,5 @@
 export type CrmEmailLoginVariant = "technician" | "admin";
+export type CrmEmailAuthTab = "login" | "register";
 
 export function crmEmailLoginTestId(variant: CrmEmailLoginVariant, part: string): string {
   const prefix = variant === "technician" ? "technician" : "admin";

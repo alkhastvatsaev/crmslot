@@ -2,15 +2,27 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
   getAdditionalUserInfo,
+  signOut,
   type Auth,
   type UserCredential,
 } from "firebase/auth";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
+import type { CrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
 
 export class CrmStaffJoinCompanyError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "CrmStaffJoinCompanyError";
+  }
+}
+
+export class CrmStaffOAuthModeError extends Error {
+  readonly code: "account_not_found" | "account_already_exists";
+
+  constructor(code: "account_not_found" | "account_already_exists") {
+    super(code);
+    this.name = "CrmStaffOAuthModeError";
+    this.code = code;
   }
 }
 
@@ -51,12 +63,38 @@ export async function registerCrmStaffAccount(params: {
   return { companyId };
 }
 
-/** Après Google / Apple : rattachement société (nouveau compte ou connexion existante). */
-export async function completeCrmStaffOAuthSession(cred: UserCredential): Promise<void> {
+/** Après Google / Apple — respecte l’onglet Connexion vs Créer un compte. */
+export async function completeCrmStaffOAuthSession(
+  cred: UserCredential,
+  mode: CrmStaffOAuthMode,
+  auth?: Auth | null
+): Promise<CrmStaffOAuthMode> {
   const isNewUser = getAdditionalUserInfo(cred)?.isNewUser ?? false;
-  if (isNewUser) {
-    await joinDefaultCompanyAfterSignUp(cred);
-  } else {
+
+  if (mode === "login") {
+    if (isNewUser) {
+      try {
+        await deleteUser(cred.user);
+      } catch {
+        /* Firebase peut refuser si session incomplète */
+      }
+      throw new CrmStaffOAuthModeError("account_not_found");
+    }
     await syncDefaultCompanyMembershipAfterLogin(cred);
+    return "login";
   }
+
+  if (!isNewUser) {
+    if (auth) {
+      try {
+        await signOut(auth);
+      } catch {
+        /* ignore */
+      }
+    }
+    throw new CrmStaffOAuthModeError("account_already_exists");
+  }
+
+  await joinDefaultCompanyAfterSignUp(cred);
+  return "register";
 }
