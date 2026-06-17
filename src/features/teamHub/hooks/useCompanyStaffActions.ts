@@ -68,5 +68,7 @@ export function useCompanyStaffActions(companyId: string | null, onSuccess?: () 
     [companyId, onSuccess]
   );
 
-  return { busyUid, error, updateMember, setMemberActive, clearError: () => setError(null) };
+  const clearError = useCallback(() => setError(null), []);
+
+  return { busyUid, error, updateMember, setMemberActive, clearError };
 }
