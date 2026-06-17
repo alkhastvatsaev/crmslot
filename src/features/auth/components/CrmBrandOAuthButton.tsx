@@ -45,7 +45,12 @@ function GoogleLogo() {
 /** Silhouette Apple officielle — blanc sur fond noir du bouton Sign in with Apple. */
 function AppleLogo() {
   return (
-    <svg aria-hidden viewBox="0 0 814 1000" className="h-[17px] w-[14px] fill-white">
+    <svg
+      aria-hidden
+      viewBox="0 0 814 1000"
+      className="h-[18px] w-[15px] shrink-0 fill-white"
+      preserveAspectRatio="xMidYMid meet"
+    >
       <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 129.9 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8-63.1 0-105.7-57.7-155.1-127.3-84.4-122.4-148.8-348.5-62.3-501.1 43.1-74.9 120.1-122.3 203.6-122.3 76.8 0 125.5 40.8 189.3 40.8 61.5 0 99.1-40.8 187.4-40.8 67.2 0 138.5 36.7 181.6 100.2-5.1 3.1-107.4 62.9-107.4 195.3-.1 148.7 126.5 200.5 129.9 201.8zM554.1 146.4c37.2-44.8 62.2-107.1 55.5-169.1-53.7 2.2-118.7 35.8-157.2 80.7-34.5 39.8-64.6 103.5-56.5 164.6 60.1 4.6 121.5-30.8 158.2-76.2z" />
     </svg>
   );
@@ -74,11 +79,11 @@ export default function CrmBrandOAuthButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "relative flex h-11 w-full items-center justify-center rounded-xl px-12 shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
+        "relative flex h-11 w-full items-center rounded-xl px-4 shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
         variantStyles[variant]
       )}
     >
-      <span className="pointer-events-none absolute left-4 flex h-[18px] w-[18px] items-center justify-center">
+      <span className="pointer-events-none flex h-[18px] w-[18px] shrink-0 items-center justify-center">
         {busy ? (
           <Loader2
             className={cn(
@@ -94,10 +99,15 @@ export default function CrmBrandOAuthButton({
         )}
       </span>
       <span
-        className="truncate text-[14px] font-medium leading-tight antialiased"
-        style={{ fontFamily: labelFont[variant] }}
+        className="pointer-events-none absolute inset-0 flex items-center justify-center px-12"
+        aria-hidden
       >
-        {label}
+        <span
+          className="max-w-full truncate text-[14px] font-medium leading-tight antialiased"
+          style={{ fontFamily: labelFont[variant] }}
+        >
+          {label}
+        </span>
       </span>
     </button>
   );
