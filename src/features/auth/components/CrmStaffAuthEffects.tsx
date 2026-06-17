@@ -8,8 +8,10 @@ import { logger } from "@/core/logger";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   CrmStaffJoinCompanyError,
+  CrmStaffOAuthModeError,
   completeCrmStaffOAuthSession,
 } from "@/features/auth/crmEmailRegister";
+import { consumeCrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
 import { crmStaffOAuthSignInErrorFeedback } from "@/features/auth/crmStaffOAuthSignIn";
 
 /** Finalise OAuth redirect (Google / Apple) pour l'auth CRM staff. */
@@ -23,17 +25,36 @@ export default function CrmStaffAuthEffects() {
       try {
         const result = await getRedirectResult(auth);
         if (!result?.user) return;
-        await completeCrmStaffOAuthSession(result);
+        const mode = consumeCrmStaffOAuthMode();
+        const outcome = await completeCrmStaffOAuthSession(result, mode, auth);
         const providerId = result.providerId?.includes("apple") ? "apple" : "google";
         toast.success(
           String(
-            t(providerId === "apple" ? "auth.apple_signin_success" : "auth.google_signin_success")
+            outcome === "register"
+              ? t("auth.register_success")
+              : t(
+                  providerId === "apple"
+                    ? "auth.apple_signin_success"
+                    : "auth.google_signin_success"
+                )
           )
         );
       } catch (e) {
         logger.warn("[CrmStaffAuthEffects] getRedirectResult", {
           error: e instanceof Error ? e.message : String(e),
         });
+        if (e instanceof CrmStaffOAuthModeError) {
+          toast.error(
+            String(
+              t(
+                e.code === "account_not_found"
+                  ? "auth.oauth_account_not_found"
+                  : "auth.oauth_account_already_exists"
+              )
+            )
+          );
+          return;
+        }
         if (e instanceof CrmStaffJoinCompanyError) {
           toast.error(e.message);
           return;

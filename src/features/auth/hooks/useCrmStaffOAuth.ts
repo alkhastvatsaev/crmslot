@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import type { CrmEmailAuthTab } from "@/features/auth/crmEmailLoginVariant";
 import {
   CrmStaffJoinCompanyError,
+  CrmStaffOAuthModeError,
   completeCrmStaffOAuthSession,
 } from "@/features/auth/crmEmailRegister";
 import {
@@ -16,18 +18,34 @@ import {
   signInCrmStaffWithGoogle,
   type CrmStaffOAuthProviderId,
 } from "@/features/auth/crmStaffOAuthSignIn";
+import {
+  crmStaffOAuthModeFromAuthTab,
+  persistCrmStaffOAuthMode,
+} from "@/features/auth/crmStaffOAuthMode";
 import type { CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
 
 type Options = {
   variant: CrmEmailLoginVariant;
+  authTab: CrmEmailAuthTab;
   onInlineError?: (message: string | null) => void;
 };
 
-export function useCrmStaffOAuth({ variant, onInlineError }: Options) {
+function oauthModeErrorMessage(
+  t: (key: string) => string,
+  code: CrmStaffOAuthModeError["code"]
+): string {
+  if (code === "account_not_found") {
+    return String(t("auth.oauth_account_not_found"));
+  }
+  return String(t("auth.oauth_account_already_exists"));
+}
+
+export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
   const { t } = useTranslation();
   const [googleBusy, setGoogleBusy] = useState(false);
   const [appleBusy, setAppleBusy] = useState(false);
   const logLabel = variant === "technician" ? "TechnicianLoginPanel" : "AdminLoginPanel";
+  const oauthMode = crmStaffOAuthModeFromAuthTab(authTab);
 
   const oauthBusy = googleBusy || appleBusy;
 
@@ -39,6 +57,7 @@ export function useCrmStaffOAuth({ variant, onInlineError }: Options) {
         return;
       }
 
+      persistCrmStaffOAuthMode(oauthMode);
       const setBusy = provider === "google" ? setGoogleBusy : setAppleBusy;
       setBusy(true);
       try {
@@ -46,10 +65,14 @@ export function useCrmStaffOAuth({ variant, onInlineError }: Options) {
           provider === "google"
             ? await signInCrmStaffWithGoogle(auth)
             : await signInCrmStaffWithApple(auth);
-        await completeCrmStaffOAuthSession(cred);
+        const outcome = await completeCrmStaffOAuthSession(cred, oauthMode, auth);
         toast.success(
           String(
-            t(provider === "google" ? "auth.google_signin_success" : "auth.apple_signin_success")
+            outcome === "register"
+              ? t("auth.register_success")
+              : t(
+                  provider === "google" ? "auth.google_signin_success" : "auth.apple_signin_success"
+                )
           )
         );
       } catch (e) {
@@ -57,9 +80,13 @@ export function useCrmStaffOAuth({ variant, onInlineError }: Options) {
           toast.message(String(t("auth.oauth_redirect")));
           return;
         }
-        logger.error(`[${logLabel}] ${provider} oauth failed`, {
+        logger.error(`[${logLabel}] ${provider} oauth ${oauthMode} failed`, {
           error: e instanceof Error ? e.message : String(e),
         });
+        if (e instanceof CrmStaffOAuthModeError) {
+          onInlineError?.(oauthModeErrorMessage(t, e.code));
+          return;
+        }
         if (e instanceof CrmStaffJoinCompanyError) {
           onInlineError?.(e.message);
           return;
@@ -74,7 +101,7 @@ export function useCrmStaffOAuth({ variant, onInlineError }: Options) {
         setBusy(false);
       }
     },
-    [logLabel, onInlineError, t]
+    [logLabel, oauthMode, onInlineError, t]
   );
 
   return {
