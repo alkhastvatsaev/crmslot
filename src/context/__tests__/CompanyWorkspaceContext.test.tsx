@@ -73,11 +73,10 @@ describe("CompanyWorkspaceContext", () => {
 
   it("ne souscrit pas Firestore avant l'auth (authLoading)", () => {
     window.localStorage.removeItem("crmslot_active_company_id");
-    // Make onAuthStateChanged not fire immediately — simulate loading
     const { onAuthStateChanged } = jest.requireMock("firebase/auth") as {
       onAuthStateChanged: jest.Mock;
     };
-    onAuthStateChanged.mockImplementationOnce(() => jest.fn()); // never fires
+    onAuthStateChanged.mockImplementationOnce(() => jest.fn());
 
     render(
       <CompanyWorkspaceProvider>
@@ -85,10 +84,28 @@ describe("CompanyWorkspaceContext", () => {
       </CompanyWorkspaceProvider>
     );
 
-    // No memberships snapshot should have been triggered
     expect(mockOnSnapshot).not.toHaveBeenCalled();
     expect(screen.getByTestId("workspace-ready").textContent).toBe("false");
-    // activeCompanyId stays empty while loading (sans id localStorage)
     expect(screen.getByTestId("company-id").textContent).toBe("empty");
+  });
+
+  it("débloque workspaceReady via localStorage pendant le boot Firestore", async () => {
+    window.localStorage.setItem("crmslot_active_company_id", "company-abc");
+    mockState.firestoreData["users/mock-user-123/company_memberships"] = [];
+
+    render(
+      <CompanyWorkspaceProvider>
+        <Consumer />
+      </CompanyWorkspaceProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(20);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-ready").textContent).toBe("true");
+      expect(screen.getByTestId("company-id").textContent).toBe("company-abc");
+    });
   });
 });

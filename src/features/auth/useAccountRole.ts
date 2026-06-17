@@ -24,6 +24,15 @@ const DEFAULT_STATE: AccountRoleState = {
   isLoading: true,
 };
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => {
+      setTimeout(() => resolve(fallback), ms);
+    }),
+  ]);
+}
+
 async function hasClientPortalProfile(uid: string): Promise<boolean> {
   if (!isConfigured || !clientPortalFirestore) return false;
   try {
@@ -88,15 +97,23 @@ export function useAccountRole(): AccountRoleState {
       }
       setState((prev) => ({ ...prev, isLoading: true }));
       try {
-        const [techSnap, isClient, isCrmTenant] = await Promise.all([
-          getDocs(
-            query(collection(firestore!, "technicians"), where("authUid", "==", user.uid), limit(1))
-          ),
-          hasClientPortalProfile(user.uid),
-          resolveCrmTenantAccount(user),
-        ]);
+        const [techSnap, isClient, isCrmTenant] = await withTimeout(
+          Promise.all([
+            getDocs(
+              query(
+                collection(firestore!, "technicians"),
+                where("authUid", "==", user.uid),
+                limit(1)
+              )
+            ),
+            hasClientPortalProfile(user.uid),
+            resolveCrmTenantAccount(user),
+          ]),
+          10_000,
+          [null, false, true] as [Awaited<ReturnType<typeof getDocs>> | null, boolean, boolean]
+        );
         if (cancelled) return;
-        const isTech = !techSnap.empty;
+        const isTech = techSnap !== null && !techSnap.empty;
         const satelliteTechnician = isTech && !isCrmTenant;
         const satelliteClient = isClient && !isTech && !isCrmTenant;
         const role: AccountRole = isCrmTenant
