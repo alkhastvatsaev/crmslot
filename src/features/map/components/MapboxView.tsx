@@ -50,6 +50,7 @@ import {
   scheduleMapboxResizeBurst,
 } from "@/features/map/mapboxMapLifecycle";
 import { resolveMapboxStyleSlug, resolveMapboxStyleUrl } from "@/features/map/mapboxStyleUrl";
+import { configureMapboxWebView } from "@/features/map/configureMapboxWebView";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocation";
@@ -295,6 +296,7 @@ export default function MapboxView() {
       if (container.clientWidth < 2 || container.clientHeight < 2) return;
 
       mapboxgl.accessToken = token;
+      configureMapboxWebView(mapboxgl);
       const initialCenter: [number, number] = [4.3522, 50.8466];
       const mobileMap = isMobile === true;
       const powerOptions = resolveMapboxInitOptions(mobileMap);
