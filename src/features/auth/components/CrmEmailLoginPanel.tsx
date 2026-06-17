@@ -13,6 +13,7 @@ import { emailPasswordAuthErrorFeedback } from "@/features/auth/clientPortalEmai
 import {
   CrmStaffJoinCompanyError,
   registerCrmStaffAccount,
+  syncDefaultCompanyMembershipAfterLogin,
 } from "@/features/auth/crmEmailRegister";
 import {
   signInTechnicianWithEmail,
@@ -90,7 +91,8 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
         await registerCrmStaffAccount({ auth, email, password });
         toast.success(String(t("auth.register_success")));
       } else {
-        await signInTechnicianWithEmail({ auth, email, password });
+        const cred = await signInTechnicianWithEmail({ auth, email, password });
+        await syncDefaultCompanyMembershipAfterLogin(cred);
         toast.success(String(t("auth.signin_success")));
       }
     } catch (e) {

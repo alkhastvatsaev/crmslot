@@ -1,5 +1,8 @@
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-import { registerCrmStaffAccount } from "@/features/auth/crmEmailRegister";
+import {
+  registerCrmStaffAccount,
+  syncDefaultCompanyMembershipAfterLogin,
+} from "@/features/auth/crmEmailRegister";
 
 describe("registerCrmStaffAccount", () => {
   const auth = {} as never;
@@ -52,5 +55,17 @@ describe("registerCrmStaffAccount", () => {
     ).rejects.toThrow("Société introuvable.");
 
     expect(deleteUser).toHaveBeenCalled();
+  });
+
+  it("syncs default company on login without deleting user on failure", async () => {
+    const user = { getIdToken: jest.fn().mockResolvedValue("token-1") };
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ ok: false }),
+    });
+
+    await syncDefaultCompanyMembershipAfterLogin({ user } as never);
+
+    expect(deleteUser).not.toHaveBeenCalled();
   });
 });

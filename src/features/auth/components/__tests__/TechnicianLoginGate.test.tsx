@@ -29,7 +29,13 @@ describe("TechnicianLoginPanel", () => {
   });
 
   it("submits email and password to Firebase auth", async () => {
-    (signInWithEmailAndPassword as jest.Mock).mockResolvedValueOnce({ user: { uid: "tech-1" } });
+    (signInWithEmailAndPassword as jest.Mock).mockResolvedValueOnce({
+      user: { getIdToken: jest.fn().mockResolvedValue("tok") },
+    });
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, companyId: "co-abc" }),
+    });
     render(<TechnicianLoginPanel />);
 
     fireEvent.change(screen.getByTestId("technician-login-email"), {
@@ -46,6 +52,10 @@ describe("TechnicianLoginPanel", () => {
         "tech@example.com",
         "secret123"
       )
+    );
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/company/join-default",
+      expect.objectContaining({ method: "POST" })
     );
   });
 
