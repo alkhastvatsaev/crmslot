@@ -1,6 +1,15 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import {
+  provisionTechnicianStaffRecord,
+  type TechnicianStaffProfile,
+} from "@/features/company/server/provisionTechnicianStaff";
 import { readDefaultStaffCompanyIdFromEnv } from "@/features/company/server/readDefaultStaffCompanyId";
+
+export type JoinDefaultCompanyOptions = {
+  staffKind?: "admin" | "technician";
+  technicianProfile?: TechnicianStaffProfile;
+};
 
 export type JoinDefaultCompanyResult =
   | { ok: true; companyId: string; alreadyMember: boolean }
@@ -27,12 +36,29 @@ async function syncTenantClaims(
   });
 }
 
+async function resolveTechnicianProfile(
+  auth: typeof admin.auth,
+  uid: string,
+  profile?: TechnicianStaffProfile
+): Promise<TechnicianStaffProfile> {
+  const base = profile ?? {};
+  if ((base.email ?? "").trim()) return base;
+  try {
+    const userRecord = await auth().getUser(uid);
+    return { ...base, email: userRecord.email ?? null };
+  } catch {
+    return base;
+  }
+}
+
 /** Attache un compte staff à la société unique configurée (Admin SDK). */
 export async function joinDefaultCompanyMembership(
   db: admin.firestore.Firestore,
   auth: typeof admin.auth,
-  uid: string
+  uid: string,
+  options?: JoinDefaultCompanyOptions
 ): Promise<JoinDefaultCompanyResult> {
+  const staffKind = options?.staffKind === "technician" ? "technician" : "admin";
   const companyId = readDefaultStaffCompanyIdFromEnv();
   if (!companyId) {
     return {
@@ -52,14 +78,21 @@ export async function joinDefaultCompanyMembership(
 
   const membershipRef = db.doc(`users/${uid}/company_memberships/${companyId}`);
   const existing = await membershipRef.get();
+  const membershipRole = staffKind === "technician" ? "collaborateur" : "admin";
+
   if (!existing.exists) {
     await membershipRef.set({
-      role: "admin",
+      role: membershipRole,
       joinedAt: FieldValue.serverTimestamp(),
       companyName,
     });
-  } else if ((existing.data()?.role as string) !== "admin") {
+  } else if (staffKind === "admin" && (existing.data()?.role as string) !== "admin") {
     await membershipRef.update({ role: "admin" });
+  }
+
+  if (staffKind === "technician") {
+    const profile = await resolveTechnicianProfile(auth, uid, options?.technicianProfile);
+    await provisionTechnicianStaffRecord(db, { uid, companyId, profile });
   }
 
   await syncTenantClaims(auth, db, uid, companyId);

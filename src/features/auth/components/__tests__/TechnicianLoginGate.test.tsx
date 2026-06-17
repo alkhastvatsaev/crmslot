@@ -70,6 +70,12 @@ describe("TechnicianLoginPanel", () => {
 
     render(<TechnicianLoginPanel />);
     fireEvent.click(screen.getByTestId("technician-login-tab-register"));
+    fireEvent.change(screen.getByTestId("technician-login-first-name"), {
+      target: { value: "Jean" },
+    });
+    fireEvent.change(screen.getByTestId("technician-login-last-name"), {
+      target: { value: "Martin" },
+    });
     fireEvent.change(screen.getByTestId("technician-login-email"), {
       target: { value: "new@example.com" },
     });
@@ -87,6 +93,18 @@ describe("TechnicianLoginPanel", () => {
         "new@example.com",
         "secret123"
       )
+    );
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/company/join-default",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          staffKind: "technician",
+          firstName: "Jean",
+          lastName: "Martin",
+          email: "new@example.com",
+        }),
+      })
     );
   });
 });

@@ -13,6 +13,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
+import { readStaffJoinPayload } from "@/features/auth/staffJoinPayload";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
@@ -146,7 +147,7 @@ export function CompanyWorkspaceProvider({
     setMembershipJoinPending(true);
     setMembershipJoinError(null);
     try {
-      const result = await requestDefaultCompanyMembership(user);
+      const result = await requestDefaultCompanyMembership(user, readStaffJoinPayload());
       if (!result.ok) {
         setMembershipJoinError(result.error);
       }
@@ -167,7 +168,7 @@ export function CompanyWorkspaceProvider({
     setMembershipJoinError(null);
 
     void (async () => {
-      const result = await requestDefaultCompanyMembership(user);
+      const result = await requestDefaultCompanyMembership(user, readStaffJoinPayload());
       if (cancelled) return;
       if (!result.ok) {
         setMembershipJoinError(result.error);

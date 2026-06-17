@@ -25,7 +25,11 @@ describe("completeCrmStaffOAuthSession", () => {
     expect(outcome).toBe("register");
     expect(global.fetch).toHaveBeenCalledWith("/api/company/join-default", {
       method: "POST",
-      headers: { Authorization: "Bearer token-1" },
+      headers: {
+        Authorization: "Bearer token-1",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ staffKind: "admin" }),
     });
   });
 
