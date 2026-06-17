@@ -18,6 +18,7 @@ export function useClientPortalLinkedCompanyId(): string | null {
     }
 
     let unsubProfile: (() => void) | undefined;
+    const portalDb = clientPortalFirestore;
 
     const unsubAuth = onAuthStateChanged(clientPortalAuth, (user) => {
       unsubProfile?.();
@@ -28,7 +29,7 @@ export function useClientPortalLinkedCompanyId(): string | null {
         return;
       }
 
-      const ref = doc(clientPortalFirestore, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid);
+      const ref = doc(portalDb, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid);
       unsubProfile = onSnapshot(
         ref,
         (snap) => {
