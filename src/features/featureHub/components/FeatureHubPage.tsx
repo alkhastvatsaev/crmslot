@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import CompanyStockAgentPanel from "@/features/featureHub/components/CompanyStockAgentPanel";
 import CompanyStockCenterPanel from "@/features/featureHub/components/CompanyStockCenterPanel";
 import CompanyStockOrdersRightRail from "@/features/featureHub/components/CompanyStockOrdersRightRail";
@@ -38,7 +39,18 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   const pageActive = pager == null || pager.pageIndex === slotIndex;
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
 
-  const { items, loading: stockLoading } = useCompanyStockItems(companyId || null);
+  const {
+    items,
+    loading: stockLoading,
+    isPreviewCatalog,
+  } = useCompanyStockItems(companyId || null);
+  const requestMobileHubRail = useRequestMobileHubRail();
+
+  useEffect(() => {
+    const onFocusAgent = () => requestMobileHubRail("left");
+    window.addEventListener("material-agent-focus-left-rail", onFocusAgent);
+    return () => window.removeEventListener("material-agent-focus-left-rail", onFocusAgent);
+  }, [requestMobileHubRail]);
 
   const {
     orders,
@@ -96,6 +108,9 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
       leftAriaLabel={`${t("companyStock.aria.page")} ${humanPage} — ${t("companyStock.aria.left")}`}
       centerAriaLabel={`${t("companyStock.aria.page")} ${humanPage} — ${t("companyStock.aria.center")}`}
       rightAriaLabel={`${t("companyStock.aria.page")} ${humanPage} — ${t("companyStock.aria.right")}`}
+      mobileLeftLabel={String(t("companyStock.agent_title"))}
+      mobileCenterLabel={String(t("companyStock.title"))}
+      mobileRightLabel={String(t("companyStock.orders_track_title"))}
       centerPadding={false}
       rightPadding={false}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
@@ -118,12 +133,13 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
                 orders={orders}
                 category="all"
                 loading={loading}
+                isPreviewCatalog={isPreviewCatalog}
               />
             ) : companyId ? (
               <CompanyStockProWorkspace
                 companyId={companyId}
                 metrics={metrics}
-                isPreviewCatalog={false}
+                isPreviewCatalog={isPreviewCatalog}
               />
             ) : null)}
         </section>
