@@ -1,34 +1,40 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { locksmithStockCatalogRows } from "@/features/catalog/locksmithStockSeedCatalog";
 import { subscribeStockItems, type StockItem } from "@/features/materials/stockFirestore";
 
 export function useCompanyStockItems(companyId: string | null) {
-  const [items, setItems] = useState<StockItem[]>([]);
+  const [liveItems, setLiveItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(Boolean(companyId));
 
   useEffect(() => {
     if (!companyId) {
-      setItems([]);
+      setLiveItems([]);
       setLoading(false);
       return;
     }
     setLoading(true);
     return subscribeStockItems(companyId, (rows) => {
-      setItems(rows);
+      setLiveItems(rows);
       setLoading(false);
     });
   }, [companyId]);
 
-  const patchDemoItem = useCallback((_id: string, _patch: Partial<StockItem>) => {}, []);
-  const adjustDemoQuantity = useCallback((_id: string, _delta: number) => {}, []);
+  const isPreviewCatalog = liveItems.length === 0 && Boolean(companyId);
+
+  const items = useMemo(() => {
+    if (liveItems.length > 0) return liveItems;
+    if (!companyId) return [];
+    return locksmithStockCatalogRows().map((row) => ({ ...row, companyId }));
+  }, [liveItems, companyId]);
 
   return {
     items,
     loading,
-    isPreviewCatalog: false,
-    hasLiveStock: items.length > 0,
-    patchDemoItem,
-    adjustDemoQuantity,
+    isPreviewCatalog,
+    hasLiveStock: liveItems.length > 0,
+    patchDemoItem: () => {},
+    adjustDemoQuantity: () => {},
   };
 }
