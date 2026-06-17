@@ -57,14 +57,16 @@ describe("registerCrmStaffAccount", () => {
     expect(deleteUser).toHaveBeenCalled();
   });
 
-  it("syncs default company on login without deleting user on failure", async () => {
+  it("throws on login when join-default fails", async () => {
     const user = { getIdToken: jest.fn().mockResolvedValue("token-1") };
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ ok: false }),
+      json: async () => ({ ok: false, error: "Société introuvable." }),
     });
 
-    await syncDefaultCompanyMembershipAfterLogin({ user } as never);
+    await expect(syncDefaultCompanyMembershipAfterLogin({ user } as never)).rejects.toThrow(
+      "Société introuvable."
+    );
 
     expect(deleteUser).not.toHaveBeenCalled();
   });

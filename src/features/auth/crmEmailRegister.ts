@@ -2,9 +2,9 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
   type Auth,
-  type User,
   type UserCredential,
 } from "firebase/auth";
+import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 
 export class CrmStaffJoinCompanyError extends Error {
   constructor(message: string) {
@@ -13,53 +13,24 @@ export class CrmStaffJoinCompanyError extends Error {
   }
 }
 
-async function postJoinDefaultCompany(user: User): Promise<{
-  ok: boolean;
-  companyId?: string;
-  error?: string;
-}> {
-  const idToken = await user.getIdToken();
-  const res = await fetch("/api/company/join-default", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${idToken}` },
-  });
-  const data = (await res.json().catch(() => ({}))) as {
-    ok?: boolean;
-    companyId?: string;
-    error?: string;
-  };
-
-  if (!res.ok || !data.ok || !data.companyId) {
-    return {
-      ok: false,
-      error:
-        typeof data.error === "string" && data.error.trim()
-          ? data.error.trim()
-          : "Impossible de rattacher le compte à la société.",
-    };
-  }
-
-  await user.getIdToken(true);
-  return { ok: true, companyId: data.companyId };
-}
-
-/** Connexion : rattachement idempotent à la société unique (ne supprime pas le compte). */
+/** Connexion : rattachement idempotent à la société unique. */
 export async function syncDefaultCompanyMembershipAfterLogin(cred: UserCredential): Promise<void> {
-  await postJoinDefaultCompany(cred.user);
+  const result = await requestDefaultCompanyMembership(cred.user);
+  if (!result.ok) {
+    throw new CrmStaffJoinCompanyError(result.error);
+  }
 }
 
 export async function joinDefaultCompanyAfterSignUp(cred: UserCredential): Promise<string> {
-  const result = await postJoinDefaultCompany(cred.user);
+  const result = await requestDefaultCompanyMembership(cred.user);
 
-  if (!result.ok || !result.companyId) {
+  if (!result.ok) {
     try {
       await deleteUser(cred.user);
     } catch {
       /* compte orphelin — admin pourra lier manuellement */
     }
-    throw new CrmStaffJoinCompanyError(
-      result.error ?? "Impossible de rattacher le compte à la société."
-    );
+    throw new CrmStaffJoinCompanyError(result.error);
   }
 
   return result.companyId;
