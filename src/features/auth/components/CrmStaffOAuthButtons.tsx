@@ -3,7 +3,7 @@
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { CrmEmailAuthTab } from "@/features/auth/crmEmailLoginVariant";
 import CrmBrandOAuthButton from "@/features/auth/components/CrmBrandOAuthButton";
-import { useIsIphoneClient } from "@/features/auth/hooks/useIsIphoneClient";
+import { useIsAppleOAuthClient } from "@/features/auth/hooks/useIsIphoneClient";
 import {
   crmEmailLoginTestId,
   type CrmEmailLoginVariant,
@@ -29,9 +29,9 @@ export default function CrmStaffOAuthButtons({
   onAppleSignIn,
 }: Props) {
   const { t } = useTranslation();
-  const isIphone = useIsIphoneClient();
+  const isAppleOAuth = useIsAppleOAuthClient();
   const oauthDisabled = disabled || googleBusy || appleBusy;
-  const showApple = isIphone === true;
+  const showApple = isAppleOAuth === true;
   const isRegister = authTab === "register";
 
   const googleLabel = String(

@@ -93,9 +93,13 @@ describe("LoginOverlay (admin)", () => {
     expect(screen.getByTestId("admin-login-confirm-password")).toBeInTheDocument();
   });
 
-  it("shows Google OAuth button on desktop", async () => {
+  it("shows Google but not Apple on Windows desktop", async () => {
     Object.defineProperty(window.navigator, "userAgent", {
-      value: "Mozilla/5.0 (Macintosh; Intel Mac OS X)",
+      value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      configurable: true,
+    });
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
       configurable: true,
     });
 
@@ -113,5 +117,31 @@ describe("LoginOverlay (admin)", () => {
     await waitFor(() => expect(screen.getByTestId("admin-login-oauth")).toBeInTheDocument());
     expect(screen.getByTestId("admin-login-google")).toBeInTheDocument();
     expect(screen.queryByTestId("admin-login-apple")).not.toBeInTheDocument();
+  });
+
+  it("shows Apple OAuth on Mac desktop", async () => {
+    Object.defineProperty(window.navigator, "userAgent", {
+      value:
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+      configurable: true,
+    });
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    (onAuthStateChanged as jest.Mock).mockImplementation((_auth, cb) => {
+      cb(null);
+      return jest.fn();
+    });
+
+    render(
+      <LoginOverlay>
+        <div />
+      </LoginOverlay>
+    );
+
+    await waitFor(() => expect(screen.getByTestId("admin-login-apple")).toBeInTheDocument());
+    expect(screen.getByTestId("admin-login-google")).toBeInTheDocument();
   });
 });
