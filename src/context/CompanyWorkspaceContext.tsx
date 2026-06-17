@@ -70,7 +70,15 @@ export function CompanyWorkspaceProvider({
 
   useEffect(() => {
     if (!auth) return () => {};
+    let failSafe: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
+      failSafe = undefined;
+      setAuthLoading(false);
+    }, 4000);
     return onAuthStateChanged(auth, (u) => {
+      if (failSafe) {
+        clearTimeout(failSafe);
+        failSafe = undefined;
+      }
       setFirebaseUid((prev) => {
         const next = u?.uid ?? null;
         if (prev !== next) setClaimsInitialSyncDone(false);
@@ -94,11 +102,16 @@ export function CompanyWorkspaceProvider({
     setMemberships([]);
 
     let unsub: (() => void) | undefined;
+    const bootstrapTimeout = setTimeout(() => {
+      setMembershipsReady(true);
+    }, 8000);
+
     const timeout = setTimeout(() => {
       const membershipsCol = collection(firestore!, "users", firebaseUid, "company_memberships");
       unsub = onSnapshot(
         membershipsCol,
         (snap) => {
+          clearTimeout(bootstrapTimeout);
           const rows: CompanyMembershipRow[] = snap.docs.map((d) => {
             const data = d.data() as { role?: string; companyName?: string };
             return {
@@ -116,8 +129,13 @@ export function CompanyWorkspaceProvider({
               : null;
 
           setActiveCompanyIdState((prev) => {
+            const storedTrimmed = stored?.trim() ?? "";
+            if (rows.length === 0) {
+              return storedTrimmed || prev.trim();
+            }
             let next = "";
-            if (stored && rows.some((r) => r.companyId === stored)) next = stored;
+            if (storedTrimmed && rows.some((r) => r.companyId === storedTrimmed))
+              next = storedTrimmed;
             else if (prev && rows.some((r) => r.companyId === prev)) next = prev;
             else next = rows[0]?.companyId ?? "";
             if (typeof window !== "undefined") {
@@ -128,6 +146,7 @@ export function CompanyWorkspaceProvider({
           });
         },
         () => {
+          clearTimeout(bootstrapTimeout);
           setMemberships([]);
           setMembershipsReady(true);
         }
@@ -135,6 +154,7 @@ export function CompanyWorkspaceProvider({
     }, 10);
 
     return () => {
+      clearTimeout(bootstrapTimeout);
       clearTimeout(timeout);
       unsub?.();
     };
@@ -157,16 +177,18 @@ export function CompanyWorkspaceProvider({
     }
   }, []);
 
+  const storedActiveCompanyId = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim() ?? "";
+  }, [membershipsReady, activeCompanyId, memberships.length]);
+
   const resolvedClaimsCompanyId = useMemo(() => {
     const fromState = activeCompanyId.trim();
     if (fromState) return fromState;
     const fromMembership = memberships[0]?.companyId?.trim() ?? "";
     if (fromMembership) return fromMembership;
-    if (typeof window !== "undefined") {
-      return window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)?.trim() ?? "";
-    }
-    return "";
-  }, [activeCompanyId, memberships]);
+    return storedActiveCompanyId;
+  }, [activeCompanyId, memberships, storedActiveCompanyId]);
 
   useEffect(() => {
     if (!auth || authLoading || !membershipsReady || memberships.length > 0) return;
@@ -176,6 +198,13 @@ export function CompanyWorkspaceProvider({
     let cancelled = false;
     setMembershipJoinPending(true);
     setMembershipJoinError(null);
+
+    const joinTimeout = setTimeout(() => {
+      if (!cancelled) {
+        setMembershipJoinPending(false);
+        setMembershipJoinError("Le rattachement société a expiré. Réessayez.");
+      }
+    }, 12_000);
 
     void (async () => {
       try {
@@ -189,6 +218,7 @@ export function CompanyWorkspaceProvider({
           setMembershipJoinError("Impossible de rattacher le compte à la société.");
         }
       } finally {
+        clearTimeout(joinTimeout);
         if (!cancelled) {
           setMembershipJoinPending(false);
         }
@@ -197,20 +227,37 @@ export function CompanyWorkspaceProvider({
 
     return () => {
       cancelled = true;
+      clearTimeout(joinTimeout);
+      setMembershipJoinPending(false);
     };
   }, [authLoading, membershipsReady, memberships.length, firebaseUid]);
 
-  const claimsGatePending = memberships.length > 0 && !claimsInitialSyncDone;
+  useEffect(() => {
+    if (memberships.length > 0 && membershipJoinPending) {
+      setMembershipJoinPending(false);
+    }
+  }, [memberships.length, membershipJoinPending]);
+
+  const joinBlocksWorkspace = false;
 
   const effectiveActiveCompanyId = useMemo(() => {
-    if (authLoading || !membershipsReady) {
+    if (authLoading) {
       return "";
     }
-    if (claimsGatePending) {
-      return resolvedClaimsCompanyId || activeCompanyId;
+    if (!membershipsReady) {
+      return storedActiveCompanyId || activeCompanyId.trim();
     }
-    return activeCompanyId;
-  }, [authLoading, membershipsReady, activeCompanyId, claimsGatePending, resolvedClaimsCompanyId]);
+    const resolved = resolvedClaimsCompanyId || activeCompanyId;
+    return resolved;
+  }, [
+    authLoading,
+    membershipsReady,
+    activeCompanyId,
+    resolvedClaimsCompanyId,
+    storedActiveCompanyId,
+  ]);
+
+  const workspaceBootstrapReady = membershipsReady || Boolean(storedActiveCompanyId && firebaseUid);
 
   const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
     const companyId = resolvedClaimsCompanyId;
@@ -240,8 +287,12 @@ export function CompanyWorkspaceProvider({
     }
 
     if (!claimsInitialSyncDone) {
-      void refreshClaimsSilent().finally(() => setClaimsInitialSyncDone(true));
-      return;
+      const failSafe = setTimeout(() => setClaimsInitialSyncDone(true), 2500);
+      void refreshClaimsSilent().finally(() => {
+        clearTimeout(failSafe);
+        setClaimsInitialSyncDone(true);
+      });
+      return () => clearTimeout(failSafe);
     }
 
     const t = setTimeout(() => {
@@ -267,8 +318,7 @@ export function CompanyWorkspaceProvider({
       activeCompanyId: effectiveActiveCompanyId,
       setActiveCompanyId,
       activeRole,
-      workspaceReady:
-        !authLoading && membershipsReady && !membershipJoinPending && !claimsGatePending,
+      workspaceReady: !authLoading && workspaceBootstrapReady && !joinBlocksWorkspace,
       isTenantUser: !authLoading && membershipsReady && memberships.length > 0,
       membershipJoinPending,
       membershipJoinError,
@@ -284,7 +334,8 @@ export function CompanyWorkspaceProvider({
       refreshClaimsSilent,
       authLoading,
       membershipsReady,
-      claimsGatePending,
+      workspaceBootstrapReady,
+      joinBlocksWorkspace,
       membershipJoinPending,
       membershipJoinError,
       retryDefaultCompanyJoin,

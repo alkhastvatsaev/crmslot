@@ -37,11 +37,19 @@ export default function CrmEmailLoginGate({ variant, children }: Props) {
 
     void ensureNativeAuthPersistence(auth);
 
+    const failSafe = setTimeout(() => {
+      setPhase(resolveGatePhase(auth?.currentUser ?? null));
+    }, 3500);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      clearTimeout(failSafe);
       setPhase(resolveGatePhase(user));
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(failSafe);
+      unsubscribe();
+    };
   }, []);
 
   if (phase === "checking") {
