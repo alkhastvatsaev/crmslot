@@ -1231,6 +1231,17 @@
     "materials": "Matériaux",
     "finish": "Terminer"
   },
+  "staff_account": {
+    "title": "Mon compte",
+    "subtitle": "Informations de votre compte CRM",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "E-mail",
+    "company": "Société",
+    "role": "Rôle",
+    "role_admin": "Administrateur",
+    "role_staff": "Collaborateur"
+  },
   "map": {
     "boot_error_token": "Carte indisponible — jeton Mapbox manquant",
     "boot_error_token_hint": "Ajoutez NEXT_PUBLIC_MAPBOX_TOKEN dans .env.local puis relancez npm run dev.",

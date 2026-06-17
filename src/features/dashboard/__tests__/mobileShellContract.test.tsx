@@ -77,23 +77,32 @@ describe("mobileShellContract — layout", () => {
 });
 
 describe("mobileShellContract — navigation profil", () => {
-  it("ouvre le sélecteur dans le panneau central au clic profil", () => {
+  it("ouvre le panneau compte dans le panneau central au clic profil", () => {
     renderMobileShell([<div key="0">Map</div>, <div key="1">Hub</div>, <div key="2">Tech</div>]);
 
     fireEvent.click(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.profileToggle));
+
+    expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.accountPanelHost)).toBeInTheDocument();
+    expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.accountPanel)).toBeInTheDocument();
+    expect(screen.getByText("Map").closest("[aria-hidden='true']")).toBeTruthy();
+  });
+
+  it("ouvre le sélecteur de pages au clic calendrier", () => {
+    renderMobileShell([<div key="0">Map</div>, <div key="1">Material</div>]);
+
+    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
 
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.pageSelectorHost)).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-page-selector-layout")).toHaveClass("mobile-hub-layout");
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.pageSelector)).toHaveClass(
       "mobile-hub-panel"
     );
-    expect(screen.getByText("Map").closest("[aria-hidden='true']")).toBeTruthy();
   });
 
   it("navigue et ferme le sélecteur", () => {
     renderMobileShell([<div key="0">Map</div>, <div key="1">Material</div>]);
 
-    fireEvent.click(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.profileToggle));
+    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
     fireEvent.click(screen.getByTestId("dashboard-page-selector-item-1"));
 
     expect(

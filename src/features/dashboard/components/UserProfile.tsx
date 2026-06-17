@@ -20,7 +20,7 @@ export const appProfiles = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
 }));
 
 type UserProfileProps = {
-  /** Clic sur le profil → grille de pages dans le panneau central. */
+  /** Clic sur le profil → panneau compte dans le panneau central. */
   interactive?: boolean;
   variant?: "desktop" | "mobile";
 };
@@ -68,6 +68,7 @@ function UserProfileInteractive({ variant }: { variant: "desktop" | "mobile" }) 
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
   const currentProfile = useProfileIndex();
+  const accountOpen = pageSelector.view === "account";
 
   const mobileClasses =
     "mobile-header-chip mobile-header-chip--interactive mobile-profile-chip h-full w-full flex-row items-center justify-center gap-2 px-4";
@@ -78,9 +79,9 @@ function UserProfileInteractive({ variant }: { variant: "desktop" | "mobile" }) 
       type="button"
       data-testid="user-profile-toggle"
       className={variant === "mobile" ? mobileClasses : desktopClasses}
-      aria-label="Ouvrir la navigation"
-      aria-expanded={pageSelector.open}
-      onClick={() => pageSelector.toggle()}
+      aria-label="Ouvrir mon compte"
+      aria-expanded={accountOpen}
+      onClick={() => pageSelector.toggleAccount()}
     >
       <ProfileLabel variant={variant} currentProfile={currentProfile} t={t} />
     </button>

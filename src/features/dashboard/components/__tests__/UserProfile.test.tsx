@@ -32,10 +32,10 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("profile-name")).toHaveTextContent("GMAIL");
   });
 
-  it("toggle le sélecteur de pages au clic profil desktop", () => {
+  it("toggle le panneau compte au clic profil desktop", () => {
     function ToggleProbe() {
-      const { open } = useDashboardPageSelector();
-      return <div data-testid="selector-state">{open ? "open" : "closed"}</div>;
+      const { view } = useDashboardPageSelector();
+      return <div data-testid="selector-state">{view}</div>;
     }
 
     renderWithPager(
@@ -50,7 +50,7 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("selector-state")).toHaveTextContent("closed");
     expect(screen.getByTestId("user-profile-toggle")).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(screen.getByTestId("user-profile-toggle"));
-    expect(screen.getByTestId("selector-state")).toHaveTextContent("open");
+    expect(screen.getByTestId("selector-state")).toHaveTextContent("account");
     expect(screen.getByTestId("user-profile-toggle")).toHaveAttribute("aria-expanded", "true");
   });
 
