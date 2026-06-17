@@ -45,9 +45,12 @@ import {
   destroyMapboxMap,
   pauseMapboxMap,
   resolveMapboxLifecycleMode,
+  resolveMapboxPauseOptions,
   resumeMapboxMap,
   scheduleMapboxResizeBurst,
 } from "@/features/map/mapboxMapLifecycle";
+import { resolveMapboxStyleSlug, resolveMapboxStyleUrl } from "@/features/map/mapboxStyleUrl";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocation";
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
@@ -101,6 +104,8 @@ export default function MapboxView() {
   const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
+  const mapPauseOptions = useMemo(() => resolveMapboxPauseOptions(), []);
+  const androidMapWebView = mapPauseOptions.skipStop === true;
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
 
   const { selectedDate } = useDateContext();
@@ -294,6 +299,7 @@ export default function MapboxView() {
       const mobileMap = isMobile === true;
       const powerOptions = resolveMapboxInitOptions(mobileMap);
       const runtimeOptions = resolveMapboxMapRuntimeOptions(mobileMap);
+      const style = resolveMapboxStyleUrl(resolveMapboxStyleSlug(mobileMap), token);
 
       if (
         typeof mapboxgl.supported === "function" &&
@@ -307,7 +313,7 @@ export default function MapboxView() {
 
       const map = new mapboxgl.Map({
         container,
-        style: powerOptions.style,
+        style,
         center: initialCenter,
         zoom: 12.5,
         pitch: 0,
@@ -320,6 +326,7 @@ export default function MapboxView() {
         collectResourceTiming: powerOptions.collectResourceTiming,
         respectPrefersReducedMotion: powerOptions.respectPrefersReducedMotion,
         failIfMajorPerformanceCaveat: runtimeOptions.failIfMajorPerformanceCaveat,
+        preserveDrawingBuffer: androidMapWebView,
         maxBounds: [
           [4.15, 50.7],
           [4.55, 50.95],
@@ -351,7 +358,13 @@ export default function MapboxView() {
       });
 
       map.on("error", (ev) => {
-        logger.error("[mapbox]", { error: ev instanceof Error ? ev.message : String(ev) });
+        const detail =
+          ev && typeof ev === "object" && "error" in ev
+            ? (ev as { error?: { message?: string } }).error?.message
+            : undefined;
+        logger.error("[mapbox]", {
+          error: detail ?? (ev instanceof Error ? ev.message : String(ev)),
+        });
         if (!cancelled) setMapBootError("load");
       });
 
@@ -378,7 +391,7 @@ export default function MapboxView() {
 
       onVisibilityChange = () => {
         if (document.hidden) {
-          pauseMapboxMap(map);
+          pauseMapboxMap(map, mapPauseOptions);
           return;
         }
         resumeMapboxMap(map);
@@ -400,7 +413,31 @@ export default function MapboxView() {
         document.removeEventListener("visibilitychange", onVisibilityChange);
       }
     };
-  }, [isMobile, mapWebGLActive]);
+  }, [isMobile, mapWebGLActive, androidMapWebView, mapPauseOptions]);
+
+  useEffect(() => {
+    if (!isCapacitorNative()) return;
+
+    let cancelled = false;
+    let removeListener: (() => void) | undefined;
+
+    void (async () => {
+      const { App } = await import("@capacitor/app");
+      if (cancelled) return;
+      const handle = await App.addListener("resume", () => {
+        const map = mapRef.current;
+        if (!map) return;
+        scheduleMapboxResizeBurst(map);
+        resumeMapboxMap(map);
+      });
+      removeListener = () => void handle.remove();
+    })();
+
+    return () => {
+      cancelled = true;
+      removeListener?.();
+    };
+  }, []);
 
   /** Mobile : pause WebGL (tuiles en cache). Desktop : détruit si hub masqué. */
   useEffect(() => {
@@ -409,7 +446,7 @@ export default function MapboxView() {
 
     if (!mapWebGLActive) {
       if (resolveMapboxLifecycleMode(isMobile) === "pause") {
-        pauseMapboxMap(map);
+        pauseMapboxMap(map, mapPauseOptions);
       } else {
         destroyMapboxMap(map);
         mapRef.current = null;
@@ -421,7 +458,7 @@ export default function MapboxView() {
     if (isMobile) {
       resumeMapboxMap(map);
     }
-  }, [isMobile, mapWebGLActive]);
+  }, [isMobile, mapWebGLActive, mapPauseOptions]);
 
   useEffect(() => {
     return () => {
