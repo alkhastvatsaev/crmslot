@@ -901,6 +901,8 @@
     "hide_password": "Hide",
     "technician_space_title": "Technician space",
     "technician_space_subtitle": "Sign in to access your missions",
+    "admin_space_title": "Administrator space",
+    "admin_space_subtitle": "Sign in to access the dashboard",
     "demo_account_label": "Demo account",
     "demo_account_hint": "Tap to fill demo credentials"
   },
