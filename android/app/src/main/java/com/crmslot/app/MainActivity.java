@@ -2,6 +2,7 @@ package com.crmslot.app;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -16,10 +17,15 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         ensureFirebaseInitialized();
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         configureWebViewForFirebaseAuth();
     }
 
-    /** Cookies + stockage DOM — requis pour Firebase Auth dans la WebView Android. */
+    /** Cookies + WebGL Mapbox — WebView prête après `onStart` (bridge initialisé). */
     private void configureWebViewForFirebaseAuth() {
         Bridge bridge = getBridge();
         if (bridge == null) {
@@ -32,6 +38,12 @@ public class MainActivity extends BridgeActivity {
         WebSettings settings = webView.getSettings();
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
+        settings.setJavaScriptEnabled(true);
+        settings.setAllowFileAccess(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        }
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);

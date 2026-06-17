@@ -17,10 +17,18 @@ describe("mapboxMapLifecycle", () => {
     expect(stop).toHaveBeenCalled();
   });
 
+  it("ne stop pas la carte sur WebView Android", () => {
+    const stop = jest.fn();
+    pauseMapboxMap({ stop }, { skipStop: true });
+    expect(stop).not.toHaveBeenCalled();
+  });
+
   it("resume appelle resize sans throw", () => {
     const resize = jest.fn();
-    resumeMapboxMap({ resize });
+    const triggerRepaint = jest.fn();
+    resumeMapboxMap({ resize, triggerRepaint });
     expect(resize).toHaveBeenCalled();
+    expect(triggerRepaint).toHaveBeenCalled();
   });
 
   it("destroy appelle remove sans throw", () => {
