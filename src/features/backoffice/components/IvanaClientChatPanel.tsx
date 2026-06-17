@@ -4,8 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, ImagePlus, X } from "lucide-react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { toast } from "sonner";
-import { auth, firestore, isConfigured, storage } from "@/core/config/firebase";
-import { logger } from "@/core/logger";
+import { isConfigured, storage } from "@/core/config/firebase";
 import { cn } from "@/lib/utils";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import {
@@ -17,7 +16,10 @@ import {
   sendIvanaPortalMessage,
   subscribeIvanaPortalMessages,
 } from "@/features/backoffice/ivanaChatFirestore";
+import { ensureIvanaChatPortalProfile } from "@/features/backoffice/ensureIvanaChatPortalProfile";
+import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIvanaChatFirebaseSession";
 import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaChatStorage";
+import { logger } from "@/core/logger";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -84,23 +86,25 @@ export default function IvanaClientChatPanel({
   const seenPortalIdsRef = useRef<Set<string>>(new Set());
   const fsHydratedRef = useRef(false);
   const seenFsIdsRef = useRef<Set<string>>(new Set());
-  // eslint-disable-next-line react-hooks/purity
-  const sessionStartTimeRef = useRef<number>(Date.now());
+
+  const { chatAuth, chatDb } = useMemo(
+    () => resolveIvanaChatFirebaseSession(publishAsPortal),
+    [publishAsPortal]
+  );
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
-  const firestoreSyncEnabled = Boolean(companyIdTrimmed && isConfigured && firestore);
+  const firestoreSyncEnabled = Boolean(companyIdTrimmed && isConfigured && chatDb);
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
   const storageKey = useMemo(() => `${STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`, [user?.uid]);
 
   useEffect(() => {
-    if (!auth) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!chatAuth) {
       setUser(null);
       return;
     }
-    return onAuthStateChanged(auth, setUser);
-  }, []);
+    return onAuthStateChanged(chatAuth, setUser);
+  }, [chatAuth]);
 
   useEffect(() => {
     fsHydratedRef.current = false;
@@ -158,13 +162,18 @@ export default function IvanaClientChatPanel({
   }, [messages, storageKey, firestoreSyncEnabled]);
 
   useEffect(() => {
-    if (!firestoreSyncEnabled || !firestore || !companyIdTrimmed) return;
+    if (!firestoreSyncEnabled || !chatDb || !companyIdTrimmed) return;
 
     const unsub = subscribeIvanaPortalMessages(
-      firestore,
+      chatDb,
       companyIdTrimmed,
       (rows) => {
-        const mapped: IvanaChatMessage[] = rows
+        const threadIvId = (chatInterventionId ?? "").trim();
+        const filteredRows = threadIvId
+          ? rows.filter((r) => (r.interventionId?.trim() ?? "") === threadIvId)
+          : rows;
+
+        const mapped: IvanaChatMessage[] = filteredRows
           .map((r) => {
             const ts = coerceFirestoreLikeDate(r.createdAt)?.getTime() ?? Date.now();
             let role: IvanaChatMessage["role"] = "user";
@@ -179,8 +188,7 @@ export default function IvanaClientChatPanel({
                 Array.isArray(r.imageUrls) && r.imageUrls.length > 0 ? r.imageUrls : undefined,
             };
           })
-          .sort((a, b) => a.createdAt - b.createdAt)
-          .filter((m) => m.createdAt >= sessionStartTimeRef.current - 5000); // Small buffer for clock skew
+          .sort((a, b) => a.createdAt - b.createdAt);
 
         if (!fsHydratedRef.current) {
           fsHydratedRef.current = true;
@@ -189,7 +197,7 @@ export default function IvanaClientChatPanel({
           return;
         }
 
-        const uid = auth?.currentUser?.uid;
+        const uid = chatAuth?.currentUser?.uid;
         const newDocs = rows.filter((r) => !seenFsIdsRef.current.has(r.id));
         newDocs.forEach((r) => seenFsIdsRef.current.add(r.id));
         if (
@@ -210,7 +218,15 @@ export default function IvanaClientChatPanel({
       }
     );
     return unsub;
-  }, [firestoreSyncEnabled, companyIdTrimmed, onRemoteClientMessage]);
+  }, [
+    firestoreSyncEnabled,
+    companyIdTrimmed,
+    chatDb,
+    chatAuth,
+    chatInterventionId,
+    onRemoteClientMessage,
+    t,
+  ]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -285,7 +301,7 @@ export default function IvanaClientChatPanel({
     const text = draft.trim();
     if ((!text && pendingImages.length === 0) || ivanaTyping) return;
 
-    if (firestoreSyncEnabled && firestore && auth?.currentUser) {
+    if (firestoreSyncEnabled && chatDb && chatAuth?.currentUser) {
       if (pendingImages.length > 0 && !storage) {
         toast.error("Chat", {
           description: t("chat.toast_storage_unavailable"),
@@ -294,19 +310,22 @@ export default function IvanaClientChatPanel({
       }
       try {
         const role = publishAsPortal ? "client" : "staff";
+        if (publishAsPortal) {
+          await ensureIvanaChatPortalProfile(chatDb, chatAuth.currentUser, companyIdTrimmed);
+        }
         let imageUrls: string[] | undefined;
         if (pendingImages.length > 0 && storage) {
           imageUrls = await uploadIvanaChatImagesFromDataUrls(storage, {
             companyId: companyIdTrimmed,
-            uid: auth.currentUser.uid,
+            uid: chatAuth.currentUser.uid,
             dataUrls: pendingImages,
           });
         }
-        await sendIvanaPortalMessage(firestore, {
+        await sendIvanaPortalMessage(chatDb, {
           companyId: companyIdTrimmed,
           body: text,
           role,
-          senderUid: auth.currentUser.uid,
+          senderUid: chatAuth.currentUser.uid,
           interventionId: chatInterventionId,
           ...(imageUrls && imageUrls.length > 0 ? { imageUrls } : {}),
         });
@@ -323,7 +342,7 @@ export default function IvanaClientChatPanel({
       return;
     }
 
-    if (firestoreSyncEnabled && !auth?.currentUser) {
+    if (firestoreSyncEnabled && !chatAuth?.currentUser) {
       toast.error(t("chat.toast_login_required"), {
         description: t("chat.toast_login_description"),
       });
@@ -361,7 +380,18 @@ export default function IvanaClientChatPanel({
       setMessages((prev) => [...prev, reply]);
       setIvanaTyping(false);
     }, delay);
-  }, [draft, ivanaTyping, pendingImages, publishAsPortal, firestoreSyncEnabled, companyIdTrimmed]);
+  }, [
+    draft,
+    ivanaTyping,
+    pendingImages,
+    publishAsPortal,
+    firestoreSyncEnabled,
+    companyIdTrimmed,
+    chatDb,
+    chatAuth,
+    chatInterventionId,
+    t,
+  ]);
 
   const bubbleTestId = (m: IvanaChatMessage) => {
     if (m.role === "user") return "ivana-chat-bubble-user";

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { doc, deleteDoc } from "firebase/firestore";
-import { auth, firestore } from "@/core/config/firebase";
+import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
@@ -21,6 +21,7 @@ import {
   findTechnicianScheduleConflicts,
 } from "@/features/scheduling/scheduleConflicts";
 import { IVANA_PORTAL_MESSAGE_EVENT } from "@/features/backoffice/ivanaChatPortalBridge";
+import { subscribeIvanaPortalMessages } from "@/features/backoffice/ivanaChatFirestore";
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import {
   mergeReportCompletionMedia,
@@ -97,7 +98,9 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   };
 
   const { selectedDate } = useDateContext();
-  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
+  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(
+    "global"
+  );
 
   const chatDayRows = useMemo(() => {
     if (dayMissions !== undefined) {
@@ -573,6 +576,33 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     window.addEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
     return () => window.removeEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
   }, [isTenant]);
+
+  useEffect(() => {
+    if (!isConfigured || !firestore || !ivanaChatCompanyId || !isTenant) return;
+
+    const seen = new Set<string>();
+    return subscribeIvanaPortalMessages(
+      firestore,
+      ivanaChatCompanyId,
+      (rows) => {
+        const uid = auth?.currentUser?.uid;
+        const incoming = rows.filter(
+          (r) => r.role === "client" && r.senderUid !== uid && !seen.has(r.id)
+        );
+        incoming.forEach((r) => seen.add(r.id));
+        if (incoming.length === 0) return;
+
+        setActiveTab("chat");
+        const ivId = incoming[incoming.length - 1]?.interventionId?.trim();
+        setSelectedChatInterventionId(ivId || "global");
+      },
+      (err) => {
+        logger.error("[useBackOfficeInboxState] portal chat watch", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    );
+  }, [ivanaChatCompanyId, isTenant]);
 
   const reportsTabBadgeCount = reportsToValidateList.length + bridgedTerrainCount;
   const reportsNothingAtAll =
