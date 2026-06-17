@@ -43,6 +43,23 @@ describe("TeamStaffListPanel", () => {
     expect(screen.getByTestId("team-staff-deactivate")).toBeInTheDocument();
   });
 
+  it("conserve la saisie dans le formulaire", () => {
+    render(
+      <TeamStaffListPanel
+        companyId="co-abc"
+        staff={staff}
+        loading={false}
+        loadError={null}
+        onRefresh={jest.fn().mockResolvedValue(undefined)}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("team-staff-row-uid-tech-1"));
+    const lastNameInput = screen.getByTestId("team-staff-edit-last-name");
+    fireEvent.change(lastNameInput, { target: { value: "Dupont" } });
+    expect(lastNameInput).toHaveValue("Dupont");
+  });
+
   it("saves profile via API", async () => {
     const { fetchWithAuth } = jest.requireMock("@/core/api/fetchWithAuth") as {
       fetchWithAuth: jest.Mock;
@@ -72,7 +89,15 @@ describe("TeamStaffListPanel", () => {
     await waitFor(() =>
       expect(fetchWithAuth).toHaveBeenCalledWith(
         "/api/company/staff/uid-tech-1?companyId=co-abc",
-        expect.objectContaining({ method: "PATCH" })
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({
+            firstName: "Jean",
+            lastName: "Dupont",
+            email: "jean@abc.be",
+            vehicle: "Camionnette",
+          }),
+        })
       )
     );
     expect(onRefresh).toHaveBeenCalled();
