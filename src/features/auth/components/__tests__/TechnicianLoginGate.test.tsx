@@ -1,5 +1,9 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import TechnicianLoginPanel from "@/features/auth/components/TechnicianLoginPanel";
 import TechnicianLoginGate from "@/features/auth/components/TechnicianLoginGate";
 import { render } from "@/test-utils/render";
@@ -40,6 +44,37 @@ describe("TechnicianLoginPanel", () => {
       expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
         expect.anything(),
         "tech@example.com",
+        "secret123"
+      )
+    );
+  });
+
+  it("creates account on register tab", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, companyId: "co-abc" }),
+    });
+    (createUserWithEmailAndPassword as jest.Mock).mockResolvedValueOnce({
+      user: { getIdToken: jest.fn().mockResolvedValue("tok") },
+    });
+
+    render(<TechnicianLoginPanel />);
+    fireEvent.click(screen.getByTestId("technician-login-tab-register"));
+    fireEvent.change(screen.getByTestId("technician-login-email"), {
+      target: { value: "new@example.com" },
+    });
+    fireEvent.change(screen.getByTestId("technician-login-password"), {
+      target: { value: "secret123" },
+    });
+    fireEvent.change(screen.getByTestId("technician-login-confirm-password"), {
+      target: { value: "secret123" },
+    });
+    fireEvent.click(screen.getByTestId("technician-login-submit"));
+
+    await waitFor(() =>
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        "new@example.com",
         "secret123"
       )
     );

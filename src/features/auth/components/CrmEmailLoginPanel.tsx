@@ -8,6 +8,12 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { HubSegmentedControl } from "@/core/ui/hub";
+import { emailPasswordAuthErrorFeedback } from "@/features/auth/clientPortalEmailPasswordAuth";
+import {
+  CrmStaffJoinCompanyError,
+  registerCrmStaffAccount,
+} from "@/features/auth/crmEmailRegister";
 import {
   signInTechnicianWithEmail,
   technicianEmailSignInErrorFeedback,
@@ -19,14 +25,18 @@ import {
   type CrmEmailLoginVariant,
 } from "@/features/auth/crmEmailLoginVariant";
 
+export type CrmEmailAuthTab = "login" | "register";
+
 type Props = {
   variant: CrmEmailLoginVariant;
 };
 
 export default function CrmEmailLoginPanel({ variant }: Props) {
   const { t } = useTranslation();
+  const [authTab, setAuthTab] = useState<CrmEmailAuthTab>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -35,13 +45,24 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
   const panelTestId = crmEmailLoginTestId(variant, "panel");
   const emailTestId = crmEmailLoginTestId(variant, "email");
   const passwordTestId = crmEmailLoginTestId(variant, "password");
+  const confirmPasswordTestId = crmEmailLoginTestId(variant, "confirm-password");
   const passwordToggleTestId = crmEmailLoginTestId(variant, "password-toggle");
   const errorTestId = crmEmailLoginTestId(variant, "error");
   const submitTestId = crmEmailLoginTestId(variant, "submit");
   const forgotTestId = crmEmailLoginTestId(variant, "forgot");
   const emailInputId = `${variant}-login-email`;
   const passwordInputId = `${variant}-login-password`;
+  const confirmPasswordInputId = `${variant}-login-confirm-password`;
   const logLabel = variant === "technician" ? "TechnicianLoginPanel" : "AdminLoginPanel";
+
+  const authErrorMessage = (e: unknown, mode: "login" | "register") => {
+    const feedback =
+      mode === "login" ? technicianEmailSignInErrorFeedback(e) : emailPasswordAuthErrorFeedback(e);
+    const { titleKey, descriptionKey } = feedback;
+    return descriptionKey
+      ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
+      : String(t(titleKey));
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -58,20 +79,29 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
       setInlineError(String(t("auth.password_required")));
       return;
     }
+    if (authTab === "register" && password !== confirmPassword) {
+      setInlineError(String(t("auth.password_mismatch")));
+      return;
+    }
 
     setBusy(true);
     try {
-      await signInTechnicianWithEmail({ auth, email, password });
-      toast.success(String(t("auth.signin_success")));
+      if (authTab === "register") {
+        await registerCrmStaffAccount({ auth, email, password });
+        toast.success(String(t("auth.register_success")));
+      } else {
+        await signInTechnicianWithEmail({ auth, email, password });
+        toast.success(String(t("auth.signin_success")));
+      }
     } catch (e) {
-      logger.error(`[${logLabel}] sign-in failed`, {
+      logger.error(`[${logLabel}] ${authTab} failed`, {
         error: e instanceof Error ? e.message : String(e),
       });
-      const { titleKey, descriptionKey } = technicianEmailSignInErrorFeedback(e);
-      const message = descriptionKey
-        ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
-        : String(t(titleKey));
-      setInlineError(message);
+      if (e instanceof CrmStaffJoinCompanyError) {
+        setInlineError(e.message);
+      } else {
+        setInlineError(authErrorMessage(e, authTab));
+      }
     } finally {
       setBusy(false);
     }
@@ -128,7 +158,31 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
           </div>
         </div>
 
-        <form className="mt-6 flex flex-col gap-3" onSubmit={handleSubmit} noValidate>
+        <div className="mt-5">
+          <HubSegmentedControl
+            size="compact"
+            ariaLabel={String(t("auth.session"))}
+            value={authTab}
+            onChange={(id) => {
+              setAuthTab(id as CrmEmailAuthTab);
+              setInlineError(null);
+            }}
+            options={[
+              {
+                id: "login",
+                label: t("auth.login_tab"),
+                testId: crmEmailLoginTestId(variant, "tab-login"),
+              },
+              {
+                id: "register",
+                label: t("auth.register_tab"),
+                testId: crmEmailLoginTestId(variant, "tab-register"),
+              },
+            ]}
+          />
+        </div>
+
+        <form className="mt-4 flex flex-col gap-3" onSubmit={handleSubmit} noValidate>
           <label htmlFor={emailInputId} className="sr-only">
             {t("auth.email_label")}
           </label>
@@ -163,7 +217,7 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
               id={passwordInputId}
               data-testid={passwordTestId}
               type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
+              autoComplete={authTab === "register" ? "new-password" : "current-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={String(t("auth.password_label"))}
@@ -181,6 +235,31 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
             </button>
           </div>
 
+          {authTab === "register" ? (
+            <>
+              <label htmlFor={confirmPasswordInputId} className="sr-only">
+                {t("auth.confirm_password_label")}
+              </label>
+              <div className="relative">
+                <Lock
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                />
+                <input
+                  id={confirmPasswordInputId}
+                  data-testid={confirmPasswordTestId}
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={String(t("auth.confirm_password_label"))}
+                  disabled={submitting}
+                  className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 py-3 text-[14px] text-slate-900 outline-none transition focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500/30 disabled:opacity-60"
+                />
+              </div>
+            </>
+          ) : null}
+
           {inlineError ? (
             <div
               role="alert"
@@ -195,25 +274,33 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
           <button
             type="submit"
             data-testid={submitTestId}
-            disabled={submitting}
+            disabled={submitting || (authTab === "register" && !confirmPassword.trim())}
             className="mt-1 flex h-11 items-center justify-center rounded-xl bg-blue-600 text-[14px] font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.99] disabled:opacity-60"
           >
-            {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> : t("auth.sign_in")}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleForgot}
-            disabled={submitting}
-            data-testid={forgotTestId}
-            className="mt-1 text-center text-[12.5px] font-medium text-blue-600 underline-offset-2 hover:underline disabled:opacity-60"
-          >
-            {resetting ? (
-              <Loader2 className="mx-auto h-4 w-4 animate-spin" aria-hidden />
+            {busy ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+            ) : authTab === "register" ? (
+              t("auth.create_account")
             ) : (
-              t("auth.forgot_password")
+              t("auth.sign_in")
             )}
           </button>
+
+          {authTab === "login" ? (
+            <button
+              type="button"
+              onClick={handleForgot}
+              disabled={submitting}
+              data-testid={forgotTestId}
+              className="mt-1 text-center text-[12.5px] font-medium text-blue-600 underline-offset-2 hover:underline disabled:opacity-60"
+            >
+              {resetting ? (
+                <Loader2 className="mx-auto h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                t("auth.forgot_password")
+              )}
+            </button>
+          ) : null}
         </form>
       </div>
     </div>
