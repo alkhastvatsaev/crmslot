@@ -1221,7 +1221,6 @@
       "invoice": {
         "ready_badge": "Invoice ready",
         "preparing": "Auto-calculating…",
-        "auto_hint": "Amount based on the client request, travel and time slot. One tap to send.",
         "send_cta": "Send invoice to client",
         "escalate_cta": "Incorrect invoice — back-office",
         "escalate_hint": "Explain the situation (mic): back-office will adjust the invoice.",

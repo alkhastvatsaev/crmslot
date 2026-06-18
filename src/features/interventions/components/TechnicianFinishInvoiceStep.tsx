@@ -227,10 +227,6 @@ export default function TechnicianFinishInvoiceStep({
             </p>
           ) : null}
         </div>
-
-        <p className="mt-4 max-w-xs text-[12px] leading-relaxed text-slate-500">
-          {String(t("technician_hub.finish.invoice.auto_hint"))}
-        </p>
       </div>
 
       <div className="shrink-0 space-y-2 border-t border-slate-100 px-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3">

@@ -1221,7 +1221,6 @@
       "invoice": {
         "ready_badge": "Facture prête",
         "preparing": "Calcul automatique…",
-        "auto_hint": "Montant calculé selon la demande client, le trajet et le créneau. Un clic pour envoyer.",
         "send_cta": "Envoyer la facture au client",
         "escalate_cta": "Facture incorrecte — back-office",
         "escalate_hint": "Expliquez la situation (micro) : le back-office ajustera la facture.",
