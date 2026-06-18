@@ -126,12 +126,16 @@ export default function TechnicianDashboardDetailPanel({
   caseId,
   liveIntervention,
   technicianUid: technicianUidProp,
+  onAssignmentAccepted,
+  onAssignmentDeclined,
 }: {
   caseId: string | null;
   /** Snapshot partagé depuis `TechnicianHubPage` (évite 2 listeners Firestore sur le même doc). */
   liveIntervention?: Intervention | null;
   /** Même UID que la liste (`useTechnicianAssignments().firebaseUid`). */
   technicianUid?: string | null;
+  onAssignmentAccepted?: (next: Intervention) => void;
+  onAssignmentDeclined?: () => void;
 }) {
   const liveIv = useInterventionLiveSource(caseId, liveIntervention);
   const queryClient = useQueryClient();
@@ -414,7 +418,12 @@ export default function TechnicianDashboardDetailPanel({
           </div>
 
           {awaitingAssignment && technicianUid ? (
-            <TechnicianAssignmentRespondBar iv={liveIv} technicianUid={technicianUid} />
+            <TechnicianAssignmentRespondBar
+              iv={liveIv}
+              technicianUid={technicianUid}
+              onAccepted={onAssignmentAccepted}
+              onDeclined={onAssignmentDeclined}
+            />
           ) : null}
 
           {showActionBar ? (

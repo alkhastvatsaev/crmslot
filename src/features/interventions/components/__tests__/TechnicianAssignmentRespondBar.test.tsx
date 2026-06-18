@@ -6,10 +6,15 @@ import {
   acceptTechnicianAssignment,
   declineTechnicianAssignment,
 } from "@/features/interventions/respondToTechnicianAssignment";
+import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
 
 jest.mock("@/features/interventions/respondToTechnicianAssignment", () => ({
   acceptTechnicianAssignment: jest.fn(),
   declineTechnicianAssignment: jest.fn(),
+}));
+
+jest.mock("@/features/interventions/patchTechnicianAssignmentInCache", () => ({
+  patchTechnicianAssignmentInCache: jest.fn(),
 }));
 
 const mockAccept = acceptTechnicianAssignment as jest.MockedFunction<
@@ -18,12 +23,21 @@ const mockAccept = acceptTechnicianAssignment as jest.MockedFunction<
 const mockDecline = declineTechnicianAssignment as jest.MockedFunction<
   typeof declineTechnicianAssignment
 >;
+const mockPatchCache = patchTechnicianAssignmentInCache as jest.MockedFunction<
+  typeof patchTechnicianAssignmentInCache
+>;
 
 jest.mock("sonner", () => ({
   toast: {
     success: jest.fn(),
     error: jest.fn(),
   },
+}));
+
+const mockQueryClient = { setQueryData: jest.fn() };
+jest.mock("@tanstack/react-query", () => ({
+  ...jest.requireActual("@tanstack/react-query"),
+  useQueryClient: () => mockQueryClient,
 }));
 
 function assignmentIv(partial: Partial<Intervention> = {}): Intervention {
@@ -47,6 +61,7 @@ describe("TechnicianAssignmentRespondBar", () => {
   beforeEach(() => {
     mockAccept.mockClear();
     mockDecline.mockClear();
+    mockPatchCache.mockClear();
     mockAccept.mockResolvedValue(undefined);
     mockDecline.mockResolvedValue(undefined);
   });
@@ -60,21 +75,51 @@ describe("TechnicianAssignmentRespondBar", () => {
     expect(screen.queryByTestId("technician-assignment-slide")).not.toBeInTheDocument();
   });
 
-  it("accept calls acceptTechnicianAssignment", async () => {
+  it("accept patches cache optimistically then calls API and onAccepted", async () => {
     const iv = assignmentIv();
-    render(<TechnicianAssignmentRespondBar iv={iv} technicianUid="demo-tech-local" />);
+    const onAccepted = jest.fn();
+    render(
+      <TechnicianAssignmentRespondBar
+        iv={iv}
+        technicianUid="demo-tech-local"
+        onAccepted={onAccepted}
+      />
+    );
 
     fireEvent.click(screen.getByTestId("technician-assignment-accept"));
 
     await waitFor(() => expect(mockAccept).toHaveBeenCalledWith(iv));
+    expect(mockPatchCache).toHaveBeenCalledWith(
+      mockQueryClient,
+      "demo-tech-local",
+      iv.id,
+      expect.objectContaining({ status: "en_route", technicianAcceptedAt: expect.any(String) })
+    );
+    expect(onAccepted).toHaveBeenCalledWith(
+      expect.objectContaining({ id: iv.id, status: "en_route" })
+    );
   });
 
-  it("decline calls declineTechnicianAssignment with technician uid", async () => {
+  it("decline patches cache, calls API and onDeclined", async () => {
     const iv = assignmentIv();
-    render(<TechnicianAssignmentRespondBar iv={iv} technicianUid="demo-tech-local" />);
+    const onDeclined = jest.fn();
+    render(
+      <TechnicianAssignmentRespondBar
+        iv={iv}
+        technicianUid="demo-tech-local"
+        onDeclined={onDeclined}
+      />
+    );
 
     fireEvent.click(screen.getByTestId("technician-assignment-decline"));
 
     await waitFor(() => expect(mockDecline).toHaveBeenCalledWith(iv, "demo-tech-local"));
+    expect(mockPatchCache).toHaveBeenCalledWith(
+      mockQueryClient,
+      "demo-tech-local",
+      iv.id,
+      expect.objectContaining({ status: "pending" })
+    );
+    expect(onDeclined).toHaveBeenCalled();
   });
 });
