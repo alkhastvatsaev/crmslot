@@ -44,6 +44,7 @@ const baseProps = {
   onClose: jest.fn(),
   onCancelIntervention: jest.fn(),
   onVerify: jest.fn(),
+  onArchiveReport: jest.fn(),
   onReject: jest.fn(),
   onAssign: jest.fn(),
   onDownloadQuotePdf: jest.fn(),
@@ -91,6 +92,24 @@ describe("InterventionDetailPanel report verification", () => {
     expect(screen.getByTestId("backoffice-invoice-preview")).toBeInTheDocument();
     expect(screen.getByText("Déplacement")).toBeInTheDocument();
     expect(screen.getByTestId("backoffice-invoice-preview-total")).toHaveTextContent(/130/);
+  });
+
+  it("shows archive button for active reports", () => {
+    render(<InterventionDetailPanel selectedItem={doneReport()} {...baseProps} />);
+    expect(screen.getByTestId("backoffice-inbox-archive-report")).toBeInTheDocument();
+  });
+
+  it("calls onArchiveReport when archive is clicked", () => {
+    const onArchiveReport = jest.fn();
+    render(
+      <InterventionDetailPanel
+        selectedItem={{ ...doneReport(), status: "invoiced" }}
+        {...baseProps}
+        onArchiveReport={onArchiveReport}
+      />
+    );
+    fireEvent.click(screen.getByTestId("backoffice-inbox-archive-report"));
+    expect(onArchiveReport).toHaveBeenCalledWith("iv-report-1");
   });
 
   it("hides reject button when report already invoiced", () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, RotateCcw, Send, X } from "lucide-react";
+import { CheckCircle2, RotateCcw, Send, X, Archive } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton, HubCard, HubDetailHeader, HUB_TYPE } from "@/core/ui/hub";
@@ -18,6 +18,7 @@ import type {
 import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
 import InterventionInvoicePreviewCard from "@/features/billing/components/InterventionInvoicePreviewCard";
 import { invoicePreviewFromIntervention } from "@/features/billing/invoicePreviewFromIntervention";
+import { canArchiveBackofficeReportInInbox } from "@/features/backoffice/backofficeReportsInboxArchive";
 
 function readTranscription(inv: unknown): string | null {
   if (!inv || typeof inv !== "object") return null;
@@ -36,6 +37,7 @@ type Props = {
   terrainAudioFailed: boolean;
   onClose: () => void;
   onVerify: (id: string) => void;
+  onArchiveReport: (id: string) => void;
   onReject: (id: string, reason?: string) => void;
 };
 
@@ -48,6 +50,7 @@ export default function TerrainReportDetailPanel({
   terrainAudioFailed,
   onClose,
   onVerify,
+  onArchiveReport,
   onReject,
 }: Props) {
   const { t } = useTranslation();
@@ -64,6 +67,7 @@ export default function TerrainReportDetailPanel({
   const address = iv?.address ? formatAddress(iv.address) : "";
   const description = iv?.problem || iv?.title || "";
   const isAlreadyValidated = iv?.status === "invoiced";
+  const canArchiveReport = Boolean(iv && canArchiveBackofficeReportInInbox(iv));
 
   const handleRejectConfirm = () => {
     onReject(r.interventionId, rejectReason.trim() || undefined);
@@ -295,6 +299,19 @@ export default function TerrainReportDetailPanel({
             ? t("backoffice.inbox.already_verified")
             : t("backoffice.inbox.verify_report")}
         </HubButton>
+
+        {canArchiveReport && !rejectOpen ? (
+          <HubButton
+            type="button"
+            variant="secondary"
+            data-testid={`backoffice-bridged-report-archive-${r.localId}`}
+            onClick={() => void onArchiveReport(r.interventionId)}
+            aria-label={t("backoffice.inbox.archive_report_aria")}
+          >
+            <Archive className="h-4 w-4" />
+            {t("backoffice.inbox.archive_report")}
+          </HubButton>
+        ) : null}
       </HubActionBar>
     </motion.div>
   );

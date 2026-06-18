@@ -149,6 +149,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
     handleAssignToTechnician,
     handleCancelIntervention,
     handleVerify,
+    handleArchiveReport,
     handleRejectReport,
     handleDragBoardSchedule,
     handleUpdateDateTime,
@@ -462,6 +463,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
             onClose={() => setSelectedItemId(null)}
             onCancelIntervention={handleCancelIntervention}
             onVerify={handleVerify}
+            onArchiveReport={handleArchiveReport}
             onReject={handleRejectReport}
             onAssign={handleAssignToTechnician}
             onDownloadQuotePdf={handleDownloadQuotePdf}
@@ -486,6 +488,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
                   terrainAudioFailed={terrainAudioFailed}
                   onClose={() => setSelectedTerrainLocalId(null)}
                   onVerify={handleVerify}
+                  onArchiveReport={handleArchiveReport}
                   onReject={handleRejectReport}
                 />
               );
