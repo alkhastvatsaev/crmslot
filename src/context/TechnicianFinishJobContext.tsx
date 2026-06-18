@@ -4,10 +4,15 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 
 export type FinishJobEntryStep = "photos" | "signature" | "invoice";
 
+/** Étape courante du wizard clôture (pour verrouiller le swipe hub mobile). */
+export type FinishJobWizardStep = "photos" | "signature" | "billing";
+
 type TechnicianFinishJobApi = {
   finishJobInterventionId: string | null;
   finishJobEntryStep: FinishJobEntryStep | null;
+  finishWizardStep: FinishJobWizardStep | null;
   setFinishJobInterventionId: (id: string | null) => void;
+  setFinishWizardStep: (step: FinishJobWizardStep | null) => void;
   /** Ouvre le wizard clôture ; `entryStep` permet d’atterrir directement sur la facture. */
   startFinishJob: (id: string, opts?: { entryStep?: FinishJobEntryStep }) => void;
 };
@@ -28,10 +33,16 @@ export function TechnicianFinishJobProvider({
     initialFinishJobInterventionId !== undefined ? initialFinishJobInterventionId : null
   );
   const [finishJobEntryStep, setFinishJobEntryStep] = useState<FinishJobEntryStep | null>(null);
+  const [finishWizardStep, setFinishWizardStepState] = useState<FinishJobWizardStep | null>(null);
 
   const setFinishJobInterventionId = useCallback((id: string | null) => {
     setFinishJobInterventionIdState(id?.trim() ? id.trim() : null);
     setFinishJobEntryStep(null);
+    setFinishWizardStepState(null);
+  }, []);
+
+  const setFinishWizardStep = useCallback((step: FinishJobWizardStep | null) => {
+    setFinishWizardStepState(step);
   }, []);
 
   const startFinishJob = useCallback((id: string, opts?: { entryStep?: FinishJobEntryStep }) => {
@@ -45,10 +56,19 @@ export function TechnicianFinishJobProvider({
     (): TechnicianFinishJobApi => ({
       finishJobInterventionId,
       finishJobEntryStep,
+      finishWizardStep,
       setFinishJobInterventionId,
+      setFinishWizardStep,
       startFinishJob,
     }),
-    [finishJobInterventionId, finishJobEntryStep, setFinishJobInterventionId, startFinishJob]
+    [
+      finishJobInterventionId,
+      finishJobEntryStep,
+      finishWizardStep,
+      setFinishJobInterventionId,
+      setFinishWizardStep,
+      startFinishJob,
+    ]
   );
 
   return (

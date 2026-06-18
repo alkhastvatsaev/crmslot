@@ -26,6 +26,10 @@ jest.mock("@/context/TechnicianFinishJobContext", () => ({
   useTechnicianFinishJob: () => ({
     finishJobInterventionId: null,
     setFinishJobInterventionId: mockSetFinishJob,
+    finishWizardStep: null,
+    finishJobEntryStep: null,
+    setFinishWizardStep: jest.fn(),
+    startFinishJob: jest.fn(),
   }),
 }));
 

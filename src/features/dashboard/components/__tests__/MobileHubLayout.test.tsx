@@ -122,6 +122,28 @@ describe("MobileHubLayout", () => {
     expectActive("mobile-hub-left");
   });
 
+  it("ignore swipe when swipeDisabled is true", () => {
+    renderMobileHubLayout(
+      <MobileHubLayout
+        rootTestId="mobile-hub-root"
+        leftTestId="mobile-hub-left"
+        centerTestId="mobile-hub-center"
+        rightTestId="mobile-hub-right"
+        swipeDisabled
+        left={<span>gauche</span>}
+        center={<span>centre</span>}
+        right={<span>droite</span>}
+      />
+    );
+
+    const root = screen.getByTestId("mobile-hub-root");
+    swipeLeft(root);
+    expect(screen.getByTestId("mobile-hub-center")).toHaveAttribute(
+      "data-mobile-hub-rail-active",
+      "true"
+    );
+  });
+
   it("ouvre le rail centre via useRequestMobileHubRail (ex. clic client/mission)", () => {
     function MissionPicker() {
       const requestRail = useRequestMobileHubRail();

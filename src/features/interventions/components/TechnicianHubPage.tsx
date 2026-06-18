@@ -41,7 +41,8 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const { pendingCaseId, setPendingCaseId } = useTechnicianCaseIntent();
-  const { finishJobInterventionId, setFinishJobInterventionId } = useTechnicianFinishJob();
+  const { finishJobInterventionId, setFinishJobInterventionId, finishWizardStep } =
+    useTechnicianFinishJob();
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const requestMobileHubRail = useRequestMobileHubRail();
   const [commandOpen, setCommandOpen] = useState(false);
@@ -214,6 +215,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         center={centerPanel}
         right={rightPanel}
         centerPadding={false}
+        mobileSwipeDisabled={Boolean(finishJobInterventionId && finishWizardStep === "signature")}
       />
     </>
   );
