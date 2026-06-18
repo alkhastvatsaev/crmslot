@@ -4,6 +4,7 @@ import {
   interventionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
 import type { Intervention } from "@/features/interventions/types";
+import type { Mission } from "@/features/map/missionTypes";
 import { makeIntervention } from "@/test-utils/factories";
 
 describe("missionsToChatDayRows", () => {
@@ -55,7 +56,7 @@ describe("buildChatDayRows", () => {
       interventions: [iv],
       dayMissions: [],
       selectedDate: today,
-      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+      workspace: { isTenantUser: true, activeRole: "admin" },
     });
     expect(rows).toHaveLength(1);
     expect(rows[0]?.threadId).toBe("iv-chat-1");
@@ -71,7 +72,7 @@ describe("buildChatDayRows", () => {
     const rows = buildChatDayRows({
       interventions: [pending],
       selectedDate: today,
-      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+      workspace: { isTenantUser: true, activeRole: "admin" },
     });
     expect(rows.map((r) => r.threadId)).toContain("iv-pending");
   });
@@ -104,7 +105,7 @@ describe("buildChatDayRows", () => {
         } as import("@/features/map/missionTypes").Mission,
       ],
       selectedDate: today,
-      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+      workspace: { isTenantUser: true, activeRole: "admin" },
     });
     expect(rows).toHaveLength(2);
     expect(rows.map((r) => r.threadId).sort()).toEqual(["202605180", "iv-firestore-1"]);
