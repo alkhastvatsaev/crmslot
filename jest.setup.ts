@@ -18,6 +18,10 @@ if (typeof globalThis.crypto?.subtle?.digest !== "function") {
     value: {
       ...baseCrypto,
       getRandomValues: (arr: Uint8Array) => nodeCrypto.randomFillSync(arr),
+      randomUUID:
+        typeof baseCrypto.randomUUID === "function"
+          ? baseCrypto.randomUUID.bind(baseCrypto)
+          : () => nodeCrypto.randomUUID(),
       subtle: {
         digest: async (_algorithm: string, data: ArrayBuffer) => {
           const hash = nodeCrypto.createHash("sha256").update(Buffer.from(data)).digest();

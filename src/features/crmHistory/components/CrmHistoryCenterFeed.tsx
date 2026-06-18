@@ -31,6 +31,7 @@ import {
   Eye,
   MousePointer,
   LogIn,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -122,6 +123,11 @@ const EVENT_META: Record<
     Icon: RotateCcw,
     colorClass: "text-amber-700",
     dotClass: "bg-amber-500",
+  },
+  intervention_report_archived: {
+    Icon: Archive,
+    colorClass: "text-slate-600",
+    dotClass: "bg-slate-400",
   },
   intervention_cancelled: {
     Icon: Ban,

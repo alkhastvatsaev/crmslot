@@ -11,6 +11,7 @@ export type CompanyCrmActivityKind =
   | "intervention_assigned"
   | "intervention_report_validated"
   | "intervention_report_rejected"
+  | "intervention_report_archived"
   | "intervention_invoiced"
   | "intervention_cancelled"
   | "intervention_schedule_updated"
@@ -135,6 +136,7 @@ const KIND_TO_EVENT_TYPE: Record<CompanyCrmActivityKind, CrmEventType> = {
   intervention_assigned: "intervention_assigned",
   intervention_report_validated: "intervention_report_validated",
   intervention_report_rejected: "intervention_report_rejected",
+  intervention_report_archived: "intervention_report_archived",
   intervention_invoiced: "intervention_invoiced",
   intervention_cancelled: "intervention_cancelled",
   intervention_schedule_updated: "intervention_schedule_updated",
