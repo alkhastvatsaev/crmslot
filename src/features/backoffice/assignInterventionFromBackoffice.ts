@@ -7,13 +7,19 @@ export type AssignInterventionSchedule = {
   scheduledTime: string;
 };
 
+export type AssignInterventionResult = {
+  scheduledDate: string;
+  scheduledTime: string;
+  rescheduled: boolean;
+};
+
 /** Assignation dispatch — API serveur (Admin SDK) en prod, droits société requis. */
 export async function assignInterventionFromBackoffice(
   id: string,
   _row: Intervention,
   technicianUid: string,
   schedule?: AssignInterventionSchedule
-): Promise<void> {
+): Promise<AssignInterventionResult | null> {
   const actorUid = auth?.currentUser?.uid?.trim();
   if (!actorUid) {
     throw Object.assign(new Error("Non connecté"), { code: "permission-denied" });
@@ -30,11 +36,30 @@ export async function assignInterventionFromBackoffice(
     }),
   });
 
-  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+    scheduledDate?: string;
+    scheduledTime?: string;
+    rescheduled?: boolean;
+  };
   if (!res.ok || !data.ok) {
     const message = typeof data.error === "string" ? data.error : "Assignation échouée";
     throw Object.assign(new Error(message), {
       code: res.status === 403 ? "permission-denied" : undefined,
     });
   }
+
+  if (
+    typeof data.scheduledDate === "string" &&
+    typeof data.scheduledTime === "string" &&
+    typeof data.rescheduled === "boolean"
+  ) {
+    return {
+      scheduledDate: data.scheduledDate,
+      scheduledTime: data.scheduledTime,
+      rescheduled: data.rescheduled,
+    };
+  }
+  return null;
 }

@@ -332,6 +332,12 @@ export default function TechnicianDashboardDetailPanel({
                 interventionId={caseId}
                 clientEmail={liveIv.clientEmail}
                 clientName={liveIv.clientName}
+                onSent={() => {
+                  patchTechnicianAssignmentInCache(queryClient, technicianUid, caseId, {
+                    status: "invoiced",
+                    statusUpdatedAt: new Date().toISOString(),
+                  });
+                }}
               />
             </div>
           ) : (

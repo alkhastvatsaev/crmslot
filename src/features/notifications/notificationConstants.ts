@@ -9,3 +9,6 @@ export const BM_TECH_REMINDER_PARAM = "bmTechReminder";
 
 /** Ouverture portail client (hub société — suivi) depuis une notification Web Push. */
 export const BM_CLIENT_CASE_PARAM = "bmClientCase";
+
+/** Ouvre l’inbox carte sur l’onglet chat (message client portail). */
+export const BM_BACKOFFICE_CHAT_PARAM = "bmBackofficeChat";

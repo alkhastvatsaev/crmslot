@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import type { AssignInterventionSchedule } from "@/features/backoffice/assignInterventionFromBackoffice";
+import { resolveSmartAssignmentSchedule } from "@/features/scheduling/resolveSmartAssignmentSchedule";
 import {
   buildBackofficeAssignPatch,
   canApplyBackofficeTechnicianAssignment,
@@ -24,14 +25,37 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
   technicianUid: string;
   actorUid: string;
   schedule?: AssignInterventionSchedule;
-}): Promise<void> {
+}): Promise<{
+  scheduledDate: string;
+  scheduledTime: string;
+  rescheduled: boolean;
+}> {
   const { db, interventionId, iv, technicianUid, actorUid, schedule } = params;
   if (!canApplyBackofficeTechnicianAssignment(iv)) {
     throw new Error("Ce dossier n'est pas assignable depuis l'onglet Demandes.");
   }
 
+  const companyId = (iv.companyId ?? "").trim();
+  const peerSnap = companyId
+    ? await db.collection("interventions").where("companyId", "==", companyId).get()
+    : null;
+  const peerInterventions =
+    peerSnap?.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Intervention) ?? [];
+
+  const now = new Date();
+  const resolved = resolveSmartAssignmentSchedule({
+    iv,
+    technicianUid,
+    peerInterventions,
+    scheduleOverride: schedule,
+    now,
+  });
+
   const actor = dispatcherTransitionActor(actorUid);
-  const basePatch = buildBackofficeAssignPatch(iv, technicianUid, schedule);
+  const basePatch = buildBackofficeAssignPatch(iv, technicianUid, schedule, {
+    peerInterventions,
+    now,
+  });
 
   if (isInterventionPendingBackOfficeIntake(iv)) {
     await transitionInterventionStatusAdmin({
@@ -43,7 +67,11 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
       extraPatch: basePatch,
       writeInboxAlerts: false,
     });
-    return;
+    return {
+      scheduledDate: resolved.scheduledDate,
+      scheduledTime: resolved.scheduledTime,
+      rescheduled: resolved.rescheduled,
+    };
   }
 
   await db
@@ -54,4 +82,10 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
       ...clearTechnicianResponseFields(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+  return {
+    scheduledDate: resolved.scheduledDate,
+    scheduledTime: resolved.scheduledTime,
+    rescheduled: resolved.rescheduled,
+  };
 }

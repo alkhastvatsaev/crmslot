@@ -9,6 +9,7 @@ import {
 import {
   BM_TECH_CASE_PARAM,
   BM_TECH_REMINDER_PARAM,
+  BM_BACKOFFICE_CHAT_PARAM,
 } from "../src/features/notifications/notificationConstants";
 import { parseTechnicianNotificationSearchParams } from "../src/features/notifications/technicianNotificationUrls";
 
@@ -26,16 +27,25 @@ function bootMessaging(): void {
     const data = payload.data ?? {};
 
     const origin = self.location.origin;
+    const pushType = typeof data.type === "string" ? data.type : "";
     const interventionId = typeof data.interventionId === "string" ? data.interventionId : "";
-    const openUrl =
-      interventionId.length > 0
-        ? `${origin}/?${BM_TECH_CASE_PARAM}=${encodeURIComponent(interventionId)}`
-        : `${origin}/?${BM_TECH_REMINDER_PARAM}=1`;
+    let openUrl = `${origin}/`;
+    let tag = "technician-reminder";
 
+    if (pushType === "portal_chat") {
+      const chatIv = interventionId.length > 0 ? interventionId : "global";
+      openUrl = `${origin}/?${BM_BACKOFFICE_CHAT_PARAM}=${encodeURIComponent(chatIv)}`;
+      tag = `portal-chat-${chatIv}`;
+    } else if (interventionId.length > 0) {
+      openUrl = `${origin}/?${BM_TECH_CASE_PARAM}=${encodeURIComponent(interventionId)}`;
+      tag = `case-${interventionId}`;
+    } else {
+      openUrl = `${origin}/?${BM_TECH_REMINDER_PARAM}=1`;
+    }
     void self.registration.showNotification(title, {
       body,
       data: { ...data, url: openUrl },
-      tag: interventionId ? `case-${interventionId}` : "technician-reminder",
+      tag,
     });
   });
 }

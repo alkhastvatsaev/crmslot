@@ -21,6 +21,7 @@ import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIv
 import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaChatStorage";
 import { logger } from "@/core/logger";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
+import { requestStaffPortalChatNotification } from "@/features/backoffice/requestStaffPortalChatNotification";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 const STORAGE_PREFIX = "map-belgique-ivana-chat-v1";
@@ -331,6 +332,13 @@ export default function IvanaClientChatPanel({
         });
         setDraft("");
         setPendingImages([]);
+        if (publishAsPortal) {
+          void requestStaffPortalChatNotification({
+            companyId: companyIdTrimmed,
+            interventionId: chatInterventionId,
+            preview: text || (imageUrls?.length ? "Photo jointe" : ""),
+          });
+        }
       } catch (e) {
         logger.error("IvanaClientChatPanel send", {
           error: e instanceof Error ? e.message : String(e),
@@ -365,6 +373,11 @@ export default function IvanaClientChatPanel({
         text: userMsg.text,
         images: userMsg.images,
         createdAt: userMsg.createdAt,
+      });
+      void requestStaffPortalChatNotification({
+        companyId: companyIdTrimmed,
+        interventionId: chatInterventionId,
+        preview: userMsg.text || (userMsg.images?.length ? "Photo jointe" : ""),
       });
     }
     setIvanaTyping(true);

@@ -5,6 +5,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/applyBackofficeTechnicianAssignmentAdmin";
+import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/server/notifyTechnicianAssignmentAdmin";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
@@ -66,7 +67,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       : undefined;
 
   try {
-    await applyBackofficeTechnicianAssignmentAdmin({
+    const assignment = await applyBackofficeTechnicianAssignmentAdmin({
       db,
       interventionId,
       iv,
@@ -74,7 +75,24 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       actorUid: auth.uid,
       schedule,
     });
-    return NextResponse.json({ ok: true });
+
+    void notifyTechnicianAssignmentAdmin({
+      db,
+      technicianUid,
+      interventionId,
+      iv,
+    }).catch((err) => {
+      logger.warn("[interventions/assign] push notify", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
+
+    return NextResponse.json({
+      ok: true,
+      scheduledDate: assignment.scheduledDate,
+      scheduledTime: assignment.scheduledTime,
+      rescheduled: assignment.rescheduled,
+    });
   } catch (e) {
     logger.error("[interventions/assign]", { error: e instanceof Error ? e.message : String(e) });
     const message = e instanceof Error ? e.message : "Erreur assignation";

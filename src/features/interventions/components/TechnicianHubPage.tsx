@@ -27,6 +27,7 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
+import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
@@ -48,6 +49,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
+  useTechnicianAssignmentPushBootstrap();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
   const { logIntervention } = useActivityLog();
 
@@ -116,6 +118,9 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       if (prev) {
         const iv = interventions.find((x) => x.id === prev);
         if (!iv) return activeTodaySorted[0]?.id ?? null;
+        if (iv.status === "invoiced" || iv.status === "cancelled") {
+          return activeTodaySorted[0]?.id ?? null;
+        }
         if (
           !interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
         ) {

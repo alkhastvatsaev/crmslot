@@ -3,11 +3,12 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-export type FinishJobStep = "photos" | "signature" | "billing";
+export type FinishJobStep = "photos" | "signature" | "billing" | "closed";
 
-const STEPS: FinishJobStep[] = ["photos", "signature", "billing"];
+const STEPS = ["photos", "signature", "billing"] as const;
+type IndicatorStep = (typeof STEPS)[number];
 
-const stepMeta: Record<FinishJobStep, { labelKey: string; testId: string }> = {
+const stepMeta: Record<IndicatorStep, { labelKey: string; testId: string }> = {
   photos: {
     labelKey: "technician_hub.finish.steps.photos",
     testId: "finish-step-photos",
@@ -32,7 +33,9 @@ type Props = {
 /** Indicateur d’étapes clôture — trois points, sans icônes. */
 export default function FinishJobStepIndicator({ current, className }: Props) {
   const { t } = useTranslation();
-  const currentIndex = STEPS.indexOf(current);
+  const indicatorCurrent: IndicatorStep = current === "closed" ? "billing" : current;
+  const currentIndex = STEPS.indexOf(indicatorCurrent);
+  const allDone = current === "closed";
 
   return (
     <nav
@@ -42,8 +45,8 @@ export default function FinishJobStepIndicator({ current, className }: Props) {
     >
       {STEPS.map((step, index) => {
         const { labelKey, testId } = stepMeta[step];
-        const done = index < currentIndex;
-        const active = step === current;
+        const done = allDone || index < currentIndex;
+        const active = !allDone && step === indicatorCurrent;
         return (
           <div key={step} className="flex items-center gap-2">
             <span
@@ -63,7 +66,7 @@ export default function FinishJobStepIndicator({ current, className }: Props) {
               <span
                 className={cn(
                   "h-px w-5 shrink-0",
-                  index < currentIndex ? "bg-slate-400" : "bg-slate-200"
+                  index < currentIndex || allDone ? "bg-slate-400" : "bg-slate-200"
                 )}
                 aria-hidden
               />

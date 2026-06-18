@@ -77,6 +77,24 @@ describe("buildChatDayRows", () => {
     expect(rows.map((r) => r.threadId)).toContain("iv-pending");
   });
 
+  it("includes off-day dossier when includeInterventionIds is set", () => {
+    const offDay = makeIntervention({
+      id: "iv-off-day",
+      clientFirstName: "Paul",
+      clientLastName: "Durand",
+      requestedDate: "2026-06-10",
+      requestedTime: "09:00",
+      status: "assigned",
+    });
+    const rows = buildChatDayRows({
+      interventions: [offDay],
+      selectedDate: today,
+      workspace: { isTenantUser: true, activeRole: "admin" },
+      includeInterventionIds: ["iv-off-day"],
+    });
+    expect(rows.map((r) => r.threadId)).toContain("iv-off-day");
+  });
+
   it("merges extra local map missions without duplicating intervention ids", () => {
     const iv = makeIntervention({
       id: "iv-firestore-1",

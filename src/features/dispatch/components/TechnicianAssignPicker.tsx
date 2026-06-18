@@ -13,6 +13,7 @@ import {
 } from "@/features/interventions/assignInterventionToTechnician";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
+import { initialAssignmentDateYmd } from "@/features/scheduling/resolveSmartAssignmentSchedule";
 import {
   prioritizeDefaultAssignTechnician,
   rankTechniciansForIntervention,
@@ -84,10 +85,9 @@ export default function TechnicianAssignPicker({
   const [aiReasoning, setAiReasoning] = useState<string | null>(null);
   const [aiRevenueImpact, setAiRevenueImpact] = useState<string | null>(null);
   const [etaByTechId, setEtaByTechId] = useState<Record<string, string>>({});
-  const [scheduleDate, setScheduleDate] = useState(() => {
-    const fromIv = intervention.scheduledDate?.trim() || intervention.requestedDate?.trim() || "";
-    return fromIv || new Date().toISOString().slice(0, 10);
-  });
+  const [scheduleDate, setScheduleDate] = useState(() =>
+    initialAssignmentDateYmd(intervention, new Date())
+  );
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
 
   const interventionCoords = useMemo(

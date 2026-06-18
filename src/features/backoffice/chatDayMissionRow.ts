@@ -9,6 +9,10 @@ import {
   isInterventionReleasedToTechnicianField,
 } from "@/features/interventions/technicianSchedule";
 import type { Mission } from "@/features/map/missionTypes";
+import {
+  chatDayRowFromIntervention,
+  sortChatDayRows,
+} from "@/features/backoffice/portalChatInboxLogic";
 
 /** Une ligne « client du jour » pour le picker chat (aligné rail missions). */
 export type ChatDayMissionRow = {
@@ -53,6 +57,8 @@ type BuildChatDayRowsInput = {
    * inclut aussi les demandes en attente de validation.
    */
   mapDispatchFilter?: boolean;
+  /** Dossiers avec messages client portail — visibles même hors créneau « jour ». */
+  includeInterventionIds?: string[];
 };
 
 /** Lignes chat du jour — interventions Firestore + missions locales carte (démo). */
@@ -62,9 +68,13 @@ export function buildChatDayRows({
   selectedDate = new Date(),
   workspace,
   mapDispatchFilter = false,
+  includeInterventionIds = [],
 }: BuildChatDayRowsInput): ChatDayMissionRow[] {
   const isDispatchMap = isCompanyDispatchViewer(workspace);
+  const boostIds = new Set(includeInterventionIds.map((id) => id.trim()).filter(Boolean));
+
   const ivs = interventions.filter((iv) => {
+    if (boostIds.has(iv.id)) return iv.status !== "cancelled";
     if (!interventionMatchesTab(iv, "today", selectedDate)) return false;
     if (mapDispatchFilter && isDispatchMap && !isInterventionReleasedToTechnicianField(iv)) {
       return false;
@@ -81,5 +91,14 @@ export function buildChatDayRows({
       if (!byThread.has(row.threadId)) byThread.set(row.threadId, row);
     }
   }
-  return [...byThread.values()];
+
+  for (const ivId of boostIds) {
+    if (byThread.has(ivId)) continue;
+    const iv = interventions.find((x) => x.id === ivId);
+    if (iv && iv.status !== "cancelled") {
+      byThread.set(ivId, chatDayRowFromIntervention(iv));
+    }
+  }
+
+  return sortChatDayRows([...byThread.values()], selectedDate);
 }

@@ -14,7 +14,7 @@ import {
 export type FinishJobEntryStep = "photos" | "signature" | "invoice";
 
 /** Étape courante du wizard clôture (pour verrouiller le swipe hub mobile). */
-export type FinishJobWizardStep = "photos" | "signature" | "billing";
+export type FinishJobWizardStep = "photos" | "signature" | "billing" | "closed";
 
 type TechnicianFinishJobApi = {
   finishJobInterventionId: string | null;

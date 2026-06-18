@@ -235,6 +235,28 @@ describe("TechnicianFinishJobPanel", () => {
     });
   });
 
+  it("shows closure screen after invoice is sent", async () => {
+    setupActive();
+    render(<TechnicianFinishJobPanel />);
+    await goToSignatureStep();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("finish-job-submit"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("finish-job-step-invoice")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("finish-invoice-send"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("finish-job-step-closed")).toBeInTheDocument();
+      expect(screen.queryByTestId("finish-job-capture-btn")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("mission-action-primary-finish")).not.toBeInTheDocument();
+    });
+  });
+
   it("capture button stays round", () => {
     setupActive();
     render(<TechnicianFinishJobPanel />);

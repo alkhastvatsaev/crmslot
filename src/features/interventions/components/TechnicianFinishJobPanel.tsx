@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  CheckCircle2,
   ClipboardList,
   Loader2,
   RotateCcw,
@@ -55,6 +56,7 @@ import type { FinishWizardPhoto } from "@/features/interventions/technicianCompl
 import { finishWizardPhotosFromIntervention } from "@/features/interventions/technicianCompletionReport";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
+import { getTechnicianAssignmentUid } from "@/features/interventions/technicianAssignmentActions";
 import { useQueryClient } from "@tanstack/react-query";
 
 const stepVariants = {
@@ -238,6 +240,18 @@ export default function TechnicianFinishJobPanel() {
     resetWizard();
     navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
   };
+
+  const handleInvoiceSent = useCallback(() => {
+    const uid = getTechnicianAssignmentUid(auth?.currentUser?.uid ?? null);
+    if (interventionId) {
+      patchTechnicianAssignmentInCache(queryClient, uid, interventionId, {
+        status: "invoiced",
+        statusUpdatedAt: new Date().toISOString(),
+      });
+    }
+    stopCamera();
+    setStep("closed");
+  }, [interventionId, queryClient, stopCamera]);
 
   const goToSignature = () => {
     stopCamera();
@@ -493,12 +507,41 @@ export default function TechnicianFinishJobPanel() {
                 clientName={liveIv?.clientName}
                 initialLines={draftBillingLines}
                 initialAiNote={draftAiNote}
-                onSent={() => {
-                  resetWizard();
-                  setFinishJobInterventionId(null);
-                  navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-                }}
+                onSent={handleInvoiceSent}
               />
+            </motion.div>
+          ) : null}
+
+          {step === "closed" ? (
+            <motion.div
+              key="closed"
+              variants={stepVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={springTransition}
+              className={cn(STEP_SHELL, "items-center justify-center")}
+              data-testid="finish-job-step-closed"
+            >
+              <div className="flex max-w-sm flex-col items-center rounded-2xl border border-emerald-100 bg-emerald-50/50 px-6 py-10 text-center shadow-sm">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                  <CheckCircle2 className="h-7 w-7" aria-hidden />
+                </div>
+                <h2 className="text-[17px] font-bold text-slate-900">
+                  {String(t("technician_hub.finish.closure_complete_title"))}
+                </h2>
+                <p className="mt-2 text-[13px] font-medium leading-relaxed text-slate-600">
+                  {String(t("technician_hub.finish.closure_complete_desc"))}
+                </p>
+                <HubButton
+                  type="button"
+                  data-testid="finish-job-closure-done"
+                  onClick={goDashboard}
+                  className="mt-6"
+                >
+                  {String(t("technician_hub.finish.closure_complete_cta"))}
+                </HubButton>
+              </div>
             </motion.div>
           ) : null}
 
@@ -522,7 +565,7 @@ export default function TechnicianFinishJobPanel() {
       </div>
 
       <footer className="shrink-0 border-t border-slate-100 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-        <FinishJobStepIndicator current={step} />
+        {step === "closed" ? null : <FinishJobStepIndicator current={step} />}
 
         {step === "photos" ? (
           <div className="mt-3 flex justify-end">
@@ -542,7 +585,7 @@ export default function TechnicianFinishJobPanel() {
           </div>
         ) : null}
 
-        {step === "billing" ? null : step === "signature" ? (
+        {step === "billing" || step === "closed" ? null : step === "signature" ? (
           <div className="mt-3 flex items-center justify-center gap-3">
             <button
               type="button"
