@@ -24,6 +24,7 @@ import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBa
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
 import BackofficeChatNotificationBootstrap from "@/features/notifications/components/BackofficeChatNotificationBootstrap";
+import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
 
 type Props = {
   pageCount: number;
@@ -37,6 +38,7 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
       <DesktopOnlyGate>
         <LoginOverlay>
           <DevServiceWorkerCleanup />
+          <AndroidAppInstallPromoBootstrap surface="admin" presentation="dialog" />
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={pageCount}>

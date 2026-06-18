@@ -14,6 +14,7 @@ import ClientPortalNotificationBootstrap from "@/features/notifications/componen
 import ClientPortalPaymentReturnEffects from "@/features/auth/components/ClientPortalPaymentReturnEffects";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
+import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
 
 const CLIENT_MOBILE_PAGE_COUNT = 1;
 
@@ -27,6 +28,7 @@ export default function ClientMobileProviders({ children }: Props) {
     <DateProvider>
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
+        <AndroidAppInstallPromoBootstrap surface="demande" presentation="toast" />
         <CompanyWorkspaceProvider>
           <GalaxyLayerBridgeProvider>
             <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
