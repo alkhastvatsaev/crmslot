@@ -13,6 +13,7 @@ import {
   invoiceTotalCents,
 } from "@/features/interventions/technicianInvoiceQuickAdjust";
 import { cn } from "@/lib/utils";
+import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
 
 type DraftBillingResponse = {
   ok?: boolean;
@@ -236,7 +237,10 @@ export default function TechnicianFinishInvoiceStep({
           fullWidth
           disabled={!canSend}
           onClick={() => void handleSend()}
-          className="h-14 rounded-full bg-emerald-600 text-[16px] font-bold text-white hover:bg-emerald-700"
+          className={cn(
+            "h-14 bg-emerald-600 text-[16px] font-bold text-white hover:bg-emerald-700",
+            TERRAIN_BTN
+          )}
         >
           {sending ? (
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
@@ -252,7 +256,10 @@ export default function TechnicianFinishInvoiceStep({
             data-testid="finish-invoice-escalate-open"
             disabled={loadingDraft || sending || escalating}
             onClick={() => setEscalateOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white py-3 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40"
+            className={cn(
+              "flex w-full items-center justify-center gap-2 border border-slate-200 bg-white py-3 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40",
+              TERRAIN_BTN
+            )}
           >
             <Headphones className="h-4 w-4 shrink-0" aria-hidden />
             {String(t("technician_hub.finish.invoice.escalate_cta"))}
@@ -272,7 +279,8 @@ export default function TechnicianFinishInvoiceStep({
               onClick={() => void toggleListening()}
               aria-pressed={listening}
               className={cn(
-                "mx-auto flex h-16 w-16 items-center justify-center rounded-full border transition active:scale-95",
+                "mx-auto flex h-16 w-16 items-center justify-center border transition active:scale-95",
+                TERRAIN_BTN_ICON,
                 listening
                   ? "border-red-200 bg-red-50 text-red-500"
                   : "border-amber-200 bg-white text-amber-700 shadow-sm"
@@ -306,7 +314,10 @@ export default function TechnicianFinishInvoiceStep({
                   setEscalateOpen(false);
                   setVoiceNote("");
                 }}
-                className="flex-1 rounded-full border border-slate-200 bg-white py-2.5 text-[12px] font-semibold text-slate-600"
+                className={cn(
+                  "flex-1 border border-slate-200 bg-white py-2.5 text-[12px] font-semibold text-slate-600",
+                  TERRAIN_BTN
+                )}
               >
                 {String(t("common.cancel"))}
               </button>
@@ -315,7 +326,7 @@ export default function TechnicianFinishInvoiceStep({
                 data-testid="finish-invoice-escalate-submit"
                 disabled={escalating}
                 onClick={() => void handleEscalate()}
-                className="flex-1 rounded-full py-2.5 text-[12px] font-bold"
+                className={cn("flex-1 py-2.5 text-[12px] font-bold", TERRAIN_BTN)}
               >
                 {escalating ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

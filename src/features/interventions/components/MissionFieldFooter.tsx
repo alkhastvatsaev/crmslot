@@ -8,6 +8,7 @@ import {
   type MissionActionVariant,
 } from "@/features/interventions/missionActionBar";
 import { cn } from "@/lib/utils";
+import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
 
 type Props = {
   intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
@@ -84,7 +85,10 @@ export default function MissionFieldFooter({
           disabled={isUpdating}
           onClick={onFinish}
           aria-label={finishLabel}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)] transition active:scale-[0.98] disabled:opacity-60"
+          className={cn(
+            "flex h-14 w-14 items-center justify-center bg-slate-900 text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)] transition active:scale-[0.98] disabled:opacity-60",
+            TERRAIN_BTN_ICON
+          )}
         >
           {isUpdating ? (
             <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
@@ -99,7 +103,8 @@ export default function MissionFieldFooter({
           disabled={isUpdating}
           onClick={handleTransition}
           className={cn(
-            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2.5 rounded-full border px-4 text-[16px] font-bold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.35)] transition active:scale-[0.99] disabled:opacity-60",
+            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2.5 border px-4 text-[16px] font-bold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.35)] transition active:scale-[0.99] disabled:opacity-60",
+            TERRAIN_BTN,
             transitionButtonClass(transitionPrimary.variant)
           )}
         >

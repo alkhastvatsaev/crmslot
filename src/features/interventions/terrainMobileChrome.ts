@@ -1,0 +1,4 @@
+/** Boutons app terrain (/m/technician) — rectangles, pas pills. */
+export const TERRAIN_BTN = "rounded-xl";
+export const TERRAIN_BTN_ICON = "rounded-xl";
+export const TERRAIN_BTN_SM = "rounded-lg";
