@@ -47,10 +47,7 @@ type BuildChatDayRowsInput = {
   interventions: Intervention[];
   dayMissions?: Mission[];
   selectedDate?: Date;
-  workspace?:
-    | Pick<CompanyWorkspaceApi, "isTenantUser" | "activeCompanyId" | "memberships">
-    | null
-    | undefined;
+  workspace?: Pick<CompanyWorkspaceApi, "isTenantUser" | "activeRole"> | null | undefined;
   /**
    * Filtre carte dispatch (missions avec coords) — pas pour le picker chat admin :
    * inclut aussi les demandes en attente de validation.
