@@ -162,7 +162,11 @@ export default function TechnicianFinishJobPanel() {
     try {
       const res = await fetchWithAuth(
         `/api/interventions/${encodeURIComponent(ivId)}/prepare-draft-billing`,
-        { method: "POST" }
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ forceRegenerate: true }),
+        }
       );
       const data = (await res.json()) as {
         ok?: boolean;

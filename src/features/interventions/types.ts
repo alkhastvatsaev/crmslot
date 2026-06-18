@@ -103,6 +103,10 @@ export interface Intervention {
   } | null;
   /** Note IA lors de la préparation du brouillon facture. */
   draftBillingAiNote?: string | null;
+  /** Technicien — facture à ajuster par le back-office. */
+  invoiceReviewRequestedAt?: string | null;
+  invoiceReviewRequestedByUid?: string | null;
+  invoiceReviewNote?: string | null;
   /** Lignes facturables saisies par le technicien avant clôture. */
   billingLines?: {
     description: string;

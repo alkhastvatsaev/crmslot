@@ -1,4 +1,10 @@
 import { getClient } from "@/core/services/audio/transcription";
+import {
+  buildInterventionBillingContextText,
+  enrichDraftBillingLines,
+  interventionProblemText,
+  type InterventionBillingContext,
+} from "@/features/interventions/interventionBillingContext";
 import { suggestBillingLinesFromProblem } from "@/features/interventions/suggestBillingLines";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -19,7 +25,7 @@ export type DraftBillingPackage = {
 export function totalCentsFromBillingLines(lines: DraftBillingLine[]): number {
   return lines.reduce(
     (sum, l) => sum + Math.round(l.unitPriceCents) * (l.quantity > 0 ? l.quantity : 1),
-    0,
+    0
   );
 }
 
@@ -35,39 +41,34 @@ function normalizeLines(lines: DraftBillingLine[]): DraftBillingLine[] {
 }
 
 /** Proposition locale à partir du formulaire client + catégorie. */
-export function buildTemplateDraftBilling(
-  iv: Pick<Intervention, "problem" | "title" | "category">,
-): DraftBillingLine[] {
-  const problem = [iv.problem, iv.title].filter(Boolean).join(" ").trim();
-  return normalizeLines(suggestBillingLinesFromProblem(problem, iv.category ?? null));
+export function buildTemplateDraftBilling(iv: InterventionBillingContext): DraftBillingLine[] {
+  const problem = interventionProblemText(iv);
+  const seed = normalizeLines(suggestBillingLinesFromProblem(problem, iv.category ?? null));
+  return enrichDraftBillingLines(iv, seed);
 }
 
 const OPENAI_BILLING_SYSTEM = `Tu es contrôleur facturation pour une entreprise de dépannage (serrurerie, vitrerie).
-On te donne le contexte client et un brouillon de lignes facture.
-Vérifie la cohérence (déplacement, main d'œuvre, pièces) et ajuste les montants si le brouillon est à 0.
-Réponds UNIQUEMENT en JSON : { "lines": [...], "note": "courte explication" }
-Chaque ligne : description (string), quantity (number), unitPriceCents (number, centimes EUR), reference (string optionnel).`;
+On te donne le contexte complet du dossier (demande client, adresse, créneau, urgence, durée terrain, photos) et un brouillon de lignes.
+Objectif : facture automatique précise pour le technicien terrain — aucune saisie manuelle.
+- Choisis le forfait / pièces cohérents avec la demande client et la catégorie.
+- Déplacement : urgent si urgence/priorité haute ou créneau hors heures ouvrables ; sinon forfaitaire ; trajet long si adresse éloignée.
+- Main d'œuvre et pièces : quantités réalistes selon le type d'intervention décrit.
+- Montants en centimes EUR (marché belge serrurerie) ; ne laisse pas de ligne à 0 si elle doit être facturée.
+Réponds UNIQUEMENT en JSON : { "lines": [...], "note": "courte explication (1 phrase)" }
+Chaque ligne : description (string), quantity (number), unitPriceCents (number), reference (string optionnel).`;
 
 /** Enrichit / valide le brouillon via OpenAI (gpt-4o-mini par défaut). */
 export async function refineDraftBillingWithOpenAI(
-  iv: Pick<Intervention, "problem" | "title" | "category" | "address" | "clientName">,
-  seedLines: DraftBillingLine[],
+  iv: InterventionBillingContext,
+  seedLines: DraftBillingLine[]
 ): Promise<{ lines: DraftBillingLine[]; note?: string }> {
   if (!process.env.OPENAI_API_KEY?.trim()) {
-    return { lines: seedLines };
+    return { lines: enrichDraftBillingLines(iv, seedLines) };
   }
 
   const client = getClient();
   const model = process.env.OPENAI_DISPATCH_MODEL?.trim() || "gpt-4o-mini";
-  const context = [
-    iv.clientName ? `Client : ${iv.clientName}` : null,
-    iv.address ? `Adresse : ${iv.address}` : null,
-    iv.category ? `Catégorie : ${iv.category}` : null,
-    iv.problem ? `Problème : ${iv.problem}` : null,
-    iv.title ? `Titre : ${iv.title}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const context = buildInterventionBillingContextText(iv);
 
   const completion = await client.chat.completions.create({
     model,
@@ -85,11 +86,16 @@ export async function refineDraftBillingWithOpenAI(
   const raw = completion.choices[0]?.message?.content ?? "{}";
   try {
     const parsed = JSON.parse(raw) as { lines?: DraftBillingLine[]; note?: string };
-    const lines = normalizeLines(Array.isArray(parsed.lines) ? parsed.lines : seedLines);
-    if (lines.length === 0) return { lines: seedLines, note: parsed.note };
+    const rawLines = normalizeLines(Array.isArray(parsed.lines) ? parsed.lines : seedLines);
+    const lines =
+      rawLines.length > 0
+        ? enrichDraftBillingLines(iv, rawLines)
+        : enrichDraftBillingLines(iv, seedLines);
+    if (lines.length === 0)
+      return { lines: enrichDraftBillingLines(iv, seedLines), note: parsed.note };
     return { lines, note: typeof parsed.note === "string" ? parsed.note : undefined };
   } catch {
-    return { lines: seedLines };
+    return { lines: enrichDraftBillingLines(iv, seedLines) };
   }
 }
 
@@ -98,14 +104,11 @@ export async function refineDraftBillingWithOpenAI(
  * Réutilise les lignes existantes si déjà présentes et cohérentes.
  */
 export async function buildDraftBillingPackage(
-  iv: Pick<
-    Intervention,
-    "problem" | "title" | "category" | "address" | "clientName" | "billingLines"
-  >,
-  opts?: { forceRegenerate?: boolean },
+  iv: InterventionBillingContext & Pick<Intervention, "billingLines">,
+  opts?: { forceRegenerate?: boolean }
 ): Promise<DraftBillingPackage> {
   const existing = normalizeLines(
-    (Array.isArray(iv.billingLines) ? iv.billingLines : []) as DraftBillingLine[],
+    (Array.isArray(iv.billingLines) ? iv.billingLines : []) as DraftBillingLine[]
   );
   if (existing.length > 0 && !opts?.forceRegenerate) {
     return {
@@ -118,7 +121,8 @@ export async function buildDraftBillingPackage(
   const templateLines = buildTemplateDraftBilling(iv);
   const seed = templateLines.length > 0 ? templateLines : existing;
   const { lines, note } = await refineDraftBillingWithOpenAI(iv, seed);
-  const finalLines = lines.length > 0 ? lines : seed;
+  const finalLines =
+    lines.length > 0 ? lines : enrichDraftBillingLines(iv, seed.length > 0 ? seed : templateLines);
 
   return {
     lines: finalLines,
