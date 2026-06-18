@@ -523,17 +523,10 @@ export default function TechnicianFinishJobPanel() {
       </div>
 
       <footer className="shrink-0 border-t border-slate-100 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <FinishJobStepIndicator current={step} />
+
         {step === "photos" ? (
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <span
-              className="text-[11px] font-semibold tabular-nums text-slate-500"
-              aria-live="polite"
-            >
-              {photos.length}/{FINISH_JOB_MAX_PHOTOS}
-              {!photosReady ? (
-                <span className="text-slate-400"> · min {FINISH_JOB_MIN_PHOTOS}</span>
-              ) : null}
-            </span>
+          <div className="mt-3 flex justify-end">
             <button
               type="button"
               data-testid="finish-job-continue-photos"
@@ -548,7 +541,7 @@ export default function TechnicianFinishJobPanel() {
         ) : null}
 
         {step === "billing" ? null : step === "signature" ? (
-          <div className="mb-2 flex items-center justify-center gap-3">
+          <div className="mt-3 flex items-center justify-center gap-3">
             <button
               type="button"
               data-testid="finish-job-back-photos"
@@ -583,8 +576,6 @@ export default function TechnicianFinishJobPanel() {
             </button>
           </div>
         ) : null}
-
-        <FinishJobStepIndicator current={step} compact />
       </footer>
     </div>
   );
