@@ -1221,7 +1221,6 @@
       "invoice": {
         "ready_badge": "Factuur klaar",
         "preparing": "Automatisch berekenen…",
-        "auto_hint": "Bedrag op basis van de aanvraag, verplaatsing en tijdslot. Eén tik om te versturen.",
         "send_cta": "Factuur naar klant sturen",
         "escalate_cta": "Factuur onjuist — back-office",
         "escalate_hint": "Leg de situatie uit (micro): back-office past de factuur aan.",
