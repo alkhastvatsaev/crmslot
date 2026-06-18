@@ -3,20 +3,13 @@ import {
   declineTechnicianAssignment,
 } from "@/features/interventions/respondToTechnicianAssignment";
 import type { Intervention } from "@/features/interventions/types";
-import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
-jest.mock("@/core/config/firebase", () => ({
-  firestore: {},
-  auth: { currentUser: { uid: "tech-uid-1" } },
+jest.mock("@/core/api/fetchWithAuth", () => ({
+  fetchWithAuth: jest.fn(),
 }));
 
-jest.mock("@/features/interventions/workflow/transitionInterventionStatus", () => ({
-  transitionInterventionStatus: jest.fn(),
-}));
-
-const mockTransition = transitionInterventionStatus as jest.MockedFunction<
-  typeof transitionInterventionStatus
->;
+const mockFetchWithAuth = fetchWithAuth as jest.MockedFunction<typeof fetchWithAuth>;
 
 const TECH_UID = "tech-uid-1";
 
@@ -30,43 +23,46 @@ const row: Intervention = {
   location: { lat: 0, lng: 0 },
 };
 
-const mockStatusEvent = {
-  id: "evt-1",
-  interventionId: "iv-1",
-  fromStatus: "assigned" as const,
-  toStatus: "en_route" as const,
-  actorUid: TECH_UID,
-  actorRole: "technician" as const,
-  at: "2026-06-16T12:00:00.000Z",
-};
-
 describe("respondToTechnicianAssignment", () => {
   beforeEach(() => {
-    mockTransition.mockReset();
-    mockTransition.mockResolvedValue(mockStatusEvent);
+    mockFetchWithAuth.mockReset();
+    mockFetchWithAuth.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    } as Response);
   });
 
-  it("accept calls transitionInterventionStatus to en_route", async () => {
+  it("accept posts to technician-response API", async () => {
     await acceptTechnicianAssignment(row);
-    expect(mockTransition).toHaveBeenCalledWith(
+    expect(mockFetchWithAuth).toHaveBeenCalledWith(
+      "/api/interventions/iv-1/technician-response",
       expect.objectContaining({
-        interventionId: "iv-1",
-        iv: row,
-        toStatus: "en_route",
-        actor: { uid: TECH_UID, role: "technician" },
+        method: "POST",
+        body: JSON.stringify({ action: "accept" }),
       })
     );
   });
 
-  it("decline calls transitionInterventionStatus to pending", async () => {
+  it("decline posts to technician-response API", async () => {
     await declineTechnicianAssignment(row, TECH_UID);
-    expect(mockTransition).toHaveBeenCalledWith(
+    expect(mockFetchWithAuth).toHaveBeenCalledWith(
+      "/api/interventions/iv-1/technician-response",
       expect.objectContaining({
-        interventionId: "iv-1",
-        iv: row,
-        toStatus: "pending",
-        actor: { uid: TECH_UID, role: "technician" },
+        method: "POST",
+        body: JSON.stringify({ action: "decline" }),
       })
+    );
+  });
+
+  it("surfaces API error message", async () => {
+    mockFetchWithAuth.mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ ok: false, error: "Mission non assignée à ce technicien." }),
+    } as Response);
+
+    await expect(acceptTechnicianAssignment(row)).rejects.toThrow(
+      "Mission non assignée à ce technicien."
     );
   });
 });

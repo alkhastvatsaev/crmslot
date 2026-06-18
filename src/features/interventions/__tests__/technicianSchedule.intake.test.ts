@@ -49,6 +49,15 @@ describe("interventionVisibleInTechnicianMissionList", () => {
   const now = new Date("2026-05-16T12:00:00");
   const techUid = "demo-tech-local";
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(now);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("keeps assigned missions visible before accept even if not scheduled today", () => {
     const row = {
       ...iv("assigned"),
@@ -101,5 +110,29 @@ describe("interventionVisibleInTechnicianMissionList", () => {
       completedAt: "2026-05-10T15:00:00.000Z",
     };
     expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, now)).toBe(false);
+  });
+
+  it("hides active en_route missions when browsing another calendar day", () => {
+    const row = {
+      ...iv("en_route"),
+      assignedTechnicianUid: techUid,
+      technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+      scheduledDate: "2026-05-16",
+      scheduledTime: "14:00",
+    };
+    const tomorrow = new Date("2026-05-17T12:00:00");
+    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, tomorrow)).toBe(false);
+  });
+
+  it("shows missions scheduled on the selected calendar day", () => {
+    const row = {
+      ...iv("en_route"),
+      assignedTechnicianUid: techUid,
+      technicianAcceptedAt: "2026-05-10T08:00:00.000Z",
+      scheduledDate: "2026-05-17",
+      scheduledTime: "09:00",
+    };
+    const tomorrow = new Date("2026-05-17T12:00:00");
+    expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, tomorrow)).toBe(true);
   });
 });

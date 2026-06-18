@@ -51,16 +51,13 @@ describe("TechnicianAssignmentRespondBar", () => {
     mockDecline.mockResolvedValue(undefined);
   });
 
-  it("renders accept and decline actions", () => {
-    render(
-      <TechnicianAssignmentRespondBar iv={assignmentIv()} technicianUid="demo-tech-local" />,
-    );
+  it("renders visible accept and decline buttons", () => {
+    render(<TechnicianAssignmentRespondBar iv={assignmentIv()} technicianUid="demo-tech-local" />);
 
     expect(screen.getByTestId("technician-assignment-respond-bar")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-slide")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-slide-knob")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-accept")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-assignment-decline")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-assignment-accept")).toBeVisible();
+    expect(screen.getByTestId("technician-assignment-decline")).toBeVisible();
+    expect(screen.queryByTestId("technician-assignment-slide")).not.toBeInTheDocument();
   });
 
   it("accept calls acceptTechnicianAssignment", async () => {
@@ -78,8 +75,6 @@ describe("TechnicianAssignmentRespondBar", () => {
 
     fireEvent.click(screen.getByTestId("technician-assignment-decline"));
 
-    await waitFor(() =>
-      expect(mockDecline).toHaveBeenCalledWith(iv, "demo-tech-local"),
-    );
+    await waitFor(() => expect(mockDecline).toHaveBeenCalledWith(iv, "demo-tech-local"));
   });
 });
