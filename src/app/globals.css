@@ -783,3 +783,13 @@ p {
 .technician-mission-brief--offer .technician-detail-description-text {
   font-weight: 600 !important;
 }
+
+/* Carte hero — heure / nom / adresse sur fond sombre */
+.technician-mission-brief__hero .technician-detail-client-name {
+  margin-top: 0.65rem;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+}

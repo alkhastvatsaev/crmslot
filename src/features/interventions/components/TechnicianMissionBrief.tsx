@@ -18,7 +18,7 @@ type Props = {
 };
 
 /**
- * Fiche mission centrée — typo et ombres type « briefing » terrain.
+ * Fiche mission centrée — carte hero (heure / client / adresse) + détail en dessous.
  */
 export default function TechnicianMissionBrief({
   timeLabel,
@@ -33,23 +33,26 @@ export default function TechnicianMissionBrief({
     <article
       data-testid="technician-mission-brief"
       className={cn(
-        "technician-mission-brief flex min-h-0 w-full flex-1 flex-col text-center",
+        "technician-mission-brief flex min-h-0 w-full flex-1 flex-col",
         awaitingAssignment && "technician-mission-brief--offer"
       )}
     >
-      <header className="flex shrink-0 flex-col items-center">
-        <span
-          className="technician-mission-brief__time inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-1.5 text-[12px] font-semibold tabular-nums tracking-wide text-white"
+      <header
+        data-testid="technician-mission-brief-hero"
+        className="technician-mission-brief__hero shrink-0 rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-800 to-zinc-600 px-5 py-5 text-center text-white shadow-[0_22px_44px_-18px_rgba(9,9,11,0.55)] ring-1 ring-inset ring-white/10"
+      >
+        <p
           data-testid="technician-detail-time"
+          className="text-[2.75rem] font-extrabold tabular-nums leading-none tracking-tight"
         >
           {timeLabel}
-        </span>
+        </p>
 
         <p
           role="heading"
           aria-level={1}
           data-testid="technician-detail-client-name"
-          className="technician-detail-client-name technician-mission-brief__name mt-4 line-clamp-3 text-[1.5rem] font-semibold leading-[1.12] tracking-tight text-slate-900 sm:text-[1.625rem]"
+          className="technician-detail-client-name technician-mission-brief__name mt-2.5 line-clamp-3 text-[1.625rem] font-bold leading-tight tracking-tight"
         >
           {clientDisplayName}
         </p>
@@ -61,29 +64,35 @@ export default function TechnicianMissionBrief({
               target="_blank"
               rel="noopener noreferrer"
               data-testid="technician-detail-address-link"
-              className="technician-mission-brief__address technician-detail-address !m-0 mt-3 flex max-w-full items-start justify-center gap-2 px-1 text-[13px] font-medium leading-snug text-slate-500 underline-offset-2 transition hover:text-blue-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
+              className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-3.5 flex max-w-full items-start justify-center gap-2 px-1 text-[0.95rem] font-medium leading-snug text-white/80 transition active:text-white"
             >
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden />
-              <span className="line-clamp-3">{address}</span>
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 opacity-70" aria-hidden />
+              <span className="line-clamp-3 text-left">{address}</span>
             </a>
           ) : (
-            <p className="technician-mission-brief__address technician-detail-address !m-0 mt-3 flex max-w-full items-start justify-center gap-2 px-1 text-[13px] font-medium leading-snug text-slate-500">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden />
-              <span className="line-clamp-3">{address}</span>
+            <p className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-3.5 flex max-w-full items-start justify-center gap-2 px-1 text-[0.95rem] font-medium leading-snug text-white/80">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 opacity-70" aria-hidden />
+              <span className="line-clamp-3 text-left">{address}</span>
             </p>
           )
+        ) : null}
+
+        {contactRail ? (
+          <div data-testid="technician-mission-brief-contacts" className="mt-5 w-full">
+            {contactRail}
+          </div>
         ) : null}
       </header>
 
       {descriptionText ? (
         <div
           data-testid="technician-detail-description"
-          className="technician-mission-brief__body mt-5 flex min-h-0 flex-1 flex-col border-t border-slate-200/80 pt-5"
+          className="technician-mission-brief__body mt-4 flex min-h-0 flex-1 flex-col"
         >
           <p
             data-testid="technician-detail-description-text"
             className={cn(
-              "technician-detail-description-text !m-0 min-h-0 flex-1 overflow-y-auto text-balance leading-relaxed text-slate-700",
+              "technician-detail-description-text !m-0 min-h-0 flex-1 overflow-y-auto text-center text-balance leading-relaxed",
               awaitingAssignment
                 ? "!text-[15px] !font-semibold !text-slate-800"
                 : "!text-[14px] !font-normal text-slate-600"
@@ -95,15 +104,6 @@ export default function TechnicianMissionBrief({
       ) : (
         <div className="min-h-0 flex-1" aria-hidden />
       )}
-
-      {contactRail ? (
-        <div
-          data-testid="technician-mission-brief-contacts"
-          className="mt-4 w-full shrink-0 border-t border-slate-200/80 pt-4"
-        >
-          {contactRail}
-        </div>
-      ) : null}
     </article>
   );
 }
