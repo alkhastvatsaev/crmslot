@@ -1,7 +1,6 @@
 "use client";
 
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
-import WorkspaceRequiredPanel from "@/features/app/WorkspaceRequiredPanel";
 import CompanyHubPage from "@/features/company/components/CompanyHubPage";
 import ClientMobileShell from "@/features/company/components/ClientMobileShell";
 import ClientMobileProviders from "@/features/company/ClientMobileProviders";
@@ -19,7 +18,6 @@ export default function ClientMobileApp() {
       <LayoutShellProvider mode="mobile">
         <MobileHubRailProvider>
           <ClientMobileShell>
-            <WorkspaceRequiredPanel />
             <ErrorBoundary name="client-mobile-hub">
               <div
                 data-testid={`client-mobile-page-${CLIENT_MOBILE_APP_SLOT_INDEX}`}
