@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
 
 export type MissionContactAction = {
   key: string;
@@ -50,7 +51,8 @@ export default function MissionContactRail({ actions, className, variant = "defa
         const iconWrap = (
           <span
             className={cn(
-              "flex items-center justify-center rounded-full shadow-sm transition-transform group-active:scale-95",
+              "flex items-center justify-center shadow-sm transition-transform group-active:scale-95",
+              TERRAIN_BTN_ICON,
               TONE_ICON_CLASS[tone],
               compact ? "h-12 w-12" : "h-11 w-11"
             )}
@@ -73,7 +75,7 @@ export default function MissionContactRail({ actions, className, variant = "defa
         const itemClass = cn(
           "group flex flex-col items-center transition",
           compact
-            ? "rounded-full"
+            ? TERRAIN_BTN_ICON
             : "min-w-0 flex-1 gap-2 rounded-xl px-1 py-2.5 hover:bg-white/90",
           action.disabled && "pointer-events-none opacity-40"
         );

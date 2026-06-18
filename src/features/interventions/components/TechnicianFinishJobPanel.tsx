@@ -23,6 +23,11 @@ import { useOfflineSyncOptional } from "@/context/OfflineSyncContext";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { cn } from "@/lib/utils";
+import {
+  TERRAIN_BTN,
+  TERRAIN_BTN_ICON,
+  TERRAIN_BTN_SM,
+} from "@/features/interventions/terrainMobileChrome";
 import { capturePhotoFromVideo } from "@/features/interventions/finishJobCapture";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
 import {
@@ -399,9 +404,12 @@ export default function TechnicianFinishJobPanel() {
                     disabled={photos.length >= FINISH_JOB_MAX_PHOTOS}
                     onClick={captureShot}
                     aria-label={String(t("technician_hub.finish.capture_photo"))}
-                    className="flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/90 bg-white/95 shadow-lg transition active:scale-95 disabled:opacity-40"
+                    className={cn(
+                      "flex h-14 w-14 items-center justify-center border-[3px] border-white/90 bg-white/95 shadow-lg transition active:scale-95 disabled:opacity-40",
+                      TERRAIN_BTN_ICON
+                    )}
                   >
-                    <div className="h-9 w-9 rounded-full bg-slate-900" />
+                    <div className={cn("h-9 w-9 bg-slate-900", TERRAIN_BTN_SM)} />
                   </button>
                 </div>
 
@@ -435,7 +443,10 @@ export default function TechnicianFinishJobPanel() {
                       data-testid={`finish-job-photo-remove-${i}`}
                       aria-label={String(t("technician_hub.finish.delete_photo"))}
                       onClick={() => removePhoto(i)}
-                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-white"
+                      className={cn(
+                        "absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center bg-black/55 text-white",
+                        TERRAIN_BTN_SM
+                      )}
                     >
                       <Trash2 className="h-2.5 w-2.5" aria-hidden />
                     </button>
@@ -505,7 +516,10 @@ export default function TechnicianFinishJobPanel() {
               disabled={!photosReady}
               onClick={goToSignature}
               aria-label={String(t("technician_hub.finish.continue_signature"))}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white shadow-md transition active:scale-95 disabled:opacity-30"
+              className={cn(
+                "flex h-12 w-12 items-center justify-center bg-slate-900 text-white shadow-md transition active:scale-95 disabled:opacity-30",
+                TERRAIN_BTN_ICON
+              )}
             >
               <ArrowRight className="h-5 w-5" strokeWidth={2.5} aria-hidden />
             </button>
@@ -519,7 +533,10 @@ export default function TechnicianFinishJobPanel() {
               data-testid="finish-job-back-photos"
               onClick={() => setStep("photos")}
               aria-label={String(t("technician_hub.finish.back_photos"))}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition active:scale-95"
+              className={cn(
+                "flex h-11 w-11 items-center justify-center bg-slate-100 text-slate-700 transition active:scale-95",
+                TERRAIN_BTN_ICON
+              )}
             >
               <ArrowLeft className="h-5 w-5" aria-hidden />
             </button>
@@ -528,7 +545,10 @@ export default function TechnicianFinishJobPanel() {
               data-testid="finish-job-clear-signature"
               onClick={() => sigRef.current?.clear()}
               aria-label={String(t("technician_hub.finish.clear_signature"))}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-rose-600 transition active:scale-95"
+              className={cn(
+                "flex h-11 w-11 items-center justify-center bg-slate-100 text-rose-600 transition active:scale-95",
+                TERRAIN_BTN_ICON
+              )}
             >
               <RotateCcw className="h-5 w-5" aria-hidden />
             </button>
@@ -538,7 +558,10 @@ export default function TechnicianFinishJobPanel() {
               disabled={submitBusy}
               onClick={() => void submitAll()}
               aria-label={String(t("technician_hub.finish.send_closure"))}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md transition active:scale-95 disabled:opacity-60"
+              className={cn(
+                "flex h-12 w-12 items-center justify-center bg-emerald-500 text-white shadow-md transition active:scale-95 disabled:opacity-60",
+                TERRAIN_BTN_ICON
+              )}
             >
               {submitBusy ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden />

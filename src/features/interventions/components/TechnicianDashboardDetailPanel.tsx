@@ -29,6 +29,7 @@ import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
 import { cn } from "@/lib/utils";
+import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
 import { HubButton } from "@/core/ui/hub";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useMissionTimeTrackingAutomation } from "@/features/timetracking/hooks/useMissionTimeTrackingAutomation";
@@ -84,7 +85,10 @@ const AudioUrlPlayer = ({ url, t }: { url: string; t: (key: string) => string })
       <button
         type="button"
         onClick={togglePlay}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition hover:bg-blue-700"
+        className={cn(
+          "flex h-8 w-8 shrink-0 items-center justify-center bg-blue-600 text-white transition hover:bg-blue-700",
+          TERRAIN_BTN_ICON
+        )}
         aria-label={
           isPlaying ? t("backoffice.audio_player.pause") : t("backoffice.audio_player.play")
         }
@@ -345,7 +349,7 @@ export default function TechnicianDashboardDetailPanel({
               data-testid="technician-edit-completion-report"
               onClick={onStartFinishJob}
               fullWidth
-              className="mx-auto h-12 max-w-[20.5rem] rounded-full text-[13px] font-semibold"
+              className={cn("mx-auto h-12 max-w-[20.5rem] text-[13px] font-semibold", TERRAIN_BTN)}
             >
               <Pencil className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden />
               {t("technician_hub.dashboard.detail.edit_report")}
