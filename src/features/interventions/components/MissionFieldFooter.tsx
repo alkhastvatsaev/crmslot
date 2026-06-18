@@ -35,23 +35,17 @@ function transitionButtonClass(variant: MissionActionVariant): string {
   }
 }
 
-function transitionIcon(
-  toStatus: Intervention["status"]
-): typeof MapPin | typeof Navigation2 | typeof Play {
-  if (toStatus === "en_route") return Navigation2;
-  if (toStatus === "in_progress") return MapPin;
-  return Play;
+function renderTransitionIcon(toStatus: Intervention["status"]) {
+  const className = "h-5 w-5 shrink-0";
+  const stroke = 2.25;
+  if (toStatus === "en_route") {
+    return <Navigation2 className={className} strokeWidth={stroke} aria-hidden />;
+  }
+  if (toStatus === "in_progress") {
+    return <MapPin className={className} strokeWidth={stroke} aria-hidden />;
+  }
+  return <Play className={className} strokeWidth={stroke} aria-hidden />;
 }
-
-type Props = {
-  intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
-  isUpdating?: boolean;
-  /** Masque Départ / Sur place / Terminer — géré par le time tracking unifié. */
-  hideAutomatedActions?: boolean;
-  onPrimaryTransition: (toStatus: Intervention["status"]) => void;
-  onFinish: () => void;
-  onWaitingMaterial?: () => void;
-};
 
 /** Pied de page terrain : une seule action principale ; le reste est repliable. */
 export default function MissionFieldFooter({
@@ -82,7 +76,6 @@ export default function MissionFieldFooter({
   };
 
   const transitionPrimary = primary?.kind === "transition" ? primary : null;
-  const TransitionIcon = transitionPrimary ? transitionIcon(transitionPrimary.toStatus) : null;
 
   return (
     <footer
@@ -142,8 +135,8 @@ export default function MissionFieldFooter({
         >
           {isUpdating ? (
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-          ) : TransitionIcon ? (
-            <TransitionIcon className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
+          ) : transitionPrimary ? (
+            renderTransitionIcon(transitionPrimary.toStatus)
           ) : null}
           {t(transitionPrimary.labelKey)}
         </button>
