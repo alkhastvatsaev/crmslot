@@ -200,6 +200,18 @@ export function sortInterventionsByScheduleAsc(
 }
 
 /**
+ * Heure HH:mm affichée sur la tuile mission (alignée {@link formatScheduledTimeOnly}).
+ */
+export function missionDisplayTimeHm(iv: InterventionScheduleFields): string | null {
+  return (
+    normalizeTimeHm(iv.scheduledTime) ??
+    normalizeTimeHm(iv.requestedTime) ??
+    normalizeTimeHm(iv.hour) ??
+    normalizeTimeHm(iv.time)
+  );
+}
+
+/**
  * Clé de tri liste / grille missions technicien — alignée sur l’heure affichée
  * ({@link formatScheduledTimeOnly}) et le jour sélectionné dans le calendrier.
  */
@@ -208,25 +220,26 @@ export function getTechnicianMissionListSortAnchor(
   missionDayAnchor = new Date()
 ): Date {
   const dayYmd = localCalendarYmd(missionDayAnchor);
-  const hasExplicitDate =
-    Boolean(iv.scheduledDate?.trim()) ||
-    Boolean(iv.requestedDate?.trim()) ||
-    Boolean(iv.date?.trim() && /^\d{4}-\d{2}-\d{2}$/.test(iv.date.trim()));
 
-  const full = getScheduleAnchor(iv);
-  if (hasExplicitDate && full.getTime() !== 0) {
-    return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
+  const displayTime = missionDisplayTimeHm(iv);
+  if (displayTime) {
+    const onViewedDay = new Date(`${dayYmd}T${displayTime}:00`);
+    if (!Number.isNaN(onViewedDay.getTime())) return onViewedDay;
   }
 
-  const displayTime =
-    normalizeTimeHm(iv.scheduledTime) ??
-    normalizeTimeHm(iv.requestedTime) ??
-    normalizeTimeHm(iv.hour) ??
-    normalizeTimeHm(iv.time);
-
-  if (displayTime) {
-    const d = new Date(`${dayYmd}T${displayTime}:00`);
-    if (!Number.isNaN(d.getTime())) return d;
+  const full = getScheduleAnchor(iv);
+  if (full.getTime() !== 0) {
+    if (localCalendarYmd(full) === dayYmd) {
+      return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
+    }
+    if (iv.status === "done" || iv.status === "invoiced") {
+      const completedAt = coerceFirestoreLikeDate(iv.completedAt);
+      if (completedAt && localCalendarYmd(completedAt) === dayYmd) {
+        return completedAt;
+      }
+      return endOfToday(missionDayAnchor);
+    }
+    return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
   }
 
   if (iv.status === "done" || iv.status === "invoiced") {
@@ -237,10 +250,6 @@ export function getTechnicianMissionListSortAnchor(
   if (iv.urgency) {
     const d = new Date(`${dayYmd}T00:00:00`);
     if (!Number.isNaN(d.getTime())) return d;
-  }
-
-  if (full.getTime() !== 0) {
-    return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
   }
 
   return new Date(0);
