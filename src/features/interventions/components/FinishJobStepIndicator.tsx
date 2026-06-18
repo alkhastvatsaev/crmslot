@@ -1,6 +1,5 @@
 "use client";
 
-import { Camera, FileSignature, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -8,20 +7,17 @@ export type FinishJobStep = "photos" | "signature" | "billing";
 
 const STEPS: FinishJobStep[] = ["photos", "signature", "billing"];
 
-const stepMeta: Record<FinishJobStep, { labelKey: string; Icon: typeof Camera; testId: string }> = {
+const stepMeta: Record<FinishJobStep, { labelKey: string; testId: string }> = {
   photos: {
     labelKey: "technician_hub.finish.steps.photos",
-    Icon: Camera,
     testId: "finish-step-photos",
   },
   signature: {
     labelKey: "technician_hub.finish.steps.signature",
-    Icon: FileSignature,
     testId: "finish-step-signature",
   },
   billing: {
     labelKey: "technician_hub.finish.steps.billing",
-    Icon: FileText,
     testId: "finish-step-billing",
   },
 };
@@ -29,11 +25,12 @@ const stepMeta: Record<FinishJobStep, { labelKey: string; Icon: typeof Camera; t
 type Props = {
   current: FinishJobStep;
   className?: string;
-  /** Icônes seules — pied de page wizard terrain. */
+  /** @deprecated Toujours en mode points — conservé pour compat. */
   compact?: boolean;
 };
 
-export default function FinishJobStepIndicator({ current, className, compact = false }: Props) {
+/** Indicateur d’étapes clôture — trois points, sans icônes. */
+export default function FinishJobStepIndicator({ current, className }: Props) {
   const { t } = useTranslation();
   const currentIndex = STEPS.indexOf(current);
 
@@ -41,40 +38,32 @@ export default function FinishJobStepIndicator({ current, className, compact = f
     <nav
       data-testid="finish-job-step-indicator"
       aria-label={String(t("technician_hub.finish.steps.aria"))}
-      className={cn("flex items-center gap-1", className)}
+      className={cn("flex items-center justify-center gap-2 py-1", className)}
     >
       {STEPS.map((step, index) => {
-        const { labelKey, Icon, testId } = stepMeta[step];
+        const { labelKey, testId } = stepMeta[step];
         const done = index < currentIndex;
         const active = step === current;
         return (
-          <div key={step} className="flex min-w-0 flex-1 items-center gap-1">
-            <div
+          <div key={step} className="flex items-center gap-2">
+            <span
               data-testid={testId}
               data-active={active ? "true" : "false"}
               data-done={done ? "true" : "false"}
+              role="img"
+              aria-label={String(t(labelKey))}
               className={cn(
-                "flex min-w-0 flex-1 items-center justify-center rounded-xl text-center transition-colors",
-                compact ? "py-2" : "flex-col gap-1 px-1 py-2",
-                active && "bg-slate-900 text-white",
-                done && !active && "bg-emerald-50 text-emerald-800",
-                !active && !done && "bg-slate-50 text-slate-400"
+                "rounded-full transition-all duration-200",
+                active && "h-2.5 w-2.5 bg-slate-900",
+                done && !active && "h-2 w-2 bg-slate-500",
+                !active && !done && "h-2 w-2 bg-slate-200"
               )}
-            >
-              <Icon className={cn("shrink-0", compact ? "h-4 w-4" : "h-4 w-4")} aria-hidden />
-              {compact ? (
-                <span className="sr-only">{String(t(labelKey))}</span>
-              ) : (
-                <span className="truncate text-[10px] font-bold uppercase tracking-wide">
-                  {String(t(labelKey))}
-                </span>
-              )}
-            </div>
+            />
             {index < STEPS.length - 1 ? (
-              <div
+              <span
                 className={cn(
-                  "h-0.5 w-2 shrink-0 rounded-full",
-                  index < currentIndex ? "bg-emerald-400" : "bg-slate-200"
+                  "h-px w-5 shrink-0",
+                  index < currentIndex ? "bg-slate-400" : "bg-slate-200"
                 )}
                 aria-hidden
               />
