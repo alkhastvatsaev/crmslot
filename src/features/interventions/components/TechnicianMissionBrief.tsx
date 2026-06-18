@@ -43,7 +43,7 @@ export default function TechnicianMissionBrief({
       >
         <p
           data-testid="technician-detail-time"
-          className="text-[2.75rem] font-extrabold tabular-nums leading-none tracking-tight"
+          className="text-[3rem] font-extrabold tabular-nums leading-none tracking-tight text-white"
         >
           {timeLabel}
         </p>
@@ -52,7 +52,7 @@ export default function TechnicianMissionBrief({
           role="heading"
           aria-level={1}
           data-testid="technician-detail-client-name"
-          className="technician-detail-client-name technician-mission-brief__name mt-2.5 line-clamp-3 text-[1.625rem] font-bold leading-tight tracking-tight"
+          className="technician-detail-client-name technician-mission-brief__name mt-3 line-clamp-3 text-[1.875rem] font-bold leading-tight tracking-tight"
         >
           {clientDisplayName}
         </p>
@@ -64,14 +64,14 @@ export default function TechnicianMissionBrief({
               target="_blank"
               rel="noopener noreferrer"
               data-testid="technician-detail-address-link"
-              className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-3.5 flex max-w-full items-start justify-center gap-2 px-1 text-[0.95rem] font-medium leading-snug text-white/80 transition active:text-white"
+              className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-4 flex max-w-full items-start justify-center gap-2.5 px-1 text-[1.0625rem] font-semibold leading-snug text-white/90 transition active:text-white"
             >
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 opacity-70" aria-hidden />
+              <MapPin className="mt-0.5 h-5 w-5 shrink-0 opacity-80" aria-hidden />
               <span className="line-clamp-3 text-left">{address}</span>
             </a>
           ) : (
-            <p className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-3.5 flex max-w-full items-start justify-center gap-2 px-1 text-[0.95rem] font-medium leading-snug text-white/80">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 opacity-70" aria-hidden />
+            <p className="technician-mission-brief__address technician-detail-address !m-0 mx-auto mt-4 flex max-w-full items-start justify-center gap-2.5 px-1 text-[1.0625rem] font-semibold leading-snug text-white/90">
+              <MapPin className="mt-0.5 h-5 w-5 shrink-0 opacity-80" aria-hidden />
               <span className="line-clamp-3 text-left">{address}</span>
             </p>
           )
@@ -94,8 +94,8 @@ export default function TechnicianMissionBrief({
             className={cn(
               "technician-detail-description-text !m-0 min-h-0 flex-1 overflow-y-auto text-center text-balance leading-relaxed",
               awaitingAssignment
-                ? "!text-[15px] !font-semibold !text-slate-800"
-                : "!text-[14px] !font-normal text-slate-600"
+                ? "!text-[17px] !font-semibold !text-slate-800"
+                : "!text-[17px] !font-semibold text-slate-700"
             )}
           >
             {descriptionText}

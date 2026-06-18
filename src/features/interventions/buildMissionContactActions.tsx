@@ -1,10 +1,11 @@
-import { Camera, Clock, Navigation2, Package, Phone, Mail } from "lucide-react";
+import { Camera, Clock, Mail, MessageSquare, Navigation2, Package, Phone } from "lucide-react";
 import type { Intervention } from "@/features/interventions/types";
 import type { MissionContactAction } from "@/features/interventions/components/MissionContactRail";
 import { resolveMissionActionBar } from "@/features/interventions/missionActionBar";
 import { formatAddress } from "@/utils/stringUtils";
 
 const ICON = "h-[1.125rem] w-[1.125rem]";
+const FIELD_ICON = "h-6 w-6";
 
 export function buildGoogleMapsDirectionsUrl(address: string | null | undefined): string | null {
   const raw = (address ?? "").trim();
@@ -20,7 +21,7 @@ export type BuildMissionContactActionsParams = {
   onOpenMaterials?: () => void;
   onWaitingMaterial?: () => void;
   onQuickPhoto?: () => void;
-  /** Si true, n’inclut que appel / mail / GPS (dans la fiche mission). */
+  /** Terrain : appel / SMS / GPS seulement (pas de mail — réservé au back-office). */
   primaryOnly?: boolean;
 };
 
@@ -36,8 +37,8 @@ export function buildMissionContactActions({
 }: BuildMissionContactActionsParams): MissionContactAction[] {
   const config = resolveMissionActionBar(intervention, { awaitingAssignment });
   const phone = intervention.clientPhone || intervention.phone;
-  const email = intervention.clientEmail;
   const mapsUrl = buildGoogleMapsDirectionsUrl(intervention.address);
+  const iconClass = primaryOnly ? FIELD_ICON : ICON;
 
   const actions: MissionContactAction[] = [];
 
@@ -48,9 +49,33 @@ export function buildMissionContactActions({
       testId: "mission-action-call",
       href: `tel:${phone}`,
       tone: "call",
-      icon: <Phone className={ICON} strokeWidth={2.25} />,
+      icon: <Phone className={iconClass} strokeWidth={2.25} />,
+    });
+    if (primaryOnly) {
+      actions.push({
+        key: "sms",
+        label: t("common.sms"),
+        testId: "mission-action-sms",
+        href: `sms:${phone}`,
+        tone: "sms",
+        icon: <MessageSquare className={iconClass} strokeWidth={2.25} />,
+      });
+    }
+  }
+  if (mapsUrl) {
+    actions.push({
+      key: "nav",
+      label: t("common.navigate"),
+      testId: "mission-action-navigate",
+      href: mapsUrl,
+      tone: "nav",
+      icon: <Navigation2 className={iconClass} strokeWidth={2.25} />,
     });
   }
+
+  if (primaryOnly) return actions;
+
+  const email = intervention.clientEmail;
   if (email) {
     actions.push({
       key: "email",
@@ -61,18 +86,6 @@ export function buildMissionContactActions({
       icon: <Mail className={ICON} strokeWidth={2.25} />,
     });
   }
-  if (mapsUrl) {
-    actions.push({
-      key: "nav",
-      label: t("common.navigate"),
-      testId: "mission-action-navigate",
-      href: mapsUrl,
-      tone: "nav",
-      icon: <Navigation2 className={ICON} strokeWidth={2.25} />,
-    });
-  }
-
-  if (primaryOnly) return actions;
 
   if (config.canMaterials && onOpenMaterials) {
     actions.push({

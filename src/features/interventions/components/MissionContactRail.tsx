@@ -11,13 +11,14 @@ export type MissionContactAction = {
   href?: string;
   onClick?: () => void;
   disabled?: boolean;
-  tone?: "call" | "email" | "nav" | "neutral";
+  tone?: "call" | "email" | "nav" | "sms" | "neutral";
 };
 
 const TONE_ICON_CLASS: Record<NonNullable<MissionContactAction["tone"]>, string> = {
   call: "bg-emerald-600 text-white",
   email: "bg-slate-800 text-white",
   nav: "bg-blue-600 text-white",
+  sms: "bg-sky-600 text-white",
   neutral: "bg-slate-600 text-white",
 };
 
@@ -38,8 +39,10 @@ export default function MissionContactRail({ actions, className, variant = "defa
       data-testid="mission-contact-rail"
       className={cn(
         "flex w-full items-center justify-center",
-        compact ? "gap-3" : "gap-1 rounded-[1.25rem] bg-slate-900/[0.04] p-1.5 ring-1 ring-slate-900/[0.06]",
-        className,
+        compact
+          ? "gap-3"
+          : "gap-1 rounded-[1.25rem] bg-slate-900/[0.04] p-1.5 ring-1 ring-slate-900/[0.06]",
+        className
       )}
     >
       {actions.map((action) => {
@@ -49,7 +52,7 @@ export default function MissionContactRail({ actions, className, variant = "defa
             className={cn(
               "flex items-center justify-center rounded-full shadow-sm transition-transform group-active:scale-95",
               TONE_ICON_CLASS[tone],
-              compact ? "h-10 w-10" : "h-11 w-11",
+              compact ? "h-12 w-12" : "h-11 w-11"
             )}
           >
             {action.icon}
@@ -72,7 +75,7 @@ export default function MissionContactRail({ actions, className, variant = "defa
           compact
             ? "rounded-full"
             : "min-w-0 flex-1 gap-2 rounded-xl px-1 py-2.5 hover:bg-white/90",
-          action.disabled && "pointer-events-none opacity-40",
+          action.disabled && "pointer-events-none opacity-40"
         );
 
         if (action.href) {

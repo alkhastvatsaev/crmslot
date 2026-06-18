@@ -16,25 +16,26 @@ describe("MissionFieldFooter", () => {
         hideAutomatedActions
         onPrimaryTransition={jest.fn()}
         onFinish={jest.fn()}
-        onWaitingMaterial={jest.fn()}
       />
     );
 
     expect(screen.queryByTestId("mission-action-primary-finish")).not.toBeInTheDocument();
-    expect(screen.getByTestId("mission-more-toggle")).toBeInTheDocument();
+    expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
   });
 
-  it("shows finish button when hideAutomatedActions is disabled", () => {
+  it("shows finish button as camera icon only", () => {
     render(
       <MissionFieldFooter
         intervention={iv("in_progress")}
         onPrimaryTransition={jest.fn()}
         onFinish={jest.fn()}
-        onWaitingMaterial={jest.fn()}
       />
     );
 
-    expect(screen.getByTestId("mission-action-primary-finish")).toBeInTheDocument();
+    const finish = screen.getByTestId("mission-action-primary-finish");
+    expect(finish).toBeInTheDocument();
+    expect(finish).toHaveAttribute("aria-label");
+    expect(finish).not.toHaveTextContent("Terminer");
   });
 
   it("hides depart slide when hideAutomatedActions is enabled on en_route", () => {
