@@ -124,6 +124,8 @@ export interface Intervention {
   completedByUid?: string | null;
   /** Validation Ivana (back-office). */
   ivanaVerified?: boolean;
+  /** Rapport masqué dans l’inbox IVANA (section Archive) — horodatage ISO. */
+  backofficeReportsArchivedAt?: string | null;
   /** Rapport refusé par IVANA — renvoi au technicien pour complément. */
   reportRejectionReason?: string | null;
   reportRejectedAt?: string | null;

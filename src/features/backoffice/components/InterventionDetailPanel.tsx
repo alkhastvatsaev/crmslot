@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Send,
   AlertTriangle,
+  Archive,
 } from "lucide-react";
 import EquipmentPanel from "@/features/equipment/components/EquipmentPanel";
 import { motion } from "framer-motion";
@@ -30,6 +31,7 @@ import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAss
 import DuplicateWarningBanner from "@/features/interventions/components/DuplicateWarningBanner";
 import InterventionInvoicePreviewCard from "@/features/billing/components/InterventionInvoicePreviewCard";
 import { invoicePreviewFromIntervention } from "@/features/billing/invoicePreviewFromIntervention";
+import { canArchiveBackofficeReportInInbox } from "@/features/backoffice/backofficeReportsInboxArchive";
 import type { ScheduleConflict } from "@/features/scheduling/scheduleConflicts";
 import type { ProposedSlot } from "@/features/scheduling/proposeAvailableSlots";
 
@@ -70,6 +72,7 @@ type Props = {
   onClose: () => void;
   onCancelIntervention: (id: string) => void;
   onVerify: (id: string) => void;
+  onArchiveReport: (id: string) => void;
   onReject: (id: string, reason?: string) => void | Promise<void>;
   onAssign: (
     id: string,
@@ -110,6 +113,7 @@ export default function InterventionDetailPanel({
   onClose,
   onCancelIntervention,
   onVerify,
+  onArchiveReport,
   onReject,
   onAssign,
   onDownloadQuotePdf,
@@ -124,6 +128,7 @@ export default function InterventionDetailPanel({
   const actionBarFill = assignPickerOpen || scheduleEditorOpen;
   const isReportQueue = !isInterventionInBackofficeRequestsQueue(selectedItem);
   const canRejectReport = isReportQueue && selectedItem.status === "done";
+  const canArchiveReport = isReportQueue && canArchiveBackofficeReportInInbox(selectedItem);
 
   const handleRejectConfirm = async () => {
     if (rejectBusy) return;
@@ -592,6 +597,18 @@ export default function InterventionDetailPanel({
                 ? t("backoffice.inbox.report_already_verified")
                 : t("backoffice.inbox.verify_report")}
             </HubButton>
+            {canArchiveReport && !rejectOpen ? (
+              <HubButton
+                type="button"
+                variant="secondary"
+                data-testid="backoffice-inbox-archive-report"
+                onClick={() => void onArchiveReport(selectedItem.id)}
+                aria-label={t("backoffice.inbox.archive_report_aria")}
+              >
+                <Archive className="h-4 w-4" />
+                {t("backoffice.inbox.archive_report")}
+              </HubButton>
+            ) : null}
           </>
         )}
       </HubActionBar>

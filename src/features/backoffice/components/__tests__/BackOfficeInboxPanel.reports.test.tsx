@@ -106,6 +106,13 @@ const archivedReport: Intervention = {
   clientLastName: "Dupont",
   completedAt: "2026-05-20T12:00:00.000Z",
   invoicedAt: "2026-05-20T13:00:00.000Z",
+  backofficeReportsArchivedAt: "2026-05-20T14:00:00.000Z",
+};
+
+const validatedNotArchived: Intervention = {
+  ...archivedReport,
+  id: "report-validated-1",
+  backofficeReportsArchivedAt: undefined,
 };
 
 function mockTenantWorkspace() {
@@ -152,5 +159,22 @@ describe("BackOfficeInboxPanel — onglet Rapports", () => {
     await waitFor(() => {
       expect(screen.getByTestId("backoffice-inbox-detail")).toBeInTheDocument();
     });
+  });
+
+  it("garde un rapport validé dans la liste principale tant qu'il n'est pas archivé", () => {
+    mockUseBackOffice.mockReturnValue({
+      interventions: [validatedNotArchived],
+      loading: false,
+      error: null,
+      firebaseUid: "ivana-uid",
+    });
+
+    renderInbox(<BackOfficeInboxPanel />);
+    fireEvent.click(screen.getByTestId("backoffice-inbox-tab-reports"));
+
+    expect(screen.queryByTestId("backoffice-reports-archive-section")).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId("backoffice-inbox-report-row-report-validated-1")
+    ).toBeInTheDocument();
   });
 });

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
@@ -35,6 +35,10 @@ import {
   pickLatestBridgedReportForIntervention,
   shouldDismissBridgedTerrainReport,
 } from "@/features/backoffice/mergeReportCompletionMedia";
+import {
+  isBackofficeReportInInboxActiveQueue,
+  isBackofficeReportInInboxArchive,
+} from "@/features/backoffice/backofficeReportsInboxArchive";
 import {
   coerceFirestoreLikeDate,
   isInterventionInBackofficeRequestsQueue,
@@ -259,12 +263,12 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   );
 
   const reportsToValidateList = useMemo(
-    () => validationReports.filter((iv) => iv.status === "done"),
+    () => validationReports.filter((iv) => isBackofficeReportInInboxActiveQueue(iv)),
     [validationReports]
   );
 
   const reportsArchivedList = useMemo(
-    () => validationReports.filter((iv) => iv.status === "invoiced"),
+    () => validationReports.filter((iv) => isBackofficeReportInInboxArchive(iv)),
     [validationReports]
   );
 
@@ -438,6 +442,38 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
             : e instanceof Error
               ? e.message
               : t("common.try_again"),
+      });
+    }
+  };
+
+  const handleArchiveReport = async (id: string) => {
+    if (!firestore) {
+      toast.error(t("backoffice.toasts.firestore_unavailable"));
+      return;
+    }
+    const row = interventions.find((x) => x.id === id);
+    if (!row || !isBackofficeReportInInboxActiveQueue(row)) return;
+    const actorUid = auth?.currentUser?.uid?.trim();
+    if (!actorUid) return;
+    const archivedAt = new Date().toISOString();
+    try {
+      await updateDoc(doc(firestore, "interventions", id), {
+        backofficeReportsArchivedAt: archivedAt,
+      });
+      await logCrmInterventionAction({
+        kind: "comment",
+        iv: row,
+        actorUid,
+        actorRole: "dispatcher",
+        note: "Rapport archivé (inbox IVANA)",
+      });
+      toast.success(t("backoffice.toasts.report_archived"));
+      setSelectedItemId(null);
+      setSelectedTerrainLocalId(null);
+    } catch (e) {
+      logger.error("Archivage rapport:", { error: e instanceof Error ? e.message : String(e) });
+      toast.error(t("common.error"), {
+        description: e instanceof Error ? e.message : t("common.try_again"),
       });
     }
   };
@@ -626,7 +662,8 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     );
   }, [ivanaChatCompanyId, isTenant, t]);
 
-  const reportsTabBadgeCount = reportsToValidateList.length + bridgedTerrainCount;
+  const reportsTabBadgeCount =
+    reportsToValidateList.filter((iv) => iv.status === "done").length + bridgedTerrainCount;
   const reportsNothingAtAll =
     reportsToValidateList.length === 0 &&
     bridgedTerrainCount === 0 &&
@@ -704,6 +741,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     handleAssignToTechnician,
     handleCancelIntervention,
     handleVerify,
+    handleArchiveReport,
     handleRejectReport,
     handleDragBoardSchedule,
     handleUpdateDateTime,
