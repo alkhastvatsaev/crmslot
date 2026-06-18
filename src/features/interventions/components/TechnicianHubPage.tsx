@@ -67,7 +67,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     const todayRows = interventions.filter((iv) =>
       interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    return sortInterventionsByScheduleAsc(todayRows);
+    return sortInterventionsByScheduleAsc(todayRows, missionDayAnchor);
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   /** Ne pas auto-sélectionner une mission déjà en archives (évite détail « clôturée » + photos sans clic explicite). */

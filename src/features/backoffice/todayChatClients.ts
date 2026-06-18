@@ -9,7 +9,7 @@ import {
 export function filterTodayChatClients(
   interventions: Intervention[],
   anchorDate: Date,
-  options?: { dispatchMap?: boolean },
+  options?: { dispatchMap?: boolean }
 ): Intervention[] {
   const dispatchMap = options?.dispatchMap ?? false;
   const rows = interventions.filter((iv) => {
@@ -18,5 +18,5 @@ export function filterTodayChatClients(
     if (iv.status === "cancelled") return false;
     return true;
   });
-  return sortInterventionsByScheduleAsc(rows);
+  return sortInterventionsByScheduleAsc(rows, anchorDate);
 }

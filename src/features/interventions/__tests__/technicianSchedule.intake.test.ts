@@ -140,12 +140,24 @@ describe("interventionVisibleInTechnicianMissionList", () => {
 
 describe("sortInterventionsByScheduleAsc", () => {
   it("orders missions by scheduled time ascending", () => {
+    const day = new Date("2026-05-16T12:00:00");
     const rows = [
       { ...iv("assigned"), id: "c", scheduledDate: "2026-05-16", scheduledTime: "14:00" },
       { ...iv("assigned"), id: "a", scheduledDate: "2026-05-16", scheduledTime: "09:00" },
       { ...iv("assigned"), id: "b", scheduledDate: "2026-05-16", scheduledTime: "11:30" },
     ];
-    const sorted = sortInterventionsByScheduleAsc(rows);
+    const sorted = sortInterventionsByScheduleAsc(rows, day);
     expect(sorted.map((r) => r.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("orders time-only missions on the selected calendar day", () => {
+    const day = new Date("2026-05-16T12:00:00");
+    const rows = [
+      { ...iv("en_route"), id: "late", time: "15:00" },
+      { ...iv("en_route"), id: "early", time: "09:00" },
+      { ...iv("en_route"), id: "mid", time: "11:30" },
+    ];
+    const sorted = sortInterventionsByScheduleAsc(rows, day);
+    expect(sorted.map((r) => r.id)).toEqual(["early", "mid", "late"]);
   });
 });

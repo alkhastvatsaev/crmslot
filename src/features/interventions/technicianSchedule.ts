@@ -186,12 +186,82 @@ export function interventionMatchesTab(
   return d >= ws && d <= we;
 }
 
-export function sortInterventionsByScheduleAsc(list: Intervention[]): Intervention[] {
+export function sortInterventionsByScheduleAsc(
+  list: Intervention[],
+  missionDayAnchor = new Date()
+): Intervention[] {
   return [...list].sort((a, b) => {
-    const delta = getScheduleAnchor(a).getTime() - getScheduleAnchor(b).getTime();
+    const delta =
+      getTechnicianMissionListSortAnchor(a, missionDayAnchor).getTime() -
+      getTechnicianMissionListSortAnchor(b, missionDayAnchor).getTime();
     if (delta !== 0) return delta;
     return a.id.localeCompare(b.id);
   });
+}
+
+/**
+ * Clé de tri liste / grille missions technicien — alignée sur l’heure affichée
+ * ({@link formatScheduledTimeOnly}) et le jour sélectionné dans le calendrier.
+ */
+export function getTechnicianMissionListSortAnchor(
+  iv: InterventionScheduleFields & Pick<Intervention, "status" | "completedAt" | "urgency">,
+  missionDayAnchor = new Date()
+): Date {
+  const dayYmd = localCalendarYmd(missionDayAnchor);
+  const hasExplicitDate =
+    Boolean(iv.scheduledDate?.trim()) ||
+    Boolean(iv.requestedDate?.trim()) ||
+    Boolean(iv.date?.trim() && /^\d{4}-\d{2}-\d{2}$/.test(iv.date.trim()));
+
+  const full = getScheduleAnchor(iv);
+  if (hasExplicitDate && full.getTime() !== 0) {
+    return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
+  }
+
+  const displayTime =
+    normalizeTimeHm(iv.scheduledTime) ??
+    normalizeTimeHm(iv.requestedTime) ??
+    normalizeTimeHm(iv.hour) ??
+    normalizeTimeHm(iv.time);
+
+  if (displayTime) {
+    const d = new Date(`${dayYmd}T${displayTime}:00`);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+
+  if (iv.status === "done" || iv.status === "invoiced") {
+    const completedAt = coerceFirestoreLikeDate(iv.completedAt);
+    if (completedAt) return completedAt;
+  }
+
+  if (iv.urgency) {
+    const d = new Date(`${dayYmd}T00:00:00`);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+
+  if (full.getTime() !== 0) {
+    return clampOverdueActiveMissionToDay(full, iv, missionDayAnchor);
+  }
+
+  return new Date(0);
+}
+
+/** Mission encore active mais planifiée avant le jour affiché → tête de journée. */
+function clampOverdueActiveMissionToDay(
+  anchor: Date,
+  iv: Pick<Intervention, "status">,
+  missionDayAnchor: Date
+): Date {
+  if (anchor.getTime() >= startOfToday(missionDayAnchor).getTime()) return anchor;
+  if (
+    iv.status === "assigned" ||
+    iv.status === "en_route" ||
+    iv.status === "in_progress" ||
+    iv.status === "waiting_material"
+  ) {
+    return startOfToday(missionDayAnchor);
+  }
+  return anchor;
 }
 
 /** AAAA-MM-JJ dans le fuseau local (aligné calendrier hub technicien). */

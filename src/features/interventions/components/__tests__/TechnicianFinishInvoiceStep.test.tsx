@@ -5,16 +5,6 @@ jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: jest.fn(),
 }));
 
-jest.mock("@/features/interventions/useBrowserSpeechDictation", () => ({
-  useBrowserSpeechDictation: (append: (text: string) => void) => ({
-    listening: false,
-    supported: true,
-    toggleListening: jest.fn(() => append("Note vocale test")),
-    stop: jest.fn(),
-    interimTranscript: "",
-  }),
-}));
-
 const { fetchWithAuth } = jest.requireMock("@/core/api/fetchWithAuth") as {
   fetchWithAuth: jest.Mock;
 };
@@ -34,9 +24,6 @@ describe("TechnicianFinishInvoiceStep", () => {
           json: async () => ({ ok: true, billingLines: INITIAL_LINES }),
         });
       }
-      if (url.includes("request-invoice-review")) {
-        return Promise.resolve({ ok: true, json: async () => ({ ok: true }) });
-      }
       return Promise.resolve({
         ok: true,
         json: async () => ({ ok: true, emailSent: true }),
@@ -55,9 +42,8 @@ describe("TechnicianFinishInvoiceStep", () => {
     );
     await waitFor(() => expect(screen.getByTestId("finish-invoice-total")).toBeInTheDocument());
     expect(screen.getByTestId("finish-invoice-send")).toBeInTheDocument();
-    expect(screen.getByTestId("finish-invoice-escalate-open")).toBeInTheDocument();
+    expect(screen.getByTestId("finish-invoice-adjust-open")).toBeInTheDocument();
     expect(screen.queryByTestId("finish-invoice-quick-add_travel")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("finish-invoice-add-line")).not.toBeInTheDocument();
   });
 
   it("envoie la facture au clic sur envoyer", async () => {
@@ -81,32 +67,58 @@ describe("TechnicianFinishInvoiceStep", () => {
     });
   });
 
-  it("transmet au back-office avec note vocale", async () => {
-    const onSkip = jest.fn();
+  it("ouvre le panneau ajustement avec chips et lignes", async () => {
     render(
       <TechnicianFinishInvoiceStep
         interventionId="iv-1"
         clientEmail="client@test.example"
         initialLines={INITIAL_LINES}
-        onSkip={onSkip}
       />
     );
-    fireEvent.click(screen.getByTestId("finish-invoice-escalate-open"));
-    expect(screen.getByTestId("finish-invoice-escalate-panel")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("finish-invoice-voice-mic"));
-    await waitFor(() =>
-      expect(screen.getByTestId("finish-invoice-voice-note")).toHaveTextContent("Note vocale test")
+    fireEvent.click(screen.getByTestId("finish-invoice-adjust-open"));
+    expect(screen.getByTestId("finish-invoice-adjust-panel")).toBeInTheDocument();
+    expect(screen.getByTestId("finish-invoice-quick-add_travel")).toBeInTheDocument();
+    expect(screen.getByTestId("finish-invoice-line-0")).toBeInTheDocument();
+    expect(screen.getByTestId("finish-invoice-regenerate")).toBeInTheDocument();
+  });
+
+  it("met à jour le total via chip et supprime une ligne", async () => {
+    render(
+      <TechnicianFinishInvoiceStep
+        interventionId="iv-1"
+        clientEmail="client@test.example"
+        initialLines={INITIAL_LINES}
+      />
     );
-    fireEvent.click(screen.getByTestId("finish-invoice-escalate-submit"));
+    fireEvent.click(screen.getByTestId("finish-invoice-adjust-open"));
+    const totalEl = screen.getByTestId("finish-invoice-adjust-total");
+    const before = totalEl.textContent;
+    fireEvent.click(screen.getByTestId("finish-invoice-quick-discount_10"));
+    await waitFor(() => expect(totalEl.textContent).not.toBe(before));
+    fireEvent.click(screen.getByTestId("finish-invoice-line-remove-0"));
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^finish-invoice-line-\d+$/).length).toBe(1);
+    });
+  });
+
+  it("envoie la facture corrigée depuis le panneau ajustement", async () => {
+    const onSent = jest.fn();
+    render(
+      <TechnicianFinishInvoiceStep
+        interventionId="iv-1"
+        clientEmail="client@test.example"
+        initialLines={INITIAL_LINES}
+        onSent={onSent}
+      />
+    );
+    fireEvent.click(screen.getByTestId("finish-invoice-adjust-open"));
+    fireEvent.click(screen.getByTestId("finish-invoice-adjust-send"));
     await waitFor(() => {
       expect(fetchWithAuth).toHaveBeenCalledWith(
-        "/api/interventions/iv-1/request-invoice-review",
-        expect.objectContaining({
-          method: "POST",
-          body: JSON.stringify({ note: "Note vocale test" }),
-        })
+        "/api/interventions/iv-1/issue-invoice",
+        expect.objectContaining({ method: "POST" })
       );
-      expect(onSkip).toHaveBeenCalled();
+      expect(onSent).toHaveBeenCalled();
     });
   });
 });

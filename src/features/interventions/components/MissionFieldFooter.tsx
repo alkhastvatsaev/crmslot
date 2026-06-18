@@ -8,7 +8,11 @@ import {
   type MissionActionVariant,
 } from "@/features/interventions/missionActionBar";
 import { cn } from "@/lib/utils";
-import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
+import {
+  TERRAIN_BTN,
+  TERRAIN_BTN_CAPTURE,
+  TERRAIN_BTN_ICON,
+} from "@/features/interventions/terrainMobileChrome";
 
 type Props = {
   intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
@@ -87,7 +91,7 @@ export default function MissionFieldFooter({
           aria-label={finishLabel}
           className={cn(
             "flex h-14 w-14 items-center justify-center bg-slate-900 text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)] transition active:scale-[0.98] disabled:opacity-60",
-            TERRAIN_BTN_ICON
+            TERRAIN_BTN_CAPTURE
           )}
         >
           {isUpdating ? (

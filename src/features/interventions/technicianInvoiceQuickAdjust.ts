@@ -102,3 +102,12 @@ export function formatInvoiceTotalEur(cents: number): string {
 export function invoiceTotalCents(lines: DraftBillingLine[]): number {
   return totalCentsFromBillingLines(normalizeLines(lines));
 }
+
+export function removeBillingLineAt(lines: DraftBillingLine[], index: number): DraftBillingLine[] {
+  if (index < 0 || index >= lines.length) return normalizeLines(lines);
+  return normalizeLines(lines.filter((_, i) => i !== index));
+}
+
+export function formatBillingLineEur(cents: number): string {
+  return formatInvoiceTotalEur(cents);
+}

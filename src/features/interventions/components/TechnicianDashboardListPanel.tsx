@@ -190,7 +190,7 @@ export default function TechnicianDashboardListPanel({
     const rows = interventions.filter((iv) =>
       interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    return sortInterventionsByScheduleAsc(rows);
+    return sortInterventionsByScheduleAsc(rows, missionDayAnchor);
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   const offlineAuth = !isConfigured || !auth;

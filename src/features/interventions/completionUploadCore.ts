@@ -124,6 +124,10 @@ export async function performCompletionUpload(params: CompletionUploadParams): P
   const data = snap.data() as Intervention | undefined;
   const fromStatus = data?.status ?? "in_progress";
 
+  if (fromStatus === "invoiced") {
+    return;
+  }
+
   if (fromStatus === "done") {
     await performCompletionAmend(params);
     return;

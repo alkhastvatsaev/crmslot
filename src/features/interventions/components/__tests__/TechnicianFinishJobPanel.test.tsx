@@ -211,4 +211,33 @@ describe("TechnicianFinishJobPanel", () => {
       expect(screen.getByTestId("finish-invoice-send")).toBeInTheDocument();
     });
   });
+
+  it("submit skips closure upload when intervention is already invoiced", async () => {
+    setupActive();
+    mockUseInterventionLive.mockReturnValue({
+      ...MOCK_IV,
+      status: "invoiced",
+    } as unknown as ReturnType<typeof mockUseInterventionLive>);
+    render(<TechnicianFinishJobPanel />);
+    await goToSignatureStep();
+
+    const { finalizeCompletionOfflineAware } = jest.requireMock(
+      "@/features/interventions/completionUpload"
+    ) as { finalizeCompletionOfflineAware: jest.Mock };
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("finish-job-submit"));
+    });
+
+    await waitFor(() => {
+      expect(finalizeCompletionOfflineAware).not.toHaveBeenCalled();
+      expect(screen.getByTestId("finish-job-step-invoice")).toBeInTheDocument();
+    });
+  });
+
+  it("capture button stays round", () => {
+    setupActive();
+    render(<TechnicianFinishJobPanel />);
+    expect(screen.getByTestId("finish-job-capture-btn")).toHaveClass("rounded-full");
+  });
 });
