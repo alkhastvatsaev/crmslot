@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
-import { blockIfProduction, requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
@@ -24,9 +24,6 @@ type Body = {
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
   if ("response" in auth) return auth.response;
-
-  const blocked = blockIfProduction();
-  if (blocked) return blocked;
 
   const { id } = await context.params;
   const interventionId = id?.trim();
