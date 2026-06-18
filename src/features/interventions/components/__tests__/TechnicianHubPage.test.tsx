@@ -29,6 +29,10 @@ jest.mock("@/context/TechnicianFinishJobContext", () => ({
   }),
 }));
 
+jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
+  useIsMobile: () => false,
+}));
+
 const mockAssignments = useTechnicianAssignments as jest.MockedFunction<
   typeof useTechnicianAssignments
 >;
@@ -59,21 +63,19 @@ describe("TechnicianHubPage", () => {
     });
   });
 
-  it("renders mobile hub with mission strip and empty detail", () => {
+  it("renders missions layout with detail view by default", () => {
     render(<TechnicianHubPage slotIndex={2} />);
 
-    expect(screen.getByTestId("technician-mobile-hub-2")).toHaveAttribute(
-      "data-ui-version",
-      "field-v2"
-    );
-    expect(screen.getByTestId("technician-mobile-day-strip-empty")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-mobile-mission-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("dashboard-pager-slot-2")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-missions-empty-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-dashboard-detail-empty")).toBeInTheDocument();
     expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
       "data-technician-center-view",
       "detail"
     );
     expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("daily-missions-empty-grid")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("technician-offline-sync-panel")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("technician-hub-vehicle-stock")).not.toBeInTheDocument();
   });
 
   it("filters missions when calendar day changes", async () => {
@@ -123,20 +125,15 @@ describe("TechnicianHubPage", () => {
       </DateProvider>
     );
 
-    expect(screen.getByTestId("technician-mobile-mission-chip-iv-today")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-mobile-mission-chip-iv-tomorrow")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-mission-iv-today")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-mission-iv-tomorrow")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("pick-tomorrow"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("technician-mobile-mission-client")).toHaveTextContent(
-        "Marie Demain"
-      );
+      expect(screen.getByTestId("daily-mission-iv-tomorrow")).toBeInTheDocument();
     });
-    expect(screen.queryByTestId("technician-mobile-mission-chip-iv-today")).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("technician-mobile-mission-chip-iv-tomorrow")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("daily-mission-iv-today")).not.toBeInTheDocument();
 
     jest.useRealTimers();
   });
