@@ -1,0 +1,29 @@
+---
+description: Commit + push main après chaque tâche terminée (déploiement Vercel auto)
+alwaysApply: true
+---
+
+# Déploiement automatique Vercel
+
+L’utilisateur veut que **chaque tâche terminée** soit déployée sans qu’il demande « deploy ».
+
+## À la fin d’une tâche avec changements de code
+
+1. Lancer les tests pertinents (`npx jest <fichiers touchés> --no-coverage` ou `npm run test:ci` si merge sensible).
+2. **Commit** uniquement les fichiers de la tâche — jamais `git add .` / `git add -A`.
+3. **Push** `git push origin main` (Vercel déploie automatiquement sur `main`).
+4. Indiquer le **hash du commit** et rappeler ~1–2 min pour le build Vercel.
+
+## Ne pas committer
+
+- Fichiers hors scope (`.env`, `capacitor.config.ts`, screenshots, `android/.idea/`, brouillons locaux) sauf s’ils font partie explicite de la demande.
+- Si la tâche était **question / review only** sans modification → pas de commit.
+
+## Message de commit
+
+- Français ou style du repo, 1–2 phrases sur le **pourquoi**.
+- HEREDOC pour le message.
+
+## En cas d’échec pre-push / CI local
+
+- Corriger, **nouveau commit** (pas d’amend sauf règles git utilisateur).
