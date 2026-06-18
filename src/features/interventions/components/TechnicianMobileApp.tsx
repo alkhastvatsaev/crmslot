@@ -4,7 +4,6 @@ import TechnicianHubPage from "@/features/interventions/components/TechnicianHub
 import TechnicianMobileShell from "@/features/interventions/components/TechnicianMobileShell";
 import TechnicianMobileProviders from "@/features/interventions/TechnicianMobileProviders";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
-import WorkspaceRequiredPanel from "@/features/app/WorkspaceRequiredPanel";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { TECHNICIAN_MOBILE_APP_SLOT_INDEX } from "@/features/interventions/technicianMobileAppConstants";
@@ -19,7 +18,6 @@ export default function TechnicianMobileApp() {
       <LayoutShellProvider mode="mobile">
         <MobileHubRailProvider>
           <TechnicianMobileShell>
-            <WorkspaceRequiredPanel />
             <ErrorBoundary name="technician-mobile-hub">
               <TechnicianHubPage slotIndex={TECHNICIAN_MOBILE_APP_SLOT_INDEX} />
             </ErrorBoundary>
