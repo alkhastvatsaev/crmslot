@@ -5,15 +5,11 @@ import { logger } from "@/core/logger";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Check,
-  CheckCircle2,
   ClipboardList,
   Loader2,
-  MoreHorizontal,
-  Package,
   RotateCcw,
   Trash2,
   X,
@@ -62,14 +58,7 @@ const stepVariants = {
 };
 const springTransition = { type: "spring", bounce: 0, duration: 0.35 } as const;
 
-const CATEGORY_ICONS = {
-  panne: AlertTriangle,
-  materiel: Package,
-  preuve: CheckCircle2,
-  autre: MoreHorizontal,
-} as const;
-
-type PhotoCategory = "panne" | "materiel" | "preuve" | "autre";
+const DEFAULT_PHOTO_CATEGORY = "preuve" as const;
 
 const STEP_SHELL = "absolute inset-0 flex min-h-0 flex-col overflow-hidden px-3";
 
@@ -85,8 +74,9 @@ export default function TechnicianFinishJobPanel() {
   const [step, setStep] = useState<FinishJobStep>("photos");
   const [draftBillingLines, setDraftBillingLines] = useState<DraftBillingLine[]>([]);
   const [draftAiNote, setDraftAiNote] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<{ url: string; category: PhotoCategory }[]>([]);
-  const [currentCategory, setCurrentCategory] = useState<PhotoCategory>("preuve");
+  const [photos, setPhotos] = useState<{ url: string; category: typeof DEFAULT_PHOTO_CATEGORY }[]>(
+    []
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
@@ -146,7 +136,7 @@ export default function TechnicianFinishJobPanel() {
     if (!v || photos.length >= FINISH_JOB_MAX_PHOTOS) return;
     try {
       const url = capturePhotoFromVideo(v);
-      setPhotos((p) => [...p, { url, category: currentCategory }]);
+      setPhotos((p) => [...p, { url, category: DEFAULT_PHOTO_CATEGORY }]);
     } catch {
       toast.error(String(t("technician_hub.finish.toasts.photo_impossible")));
     }
@@ -411,30 +401,8 @@ export default function TechnicianFinishJobPanel() {
                   </button>
                 </div>
 
-                <div className="absolute left-2 right-2 top-2 z-20 flex justify-center gap-2 rounded-full bg-black/45 p-1 backdrop-blur-sm">
-                  {(["panne", "materiel", "preuve", "autre"] as const).map((cat) => {
-                    const IconComponent = CATEGORY_ICONS[cat];
-                    const isActive = currentCategory === cat;
-                    return (
-                      <button
-                        key={cat}
-                        type="button"
-                        onClick={() => setCurrentCategory(cat)}
-                        aria-label={cat}
-                        aria-pressed={isActive}
-                        className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-full transition",
-                          isActive ? "bg-white text-slate-900" : "text-white/80"
-                        )}
-                      >
-                        <IconComponent className="h-4 w-4" strokeWidth={2.25} />
-                      </button>
-                    );
-                  })}
-                </div>
-
                 {PRESENTATION_PRIVACY_MODE ? (
-                  <div className="absolute right-2 top-14 rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase text-white">
+                  <div className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase text-white">
                     {String(t("technician_hub.finish.presentation_mode"))}
                   </div>
                 ) : null}
