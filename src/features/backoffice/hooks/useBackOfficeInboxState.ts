@@ -30,15 +30,9 @@ import {
 } from "@/features/backoffice/mergeReportCompletionMedia";
 import {
   coerceFirestoreLikeDate,
-  interventionMatchesTab,
   isInterventionInBackofficeRequestsQueue,
-  isInterventionReleasedToTechnicianField,
 } from "@/features/interventions/technicianSchedule";
-import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
-import {
-  interventionsToChatDayRows,
-  missionsToChatDayRows,
-} from "@/features/backoffice/chatDayMissionRow";
+import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
 import type { Mission } from "@/features/map/missionTypes";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
@@ -71,6 +65,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     inboxCompanyIds.length > 0 &&
     (isMobile !== true ||
       powerGate.inboxDataActive ||
+      activeTab === "chat" ||
       activeTab === "requests" ||
       activeTab === "reports");
   const { interventions, loading } = useBackOfficeInterventions(
@@ -98,22 +93,18 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   };
 
   const { selectedDate } = useDateContext();
-  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(
-    "global"
-  );
+  const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
 
-  const chatDayRows = useMemo(() => {
-    if (dayMissions !== undefined) {
-      return missionsToChatDayRows(dayMissions);
-    }
-    const isDispatchMap = isCompanyDispatchViewer(workspace);
-    const ivs = interventions.filter((iv) => {
-      if (!interventionMatchesTab(iv, "today", selectedDate)) return false;
-      if (isDispatchMap && !isInterventionReleasedToTechnicianField(iv)) return false;
-      return iv.status !== "cancelled";
-    });
-    return interventionsToChatDayRows(ivs);
-  }, [dayMissions, interventions, selectedDate, workspace]);
+  const chatDayRows = useMemo(
+    () =>
+      buildChatDayRows({
+        interventions,
+        dayMissions,
+        selectedDate,
+        workspace,
+      }),
+    [dayMissions, interventions, selectedDate, workspace]
+  );
 
   const selectedItem = useMemo(
     () => (selectedItemId ? (interventions.find((x) => x.id === selectedItemId) ?? null) : null),

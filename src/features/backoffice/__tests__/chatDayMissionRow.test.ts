@@ -1,7 +1,10 @@
 import {
   missionsToChatDayRows,
+  buildChatDayRows,
+  interventionsToChatDayRows,
 } from "@/features/backoffice/chatDayMissionRow";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Intervention } from "@/features/interventions/types";
+import { makeIntervention } from "@/test-utils/factories";
 
 describe("missionsToChatDayRows", () => {
   it("maps demo missions with stable thread id", () => {
@@ -33,5 +36,77 @@ describe("missionsToChatDayRows", () => {
       } as Mission,
     ]);
     expect(rows[0]?.threadId).toBe("iv-firestore-1");
+  });
+});
+
+describe("buildChatDayRows", () => {
+  const today = new Date("2026-06-17T12:00:00.000Z");
+
+  it("prefers Firestore interventions when day missions are empty", () => {
+    const iv = makeIntervention({
+      id: "iv-chat-1",
+      clientFirstName: "Alice",
+      clientLastName: "Martin",
+      requestedDate: "2026-06-17",
+      requestedTime: "10:00",
+      status: "pending",
+    });
+    const rows = buildChatDayRows({
+      interventions: [iv],
+      dayMissions: [],
+      selectedDate: today,
+      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.threadId).toBe("iv-chat-1");
+    expect(rows[0]?.clientName).toMatch(/Alice/i);
+  });
+
+  it("includes pending intake in chat list (not only released-to-field)", () => {
+    const pending = makeIntervention({
+      id: "iv-pending",
+      status: "pending",
+      requestedDate: "2026-06-17",
+    });
+    const rows = buildChatDayRows({
+      interventions: [pending],
+      selectedDate: today,
+      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+    });
+    expect(rows.map((r) => r.threadId)).toContain("iv-pending");
+  });
+
+  it("merges extra local map missions without duplicating intervention ids", () => {
+    const iv = makeIntervention({
+      id: "iv-firestore-1",
+      requestedDate: "2026-06-17",
+      clientFirstName: "Jean",
+      clientLastName: "Dupont",
+    });
+    const rows = buildChatDayRows({
+      interventions: [iv],
+      dayMissions: [
+        {
+          id: 1,
+          key: "iv-firestore-1",
+          clientName: "Jean",
+          coordinates: [4.35, 50.84],
+          time: "14:00",
+          status: "assigned",
+          statusCode: "assigned",
+        } as import("@/features/map/missionTypes").Mission,
+        {
+          id: 202605180,
+          clientName: "M. Dubois",
+          coordinates: [4.35, 50.84],
+          time: "10:00",
+          status: "À venir",
+        } as import("@/features/map/missionTypes").Mission,
+      ],
+      selectedDate: today,
+      workspace: { isTenantUser: true, activeCompanyId: "co", memberships: [{ companyId: "co" }] },
+    });
+    expect(rows).toHaveLength(2);
+    expect(rows.map((r) => r.threadId).sort()).toEqual(["202605180", "iv-firestore-1"]);
   });
 });
