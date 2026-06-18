@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import nodeCrypto from "node:crypto";
 import { TextDecoder, TextEncoder } from "util";
 import { mockState } from "./src/test-utils/mockState";
 import { resetFactorySequence } from "./src/test-utils/factories";
@@ -6,6 +7,26 @@ import { resetFactorySequence } from "./src/test-utils/factories";
 if (typeof global.TextDecoder === "undefined") {
   global.TextDecoder = TextDecoder as typeof global.TextDecoder;
   global.TextEncoder = TextEncoder as typeof global.TextEncoder;
+}
+
+if (typeof globalThis.crypto?.subtle?.digest !== "function") {
+  const baseCrypto =
+    typeof globalThis.crypto === "object" && globalThis.crypto !== null
+      ? globalThis.crypto
+      : ({} as Crypto);
+  Object.defineProperty(globalThis, "crypto", {
+    value: {
+      ...baseCrypto,
+      getRandomValues: (arr: Uint8Array) => nodeCrypto.randomFillSync(arr),
+      subtle: {
+        digest: async (_algorithm: string, data: ArrayBuffer) => {
+          const hash = nodeCrypto.createHash("sha256").update(Buffer.from(data)).digest();
+          return hash.buffer.slice(hash.byteOffset, hash.byteOffset + hash.byteLength);
+        },
+      },
+    },
+    configurable: true,
+  });
 }
 
 afterEach(() => {
@@ -197,9 +218,14 @@ jest.mock("firebase/auth", () => {
     this.setCustomParameters = jest.fn();
   }
 
-  function MockOAuthProvider(this: { addScope: jest.Mock; setCustomParameters: jest.Mock }) {
+  function MockOAuthProvider(this: {
+    addScope: jest.Mock;
+    setCustomParameters: jest.Mock;
+    credential: jest.Mock;
+  }) {
     this.addScope = jest.fn();
     this.setCustomParameters = jest.fn();
+    this.credential = jest.fn(() => ({ providerId: "apple.com" }));
   }
 
   return {
@@ -235,6 +261,18 @@ jest.mock("firebase/auth", () => {
       })
     ),
     signInWithRedirect: jest.fn(() => Promise.resolve()),
+    signInWithCredential: jest.fn(() =>
+      Promise.resolve({
+        user: {
+          uid: "apple-user",
+          email: "apple@test.example",
+          emailVerified: true,
+          displayName: "Apple User",
+          photoURL: null,
+          providerData: [{ providerId: "apple.com" }],
+        },
+      })
+    ),
     createUserWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({
         user: {

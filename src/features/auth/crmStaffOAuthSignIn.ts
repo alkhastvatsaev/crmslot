@@ -1,12 +1,18 @@
 import {
   GoogleAuthProvider,
   OAuthProvider,
+  signInWithCredential,
   signInWithPopup,
   signInWithRedirect,
   type Auth,
   type AuthProvider,
   type UserCredential,
 } from "firebase/auth";
+import {
+  authorizeNativeAppleSignIn,
+  NativeAppleSignInCancelled,
+  shouldUseNativeAppleSignIn,
+} from "@/core/native/nativeAppleSignIn";
 
 /** Connexion OAuth lancée en redirect — la page sera rechargée par Firebase. */
 export class CrmStaffOAuthRedirectPending extends Error {
@@ -59,7 +65,24 @@ export async function signInCrmStaffWithGoogle(auth: Auth): Promise<UserCredenti
 }
 
 export async function signInCrmStaffWithApple(auth: Auth): Promise<UserCredential> {
+  if (shouldUseNativeAppleSignIn()) {
+    return signInCrmStaffWithNativeApple(auth);
+  }
   return signInCrmStaffWithProvider(auth, createCrmStaffAppleProvider());
+}
+
+async function signInCrmStaffWithNativeApple(auth: Auth): Promise<UserCredential> {
+  try {
+    const { identityToken, rawNonce } = await authorizeNativeAppleSignIn();
+    const provider = createCrmStaffAppleProvider();
+    const credential = provider.credential({ idToken: identityToken, rawNonce });
+    return await signInWithCredential(auth, credential);
+  } catch (e) {
+    if (e instanceof NativeAppleSignInCancelled) {
+      throw { code: "auth/popup-closed-by-user" };
+    }
+    throw e;
+  }
 }
 
 export type CrmStaffOAuthProviderId = "google" | "apple";
