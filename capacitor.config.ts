@@ -1,14 +1,17 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
+const serverUrl =
+  process.env.CAPACITOR_SERVER_URL?.trim() || "https://crmslot.vercel.app/m/technician";
+
 const config: CapacitorConfig = {
   appId: "com.crmslot.app",
   appName: "CRMSLOT",
   webDir: "capacitor-shell",
   server: {
     // Doit pointer vers un domaine qui sert l'app en 200 (pas de 307 vers un autre hôte — casse la PWA).
-    url: process.env.CAPACITOR_SERVER_URL?.trim() || "https://crmslot.vercel.app/m/technician",
-    cleartext: false,
+    url: serverUrl,
+    cleartext: serverUrl.startsWith("http://"),
   },
   ios: {
     contentInset: "always",
