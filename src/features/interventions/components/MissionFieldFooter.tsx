@@ -1,12 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { Camera, MapPin, Navigation2, Play } from "lucide-react";
+import { Camera, MapPin, Navigation2, Play, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
-import { resolveMissionActionBar } from "@/features/interventions/missionActionBar";
-import { SlideAction } from "@/components/ui/slide-action";
+import {
+  resolveMissionActionBar,
+  type MissionActionVariant,
+} from "@/features/interventions/missionActionBar";
 import { HubButton } from "@/core/ui/hub";
+import { cn } from "@/lib/utils";
+
+type Props = {
+  intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
+  isUpdating?: boolean;
+  /** Masque Départ / Sur place / Terminer — géré par le time tracking unifié. */
+  hideAutomatedActions?: boolean;
+  onPrimaryTransition: (toStatus: Intervention["status"]) => void;
+  onFinish: () => void;
+  onWaitingMaterial?: () => void;
+};
+
+function transitionButtonClass(variant: MissionActionVariant): string {
+  switch (variant) {
+    case "amber":
+      return "border-amber-200 bg-amber-500 text-white hover:bg-amber-400";
+    case "emerald":
+      return "border-emerald-200 bg-emerald-600 text-white hover:bg-emerald-500";
+    case "purple":
+      return "border-violet-200 bg-violet-600 text-white hover:bg-violet-500";
+    case "blue":
+    default:
+      return "border-blue-200 bg-blue-600 text-white hover:bg-blue-500";
+  }
+}
+
+function transitionIcon(
+  toStatus: Intervention["status"]
+): typeof MapPin | typeof Navigation2 | typeof Play {
+  if (toStatus === "en_route") return Navigation2;
+  if (toStatus === "in_progress") return MapPin;
+  return Play;
+}
 
 type Props = {
   intervention: Pick<Intervention, "status" | "clientPhone" | "phone" | "address" | "clientEmail">;
@@ -46,14 +81,8 @@ export default function MissionFieldFooter({
     onPrimaryTransition(primary.toStatus);
   };
 
-  const slideIcon =
-    primary?.kind === "transition" && primary.toStatus === "en_route"
-      ? Navigation2
-      : primary?.kind === "transition" && primary.toStatus === "in_progress"
-        ? MapPin
-        : Play;
-
-  const slideLabel = primary?.kind === "transition" ? t(primary.labelKey) : "";
+  const transitionPrimary = primary?.kind === "transition" ? primary : null;
+  const TransitionIcon = transitionPrimary ? transitionIcon(transitionPrimary.toStatus) : null;
 
   return (
     <footer
@@ -100,18 +129,24 @@ export default function MissionFieldFooter({
           <Camera className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
           {t(primary.labelKey)}
         </HubButton>
-      ) : primary?.kind === "transition" ? (
-        <div className="w-full max-w-[20.5rem]">
-          <SlideAction
-            testId={primary.testId}
-            label={slideLabel}
-            icon={slideIcon}
-            disabled={isUpdating}
-            variant="premium"
-            compact
-            onAction={handleTransition}
-          />
-        </div>
+      ) : transitionPrimary ? (
+        <button
+          type="button"
+          data-testid={transitionPrimary.testId}
+          disabled={isUpdating}
+          onClick={handleTransition}
+          className={cn(
+            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2 rounded-full border px-4 text-[15px] font-semibold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.35)] transition active:scale-[0.99] disabled:opacity-60",
+            transitionButtonClass(transitionPrimary.variant)
+          )}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+          ) : TransitionIcon ? (
+            <TransitionIcon className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
+          ) : null}
+          {t(transitionPrimary.labelKey)}
+        </button>
       ) : null}
     </footer>
   );

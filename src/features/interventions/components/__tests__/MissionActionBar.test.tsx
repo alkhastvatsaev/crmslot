@@ -20,9 +20,23 @@ describe("MissionActionBar", () => {
         intervention={iv("en_route")}
         onPrimaryTransition={jest.fn()}
         onFinish={jest.fn()}
-      />,
+      />
     );
     expect(screen.getByTestId("mission-action-primary-on-site")).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+  });
+
+  it("calls onPrimaryTransition when on-site button is clicked", () => {
+    const onPrimaryTransition = jest.fn();
+    render(
+      <MissionActionBar
+        intervention={iv("en_route")}
+        onPrimaryTransition={onPrimaryTransition}
+        onFinish={jest.fn()}
+      />
+    );
+    fireEvent.click(screen.getByTestId("mission-action-primary-on-site"));
+    expect(onPrimaryTransition).toHaveBeenCalledWith("in_progress");
   });
 
   it("calls onFinish for in_progress primary", () => {
@@ -33,7 +47,7 @@ describe("MissionActionBar", () => {
         onPrimaryTransition={jest.fn()}
         onFinish={onFinish}
         onWaitingMaterial={jest.fn()}
-      />,
+      />
     );
     fireEvent.click(screen.getByTestId("mission-action-primary-finish"));
     expect(onFinish).toHaveBeenCalled();
@@ -47,7 +61,7 @@ describe("MissionActionBar", () => {
         onPrimaryTransition={jest.fn()}
         onFinish={jest.fn()}
         onWaitingMaterial={onWaitingMaterial}
-      />,
+      />
     );
     expect(screen.queryByTestId("technician-waiting-material-btn")).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mission-more-toggle"));
