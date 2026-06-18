@@ -4,6 +4,7 @@ import {
   isInterventionPendingBackOfficeIntake,
   isInterventionReleasedToTechnicianField,
   isInterventionVisibleOnTechnicianMap,
+  sortInterventionsByScheduleAsc,
 } from "@/features/interventions/technicianSchedule";
 
 function iv(status: Intervention["status"]): Intervention {
@@ -134,5 +135,17 @@ describe("interventionVisibleInTechnicianMissionList", () => {
     };
     const tomorrow = new Date("2026-05-17T12:00:00");
     expect(interventionVisibleInTechnicianMissionList(row, "today", techUid, tomorrow)).toBe(true);
+  });
+});
+
+describe("sortInterventionsByScheduleAsc", () => {
+  it("orders missions by scheduled time ascending", () => {
+    const rows = [
+      { ...iv("assigned"), id: "c", scheduledDate: "2026-05-16", scheduledTime: "14:00" },
+      { ...iv("assigned"), id: "a", scheduledDate: "2026-05-16", scheduledTime: "09:00" },
+      { ...iv("assigned"), id: "b", scheduledDate: "2026-05-16", scheduledTime: "11:30" },
+    ];
+    const sorted = sortInterventionsByScheduleAsc(rows);
+    expect(sorted.map((r) => r.id)).toEqual(["a", "b", "c"]);
   });
 });

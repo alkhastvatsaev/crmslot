@@ -187,7 +187,11 @@ export function interventionMatchesTab(
 }
 
 export function sortInterventionsByScheduleAsc(list: Intervention[]): Intervention[] {
-  return [...list].sort((a, b) => getScheduleAnchor(a).getTime() - getScheduleAnchor(b).getTime());
+  return [...list].sort((a, b) => {
+    const delta = getScheduleAnchor(a).getTime() - getScheduleAnchor(b).getTime();
+    if (delta !== 0) return delta;
+    return a.id.localeCompare(b.id);
+  });
 }
 
 /** AAAA-MM-JJ dans le fuseau local (aligné calendrier hub technicien). */

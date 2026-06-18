@@ -190,9 +190,7 @@ export default function TechnicianDashboardListPanel({
     const rows = interventions.filter((iv) =>
       interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    const awaiting = rows.filter((iv) => isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
-    const rest = rows.filter((iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
-    return [...sortInterventionsByScheduleAsc(awaiting), ...sortInterventionsByScheduleAsc(rest)];
+    return sortInterventionsByScheduleAsc(rows);
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   const offlineAuth = !isConfigured || !auth;

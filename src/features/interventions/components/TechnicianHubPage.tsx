@@ -25,7 +25,6 @@ import {
   statusLabelKey,
   formatScheduledTimeOnly,
 } from "@/features/interventions/technicianSchedule";
-import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
@@ -68,11 +67,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     const todayRows = interventions.filter((iv) =>
       interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    const awaiting = todayRows.filter((iv) =>
-      isTechnicianAssignmentAwaitingResponse(iv, firebaseUid)
-    );
-    const rest = todayRows.filter((iv) => !isTechnicianAssignmentAwaitingResponse(iv, firebaseUid));
-    return [...sortInterventionsByScheduleAsc(awaiting), ...sortInterventionsByScheduleAsc(rest)];
+    return sortInterventionsByScheduleAsc(todayRows);
   }, [interventions, missionDayAnchor, firebaseUid]);
 
   /** Ne pas auto-sélectionner une mission déjà en archives (évite détail « clôturée » + photos sans clic explicite). */
@@ -83,7 +78,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const todayMissions = useMemo<Mission[]>(
     () =>
-      sortInterventionsByScheduleAsc(filteredSorted).map((iv, index) => ({
+      filteredSorted.map((iv, index) => ({
         id: index,
         key: iv.id,
         clientName: interventionClientLabel(iv) || String(t("common.client")),
