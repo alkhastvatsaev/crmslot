@@ -160,4 +160,26 @@ describe("sortInterventionsByScheduleAsc", () => {
     const sorted = sortInterventionsByScheduleAsc(rows, day);
     expect(sorted.map((r) => r.id)).toEqual(["early", "mid", "late"]);
   });
+
+  it("orders by displayed hour on the viewed day (not legacy schedule date)", () => {
+    const day = new Date("2026-06-18T12:00:00");
+    const rows = [
+      {
+        ...iv("done"),
+        id: "afternoon",
+        scheduledDate: "2026-06-17",
+        scheduledTime: "14:00",
+        completedAt: "2026-06-18T15:00:00.000Z",
+      },
+      {
+        ...iv("done"),
+        id: "morning",
+        scheduledDate: "2026-06-18",
+        scheduledTime: "09:00",
+        completedAt: "2026-06-18T10:00:00.000Z",
+      },
+    ];
+    const sorted = sortInterventionsByScheduleAsc(rows, day);
+    expect(sorted.map((r) => r.id)).toEqual(["morning", "afternoon"]);
+  });
 });
