@@ -145,22 +145,28 @@ export function isTechnicianCompletedFieldMission(
   return completedAt >= startOfToday(now) && completedAt <= endOfToday(now);
 }
 
+/** Jour sélectionné dans le calendrier = jour civil courant (fuseau local). */
+export function isCalendarAnchorToday(anchor: Date, realNow = new Date()): boolean {
+  return localCalendarYmd(anchor) === localCalendarYmd(realNow);
+}
+
 /**
  * Liste missions technicien (panneau gauche) :
- * - assignations en attente d’acceptation (toute date) ;
- * - missions acceptées en cours (`en_route`, etc.) — ne pas les faire disparaître après acceptation ;
- * - missions clôturées aujourd’hui — rester visibles avec style « terminé ».
+ * - assignations en attente + missions actives — visibles seulement quand le calendrier est sur **aujourd’hui** ;
+ * - sinon filtre strict sur le jour sélectionné (planifiées / clôturées ce jour-là).
  */
 export function interventionVisibleInTechnicianMissionList(
   iv: Intervention,
   tab: TechnicianTabFilter,
   technicianUid: string | null | undefined,
-  now = new Date()
+  selectedDay = new Date(),
+  realNow = new Date()
 ): boolean {
-  if (isTechnicianAssignmentAwaitingResponse(iv, technicianUid)) return true;
-  if (isTechnicianActiveFieldMission(iv, technicianUid)) return true;
-  if (isTechnicianCompletedFieldMission(iv, technicianUid, tab, now)) return true;
-  return interventionMatchesTab(iv, tab, now);
+  const viewingToday = isCalendarAnchorToday(selectedDay, realNow);
+  if (viewingToday && isTechnicianAssignmentAwaitingResponse(iv, technicianUid)) return true;
+  if (viewingToday && isTechnicianActiveFieldMission(iv, technicianUid)) return true;
+  if (isTechnicianCompletedFieldMission(iv, technicianUid, tab, selectedDay)) return true;
+  return interventionMatchesTab(iv, tab, selectedDay);
 }
 
 export function interventionMatchesTab(

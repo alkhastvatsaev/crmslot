@@ -57,6 +57,8 @@ const doneArchived: Intervention = {
 
 describe("TechnicianDashboardListPanel", () => {
   beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-05-16T12:00:00"));
     mockReopen.mockClear();
     jest.spyOn(window, "confirm").mockReturnValue(true);
     mockAssignments.mockReturnValue({
@@ -65,6 +67,10 @@ describe("TechnicianDashboardListPanel", () => {
       error: null,
       firebaseUid: techUid,
     });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("shows assignment offer card for assigned mission awaiting response", () => {
