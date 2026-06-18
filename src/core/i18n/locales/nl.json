@@ -10,6 +10,26 @@
     "enabled": "Volgnotificaties ingeschakeld",
     "blocked": "Meldingen geblokkeerd in de browser"
   },
+  "pwa": {
+    "install_promo": {
+      "install": "Installeren",
+      "later": "Later",
+      "installed_toast": "App geïnstalleerd",
+      "chrome_manual_hint": "Menu ⋮ rechtsboven → App installeren of Toevoegen aan startscherm",
+      "admin": {
+        "title": "Admin-app installeren",
+        "description": "Open het back-office sneller vanaf je startscherm."
+      },
+      "demande": {
+        "title": "Aanvraag-app installeren",
+        "description": "Volg je interventies zonder telkens Chrome te openen."
+      },
+      "technician": {
+        "title": "Technicus-app installeren",
+        "description": "Missies en afsluiting werken het best als geïnstalleerde app."
+      }
+    }
+  },
   "tracking": {
     "waiting_material_banner": "Wachten op materiaal. We nemen contact op zodra het binnen is.",
     "waiting_material_subline": "We nemen contact op zodra het materiaal binnen is.",

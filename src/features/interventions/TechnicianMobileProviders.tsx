@@ -15,6 +15,7 @@ import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeConte
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
+import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
 
 const TECHNICIAN_MOBILE_PAGE_COUNT = 1;
 
@@ -28,6 +29,7 @@ export default function TechnicianMobileProviders({ children }: Props) {
     <DateProvider>
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
+        <AndroidAppInstallPromoBootstrap surface="technician" presentation="toast" />
         <CompanyWorkspaceProvider>
           <GalaxyLayerBridgeProvider>
             <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>

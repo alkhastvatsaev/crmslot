@@ -10,6 +10,26 @@
     "enabled": "Tracking notifications enabled",
     "blocked": "Notifications blocked in your browser"
   },
+  "pwa": {
+    "install_promo": {
+      "install": "Install",
+      "later": "Later",
+      "installed_toast": "App installed",
+      "chrome_manual_hint": "Tap ⋮ top right → Install app or Add to Home screen",
+      "admin": {
+        "title": "Install Admin app",
+        "description": "Open the back-office faster from your home screen."
+      },
+      "demande": {
+        "title": "Install Request app",
+        "description": "Track your jobs without reopening Chrome every time."
+      },
+      "technician": {
+        "title": "Install Technician app",
+        "description": "Missions and field closure work best as an installed app."
+      }
+    }
+  },
   "tracking": {
     "waiting_material_banner": "Waiting for parts. We will contact you when they arrive.",
     "waiting_material_subline": "We will contact you when parts arrive.",

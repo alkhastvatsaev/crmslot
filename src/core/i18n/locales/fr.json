@@ -10,6 +10,26 @@
     "enabled": "Notifications de suivi activées",
     "blocked": "Notifications bloquées dans le navigateur"
   },
+  "pwa": {
+    "install_promo": {
+      "install": "Installer",
+      "later": "Plus tard",
+      "installed_toast": "Application installée",
+      "chrome_manual_hint": "Menu ⋮ en haut à droite → Installer l'application ou Ajouter à l'écran d'accueil",
+      "admin": {
+        "title": "Installer l'app Admin",
+        "description": "Accédez au back-office plus rapidement depuis votre écran d'accueil."
+      },
+      "demande": {
+        "title": "Installer l'app Demande",
+        "description": "Suivez vos interventions sans rouvrir Chrome à chaque fois."
+      },
+      "technician": {
+        "title": "Installer l'app Technicien",
+        "description": "Missions et clôture terrain optimisées en application installée."
+      }
+    }
+  },
   "tracking": {
     "waiting_material_banner": "Intervention en attente de matériel. Nous vous recontactons dès réception.",
     "waiting_material_subline": "Nous vous recontactons dès réception.",
