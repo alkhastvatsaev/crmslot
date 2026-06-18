@@ -46,26 +46,9 @@ describe("MissionActionBar", () => {
         intervention={iv("in_progress")}
         onPrimaryTransition={jest.fn()}
         onFinish={onFinish}
-        onWaitingMaterial={jest.fn()}
       />
     );
     fireEvent.click(screen.getByTestId("mission-action-primary-finish"));
     expect(onFinish).toHaveBeenCalled();
-  });
-
-  it("reveals waiting material action behind more toggle", () => {
-    const onWaitingMaterial = jest.fn();
-    render(
-      <MissionActionBar
-        intervention={iv("in_progress")}
-        onPrimaryTransition={jest.fn()}
-        onFinish={jest.fn()}
-        onWaitingMaterial={onWaitingMaterial}
-      />
-    );
-    expect(screen.queryByTestId("technician-waiting-material-btn")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("mission-more-toggle"));
-    fireEvent.click(screen.getByTestId("technician-waiting-material-btn"));
-    expect(onWaitingMaterial).toHaveBeenCalled();
   });
 });

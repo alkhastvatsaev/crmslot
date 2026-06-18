@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Camera, MapPin, Navigation2, Play, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
@@ -8,7 +7,6 @@ import {
   resolveMissionActionBar,
   type MissionActionVariant,
 } from "@/features/interventions/missionActionBar";
-import { HubButton } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -36,7 +34,7 @@ function transitionButtonClass(variant: MissionActionVariant): string {
 }
 
 function renderTransitionIcon(toStatus: Intervention["status"]) {
-  const className = "h-5 w-5 shrink-0";
+  const className = "h-6 w-6 shrink-0";
   const stroke = 2.25;
   if (toStatus === "en_route") {
     return <Navigation2 className={className} strokeWidth={stroke} aria-hidden />;
@@ -47,17 +45,15 @@ function renderTransitionIcon(toStatus: Intervention["status"]) {
   return <Play className={className} strokeWidth={stroke} aria-hidden />;
 }
 
-/** Pied de page terrain : une seule action principale ; le reste est repliable. */
+/** Pied de page terrain : une seule action principale. */
 export default function MissionFieldFooter({
   intervention,
   isUpdating = false,
   hideAutomatedActions = false,
   onPrimaryTransition,
   onFinish,
-  onWaitingMaterial,
 }: Props) {
   const { t } = useTranslation();
-  const [moreOpen, setMoreOpen] = useState(false);
   const config = resolveMissionActionBar(intervention);
 
   const primaryHidden =
@@ -66,9 +62,7 @@ export default function MissionFieldFooter({
     (config.primary.kind === "transition" || config.primary.kind === "finish");
   const primary = primaryHidden ? null : config.primary;
 
-  const showMore = intervention.status === "in_progress" && Boolean(onWaitingMaterial);
-
-  if (!primary && !showMore) return null;
+  if (!primary) return null;
 
   const handleTransition = () => {
     if (!primary || primary.kind !== "transition" || isUpdating) return;
@@ -76,52 +70,28 @@ export default function MissionFieldFooter({
   };
 
   const transitionPrimary = primary?.kind === "transition" ? primary : null;
+  const finishLabel = t("technician_hub.dashboard.detail.finish_job");
 
   return (
     <footer
       data-testid="mission-action-bar"
       className="flex shrink-0 flex-col items-center border-t border-slate-200/50 bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
     >
-      {showMore ? (
-        <div className="mb-3 w-full max-w-[20.5rem]">
-          <button
-            type="button"
-            data-testid="mission-more-toggle"
-            onClick={() => setMoreOpen((v) => !v)}
-            className="w-full text-center text-[12px] font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline"
-          >
-            {moreOpen
-              ? t("technician_hub.dashboard.field_footer.less")
-              : t("technician_hub.dashboard.field_footer.more")}
-          </button>
-          {moreOpen ? (
-            <HubButton
-              type="button"
-              variant="secondary"
-              fullWidth
-              data-testid="technician-waiting-material-btn"
-              disabled={isUpdating}
-              onClick={onWaitingMaterial}
-              className="mt-2 min-h-[42px] text-[13px] font-medium"
-            >
-              {t("technician_hub.dashboard.detail.waiting_material")}
-            </HubButton>
-          ) : null}
-        </div>
-      ) : null}
-
-      {primary?.kind === "finish" ? (
-        <HubButton
+      {primary.kind === "finish" ? (
+        <button
           type="button"
           data-testid="mission-action-primary-finish"
           disabled={isUpdating}
           onClick={onFinish}
-          fullWidth
-          className="h-14 max-w-[20.5rem] rounded-full text-[15px] font-semibold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)]"
+          aria-label={finishLabel}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.4)] transition active:scale-[0.98] disabled:opacity-60"
         >
-          <Camera className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
-          {t(primary.labelKey)}
-        </HubButton>
+          {isUpdating ? (
+            <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
+          ) : (
+            <Camera className="h-6 w-6 shrink-0" strokeWidth={2.25} aria-hidden />
+          )}
+        </button>
       ) : transitionPrimary ? (
         <button
           type="button"
@@ -129,15 +99,15 @@ export default function MissionFieldFooter({
           disabled={isUpdating}
           onClick={handleTransition}
           className={cn(
-            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2 rounded-full border px-4 text-[15px] font-semibold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.35)] transition active:scale-[0.99] disabled:opacity-60",
+            "flex h-14 w-full max-w-[20.5rem] items-center justify-center gap-2.5 rounded-full border px-4 text-[16px] font-bold shadow-[0_12px_32px_-8px_rgba(15,23,42,0.35)] transition active:scale-[0.99] disabled:opacity-60",
             transitionButtonClass(transitionPrimary.variant)
           )}
         >
           {isUpdating ? (
-            <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-          ) : transitionPrimary ? (
+            <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
+          ) : (
             renderTransitionIcon(transitionPrimary.toStatus)
-          ) : null}
+          )}
           {t(transitionPrimary.labelKey)}
         </button>
       ) : null}
