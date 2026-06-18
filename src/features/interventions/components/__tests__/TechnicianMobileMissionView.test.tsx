@@ -39,18 +39,24 @@ describe("TechnicianMobileMissionView", () => {
     });
   });
 
-  it("shows large time and client with primary on-site action", () => {
+  it("renders dark hero card with step track and floating CTA", () => {
     render(
       <TechnicianMobileMissionView caseId="iv-1" liveIntervention={baseIv} technicianUid="tech-1" />
     );
 
-    expect(screen.getByTestId("technician-mobile-mission")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-mission")).toHaveAttribute(
+      "data-ui-version",
+      "field-v2"
+    );
+    expect(screen.getByTestId("technician-mobile-step-track")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-mission-time")).toHaveTextContent("14:00");
     expect(screen.getByTestId("technician-mobile-mission-client")).toHaveTextContent(
       "Marie Dupont"
     );
     expect(screen.getByTestId("mission-action-primary-on-site")).toBeInTheDocument();
-    expect(screen.getByTestId("mission-contact-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-call")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-navigate")).toBeInTheDocument();
+    expect(screen.queryByTestId("mission-contact-rail")).not.toBeInTheDocument();
   });
 
   it("shows empty state when no mission selected", () => {
@@ -70,7 +76,7 @@ describe("TechnicianMobileMissionView", () => {
     expect(screen.getByTestId("technician-mobile-mission-empty")).toBeInTheDocument();
   });
 
-  it("expands details panel on toggle", () => {
+  it("opens details sheet from info button", () => {
     const ivWithDesc = { ...baseIv, problem: "Fuite sous évier", title: "Chaudière" };
     mockUseActions.mockReturnValue({
       liveIv: ivWithDesc,

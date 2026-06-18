@@ -36,22 +36,39 @@ describe("TechnicianMobileDayStrip", () => {
     },
   ];
 
-  it("renders mission chips and highlights selection", () => {
+  it("renders time pills and highlights selection", () => {
     const onSelect = jest.fn();
     render(
-      <TechnicianMobileDayStrip missions={missions} selectedId="iv-a" onSelect={onSelect} t={t} />
+      <TechnicianMobileDayStrip
+        missions={missions}
+        selectedId="iv-a"
+        onSelect={onSelect}
+        t={t}
+        technicianUid="tech-1"
+      />
     );
 
     const chipA = screen.getByTestId("technician-mobile-mission-chip-iv-a");
     expect(chipA).toHaveAttribute("data-selected", "true");
     expect(chipA).toHaveTextContent("09:00");
-    expect(chipA).toHaveTextContent("Paul");
 
     fireEvent.click(screen.getByTestId("technician-mobile-mission-chip-iv-b"));
     expect(onSelect).toHaveBeenCalledWith("iv-b");
   });
 
-  it("shows empty strip placeholder", () => {
+  it("hides strip when only one mission", () => {
+    render(
+      <TechnicianMobileDayStrip
+        missions={[missions[0]!]}
+        selectedId="iv-a"
+        onSelect={jest.fn()}
+        t={t}
+      />
+    );
+    expect(screen.queryByTestId("technician-mobile-day-strip")).not.toBeInTheDocument();
+  });
+
+  it("shows spacer when no missions", () => {
     render(<TechnicianMobileDayStrip missions={[]} selectedId={null} onSelect={jest.fn()} t={t} />);
     expect(screen.getByTestId("technician-mobile-day-strip-empty")).toBeInTheDocument();
   });

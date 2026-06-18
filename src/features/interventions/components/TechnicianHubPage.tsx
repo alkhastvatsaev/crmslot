@@ -126,13 +126,15 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       ) : null}
       <div
         data-testid={`technician-mobile-hub-${slotIndex}`}
-        className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white"
+        data-ui-version="field-v2"
+        className="technician-field-screen flex min-h-0 flex-1 flex-col overflow-hidden"
       >
         <TechnicianMobileDayStrip
           missions={filteredSorted}
           selectedId={selectedCaseId}
           onSelect={handleSelectMission}
           t={t}
+          technicianUid={firebaseUid}
         />
         <section
           id={TECHNICIAN_HUB_ANCHOR_MISSIONS}
