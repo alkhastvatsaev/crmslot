@@ -1,19 +1,16 @@
-import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
+import {
+  serializeTechnicianExtraPatchForApi,
+  transitionInterventionFromTechnician,
+} from "@/features/interventions/workflow/transitionInterventionFromTechnician";
 import type { Intervention } from "@/features/interventions/types";
-import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { serverTimestamp } from "firebase/firestore";
 
-jest.mock("@/core/config/firebase", () => ({
-  firestore: {},
-  auth: { currentUser: { uid: "tech-uid-1" } },
+jest.mock("@/core/api/fetchWithAuth", () => ({
+  fetchWithAuth: jest.fn(),
 }));
 
-jest.mock("@/features/interventions/workflow/transitionInterventionStatus", () => ({
-  transitionInterventionStatus: jest.fn(),
-}));
-
-const mockTransition = transitionInterventionStatus as jest.MockedFunction<
-  typeof transitionInterventionStatus
->;
+const mockFetchWithAuth = fetchWithAuth as jest.MockedFunction<typeof fetchWithAuth>;
 
 const iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "createdByUid" | "companyId"> = {
   status: "en_route",
@@ -22,37 +19,61 @@ const iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "createdByUid"
   companyId: "co-test",
 };
 
-const mockStatusEvent = {
-  id: "evt-1",
-  interventionId: "iv-42",
-  fromStatus: "en_route" as const,
-  toStatus: "in_progress" as const,
-  actorUid: "tech-uid-1",
-  actorRole: "technician" as const,
-  at: "2026-06-16T12:00:00.000Z",
-};
+describe("serializeTechnicianExtraPatchForApi", () => {
+  it("converts serverTimestamp completedAt to ISO string", () => {
+    const out = serializeTechnicianExtraPatchForApi({
+      completedAt: serverTimestamp(),
+      completedByUid: "tech-1",
+    });
+    expect(out?.completedByUid).toBe("tech-1");
+    expect(typeof out?.completedAt).toBe("string");
+    expect(Number.isNaN(Date.parse(String(out?.completedAt)))).toBe(false);
+  });
+});
 
 describe("transitionInterventionFromTechnician", () => {
   beforeEach(() => {
-    mockTransition.mockReset();
-    mockTransition.mockResolvedValue(mockStatusEvent);
+    mockFetchWithAuth.mockReset();
+    mockFetchWithAuth.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    } as Response);
   });
 
-  it("calls transitionInterventionStatus with authenticated technician actor", async () => {
+  it("posts transition to API", async () => {
     await transitionInterventionFromTechnician({
       interventionId: "iv-42",
       iv,
       toStatus: "in_progress",
+      note: "Arrivée",
     });
-    expect(mockTransition).toHaveBeenCalledWith(
+
+    expect(mockFetchWithAuth).toHaveBeenCalledWith(
+      "/api/interventions/iv-42/transition",
       expect.objectContaining({
-        interventionId: "iv-42",
-        iv,
-        toStatus: "in_progress",
-        actor: { uid: "tech-uid-1", role: "technician" },
-        note: undefined,
-        extraPatch: undefined,
+        method: "POST",
+        body: JSON.stringify({
+          toStatus: "in_progress",
+          note: "Arrivée",
+          extraPatch: undefined,
+        }),
       })
     );
+  });
+
+  it("surfaces API error message", async () => {
+    mockFetchWithAuth.mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ ok: false, error: "Transition interdite : en_route → done" }),
+    } as Response);
+
+    await expect(
+      transitionInterventionFromTechnician({
+        interventionId: "iv-42",
+        iv,
+        toStatus: "done",
+      })
+    ).rejects.toThrow("Transition interdite : en_route → done");
   });
 });

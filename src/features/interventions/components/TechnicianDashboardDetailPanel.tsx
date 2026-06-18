@@ -223,7 +223,10 @@ export default function TechnicianDashboardDetailPanel({
       logger.error("Failed to update status", {
         error: err instanceof Error ? err.message : String(err),
       });
-      toast.error(String(t("technician_hub.dashboard.detail.update_failed")));
+      const message = err instanceof Error ? err.message : "";
+      toast.error(String(t("technician_hub.dashboard.detail.update_failed")), {
+        description: message || undefined,
+      });
     } finally {
       setIsUpdating(false);
     }
