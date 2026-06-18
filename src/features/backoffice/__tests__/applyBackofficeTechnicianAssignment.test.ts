@@ -32,6 +32,22 @@ function row(partial: Partial<Intervention> = {}): Intervention {
   };
 }
 
+function makeMockDb(peerDocs: Intervention[] = []) {
+  return {
+    collection: () => ({
+      where: () => ({
+        get: async () => ({
+          docs: peerDocs.map((doc) => ({
+            id: doc.id,
+            data: () => doc,
+          })),
+        }),
+      }),
+      doc: () => ({ update: mockUpdate }),
+    }),
+  } as unknown as Parameters<typeof applyBackofficeTechnicianAssignmentAdmin>[0]["db"];
+}
+
 describe("applyBackofficeTechnicianAssignmentAdmin", () => {
   beforeEach(() => {
     mockTransitionAdmin.mockClear();
@@ -40,11 +56,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
 
   it("transitions pending to assigned", async () => {
     const iv = row({ status: "pending" });
-    const db = {
-      collection: () => ({
-        doc: () => ({ update: mockUpdate }),
-      }),
-    } as unknown as Parameters<typeof applyBackofficeTechnicianAssignmentAdmin>[0]["db"];
+    const db = makeMockDb();
 
     await applyBackofficeTechnicianAssignmentAdmin({
       db,
@@ -64,11 +76,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
       assignedTechnicianUid: "tech-1",
       technicianAcceptedAt: undefined,
     });
-    const db = {
-      collection: () => ({
-        doc: () => ({ update: mockUpdate }),
-      }),
-    } as unknown as Parameters<typeof applyBackofficeTechnicianAssignmentAdmin>[0]["db"];
+    const db = makeMockDb();
 
     await applyBackofficeTechnicianAssignmentAdmin({
       db,
