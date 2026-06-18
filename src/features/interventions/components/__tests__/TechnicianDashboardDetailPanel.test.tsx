@@ -13,6 +13,11 @@ jest.mock("@/features/interventions/useInterventionLive", () => ({
 jest.mock("@/context/TechnicianFinishJobContext", () => ({
   useTechnicianFinishJob: () => ({
     setFinishJobInterventionId: jest.fn(),
+    finishWizardStep: null,
+    setFinishWizardStep: jest.fn(),
+    finishJobInterventionId: null,
+    finishJobEntryStep: null,
+    startFinishJob: jest.fn(),
   }),
 }));
 

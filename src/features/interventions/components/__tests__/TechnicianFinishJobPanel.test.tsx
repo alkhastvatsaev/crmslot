@@ -109,7 +109,9 @@ function setupActive(interventionId = "iv-001") {
   mockUseFinishJob.mockReturnValue({
     finishJobInterventionId: interventionId,
     finishJobEntryStep: null,
+    finishWizardStep: null,
     setFinishJobInterventionId: jest.fn(),
+    setFinishWizardStep: jest.fn(),
     startFinishJob: jest.fn(),
   });
   mockUseInterventionLive.mockReturnValue(MOCK_IV);
@@ -134,7 +136,9 @@ describe("TechnicianFinishJobPanel", () => {
     mockUseFinishJob.mockReturnValue({
       finishJobInterventionId: null,
       finishJobEntryStep: null,
+      finishWizardStep: null,
       setFinishJobInterventionId: jest.fn(),
+      setFinishWizardStep: jest.fn(),
       startFinishJob: jest.fn(),
     });
     render(<TechnicianFinishJobPanel />);
@@ -157,9 +161,19 @@ describe("TechnicianFinishJobPanel", () => {
 
   it("advances to signature step after photos", async () => {
     setupActive();
+    const setFinishWizardStep = jest.fn();
+    mockUseFinishJob.mockReturnValue({
+      finishJobInterventionId: "iv-001",
+      finishJobEntryStep: null,
+      finishWizardStep: null,
+      setFinishJobInterventionId: jest.fn(),
+      setFinishWizardStep,
+      startFinishJob: jest.fn(),
+    });
     render(<TechnicianFinishJobPanel />);
     await goToSignatureStep();
     expect(screen.getByTestId("finish-step-signature")).toHaveAttribute("data-active", "true");
+    expect(setFinishWizardStep).toHaveBeenCalledWith("signature");
   });
 
   it("back button on signature returns to photos", async () => {

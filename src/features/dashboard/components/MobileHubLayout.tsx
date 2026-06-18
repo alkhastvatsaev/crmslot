@@ -36,6 +36,8 @@ type Props = {
   onRailChange?: (rail: MobileHubRail) => void;
   /** Mode contrôlé : force le rail actif depuis l'extérieur. */
   activeRail?: MobileHubRail;
+  /** Bloque le swipe horizontal (ex. signature client sur le panneau central). */
+  swipeDisabled?: boolean;
 };
 
 const RAIL_PANEL: Record<MobileHubRail, keyof Pick<Props, "left" | "center" | "right">> = {
@@ -68,6 +70,7 @@ export default function MobileHubLayout({
   sideScroll = true,
   onRailChange,
   activeRail,
+  swipeDisabled = false,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const registrationId = useId();
@@ -116,7 +119,7 @@ export default function MobileHubLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeRail]);
 
-  usePanelSwipe(rootRef, navigateLeft, navigateRight);
+  usePanelSwipe(rootRef, navigateLeft, navigateRight, swipeDisabled);
 
   const innerClassFor = useCallback(
     (railKey: MobileHubRail) => {

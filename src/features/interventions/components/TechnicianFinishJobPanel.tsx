@@ -12,7 +12,6 @@ import {
   Loader2,
   RotateCcw,
   Trash2,
-  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Intervention } from "@/features/interventions/types";
@@ -46,6 +45,7 @@ import FinishJobStepIndicator, {
 } from "@/features/interventions/components/FinishJobStepIndicator";
 import TechnicianFinishInvoiceStep from "@/features/interventions/components/TechnicianFinishInvoiceStep";
 import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
+import type { FinishWizardPhoto } from "@/features/interventions/technicianCompletionReport";
 import { finishWizardPhotosFromIntervention } from "@/features/interventions/technicianCompletionReport";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
@@ -66,17 +66,19 @@ export default function TechnicianFinishJobPanel() {
   const { t } = useTranslation();
   const pager = useDashboardPagerOptional();
   const queryClient = useQueryClient();
-  const { finishJobInterventionId, finishJobEntryStep, setFinishJobInterventionId } =
-    useTechnicianFinishJob();
+  const {
+    finishJobInterventionId,
+    finishJobEntryStep,
+    setFinishJobInterventionId,
+    setFinishWizardStep,
+  } = useTechnicianFinishJob();
   const offlineSync = useOfflineSyncOptional();
   const backofficeBridge = useTechnicianBackofficeReportBridgeOptional();
 
   const [step, setStep] = useState<FinishJobStep>("photos");
   const [draftBillingLines, setDraftBillingLines] = useState<DraftBillingLine[]>([]);
   const [draftAiNote, setDraftAiNote] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<{ url: string; category: typeof DEFAULT_PHOTO_CATEGORY }[]>(
-    []
-  );
+  const [photos, setPhotos] = useState<FinishWizardPhoto[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
@@ -199,6 +201,15 @@ export default function TechnicianFinishJobPanel() {
       setPhotos(existingPhotos);
     }
   }, [liveIv]);
+
+  useEffect(() => {
+    if (!interventionId) {
+      setFinishWizardStep(null);
+      return;
+    }
+    setFinishWizardStep(step);
+    return () => setFinishWizardStep(null);
+  }, [interventionId, step, setFinishWizardStep]);
 
   const goDashboard = () => {
     setFinishJobInterventionId(null);
@@ -350,17 +361,6 @@ export default function TechnicianFinishJobPanel() {
 
   return (
     <div data-testid="finish-job-panel" className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="flex shrink-0 items-center justify-end px-3 py-1">
-        <button
-          type="button"
-          onClick={goDashboard}
-          aria-label={String(t("technician_hub.finish.cancel_close"))}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-        >
-          <X className="h-4 w-4" aria-hidden />
-        </button>
-      </div>
-
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           {step === "photos" && (
