@@ -23,6 +23,7 @@ import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
+import BackofficeChatNotificationBootstrap from "@/features/notifications/components/BackofficeChatNotificationBootstrap";
 
 type Props = {
   pageCount: number;
@@ -54,6 +55,7 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                         <RequesterHubProvider>
                                           <AuthActivityLogger />
                                           <ActivityLogPageObserver />
+                                          <BackofficeChatNotificationBootstrap />
                                           {children}
                                         </RequesterHubProvider>
                                       </TechnicianQueryProvider>

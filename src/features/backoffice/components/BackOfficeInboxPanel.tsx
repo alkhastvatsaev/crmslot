@@ -115,6 +115,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
     selectedChatInterventionId,
     setSelectedChatInterventionId,
     chatDayRows,
+    chatThreadsNeedingReply,
     isEditingDateTime,
     setIsEditingDateTime,
     editDate,
@@ -239,7 +240,10 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
           {
             id: "chat",
             label: t("backoffice.inbox.tabs.chat"),
+            testId: "backoffice-inbox-tab-chat",
             activeAccent: "blue",
+            badge: chatThreadsNeedingReply,
+            badgeAccent: "blue",
           },
           {
             id: "documents",

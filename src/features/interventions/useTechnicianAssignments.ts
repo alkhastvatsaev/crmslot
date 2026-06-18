@@ -16,6 +16,13 @@ import {
   technicianAssignmentsFirestoreQuery,
 } from "@/features/interventions/technicianAssignmentsQuery";
 import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
+import { TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT } from "@/features/interventions/technicianAssignmentSyncEvents";
+import {
+  interventionAssignmentPreview,
+  newAssignmentIdsFromSnapshotChanges,
+  showTechnicianNewAssignmentNotification,
+} from "@/features/interventions/technicianNewAssignmentAlerts";
+import { toast } from "sonner";
 
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
@@ -103,6 +110,21 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   );
 
   const syncFromServerRef = useRef<(() => Promise<void>) | null>(null);
+  const listenerHydratedRef = useRef(false);
+  const knownAssignmentIdsRef = useRef<Set<string>>(new Set());
+
+  const notifyNewAssignments = useCallback((rows: Intervention[]) => {
+    if (rows.length === 0) return;
+    const preview = interventionAssignmentPreview(rows[rows.length - 1]!);
+    toast.message("Nouvelle intervention", {
+      description: rows.length > 1 ? `${rows.length} nouvelles missions` : preview,
+    });
+    showTechnicianNewAssignmentNotification(
+      "Nouvelle intervention",
+      preview,
+      `assignment-${rows[rows.length - 1]!.id}`
+    );
+  }, []);
 
   const syncAssignmentsFromServer = useCallback(async () => {
     const uid = firebaseUid?.trim();
@@ -112,6 +134,19 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
     try {
       const data = await fetchTechnicianAssignments(db, uid, { fromServer: true });
+      const prev =
+        queryClient.getQueryData<Intervention[]>([
+          TECHNICIAN_ASSIGNMENTS_QUERY_KEY,
+          uid,
+        ] as const) ?? [];
+      const prevIds = new Set(prev.map((row) => row.id));
+      const added = data.filter((row) => !prevIds.has(row.id));
+      if (listenerHydratedRef.current && added.length > 0) {
+        notifyNewAssignments(added);
+      }
+      for (const row of data) {
+        knownAssignmentIdsRef.current.add(row.id);
+      }
       applyAssignmentsToCache(queryClient, uid, data);
       setSnapshotReady(true);
       setError(null);
@@ -120,7 +155,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
         error: e instanceof Error ? e.message : String(e),
       });
     }
-  }, [firebaseUid, queryClient]);
+  }, [firebaseUid, queryClient, notifyNewAssignments]);
 
   syncFromServerRef.current = syncAssignmentsFromServer;
 
@@ -162,6 +197,8 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       setFirebaseUid(technicianUid);
       setSnapshotReady(false);
       setError(null);
+      listenerHydratedRef.current = false;
+      knownAssignmentIdsRef.current = new Set();
 
       const db = firestore!;
       const q = technicianAssignmentsFirestoreQuery(db, technicianUid);
@@ -171,6 +208,30 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
         { includeMetadataChanges: false },
         (snapshot) => {
           const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
+
+          if (!listenerHydratedRef.current) {
+            listenerHydratedRef.current = true;
+            knownAssignmentIdsRef.current = new Set(data.map((row) => row.id));
+            applyAssignmentsToCache(queryClient, technicianUid, data);
+            setSnapshotReady(true);
+            setError(null);
+            return;
+          }
+
+          const newIds = newAssignmentIdsFromSnapshotChanges(
+            snapshot.docChanges().map((c) => ({ type: c.type, docId: c.doc.id })),
+            knownAssignmentIdsRef.current
+          );
+          for (const id of data.map((row) => row.id)) {
+            knownAssignmentIdsRef.current.add(id);
+          }
+
+          if (newIds.length > 0) {
+            const addedRows = data.filter((row) => newIds.includes(row.id));
+            notifyNewAssignments(addedRows);
+            void syncFromServerRef.current?.();
+          }
+
           applyAssignmentsToCache(queryClient, technicianUid, data);
           setSnapshotReady(true);
           setError(null);
@@ -201,7 +262,17 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       clearSnap();
       unsubAuth();
     };
-  }, [queryClient, hookEnabled, noFirebaseAuth]);
+  }, [queryClient, hookEnabled, noFirebaseAuth, notifyNewAssignments]);
+
+  useEffect(() => {
+    if (!hookEnabled || !firebaseUid || noFirebaseAuth) return () => {};
+
+    const onResync = () => {
+      void syncFromServerRef.current?.();
+    };
+    window.addEventListener(TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT, onResync);
+    return () => window.removeEventListener(TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT, onResync);
+  }, [hookEnabled, firebaseUid, noFirebaseAuth]);
 
   /** Resync quand l’app revient au premier plan ou retrouve le réseau. */
   useEffect(() => {

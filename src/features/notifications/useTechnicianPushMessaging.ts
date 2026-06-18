@@ -21,6 +21,7 @@ import {
   navigateTechnicianHub,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
+import { requestTechnicianAssignmentsResync } from "@/features/interventions/technicianAssignmentSyncEvents";
 
 export type { FcmUiStatus };
 
@@ -63,6 +64,10 @@ export function useTechnicianPushMessaging(
       const id =
         typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
       if (pushType === "daily_reminder" || pushType === "appointment_reminder") return;
+      if (pushType === "portal_chat") return;
+      if (pushType === "assignment" || id?.trim()) {
+        requestTechnicianAssignmentsResync();
+      }
       if (id?.trim()) openCaseFromPayload(id.trim());
     });
   }, [openCaseFromPayload]);

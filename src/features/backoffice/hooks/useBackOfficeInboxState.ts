@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { doc, deleteDoc } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
@@ -22,6 +22,13 @@ import {
 } from "@/features/scheduling/scheduleConflicts";
 import { IVANA_PORTAL_MESSAGE_EVENT } from "@/features/backoffice/ivanaChatPortalBridge";
 import { subscribeIvanaPortalMessages } from "@/features/backoffice/ivanaChatFirestore";
+import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import {
+  countClientPortalThreadsNeedingReply,
+  filterNewClientPortalMessages,
+  interventionIdsWithClientPortalChat,
+  showPortalChatBrowserNotification,
+} from "@/features/backoffice/portalChatInboxLogic";
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
 import {
   mergeReportCompletionMedia,
@@ -35,8 +42,6 @@ import {
 import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
 import type { Mission } from "@/features/map/missionTypes";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
-import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useBackofficeReminderPush } from "@/features/reminders/useBackofficeReminderPush";
@@ -44,6 +49,7 @@ import {
   proposeAvailableSlotsForTechnician,
   proposeCompanyOpenSlots,
 } from "@/features/scheduling/proposeAvailableSlots";
+import { initialAssignmentDateYmd } from "@/features/scheduling/resolveSmartAssignmentSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import {
@@ -57,17 +63,10 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const { logIntervention } = useActivityLog();
   const inboxCompanyIds = useMemo(() => resolveBackofficeInboxCompanyIds(workspace), [workspace]);
   const cid = inboxCompanyIds[0] ?? null;
-  const isMobile = useIsMobile();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
-  const powerGate = useMobileMapPagePowerGate(activeTab);
-  const inboxFirestoreEnabled =
-    inboxCompanyIds.length > 0 &&
-    (isMobile !== true ||
-      powerGate.inboxDataActive ||
-      activeTab === "chat" ||
-      activeTab === "requests" ||
-      activeTab === "reports");
+  const portalChatHydratedRef = useRef(false);
+  const inboxFirestoreEnabled = inboxCompanyIds.length > 0;
   const { interventions, loading } = useBackOfficeInterventions(
     inboxFirestoreEnabled ? inboxCompanyIds : null
   );
@@ -94,6 +93,12 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
 
   const { selectedDate } = useDateContext();
   const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
+  const [portalChatMessages, setPortalChatMessages] = useState<IvanaPortalChatDoc[]>([]);
+
+  const chatBoostInterventionIds = useMemo(
+    () => interventionIdsWithClientPortalChat(portalChatMessages),
+    [portalChatMessages]
+  );
 
   const chatDayRows = useMemo(
     () =>
@@ -102,8 +107,14 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         dayMissions,
         selectedDate,
         workspace,
+        includeInterventionIds: chatBoostInterventionIds,
       }),
-    [dayMissions, interventions, selectedDate, workspace]
+    [dayMissions, interventions, selectedDate, workspace, chatBoostInterventionIds]
+  );
+
+  const chatThreadsNeedingReply = useMemo(
+    () => countClientPortalThreadsNeedingReply(portalChatMessages),
+    [portalChatMessages]
   );
 
   const selectedItem = useMemo(
@@ -178,10 +189,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
 
   const intakeProposedSlots = useMemo(() => {
     if (!selectedItem || !isEditingDateTime) return [];
-    const dateYmd =
-      editDate.trim() ||
-      selectedItem.requestedDate?.trim() ||
-      new Date().toISOString().slice(0, 10);
+    const dateYmd = editDate.trim() || initialAssignmentDateYmd(selectedItem, new Date());
     const tech = (selectedItem.assignedTechnicianUid ?? "").trim();
     if (tech) {
       return proposeAvailableSlotsForTechnician({
@@ -313,8 +321,18 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         toast.error(t("common.error"), { description: t("backoffice.toasts.assign_failed") });
         return;
       }
-      await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
-      toast.success(t("backoffice.toasts.request_assigned"));
+      const assignment = await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
+      if (assignment?.rescheduled) {
+        const fromSlot =
+          `${row.requestedDate ?? row.scheduledDate ?? "?"} ${row.requestedTime ?? row.scheduledTime ?? ""}`.trim();
+        toast.success(String(t("backoffice.toasts.request_assigned_rescheduled")), {
+          description: String(t("backoffice.toasts.request_assigned_rescheduled_desc"))
+            .replace("{{from}}", fromSlot)
+            .replace("{{to}}", `${assignment.scheduledDate} ${assignment.scheduledTime}`),
+        });
+      } else {
+        toast.success(t("backoffice.toasts.request_assigned"));
+      }
       setAssignPickerOpen(false);
       setSelectedItemId(null);
     } catch (e) {
@@ -571,21 +589,34 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   useEffect(() => {
     if (!isConfigured || !firestore || !ivanaChatCompanyId || !isTenant) return;
 
+    portalChatHydratedRef.current = false;
     const seen = new Set<string>();
     return subscribeIvanaPortalMessages(
       firestore,
       ivanaChatCompanyId,
       (rows) => {
+        setPortalChatMessages(rows);
+        if (!portalChatHydratedRef.current) {
+          portalChatHydratedRef.current = true;
+          rows.forEach((r) => seen.add(r.id));
+          return;
+        }
+
         const uid = auth?.currentUser?.uid;
-        const incoming = rows.filter(
-          (r) => r.role === "client" && r.senderUid !== uid && !seen.has(r.id)
-        );
+        const incoming = filterNewClientPortalMessages(rows, seen, uid);
         incoming.forEach((r) => seen.add(r.id));
         if (incoming.length === 0) return;
 
         setActiveTab("chat");
         const ivId = incoming[incoming.length - 1]?.interventionId?.trim();
         setSelectedChatInterventionId(ivId || "global");
+
+        const preview = incoming[incoming.length - 1]?.body?.trim() || "Nouveau message client";
+        showPortalChatBrowserNotification(
+          String(t("backoffice.inbox.tabs.chat")),
+          preview,
+          `portal-chat-${ivId || "global"}`
+        );
       },
       (err) => {
         logger.error("[useBackOfficeInboxState] portal chat watch", {
@@ -593,7 +624,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         });
       }
     );
-  }, [ivanaChatCompanyId, isTenant]);
+  }, [ivanaChatCompanyId, isTenant, t]);
 
   const reportsTabBadgeCount = reportsToValidateList.length + bridgedTerrainCount;
   const reportsNothingAtAll =
@@ -630,7 +661,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     selectedChatInterventionId,
     setSelectedChatInterventionId,
     chatDayRows,
-    // date editing
+    chatThreadsNeedingReply,
     isEditingDateTime,
     setIsEditingDateTime,
     editDate,
