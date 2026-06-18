@@ -71,6 +71,7 @@ const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
   intervention_deleted: "crmHistory.detail.body.intervention_deleted",
   intervention_report_validated: "crmHistory.detail.body.intervention_report_validated",
   intervention_report_rejected: "crmHistory.detail.body.intervention_report_rejected",
+  intervention_report_archived: "crmHistory.detail.body.intervention_report_archived",
   intervention_cancelled: "crmHistory.detail.body.intervention_cancelled",
   intervention_schedule_updated: "crmHistory.detail.body.intervention_schedule_updated",
   intervention_billing_updated: "crmHistory.detail.body.intervention_billing_updated",

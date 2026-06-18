@@ -9,6 +9,7 @@ export type CrmEventType =
   | "intervention_deleted"
   | "intervention_report_validated"
   | "intervention_report_rejected"
+  | "intervention_report_archived"
   | "intervention_cancelled"
   | "intervention_schedule_updated"
   | "intervention_billing_updated"

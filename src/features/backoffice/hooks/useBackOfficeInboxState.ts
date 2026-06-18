@@ -461,7 +461,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         backofficeReportsArchivedAt: archivedAt,
       });
       await logCrmInterventionAction({
-        kind: "comment",
+        kind: "intervention_report_archived",
         iv: row,
         actorUid,
         actorRole: "dispatcher",
