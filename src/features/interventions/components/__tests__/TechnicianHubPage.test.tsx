@@ -62,7 +62,10 @@ describe("TechnicianHubPage", () => {
   it("renders mobile hub with mission strip and empty detail", () => {
     render(<TechnicianHubPage slotIndex={2} />);
 
-    expect(screen.getByTestId("technician-mobile-hub-2")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-hub-2")).toHaveAttribute(
+      "data-ui-version",
+      "field-v2"
+    );
     expect(screen.getByTestId("technician-mobile-day-strip-empty")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-mission-empty")).toBeInTheDocument();
     expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
@@ -126,9 +129,14 @@ describe("TechnicianHubPage", () => {
     fireEvent.click(screen.getByTestId("pick-tomorrow"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("technician-mobile-mission-chip-iv-tomorrow")).toBeInTheDocument();
+      expect(screen.getByTestId("technician-mobile-mission-client")).toHaveTextContent(
+        "Marie Demain"
+      );
     });
     expect(screen.queryByTestId("technician-mobile-mission-chip-iv-today")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("technician-mobile-mission-chip-iv-tomorrow")
+    ).not.toBeInTheDocument();
 
     jest.useRealTimers();
   });

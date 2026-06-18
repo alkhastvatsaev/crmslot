@@ -2,64 +2,59 @@
 
 import type { Intervention } from "@/features/interventions/types";
 import { buildTechnicianMissionPresentation } from "@/features/interventions/technicianMissionPresentation";
+import { isTechnicianAssignmentAwaitingResponse } from "@/features/interventions/technicianAssignmentActions";
 import { cn } from "@/lib/utils";
+import "./technician-mobile-mission.css";
 
 type Props = {
   missions: Intervention[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   t: (key: string) => string;
+  technicianUid?: string | null;
 };
 
-/** Bandeau horizontal — changer de mission en un tap (style Uber). */
-export default function TechnicianMobileDayStrip({ missions, selectedId, onSelect, t }: Props) {
-  if (missions.length === 0) {
-    return (
-      <div
-        data-testid="technician-mobile-day-strip-empty"
-        className="shrink-0 border-b border-slate-200/80 px-4 py-3 text-center text-[13px] font-medium text-slate-500"
-      >
-        —
-      </div>
-    );
+/** Sélecteur jour — pastilles horaires uniquement (masqué si une seule mission). */
+export default function TechnicianMobileDayStrip({
+  missions,
+  selectedId,
+  onSelect,
+  t,
+  technicianUid,
+}: Props) {
+  if (missions.length <= 1) {
+    return missions.length === 0 ? (
+      <div data-testid="technician-mobile-day-strip-empty" className="h-2 shrink-0" aria-hidden />
+    ) : null;
   }
 
   return (
-    <div
+    <nav
       data-testid="technician-mobile-day-strip"
-      className="shrink-0 border-b border-slate-200/80 bg-white/90"
+      className="tm-day-rail shrink-0"
+      aria-label="Missions"
     >
-      <div className="flex gap-2 overflow-x-auto px-3 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {missions.map((iv) => {
-          const { shortClientLabel, timeLabel } = buildTechnicianMissionPresentation(iv, t);
-          const selected = iv.id === selectedId;
-          return (
-            <button
-              key={iv.id}
-              type="button"
-              data-testid={`technician-mobile-mission-chip-${iv.id}`}
-              data-selected={selected ? "true" : "false"}
-              onClick={() => onSelect(iv.id)}
-              className={cn(
-                "flex shrink-0 flex-col items-start rounded-2xl border px-3.5 py-2 text-left transition active:scale-[0.98]",
-                selected
-                  ? "border-slate-900 bg-slate-900 text-white shadow-md"
-                  : "border-slate-200 bg-slate-50 text-slate-800"
-              )}
-            >
-              <span className="text-[15px] font-bold tabular-nums leading-none">{timeLabel}</span>
-              <span
-                className={cn(
-                  "mt-1 max-w-[9rem] truncate text-[13px] font-semibold",
-                  selected ? "text-white/90" : "text-slate-600"
-                )}
-              >
-                {shortClientLabel}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+      {missions.map((iv) => {
+        const { timeLabel } = buildTechnicianMissionPresentation(iv, t);
+        const selected = iv.id === selectedId;
+        const isOffer = technicianUid && isTechnicianAssignmentAwaitingResponse(iv, technicianUid);
+        return (
+          <button
+            key={iv.id}
+            type="button"
+            data-testid={`technician-mobile-mission-chip-${iv.id}`}
+            data-selected={selected ? "true" : "false"}
+            onClick={() => onSelect(iv.id)}
+            className={cn(
+              "tm-day-pill",
+              selected && "tm-day-pill--active",
+              isOffer && !selected && "tm-day-pill--offer"
+            )}
+          >
+            {timeLabel}
+          </button>
+        );
+      })}
+    </nav>
   );
 }
