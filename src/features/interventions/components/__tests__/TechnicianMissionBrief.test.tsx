@@ -2,6 +2,21 @@ import { render, screen } from "@/test-utils/render";
 import TechnicianMissionBrief from "@/features/interventions/components/TechnicianMissionBrief";
 
 describe("TechnicianMissionBrief", () => {
+  it("renders hero card with large time and client name", () => {
+    render(
+      <TechnicianMissionBrief
+        timeLabel="13:00"
+        clientDisplayName="Alex Bach"
+        address="Rue Test 1"
+        descriptionText="Problème serrure"
+      />
+    );
+
+    expect(screen.getByTestId("technician-mission-brief-hero")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-detail-time")).toHaveTextContent("13:00");
+    expect(screen.getByTestId("technician-detail-client-name")).toHaveTextContent("Alex Bach");
+  });
+
   it("renders mission brief without description heading", () => {
     render(
       <TechnicianMissionBrief
