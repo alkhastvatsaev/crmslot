@@ -2,6 +2,7 @@ import {
   applyQuickInvoiceAdjust,
   formatInvoiceTotalEur,
   invoiceTotalCents,
+  removeBillingLineAt,
 } from "../technicianInvoiceQuickAdjust";
 
 const BASE = [
@@ -23,5 +24,11 @@ describe("technicianInvoiceQuickAdjust", () => {
 
   it("formate le total en EUR", () => {
     expect(formatInvoiceTotalEur(17000)).toMatch(/170/);
+  });
+
+  it("supprime une ligne par index", () => {
+    const next = removeBillingLineAt(BASE, 0);
+    expect(next).toHaveLength(1);
+    expect(next[0].description).toContain("Déplacement");
   });
 });

@@ -25,6 +25,7 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import { cn } from "@/lib/utils";
 import {
   TERRAIN_BTN,
+  TERRAIN_BTN_CAPTURE,
   TERRAIN_BTN_ICON,
   TERRAIN_BTN_SM,
 } from "@/features/interventions/terrainMobileChrome";
@@ -91,10 +92,13 @@ export default function TechnicianFinishJobPanel() {
   const [submitBusy, setSubmitBusy] = useState(false);
   const submitInFlightRef = useRef(false);
   const hydratedReportRef = useRef<string | null>(null);
+  const wizardMissionIdRef = useRef<string | null>(null);
 
   const interventionId = finishJobInterventionId;
   const liveIv = useInterventionLive(interventionId);
-  const isAmendMode = liveIv?.status === "done";
+  const liveStatus = liveIv?.status;
+  const isAmendMode = liveStatus === "done";
+  const isInvoicedLocked = liveStatus === "invoiced";
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -190,17 +194,23 @@ export default function TechnicianFinishJobPanel() {
   }, []);
 
   useEffect(() => {
+    if (!interventionId) {
+      wizardMissionIdRef.current = null;
+      return;
+    }
+    if (wizardMissionIdRef.current === interventionId) return;
+    wizardMissionIdRef.current = interventionId;
     resetWizard();
-    if (finishJobEntryStep === "invoice" && interventionId) {
+    if (finishJobEntryStep === "invoice") {
       setStep("billing");
       void prefetchDraftBilling(interventionId);
     }
   }, [interventionId, finishJobEntryStep, prefetchDraftBilling]);
 
   useEffect(() => {
-    if (!interventionId || isAmendMode) return;
+    if (!interventionId || isAmendMode || isInvoicedLocked) return;
     void prefetchDraftBilling(interventionId);
-  }, [interventionId, isAmendMode, prefetchDraftBilling]);
+  }, [interventionId, isAmendMode, isInvoicedLocked, prefetchDraftBilling]);
 
   useEffect(() => {
     if (!liveIv || liveIv.status !== "done" || hydratedReportRef.current === liveIv.id) return;
@@ -217,8 +227,11 @@ export default function TechnicianFinishJobPanel() {
       return;
     }
     setFinishWizardStep(step);
-    return () => setFinishWizardStep(null);
   }, [interventionId, step, setFinishWizardStep]);
+
+  useEffect(() => {
+    return () => setFinishWizardStep(null);
+  }, [interventionId, setFinishWizardStep]);
 
   const goDashboard = () => {
     setFinishJobInterventionId(null);
@@ -240,6 +253,14 @@ export default function TechnicianFinishJobPanel() {
     const sig = sigRef.current?.getPngDataUrl();
     if (!sig) {
       toast.error(String(t("technician_hub.finish.toasts.signature_missing")));
+      return;
+    }
+
+    if (isInvoicedLocked) {
+      toast.message(String(t("technician_hub.finish.toasts.already_invoiced")), {
+        description: String(t("technician_hub.finish.toasts.already_invoiced_desc")),
+      });
+      setStep("billing");
       return;
     }
 
@@ -406,10 +427,10 @@ export default function TechnicianFinishJobPanel() {
                     aria-label={String(t("technician_hub.finish.capture_photo"))}
                     className={cn(
                       "flex h-14 w-14 items-center justify-center border-[3px] border-white/90 bg-white/95 shadow-lg transition active:scale-95 disabled:opacity-40",
-                      TERRAIN_BTN_ICON
+                      TERRAIN_BTN_CAPTURE
                     )}
                   >
-                    <div className={cn("h-9 w-9 bg-slate-900", TERRAIN_BTN_SM)} />
+                    <div className="h-9 w-9 rounded-full bg-slate-900" />
                   </button>
                 </div>
 
@@ -473,11 +494,6 @@ export default function TechnicianFinishJobPanel() {
                 initialLines={draftBillingLines}
                 initialAiNote={draftAiNote}
                 onSent={() => {
-                  resetWizard();
-                  setFinishJobInterventionId(null);
-                  navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);
-                }}
-                onSkip={() => {
                   resetWizard();
                   setFinishJobInterventionId(null);
                   navigateTechnicianHub(pager ?? undefined, TECHNICIAN_HUB_ANCHOR_MISSIONS);

@@ -40,7 +40,7 @@ export default function TechnicianDayPanel() {
     const matched = interventions.filter((iv) =>
       interventionMatchesTab(iv, "today", missionDayAnchor)
     );
-    return sortInterventionsByScheduleAsc(matched);
+    return sortInterventionsByScheduleAsc(matched, missionDayAnchor);
   }, [interventions, missionDayAnchor]);
 
   const pendingToday = todayInterventions.filter(

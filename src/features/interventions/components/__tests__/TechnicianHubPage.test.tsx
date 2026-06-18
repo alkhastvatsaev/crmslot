@@ -141,4 +141,67 @@ describe("TechnicianHubPage", () => {
 
     jest.useRealTimers();
   });
+
+  it("orders left-panel missions chronologically by scheduled time", () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-05-16T12:00:00"));
+
+    const techUid = "tech-uid";
+    const missions: Intervention[] = [
+      {
+        id: "iv-afternoon",
+        title: "Après-midi",
+        address: "Rue 3",
+        status: "en_route",
+        assignedTechnicianUid: techUid,
+        technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+        scheduledDate: "2026-05-16",
+        scheduledTime: "15:00",
+        clientFirstName: "Paul",
+        location: { lat: 50.8, lng: 4.35 },
+      },
+      {
+        id: "iv-morning",
+        title: "Matin",
+        address: "Rue 1",
+        status: "en_route",
+        assignedTechnicianUid: techUid,
+        technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+        scheduledDate: "2026-05-16",
+        scheduledTime: "09:00",
+        clientFirstName: "Jean",
+        location: { lat: 50.8, lng: 4.35 },
+      },
+      {
+        id: "iv-noon",
+        title: "Midi",
+        address: "Rue 2",
+        status: "in_progress",
+        assignedTechnicianUid: techUid,
+        technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+        scheduledDate: "2026-05-16",
+        scheduledTime: "12:00",
+        clientFirstName: "Marie",
+        location: { lat: 50.8, lng: 4.35 },
+      },
+    ];
+
+    mockAssignments.mockReturnValue({
+      interventions: missions,
+      loading: false,
+      error: null,
+      firebaseUid: techUid,
+    });
+
+    render(<TechnicianHubPage slotIndex={2} />);
+
+    const cards = screen.getAllByTestId(/^daily-mission-/);
+    expect(cards.map((el) => el.getAttribute("data-testid"))).toEqual([
+      "daily-mission-iv-morning",
+      "daily-mission-iv-noon",
+      "daily-mission-iv-afternoon",
+    ]);
+
+    jest.useRealTimers();
+  });
 });

@@ -1,19 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Headphones, Loader2, Mail, Mic, Square } from "lucide-react";
+import { Loader2, Mail, Pencil, RefreshCw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { HubButton } from "@/core/ui/hub";
 import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
-import { useBrowserSpeechDictation } from "@/features/interventions/useBrowserSpeechDictation";
 import {
+  applyQuickInvoiceAdjust,
+  formatBillingLineEur,
   formatInvoiceTotalEur,
   invoiceTotalCents,
+  QUICK_INVOICE_ADJUST_IDS,
+  removeBillingLineAt,
+  type QuickInvoiceAdjustId,
 } from "@/features/interventions/technicianInvoiceQuickAdjust";
 import { cn } from "@/lib/utils";
-import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
+import { TERRAIN_BTN } from "@/features/interventions/terrainMobileChrome";
 
 type DraftBillingResponse = {
   ok?: boolean;
@@ -37,7 +41,14 @@ type Props = {
   initialLines?: DraftBillingLine[];
   initialAiNote?: string | null;
   onSent?: () => void;
-  onSkip?: () => void;
+};
+
+const QUICK_CHIP_I18N: Record<QuickInvoiceAdjustId, string> = {
+  add_travel: "technician_hub.finish.invoice.chip_add_travel",
+  add_labor_30: "technician_hub.finish.invoice.chip_add_labor_30",
+  add_labor_1h: "technician_hub.finish.invoice.chip_add_labor_1h",
+  discount_10: "technician_hub.finish.invoice.chip_discount_10",
+  urgency_10: "technician_hub.finish.invoice.chip_urgency_10",
 };
 
 export default function TechnicianFinishInvoiceStep({
@@ -47,28 +58,12 @@ export default function TechnicianFinishInvoiceStep({
   initialLines,
   initialAiNote,
   onSent,
-  onSkip,
 }: Props) {
   const { t } = useTranslation();
   const [lines, setLines] = useState<DraftBillingLine[]>(initialLines ?? []);
   const [loadingDraft, setLoadingDraft] = useState(!initialLines?.length);
   const [sending, setSending] = useState(false);
-  const [escalating, setEscalating] = useState(false);
-  const [escalateOpen, setEscalateOpen] = useState(false);
-  const [voiceNote, setVoiceNote] = useState("");
-
-  const appendVoiceNote = useCallback((text: string) => {
-    const piece = text.trim();
-    if (!piece) return;
-    setVoiceNote((prev) => (prev ? `${prev} ${piece}` : piece));
-  }, []);
-
-  const {
-    listening,
-    supported: voiceSupported,
-    toggleListening,
-    interimTranscript,
-  } = useBrowserSpeechDictation(appendVoiceNote);
+  const [adjustOpen, setAdjustOpen] = useState(false);
 
   const loadDraft = useCallback(async () => {
     setLoadingDraft(true);
@@ -149,36 +144,148 @@ export default function TechnicianFinishInvoiceStep({
     }
   };
 
-  const handleEscalate = async () => {
-    if (escalating) return;
-    setEscalating(true);
-    try {
-      const res = await fetchWithAuth(
-        `/api/interventions/${encodeURIComponent(interventionId)}/request-invoice-review`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ note: voiceNote.trim() }),
-        }
-      );
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error ?? "Transmission back-office impossible");
-      }
-      toast.success(String(t("technician_hub.finish.invoice.escalate_ok")), {
-        description: String(t("technician_hub.finish.invoice.escalate_ok_desc")),
-      });
-      onSkip?.();
-    } catch (e) {
-      toast.error(String(t("technician_hub.finish.invoice.escalate_error")), {
-        description: e instanceof Error ? e.message : String(e),
-      });
-    } finally {
-      setEscalating(false);
-    }
+  const applyChip = (adjustId: QuickInvoiceAdjustId) => {
+    setLines((prev) => applyQuickInvoiceAdjust(prev, adjustId));
   };
 
-  const displayNote = voiceNote.trim() || interimTranscript.trim();
+  const removeLine = (index: number) => {
+    setLines((prev) => removeBillingLineAt(prev, index));
+  };
+
+  if (adjustOpen) {
+    return (
+      <div
+        data-testid="finish-invoice-adjust-panel"
+        className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-1 pb-2 pt-1">
+          <button
+            type="button"
+            data-testid="finish-invoice-adjust-back"
+            onClick={() => setAdjustOpen(false)}
+            className={cn(
+              "flex items-center gap-1 px-2 py-1.5 text-[13px] font-semibold text-slate-600",
+              TERRAIN_BTN
+            )}
+          >
+            <X className="h-4 w-4" aria-hidden />
+            {String(t("technician_hub.finish.invoice.adjust_back"))}
+          </button>
+          <p
+            data-testid="finish-invoice-adjust-total"
+            className="text-lg font-black tabular-nums text-slate-900"
+          >
+            {formatInvoiceTotalEur(totalCents)}
+          </p>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-1 py-2">
+          <p className="mb-2 text-[12px] font-medium text-slate-500">
+            {String(t("technician_hub.finish.invoice.adjust_lines_heading"))}
+          </p>
+          <ul className="space-y-1.5" data-testid="finish-invoice-lines">
+            {lines.map((line, index) => {
+              const lineTotal =
+                Math.round(line.unitPriceCents) * (line.quantity > 0 ? line.quantity : 1);
+              return (
+                <li
+                  key={`${index}-${line.description}`}
+                  data-testid={`finish-invoice-line-${index}`}
+                  className={cn(
+                    "flex items-center gap-2 border border-slate-100 bg-white px-2.5 py-2",
+                    TERRAIN_BTN
+                  )}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-semibold text-slate-800">
+                      {line.description}
+                    </p>
+                    {line.quantity > 1 ? (
+                      <p className="text-[11px] text-slate-500">
+                        ×{line.quantity} — {formatBillingLineEur(line.unitPriceCents)}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span className="shrink-0 text-[13px] font-bold tabular-nums text-slate-700">
+                    {formatBillingLineEur(lineTotal)}
+                  </span>
+                  <button
+                    type="button"
+                    data-testid={`finish-invoice-line-remove-${index}`}
+                    onClick={() => removeLine(index)}
+                    aria-label={String(t("technician_hub.finish.invoice.remove_line_aria"))}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center text-rose-500"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          <p className="mb-2 mt-4 text-[12px] font-medium text-slate-500">
+            {String(t("technician_hub.finish.invoice.adjust_chips_heading"))}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_INVOICE_ADJUST_IDS.map((adjustId) => (
+              <button
+                key={adjustId}
+                type="button"
+                data-testid={`finish-invoice-quick-${adjustId}`}
+                disabled={loadingDraft || sending}
+                onClick={() => applyChip(adjustId)}
+                className={cn(
+                  "border border-indigo-100 bg-indigo-50 px-3 py-2 text-[12px] font-semibold text-indigo-800 transition active:scale-[0.98] disabled:opacity-40",
+                  TERRAIN_BTN
+                )}
+              >
+                {String(t(QUICK_CHIP_I18N[adjustId]))}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            data-testid="finish-invoice-regenerate"
+            disabled={loadingDraft || sending}
+            onClick={() => void loadDraft()}
+            className={cn(
+              "mt-3 flex w-full items-center justify-center gap-2 border border-slate-200 bg-slate-50 py-2.5 text-[12px] font-semibold text-slate-700 disabled:opacity-40",
+              TERRAIN_BTN
+            )}
+          >
+            {loadingDraft ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <RefreshCw className="h-4 w-4" aria-hidden />
+            )}
+            {String(t("technician_hub.finish.invoice.regenerate_cta"))}
+          </button>
+        </div>
+
+        <div className="shrink-0 border-t border-slate-100 px-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3">
+          <HubButton
+            type="button"
+            data-testid="finish-invoice-adjust-send"
+            fullWidth
+            disabled={!canSend}
+            onClick={() => void handleSend()}
+            className={cn(
+              "h-14 bg-emerald-600 text-[16px] font-bold text-white hover:bg-emerald-700",
+              TERRAIN_BTN
+            )}
+          >
+            {sending ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+            ) : (
+              <Mail className="h-5 w-5 shrink-0" aria-hidden />
+            )}
+            {String(t("technician_hub.finish.invoice.adjust_send_cta"))}
+          </HubButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -250,93 +357,19 @@ export default function TechnicianFinishInvoiceStep({
           {String(t("technician_hub.finish.invoice.send_cta"))}
         </HubButton>
 
-        {!escalateOpen ? (
-          <button
-            type="button"
-            data-testid="finish-invoice-escalate-open"
-            disabled={loadingDraft || sending || escalating}
-            onClick={() => setEscalateOpen(true)}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 border border-slate-200 bg-white py-3 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40",
-              TERRAIN_BTN
-            )}
-          >
-            <Headphones className="h-4 w-4 shrink-0" aria-hidden />
-            {String(t("technician_hub.finish.invoice.escalate_cta"))}
-          </button>
-        ) : (
-          <div
-            data-testid="finish-invoice-escalate-panel"
-            className="rounded-2xl border border-amber-100 bg-amber-50/60 p-3 space-y-3"
-          >
-            <p className="text-[12px] font-semibold text-amber-900">
-              {String(t("technician_hub.finish.invoice.escalate_hint"))}
-            </p>
-            <button
-              type="button"
-              data-testid="finish-invoice-voice-mic"
-              disabled={!voiceSupported || escalating}
-              onClick={() => void toggleListening()}
-              aria-pressed={listening}
-              className={cn(
-                "mx-auto flex h-16 w-16 items-center justify-center border transition active:scale-95",
-                TERRAIN_BTN_ICON,
-                listening
-                  ? "border-red-200 bg-red-50 text-red-500"
-                  : "border-amber-200 bg-white text-amber-700 shadow-sm"
-              )}
-              aria-label={String(t("technician_hub.finish.invoice.voice_aria"))}
-            >
-              {listening ? (
-                <Square className="h-7 w-7 fill-current" aria-hidden />
-              ) : (
-                <Mic className="h-7 w-7" aria-hidden />
-              )}
-            </button>
-            {displayNote ? (
-              <p
-                data-testid="finish-invoice-voice-note"
-                className="rounded-xl bg-white px-3 py-2 text-left text-[12px] leading-snug text-slate-700"
-              >
-                {displayNote}
-              </p>
-            ) : (
-              <p className="text-[11px] text-amber-800/80">
-                {String(t("technician_hub.finish.invoice.voice_empty_hint"))}
-              </p>
-            )}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                data-testid="finish-invoice-escalate-cancel"
-                disabled={escalating}
-                onClick={() => {
-                  setEscalateOpen(false);
-                  setVoiceNote("");
-                }}
-                className={cn(
-                  "flex-1 border border-slate-200 bg-white py-2.5 text-[12px] font-semibold text-slate-600",
-                  TERRAIN_BTN
-                )}
-              >
-                {String(t("common.cancel"))}
-              </button>
-              <HubButton
-                type="button"
-                data-testid="finish-invoice-escalate-submit"
-                disabled={escalating}
-                onClick={() => void handleEscalate()}
-                className={cn("flex-1 py-2.5 text-[12px] font-bold", TERRAIN_BTN)}
-              >
-                {escalating ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                ) : (
-                  String(t("technician_hub.finish.invoice.escalate_submit"))
-                )}
-              </HubButton>
-            </div>
-          </div>
-        )}
+        <button
+          type="button"
+          data-testid="finish-invoice-adjust-open"
+          disabled={loadingDraft || sending}
+          onClick={() => setAdjustOpen(true)}
+          className={cn(
+            "flex w-full items-center justify-center gap-2 border border-slate-200 bg-white py-3 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40",
+            TERRAIN_BTN
+          )}
+        >
+          <Pencil className="h-4 w-4 shrink-0" aria-hidden />
+          {String(t("technician_hub.finish.invoice.adjust_cta"))}
+        </button>
       </div>
     </div>
   );

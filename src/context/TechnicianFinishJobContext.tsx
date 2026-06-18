@@ -1,6 +1,15 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type FinishJobEntryStep = "photos" | "signature" | "invoice";
 
@@ -34,9 +43,17 @@ export function TechnicianFinishJobProvider({
   );
   const [finishJobEntryStep, setFinishJobEntryStep] = useState<FinishJobEntryStep | null>(null);
   const [finishWizardStep, setFinishWizardStepState] = useState<FinishJobWizardStep | null>(null);
+  const finishJobIdRef = useRef(finishJobInterventionId);
+
+  useEffect(() => {
+    finishJobIdRef.current = finishJobInterventionId;
+  }, [finishJobInterventionId]);
 
   const setFinishJobInterventionId = useCallback((id: string | null) => {
-    setFinishJobInterventionIdState(id?.trim() ? id.trim() : null);
+    const next = id?.trim() ? id.trim() : null;
+    if (finishJobIdRef.current === next) return;
+    finishJobIdRef.current = next;
+    setFinishJobInterventionIdState(next);
     setFinishJobEntryStep(null);
     setFinishWizardStepState(null);
   }, []);
@@ -48,6 +65,7 @@ export function TechnicianFinishJobProvider({
   const startFinishJob = useCallback((id: string, opts?: { entryStep?: FinishJobEntryStep }) => {
     const trimmed = id.trim();
     if (!trimmed) return;
+    finishJobIdRef.current = trimmed;
     setFinishJobInterventionIdState(trimmed);
     setFinishJobEntryStep(opts?.entryStep ?? null);
   }, []);
