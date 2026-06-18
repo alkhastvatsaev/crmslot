@@ -398,6 +398,22 @@ export default function InterventionDetailPanel({
             <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(selectedItem)} />
           ) : null}
 
+          {selectedItem.invoiceReviewRequestedAt ? (
+            <div
+              data-testid="backoffice-invoice-review-alert"
+              className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-1"
+            >
+              <p className="text-[12px] font-bold text-amber-900">
+                {t("backoffice.inbox.invoice_review_alert_title")}
+              </p>
+              {selectedItem.invoiceReviewNote ? (
+                <p className="text-[13px] leading-snug text-amber-950">
+                  {selectedItem.invoiceReviewNote}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
           {canRejectReport && rejectOpen ? (
             <div
               data-testid="backoffice-inbox-reject-form"

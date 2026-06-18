@@ -5,10 +5,14 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
 import type { Intervention } from "@/features/interventions/types";
-import { prepareDraftBillingOnIntervention } from "@/features/interventions/server/prepareDraftBillingOnIntervention";
+import { requestInterventionInvoiceReviewAdmin } from "@/features/interventions/server/requestInterventionInvoiceReviewAdmin";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
+
+type Body = {
+  note?: string;
+};
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const auth = await requireAuthenticatedUser(request);
@@ -21,6 +25,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       { ok: false, error: "Identifiant intervention manquant." },
       { status: 400 }
     );
+  }
+
+  let body: Body = {};
+  try {
+    const raw = await request.text();
+    if (raw.trim()) body = JSON.parse(raw) as Body;
+  } catch {
+    return NextResponse.json({ ok: false, error: "Corps JSON invalide." }, { status: 400 });
   }
 
   const db = admin.firestore();
@@ -40,21 +52,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   }
 
   try {
-    let body: { forceRegenerate?: boolean } = {};
-    try {
-      const raw = await request.text();
-      if (raw.trim()) body = JSON.parse(raw) as { forceRegenerate?: boolean };
-    } catch {
-      return NextResponse.json({ ok: false, error: "Corps JSON invalide." }, { status: 400 });
-    }
-
-    const result = await prepareDraftBillingOnIntervention(db, interventionId, {
-      forceRegenerate: body.forceRegenerate === true,
+    await requestInterventionInvoiceReviewAdmin({
+      db,
+      interventionId,
+      actorUid: auth.uid,
+      note: typeof body.note === "string" ? body.note : "",
     });
-    return NextResponse.json({ ok: true, ...result });
+    return NextResponse.json({ ok: true });
   } catch (e) {
-    logger.error("[prepare-draft-billing]", { error: e instanceof Error ? e.message : String(e) });
-    const message = e instanceof Error ? e.message : "Erreur préparation facture";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    logger.error("[request-invoice-review]", {
+      error: e instanceof Error ? e.message : String(e),
+    });
+    const message = e instanceof Error ? e.message : "Transmission back-office impossible";
+    const status = message.includes("clôture") ? 409 : 500;
+    return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
