@@ -160,6 +160,12 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
           caseId={selectedCaseId}
           liveIntervention={liveSelectedIntervention}
           technicianUid={firebaseUid}
+          onAssignmentAccepted={() => {
+            requestMobileHubRail("center");
+          }}
+          onAssignmentDeclined={() => {
+            setSelectedCaseId(null);
+          }}
         />
       )}
     </section>
