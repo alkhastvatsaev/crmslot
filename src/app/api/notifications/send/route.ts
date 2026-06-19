@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { logger } from "@/core/logger";
 import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
 import { SendNotificationRequestSchema } from "@/core/api/schemas/notifications";
+import { requireAuthenticatedUser, requireAnyCompanyStaff } from "@/core/api/routeAuth";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,11 @@ export const runtime = "nodejs";
  * For SMS/push: placeholder for future Twilio / FCM integration.
  */
 export async function POST(req: Request) {
+  const authResult = await requireAuthenticatedUser(req);
+  if ("response" in authResult) return authResult.response;
+  const staffDenied = await requireAnyCompanyStaff(authResult.uid, authResult.decoded);
+  if (staffDenied) return staffDenied;
+
   try {
     const body = await req.json().catch(() => ({}));
     const parsed = SendNotificationRequestSchema.safeParse(body);
@@ -103,9 +109,6 @@ export async function POST(req: Request) {
 // ---------------------------------------------------------------------------
 
 function resolveRecipientEmail(role: string, variables: Record<string, string>): string | null {
-  const explicit = variables.recipientEmail?.trim();
-  if (explicit) return explicit;
-
   // In a full implementation, we'd query Firestore for the user's email.
   // For now, dispatcher emails go to the configured company inbox.
   if (role === "dispatcher") {

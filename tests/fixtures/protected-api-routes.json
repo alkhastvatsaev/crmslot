@@ -77,6 +77,11 @@
   },
   {
     "method": "POST",
+    "path": "/api/ai/vehicle-stock-agent",
+    "body": {}
+  },
+  {
+    "method": "POST",
     "path": "/api/ai/workspace-copilot",
     "body": {}
   },
@@ -98,21 +103,41 @@
     "path": "/api/companies/fixture/pwa-registry"
   },
   {
+    "method": "POST",
+    "path": "/api/companies/fixture/quotes/fixture/accept",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/companies/fixture/quotes/fixture/send",
+    "body": {}
+  },
+  {
     "method": "GET",
     "path": "/api/companies/fixture/supplier-orders/fixture/pdf"
   },
   {
     "method": "GET",
-    "path": "/api/demo/client-audio"
+    "path": "/api/companies/fixture/webhooks"
   },
   {
     "method": "POST",
-    "path": "/api/demo/client-audio",
+    "path": "/api/companies/fixture/webhooks",
     "body": {}
   },
   {
     "method": "GET",
-    "path": "/api/demo/client-audio/file/fixture"
+    "path": "/api/company/staff"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/company/staff/fixture",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/company/staff/fixture",
+    "body": {}
   },
   {
     "method": "POST",
@@ -168,6 +193,12 @@
   },
   {
     "method": "POST",
+    "path": "/api/integrations/gmail/messages/fixture/create-intervention",
+    "body": {},
+    "localDevBypass": true
+  },
+  {
+    "method": "POST",
     "path": "/api/integrations/gmail/messages/fixture/link-intervention",
     "body": {},
     "localDevBypass": true
@@ -206,12 +237,42 @@
   },
   {
     "method": "POST",
+    "path": "/api/interventions/fixture/auto-assign",
+    "body": {}
+  },
+  {
+    "method": "POST",
     "path": "/api/interventions/fixture/completion-amend",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/dispatch-status-webhook",
     "body": {}
   },
   {
     "method": "GET",
     "path": "/api/interventions/fixture/document-pdf"
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/e-invoice",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/issue-invoice",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/portal-access-notify",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/portal-token",
+    "body": {}
   },
   {
     "method": "POST",
@@ -224,14 +285,28 @@
   },
   {
     "method": "POST",
+    "path": "/api/interventions/fixture/reject-report",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/request-invoice-review",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/interventions/fixture/request-signature",
+    "body": {}
+  },
+  {
+    "method": "POST",
     "path": "/api/interventions/fixture/send-client-invoice",
     "body": {}
   },
   {
     "method": "POST",
     "path": "/api/interventions/fixture/technician-response",
-    "body": {},
-    "localDevBypass": true
+    "body": {}
   },
   {
     "method": "POST",
@@ -253,6 +328,10 @@
     "path": "/api/interventions/local"
   },
   {
+    "method": "GET",
+    "path": "/api/maintenance/generate-due"
+  },
+  {
     "method": "POST",
     "path": "/api/maintenance/generate-due",
     "body": {}
@@ -268,7 +347,17 @@
   },
   {
     "method": "POST",
+    "path": "/api/notifications/send",
+    "body": {}
+  },
+  {
+    "method": "POST",
     "path": "/api/notifications/whatsapp",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/portal-chat/notify-staff",
     "body": {}
   },
   {
@@ -279,6 +368,11 @@
   {
     "method": "GET",
     "path": "/api/stripe/balance"
+  },
+  {
+    "method": "POST",
+    "path": "/api/stripe/create-payment-intent",
+    "body": {}
   },
   {
     "method": "POST",

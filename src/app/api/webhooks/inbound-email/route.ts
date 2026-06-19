@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { logger } from "@/core/logger";
+import { requireInboundWebhookSecret } from "@/core/api/routeAuth";
 
 const COLLECTION = "intervention_emails";
 
 export async function POST(req: Request) {
+  const denied = requireInboundWebhookSecret(req);
+  if (denied) return denied;
+
   try {
     let toField = "";
     let fromField = "";

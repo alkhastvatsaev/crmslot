@@ -91,6 +91,36 @@ service cloud.firestore {
         );
     }
 
+
+    function canReadStatusEventForCompany(companyId) {
+      return companyId is string
+        && companyId.size() > 0
+        && (
+          userBelongsToCompany(companyId)
+          || tenantClaimsIncludeCompany(companyId)
+        );
+    }
+
+    function canReadInterventionSubresource(interventionId) {
+      let iv = get(/databases/$(database)/documents/interventions/$(interventionId));
+      return iv != null
+        && iv.data != null
+        && (
+          (interventionHasTenantScope(iv.data) && tenantClaimsIncludeCompany(iv.data.companyId))
+          || (interventionHasTenantScope(iv.data) && userBelongsToCompany(iv.data.companyId))
+          || (
+            iv.data.keys().hasAny(['assignedTechnicianUid'])
+            && iv.data.assignedTechnicianUid is string
+            && iv.data.assignedTechnicianUid.size() > 0
+            && iv.data.assignedTechnicianUid == request.auth.uid
+          )
+          || (
+            iv.data.keys().hasAny(['createdByUid'])
+            && iv.data.createdByUid == request.auth.uid
+          )
+        );
+    }
+
     function canAccessCompanyHubData(companyId) {
       return companyId is string
         && companyId.size() > 0
@@ -486,7 +516,9 @@ service cloud.firestore {
      * Requêtes collection group (`useCompanyStatusEventsFeed`) — même contrat que la sous-collection intervention.
      */
     match /{path=**}/status_events/{eventId} {
-      allow read: if isAuthed();
+      allow read: if isAuthed()
+        && resource.data.keys().hasAny(['companyId'])
+        && canReadStatusEventForCompany(resource.data.companyId);
       allow create, update, delete: if false;
     }
 
@@ -515,7 +547,7 @@ service cloud.firestore {
       allow delete: if isAuthed() && canDeleteInterventionAsAdmin();
 
       match /status_events/{eventId} {
-        allow read: if isAuthed();
+        allow read: if canReadInterventionSubresource(docId);
         allow create: if isAuthed()
           && request.resource.data.interventionId == docId
           && request.resource.data.actorUid == request.auth.uid;
@@ -555,10 +587,22 @@ service cloud.firestore {
       allow read: if isAuthed() && request.auth.uid == uid;
       allow create: if isAuthed()
         && request.auth.uid == uid
-        && request.resource.data.uid == uid;
+        && request.resource.data.uid == uid
+        && (
+          !request.resource.data.keys().hasAny(['companyId'])
+          || request.resource.data.companyId == null
+          || (
+            request.resource.data.companyId is string
+            && allowedUsersPhoneMatchesIvanaCompany(request.resource.data.companyId)
+          )
+        );
       allow update: if isAuthed()
         && request.auth.uid == uid
-        && request.resource.data.uid == uid;
+        && request.resource.data.uid == uid
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['companyId'])
+          || request.resource.data.companyId == resource.data.companyId
+        );
       allow delete: if false;
     }
 
@@ -610,7 +654,7 @@ service cloud.firestore {
     }
 
     match /ai_audio_decisions/{docId} {
-      allow read, write: if isAuthed();
+      allow read, write: if false;
     }
 
     match /portal_ivana_chat_messages/{msgId} {

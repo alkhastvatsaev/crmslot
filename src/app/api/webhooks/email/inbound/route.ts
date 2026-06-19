@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { logger } from "@/core/logger";
+import { requireInboundWebhookSecret } from "@/core/api/routeAuth";
 
 const COLLECTION = "intervention_emails";
 
@@ -33,13 +34,8 @@ async function parseSendGridPayload(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  const expectedSecret = process.env.EMAIL_INBOUND_SECRET;
-
-  if (expectedSecret && secret !== expectedSecret) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = requireInboundWebhookSecret(req);
+  if (denied) return denied;
 
   let payload: {
     from: string;

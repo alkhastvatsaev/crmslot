@@ -139,7 +139,7 @@ export async function dispatchStatusNotifications(
         });
         continue;
       }
-      void fetch("/api/notifications/send", {
+      void fetchWithAuth("/api/notifications/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

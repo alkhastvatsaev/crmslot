@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
+import { isProductionNodeEnv } from "@/core/api/routeAuth";
 import {
   joinDefaultCompanyMembership,
   type JoinDefaultCompanyOptions,
@@ -37,6 +38,13 @@ function parseJoinDefaultBody(body: unknown): JoinDefaultCompanyOptions | undefi
  * Inscription staff self-service : rattache le compte à la société unique (Admin SDK).
  */
 export async function POST(req: Request) {
+  if (isProductionNodeEnv() && process.env.ALLOW_OPEN_STAFF_JOIN !== "true") {
+    return NextResponse.json(
+      { ok: false, error: "Inscription staff ouverte désactivée en production." },
+      { status: 403 }
+    );
+  }
+
   if (!admin.apps.length) {
     return NextResponse.json(
       { ok: false, error: "Firebase Admin non configuré." },
