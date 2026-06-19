@@ -49,17 +49,8 @@ export default function PlanningHubRightPanel({ selectedIntervention, pendingRow
       data-testid="planning-hub-confirmations"
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <div className="shrink-0 border-b border-black/[0.05] px-4 py-3 text-center">
-        <p className="text-sm font-semibold text-slate-800">{t("planningHub.pending_title")}</p>
-        <p className="text-[11px] text-slate-500">{t("planningHub.pending_hint")}</p>
-      </div>
       {pendingRows.length === 0 ? (
-        <div
-          data-testid="planning-hub-pending-empty"
-          className="flex flex-1 items-center justify-center px-6 text-center text-[12px] text-slate-400"
-        >
-          {t("planningHub.pending_empty")}
-        </div>
+        <div data-testid="planning-hub-pending-empty" className="min-h-0 flex-1" aria-hidden />
       ) : (
         <ul className="custom-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
           {pendingRows.map((row) => (
