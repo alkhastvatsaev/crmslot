@@ -91,12 +91,20 @@ Chaque clone a son index Cursor séparé → moins de conflits et moins de RAM p
 3. Commit sur **ta** branche si demandé (jamais `git add .`)
 4. Vider la colonne « Propriétaire session » dans `PARALLEL_WORK.md`
 
-## Fichiers créés pour cette optimisation
+## Explorateur VS Code / Cursor (files.exclude)
 
-| Fichier                            | Rôle                                                 |
-| ---------------------------------- | ---------------------------------------------------- |
-| `.cursorignore`                    | Exclut builds, deps, android, docs lourds de l’index |
-| `.vscode/settings.json`            | Watchers / search excludes → moins CPU               |
-| `.cursor/rules/zone-*.mdc`         | Contexte métier par feature                          |
-| `.cursor/rules/cursor-hygiene.mdc` | Exploration légère (always on)                       |
-| `docs/agents/AGENTS_EXTENDED.md`   | Patterns stepper / glossaire (hors contexte fixe)    |
+L'explorateur masque par défaut : natif (`android/`, `ios/`), infra (`scripts/`, `functions/`, `tests/`, `data/`), builds (`.next`, `coverage`), tests colocalisés, docs `ops/` et `reference/`, configs Firebase/Jest rarement éditées.
+
+**Visible au quotidien** : `src/`, `docs/agents/`, `package.json`, `next.config.ts`, `jest.config.ts`.
+
+Pour rouvrir un fichier masqué : Cmd+P puis le nom du fichier.
+
+## Fichiers clés perf
+
+| Fichier                          | Rôle                                              |
+| -------------------------------- | ------------------------------------------------- |
+| `.cursorignore`                  | Index Cursor minimal (features + 2 guides agents) |
+| `.vscode/settings.json`          | Masquage explorateur + watchers / search          |
+| `.cursor/rules/agent-core.mdc`   | Règle unique session Agent                        |
+| `docs/agents/AGENTS_EXTENDED.md` | Steppers / glossaire hub société                  |
+| `scripts/README.md`              | Index scripts (`ci/`, `dev/`, `lecot/`, …)        |

@@ -17,13 +17,15 @@ type TrainingExportMessage = {
 
 async function runExport() {
   if (!isFirebaseAdminReady()) {
-    console.error("Firebase Admin is not configured. Please ensure .env.local has required credentials.");
+    console.error(
+      "Firebase Admin is not configured. Please ensure .env.local has required credentials."
+    );
     process.exit(1);
   }
 
   const db = getAdminDb();
   console.log("Fetching logs from Firestore collection 'chatbot_training_logs'...");
-  
+
   const snapshot = await db.collection("chatbot_training_logs").get();
   if (snapshot.empty) {
     console.log("No logs found in the collection.");
@@ -41,10 +43,10 @@ async function runExport() {
   let count = 0;
   snapshot.forEach((doc) => {
     const data = doc.data();
-    
+
     // Construct the OpenAI fine-tuning format
     // {"messages": [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
-    
+
     const messages: TrainingExportMessage[] = [];
     if (data.systemPrompt) {
       messages.push({ role: "system", content: String(data.systemPrompt) });

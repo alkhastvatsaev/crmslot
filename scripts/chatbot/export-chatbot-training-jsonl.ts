@@ -50,7 +50,9 @@ type TrainingDoc = {
 async function main() {
   const companyId = arg("companyId");
   if (!companyId) {
-    console.error("Usage: npm run export:chatbot-training -- --companyId=VOTRE_ID [--limit=20000] [--out=...]");
+    console.error(
+      "Usage: npm run export:chatbot-training -- --companyId=VOTRE_ID [--limit=20000] [--out=...]"
+    );
     process.exit(1);
   }
 
@@ -65,7 +67,7 @@ async function main() {
     "data",
     "chatbot-training",
     "exports",
-    `chatbot-training-${companyId}.jsonl`,
+    `chatbot-training-${companyId}.jsonl`
   );
   const outPath = arg("out") ?? defaultOut;
 
@@ -105,14 +107,16 @@ async function main() {
         ];
 
     const row = {
-      ...(OPENAI_FORMAT ? {} : {
-        id: doc.id,
-        companyId,
-        createdAt: created,
-        model: d.modelName ?? null,
-        conversationId: d.conversationId ?? null,
-        hadToolRounds: Boolean(d.hadToolRounds),
-      }),
+      ...(OPENAI_FORMAT
+        ? {}
+        : {
+            id: doc.id,
+            companyId,
+            createdAt: created,
+            model: d.modelName ?? null,
+            conversationId: d.conversationId ?? null,
+            hadToolRounds: Boolean(d.hadToolRounds),
+          }),
       messages,
     };
     lines.push(JSON.stringify(row));
@@ -120,14 +124,18 @@ async function main() {
   }
 
   fs.writeFileSync(outPath, `${lines.join("\n")}\n`, "utf-8");
-  const toolCount = snap.docs.filter((d) => Boolean((d.data() as TrainingDoc).hadToolRounds)).length;
+  const toolCount = snap.docs.filter((d) =>
+    Boolean((d.data() as TrainingDoc).hadToolRounds)
+  ).length;
   console.log(`✅ ${n} exemples exportés → ${outPath}`);
   if (!OPENAI_FORMAT) {
     console.log(`   ${toolCount} avec outil sur ${n} total`);
     console.log(`\n💡 Pour le format fine-tuning OpenAI, ajoutez --openai-format`);
   } else {
     console.log(`\n📤 Upload vers OpenAI :`);
-    console.log(`   openai api fine_tuning.jobs.create --training-file "${outPath}" --model gpt-4o-mini`);
+    console.log(
+      `   openai api fine_tuning.jobs.create --training-file "${outPath}" --model gpt-4o-mini`
+    );
   }
 }
 

@@ -2,7 +2,7 @@
 # Serveur prod-like pour E2E DesktopOnlyGate (port 3001, build séparé).
 # Next 16 n’autorise qu’un seul `next dev` par repo — on utilise build + start.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 export NEXT_E2E_GATE_DIST=1
 export NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW="${NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW:-true}"
