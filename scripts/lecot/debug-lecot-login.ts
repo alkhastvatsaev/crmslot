@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { launchLecotBrowser } from "../src/features/catalog/lecotPlaywrightBrowser";
-import { lecotShopCredentials, lecotShopLoginUrl } from "../src/features/catalog/lecotShopConfig";
+import { launchLecotBrowser } from "../../src/features/catalog/lecotPlaywrightBrowser";
+import {
+  lecotShopCredentials,
+  lecotShopLoginUrl,
+} from "../../src/features/catalog/lecotShopConfig";
 
 function loadDotEnv(filePath: string) {
   if (!fs.existsSync(filePath)) return;

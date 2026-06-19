@@ -3,7 +3,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import type { LecotProductImageIndex } from "../src/features/catalog/lecotProductImageIndex";
+import type { LecotProductImageIndex } from "../../src/features/catalog/lecotProductImageIndex";
 
 const DATA_DIR = path.join(process.cwd(), "data/catalog/lecot");
 const SAMPLE_SIZE = Number(process.env.LECOT_VERIFY_SAMPLE ?? 24);
