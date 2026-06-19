@@ -9,7 +9,7 @@ import {
   addCalendarMonths,
   buildCalendarMonthCells,
   buildTechnicianMissionDaySummaries,
-  formatTechnicianMonthTitle,
+  formatTechnicianMonthLabel,
   resolveTechnicianMonthDayTone,
   startOfCalendarMonth,
   type TechnicianMonthDayTone,
@@ -44,7 +44,7 @@ function toneDotClass(tone: TechnicianMonthDayTone): string {
 }
 
 function dayNumberClass(tone: TechnicianMonthDayTone, selected: boolean, today: boolean): string {
-  if (selected) return "font-semibold text-slate-900";
+  if (selected) return "font-semibold text-blue-600";
   if (today) return "font-semibold text-slate-800";
   if (tone === "empty") return "font-normal text-slate-300";
   return "font-medium text-slate-700";
@@ -66,7 +66,7 @@ export default function TechnicianMonthCalendar({ interventions, technicianUid, 
   );
 
   const cells = useMemo(() => buildCalendarMonthCells(monthAnchor), [monthAnchor]);
-  const monthTitle = formatTechnicianMonthTitle(monthAnchor, locale);
+  const monthLabel = formatTechnicianMonthLabel(monthAnchor, locale);
 
   const weekdayLabels = useMemo(() => {
     const raw = tValue("technician_hub.dashboard.calendar.weekdays_short");
@@ -99,104 +99,109 @@ export default function TechnicianMonthCalendar({ interventions, technicianUid, 
         <X className="h-4 w-4" strokeWidth={2} />
       </button>
 
-      <header className="mb-5 flex shrink-0 items-center justify-center gap-5 pr-6">
-        <button
-          type="button"
-          data-testid="technician-calendar-prev-month"
-          onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, -1))}
-          className="flex h-8 w-8 items-center justify-center text-slate-400 transition hover:text-slate-700"
-          aria-label={String(t("technician_hub.dashboard.calendar.prev_month"))}
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center">
+        <header
+          data-testid="technician-calendar-nav"
+          className="mb-6 grid w-full max-w-[17.5rem] shrink-0 grid-cols-[2rem_1fr_2rem] items-center"
         >
-          <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
-        </button>
-
-        <p
-          data-testid="technician-calendar-month-title"
-          className="min-w-0 truncate text-[17px] font-semibold capitalize tracking-tight text-slate-900"
-        >
-          {monthTitle}
-        </p>
-
-        <button
-          type="button"
-          data-testid="technician-calendar-next-month"
-          onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, 1))}
-          className="flex h-8 w-8 items-center justify-center text-slate-400 transition hover:text-slate-700"
-          aria-label={String(t("technician_hub.dashboard.calendar.next_month"))}
-        >
-          <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
-        </button>
-      </header>
-
-      <div className="grid shrink-0 grid-cols-7 gap-y-1">
-        {weekdayLabels.map((label, index) => (
-          <div
-            key={`${label}-${index}`}
-            className="pb-2 text-center text-[11px] font-medium text-slate-300"
+          <button
+            type="button"
+            data-testid="technician-calendar-prev-month"
+            onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, -1))}
+            className="flex h-8 w-8 items-center justify-center justify-self-start text-slate-400 transition hover:text-slate-700"
+            aria-label={String(t("technician_hub.dashboard.calendar.prev_month"))}
           >
-            {label}
-          </div>
-        ))}
-      </div>
+            <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
+          </button>
 
-      <div data-testid="technician-calendar-grid" className="grid auto-rows-fr grid-cols-7 gap-y-3">
-        {cells.map(({ date, inMonth, ymd }) => {
-          if (!inMonth) {
-            return <div key={ymd} aria-hidden className="aspect-square" />;
-          }
+          <p
+            data-testid="technician-calendar-month-title"
+            className="truncate text-center text-[17px] font-semibold capitalize tracking-tight text-slate-900"
+          >
+            {monthLabel}
+          </p>
 
-          const summary = daySummaries.get(ymd);
-          const tone = resolveTechnicianMonthDayTone(summary);
-          const isSelected = ymd === selectedYmd;
-          const isToday = ymd === todayYmd;
-          const hasMissions = tone !== "empty";
+          <button
+            type="button"
+            data-testid="technician-calendar-next-month"
+            onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, 1))}
+            className="flex h-8 w-8 items-center justify-center justify-self-end text-slate-400 transition hover:text-slate-700"
+            aria-label={String(t("technician_hub.dashboard.calendar.next_month"))}
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
+          </button>
+        </header>
 
-          return (
-            <button
-              key={ymd}
-              type="button"
-              data-testid={`technician-calendar-day-${ymd}`}
-              data-calendar-tone={tone}
-              onClick={() => handlePickDay(date)}
-              className="group relative flex aspect-square flex-col items-center justify-center transition active:scale-95"
-            >
-              {isToday && !isSelected ? (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full ring-1 ring-slate-200"
-                />
-              ) : null}
-              {isSelected ? (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full bg-slate-900"
-                />
-              ) : null}
-
-              <span
-                className={cn(
-                  "relative z-[1] text-[15px] tabular-nums leading-none",
-                  dayNumberClass(tone, isSelected, isToday),
-                  isSelected && "text-white"
-                )}
+        <div className="w-full max-w-[17.5rem] shrink-0">
+          <div className="grid grid-cols-7 gap-y-1">
+            {weekdayLabels.map((label, index) => (
+              <div
+                key={`${label}-${index}`}
+                className="pb-2 text-center text-[11px] font-medium text-slate-300"
               >
-                {date.getDate()}
-              </span>
+                {label}
+              </div>
+            ))}
+          </div>
 
-              {hasMissions ? (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "relative z-[1] mt-1 h-1 w-1 rounded-full",
-                    isSelected ? "bg-white/90" : toneDotClass(tone)
+          <div
+            data-testid="technician-calendar-grid"
+            className="grid auto-rows-fr grid-cols-7 gap-y-3"
+          >
+            {cells.map(({ date, inMonth, ymd }) => {
+              if (!inMonth) {
+                return <div key={ymd} aria-hidden className="aspect-square" />;
+              }
+
+              const summary = daySummaries.get(ymd);
+              const tone = resolveTechnicianMonthDayTone(summary);
+              const isSelected = ymd === selectedYmd;
+              const isToday = ymd === todayYmd;
+              const hasMissions = tone !== "empty";
+
+              return (
+                <button
+                  key={ymd}
+                  type="button"
+                  data-testid={`technician-calendar-day-${ymd}`}
+                  data-calendar-tone={tone}
+                  onClick={() => handlePickDay(date)}
+                  className="group relative flex aspect-square flex-col items-center justify-center transition active:scale-95"
+                >
+                  {isSelected ? (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full ring-2 ring-blue-500"
+                    />
+                  ) : isToday ? (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full ring-1 ring-slate-200"
+                    />
+                  ) : null}
+
+                  <span
+                    className={cn(
+                      "relative z-[1] text-[15px] tabular-nums leading-none",
+                      dayNumberClass(tone, isSelected, isToday)
+                    )}
+                  >
+                    {date.getDate()}
+                  </span>
+
+                  {hasMissions ? (
+                    <span
+                      aria-hidden
+                      className={cn("relative z-[1] mt-1 h-1 w-1 rounded-full", toneDotClass(tone))}
+                    />
+                  ) : (
+                    <span aria-hidden className="mt-1 h-1 w-1" />
                   )}
-                />
-              ) : (
-                <span aria-hidden className="mt-1 h-1 w-1" />
-              )}
-            </button>
-          );
-        })}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -146,3 +146,7 @@ export function resolveTechnicianMonthDayTone(
 export function formatTechnicianMonthTitle(monthAnchor: Date, locale: string): string {
   return monthAnchor.toLocaleDateString(locale, { month: "long", year: "numeric" });
 }
+
+export function formatTechnicianMonthLabel(monthAnchor: Date, locale: string): string {
+  return monthAnchor.toLocaleDateString(locale, { month: "long" });
+}

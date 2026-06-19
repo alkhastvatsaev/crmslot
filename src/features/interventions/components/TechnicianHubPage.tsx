@@ -32,6 +32,7 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import TechnicianMonthCalendar from "@/features/interventions/components/TechnicianMonthCalendar";
+import { resolveTechnicianHubMissionSelection } from "@/features/interventions/technicianHubMissionSelection";
 
 type Props = { slotIndex: number };
 
@@ -68,19 +69,13 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const liveSelectedIntervention = selectedFromList ?? liveFromSnapshot;
 
-  /** Même filtre « aujourd’hui » que la liste gauche (sélection auto du 1er dossier du jour). */
+  /** Missions du jour sélectionné (calendrier), triées par horaire. */
   const filteredSorted = useMemo(() => {
-    const todayRows = interventions.filter((iv) =>
+    const dayRows = interventions.filter((iv) =>
       interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
     );
-    return sortInterventionsByScheduleAsc(todayRows, missionDayAnchor);
+    return sortInterventionsByScheduleAsc(dayRows, missionDayAnchor);
   }, [interventions, missionDayAnchor, firebaseUid]);
-
-  /** Ne pas auto-sélectionner une mission déjà en archives (évite détail « clôturée » + photos sans clic explicite). */
-  const activeTodaySorted = useMemo(
-    () => filteredSorted.filter((iv) => iv.status !== "done" && iv.status !== "invoiced"),
-    [filteredSorted]
-  );
 
   const todayMissions = useMemo<Mission[]>(
     () =>
@@ -108,47 +103,22 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   };
 
   useEffect(() => {
-    if (calendarOpen) {
-      requestMobileHubRail("center");
-    }
-  }, [calendarOpen, requestMobileHubRail]);
-
-  useEffect(() => {
     if (finishJobInterventionId) {
       setSelectedCaseId(finishJobInterventionId);
       return;
     }
     if (pendingCaseId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedCaseId(pendingCaseId);
       setPendingCaseId(null);
       return;
     }
-    setSelectedCaseId((prev) => {
-      if (prev) {
-        const iv = interventions.find((x) => x.id === prev);
-        if (!iv) return activeTodaySorted[0]?.id ?? null;
-        if (iv.status === "invoiced" || iv.status === "cancelled") {
-          return activeTodaySorted[0]?.id ?? null;
-        }
-        if (
-          !interventionVisibleInTechnicianMissionList(iv, "today", firebaseUid, missionDayAnchor)
-        ) {
-          return activeTodaySorted[0]?.id ?? null;
-        }
-        return prev;
-      }
-      return activeTodaySorted[0]?.id ?? null;
-    });
-  }, [
-    pendingCaseId,
-    setPendingCaseId,
-    interventions,
-    missionDayAnchor,
-    activeTodaySorted,
-    firebaseUid,
-    finishJobInterventionId,
-  ]);
+    setSelectedCaseId((prev) => resolveTechnicianHubMissionSelection(prev, filteredSorted));
+  }, [pendingCaseId, setPendingCaseId, filteredSorted, finishJobInterventionId]);
+
+  useEffect(() => {
+    if (finishJobInterventionId) return;
+    requestMobileHubRail(calendarOpen ? "center" : "left");
+  }, [calendarOpen, finishJobInterventionId, requestMobileHubRail]);
 
   const centerView = calendarOpen ? "calendar" : finishJobInterventionId ? "finish" : "detail";
 
@@ -181,7 +151,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
             requestMobileHubRail("center");
           }}
           onAssignmentDeclined={() => {
-            setSelectedCaseId(null);
+            setSelectedCaseId(resolveTechnicianHubMissionSelection(null, filteredSorted));
           }}
         />
       )}
@@ -234,6 +204,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         mobileSwipeDisabled={
           calendarOpen || Boolean(finishJobInterventionId && finishWizardStep === "signature")
         }
+        mobileInitialRail="left"
       />
     </>
   );

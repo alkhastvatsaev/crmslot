@@ -40,6 +40,7 @@ describe("TechnicianMonthCalendar", () => {
     );
 
     expect(screen.getByTestId("technician-month-calendar")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-calendar-month-title")).toHaveTextContent(/^juin$/i);
     expect(screen.queryByTestId("technician-calendar-legend")).not.toBeInTheDocument();
     expect(screen.getByTestId("technician-calendar-day-2026-06-20")).toHaveAttribute(
       "data-calendar-tone",

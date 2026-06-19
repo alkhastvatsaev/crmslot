@@ -77,15 +77,7 @@ export default function TechnicianDashboardImagesPanel({
 
   if (!caseId) {
     return (
-      <div
-        data-testid="technician-dashboard-images-empty"
-        className="flex h-full w-full flex-col items-center justify-center rounded-[inherit] px-5 py-8 text-center"
-      >
-        <ImageIcon className="mb-3 h-10 w-10 text-slate-300" aria-hidden />
-        <p className="text-[14px] font-medium text-slate-400">
-          {String(t("technician_hub.dashboard.images.no_mission_selected"))}
-        </p>
-      </div>
+      <div data-testid="technician-dashboard-images-empty" className="min-h-0 flex-1" aria-hidden />
     );
   }
 

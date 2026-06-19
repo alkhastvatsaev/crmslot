@@ -12,6 +12,8 @@ type Props = ComponentProps<typeof DashboardTriplePanelLayout> & {
   mobileRightLabel?: string;
   /** Bloque le swipe entre panneaux (terrain : étape signature). */
   mobileSwipeDisabled?: boolean;
+  /** Rail mobile au chargement (défaut : centre). */
+  mobileInitialRail?: "left" | "center" | "right";
 };
 
 /**
@@ -25,6 +27,7 @@ export default function AdaptiveTriplePanelLayout({
   mobileCenterLabel,
   mobileRightLabel,
   mobileSwipeDisabled = false,
+  mobileInitialRail = "center",
   centerPadding = true,
   rightPadding = true,
   ...props
@@ -47,6 +50,7 @@ export default function AdaptiveTriplePanelLayout({
         rightLabel={mobileRightLabel}
         panelPadding={panelPadding}
         swipeDisabled={mobileSwipeDisabled}
+        mobileInitialRail={mobileInitialRail}
       />
     );
   }
