@@ -4,6 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CRMSLOT. Plan mode gros diff. @fichier:ligne. Tests → AGENTS.md si besoin.
 
+## Sécurité max (plus tard)
+
+Tutoriel App Check, CSP enforce, backups, PITR → **`docs/ops/SECURITE_MAX_CHECKLIST.md`** (rappeler à l’utilisateur quand il veut renforcer au max).
+
 ## Travail parallèle avec Cursor
 
 Si l’utilisateur a aussi **Cursor / l’Agent** ouvert sur ce repo :
