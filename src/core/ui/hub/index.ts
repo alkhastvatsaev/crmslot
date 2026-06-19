@@ -25,3 +25,5 @@ export type { HubSegmentOption } from "@/core/ui/hub/HubSegmentedControl";
 export { default as PatronHubGuide } from "@/core/ui/hub/PatronHubGuide";
 export { default as PatronHubChipRow } from "@/core/ui/hub/PatronHubChipRow";
 export type { PatronHubChipOption } from "@/core/ui/hub/PatronHubChipRow";
+export { default as HubSquareGrid } from "@/core/ui/hub/HubSquareGrid";
+export type { HubSquareTile, HubSquareTileTone } from "@/core/ui/hub/HubSquareGrid";
