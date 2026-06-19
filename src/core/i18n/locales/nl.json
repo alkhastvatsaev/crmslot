@@ -254,9 +254,42 @@
       "history": "Log"
     },
     "kpi": {
-      "month_total": "Deze maand",
+      "month_total": "Uitbetaling",
+      "revenue": "Omzet maand",
       "active_techs": "Technici",
       "exceptions": "Uitzonderingen"
+    },
+    "sparkline": {
+      "title": "Laatste 6 maanden",
+      "window": "{{n}} maanden",
+      "sum": "Totaal {{value}}"
+    },
+    "steps": {
+      "revenue_verb": "1 · Innen",
+      "revenue_caption": "Wat je gefactureerd hebt",
+      "revenue_hint": "{{count}} actieve technici",
+      "distribute_verb": "2 · Verdelen",
+      "distribute_caption": "Hoe het wordt verdeeld",
+      "distribute_total": "Uitbetaling deze maand",
+      "distribute_only_podium": "Iedereen staat op het podium.",
+      "rules_verb": "3 · Bijsturen",
+      "rules_caption": "De knoppen die je kunt draaien",
+      "rules_focus": "Focus op {{name}}",
+      "rules_editing": "Regel bewerken",
+      "rules_creating": "Nieuwe regel",
+      "rules_bonus": "Bonus toevoegen",
+      "rules_list_title": "Actieve regels",
+      "flow_to_distribute": "naar verdeling",
+      "flow_to_rules": "naar regels"
+    },
+    "cancel": "Annuleren",
+    "tech_rates": {
+      "title": "Tarief per technicus",
+      "personal": "Eigen",
+      "inherited": "Bedrijfstarief",
+      "reset": "Eigen tarief verwijderen",
+      "intervention_overrides": "Dossier-uitzonderingen",
+      "add_override": "+ Dossier-uitzondering"
     },
     "company_rule": {
       "label": "Bedrijfsregel",
@@ -274,7 +307,12 @@
       "month_label": "Deze maand",
       "add_bonus": "+ Bonus",
       "set_rule": "Eigen regel",
-      "edit_rule": "Regel wijzigen"
+      "edit_rule": "Regel wijzigen",
+      "tech_rate_label": "Tarief {{name}}",
+      "tech_rate_value_aria": "Tariefwaarde",
+      "tech_rate_create": "Tarief instellen",
+      "tech_rate_update": "Bijwerken",
+      "tech_rate_reset": "× Verwijderen"
     },
     "level": {
       "all": "Alles"

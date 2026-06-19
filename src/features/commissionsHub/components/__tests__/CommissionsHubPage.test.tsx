@@ -85,12 +85,12 @@ describe("CommissionsHubPage premium patron", () => {
     expect(screen.getByTestId("commissions-hub-tech-bonus")).toBeInTheDocument();
   });
 
-  it("switches to rules grid from view chips", () => {
+  it("shows the per-technician rates list in the right panel by default", () => {
     render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
-    fireEvent.click(screen.getByTestId("commissions-hub-mode-rules"));
-    expect(screen.getByTestId("commissions-hub-rules-grid")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-rule-rule-1")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-tech-rates")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-tech-rate-row-tech-a")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-tech-rate-plus-tech-a")).toBeInTheDocument();
   });
   it("opens manual bonus form without switching center to rules", () => {
     render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });

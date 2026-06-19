@@ -254,9 +254,42 @@
       "history": "Log"
     },
     "kpi": {
-      "month_total": "This month",
+      "month_total": "Payout",
+      "revenue": "Revenue",
       "active_techs": "Technicians",
       "exceptions": "Exceptions"
+    },
+    "sparkline": {
+      "title": "Last 6 months",
+      "window": "{{n}} months",
+      "sum": "Total {{value}}"
+    },
+    "steps": {
+      "revenue_verb": "1 · Earn",
+      "revenue_caption": "What you invoiced",
+      "revenue_hint": "{{count}} active technicians",
+      "distribute_verb": "2 · Distribute",
+      "distribute_caption": "How it splits",
+      "distribute_total": "Payout this month",
+      "distribute_only_podium": "Everyone is on the podium.",
+      "rules_verb": "3 · Adjust",
+      "rules_caption": "Levers you can pull",
+      "rules_focus": "Focus on {{name}}",
+      "rules_editing": "Edit rule",
+      "rules_creating": "New rule",
+      "rules_bonus": "Add bonus",
+      "rules_list_title": "Active rules",
+      "flow_to_distribute": "to distribution",
+      "flow_to_rules": "to rules"
+    },
+    "cancel": "Cancel",
+    "tech_rates": {
+      "title": "Rate per technician",
+      "personal": "Custom",
+      "inherited": "Inherited",
+      "reset": "Remove custom rate",
+      "intervention_overrides": "Job overrides",
+      "add_override": "+ Job override"
     },
     "company_rule": {
       "label": "Company rule",
@@ -274,7 +307,12 @@
       "month_label": "This month",
       "add_bonus": "+ Bonus",
       "set_rule": "Personal rule",
-      "edit_rule": "Edit rule"
+      "edit_rule": "Edit rule",
+      "tech_rate_label": "{{name}}'s rate",
+      "tech_rate_value_aria": "Rate value",
+      "tech_rate_create": "Set rate",
+      "tech_rate_update": "Update",
+      "tech_rate_reset": "× Remove"
     },
     "level": {
       "all": "All"

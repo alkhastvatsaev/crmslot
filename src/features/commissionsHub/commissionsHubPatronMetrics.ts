@@ -8,8 +8,22 @@ export type PatronCommissionKpis = {
   monthTotalCents: number;
   monthMissionCents: number;
   monthManualCents: number;
+  monthRevenueCents: number;
   activeTechnicianCount: number;
   exceptionRuleCount: number;
+};
+
+export type PatronMonthlyPoint = {
+  monthKey: string;
+  label: string;
+  commissionCents: number;
+  revenueCents: number;
+};
+
+export type PatronTrend = {
+  currentCents: number;
+  previousCents: number;
+  deltaPct: number | null;
 };
 
 export type PatronTechnicianRow = {
@@ -89,10 +103,13 @@ export function buildPatronCommissionKpis(params: {
   const monthKey = monthKeyFromDate(now);
 
   let monthMissionCents = 0;
+  let monthRevenueCents = 0;
   const techWithMission = new Set<string>();
 
   for (const iv of params.interventions) {
     if (interventionCommissionMonth(iv) !== monthKey) continue;
+    const revenue = iv.invoiceAmountCents ?? 0;
+    if (revenue > 0) monthRevenueCents += revenue;
     const cents = iv.commissionAmountCents ?? 0;
     if (cents <= 0) continue;
     monthMissionCents += cents;
@@ -118,9 +135,85 @@ export function buildPatronCommissionKpis(params: {
     monthMissionCents,
     monthManualCents,
     monthTotalCents: monthMissionCents + monthManualCents,
+    monthRevenueCents,
     activeTechnicianCount,
     exceptionRuleCount,
   };
+}
+
+const MONTH_SHORT_FR = [
+  "jan",
+  "fév",
+  "mar",
+  "avr",
+  "mai",
+  "juin",
+  "juil",
+  "août",
+  "sep",
+  "oct",
+  "nov",
+  "déc",
+];
+
+export function buildPatronMonthlySeries(params: {
+  interventions: Intervention[];
+  manualEntries: ManualCommissionEntry[];
+  now?: Date;
+  months?: number;
+}): PatronMonthlyPoint[] {
+  const now = params.now ?? new Date();
+  const months = params.months ?? 6;
+
+  const points: PatronMonthlyPoint[] = [];
+  const indexByKey = new Map<string, number>();
+
+  for (let offset = months - 1; offset >= 0; offset -= 1) {
+    const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    const key = monthKeyFromDate(d);
+    indexByKey.set(key, points.length);
+    points.push({
+      monthKey: key,
+      label: MONTH_SHORT_FR[d.getMonth()] ?? key,
+      commissionCents: 0,
+      revenueCents: 0,
+    });
+  }
+
+  for (const iv of params.interventions) {
+    const key = interventionCommissionMonth(iv);
+    if (!key) continue;
+    const idx = indexByKey.get(key);
+    if (idx == null) continue;
+    const cents = iv.commissionAmountCents ?? 0;
+    if (cents > 0) points[idx]!.commissionCents += cents;
+    const revenue = iv.invoiceAmountCents ?? 0;
+    if (revenue > 0) points[idx]!.revenueCents += revenue;
+  }
+
+  for (const entry of params.manualEntries) {
+    const key = manualEntryMonth(entry);
+    if (!key) continue;
+    const idx = indexByKey.get(key);
+    if (idx == null) continue;
+    points[idx]!.commissionCents += Math.round(entry.amountEuros * 100);
+  }
+
+  return points;
+}
+
+export function buildPatronTrend(
+  series: PatronMonthlyPoint[],
+  field: "commissionCents" | "revenueCents"
+): PatronTrend {
+  if (series.length === 0) return { currentCents: 0, previousCents: 0, deltaPct: null };
+  const current = series[series.length - 1]![field];
+  const previous = series.length >= 2 ? series[series.length - 2]![field] : 0;
+  if (previous === 0) {
+    return { currentCents: current, previousCents: 0, deltaPct: current > 0 ? null : 0 };
+  }
+  const deltaPct = Math.round(((current - previous) / previous) * 100);
+  return { currentCents: current, previousCents: previous, deltaPct };
 }
 
 export function buildPatronTechnicianRows(params: {
