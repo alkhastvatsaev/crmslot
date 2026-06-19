@@ -39,7 +39,10 @@ export default function ChatDayClientsPicker({
       </button>
 
       {rows.length > 0 ? (
-        <ul data-testid="chat-day-clients-list" className="min-h-0 flex-1 space-y-2.5 overflow-y-auto pb-2 custom-scrollbar">
+        <ul
+          data-testid="chat-day-clients-list"
+          className="min-h-0 flex-1 space-y-2.5 overflow-y-auto pb-2 custom-scrollbar"
+        >
           {rows.map((row) => {
             const displayName = row.clientName.trim()
               ? capitalizeName(row.clientName)
@@ -55,7 +58,9 @@ export default function ChatDayClientsPicker({
                     "group flex mx-4 w-[calc(100%-2rem)] items-center justify-center rounded-[18px] border bg-white py-4.5 px-4 text-center shadow-sm transition-all active:scale-[0.99]",
                     active
                       ? "border-blue-300 ring-2 ring-blue-100 bg-blue-50/20"
-                      : "border-slate-200/80 hover:border-blue-300 hover:bg-slate-50/50 hover:shadow-md",
+                      : row.isToday === false
+                        ? "border-slate-100/90 opacity-90 hover:border-blue-300 hover:bg-slate-50/50 hover:shadow-md"
+                        : "border-slate-200/80 hover:border-blue-300 hover:bg-slate-50/50 hover:shadow-md"
                   )}
                 >
                   <div className="min-w-0 flex-1 flex flex-col justify-center items-center text-center">

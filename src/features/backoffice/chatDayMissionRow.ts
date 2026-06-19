@@ -9,12 +9,9 @@ import {
   isInterventionReleasedToTechnicianField,
 } from "@/features/interventions/technicianSchedule";
 import type { Mission } from "@/features/map/missionTypes";
-import {
-  chatDayRowFromIntervention,
-  sortChatDayRows,
-} from "@/features/backoffice/portalChatInboxLogic";
+import { sortChatDayRows } from "@/features/backoffice/portalChatInboxLogic";
 
-/** Une ligne « client du jour » pour le picker chat (aligné rail missions). */
+/** Une ligne client pour le picker chat (jour en tête, puis historique). */
 export type ChatDayMissionRow = {
   threadId: string;
   clientName: string;
@@ -23,6 +20,8 @@ export type ChatDayMissionRow = {
   statusCode?: Intervention["status"];
   /** Libellé affiché si pas de code métier (missions démo). */
   statusLabel?: string;
+  /** Créneau du jour sélectionné (affiché en tête de liste). */
+  isToday?: boolean;
 };
 
 export function missionsToChatDayRows(missions: Mission[]): ChatDayMissionRow[] {
@@ -33,10 +32,14 @@ export function missionsToChatDayRows(missions: Mission[]): ChatDayMissionRow[] 
     address: m.address,
     statusCode: m.statusCode,
     statusLabel: m.status,
+    isToday: true,
   }));
 }
 
-export function interventionsToChatDayRows(interventions: Intervention[]): ChatDayMissionRow[] {
+export function interventionsToChatDayRows(
+  interventions: Intervention[],
+  selectedDate: Date
+): ChatDayMissionRow[] {
   return interventions.map((iv) => ({
     threadId: iv.id,
     clientName:
@@ -44,6 +47,7 @@ export function interventionsToChatDayRows(interventions: Intervention[]): ChatD
     time: formatScheduledTimeOnly(iv),
     address: iv.address,
     statusCode: iv.status,
+    isToday: interventionMatchesTab(iv, "today", selectedDate),
   }));
 }
 
@@ -61,42 +65,44 @@ type BuildChatDayRowsInput = {
   includeInterventionIds?: string[];
 };
 
-/** Lignes chat du jour — interventions Firestore + missions locales carte (démo). */
+/** Lignes chat — tous les dossiers société, créneau « jour » en tête. */
 export function buildChatDayRows({
   interventions,
   dayMissions,
   selectedDate = new Date(),
   workspace,
   mapDispatchFilter = false,
-  includeInterventionIds = [],
+  includeInterventionIds: _includeInterventionIds = [],
 }: BuildChatDayRowsInput): ChatDayMissionRow[] {
   const isDispatchMap = isCompanyDispatchViewer(workspace);
-  const boostIds = new Set(includeInterventionIds.map((id) => id.trim()).filter(Boolean));
-
-  const ivs = interventions.filter((iv) => {
-    if (boostIds.has(iv.id)) return iv.status !== "cancelled";
-    if (!interventionMatchesTab(iv, "today", selectedDate)) return false;
-    if (mapDispatchFilter && isDispatchMap && !isInterventionReleasedToTechnicianField(iv)) {
-      return false;
-    }
-    return iv.status !== "cancelled";
-  });
 
   const byThread = new Map<string, ChatDayMissionRow>();
-  for (const row of interventionsToChatDayRows(ivs)) {
-    byThread.set(row.threadId, row);
+
+  for (const iv of interventions) {
+    if (iv.status === "cancelled") continue;
+    const isToday = interventionMatchesTab(iv, "today", selectedDate);
+    if (
+      mapDispatchFilter &&
+      isDispatchMap &&
+      isToday &&
+      !isInterventionReleasedToTechnicianField(iv)
+    ) {
+      continue;
+    }
+    byThread.set(iv.id, {
+      threadId: iv.id,
+      clientName:
+        interventionClientLabel(iv) || iv.clientCompanyName?.trim() || iv.clientName?.trim() || "",
+      time: formatScheduledTimeOnly(iv),
+      address: iv.address,
+      statusCode: iv.status,
+      isToday,
+    });
   }
+
   if (dayMissions) {
     for (const row of missionsToChatDayRows(dayMissions)) {
       if (!byThread.has(row.threadId)) byThread.set(row.threadId, row);
-    }
-  }
-
-  for (const ivId of boostIds) {
-    if (byThread.has(ivId)) continue;
-    const iv = interventions.find((x) => x.id === ivId);
-    if (iv && iv.status !== "cancelled") {
-      byThread.set(ivId, chatDayRowFromIntervention(iv));
     }
   }
 
