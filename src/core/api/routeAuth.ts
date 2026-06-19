@@ -20,7 +20,7 @@ export function clientIp(request: Request): string {
 }
 
 export async function verifyBearerFromRequest(
-  request: Request,
+  request: Request
 ): Promise<admin.auth.DecodedIdToken | null> {
   if (!admin.apps.length) return null;
   const authHeader = request.headers.get("authorization");
@@ -34,13 +34,13 @@ export async function verifyBearerFromRequest(
 }
 
 export async function requireAuthenticatedUser(
-  request: Request,
+  request: Request
 ): Promise<AuthenticatedRequest | AuthGuardFailure> {
   if (!admin.apps.length) {
     return {
       response: NextResponse.json(
         { ok: false, error: "Firebase Admin non configuré (variables serveur manquantes)." },
-        { status: 503 },
+        { status: 503 }
       ),
     };
   }
@@ -67,7 +67,7 @@ export function isLocalDevelopmentRuntime(): boolean {
  * Production : identique à {@link requireAuthenticatedUser}.
  */
 export async function requireAuthenticatedUserOrLocalDev(
-  request: Request,
+  request: Request
 ): Promise<AuthenticatedRequest | AuthGuardFailure> {
   const authResult = await requireAuthenticatedUser(request);
   if (!("response" in authResult)) return authResult;
@@ -84,6 +84,23 @@ export function blockIfProduction(): NextResponse | null {
     return NextResponse.json({ error: "Non disponible en production." }, { status: 404 });
   }
   return null;
+}
+
+/**
+ * Garde les routes `/api/cron/*` derrière `CRON_SECRET`.
+ * Vercel Cron envoie `Authorization: Bearer ${CRON_SECRET}`; on accepte aussi `x-cron-secret`.
+ * Sans `CRON_SECRET` configuré, toute requête est refusée — y compris en dev (configurer
+ * `CRON_SECRET=dev-cron` dans `.env.local` pour tester).
+ */
+export function requireCronSecret(request: Request): NextResponse | null {
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  if (!cronSecret) {
+    return NextResponse.json({ ok: false, error: "CRON_SECRET non configuré." }, { status: 503 });
+  }
+  const bearer = request.headers.get("authorization")?.trim();
+  const headerSecret = request.headers.get("x-cron-secret")?.trim();
+  if (bearer === `Bearer ${cronSecret}` || headerSecret === cronSecret) return null;
+  return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
 }
 
 /**

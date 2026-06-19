@@ -1,0 +1,55 @@
+name: Firestore backup
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # tous les jours 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # Renseigner ces secrets côté GitHub :
+  #   GCP_PROJECT_ID                — id projet Firebase / GCP
+  #   GCP_BACKUP_BUCKET             — gs://...-firestore-backups
+  #   GCP_WORKLOAD_IDENTITY_PROVIDER — projects/<num>/locations/global/workloadIdentityPools/<pool>/providers/<provider>
+  #   GCP_SERVICE_ACCOUNT           — sa@projet.iam.gserviceaccount.com (rôles : datastore.importExportAdmin + storage.objectAdmin)
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  BACKUP_BUCKET: ${{ secrets.GCP_BACKUP_BUCKET }}
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Skip si secrets absents
+        id: gate
+        run: |
+          if [[ -z "${{ env.PROJECT_ID }}" || -z "${{ env.BACKUP_BUCKET }}" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::GCP_PROJECT_ID ou GCP_BACKUP_BUCKET non configurés — job ignoré."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Authenticate Google Cloud (OIDC)
+        if: steps.gate.outputs.skip == 'false'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        if: steps.gate.outputs.skip == 'false'
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Lancer l'export Firestore
+        if: steps.gate.outputs.skip == 'false'
+        run: |
+          STAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+          DEST="${BACKUP_BUCKET%/}/$STAMP"
+          echo "Export Firestore → $DEST"
+          gcloud firestore export "$DEST" \
+            --project="$PROJECT_ID" \
+            --async

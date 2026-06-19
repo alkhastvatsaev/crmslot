@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { logger } from "@/core/logger";
 import { firestore, auth, isConfigured } from "@/core/config/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { Technician } from "./types";
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
@@ -28,6 +28,13 @@ export function useTechnicians() {
       return;
     }
 
+    /** Sécurité : sans companyId résolu, on n'interroge pas (rule Firestore exige le scope tenant). */
+    if (!companyId) {
+      setTechnicians([]);
+      setLoading(false);
+      return;
+    }
+
     let unsubscribeAuth: (() => void) | undefined;
     let unsubscribeSnapshot: (() => void) | undefined;
     let active = true;
@@ -41,12 +48,15 @@ export function useTechnicians() {
           if (!active) return;
 
           if (user) {
-            const techRef = collection(firestore!, "technicians");
+            const techQuery = query(
+              collection(firestore!, "technicians"),
+              where("companyId", "==", companyId)
+            );
 
             if (unsubscribeSnapshot) unsubscribeSnapshot();
 
             unsubscribeSnapshot = onSnapshot(
-              techRef,
+              techQuery,
               (snapshot) => {
                 if (!active) return;
 
@@ -97,7 +107,7 @@ export function useTechnicians() {
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
-  }, []);
+  }, [companyId]);
 
   const filteredTechnicians = useMemo(
     () => technicians.filter((tech) => isAssignableTechnician(tech, companyId)),

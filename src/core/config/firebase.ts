@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { logger } from "@/core/logger";
+import { maybeInitializeAppCheck } from "@/core/config/firebase-app-check";
 import { getDatabase, type Database } from "firebase/database";
 import {
   enableMultiTabIndexedDbPersistence,
@@ -38,6 +39,8 @@ const firebaseConfig = {
 const isConfigured = !!firebaseConfig.projectId;
 
 const app = isConfigured ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)) : null;
+
+if (app) maybeInitializeAppCheck(app);
 
 /** Auth CRM / back-office — ne pas utiliser pour la connexion client hub société. */
 const CLIENT_PORTAL_APP_NAME = "clientPortal";

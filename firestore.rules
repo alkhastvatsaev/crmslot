@@ -563,17 +563,49 @@ service cloud.firestore {
     }
 
     // --- Collections BelgMap existantes ---
+    /** Whitelist téléphone — lecture self uniquement (sinon fuite de tous les numéros). Écriture Admin SDK. */
     match /allowed_users/{phone} {
-      allow read: if isAuthed();
+      allow read: if isAuthed()
+        && request.auth.token.phone_number is string
+        && request.auth.token.phone_number == phone;
       allow write: if false;
     }
 
-    match /technicians/{docId} {
-      allow read, write: if isAuthed();
+    /**
+     * Techniciens — doc id = Firebase Auth uid. Lecture scopée multi-tenant.
+     * Plusieurs `allow read` séparés (OU logique) pour valider les requêtes filtrées.
+     * Écriture exclusivement via Admin SDK (provisionTechnicianStaff, setCompanyStaffActive…).
+     */
+    match /technicians/{techUid} {
+      /** Self : doc id = uid (read direct via `doc(firestore, "technicians", uid)`). */
+      allow read: if isAuthed() && request.auth.uid == techUid;
+
+      /** Self via champ `authUid` (queries `where("authUid","==",uid)`). */
+      allow read: if isAuthed()
+        && resource.data.keys().hasAny(['authUid'])
+        && resource.data.authUid is string
+        && resource.data.authUid == request.auth.uid;
+
+      /** Membre société (back-office membership). */
+      allow read: if isAuthed()
+        && resource.data.keys().hasAny(['companyId'])
+        && resource.data.companyId is string
+        && resource.data.companyId.size() > 0
+        && userBelongsToCompany(resource.data.companyId);
+
+      /** Portail société via bmTenants. */
+      allow read: if isAuthed()
+        && resource.data.keys().hasAny(['companyId'])
+        && resource.data.companyId is string
+        && resource.data.companyId.size() > 0
+        && tenantClaimsIncludeCompany(resource.data.companyId);
+
+      allow write: if false;
     }
 
+    /** Statut publication IA — lecture authentifiée uniquement (n'expose plus en clair). */
     match /ai_status/{docId} {
-      allow read: if true;
+      allow read: if isAuthed();
       allow write: if false;
     }
 
@@ -820,6 +852,11 @@ service cloud.firestore {
 
     /** Jetons OAuth Gmail (Admin SDK uniquement). */
     match /platform_config/{docId} {
+      allow read, write: if false;
+    }
+
+    /** Journal d'audit sécurité — écriture exclusive Admin SDK, aucune lecture client. */
+    match /security_audit/{entryId} {
       allow read, write: if false;
     }
 
