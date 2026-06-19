@@ -24,7 +24,7 @@ describe("planningInterventionDetailFields", () => {
       clientPhone: "+32 470 00 00 00",
       clientEmail: "marie@example.com",
       problem: "Serrure cassée",
-      category: "Serrurerie",
+      category: "serrurerie",
       urgency: true,
       requestedDate: "2026-06-19",
       requestedTime: "14:00",
@@ -60,7 +60,7 @@ describe("planningInterventionDetailFields", () => {
       billingLines: [{ description: "Main d'oeuvre", quantity: 1, unitPriceCents: 8500 }],
       invoiceAmountCents: 8500,
       completionSignatureUrl: "https://cdn/sign.png",
-      completionPhotos: [{ url: "https://cdn/done.jpg" }],
+      completionPhotos: [{ url: "https://cdn/done.jpg", category: "preuve" }],
     });
 
     expect(fields.map((f) => f.id)).toEqual(
@@ -88,8 +88,27 @@ describe("planningInterventionDetailFields", () => {
     expect(
       technicianCompletionPhotoUrls({
         ...baseIv,
-        completionPhotos: [{ url: "x" }],
+        completionPhotos: [{ url: "x", category: "preuve" }],
       })
     ).toEqual(["x"]);
+  });
+
+  it("handles Firestore-like raw values without crashing", () => {
+    const iv = {
+      ...baseIv,
+      clientName: 12345 as unknown as string,
+      phone: 470123456 as unknown as string,
+      technicianAcceptedAt: {
+        toDate: () => new Date("2026-06-19T10:00:00Z"),
+      } as unknown as string,
+      billingLines: [
+        { description: "MO", quantity: 1, unitPriceCents: undefined as unknown as number },
+      ],
+    };
+
+    expect(() => buildClientIntakeFields(iv)).not.toThrow();
+    const techFields = buildTechnicianReportFields(iv);
+    expect(techFields.some((f) => f.id === "accepted")).toBe(true);
+    expect(techFields.find((f) => f.id === "billing")?.value).toContain("MO");
   });
 });

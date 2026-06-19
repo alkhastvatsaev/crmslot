@@ -1,5 +1,6 @@
 import type { Intervention } from "@/features/interventions/types";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
+import { coerceDisplayString } from "@/features/interventions/technicianSchedule";
 
 export type PlanningDetailField = {
   id: string;
@@ -8,17 +9,21 @@ export type PlanningDetailField = {
 };
 
 function readTranscription(iv: Intervention): string | null {
-  const hit = iv.transcription?.trim();
-  return hit || null;
+  const candidates = [iv.transcription, (iv as Record<string, unknown>).audioTranscription];
+  for (const hit of candidates) {
+    const text = coerceDisplayString(hit);
+    if (text) return text;
+  }
+  return null;
 }
 
 function formatSchedule(
   date: string | null | undefined,
   time: string | null | undefined
 ): string | null {
-  const d = date?.trim();
+  const d = coerceDisplayString(date);
   if (!d) return null;
-  const tm = time?.trim();
+  const tm = coerceDisplayString(time);
   return tm ? `${d} · ${tm}` : d;
 }
 
@@ -31,23 +36,22 @@ function formatCents(cents: number | null | undefined): string | null {
 }
 
 function formatBillingLines(iv: Intervention): string | null {
-  const lines = iv.billingLines?.filter((l) => l.description?.trim());
+  const lines = iv.billingLines?.filter((l) => coerceDisplayString(l.description));
   if (!lines?.length) return null;
   return lines
     .map((line) => {
-      const unit = (line.unitPriceCents / 100).toFixed(2);
-      return `${line.description.trim()} · ${line.quantity} × ${unit} €`;
+      const description = coerceDisplayString(line.description) ?? "—";
+      const unitCents = line.unitPriceCents;
+      const unit =
+        unitCents != null && Number.isFinite(unitCents) ? (unitCents / 100).toFixed(2) : "—";
+      const qty = line.quantity != null && Number.isFinite(line.quantity) ? line.quantity : 1;
+      return `${description} · ${qty} × ${unit} €`;
     })
     .join("\n");
 }
 
-function pushField(
-  out: PlanningDetailField[],
-  id: string,
-  labelKey: string,
-  raw: string | null | undefined
-) {
-  const value = raw?.trim();
+function pushField(out: PlanningDetailField[], id: string, labelKey: string, raw: unknown) {
+  const value = coerceDisplayString(raw);
   if (!value) return;
   out.push({ id, labelKey, value });
 }
@@ -58,12 +62,7 @@ export function buildClientIntakeFields(iv: Intervention): PlanningDetailField[]
 
   pushField(out, "name", "planningHub.detail.fields.name", resolveInterventionClientName(iv));
   pushField(out, "company", "planningHub.detail.fields.company", iv.clientCompanyName);
-  pushField(
-    out,
-    "phone",
-    "planningHub.detail.fields.phone",
-    iv.clientPhone ?? iv.phone ?? undefined
-  );
+  pushField(out, "phone", "planningHub.detail.fields.phone", iv.clientPhone ?? iv.phone);
   pushField(out, "email", "planningHub.detail.fields.email", iv.clientEmail);
   pushField(out, "whatsapp", "planningHub.detail.fields.whatsapp", iv.clientWhatsapp);
   pushField(out, "address", "planningHub.detail.fields.address", iv.address);
@@ -82,7 +81,7 @@ export function buildClientIntakeFields(iv: Intervention): PlanningDetailField[]
   );
   pushField(out, "transcription", "planningHub.detail.fields.transcription", readTranscription(iv));
 
-  const clientPhotos = iv.attachmentThumbnails?.filter(Boolean).length ?? 0;
+  const clientPhotos = clientIntakePhotoUrls(iv).length;
   if (clientPhotos > 0) {
     pushField(out, "client_photos", "planningHub.detail.fields.photos_count", String(clientPhotos));
   }
@@ -94,7 +93,12 @@ export function buildClientIntakeFields(iv: Intervention): PlanningDetailField[]
 export function buildTechnicianReportFields(iv: Intervention): PlanningDetailField[] {
   const out: PlanningDetailField[] = [];
 
-  pushField(out, "status", "planningHub.detail.fields.status", iv.status?.replace(/_/g, " "));
+  pushField(
+    out,
+    "status",
+    "planningHub.detail.fields.status",
+    coerceDisplayString(iv.status)?.replace(/_/g, " ")
+  );
   pushField(
     out,
     "scheduled",
@@ -126,7 +130,10 @@ export function buildTechnicianReportFields(iv: Intervention): PlanningDetailFie
     formatCents(iv.commissionAmountCents)
   );
   pushField(out, "payment", "planningHub.detail.fields.payment_status", iv.paymentStatus);
-  if (iv.completionSignatureUrl?.trim() || iv.remoteSignatureUrl?.trim()) {
+  if (
+    coerceDisplayString(iv.completionSignatureUrl) ||
+    coerceDisplayString(iv.remoteSignatureUrl)
+  ) {
     pushField(out, "signature", "planningHub.detail.fields.signature_yes", "✓");
   }
   pushField(
@@ -142,7 +149,7 @@ export function buildTechnicianReportFields(iv: Intervention): PlanningDetailFie
     iv.reportRejectionReason
   );
 
-  const completionPhotos = iv.completionPhotos?.length ?? iv.completionPhotoUrls?.length ?? 0;
+  const completionPhotos = technicianCompletionPhotoUrls(iv).length;
   if (completionPhotos > 0) {
     pushField(
       out,
@@ -156,16 +163,24 @@ export function buildTechnicianReportFields(iv: Intervention): PlanningDetailFie
 }
 
 export function clientIntakePhotoUrls(iv: Intervention): string[] {
-  return iv.attachmentThumbnails?.filter(Boolean) ?? [];
+  return (iv.attachmentThumbnails ?? []).filter(
+    (url): url is string => typeof url === "string" && url.trim().length > 0
+  );
 }
 
 export function technicianCompletionPhotoUrls(iv: Intervention): string[] {
   if (iv.completionPhotos?.length) {
-    return iv.completionPhotos.map((p) => p.url).filter(Boolean);
+    return iv.completionPhotos
+      .map((p) => (typeof p?.url === "string" ? p.url : null))
+      .filter((url): url is string => Boolean(url?.trim()));
   }
-  return iv.completionPhotoUrls?.filter(Boolean) ?? [];
+  return (iv.completionPhotoUrls ?? []).filter(
+    (url): url is string => typeof url === "string" && url.trim().length > 0
+  );
 }
 
 export function technicianSignatureUrl(iv: Intervention): string | null {
-  return iv.completionSignatureUrl?.trim() || iv.remoteSignatureUrl?.trim() || null;
+  return (
+    coerceDisplayString(iv.completionSignatureUrl) ?? coerceDisplayString(iv.remoteSignatureUrl)
+  );
 }
