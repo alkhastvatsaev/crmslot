@@ -1130,7 +1130,11 @@
         "assignment_action_failed": "Action impossible",
         "update_failed": "Mise à jour impossible",
         "assignment_respond_in_list": "Acceptez ou refusez cette mission dans la liste à gauche.",
-        "description_label": "Description"
+        "description_label": "Description",
+        "early_start_title": "Rendez-vous pas encore arrivé",
+        "early_start_message": "Cette intervention est prévue {{schedule}}. Voulez-vous commencer avant l'heure ?",
+        "early_start_wait": "J'attends",
+        "early_start_schedule_unknown": "à l'heure prévue"
       },
       "mission_action": {
         "depart": "Je pars",

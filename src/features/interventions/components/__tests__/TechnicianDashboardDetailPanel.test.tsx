@@ -10,6 +10,15 @@ jest.mock("@/features/interventions/useInterventionLive", () => ({
   ),
 }));
 
+jest.mock("@/features/interventions/workflow/transitionInterventionFromTechnician", () => ({
+  transitionInterventionFromTechnician: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock("@/features/interventions/respondToTechnicianAssignment", () => ({
+  acceptTechnicianAssignment: jest.fn().mockResolvedValue(undefined),
+  declineTechnicianAssignment: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock("@/context/TechnicianFinishJobContext", () => ({
   useTechnicianFinishJob: () => ({
     setFinishJobInterventionId: jest.fn(),
@@ -20,6 +29,17 @@ jest.mock("@/context/TechnicianFinishJobContext", () => ({
     startFinishJob: jest.fn(),
   }),
 }));
+
+import { fireEvent, waitFor } from "@testing-library/react";
+import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
+import { acceptTechnicianAssignment } from "@/features/interventions/respondToTechnicianAssignment";
+
+const mockTransition = transitionInterventionFromTechnician as jest.MockedFunction<
+  typeof transitionInterventionFromTechnician
+>;
+const mockAccept = acceptTechnicianAssignment as jest.MockedFunction<
+  typeof acceptTechnicianAssignment
+>;
 
 jest.mock("@/core/config/firebase", () => ({
   auth: { currentUser: { uid: "anonymous-other-uid" } },
@@ -45,6 +65,16 @@ function iv(partial: Partial<Intervention> = {}): Intervention {
 }
 
 describe("TechnicianDashboardDetailPanel", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-05-16T08:00:00"));
+    mockTransition.mockClear();
+    mockAccept.mockClear();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
   it("shows scroll region and description without finish overlay layer", () => {
     render(<TechnicianDashboardDetailPanel caseId="iv-detail-1" liveIntervention={iv()} />);
 
@@ -65,7 +95,12 @@ describe("TechnicianDashboardDetailPanel", () => {
       <TechnicianDashboardDetailPanel
         caseId="iv-detail-1"
         technicianUid="demo-tech-local"
-        liveIntervention={iv({ status: "assigned", assignedTechnicianUid: "demo-tech-local" })}
+        liveIntervention={iv({
+          status: "assigned",
+          assignedTechnicianUid: "demo-tech-local",
+          scheduledDate: "2026-05-16",
+          scheduledTime: "08:00",
+        })}
       />
     );
 
@@ -116,5 +151,62 @@ describe("TechnicianDashboardDetailPanel", () => {
     expect(screen.getByTestId("technician-detail-done-badge")).toBeInTheDocument();
     expect(screen.getByTestId("technician-edit-completion-report")).toBeInTheDocument();
     expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
+  });
+
+  it("shows early start overlay before scheduled slot on en_route mission", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "en_route",
+          scheduledDate: "2026-05-16",
+          scheduledTime: "09:00",
+        })}
+      />
+    );
+
+    expect(screen.getByTestId("technician-early-start-prompt")).toBeInTheDocument();
+    expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
+  });
+
+  it("starts en_route mission early from overlay confirm", async () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "en_route",
+          scheduledDate: "2026-05-16",
+          scheduledTime: "09:00",
+        })}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("technician-early-start-confirm"));
+
+    await waitFor(() => {
+      expect(mockTransition).toHaveBeenCalledWith(
+        expect.objectContaining({ toStatus: "in_progress" })
+      );
+    });
+  });
+
+  it("hides early start overlay after dismiss and restores action bar", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "en_route",
+          scheduledDate: "2026-05-16",
+          scheduledTime: "09:00",
+        })}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("technician-early-start-dismiss"));
+    expect(screen.queryByTestId("technician-early-start-prompt")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mission-action-bar")).toBeInTheDocument();
   });
 });

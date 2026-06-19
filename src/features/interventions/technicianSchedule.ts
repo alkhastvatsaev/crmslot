@@ -461,6 +461,62 @@ export function formatPortalAppointmentLabel(
     : `${weekday}, ${day} ${month}`;
 }
 
+/** Créneau planifié explicite (sans repli sur `createdAt`). */
+export function getInterventionExplicitScheduledStart(iv: InterventionScheduleFields): Date | null {
+  const schD = iv.scheduledDate?.trim();
+  const schT = normalizeTimeHm(iv.scheduledTime);
+  if (schD && /^\d{4}-\d{2}-\d{2}$/.test(schD)) {
+    const d = new Date(`${schD}T${schT ?? "00:00"}:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  const reqD = iv.requestedDate?.trim();
+  const reqT = normalizeTimeHm(iv.requestedTime);
+  if (reqD && /^\d{4}-\d{2}-\d{2}$/.test(reqD)) {
+    const d = new Date(`${reqD}T${reqT ?? "00:00"}:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  const legacy = anchorFromLegacyDateHour(iv);
+  if (legacy && ((iv.date ?? "").trim() || (iv.hour ?? "").trim() || (iv.time ?? "").trim())) {
+    return legacy;
+  }
+  return null;
+}
+
+/** Vrai tant que l’heure / le jour planifié n’est pas encore atteint. */
+export function isInterventionBeforeScheduledSlot(
+  iv: InterventionScheduleFields,
+  now = new Date()
+): boolean {
+  const start = getInterventionExplicitScheduledStart(iv);
+  if (!start) return false;
+  return now.getTime() < start.getTime();
+}
+
+/** Statuts terrain où un démarrage anticipé a du sens. */
+export function isTechnicianEarlyStartPromptEligible(status: Intervention["status"]): boolean {
+  return status === "assigned" || status === "en_route";
+}
+
+/** Libellé rendez-vous pour le bandeau « démarrage anticipé ». */
+export function formatTechnicianScheduledAppointmentLabel(
+  iv: InterventionScheduleFields,
+  locale = "fr-BE"
+): string | null {
+  const schD = iv.scheduledDate?.trim();
+  if (schD) {
+    return formatPortalAppointmentLabel(schD, iv.scheduledTime, locale);
+  }
+  const reqD = iv.requestedDate?.trim();
+  if (reqD) {
+    return formatPortalAppointmentLabel(reqD, iv.requestedTime, locale);
+  }
+  const legacyDate = iv.date?.trim();
+  if (legacyDate) {
+    return formatPortalAppointmentLabel(legacyDate, iv.hour ?? iv.time, locale);
+  }
+  return null;
+}
+
 export function interventionClientLabel(iv: Intervention): string {
   const first = iv.clientFirstName?.trim();
   const last = iv.clientLastName?.trim();

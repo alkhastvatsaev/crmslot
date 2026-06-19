@@ -3,15 +3,14 @@
 import type { ReactNode } from "react";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
-import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
-import UserProfile from "@/features/dashboard/components/UserProfile";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
+import TechnicianMobileProfileChip from "@/features/interventions/components/TechnicianMobileProfileChip";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
-import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
   MOBILE_GALAXY_DOCK_CLASS,
+  MOBILE_HEADER_RAIL_HOST_CLASS,
   MOBILE_PROFILE_BAR_CHROME_CLASS,
   MOBILE_PROFILE_BAR_CLASS,
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
@@ -35,8 +34,7 @@ const accountOverlayClass = cn(
 );
 
 /**
- * Chrome mobile terrain : calendrier (header) + Galaxy dock (footer).
- * Une seule page hub — pas de carrousel 8 pages ni dots bar.
+ * Chrome mobile terrain : calendrier (header) + profil dock (footer, à la place de Galaxy).
  */
 export default function TechnicianMobileShell({ children }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
@@ -61,14 +59,19 @@ export default function TechnicianMobileShell({ children }: Props) {
           chromeClassName={MOBILE_PROFILE_BAR_CHROME_CLASS}
           data-testid={MOBILE_SHELL_CONTRACT.testIds.topBar}
         >
-          <MobileHeaderRailLayout
-            rootTestId="technician-mobile-header-rail"
-            leftTestId="technician-mobile-header-calendar"
-            centerTestId="technician-mobile-header-profile"
-            swipeDisabled={overlayOpen}
-            left={<ClockCalendar compact interactive />}
-            center={<UserProfile variant="mobile" interactive />}
-          />
+          <div
+            className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, "mobile-header-rail-host h-full w-full")}
+            data-testid="technician-mobile-header-rail"
+          >
+            <div
+              data-testid="technician-mobile-header-calendar"
+              data-mobile-header-rail="left"
+              data-mobile-header-rail-active="true"
+              className="mobile-header-rail-layer flex h-full w-full min-h-0 items-stretch"
+            >
+              <ClockCalendar compact interactive />
+            </div>
+          </div>
         </MobileShellSlotGrid>
       </header>
 
@@ -97,9 +100,9 @@ export default function TechnicianMobileShell({ children }: Props) {
         <MobileShellSlotGrid
           rootClassName={MOBILE_GALAXY_DOCK_CLASS}
           chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
-          data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
+          data-testid="technician-mobile-profile-dock"
         >
-          <DashboardGalaxyLayer />
+          <TechnicianMobileProfileChip />
         </MobileShellSlotGrid>
       </footer>
     </div>

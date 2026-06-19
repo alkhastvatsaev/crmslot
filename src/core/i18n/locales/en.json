@@ -1130,7 +1130,11 @@
         "assignment_action_failed": "Action failed",
         "update_failed": "Update failed",
         "assignment_respond_in_list": "Accept or decline this job using the list on the left.",
-        "description_label": "Description"
+        "description_label": "Description",
+        "early_start_title": "Appointment not yet due",
+        "early_start_message": "This job is scheduled for {{schedule}}. Do you want to start early?",
+        "early_start_wait": "I'll wait",
+        "early_start_schedule_unknown": "at the scheduled time"
       },
       "mission_action": {
         "depart": "I'm on my way",

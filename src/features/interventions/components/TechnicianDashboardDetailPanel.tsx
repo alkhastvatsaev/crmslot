@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Play, CheckCircle2, Pause, Pencil, AlertTriangle } from "lucide-react";
 import MissionFieldFooter from "@/features/interventions/components/MissionFieldFooter";
@@ -12,9 +12,11 @@ import {
 } from "@/features/interventions/buildMissionContactActions";
 import TechnicianAssignmentRespondBar from "@/features/interventions/components/TechnicianAssignmentRespondBar";
 import {
+  acceptTechnicianAssignmentPatch,
   getTechnicianAssignmentUid,
   isTechnicianAssignmentAwaitingResponse,
 } from "@/features/interventions/technicianAssignmentActions";
+import { acceptTechnicianAssignment } from "@/features/interventions/respondToTechnicianAssignment";
 import { auth } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
@@ -24,7 +26,12 @@ import { useInterventionLiveSource } from "@/features/interventions/useIntervent
 import type { Intervention } from "@/features/interventions/types";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import { interventionDescriptionText } from "@/features/interventions/interventionDescriptionText";
-import { formatScheduledTimeOnly } from "@/features/interventions/technicianSchedule";
+import {
+  formatScheduledTimeOnly,
+  isInterventionBeforeScheduledSlot,
+  isTechnicianEarlyStartPromptEligible,
+} from "@/features/interventions/technicianSchedule";
+import TechnicianEarlyStartPrompt from "@/features/interventions/components/TechnicianEarlyStartPrompt";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
@@ -145,7 +152,12 @@ export default function TechnicianDashboardDetailPanel({
   const queryClient = useQueryClient();
   const { setFinishJobInterventionId } = useTechnicianFinishJob();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [earlyStartDismissed, setEarlyStartDismissed] = useState(false);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    setEarlyStartDismissed(false);
+  }, [caseId, liveIv?.status]);
   const timetrackingEnabled = useFeatureFlag("unifiedFieldCockpit");
 
   const technicianUidForTracking =
@@ -247,6 +259,50 @@ export default function TechnicianDashboardDetailPanel({
     liveIv.assignedTechnicianUid?.trim() ||
     "";
   const awaitingAssignment = isTechnicianAssignmentAwaitingResponse(liveIv, technicianUid);
+  const showEarlyStartPrompt =
+    !earlyStartDismissed &&
+    isInterventionBeforeScheduledSlot(liveIv) &&
+    isTechnicianEarlyStartPromptEligible(liveIv.status);
+
+  const handleEarlyStartConfirm = async () => {
+    if (isUpdating) return;
+    setEarlyStartDismissed(true);
+
+    if (awaitingAssignment && technicianUid) {
+      const acceptPatch = acceptTechnicianAssignmentPatch();
+      const optimistic: Partial<Intervention> = {
+        status: "en_route",
+        technicianAcceptedAt: String(acceptPatch.technicianAcceptedAt),
+      };
+      patchTechnicianAssignmentInCache(queryClient, technicianUid, liveIv.id, optimistic);
+      setIsUpdating(true);
+      try {
+        await acceptTechnicianAssignment(liveIv);
+        onAssignmentAccepted?.({ ...liveIv, ...optimistic } as Intervention);
+        toast.success(String(t("technician_hub.dashboard.detail.assignment_accepted")));
+      } catch (err) {
+        patchTechnicianAssignmentInCache(queryClient, technicianUid, liveIv.id, {
+          status: liveIv.status,
+          technicianAcceptedAt: liveIv.technicianAcceptedAt,
+        });
+        setEarlyStartDismissed(false);
+        logger.error("acceptTechnicianAssignment", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        const message = err instanceof Error ? err.message : "";
+        toast.error(String(t("technician_hub.dashboard.detail.assignment_action_failed")), {
+          description: message || undefined,
+        });
+      } finally {
+        setIsUpdating(false);
+      }
+      return;
+    }
+
+    if (liveIv.status === "en_route") {
+      await handleUpdateStatus("in_progress");
+    }
+  };
 
   let firstName = liveIv.clientFirstName;
   let lastName = liveIv.clientLastName;
@@ -375,62 +431,74 @@ export default function TechnicianDashboardDetailPanel({
                 : undefined
             }
           >
-            <div
-              className="technician-detail-body flex min-h-0 flex-1 flex-col gap-4 overflow-hidden px-5 py-4"
-              data-testid="technician-detail-scroll"
-            >
-              <TechnicianMissionBrief
-                timeLabel={formatScheduledTimeOnly(liveIv)}
-                clientDisplayName={clientDisplayName}
-                address={liveIv.address ? formatAddress(liveIv.address) : null}
-                addressMapsHref={addressMapsHref}
-                descriptionText={descriptionText}
-                awaitingAssignment={awaitingAssignment}
-                contactRail={
-                  primaryContactActions.length > 0 ? (
-                    <MissionContactRail variant="compact" actions={primaryContactActions} />
-                  ) : null
-                }
-              />
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div
+                className="technician-detail-body flex min-h-0 flex-1 flex-col gap-4 overflow-hidden px-5 py-4"
+                data-testid="technician-detail-scroll"
+              >
+                <TechnicianMissionBrief
+                  timeLabel={formatScheduledTimeOnly(liveIv)}
+                  clientDisplayName={clientDisplayName}
+                  address={liveIv.address ? formatAddress(liveIv.address) : null}
+                  addressMapsHref={addressMapsHref}
+                  descriptionText={descriptionText}
+                  awaitingAssignment={awaitingAssignment}
+                  contactRail={
+                    primaryContactActions.length > 0 ? (
+                      <MissionContactRail variant="compact" actions={primaryContactActions} />
+                    ) : null
+                  }
+                />
 
-              {liveIv.status === "waiting_material" ? (
-                <p className="!m-0 shrink-0 border-t border-amber-200/80 pt-3 text-center text-[12px] font-semibold leading-snug text-amber-900 line-clamp-3">
-                  {t("technician_hub.dashboard.detail.waiting_material_banner")}
-                </p>
-              ) : null}
+                {liveIv.status === "waiting_material" ? (
+                  <p className="!m-0 shrink-0 border-t border-amber-200/80 pt-3 text-center text-[12px] font-semibold leading-snug text-amber-900 line-clamp-3">
+                    {t("technician_hub.dashboard.detail.waiting_material_banner")}
+                  </p>
+                ) : null}
 
-              {liveIv.status === "in_progress" && liveIv.reportRejectionReason?.trim() ? (
-                <div
-                  data-testid="technician-report-rejected-banner"
-                  className="shrink-0 border-t border-amber-200/80 pt-3 text-left"
-                >
-                  <p className="flex items-center gap-1.5 text-[12px] font-bold text-amber-900">
-                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                    {t("technician_hub.dashboard.detail.report_rejected_title")}
-                  </p>
-                  <p className="mt-1 text-[12px] font-medium leading-snug text-amber-950">
-                    {liveIv.reportRejectionReason.trim()}
-                  </p>
-                  <p className="mt-1.5 text-[11px] font-semibold text-amber-800">
-                    {t("technician_hub.dashboard.detail.report_rejected_hint")}
-                  </p>
-                </div>
-              ) : null}
-
-              {hasAudioBlock ? (
-                <div className="flex w-full shrink-0 flex-col gap-2 border-t border-slate-200/80 pt-3">
-                  {liveIv.audioUrl ? <AudioUrlPlayer url={liveIv.audioUrl} t={t} /> : null}
-                  {liveIv.transcription?.trim() ? (
-                    <p className="line-clamp-3 text-[12px] font-semibold leading-snug text-slate-800">
-                      {liveIv.transcription.trim()}
+                {liveIv.status === "in_progress" && liveIv.reportRejectionReason?.trim() ? (
+                  <div
+                    data-testid="technician-report-rejected-banner"
+                    className="shrink-0 border-t border-amber-200/80 pt-3 text-left"
+                  >
+                    <p className="flex items-center gap-1.5 text-[12px] font-bold text-amber-900">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      {t("technician_hub.dashboard.detail.report_rejected_title")}
                     </p>
-                  ) : null}
-                </div>
+                    <p className="mt-1 text-[12px] font-medium leading-snug text-amber-950">
+                      {liveIv.reportRejectionReason.trim()}
+                    </p>
+                    <p className="mt-1.5 text-[11px] font-semibold text-amber-800">
+                      {t("technician_hub.dashboard.detail.report_rejected_hint")}
+                    </p>
+                  </div>
+                ) : null}
+
+                {hasAudioBlock ? (
+                  <div className="flex w-full shrink-0 flex-col gap-2 border-t border-slate-200/80 pt-3">
+                    {liveIv.audioUrl ? <AudioUrlPlayer url={liveIv.audioUrl} t={t} /> : null}
+                    {liveIv.transcription?.trim() ? (
+                      <p className="line-clamp-3 text-[12px] font-semibold leading-snug text-slate-800">
+                        {liveIv.transcription.trim()}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+
+              {showEarlyStartPrompt ? (
+                <TechnicianEarlyStartPrompt
+                  intervention={liveIv}
+                  awaitingAssignment={awaitingAssignment}
+                  isUpdating={isUpdating}
+                  onConfirm={() => void handleEarlyStartConfirm()}
+                  onDismiss={() => setEarlyStartDismissed(true)}
+                />
               ) : null}
             </div>
           </div>
 
-          {awaitingAssignment && technicianUid ? (
+          {awaitingAssignment && technicianUid && !showEarlyStartPrompt ? (
             <TechnicianAssignmentRespondBar
               iv={liveIv}
               technicianUid={technicianUid}
@@ -439,7 +507,7 @@ export default function TechnicianDashboardDetailPanel({
             />
           ) : null}
 
-          {showActionBar ? (
+          {showActionBar && !showEarlyStartPrompt ? (
             <MissionFieldFooter
               intervention={liveIv}
               isUpdating={isUpdating}
