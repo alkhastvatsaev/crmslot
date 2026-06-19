@@ -5,6 +5,8 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import type { Intervention } from "@/features/interventions/types";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
+import { canTechnicianAmendInvoicedReport } from "@/features/interventions/technicianInvoicedReportAmend";
+import { technicianAmendInvoicedReportAdmin } from "@/features/interventions/server/technicianAmendInvoicedReportAdmin";
 import { coerceAdminExtraPatch } from "@/features/interventions/workflow/coerceAdminExtraPatch";
 import { logger } from "@/core/logger";
 
@@ -55,7 +57,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     );
   }
 
-  const gate = canTechnicianAmendCompletionReport(iv, auth.uid);
+  const isInvoiced = iv.status === "invoiced";
+  const gate = isInvoiced
+    ? canTechnicianAmendInvoicedReport(iv, auth.uid)
+    : canTechnicianAmendCompletionReport(iv, auth.uid);
   if (!gate.allowed) {
     return NextResponse.json(
       { ok: false, error: `Modification refusée (${gate.reason})` },
@@ -71,10 +76,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   });
 
   try {
-    await db
-      .collection("interventions")
-      .doc(interventionId)
-      .update(extraPatch ?? {});
+    if (isInvoiced) {
+      await technicianAmendInvoicedReportAdmin({
+        db,
+        interventionId,
+        actorUid: auth.uid,
+        patch: extraPatch ?? {},
+      });
+    } else {
+      await db
+        .collection("interventions")
+        .doc(interventionId)
+        .update(extraPatch ?? {});
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     logger.error("[interventions/completion-amend]", {

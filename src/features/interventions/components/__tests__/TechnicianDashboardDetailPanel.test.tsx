@@ -19,9 +19,11 @@ jest.mock("@/features/interventions/respondToTechnicianAssignment", () => ({
   declineTechnicianAssignment: jest.fn().mockResolvedValue(undefined),
 }));
 
+const mockSetFinishJobInterventionId = jest.fn();
+
 jest.mock("@/context/TechnicianFinishJobContext", () => ({
   useTechnicianFinishJob: () => ({
-    setFinishJobInterventionId: jest.fn(),
+    setFinishJobInterventionId: mockSetFinishJobInterventionId,
     finishWizardStep: null,
     setFinishWizardStep: jest.fn(),
     finishJobInterventionId: null,
@@ -70,6 +72,7 @@ describe("TechnicianDashboardDetailPanel", () => {
     jest.setSystemTime(new Date("2026-05-16T08:00:00"));
     mockTransition.mockClear();
     mockAccept.mockClear();
+    mockSetFinishJobInterventionId.mockClear();
   });
 
   afterEach(() => {
@@ -151,6 +154,38 @@ describe("TechnicianDashboardDetailPanel", () => {
     expect(screen.getByTestId("technician-detail-done-badge")).toBeInTheDocument();
     expect(screen.getByTestId("technician-edit-completion-report")).toBeInTheDocument();
     expect(screen.queryByTestId("mission-action-bar")).not.toBeInTheDocument();
+  });
+
+  it("shows pencil under completed banner for invoiced mission", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "invoiced",
+          assignedTechnicianUid: "demo-tech-local",
+        })}
+      />
+    );
+
+    expect(screen.getByText(/terminée et clôturée/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("technician-edit-closed-intervention"));
+    expect(mockSetFinishJobInterventionId).toHaveBeenCalledWith("iv-detail-1");
+  });
+
+  it("hides pencil for cancelled mission", () => {
+    render(
+      <TechnicianDashboardDetailPanel
+        caseId="iv-detail-1"
+        technicianUid="demo-tech-local"
+        liveIntervention={iv({
+          status: "cancelled",
+          assignedTechnicianUid: "demo-tech-local",
+        })}
+      />
+    );
+
+    expect(screen.queryByTestId("technician-edit-closed-intervention")).not.toBeInTheDocument();
   });
 
   it("shows early start overlay before scheduled slot on en_route mission", () => {

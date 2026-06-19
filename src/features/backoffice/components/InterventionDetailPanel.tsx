@@ -16,6 +16,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton, HubCard, HubDetailHeader, HUB_TYPE } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useTechnicians } from "@/features/technicians/hooks";
+import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
 import { capitalizeName, formatAddress } from "@/utils/stringUtils";
 import {
   isInterventionAwaitingTechnicianAcceptance,
@@ -120,6 +122,18 @@ export default function InterventionDetailPanel({
   onUpdateDateTime,
 }: Props) {
   const { t } = useTranslation();
+  const { technicians } = useTechnicians();
+  const amendedByUid = (selectedItem.technicianReportAmendedByUid ?? "").trim();
+  const amendedByTech = technicians.find(
+    (tech) => tech.id === amendedByUid || tech.authUid === amendedByUid
+  );
+  const amendedByName =
+    [amendedByTech?.firstName, amendedByTech?.lastName].filter(Boolean).join(" ").trim() ||
+    amendedByTech?.name?.trim() ||
+    amendedByUid;
+  const showTechnicianAmendmentAlert =
+    hasPendingTechnicianReportAmendment(selectedItem) &&
+    !isInterventionInBackofficeRequestsQueue(selectedItem);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectBusy, setRejectBusy] = useState(false);
@@ -401,6 +415,23 @@ export default function InterventionDetailPanel({
           {/* Facture proposée par le technicien — vérification avant validation */}
           {!isInterventionInBackofficeRequestsQueue(selectedItem) ? (
             <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(selectedItem)} />
+          ) : null}
+
+          {showTechnicianAmendmentAlert ? (
+            <div
+              data-testid="backoffice-technician-amendment-alert"
+              className="rounded-2xl border border-amber-200 bg-amber-50 p-4"
+            >
+              <p className="text-[12px] font-bold text-amber-900">
+                {String(t("backoffice.inbox.technician_amendment_alert_title"))}
+              </p>
+              <p className="mt-1 text-[13px] leading-snug text-amber-950">
+                {String(t("backoffice.inbox.technician_amendment_alert_body")).replace(
+                  "{{name}}",
+                  amendedByName || String(t("backoffice.inbox.unknown_technician"))
+                )}
+              </p>
+            </div>
           ) : null}
 
           {selectedItem.invoiceReviewRequestedAt ? (

@@ -35,6 +35,7 @@ import TechnicianEarlyStartPrompt from "@/features/interventions/components/Tech
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
+import { canTechnicianAmendInvoicedReport } from "@/features/interventions/technicianInvoicedReportAmend";
 import { cn } from "@/lib/utils";
 import { TERRAIN_BTN, TERRAIN_BTN_ICON } from "@/features/interventions/terrainMobileChrome";
 import { HubButton } from "@/core/ui/hub";
@@ -321,6 +322,8 @@ export default function TechnicianDashboardDetailPanel({
   const addressMapsHref = buildGoogleMapsDirectionsUrl(liveIv.address);
   const hasAudioBlock = Boolean(liveIv.audioUrl || liveIv.transcription?.trim());
   const isInvoicedOrCancelled = liveIv.status === "invoiced" || liveIv.status === "cancelled";
+  const isInvoicedAmendable =
+    liveIv.status === "invoiced" && canTechnicianAmendInvoicedReport(liveIv, technicianUid).allowed;
   const isDoneAmendable =
     liveIv.status === "done" && canTechnicianAmendCompletionReport(liveIv, technicianUid).allowed;
   const showActionBar =
@@ -352,6 +355,17 @@ export default function TechnicianDashboardDetailPanel({
               {t("technician_hub.dashboard.detail.mission_completed")}
             </p>
           </div>
+          {isInvoicedAmendable ? (
+            <button
+              type="button"
+              data-testid="technician-edit-closed-intervention"
+              aria-label={String(t("technician_hub.dashboard.detail.consult_edit_closed"))}
+              onClick={onStartFinishJob}
+              className="mt-5 flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95"
+            >
+              <Pencil className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+            </button>
+          ) : null}
         </div>
       ) : isDoneAmendable ? (
         <>

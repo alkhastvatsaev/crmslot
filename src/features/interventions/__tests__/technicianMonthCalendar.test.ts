@@ -23,10 +23,15 @@ function iv(partial: Partial<Intervention> = {}): Intervention {
 }
 
 describe("technicianMonthCalendar", () => {
-  it("builds 42 cells for a month grid", () => {
-    const cells = buildCalendarMonthCells(new Date("2026-06-01T12:00:00"));
-    expect(cells).toHaveLength(42);
-    expect(cells.filter((c) => c.inMonth)).toHaveLength(30);
+  it("builds month cells without trailing days from next month", () => {
+    const june = buildCalendarMonthCells(new Date("2026-06-01T12:00:00"));
+    expect(june.filter((c) => c.inMonth)).toHaveLength(30);
+    expect(june.some((c) => c.inMonth && c.ymd.startsWith("2026-07"))).toBe(false);
+    expect(june).toHaveLength(30);
+
+    const may = buildCalendarMonthCells(new Date("2026-05-01T12:00:00"));
+    expect(may.filter((c) => c.inMonth)).toHaveLength(31);
+    expect(may.filter((c) => !c.inMonth)).toHaveLength(4);
   });
 
   it("aggregates missions per scheduled day", () => {

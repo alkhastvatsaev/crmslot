@@ -125,6 +125,12 @@ export async function performCompletionUpload(params: CompletionUploadParams): P
   const fromStatus = data?.status ?? "in_progress";
 
   if (fromStatus === "invoiced") {
+    await performCompletionAmend({
+      interventionId,
+      photoDataUrls,
+      signaturePngDataUrl,
+      billingLines: billingLines ?? data?.billingLines,
+    });
     return;
   }
 

@@ -7,6 +7,7 @@ import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSche
 import { capitalizeName } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import type { Intervention } from "@/features/interventions/types";
 import SlaBadge from "@/features/interventions/components/SlaBadge";
@@ -35,6 +36,7 @@ export function BackOfficeInboxInterventionRow({
   const slaTrackerEnabled = useFeatureFlag("slaTracker");
   const isRequest = variant === "request";
   const isUrgent = item.urgency;
+  const hasTechnicianAmendment = hasPendingTechnicianReportAmendment(item);
 
   let fName = item.clientFirstName;
   let lName = item.clientLastName;
@@ -70,9 +72,11 @@ export function BackOfficeInboxInterventionRow({
             : "border-slate-100"
           : variant === "report-archived"
             ? "border-slate-200/70 bg-slate-50/50 opacity-85"
-            : item.status === "invoiced"
-              ? "border-green-100 opacity-70"
-              : "border-blue-100"
+            : hasTechnicianAmendment
+              ? "border-amber-200 bg-amber-50/30"
+              : item.status === "invoiced"
+                ? "border-green-100 opacity-70"
+                : "border-blue-100"
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -123,18 +127,22 @@ export function BackOfficeInboxInterventionRow({
                 ? isUrgent
                   ? "bg-amber-100 text-amber-700"
                   : "bg-blue-100 text-blue-700"
-                : item.status === "invoiced"
-                  ? "bg-slate-100 text-slate-500"
-                  : "bg-green-100 text-green-700"
+                : hasTechnicianAmendment
+                  ? "bg-amber-100 text-amber-800"
+                  : item.status === "invoiced"
+                    ? "bg-slate-100 text-slate-500"
+                    : "bg-green-100 text-green-700"
             )}
           >
             {isRequest
               ? isUrgent
                 ? t("backoffice.inbox.tag_urgent")
                 : t("backoffice.inbox.tag_request")
-              : item.status === "invoiced"
-                ? t("backoffice.inbox.tag_verified")
-                : t("backoffice.inbox.tag_report")}
+              : hasTechnicianAmendment
+                ? t("backoffice.inbox.tag_amended")
+                : item.status === "invoiced"
+                  ? t("backoffice.inbox.tag_verified")
+                  : t("backoffice.inbox.tag_report")}
           </div>
           <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" />
         </div>

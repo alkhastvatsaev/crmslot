@@ -459,6 +459,8 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     try {
       await updateDoc(doc(firestore, "interventions", id), {
         backofficeReportsArchivedAt: archivedAt,
+        technicianReportAmendedAt: null,
+        technicianReportAmendedByUid: null,
       });
       await logCrmInterventionAction({
         kind: "intervention_report_archived",

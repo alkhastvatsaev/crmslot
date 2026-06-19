@@ -62,19 +62,31 @@ function startOfWeekMonday(ref: Date): Date {
   return x;
 }
 
-/** Grille 6×7 — semaine commence lundi. */
+/** Grille du mois — jours du mois uniquement (+ cases vides en tête de semaine). */
 export function buildCalendarMonthCells(monthAnchor: Date): CalendarMonthCell[] {
   const first = startOfCalendarMonth(monthAnchor);
   const gridStart = startOfWeekMonday(first);
   const targetMonth = first.getMonth();
+  const year = first.getFullYear();
+  const daysInMonth = new Date(year, targetMonth + 1, 0).getDate();
+  const leadingPad = Math.round((first.getTime() - gridStart.getTime()) / 86_400_000);
   const cells: CalendarMonthCell[] = [];
 
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < leadingPad; i++) {
     const date = new Date(gridStart);
     date.setDate(gridStart.getDate() + i);
     cells.push({
       date,
-      inMonth: date.getMonth() === targetMonth,
+      inMonth: false,
+      ymd: `pad-${i}`,
+    });
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, targetMonth, day);
+    cells.push({
+      date,
+      inMonth: true,
       ymd: localCalendarYmd(date),
     });
   }

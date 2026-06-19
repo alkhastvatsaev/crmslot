@@ -126,6 +126,9 @@ export interface Intervention {
   ivanaVerified?: boolean;
   /** Rapport masqué dans l’inbox IVANA (section Archive) — horodatage ISO. */
   backofficeReportsArchivedAt?: string | null;
+  /** Technicien — rapport modifié après clôture / facturation (alerte QM). */
+  technicianReportAmendedAt?: string | null;
+  technicianReportAmendedByUid?: string | null;
   /** Rapport refusé par IVANA — renvoi au technicien pour complément. */
   reportRejectionReason?: string | null;
   reportRejectedAt?: string | null;
