@@ -13,6 +13,8 @@
   /** Espacement vertical uniforme : profil · panneau · dots · galaxy */
   --mobile-stack-gap: var(--mobile-panel-gap);
   --mobile-body-pad-y: var(--mobile-stack-gap);
+  /** iOS notch via env() ; repli min 1rem sur Android (safe-area souvent 0). */
+  --mobile-header-safe-top: max(1rem, env(safe-area-inset-top, 0px));
   --mobile-tab-active: rgb(37 99 235);
   --mobile-tab-inactive: rgb(148 163 184);
   /** Courbe iOS spring (mêmes valeurs partout pour cohérence du toucher). */
@@ -42,7 +44,7 @@
 .mobile-shell-header {
   flex-shrink: 0;
   z-index: 30;
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: var(--mobile-header-safe-top);
 }
 
 .mobile-shell-body {

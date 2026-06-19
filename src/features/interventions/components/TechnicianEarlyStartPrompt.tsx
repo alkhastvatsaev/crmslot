@@ -53,9 +53,10 @@ export default function TechnicianEarlyStartPrompt({
               {t("technician_hub.dashboard.detail.early_start_title")}
             </p>
             <p className="mt-1.5 text-[12px] font-medium leading-snug text-slate-600">
-              {t("technician_hub.dashboard.detail.early_start_message", {
-                schedule: scheduleLabel,
-              })}
+              {String(t("technician_hub.dashboard.detail.early_start_message")).replace(
+                "{{schedule}}",
+                scheduleLabel
+              )}
             </p>
           </div>
         </div>
