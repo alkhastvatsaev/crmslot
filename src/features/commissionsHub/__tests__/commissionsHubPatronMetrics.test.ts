@@ -116,7 +116,7 @@ describe("commissionsHubPatronMetrics", () => {
           technicianUid: "tech-a",
           amountEuros: 20,
           reason: "Bonus",
-          date: { toDate: () => june2026 },
+          date: "2026-06-15",
           createdByUid: "admin",
           createdAt: "",
         },
