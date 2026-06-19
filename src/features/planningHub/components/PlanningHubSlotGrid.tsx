@@ -34,7 +34,8 @@ export default function PlanningHubSlotGrid({ slots, selectedSlotTime, onSelectS
         }))}
         selectedId={selectedSlotTime}
         onSelect={onSelectSlot}
-        minSlots={12}
+        minSlots={16}
+        columns={4}
         size="compact"
       />
       {hasConflict ? (
