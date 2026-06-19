@@ -50,6 +50,8 @@ const clientPortalApp = app
     : initializeApp(firebaseConfig, CLIENT_PORTAL_APP_NAME)
   : null;
 
+if (clientPortalApp) maybeInitializeAppCheck(clientPortalApp);
+
 const db: Database | null = app && realtimeDatabaseUrl ? getDatabase(app) : null;
 
 /**

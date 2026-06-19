@@ -2,7 +2,9 @@
  * @jest-environment node
  */
 import {
+  isAnonymousFirebaseUser,
   isProductionNodeEnv,
+  rejectAnonymousInProduction,
   requireAnyCompanyStaff,
   requireInboundWebhookSecret,
 } from "@/core/api/routeAuth";
@@ -52,5 +54,36 @@ describe("isProductionNodeEnv", () => {
     process.env.NODE_ENV = "production";
     expect(isProductionNodeEnv()).toBe(true);
     process.env.NODE_ENV = prev;
+  });
+});
+
+describe("rejectAnonymousInProduction", () => {
+  it("blocks anonymous in production", () => {
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    const res = rejectAnonymousInProduction({
+      firebase: { sign_in_provider: "anonymous" },
+    } as import("firebase-admin").auth.DecodedIdToken);
+    expect(res?.status).toBe(403);
+    process.env.NODE_ENV = prev;
+  });
+
+  it("allows email provider in production", () => {
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    expect(
+      rejectAnonymousInProduction({
+        firebase: { sign_in_provider: "password" },
+      } as import("firebase-admin").auth.DecodedIdToken)
+    ).toBeNull();
+    process.env.NODE_ENV = prev;
+  });
+
+  it("detects anonymous provider", () => {
+    expect(
+      isAnonymousFirebaseUser({
+        firebase: { sign_in_provider: "anonymous" },
+      } as import("firebase-admin").auth.DecodedIdToken)
+    ).toBe(true);
   });
 });

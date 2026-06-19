@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { writeAuditLog, auditMetaFromRequest } from "@/core/services/audit/writeAuditLog";
+import { rateLimitByKey } from "@/core/api/rateLimit";
+import { rejectAnonymousInProduction } from "@/core/api/routeAuth";
 
 /**
  * Synchronise les custom claims Firebase à partir des documents
@@ -29,6 +31,12 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "Token invalide." }, { status: 401 });
   }
+
+  const anonymousDenied = rejectAnonymousInProduction(decoded);
+  if (anonymousDenied) return anonymousDenied;
+
+  const limited = rateLimitByKey(decoded.uid, "sync-claims", 30, 60 * 60 * 1000);
+  if (limited) return limited;
 
   const uid = decoded.uid;
   const db = admin.firestore();

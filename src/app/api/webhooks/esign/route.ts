@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import "@/core/config/firebase-admin";
+import { isProductionNodeEnv } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
 
 export const runtime = "nodejs";
 
 function verifyEsignSignature(rawBody: string, signature: string | null): boolean {
   const secret = process.env.ESIGN_WEBHOOK_SECRET?.trim();
-  if (!secret || !signature) return process.env.NODE_ENV !== "production";
+  if (!secret) return !isProductionNodeEnv();
+  if (!signature) return false;
   const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
   try {
     return timingSafeEqual(Buffer.from(expected), Buffer.from(signature));

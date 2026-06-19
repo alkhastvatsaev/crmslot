@@ -26,6 +26,9 @@ const SECURITY_HEADERS: Array<[string, string]> = [
   // HSTS — Vercel l'ajoute déjà sur le edge, doublon inoffensif côté custom domain.
   ["Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"],
   ["X-DNS-Prefetch-Control", "off"],
+  ["Cross-Origin-Opener-Policy", "same-origin-allow-popups"],
+  ["Cross-Origin-Resource-Policy", "same-site"],
+  ["X-Permitted-Cross-Domain-Policies", "none"],
 ];
 
 /**
@@ -44,6 +47,8 @@ function buildCsp(): string {
       "https://*.firebaseapp.com",
       "https://apis.google.com",
       "https://www.googletagmanager.com",
+      "https://www.google.com",
+      "https://www.gstatic.com",
     ],
     "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
     "img-src": ["'self'", "data:", "blob:", "https:"],
@@ -60,6 +65,9 @@ function buildCsp(): string {
       "https://events.mapbox.com",
       "https://api.stripe.com",
       "https://*.sentry.io",
+      "https://www.google.com",
+      "https://www.gstatic.com",
+      "https://content-firebaseappcheck.googleapis.com",
       "wss://*.firebaseio.com",
     ],
     "frame-src": ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
