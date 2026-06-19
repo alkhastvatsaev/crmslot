@@ -15,6 +15,7 @@
   --mobile-body-pad-y: var(--mobile-stack-gap);
   /** iOS notch via env() ; repli min 1rem sur Android (safe-area souvent 0). */
   --mobile-header-safe-top: max(1rem, env(safe-area-inset-top, 0px));
+  --mobile-footer-safe-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   --mobile-tab-active: rgb(37 99 235);
   --mobile-tab-inactive: rgb(148 163 184);
   /** Courbe iOS spring (mêmes valeurs partout pour cohérence du toucher). */
@@ -61,7 +62,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: var(--mobile-footer-safe-bottom);
 }
 
 /* ── Header ─────────────────────────────────────────────── */
