@@ -121,9 +121,10 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const mode = view === "team" ? "team" : "rules";
 
   const ruleFooterLabel = companyGroupRule
-    ? t("commissionsHub.company_rule.applies_all", {
-        value: formatCommissionValue(companyGroupRule.valueType, companyGroupRule.value),
-      })
+    ? t("commissionsHub.company_rule.applies_all").replace(
+        "{{value}}",
+        formatCommissionValue(companyGroupRule.valueType, companyGroupRule.value)
+      )
     : t("commissionsHub.company_rule.empty");
 
   return (

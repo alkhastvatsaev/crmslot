@@ -165,7 +165,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
       error: null,
       firebaseUid: "ivana-uid",
     });
-    mockAssign.mockResolvedValue(undefined);
+    mockAssign.mockResolvedValue(null);
   });
 
   function openRequestsTab() {
