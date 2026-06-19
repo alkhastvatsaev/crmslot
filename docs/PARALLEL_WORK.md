@@ -2,6 +2,13 @@
 
 Un seul clone Git, deux outils possibles en même temps. Ce fichier est la **source de vérité** pour qui touche quoi.
 
+## Cursor — perf & sessions
+
+- **Index** : `.cursorignore` exclut `.next`, `node_modules`, `android/` (~4 Go). Après changement → resync index Cursor.
+- **Guide session** : [`docs/CURSOR_WORKFLOW.md`](CURSOR_WORKFLOW.md) (scripts Jest, `@` fichiers, worktree).
+- **Règles scoped** : `.cursor/rules/zone-*.mdc` — contexte chargé seulement sur la zone ouverte.
+- **Premier message Agent** : zone + chemins + `npm run test:<zone>` + ce qu’il ne faut pas toucher.
+
 ## Zones (à mettre à jour avant chaque session)
 
 | Zone                     | Chemins                                                                                                        | Propriétaire session | Branche suggérée                       |
@@ -10,6 +17,7 @@ Un seul clone Git, deux outils possibles en même temps. Ce fichier est la **sou
 | B — Matériel             | `src/features/featureHub/**`, `src/app/api/ai/material-agent/**`                                               | _à remplir_          | `cursor/materiel` ou `claude/materiel` |
 | C — Historique CRM       | `src/features/crmHistory/**`, `src/app/api/ai/crm-history-agent/**`                                            | _à remplir_          | `cursor/crm` ou `claude/crm`           |
 | D — Facturation          | `src/features/billingHub/**`, `src/app/api/ai/billing-hub-agent/**`                                            | _à remplir_          | `cursor/billing` ou `claude/billing`   |
+| **H — Hubs patron**      | `caseHub`, `teamHub`, `planningHub`, `commissionsHub`, `src/core/ui/hub/**`                                    | _à remplir_          | `cursor/patron-hubs`                   |
 | E — Hub partagé          | `src/app/page.tsx` (switch mobile/desktop uniquement), `src/context/**`                                        | _coordination_       | `cursor/mobile-corrections`            |
 | **F-UI — Mobile shell**  | `dashboard-mobile-layout.css`, `Mobile*.tsx`, `UserProfile`, `AdaptiveTriplePanelLayout`, hubs (layout mobile) | **Claude Code**      | `cursor/mobile-corrections`            |
 | **F-infra — Mobile app** | `useIsMobile`, `mobileAccess.ts`, `DesktopOnlyGate`, PWA/manifest, ngrok, tests E2E mobile                     | **Cursor**           | `cursor/mobile-corrections`            |

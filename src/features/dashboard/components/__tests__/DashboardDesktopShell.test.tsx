@@ -13,7 +13,7 @@ import UserProfile from "@/features/dashboard/components/UserProfile";
 describe("DashboardDesktopShell", () => {
   it("renders galaxy dock in center grid slot (column 2)", () => {
     render(
-      <DashboardPagerProvider pageCount={6}>
+      <DashboardPagerProvider pageCount={9}>
         <DashboardPageSelectorProvider>
           <DashboardDesktopShell
             header={<span data-testid="shell-header">header</span>}
@@ -41,9 +41,9 @@ describe("DashboardDesktopShell", () => {
     expect(DASHBOARD_GALAXY_GRID_COLUMN).toBe(2);
   });
 
-  it("affiche le panneau compte au centre au clic profil", () => {
+  it("affiche le menu pages à droite au clic profil desktop", () => {
     render(
-      <DashboardPagerProvider pageCount={6}>
+      <DashboardPagerProvider pageCount={9}>
         <DashboardPageSelectorProvider>
           <DashboardDesktopShell
             header={<UserProfile interactive />}
@@ -54,12 +54,12 @@ describe("DashboardDesktopShell", () => {
       </DashboardPagerProvider>
     );
 
-    expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("user-profile-toggle"));
-    const host = screen.getByTestId("dashboard-account-panel-host");
-    expect(host).toBeInTheDocument();
-    expect(host).toHaveClass("dashboard-desktop-col--center");
-    expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("user-profile-toggle"));
+    const host = screen.getByTestId("dashboard-page-selector-host");
+    expect(host).toBeInTheDocument();
+    expect(host).toHaveClass("dashboard-desktop-col--right");
+    expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
   });
 });

@@ -1,0 +1,17 @@
+---
+description: Hub partagé — page carrousel + contexts (coordination obligatoire)
+globs: src/app/page.tsx,src/context/**
+alwaysApply: false
+---
+
+# Zone E — Hub partagé
+
+**Coordination obligatoire** — un seul outil à la fois.
+
+`page.tsx` : assemblage des slots carrousel ; intents wrappés ici.
+
+Contexts : communication inter-pages (chatbot, billing, technician case, etc.).
+
+Avant modif : lire `docs/PARALLEL_WORK.md` et annoncer la zone aux autres sessions.
+
+Tests impact carrousel : `src/features/dashboard/__tests__/dashboardCarouselRegistry.test.ts`.

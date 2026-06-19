@@ -14,7 +14,6 @@ import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext"
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
 import { CrmHistoryAgentBridgeProvider } from "@/context/CrmHistoryAgentBridgeContext";
 import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeContext";
-import { PwaCopilotAgentBridgeProvider } from "@/context/PwaCopilotAgentBridgeContext";
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
@@ -49,22 +48,20 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                         <CompanyStockAgentBridgeProvider>
                           <CrmHistoryAgentBridgeProvider>
                             <BillingHubAgentBridgeProvider>
-                              <PwaCopilotAgentBridgeProvider>
-                                <BillingHubIntentProvider>
-                                  <TechnicianBackofficeReportBridgeProvider>
-                                    <OfflineSyncProvider>
-                                      <TechnicianQueryProvider>
-                                        <RequesterHubProvider>
-                                          <AuthActivityLogger />
-                                          <ActivityLogPageObserver />
-                                          <BackofficeChatNotificationBootstrap />
-                                          {children}
-                                        </RequesterHubProvider>
-                                      </TechnicianQueryProvider>
-                                    </OfflineSyncProvider>
-                                  </TechnicianBackofficeReportBridgeProvider>
-                                </BillingHubIntentProvider>
-                              </PwaCopilotAgentBridgeProvider>
+                              <BillingHubIntentProvider>
+                                <TechnicianBackofficeReportBridgeProvider>
+                                  <OfflineSyncProvider>
+                                    <TechnicianQueryProvider>
+                                      <RequesterHubProvider>
+                                        <AuthActivityLogger />
+                                        <ActivityLogPageObserver />
+                                        <BackofficeChatNotificationBootstrap />
+                                        {children}
+                                      </RequesterHubProvider>
+                                    </TechnicianQueryProvider>
+                                  </OfflineSyncProvider>
+                                </TechnicianBackofficeReportBridgeProvider>
+                              </BillingHubIntentProvider>
                             </BillingHubAgentBridgeProvider>
                           </CrmHistoryAgentBridgeProvider>
                         </CompanyStockAgentBridgeProvider>

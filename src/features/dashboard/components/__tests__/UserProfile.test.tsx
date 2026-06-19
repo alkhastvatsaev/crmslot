@@ -9,7 +9,7 @@ import {
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 
 describe("UserProfile", () => {
-  it("shows one profile per carousel page (7 admin hubs)", () => {
+  it("shows one profile per carousel page (9 admin hubs)", () => {
     expect(appProfiles).toHaveLength(DASHBOARD_CAROUSEL_PAGE_COUNT);
     expect(appProfiles.map((p) => p.name)).toEqual([
       "IVANA",
@@ -17,8 +17,10 @@ describe("UserProfile", () => {
       "QUALITY MANAGEMENT",
       "FACTURATION",
       "GMAIL",
-      "ASSISTANT IA",
       "ÉQUIPE",
+      "DOSSIERS",
+      "COMMISSIONS",
+      "PLANNING",
     ]);
   });
 
@@ -33,7 +35,7 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("profile-name")).toHaveTextContent("GMAIL");
   });
 
-  it("toggle le panneau compte au clic profil desktop", () => {
+  it("toggle le panneau navigation pages au clic profil desktop", () => {
     function ToggleProbe() {
       const { view } = useDashboardPageSelector();
       return <div data-testid="selector-state">{view}</div>;
@@ -51,7 +53,7 @@ describe("UserProfile", () => {
     expect(screen.getByTestId("selector-state")).toHaveTextContent("closed");
     expect(screen.getByTestId("user-profile-toggle")).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(screen.getByTestId("user-profile-toggle"));
-    expect(screen.getByTestId("selector-state")).toHaveTextContent("account");
+    expect(screen.getByTestId("selector-state")).toHaveTextContent("pages");
     expect(screen.getByTestId("user-profile-toggle")).toHaveAttribute("aria-expanded", "true");
   });
 

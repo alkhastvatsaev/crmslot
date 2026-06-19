@@ -5,7 +5,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 describe("MobileTabBar", () => {
   it("change de page au tap sur un onglet", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={0}>
+      <DashboardPagerProvider pageCount={9} initialPageIndex={0}>
         <MobileTabBar />
       </DashboardPagerProvider>
     );

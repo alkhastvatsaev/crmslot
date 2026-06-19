@@ -1,0 +1,13 @@
+---
+description: Zone D — Billing hub + facturation
+globs: src/features/billingHub/**,src/features/billing/**,src/app/api/ai/billing-hub-agent/**
+alwaysApply: false
+---
+
+# Zone Facturation
+
+**Tests** : `npm run test:billing-hub` → `npm run test:ci` avant merge.
+
+Logique serveur : `src/features/interventions/server/` pour clôture/IVANA ; routes `src/app/api/interventions/**` = wrappers minces.
+
+PDF côté PWA (jsPDF) — pas de génération PDF serveur chatbot.

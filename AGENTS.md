@@ -1,42 +1,23 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+Read `node_modules/next/dist/docs/` before writing Next.js code. Heed deprecation notices.
+
 <!-- END:nextjs-agent-rules -->
 
-# Testing Architecture & Rules
-This project follows a strict testing architecture to prevent regressions and assist AI agents in maintaining code quality. As an AI agent working on this project, you MUST adhere to the following rules:
+# Testing — règles essentielles
 
-1. **Colocated Tests (Jest)**: When you create or modify a React component or a hook in `src/features/*`, you MUST update or create the corresponding unit test in the `__tests__` folder next to it. For example, `src/features/dispatch/__tests__/algorithm.test.ts`.
-2. **Use Data Test IDs**: When writing tests with React Testing Library, rely heavily on `data-testid` attributes. If an element doesn't have one and you need to interact with it, add a `data-testid`. This prevents UI changes (like Tailwind class modifications) from breaking tests.
-3. **Use Provided Mocks**: Do NOT try to test the internals of third-party complex libraries like `mapbox-gl`, `firebase`, or `framer-motion`. Standard mocks for these are already set up globally in `jest.setup.ts`. Always leverage them. If a test imports Firebase modules used by `src/core/config/firebase.ts` but missing from the global mock (e.g. new Firebase submodule), **extend `jest.setup.ts`** once for everyone instead of adding one-off mocks in specs.
-4. **Coverage & CI**: Run `npm run test:coverage` before merging (same as CI). Global thresholds are defined in `jest.config.ts` (`coverageThreshold`), with stricter **per-file** floors on critical modules (`assignInterventionToTechnician`, `technicianAssignmentActions`, `technicianSchedule`, `technicianAssignmentsFilter`, `mapTechnicianMissions`, `dashboardDesktopLayout`). Coverage is collected from `src/**/*.{ts,tsx}` excluding `__tests__`, with additional `collectCoverageFrom` negations in `jest.config.ts` (e.g. most Next `app/api` route handlers and a few app shells are omitted so global **function** thresholds stay meaningful). Raise thresholds slowly as you add tests — do not lower them without maintainer approval. **P0 métier** : intake / visibilité liste (`technicianSchedule`), assignation (`assignInterventionToTechnician`), filtre technicien (`technicianAssignmentsFilter`), carte (`mapTechnicianMissions`), UI assignation (`IncomingClientRequestsPanel`, `TechnicianAssignmentOfferCard`, `TechnicianDashboardListPanel`).
-5. **Shared RTL helpers**: Use `render` (alias for `renderWithProviders`) from `src/test-utils/render.tsx` for all component tests. Use `mockState` from `src/test-utils/mockState.ts` to control data/auth state. Use `renderWithPager` from `src/test-utils/renderWithPager.tsx` ONLY if the component specifically depends on `DashboardPagerProvider`. **Use `makeIntervention`, `makeAssignedIntervention`, `makeDoneIntervention` from `src/test-utils/factories.ts`** instead of local `iv()` functions — this avoids duplication and keeps fixtures consistent across test files.
-6. **E2E Tests (Playwright)**: End-to-end tests live in `tests/e2e/` — lancer avec `npm run test:e2e`. Ne les modifier que pour un parcours critique (login, assignation, layout dashboard). Job CI séparé recommandé si les smoke tests deviennent lents.
-7. **Continuous Integration**: GitHub Actions runs `npm run typecheck` and `npm run test:coverage` on every push and PR to `main`. Ensure all code modifications pass `npm run test:ci` locally before considering a task complete. For a quick loop on one file or pattern, use `npx jest <path-or-pattern> --no-coverage` (Jest CLI args do not always pass through `npm run` the way you expect; `npx jest` is the reliable shortcut).
-8. **Chatbot (Codex / agents)**: Plan détaillé et checklist dans [`docs/TESTING.md`](docs/TESTING.md) §3. Fichiers source : `chatbot-tools.ts`, `chatbot-tool-executor.ts`, `chatbot-openai.ts`, `chatbot-route-handler.ts`, `chatbot-document-action-handler.ts`, `hooks/useChatbot.ts` — **jamais** les copies `* 2.ts` / `* 3.ts`. Après toute modif sous `src/features/chatbot/**` ou `src/app/api/ai/chatbot/**` : `npm run test:chatbot` puis `npm run test:ci` avant merge. Les PR qui touchent ce module déclenchent aussi le job CI `Chatbot tests` (`.github/workflows/chatbot-tests.yml`). Nouvel outil = définition + executor + test routing/executor (+ intent local si applicable). Routes API : logique dans les handlers, pas dans `route.ts`.
-9. **Interventions / facturation (agents)**: Logique serveur dans `src/features/interventions/server/` — routes `src/app/api/interventions/**` = wrappers minces. Après modif facturation, clôture terrain ou validation IVANA : `npm run test:interventions` puis `npm run test:ci`. Job CI ciblé : `.github/workflows/interventions-tests.yml`. Nouvelle route API → test du module `server/*.ts` (`@jest-environment node`) avec mocks Admin/Firestore.
+Workflow Cursor : `docs/CURSOR_WORKFLOW.md`. Patterns stepper / glossaire : `docs/AGENTS_EXTENDED.md`.
 
-14. **Règle fichier > 50 lignes** : tout nouveau fichier `src/features/**/*.ts(x)` de plus de 50 lignes métier **doit** avoir au moins 1 test colocalisé dans `__tests__/`. Cette règle ne s'applique pas aux fichiers purement déclaratifs (types, constantes, i18n, UI sans logique). Les hooks React (`use*.ts`) et les fonctions de traitement (`chatbot-*.ts`, `algorithm.ts`, `*Schedule.ts`, etc.) sont toujours concernés.
-
-15. **Mocks globaux disponibles** : `jest.setup.ts` expose des mocks globaux pour `firebase-admin/firestore` (Firestore Admin), `openai` (SDK OpenAI), Firebase client SDK, Mapbox, Framer Motion, next/navigation. **Ne pas redéclarer** ces mocks dans les specs — surcharger avec `jest.spyOn` ou `mockReturnValue` si nécessaire. Pour les tests serveur (`@jest-environment node`) qui utilisent Firebase Admin via `firebase-admin` (pas `firebase-admin/firestore`), mocker directement `firebase-admin` inline comme montré dans `finalizeInterventionInvoiceAdmin.test.ts`.
-
-16. **HubAgents** : tout changement dans `src/features/hubAgents/` doit être couvert par les tests dans `src/features/hubAgents/__tests__/`. Pattern : `useHubAgent` → `renderHook` + mock `fetchWithAuth` + mock stream via `body.getReader()` (pas `ReadableStream` natif — indisponible en jsdom). `useHubAgentStreamHandler` → `renderHook` + mocks des contexts pager/chatbot/billing/inbox.
-
-## Patterns obligatoires pour les steppers (pages 2 & 3)
-
-Ces règles s'appliquent à tout composant à étapes multiples utilisant `AnimatePresence`.
-
-10. **Stepper invariants**: Tout wizard multi-étapes (`RequesterInterventionPanel`, `TechnicianFinishJobPanel`, etc.) doit avoir au minimum ces 3 tests : (a) indicateur d'étape actif sur la bonne étape à chaque transition, (b) bouton retour ramène à l'étape précédente, (c) soumission finale appelle le service métier avec les bons arguments. Utiliser `waitFor` après chaque `fireEvent.click` pour attendre la transition.
-
-11. **Context persistence**: Pour un context React qui persiste en `localStorage` (ex. `RequesterHubContext`), tester obligatoirement : (a) `persist → restore` — JSON sérialisé puis désérialisé conserve les données, (b) `resetAll` — l'état retourne aux valeurs par défaut, (c) toute migration de champ legacy (`societe → login`). Ne pas mocker `localStorage` — le vrai `localStorage` de jsdom est suffisant.
-
-12. **Form submit : 3 tests minimum**: Tout formulaire qui appelle un service réseau (Firestore, fetch, upload) doit avoir au moins : (a) soumission bloquée si champ obligatoire manquant, (b) soumission bloquée si utilisateur non authentifié, (c) soumission réussie vérifie les arguments passés au service. Penser à surcharger `@/core/config/firebase` dans le fichier de test si le composant vérifie `auth.currentUser` (le mock global met `currentUser: null`).
-
-13. **Panneaux vides = bug latent**: Si un `DashboardTriplePanelLayout` a un panneau gauche ou droit vide (`<section></section>`), c'est un indicateur que les sous-composants n'ont pas été câblés. Vérifier si des composants orphelins (non importés mais présents dans le dossier `components/`) doivent y être rendus. Ajouter un mock `jest.mock("@/features/featureHub/companyStockChatbot", ...)` si le sous-composant utilise `navigateToChatbotWithPrompt`.
-
-## Glossaire UI — hub société (carrousel)
-
-- **Qui demande ?** : rail gauche (`CompanyHubPage`) — `RequesterProfilePanel` (`Particulier` / `Login`). Onglet Login : `ClientPortalAuthPanel` en `authRailMode` (`data-testid="requester-login-rail"`). Section `data-testid="company-hub-rail-demande"`. Ancre : `COMPANY_HUB_ANCHOR_WORKSPACE` (`company-hub-workspace`). `dashboard-secondary-panel-left`.
-- **Que faut-il réparer ?** : rail central — `RequesterInterventionPanel` (`data-testid="requester-intervention-panel"`). Ancre : `COMPANY_HUB_ANCHOR_SMART_FORM` (`company-hub-smart-form`). `dashboard-secondary-panel-center`.
-- **Suivi et chat** : rail droit — `data-testid="company-hub-rail-portail"` : onglets `company-hub-right-tab-tracking` / `company-hub-right-tab-chat` (`RequesterTrackingPanel`, `IvanaClientChatPanel`). `dashboard-secondary-panel-right`. (Le composant `CompanySpacePanel` reste utilisé ailleurs dans l’app, mais plus comme rail central de cette page.)
+1. **Tests colocalisés** : tout hook ou logique métier modifié dans `src/features/*` → `__tests__/` à côté. Fichier > 50 lignes métier → au moins 1 test (sauf types/constantes purs).
+2. **data-testid** : éléments interactifs testés en RTL.
+3. **Mocks globaux** : `jest.setup.ts` (Firebase, Mapbox, Framer, OpenAI) — étendre une fois, pas par spec.
+4. **Helpers** : `render` / `renderWithPager` (`src/test-utils/`), fixtures `makeIntervention` (`factories.ts`).
+5. **Boucle** : `npx jest <path> --no-coverage` · **merge** : `npm run test:ci`.
+6. **Zones** : `npm run test:chatbot` · `test:interventions` · `test:feature-hub` · `test:crm` · `test:billing-hub` · `test:patron-hubs` · `test:mobile-infra`.
+7. **Chatbot** : après modif → `test:chatbot` + `test:ci`. Détail `docs/TESTING.md` §3.
+8. **Interventions serveur** : logique dans `server/*.ts`, routes API = wrappers minces.
+9. **HubAgents** : tests dans `src/features/hubAgents/__tests__/` (stream mock via `body.getReader()`).
+10. **E2E** : `tests/e2e/` — parcours critiques seulement.
+11. **Parallèle** : `docs/PARALLEL_WORK.md` — une zone, un propriétaire.

@@ -1,0 +1,15 @@
+---
+description: Dashboard shell — mobile UI + carrousel (coordination)
+globs: src/features/dashboard/**,src/features/dashboard/**/*.css
+alwaysApply: false
+---
+
+# Dashboard shell
+
+**Tests shell** : `npm run test:mobile-shell`
+
+Carrousel : `DashboardPagerProvider`, registre `dashboardCarouselRegistry.ts`.
+
+**F-UI mobile** : si session Claude active sur `Mobile*.tsx`, ne pas éditer en parallèle.
+
+Navigation inter-pages : `useDashboardPagerOptional().setPageIndex(N)`.

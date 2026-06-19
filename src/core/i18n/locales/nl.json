@@ -239,6 +239,58 @@
     "invoice_amount_invalid": "Ongeldig bedrag",
     "invoice_amount_saved": "Bedrag en commissie bijgewerkt"
   },
+  "commissionsHub": {
+    "company_required": "Selecteer een bedrijf.",
+    "guide": {
+      "value_label": "te betalen deze maand",
+      "hint": "Tik op een technicus voor details.",
+      "chip_team": "Technici",
+      "chip_rules": "Instellingen"
+    },
+    "mode": {
+      "team": "Team",
+      "rules": "Regels",
+      "manual": "Bonus",
+      "history": "Log"
+    },
+    "kpi": {
+      "month_total": "Deze maand",
+      "active_techs": "Technici",
+      "exceptions": "Uitzonderingen"
+    },
+    "company_rule": {
+      "label": "Bedrijfsregel",
+      "applies_all": "Voor iedereen: {{value}}",
+      "empty": "Standaardcommissie instellen",
+      "empty_hint": "1 klik — geldt voor het hele team"
+    },
+    "team": {
+      "empty": "Geen commissies deze maand",
+      "missions": "missies",
+      "no_missions": "0 missie",
+      "bonus": "bonus",
+      "rule": "Regel",
+      "personal": "eigen",
+      "month_label": "Deze maand",
+      "add_bonus": "+ Bonus",
+      "set_rule": "Eigen regel",
+      "edit_rule": "Regel wijzigen"
+    },
+    "level": {
+      "all": "Alles"
+    },
+    "level_filter_aria": "Filter op niveau",
+    "add": "Regel",
+    "save": "Opslaan",
+    "pick_or_add": "Kies een tegel of +",
+    "history_hint": "Gebeurtenissen — midden",
+    "aria": {
+      "page": "Pagina",
+      "left": "modi",
+      "center": "raster",
+      "right": "detail"
+    }
+  },
   "payment": {
     "pay_now": "Online betalen",
     "pay_by_card": "Betalen met kaart",
@@ -856,16 +908,29 @@
     "title": "Team",
     "subtitle": "Medewerkers en technici van uw bedrijf",
     "company_required": "Selecteer een actief bedrijf.",
+    "guide": {
+      "value_label": "actieve mensen",
+      "hint": "Tik op een naam om te wijzigen.",
+      "chip_active": "Actief",
+      "chip_all": "Alle"
+    },
     "empty": "Geen medewerkers voor dit filter.",
     "no_email": "Geen e-mail ingevuld",
-    "select_member": "Selecteer een medewerker om het profiel te bewerken.",
+    "select_member": "Tik links op een naam.",
     "save": "Opslaan",
     "deactivate": "Deactiveren",
     "reactivate": "Heractiveren",
+    "technician_badge": "Veld",
+    "kpi": {
+      "total": "Personeel",
+      "active": "Actief",
+      "technicians": "Veld"
+    },
     "filter": {
+      "all": "Alle",
       "active": "Actief",
       "inactive": "Inactief",
-      "all": "Alle"
+      "technicians": "Veld"
     },
     "status": {
       "active": "Actief",
@@ -882,7 +947,80 @@
       "vehicle": "Voertuig"
     },
     "aria": {
-      "page": "Pagina"
+      "page": "Pagina",
+      "left": "samenvatting",
+      "center": "lijst",
+      "right": "profiel"
+    }
+  },
+  "caseHub": {
+    "company_required": "Selecteer een bedrijf.",
+    "guide": {
+      "value_label": "lopende dossiers",
+      "hint": "Tik op een dossier om alles te zien.",
+      "chip_open": "Bezig",
+      "chip_done": "Afgesloten"
+    },
+    "empty": "Geen dossiers voor dit filter.",
+    "pick_case": "Tik links op een dossier.",
+    "selected_label": "Dossier",
+    "kpi": {
+      "open": "Open",
+      "active": "Bezig",
+      "week": "Deze week"
+    },
+    "filter": {
+      "all": "Alle",
+      "open": "Open",
+      "active": "Bezig",
+      "done": "Afgesloten"
+    },
+    "status": {
+      "pending": "Wachten",
+      "assigned": "Toegewezen",
+      "en_route": "Onderweg",
+      "in_progress": "Ter plaatse",
+      "waiting_material": "Materiaal",
+      "done": "Klaar",
+      "invoiced": "Gefactureerd",
+      "cancelled": "Geannuleerd",
+      "pending_needs_address": "Adres"
+    },
+    "aria": {
+      "page": "Pagina",
+      "left": "samenvatting",
+      "center": "lijst",
+      "right": "detail"
+    }
+  },
+  "planningHub": {
+    "company_required": "Selecteer een bedrijf.",
+    "guide": {
+      "value_label": "opdrachten vandaag",
+      "hint": "Kies een technicus, dan een uur."
+    },
+    "no_technicians": "Geen technici.",
+    "missions_today": "opdrachten",
+    "today": "Vandaag",
+    "conflict_hint": "Twee opdrachten tegelijk — verplaats er één.",
+    "slot_detail": "Tijdslot",
+    "pending_title": "Vandaag te doen",
+    "pending_hint": "Opdrachten zonder technicus of nog niet geaccepteerd",
+    "pending_empty": "Alles in orde.",
+    "pending_state": {
+      "unassigned": "Geen tech",
+      "awaiting_accept": "Te accepteren"
+    },
+    "kpi": {
+      "missions": "Opdrachten",
+      "conflicts": "Conflicten",
+      "unassigned": "Zonder tech"
+    },
+    "aria": {
+      "page": "Pagina",
+      "left": "team",
+      "center": "uren",
+      "right": "detail"
     }
   },
   "spotlight": {
@@ -904,6 +1042,9 @@
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Facturatie",
     "nav_team_hub": "Team",
+    "nav_case_hub": "Dossiers",
+    "nav_commissions_hub": "Commissies",
+    "nav_planning_hub": "Planning",
     "open_aria": "Zoek openen",
     "active_label": "Actief",
     "nav_group_heading": "Navigatie"
@@ -2146,6 +2287,9 @@
     "tab_crm": "CRM",
     "tab_billing": "Facturen",
     "tab_team": "Team",
+    "tab_case": "Dossiers",
+    "tab_commissions": "Comm.",
+    "tab_planning": "Planning",
     "rail_segment_label": "Paneel van de pagina",
     "rail_left": "Links",
     "rail_center": "Midden",

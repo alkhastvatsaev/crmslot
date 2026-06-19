@@ -35,6 +35,10 @@ L’utilisateur peut avoir **Cursor (Agent)** et **Claude Code dans le terminal*
 | `src/app/page.tsx`, i18n, contexts | Une seule personne/outil à la fois |
 | API + UI même feature | Enchaîner API puis UI, ou même propriétaire |
 
+## Perf Cursor
+
+Voir [docs/CURSOR_WORKFLOW.md](docs/CURSOR_WORKFLOW.md) — `.cursorignore`, scripts zone, worktree.
+
 ## Commandes utiles
 
 ```bash

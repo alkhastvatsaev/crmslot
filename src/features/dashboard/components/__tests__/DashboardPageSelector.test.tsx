@@ -7,7 +7,7 @@ describe("DashboardPageSelector", () => {
     const onClose = jest.fn();
 
     render(
-      <DashboardPagerProvider pageCount={6}>
+      <DashboardPagerProvider pageCount={9}>
         <DashboardPageSelector onClose={onClose} variant="desktop" />
       </DashboardPagerProvider>
     );

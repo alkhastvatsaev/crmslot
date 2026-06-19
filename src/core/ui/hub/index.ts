@@ -22,3 +22,6 @@ export type { HubFilterChipOption } from "@/core/ui/hub/HubFilterChips";
 export { default as HubPanelHeader } from "@/core/ui/hub/HubPanelHeader";
 export { default as HubSegmentedControl } from "@/core/ui/hub/HubSegmentedControl";
 export type { HubSegmentOption } from "@/core/ui/hub/HubSegmentedControl";
+export { default as PatronHubGuide } from "@/core/ui/hub/PatronHubGuide";
+export { default as PatronHubChipRow } from "@/core/ui/hub/PatronHubChipRow";
+export type { PatronHubChipOption } from "@/core/ui/hub/PatronHubChipRow";

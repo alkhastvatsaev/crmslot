@@ -1,0 +1,13 @@
+---
+description: Zone B — Matériel entreprise (feature hub)
+globs: src/features/featureHub/**,src/features/catalog/**,src/app/api/ai/material-agent/**
+alwaysApply: false
+---
+
+# Zone Matériel
+
+**Tests** : `npm run test:feature-hub` → `npm run test:ci` avant merge.
+
+Navigation chatbot : `companyStockChatbot.ts` — événements `chatbot-draft-prompt` / `chatbot-quick-prompt`.
+
+Lecot : feature flags `lecotProductSearch`, `supplierPortal`.

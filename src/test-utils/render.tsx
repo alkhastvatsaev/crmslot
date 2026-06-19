@@ -21,11 +21,11 @@ interface AllTheProvidersProps {
 /**
  * Wraps children with all application providers for testing.
  */
-export function AllTheProviders({ 
-  children, 
-  pageCount = 7,
+export function AllTheProviders({
+  children,
+  pageCount = 9,
   initialPageIndex = 0,
-  activeCompanyId = null
+  activeCompanyId = null,
 }: AllTheProvidersProps) {
   // Keep unit tests lightweight and deterministic.
   if (process.env.NODE_ENV === "test") {
@@ -46,9 +46,7 @@ export function AllTheProviders({
                 <OfflineSyncProvider>
                   <TechnicianCaseIntentProvider>
                     <BackofficeInboxIntentProvider>
-                      <TechnicianFinishJobProvider>
-                        {children}
-                      </TechnicianFinishJobProvider>
+                      <TechnicianFinishJobProvider>{children}</TechnicianFinishJobProvider>
                     </BackofficeInboxIntentProvider>
                   </TechnicianCaseIntentProvider>
                 </OfflineSyncProvider>
@@ -72,17 +70,12 @@ interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
  */
 export function renderWithProviders(
   ui: ReactElement,
-  { 
-    pageCount, 
-    initialPageIndex,
-    activeCompanyId, 
-    ...options 
-  }: CustomRenderOptions = {}
+  { pageCount, initialPageIndex, activeCompanyId, ...options }: CustomRenderOptions = {}
 ) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <AllTheProviders 
-        pageCount={pageCount} 
+      <AllTheProviders
+        pageCount={pageCount}
         initialPageIndex={initialPageIndex}
         activeCompanyId={activeCompanyId}
       >

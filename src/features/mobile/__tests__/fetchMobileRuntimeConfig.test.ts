@@ -21,7 +21,7 @@ describe("fetchMobileRuntimeConfig", () => {
         forceMobileQueryKey: "forceMobile",
         pwaServiceWorkerEnabled: false,
         gitSha: "deadbeef",
-        hubPageCount: 7,
+        hubPageCount: 9,
         nodeEnv: "test",
         timestamp: "2026-06-07T00:00:00.000Z",
       }),
@@ -30,7 +30,7 @@ describe("fetchMobileRuntimeConfig", () => {
     const cfg = await fetchMobileRuntimeConfig();
     expect(fetchMock).toHaveBeenCalledWith("/api/mobile/config", { cache: "no-store" });
     expect(cfg?.mobileAccessAllowed).toBe(true);
-    expect(cfg?.hubPageCount).toBe(7);
+    expect(cfg?.hubPageCount).toBe(9);
   });
 
   it("retourne null si la route échoue", async () => {

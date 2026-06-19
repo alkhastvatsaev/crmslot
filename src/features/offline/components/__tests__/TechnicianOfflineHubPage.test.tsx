@@ -30,7 +30,7 @@ jest.mock("@/features/copilot/hooks/useWorkspaceCopilotSnapshot", () => ({
 
 describe("TechnicianOfflineHubPage", () => {
   it("renders PWA copilot chat with context rails", () => {
-    render(<TechnicianOfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />, { pageCount: 6 });
+    render(<TechnicianOfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />, { pageCount: 9 });
     expect(screen.getByTestId("pwa-copilot-chat-panel")).toBeInTheDocument();
     expect(screen.getByTestId("pwa-copilot-context-summary")).toBeInTheDocument();
     expect(screen.getByTestId("pwa-copilot-suggestions")).toBeInTheDocument();
