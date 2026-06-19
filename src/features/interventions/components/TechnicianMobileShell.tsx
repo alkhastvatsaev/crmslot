@@ -69,7 +69,7 @@ export default function TechnicianMobileShell({ children }: Props) {
               data-mobile-header-rail-active="true"
               className="mobile-header-rail-layer flex h-full w-full min-h-0 items-stretch"
             >
-              <ClockCalendar compact interactive />
+              <ClockCalendar compact interactive toggleTarget="calendar" />
             </div>
           </div>
         </MobileShellSlotGrid>

@@ -1152,6 +1152,25 @@
         "actions": "Quick actions",
         "active": "Active"
       },
+      "calendar": {
+        "title": "Mission calendar",
+        "subtitle": "Tap a day to view its missions",
+        "prev_month": "Previous month",
+        "next_month": "Next month",
+        "legend_title": "Legend",
+        "legend_scheduled": "Upcoming",
+        "legend_completed": "Completed",
+        "legend_awaiting": "To accept",
+        "legend_mixed": "Mixed status",
+        "weekdays_short": ["M", "T", "W", "T", "F", "S", "S"],
+        "weekday_mon": "M",
+        "weekday_tue": "T",
+        "weekday_wed": "W",
+        "weekday_thu": "T",
+        "weekday_fri": "F",
+        "weekday_sat": "S",
+        "weekday_sun": "S"
+      },
       "images": {
         "no_mission_selected": "Select a mission to see client photos",
         "no_photos": "No photos provided by the client",

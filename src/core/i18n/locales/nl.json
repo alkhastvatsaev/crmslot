@@ -1152,6 +1152,25 @@
         "actions": "Snelle acties",
         "active": "Actief"
       },
+      "calendar": {
+        "title": "Missiekalender",
+        "subtitle": "Tik op een dag om de missies te tonen",
+        "prev_month": "Vorige maand",
+        "next_month": "Volgende maand",
+        "legend_title": "Legende",
+        "legend_scheduled": "Te doen",
+        "legend_completed": "Voltooid",
+        "legend_awaiting": "Te accepteren",
+        "legend_mixed": "Gemengde status",
+        "weekdays_short": ["M", "D", "W", "D", "V", "Z", "Z"],
+        "weekday_mon": "M",
+        "weekday_tue": "D",
+        "weekday_wed": "W",
+        "weekday_thu": "D",
+        "weekday_fri": "V",
+        "weekday_sat": "Z",
+        "weekday_sun": "Z"
+      },
       "images": {
         "no_mission_selected": "Selecteer een missie om klantfoto's te zien",
         "no_photos": "Geen foto's verstrekt door de klant",
