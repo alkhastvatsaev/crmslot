@@ -1108,6 +1108,7 @@
         "job_title": "Functietitel",
         "gps_navigation": "GPS-navigatie",
         "mission_completed": "Deze interventie is voltooid en gesloten.",
+        "consult_edit_closed": "Rapport bekijken of wijzigen",
         "mission_done_badge": "Voltooid",
         "invoice_backoffice_pending": "Stuur de factuur hieronder naar de klant.",
         "edit_report": "Rapport wijzigen",
@@ -1262,6 +1263,8 @@
         "report_sent_desc": "Stuur de automatische factuur in één tik naar de klant.",
         "report_updated": "Rapport bijgewerkt",
         "report_updated_desc": "De missie blijft voltooid. Uw aanpassingen zijn opgeslagen.",
+        "invoiced_report_updated": "Wijzigingen opgeslagen",
+        "invoiced_report_updated_desc": "Het backoffice is op de hoogte gebracht van uw wijzigingen.",
         "presentation_mode": "Presentatiemodus",
         "presentation_mode_desc": "Lichte cloudopslag. Back-office ziet het rapport via de demomodus.",
         "send_failed": "Verzenden niet mogelijk",
@@ -1399,6 +1402,7 @@
       "tag_request": "Aanvraag",
       "tag_report": "Rapport",
       "tag_verified": "Geverifieerd",
+      "tag_amended": "Gewijzigd",
       "empty_requests": "Geen nieuwe aanvragen",
       "empty_reports": "Geen rapporten om te verifiëren",
       "detail_title_request": "Aanvraagdetails",
@@ -1453,7 +1457,10 @@
       "view_invoice_pdf": "Factuur PDF bekijken",
       "invoice_preview_label": "Voorgestelde factuur",
       "invoice_preview_empty": "Nog geen factuur voorbereid door de technicus.",
-      "invoice_review_alert_title": "Technicus — factuur te corrigeren"
+      "invoice_review_alert_title": "Technicus — factuur te corrigeren",
+      "technician_amendment_alert_title": "Rapport gewijzigd door technicus",
+      "technician_amendment_alert_body": "{{name}} heeft de gegevens van deze interventie na afsluiting gewijzigd.",
+      "unknown_technician": "Een technicus"
     },
     "toasts": {
       "request_deleted": "Aanvraag verwijderd",

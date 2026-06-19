@@ -30,7 +30,7 @@ describe("TechnicianMonthCalendar", () => {
     jest.useRealTimers();
   });
 
-  it("renders month grid with mission count and selects a day", () => {
+  it("renders month grid with tone dot and selects a day", () => {
     const onClose = jest.fn();
 
     render(
@@ -40,11 +40,15 @@ describe("TechnicianMonthCalendar", () => {
     );
 
     expect(screen.getByTestId("technician-month-calendar")).toBeInTheDocument();
+    expect(screen.queryByTestId("technician-calendar-legend")).not.toBeInTheDocument();
     expect(screen.getByTestId("technician-calendar-day-2026-06-20")).toHaveAttribute(
       "data-calendar-tone",
       "scheduled"
     );
-    expect(screen.getByTestId("technician-calendar-day-count-2026-06-20")).toHaveTextContent("1");
+    expect(
+      screen.queryByTestId("technician-calendar-day-count-2026-06-20")
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("technician-calendar-day-2026-07-01")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("technician-calendar-day-2026-06-20"));
     expect(onClose).toHaveBeenCalled();

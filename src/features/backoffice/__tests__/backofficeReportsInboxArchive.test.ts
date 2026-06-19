@@ -7,7 +7,8 @@ import {
 import type { Intervention } from "@/features/interventions/types";
 
 function iv(
-  partial: Pick<Intervention, "status"> & Partial<Pick<Intervention, "backofficeReportsArchivedAt">>
+  partial: Pick<Intervention, "status"> &
+    Partial<Pick<Intervention, "backofficeReportsArchivedAt" | "technicianReportAmendedAt">>
 ): Intervention {
   return {
     id: "iv-1",
@@ -28,6 +29,18 @@ describe("backofficeReportsInboxArchive", () => {
         iv({ status: "invoiced", backofficeReportsArchivedAt: "2026-06-01T10:00:00.000Z" })
       )
     ).toBe(false);
+  });
+
+  it("active queue: technician amendment resurfaces archived invoiced report", () => {
+    expect(
+      isBackofficeReportInInboxActiveQueue(
+        iv({
+          status: "invoiced",
+          backofficeReportsArchivedAt: "2026-06-01T10:00:00.000Z",
+          technicianReportAmendedAt: "2026-06-02T10:00:00.000Z",
+        })
+      )
+    ).toBe(true);
   });
 
   it("archive section: only when archive timestamp is set", () => {

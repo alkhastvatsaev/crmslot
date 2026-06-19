@@ -28,32 +28,29 @@ type Props = {
 
 const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
-function dayToneClass(tone: TechnicianMonthDayTone, selected: boolean, today: boolean): string {
-  if (selected) {
-    return "border-blue-600 bg-blue-600 text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.55)]";
-  }
-  if (today) {
-    return "border-blue-300 bg-blue-50/90 text-slate-900 ring-2 ring-blue-200/80";
-  }
+function toneDotClass(tone: TechnicianMonthDayTone): string {
   switch (tone) {
     case "awaiting":
-      return "border-amber-200/90 bg-amber-50 text-amber-950";
+      return "bg-amber-500";
     case "scheduled":
-      return "border-blue-200/90 bg-blue-50 text-slate-900";
+      return "bg-blue-500";
     case "completed":
-      return "border-emerald-200/90 bg-emerald-50/90 text-emerald-950";
+      return "bg-emerald-500";
     case "mixed":
-      return "border-violet-200/90 bg-gradient-to-br from-blue-50 to-emerald-50 text-slate-900";
+      return "bg-gradient-to-r from-blue-500 to-emerald-500";
     default:
-      return "border-slate-200/80 bg-white text-slate-600";
+      return "bg-transparent";
   }
 }
 
-function LegendDot({ className }: { className: string }) {
-  return <span className={cn("h-2 w-2 shrink-0 rounded-full", className)} aria-hidden />;
+function dayNumberClass(tone: TechnicianMonthDayTone, selected: boolean, today: boolean): string {
+  if (selected) return "font-semibold text-slate-900";
+  if (today) return "font-semibold text-slate-800";
+  if (tone === "empty") return "font-normal text-slate-300";
+  return "font-medium text-slate-700";
 }
 
-/** Calendrier mois terrain — vue globale + sélection rapide du jour. */
+/** Calendrier mois terrain — vue globale minimaliste. */
 export default function TechnicianMonthCalendar({ interventions, technicianUid, onClose }: Props) {
   const { selectedDate, setSelectedDate } = useDateContext();
   const { t, language, tValue } = useTranslation();
@@ -74,9 +71,11 @@ export default function TechnicianMonthCalendar({ interventions, technicianUid, 
   const weekdayLabels = useMemo(() => {
     const raw = tValue("technician_hub.dashboard.calendar.weekdays_short");
     if (Array.isArray(raw) && raw.length === 7) {
-      return raw.map(String);
+      return raw.map((label) => String(label).charAt(0));
     }
-    return WEEKDAY_KEYS.map((key) => String(t(`technician_hub.dashboard.calendar.weekday_${key}`)));
+    return WEEKDAY_KEYS.map((key) =>
+      String(t(`technician_hub.dashboard.calendar.weekday_${key}`)).charAt(0)
+    );
   }, [t, tValue]);
 
   const handlePickDay = (date: Date) => {
@@ -87,73 +86,70 @@ export default function TechnicianMonthCalendar({ interventions, technicianUid, 
   return (
     <section
       data-testid="technician-month-calendar"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3"
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-4 pt-2"
       aria-label={String(t("technician_hub.dashboard.calendar.title"))}
     >
-      <header className="mb-3 flex shrink-0 items-center justify-between gap-2">
+      <button
+        type="button"
+        data-testid="technician-calendar-close"
+        onClick={onClose}
+        className="absolute right-3 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+        aria-label={String(t("common.close"))}
+      >
+        <X className="h-4 w-4" strokeWidth={2} />
+      </button>
+
+      <header className="mb-5 flex shrink-0 items-center justify-center gap-5 pr-6">
         <button
           type="button"
           data-testid="technician-calendar-prev-month"
           onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, -1))}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+          className="flex h-8 w-8 items-center justify-center text-slate-400 transition hover:text-slate-700"
           aria-label={String(t("technician_hub.dashboard.calendar.prev_month"))}
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
         </button>
 
-        <div className="min-w-0 flex-1 text-center">
-          <p
-            data-testid="technician-calendar-month-title"
-            className="truncate text-[15px] font-bold capitalize tracking-tight text-slate-900"
-          >
-            {monthTitle}
-          </p>
-          <p className="mt-0.5 text-[11px] font-medium text-slate-500">
-            {t("technician_hub.dashboard.calendar.subtitle")}
-          </p>
-        </div>
+        <p
+          data-testid="technician-calendar-month-title"
+          className="min-w-0 truncate text-[17px] font-semibold capitalize tracking-tight text-slate-900"
+        >
+          {monthTitle}
+        </p>
 
         <button
           type="button"
           data-testid="technician-calendar-next-month"
           onClick={() => setMonthAnchor((prev) => addCalendarMonths(prev, 1))}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+          className="flex h-8 w-8 items-center justify-center text-slate-400 transition hover:text-slate-700"
           aria-label={String(t("technician_hub.dashboard.calendar.next_month"))}
         >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-
-        <button
-          type="button"
-          data-testid="technician-calendar-close"
-          onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
-          aria-label={String(t("common.close"))}
-        >
-          <X className="h-4 w-4" />
+          <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
         </button>
       </header>
 
-      <div className="grid shrink-0 grid-cols-7 gap-1 px-0.5">
-        {weekdayLabels.map((label) => (
+      <div className="grid shrink-0 grid-cols-7 gap-y-1">
+        {weekdayLabels.map((label, index) => (
           <div
-            key={label}
-            className="py-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400"
+            key={`${label}-${index}`}
+            className="pb-2 text-center text-[11px] font-medium text-slate-300"
           >
             {label}
           </div>
         ))}
       </div>
 
-      <div
-        data-testid="technician-calendar-grid"
-        className="mt-1 grid min-h-0 flex-1 auto-rows-fr grid-cols-7 gap-1.5"
-      >
+      <div data-testid="technician-calendar-grid" className="grid auto-rows-fr grid-cols-7 gap-y-3">
         {cells.map(({ date, inMonth, ymd }) => {
+          if (!inMonth) {
+            return <div key={ymd} aria-hidden className="aspect-square" />;
+          }
+
           const summary = daySummaries.get(ymd);
           const tone = resolveTechnicianMonthDayTone(summary);
           const isSelected = ymd === selectedYmd;
           const isToday = ymd === todayYmd;
+          const hasMissions = tone !== "empty";
 
           return (
             <button
@@ -161,58 +157,47 @@ export default function TechnicianMonthCalendar({ interventions, technicianUid, 
               type="button"
               data-testid={`technician-calendar-day-${ymd}`}
               data-calendar-tone={tone}
-              data-calendar-in-month={inMonth ? "true" : "false"}
-              disabled={!inMonth}
               onClick={() => handlePickDay(date)}
-              className={cn(
-                "relative flex min-h-[2.65rem] flex-col items-center justify-center rounded-xl border text-[13px] font-semibold tabular-nums transition active:scale-[0.97]",
-                !inMonth && "pointer-events-none opacity-30",
-                dayToneClass(tone, isSelected, isToday && !isSelected)
-              )}
+              className="group relative flex aspect-square flex-col items-center justify-center transition active:scale-95"
             >
-              <span>{date.getDate()}</span>
-              {summary && summary.total > 0 ? (
+              {isToday && !isSelected ? (
                 <span
-                  data-testid={`technician-calendar-day-count-${ymd}`}
-                  className={cn(
-                    "absolute bottom-1 rounded-full px-1 text-[9px] font-bold leading-none",
-                    isSelected ? "bg-white/25 text-white" : "bg-black/5 text-slate-600"
-                  )}
-                >
-                  {summary.total}
-                </span>
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full ring-1 ring-slate-200"
+                />
               ) : null}
+              {isSelected ? (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 m-auto h-9 w-9 rounded-full bg-slate-900"
+                />
+              ) : null}
+
+              <span
+                className={cn(
+                  "relative z-[1] text-[15px] tabular-nums leading-none",
+                  dayNumberClass(tone, isSelected, isToday),
+                  isSelected && "text-white"
+                )}
+              >
+                {date.getDate()}
+              </span>
+
+              {hasMissions ? (
+                <span
+                  aria-hidden
+                  className={cn(
+                    "relative z-[1] mt-1 h-1 w-1 rounded-full",
+                    isSelected ? "bg-white/90" : toneDotClass(tone)
+                  )}
+                />
+              ) : (
+                <span aria-hidden className="mt-1 h-1 w-1" />
+              )}
             </button>
           );
         })}
       </div>
-
-      <footer
-        data-testid="technician-calendar-legend"
-        className="mt-3 shrink-0 rounded-2xl border border-slate-200/80 bg-white/80 px-3 py-2.5"
-      >
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          {t("technician_hub.dashboard.calendar.legend_title")}
-        </p>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] font-medium text-slate-600">
-          <span className="flex items-center gap-1.5">
-            <LegendDot className="bg-blue-500" />
-            {t("technician_hub.dashboard.calendar.legend_scheduled")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <LegendDot className="bg-emerald-500" />
-            {t("technician_hub.dashboard.calendar.legend_completed")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <LegendDot className="bg-amber-500" />
-            {t("technician_hub.dashboard.calendar.legend_awaiting")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <LegendDot className="bg-violet-400" />
-            {t("technician_hub.dashboard.calendar.legend_mixed")}
-          </span>
-        </div>
-      </footer>
     </section>
   );
 }

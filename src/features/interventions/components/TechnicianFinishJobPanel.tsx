@@ -52,8 +52,10 @@ import FinishJobStepIndicator, {
 } from "@/features/interventions/components/FinishJobStepIndicator";
 import TechnicianFinishInvoiceStep from "@/features/interventions/components/TechnicianFinishInvoiceStep";
 import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
-import type { FinishWizardPhoto } from "@/features/interventions/technicianCompletionReport";
-import { finishWizardPhotosFromIntervention } from "@/features/interventions/technicianCompletionReport";
+import {
+  finishWizardPhotosFromIntervention,
+  type FinishWizardPhoto,
+} from "@/features/interventions/technicianCompletionReport";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { patchTechnicianAssignmentInCache } from "@/features/interventions/patchTechnicianAssignmentInCache";
 import { getTechnicianAssignmentUid } from "@/features/interventions/technicianAssignmentActions";
@@ -100,7 +102,7 @@ export default function TechnicianFinishJobPanel() {
   const liveIv = useInterventionLive(interventionId);
   const liveStatus = liveIv?.status;
   const isAmendMode = liveStatus === "done";
-  const isInvoicedLocked = liveStatus === "invoiced";
+  const isInvoicedAmendMode = liveStatus === "invoiced";
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -210,12 +212,13 @@ export default function TechnicianFinishJobPanel() {
   }, [interventionId, finishJobEntryStep, prefetchDraftBilling]);
 
   useEffect(() => {
-    if (!interventionId || isAmendMode || isInvoicedLocked) return;
+    if (!interventionId || isAmendMode || isInvoicedAmendMode) return;
     void prefetchDraftBilling(interventionId);
-  }, [interventionId, isAmendMode, isInvoicedLocked, prefetchDraftBilling]);
+  }, [interventionId, isAmendMode, isInvoicedAmendMode, prefetchDraftBilling]);
 
   useEffect(() => {
-    if (!liveIv || liveIv.status !== "done" || hydratedReportRef.current === liveIv.id) return;
+    if (!liveIv || hydratedReportRef.current === liveIv.id) return;
+    if (liveIv.status !== "done" && liveIv.status !== "invoiced") return;
     hydratedReportRef.current = liveIv.id;
     const existingPhotos = finishWizardPhotosFromIntervention(liveIv);
     if (existingPhotos.length > 0) {
@@ -264,17 +267,9 @@ export default function TechnicianFinishJobPanel() {
       toast.error(String(t("technician_hub.finish.toasts.login_required")));
       return;
     }
-    const sig = sigRef.current?.getPngDataUrl();
+    const sig = sigRef.current?.getPngDataUrl() ?? liveIv?.completionSignatureUrl ?? null;
     if (!sig) {
       toast.error(String(t("technician_hub.finish.toasts.signature_missing")));
-      return;
-    }
-
-    if (isInvoicedLocked) {
-      toast.message(String(t("technician_hub.finish.toasts.already_invoiced")), {
-        description: String(t("technician_hub.finish.toasts.already_invoiced_desc")),
-      });
-      setStep("billing");
       return;
     }
 
@@ -298,9 +293,11 @@ export default function TechnicianFinishJobPanel() {
           iv: liveIv,
           actorUid,
           actorRole: "technician",
-          note: isAmendMode
-            ? `Rapport terrain modifié (${photoDataUrls.length} photo(s))`
-            : `Rapport terrain (${photoDataUrls.length} photo(s))`,
+          note: isInvoicedAmendMode
+            ? `Rapport facturé modifié (${photoDataUrls.length} photo(s))`
+            : isAmendMode
+              ? `Rapport terrain modifié (${photoDataUrls.length} photo(s))`
+              : `Rapport terrain (${photoDataUrls.length} photo(s))`,
         });
       }
 
@@ -324,6 +321,14 @@ export default function TechnicianFinishJobPanel() {
         void offlineSync?.flushNow?.();
       }
       void offlineSync?.refreshPendingCount();
+
+      if (isInvoicedAmendMode) {
+        toast.success(String(t("technician_hub.finish.toasts.invoiced_report_updated")), {
+          description: String(t("technician_hub.finish.toasts.invoiced_report_updated_desc")),
+        });
+        goDashboard();
+        return;
+      }
 
       const technicianUid = auth?.currentUser?.uid?.trim() || "";
       if (isAmendMode && technicianUid) {

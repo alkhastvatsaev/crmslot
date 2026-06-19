@@ -1108,6 +1108,7 @@
         "job_title": "Intitulé",
         "gps_navigation": "Navigation GPS",
         "mission_completed": "Cette intervention est terminée et clôturée.",
+        "consult_edit_closed": "Consulter ou modifier le rapport",
         "mission_done_badge": "Terminée",
         "invoice_backoffice_pending": "Envoyez la facture au client ci-dessous.",
         "edit_report": "Modifier le rapport",
@@ -1262,6 +1263,8 @@
         "report_sent_desc": "Envoyez la facture automatique au client en un clic.",
         "report_updated": "Rapport mis à jour",
         "report_updated_desc": "La mission reste terminée. Vos corrections sont enregistrées.",
+        "invoiced_report_updated": "Modifications enregistrées",
+        "invoiced_report_updated_desc": "Le back-office a été notifié de vos changements.",
         "presentation_mode": "Mode présentation",
         "presentation_mode_desc": "Sauvegarde cloud allégée. Le back-office voit le rapport via le mode démo.",
         "send_failed": "Envoi impossible",
@@ -1399,6 +1402,7 @@
       "tag_request": "Demande",
       "tag_report": "Rapport",
       "tag_verified": "Vérifié",
+      "tag_amended": "Modifié",
       "empty_requests": "Aucune nouvelle demande",
       "empty_reports": "Aucun rapport à vérifier",
       "detail_title_request": "Détails demande",
@@ -1453,7 +1457,10 @@
       "view_invoice_pdf": "Voir la facture PDF",
       "invoice_preview_label": "Facture proposée",
       "invoice_preview_empty": "Aucune facture préparée par le technicien pour l'instant.",
-      "invoice_review_alert_title": "Technicien — facture à corriger"
+      "invoice_review_alert_title": "Technicien — facture à corriger",
+      "technician_amendment_alert_title": "Rapport modifié par le technicien",
+      "technician_amendment_alert_body": "{{name}} a modifié les informations de cette intervention après clôture.",
+      "unknown_technician": "Un technicien"
     },
     "toasts": {
       "request_deleted": "Demande supprimée",

@@ -1108,6 +1108,7 @@
         "job_title": "Title",
         "gps_navigation": "GPS Navigation",
         "mission_completed": "This intervention is finished and closed.",
+        "consult_edit_closed": "View or edit the report",
         "mission_done_badge": "Done",
         "invoice_backoffice_pending": "Send the invoice to the client below.",
         "edit_report": "Edit report",
@@ -1262,6 +1263,8 @@
         "report_sent_desc": "Send the automatic invoice to the client in one tap.",
         "report_updated": "Report updated",
         "report_updated_desc": "The job stays marked done. Your changes are saved.",
+        "invoiced_report_updated": "Changes saved",
+        "invoiced_report_updated_desc": "The back office has been notified of your changes.",
         "presentation_mode": "Presentation mode",
         "presentation_mode_desc": "Lightweight cloud save. Back-office sees the report via demo mode.",
         "send_failed": "Unable to send",
@@ -1399,6 +1402,7 @@
       "tag_request": "Request",
       "tag_report": "Report",
       "tag_verified": "Verified",
+      "tag_amended": "Amended",
       "empty_requests": "No new requests",
       "empty_reports": "No reports to verify",
       "detail_title_request": "Request details",
@@ -1453,7 +1457,10 @@
       "view_invoice_pdf": "View invoice PDF",
       "invoice_preview_label": "Proposed invoice",
       "invoice_preview_empty": "No invoice prepared by the technician yet.",
-      "invoice_review_alert_title": "Technician — invoice needs correction"
+      "invoice_review_alert_title": "Technician — invoice needs correction",
+      "technician_amendment_alert_title": "Report amended by technician",
+      "technician_amendment_alert_body": "{{name}} modified this intervention's details after closure.",
+      "unknown_technician": "A technician"
     },
     "toasts": {
       "request_deleted": "Request deleted",
