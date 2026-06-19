@@ -1,37 +1,42 @@
 {
   "files.watcherExclude": {
     "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
     "**/.next/**": true,
-    "**/.next-e2e-gate/**": true,
     "**/coverage/**": true,
     "**/android/**": true,
     "**/ios/**": true,
-    "**/playwright-report/**": true,
+    "**/public/**": true,
     "**/test-results/**": true,
-    "**/functions/node_modules/**": true,
-    "**/functions/lib/**": true
+    "**/playwright-report/**": true,
+    "**/src/core/i18n/locales/**": true,
+    "**/package-lock.json": true
   },
   "search.exclude": {
     "**/node_modules": true,
     "**/.next": true,
-    "**/.next-e2e-gate": true,
     "**/coverage": true,
     "**/android": true,
     "**/ios": true,
-    "**/dist": true,
-    "**/build": true,
-    "**/playwright-report": true,
-    "**/test-results/**": true,
-    "**/functions/node_modules": true,
-    "**/*.tsbuildinfo": true
+    "**/public": true,
+    "**/package-lock.json": true,
+    "**/src/core/i18n/locales": true,
+    "**/__tests__": true,
+    "**/*.test.ts": true,
+    "**/*.test.tsx": true,
+    "**/tests/e2e": true,
+    "**/scripts": true,
+    "**/functions": true
   },
   "files.exclude": {
     "**/.next": true,
-    "**/.next-e2e-gate": true
+    "**/ios/build": true,
+    "**/android/app/build": true,
+    "**/android/.gradle": true
   },
-  "typescript.tsserver.maxTsServerMemory": 4096,
+  "search.followSymlinks": false,
+  "typescript.tsserver.maxTsServerMemory": 8192,
   "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.disableAutomaticTypeAcquisition": true,
   "editor.formatOnSave": false
 }
