@@ -121,7 +121,6 @@ export default function PlanningHubPage({ slotIndex = PLANNING_HUB_SLOT_INDEX }:
           {companyId && !gate ? (
             selectedTech ? (
               <PlanningHubSlotGrid
-                techName={selectedTech.name}
                 slots={slots}
                 selectedSlotTime={selectedSlotTime}
                 onSelectSlot={setSelectedSlotTime}

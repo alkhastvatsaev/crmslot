@@ -11,29 +11,17 @@ const SLOT_CLASS = {
 };
 
 type Props = {
-  techName: string;
   slots: PlanningHubSlot[];
   selectedSlotTime: string | null;
   onSelectSlot: (time: string) => void;
 };
 
-export default function PlanningHubSlotGrid({
-  techName,
-  slots,
-  selectedSlotTime,
-  onSelectSlot,
-}: Props) {
+export default function PlanningHubSlotGrid({ slots, selectedSlotTime, onSelectSlot }: Props) {
   const { t } = useTranslation();
   const hasConflict = slots.some((s) => s.kind === "conflict");
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="shrink-0 border-b border-black/[0.05] px-4 py-3 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-          {t("planningHub.today")}
-        </p>
-        <p className="mt-1 text-sm font-semibold text-slate-800">{techName}</p>
-      </div>
       <div
         data-testid="planning-hub-slots"
         className="custom-scrollbar grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto p-4 sm:grid-cols-3"
@@ -45,17 +33,15 @@ export default function PlanningHubSlotGrid({
               key={slot.time}
               type="button"
               data-testid={`planning-slot-${slot.time}`}
+              aria-label={`${slot.time}${slot.label ? ` — ${slot.label}` : ""}`}
               onClick={() => onSelectSlot(slot.time)}
               className={cn(
-                "flex min-h-[88px] flex-col rounded-[20px] border p-3 text-left ring-1 transition hover:scale-[1.02]",
+                "flex min-h-[88px] flex-col items-center justify-center rounded-[20px] border p-3 ring-1 transition hover:scale-[1.02]",
                 SLOT_CLASS[slot.kind],
                 active && "ring-2 ring-slate-900/20"
               )}
             >
-              <span className="text-[11px] font-bold tabular-nums">{slot.time}</span>
-              <span className="mt-1 line-clamp-2 text-[12px] font-medium leading-snug">
-                {slot.label}
-              </span>
+              <span className="text-[13px] font-bold tabular-nums">{slot.time}</span>
             </button>
           );
         })}
