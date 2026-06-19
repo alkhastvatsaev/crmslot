@@ -1,13 +1,13 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import HubSquareGrid, { type HubSquareTileTone } from "@/core/ui/hub/HubSquareGrid";
 import type { PlanningHubSlot } from "@/features/planningHub/planningHubTypes";
 
-const SLOT_CLASS = {
-  free: "border-emerald-200/80 bg-emerald-50/80 text-emerald-800 ring-emerald-200/60",
-  busy: "border-sky-200/80 bg-sky-50/80 text-sky-900 ring-sky-200/60",
-  conflict: "border-red-300/80 bg-red-50/80 text-red-800 ring-red-200/60",
+const SLOT_TONE: Record<PlanningHubSlot["kind"], HubSquareTileTone> = {
+  free: "muted",
+  busy: "default",
+  conflict: "danger",
 };
 
 type Props = {
@@ -16,36 +16,27 @@ type Props = {
   onSelectSlot: (time: string) => void;
 };
 
+/** Créneaux du jour — même grille carrée que DailyMissions (page 0). */
 export default function PlanningHubSlotGrid({ slots, selectedSlotTime, onSelectSlot }: Props) {
   const { t } = useTranslation();
   const hasConflict = slots.some((s) => s.kind === "conflict");
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div
-        data-testid="planning-hub-slots"
-        className="custom-scrollbar grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto p-4 sm:grid-cols-3"
-      >
-        {slots.map((slot) => {
-          const active = selectedSlotTime === slot.time;
-          return (
-            <button
-              key={slot.time}
-              type="button"
-              data-testid={`planning-slot-${slot.time}`}
-              aria-label={`${slot.time}${slot.label ? ` — ${slot.label}` : ""}`}
-              onClick={() => onSelectSlot(slot.time)}
-              className={cn(
-                "flex min-h-[88px] flex-col items-center justify-center rounded-[20px] border p-3 ring-1 transition hover:scale-[1.02]",
-                SLOT_CLASS[slot.kind],
-                active && "ring-2 ring-slate-900/20"
-              )}
-            >
-              <span className="text-[13px] font-bold tabular-nums">{slot.time}</span>
-            </button>
-          );
-        })}
-      </div>
+      <HubSquareGrid
+        testId="planning-hub-slots"
+        tiles={slots.map((slot) => ({
+          id: slot.time,
+          primary: slot.label,
+          secondary: slot.time,
+          tone: SLOT_TONE[slot.kind],
+          testId: `planning-slot-${slot.time}`,
+        }))}
+        selectedId={selectedSlotTime}
+        onSelect={onSelectSlot}
+        minSlots={12}
+        size="compact"
+      />
       {hasConflict ? (
         <p
           data-testid="planning-hub-conflict-alert"
