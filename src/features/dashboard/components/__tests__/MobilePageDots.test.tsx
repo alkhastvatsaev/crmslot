@@ -11,7 +11,7 @@ describe("MobilePageDots", () => {
     );
 
     const dots = screen.getByTestId("mobile-page-dots").querySelectorAll(".mobile-page-dot");
-    expect(dots).toHaveLength(7);
+    expect(dots).toHaveLength(9);
     expect(dots[2]).toHaveClass("mobile-page-dot--active");
   });
 
