@@ -1,0 +1,61 @@
+name: Deploy Firebase rules
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - firestore.rules
+      - storage.rules
+      - firebase.json
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Skip si secrets Firebase absents
+        id: gate
+        run: |
+          if [[ -z "${{ secrets.FIREBASE_PROJECT_ID }}" || -z "${{ secrets.FIREBASE_CLIENT_EMAIL }}" || -z "${{ secrets.FIREBASE_PRIVATE_KEY }}" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Secrets FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY requis."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Écrire le compte de service temporaire
+        if: steps.gate.outputs.skip == 'false'
+        run: |
+          python3 << 'PY'
+          import json, os
+          sa = {
+            "type": "service_account",
+            "project_id": os.environ["FIREBASE_PROJECT_ID"],
+            "client_email": os.environ["FIREBASE_CLIENT_EMAIL"],
+            "private_key": os.environ["FIREBASE_PRIVATE_KEY"].replace("\\n", "\n"),
+            "token_uri": "https://oauth2.googleapis.com/token",
+          }
+          with open("firebase-sa.json", "w") as f:
+            json.dump(sa, f)
+          PY
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+
+      - name: Déployer firestore.rules + storage.rules
+        if: steps.gate.outputs.skip == 'false'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-sa.json
+        run: node scripts/ops/deploy-firebase-rules.mjs
