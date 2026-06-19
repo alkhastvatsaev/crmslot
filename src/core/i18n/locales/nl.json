@@ -1022,6 +1022,38 @@
       "left": "team",
       "center": "uren",
       "right": "detail"
+    },
+    "detail": {
+      "client_section": "Klantaanvraag",
+      "technician_section": "Technicusrapport",
+      "fields": {
+        "name": "Naam",
+        "company": "Bedrijf",
+        "phone": "Telefoon",
+        "email": "E-mail",
+        "whatsapp": "WhatsApp",
+        "address": "Adres",
+        "category": "Categorie",
+        "urgency_yes": "Dringend",
+        "problem": "Probleem",
+        "title": "Titel",
+        "requested_schedule": "Gevraagd tijdslot",
+        "transcription": "Transcriptie",
+        "photos_count": "Bijgevoegde foto's",
+        "status": "Status",
+        "assigned_schedule": "Gepland tijdslot",
+        "accepted_at": "Geaccepteerd op",
+        "arrived_at": "Aankomst ter plaatse",
+        "completed_at": "Afgerond op",
+        "duration": "Werkelijke duur",
+        "billing_lines": "Factuurregels",
+        "invoice_amount": "Factuurbedrag",
+        "commission": "Commissie",
+        "payment_status": "Betaling",
+        "signature_yes": "Klant handtekening",
+        "report_amended": "Rapport gewijzigd op",
+        "rejection_reason": "Reden afkeuring rapport"
+      }
     }
   },
   "spotlight": {

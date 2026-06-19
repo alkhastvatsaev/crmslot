@@ -1022,6 +1022,38 @@
       "left": "team",
       "center": "schedule",
       "right": "detail"
+    },
+    "detail": {
+      "client_section": "Client request",
+      "technician_section": "Technician report",
+      "fields": {
+        "name": "Name",
+        "company": "Company",
+        "phone": "Phone",
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "address": "Address",
+        "category": "Category",
+        "urgency_yes": "Urgent",
+        "problem": "Problem",
+        "title": "Title",
+        "requested_schedule": "Requested slot",
+        "transcription": "Transcription",
+        "photos_count": "Attached photos",
+        "status": "Status",
+        "assigned_schedule": "Scheduled slot",
+        "accepted_at": "Accepted at",
+        "arrived_at": "Arrived on site",
+        "completed_at": "Completed at",
+        "duration": "Actual duration",
+        "billing_lines": "Billing lines",
+        "invoice_amount": "Invoice amount",
+        "commission": "Commission",
+        "payment_status": "Payment",
+        "signature_yes": "Client signature",
+        "report_amended": "Report amended at",
+        "rejection_reason": "Report rejection reason"
+      }
     }
   },
   "spotlight": {

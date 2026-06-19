@@ -63,10 +63,12 @@ describe("PlanningHubPage premium patron", () => {
     expect(screen.getByTestId("planning-confirm-iv-plan-2")).toBeInTheDocument();
   });
 
-  it("shows slot detail when a busy slot is clicked", () => {
+  it("shows client and technician sections when a busy slot is clicked", () => {
     render(<PlanningHubPage slotIndex={PLANNING_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
     fireEvent.click(screen.getByTestId("planning-slot-09:00"));
     expect(screen.getByTestId("planning-hub-right-mission")).toBeInTheDocument();
+    expect(screen.getByTestId("planning-hub-client-data")).toBeInTheDocument();
+    expect(screen.getByTestId("planning-hub-technician-data")).toBeInTheDocument();
   });
 });

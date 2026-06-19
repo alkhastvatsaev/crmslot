@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
 import type { PlanningPendingRow } from "@/features/planningHub/planningHubTypes";
-import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
+import PlanningHubInterventionDetail from "@/features/planningHub/components/PlanningHubInterventionDetail";
 
 type Props = {
   selectedIntervention: Intervention | null;
@@ -15,33 +15,7 @@ export default function PlanningHubRightPanel({ selectedIntervention, pendingRow
   const { t } = useTranslation();
 
   if (selectedIntervention) {
-    const title =
-      resolveInterventionClientName(selectedIntervention) ||
-      selectedIntervention.title ||
-      selectedIntervention.id;
-
-    return (
-      <div
-        data-testid="planning-hub-right-mission"
-        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4"
-      >
-        <div className="rounded-[24px] border border-sky-200/70 bg-gradient-to-b from-sky-50/90 to-white p-4 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-sky-600/90">
-            {t("planningHub.slot_detail")}
-          </p>
-          <p className="mt-2 text-lg font-bold text-slate-900">{title}</p>
-          <p className="mt-1 text-[12px] text-slate-600">{selectedIntervention.address || "—"}</p>
-          <p className="mt-2 text-[11px] font-medium text-slate-500">
-            {(selectedIntervention.scheduledDate ?? selectedIntervention.requestedDate ?? "—") +
-              " · " +
-              (selectedIntervention.scheduledTime ?? selectedIntervention.requestedTime ?? "—")}
-          </p>
-          <span className="mt-3 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-700">
-            {(selectedIntervention.status ?? "pending").replace("_", " ")}
-          </span>
-        </div>
-      </div>
-    );
+    return <PlanningHubInterventionDetail intervention={selectedIntervention} />;
   }
 
   return (

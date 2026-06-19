@@ -1022,6 +1022,38 @@
       "left": "équipe",
       "center": "horaires",
       "right": "détail"
+    },
+    "detail": {
+      "client_section": "Demande client",
+      "technician_section": "Intervention technicien",
+      "fields": {
+        "name": "Nom",
+        "company": "Société",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "whatsapp": "WhatsApp",
+        "address": "Adresse",
+        "category": "Catégorie",
+        "urgency_yes": "Urgent",
+        "problem": "Problème",
+        "title": "Titre",
+        "requested_schedule": "Créneau demandé",
+        "transcription": "Transcription",
+        "photos_count": "Photos jointes",
+        "status": "Statut",
+        "assigned_schedule": "Créneau planifié",
+        "accepted_at": "Accepté le",
+        "arrived_at": "Arrivée sur site",
+        "completed_at": "Clôturé le",
+        "duration": "Durée réelle",
+        "billing_lines": "Lignes facturation",
+        "invoice_amount": "Montant facture",
+        "commission": "Commission",
+        "payment_status": "Paiement",
+        "signature_yes": "Signature client",
+        "report_amended": "Rapport modifié le",
+        "rejection_reason": "Motif rejet rapport"
+      }
     }
   },
   "spotlight": {
