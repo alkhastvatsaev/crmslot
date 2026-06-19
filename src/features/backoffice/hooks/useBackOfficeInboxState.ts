@@ -26,7 +26,6 @@ import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestor
 import {
   countClientPortalThreadsNeedingReply,
   filterNewClientPortalMessages,
-  interventionIdsWithClientPortalChat,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
@@ -99,11 +98,6 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
   const [portalChatMessages, setPortalChatMessages] = useState<IvanaPortalChatDoc[]>([]);
 
-  const chatBoostInterventionIds = useMemo(
-    () => interventionIdsWithClientPortalChat(portalChatMessages),
-    [portalChatMessages]
-  );
-
   const chatDayRows = useMemo(
     () =>
       buildChatDayRows({
@@ -111,9 +105,8 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         dayMissions,
         selectedDate,
         workspace,
-        includeInterventionIds: chatBoostInterventionIds,
       }),
-    [dayMissions, interventions, selectedDate, workspace, chatBoostInterventionIds]
+    [dayMissions, interventions, selectedDate, workspace]
   );
 
   const chatThreadsNeedingReply = useMemo(

@@ -5,6 +5,7 @@ import {
   coerceFirestoreLikeDate,
   formatScheduledTimeOnly,
   interventionClientLabel,
+  interventionMatchesTab,
 } from "@/features/interventions/technicianSchedule";
 
 export function portalChatThreadKey(interventionId?: string | null): string {
@@ -66,20 +67,29 @@ export function sortChatDayRows(
   rows: ChatDayMissionRow[],
   _dayAnchor = new Date()
 ): ChatDayMissionRow[] {
-  const score = (row: ChatDayMissionRow): number => {
+  const timeScore = (row: ChatDayMissionRow): number => {
     const m = /^(\d{1,2}):(\d{2})/.exec((row.time ?? "").trim());
     if (!m) return 9999;
     return Number(m[1]) * 60 + Number(m[2]);
   };
   return [...rows].sort((a, b) => {
-    const delta = score(a) - score(b);
-    if (delta !== 0) return delta;
+    const aToday = a.isToday ? 0 : 1;
+    const bToday = b.isToday ? 0 : 1;
+    if (aToday !== bToday) return aToday - bToday;
+    if (a.isToday && b.isToday) {
+      const delta = timeScore(a) - timeScore(b);
+      if (delta !== 0) return delta;
+    }
+    const nameCmp = a.clientName.localeCompare(b.clientName, "fr");
+    if (nameCmp !== 0) return nameCmp;
     return a.threadId.localeCompare(b.threadId);
   });
 }
 
-/** Ligne picker si le dossier n’est pas dans le filtre « jour » mais a du chat client. */
-export function chatDayRowFromIntervention(iv: Intervention): ChatDayMissionRow {
+export function chatDayRowFromIntervention(
+  iv: Intervention,
+  selectedDate = new Date()
+): ChatDayMissionRow {
   return {
     threadId: iv.id,
     clientName:
@@ -87,6 +97,7 @@ export function chatDayRowFromIntervention(iv: Intervention): ChatDayMissionRow 
     time: formatScheduledTimeOnly(iv),
     address: iv.address,
     statusCode: iv.status,
+    isToday: interventionMatchesTab(iv, "today", selectedDate),
   };
 }
 
