@@ -142,3 +142,54 @@ export async function authorizeAudioDispatch(request: Request): Promise<boolean>
   if (!isProductionNodeEnv()) return true;
   return (await verifyBearerFromRequest(request)) !== null;
 }
+
+/**
+ * Webhooks entrants (email, etc.) — secret obligatoire en production.
+ * Accepte `?secret=` ou en-tête `x-inbound-webhook-secret`.
+ */
+export function requireInboundWebhookSecret(
+  request: Request,
+  envKey = "EMAIL_INBOUND_SECRET"
+): NextResponse | null {
+  const expected = process.env[envKey]?.trim();
+  if (!expected) {
+    if (isProductionNodeEnv()) {
+      return NextResponse.json({ ok: false, error: "Webhook non configuré." }, { status: 503 });
+    }
+    return null;
+  }
+
+  const url = new URL(request.url);
+  const provided =
+    url.searchParams.get("secret")?.trim() ||
+    request.headers.get("x-inbound-webhook-secret")?.trim();
+  if (provided !== expected) {
+    return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
+  }
+  return null;
+}
+
+/** Au moins une appartenance société (membership ou bmTenants). */
+export async function requireAnyCompanyStaff(
+  uid: string,
+  decoded: admin.auth.DecodedIdToken
+): Promise<NextResponse | null> {
+  const tenants = decoded.bmTenants;
+  if (Array.isArray(tenants) && tenants.length > 0) return null;
+
+  if (!admin.apps.length) {
+    return NextResponse.json(
+      { ok: false, error: "Firebase Admin non configuré." },
+      { status: 503 }
+    );
+  }
+
+  const snap = await admin
+    .firestore()
+    .collection(`users/${uid}/company_memberships`)
+    .limit(1)
+    .get();
+  if (!snap.empty) return null;
+
+  return NextResponse.json({ ok: false, error: "Accès staff requis." }, { status: 403 });
+}

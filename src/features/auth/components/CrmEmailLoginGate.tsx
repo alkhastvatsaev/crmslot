@@ -15,7 +15,9 @@ import {
 type GatePhase = "checking" | "login" | "ready";
 
 function resolveGatePhase(user: User | null): GatePhase {
-  if (!isConfigured || !auth) return "ready";
+  if (!isConfigured || !auth) {
+    return process.env.NODE_ENV === "production" ? "login" : "ready";
+  }
   if (user && !user.isAnonymous) return "ready";
   return "login";
 }

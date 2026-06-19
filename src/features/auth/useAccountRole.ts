@@ -73,7 +73,7 @@ export function useAccountRole(): AccountRoleState {
   useEffect(() => {
     if (!isConfigured || !auth || !firestore) {
       setState({
-        role: "admin",
+        role: "unknown",
         isTechnicianAccount: false,
         isClientPortalAccount: false,
         isCrmTenantAccount: false,
@@ -133,7 +133,7 @@ export function useAccountRole(): AccountRoleState {
       } catch {
         if (cancelled) return;
         setState({
-          role: "admin",
+          role: "unknown",
           isTechnicianAccount: false,
           isClientPortalAccount: false,
           isCrmTenantAccount: false,
