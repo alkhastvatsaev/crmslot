@@ -1,8 +1,10 @@
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
+import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
-import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
+import { PLANNING_HUB_SLOT_INDEX } from "@/features/planningHub/planningHubConstants";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 
 /** Rôle affiché sous le nom dans le header (clé i18n `profiles.roles.*`). */
@@ -28,13 +30,15 @@ export type DashboardCarouselPageDef = {
     | "spotlight.nav_crm_history"
     | "spotlight.nav_billing_hub"
     | "spotlight.nav_team_hub"
-    | "spotlight.nav_offline";
+    | "spotlight.nav_case_hub"
+    | "spotlight.nav_commissions_hub"
+    | "spotlight.nav_planning_hub";
   guideTitle: string;
   guideHint: string;
 };
 
 /**
- * Source unique — ordre = carrousel admin `src/app/page.tsx` (7 pages).
+ * Source unique — ordre = carrousel admin `src/app/page.tsx` (9 pages).
  * Portail client : `/m/demande` · terrain : `/m/technician`.
  */
 export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
@@ -80,21 +84,36 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     guideHint: "Boîte mail PWA et pièces jointes.",
   },
   {
-    slotIndex: OFFLINE_HUB_SLOT_INDEX,
-    inCarouselNav: false,
-    profileName: "ASSISTANT IA",
-    profileRoleKey: "technician",
-    spotlightLabelKey: "spotlight.nav_offline",
-    guideTitle: "Assistant IA",
-    guideHint: "Copilote IA — dossiers, clients, suggestions intelligentes et chat contextuel.",
-  },
-  {
     slotIndex: TEAM_HUB_SLOT_INDEX,
     profileName: "ÉQUIPE",
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_team_hub",
     guideTitle: "Équipe",
-    guideHint: "Employés, techniciens, rôles et accès terrain.",
+    guideHint: "Effectif, filtres et profils employés — édition en un clic.",
+  },
+  {
+    slotIndex: CASE_HUB_SLOT_INDEX,
+    profileName: "DOSSIERS",
+    profileRoleKey: "back_office",
+    spotlightLabelKey: "spotlight.nav_case_hub",
+    guideTitle: "Dossiers",
+    guideHint: "Ouverts, en cours et détail dossier en un clic.",
+  },
+  {
+    slotIndex: COMMISSIONS_HUB_SLOT_INDEX,
+    profileName: "COMMISSIONS",
+    profileRoleKey: "admin",
+    spotlightLabelKey: "spotlight.nav_commissions_hub",
+    guideTitle: "Commissions",
+    guideHint: "Tuiles de règles, saisie manuelle et trace — édition en un clic.",
+  },
+  {
+    slotIndex: PLANNING_HUB_SLOT_INDEX,
+    profileName: "PLANNING",
+    profileRoleKey: "admin",
+    spotlightLabelKey: "spotlight.nav_planning_hub",
+    guideTitle: "Planning",
+    guideHint: "Missions du jour, créneaux et dossiers à assigner.",
   },
 ] as const;
 
@@ -168,8 +187,10 @@ export function assertDashboardCarouselSlotAlignment(): void {
     CRM_HISTORY_SLOT_INDEX,
     BILLING_HUB_SLOT_INDEX,
     GMAIL_HUB_SLOT_INDEX,
-    OFFLINE_HUB_SLOT_INDEX,
     TEAM_HUB_SLOT_INDEX,
+    CASE_HUB_SLOT_INDEX,
+    COMMISSIONS_HUB_SLOT_INDEX,
+    PLANNING_HUB_SLOT_INDEX,
   ];
   DASHBOARD_CAROUSEL_PAGES.forEach((page, i) => {
     if (page.slotIndex !== i) {

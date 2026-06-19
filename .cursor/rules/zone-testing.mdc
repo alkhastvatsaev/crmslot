@@ -1,0 +1,15 @@
+---
+description: Patterns tests RTL — steppers, formulaires, contexts
+globs: src/**/__tests__/**
+alwaysApply: false
+---
+
+# Tests colocalisés
+
+Helpers : `render` / `renderWithPager` depuis `src/test-utils/`. Fixtures : `makeIntervention` etc. dans `factories.ts`.
+
+**data-testid** pour tout élément interactif testé.
+
+Mocks globaux dans `jest.setup.ts` — ne pas redéclarer Firebase/Mapbox/Framer.
+
+Steppers, formulaires réseau, glossaire hub société : `@docs/AGENTS_EXTENDED.md`.

@@ -239,6 +239,58 @@
     "invoice_amount_invalid": "Invalid amount",
     "invoice_amount_saved": "Amount and commission updated"
   },
+  "commissionsHub": {
+    "company_required": "Select a company.",
+    "guide": {
+      "value_label": "to pay this month",
+      "hint": "Tap a technician to see details.",
+      "chip_team": "Technicians",
+      "chip_rules": "Settings"
+    },
+    "mode": {
+      "team": "Team",
+      "rules": "Rules",
+      "manual": "Bonus",
+      "history": "Log"
+    },
+    "kpi": {
+      "month_total": "This month",
+      "active_techs": "Technicians",
+      "exceptions": "Exceptions"
+    },
+    "company_rule": {
+      "label": "Company rule",
+      "applies_all": "For everyone: {{value}}",
+      "empty": "Set default commission",
+      "empty_hint": "One click — applies to whole team"
+    },
+    "team": {
+      "empty": "No commissions this month",
+      "missions": "jobs",
+      "no_missions": "0 jobs",
+      "bonus": "bonus",
+      "rule": "Rule",
+      "personal": "custom",
+      "month_label": "This month",
+      "add_bonus": "+ Bonus",
+      "set_rule": "Personal rule",
+      "edit_rule": "Edit rule"
+    },
+    "level": {
+      "all": "All"
+    },
+    "level_filter_aria": "Filter by level",
+    "add": "Rule",
+    "save": "Save",
+    "pick_or_add": "Pick a tile or +",
+    "history_hint": "Event feed — center",
+    "aria": {
+      "page": "Page",
+      "left": "modes",
+      "center": "grid",
+      "right": "detail"
+    }
+  },
   "payment": {
     "pay_now": "Pay online",
     "pay_by_card": "Pay by card",
@@ -856,16 +908,29 @@
     "title": "Team",
     "subtitle": "Employees and technicians in your company",
     "company_required": "Select an active company.",
+    "guide": {
+      "value_label": "active people",
+      "hint": "Tap a name to edit.",
+      "chip_active": "Active",
+      "chip_all": "All"
+    },
     "empty": "No employees for this filter.",
     "no_email": "No email on file",
-    "select_member": "Select an employee to edit their profile.",
+    "select_member": "Tap a name on the left.",
     "save": "Save",
     "deactivate": "Deactivate",
     "reactivate": "Reactivate",
+    "technician_badge": "Field",
+    "kpi": {
+      "total": "Staff",
+      "active": "Active",
+      "technicians": "Field"
+    },
     "filter": {
+      "all": "All",
       "active": "Active",
       "inactive": "Inactive",
-      "all": "All"
+      "technicians": "Field"
     },
     "status": {
       "active": "Active",
@@ -882,7 +947,80 @@
       "vehicle": "Vehicle"
     },
     "aria": {
-      "page": "Page"
+      "page": "Page",
+      "left": "summary",
+      "center": "list",
+      "right": "profile"
+    }
+  },
+  "caseHub": {
+    "company_required": "Select a company.",
+    "guide": {
+      "value_label": "open cases",
+      "hint": "Tap a case to see everything.",
+      "chip_open": "Open",
+      "chip_done": "Closed"
+    },
+    "empty": "No cases for this filter.",
+    "pick_case": "Tap a case on the left.",
+    "selected_label": "Case",
+    "kpi": {
+      "open": "Open",
+      "active": "In progress",
+      "week": "This week"
+    },
+    "filter": {
+      "all": "All",
+      "open": "Open",
+      "active": "In progress",
+      "done": "Closed"
+    },
+    "status": {
+      "pending": "Waiting",
+      "assigned": "Assigned",
+      "en_route": "On the way",
+      "in_progress": "On site",
+      "waiting_material": "Parts",
+      "done": "Done",
+      "invoiced": "Invoiced",
+      "cancelled": "Cancelled",
+      "pending_needs_address": "Address"
+    },
+    "aria": {
+      "page": "Page",
+      "left": "summary",
+      "center": "list",
+      "right": "detail"
+    }
+  },
+  "planningHub": {
+    "company_required": "Select a company.",
+    "guide": {
+      "value_label": "jobs today",
+      "hint": "Pick a technician, then a time."
+    },
+    "no_technicians": "No technicians.",
+    "missions_today": "jobs",
+    "today": "Today",
+    "conflict_hint": "Two jobs at the same time — reschedule one.",
+    "slot_detail": "Slot",
+    "pending_title": "To do today",
+    "pending_hint": "Jobs without a technician or not accepted yet",
+    "pending_empty": "All clear.",
+    "pending_state": {
+      "unassigned": "No tech",
+      "awaiting_accept": "To accept"
+    },
+    "kpi": {
+      "missions": "Jobs",
+      "conflicts": "Conflicts",
+      "unassigned": "Unassigned"
+    },
+    "aria": {
+      "page": "Page",
+      "left": "team",
+      "center": "schedule",
+      "right": "detail"
     }
   },
   "spotlight": {
@@ -904,6 +1042,9 @@
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Billing",
     "nav_team_hub": "Team",
+    "nav_case_hub": "Cases",
+    "nav_commissions_hub": "Commissions",
+    "nav_planning_hub": "Planning",
     "open_aria": "Open search",
     "active_label": "Active",
     "nav_group_heading": "Navigation"
@@ -2146,6 +2287,9 @@
     "tab_crm": "CRM",
     "tab_billing": "Billing",
     "tab_team": "Team",
+    "tab_case": "Cases",
+    "tab_commissions": "Comm.",
+    "tab_planning": "Plan",
     "rail_segment_label": "Page panels",
     "rail_left": "Left",
     "rail_center": "Center",

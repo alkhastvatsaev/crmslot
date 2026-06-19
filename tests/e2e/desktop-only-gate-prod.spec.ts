@@ -28,7 +28,7 @@ test.describe("DesktopOnlyGate prod-like", () => {
           forceMobileQueryKey: "forceMobile",
           pwaServiceWorkerEnabled: false,
           gitSha: null,
-          hubPageCount: 7,
+          hubPageCount: 9,
           nodeEnv: "production",
           timestamp: new Date().toISOString(),
         }),

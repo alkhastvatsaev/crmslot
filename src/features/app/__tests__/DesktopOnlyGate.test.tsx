@@ -94,7 +94,7 @@ describe("DesktopOnlyGate prod-like", () => {
       forceMobileQueryKey: "forceMobile",
       pwaServiceWorkerEnabled: false,
       gitSha: null,
-      hubPageCount: 7,
+      hubPageCount: 9,
       nodeEnv: "production",
       timestamp: "2026-06-07T00:00:00.000Z",
     });
@@ -141,7 +141,7 @@ describe("DesktopOnlyGate prod-like", () => {
       forceMobileQueryKey: "forceMobile",
       pwaServiceWorkerEnabled: false,
       gitSha: null,
-      hubPageCount: 7,
+      hubPageCount: 9,
       nodeEnv: "production",
       timestamp: "2026-06-07T00:00:00.000Z",
     });

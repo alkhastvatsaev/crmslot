@@ -1,5 +1,6 @@
 import type * as admin from "firebase-admin";
 import type { CompanyStaffMember } from "@/features/teamHub/types";
+import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 import { buildTechnicianDisplayName } from "@/features/company/server/provisionTechnicianStaff";
 import {
   listStaffDirectoryUids,
@@ -164,5 +165,7 @@ export async function listCompanyStaff(
     if (creator) members.push(creator);
   }
 
-  return members.sort((a, b) => a.displayName.localeCompare(b.displayName, "fr"));
+  return stripLegacyDemoTechnicians(
+    members.sort((a, b) => a.displayName.localeCompare(b.displayName, "fr"))
+  );
 }

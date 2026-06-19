@@ -1,0 +1,13 @@
+---
+description: Zone G — App terrain technicien (Capacitor /m/technician)
+globs: src/app/m/technician/**,src/features/**/TechnicianMobileApp.tsx
+alwaysApply: false
+---
+
+# App terrain technicien
+
+**Tests** : `npm run test:native-infra` · E2E `npm run test:e2e:technician-app`.
+
+Capacitor : `cap:sync:terrain*` scripts dans `package.json`.
+
+Séparé du shell dashboard — ne pas mélanger avec hubs patron desktop.

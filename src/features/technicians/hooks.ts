@@ -5,6 +5,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { Technician } from "./types";
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
+import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 
 function isAssignableTechnician(tech: Technician, companyId: string | null): boolean {
   if (tech.active === false) return false;
@@ -49,8 +50,10 @@ export function useTechnicians() {
               (snapshot) => {
                 if (!active) return;
 
-                const parsed = snapshot.docs.map((d) =>
-                  withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician)
+                const parsed = stripLegacyDemoTechnicians(
+                  snapshot.docs.map((d) =>
+                    withTechnicianAuthUid({ ...d.data(), id: d.id } as Technician)
+                  )
                 );
                 setTechnicians(parsed);
                 setLoading(false);

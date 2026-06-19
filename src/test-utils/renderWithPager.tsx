@@ -11,7 +11,7 @@ type Options = Omit<RenderOptions, "wrapper"> & {
 /**
  * Rend un composant sous `DashboardPagerProvider` (évite de dupliquer le boilerplate dans les tests).
  */
-export function renderWithPager(ui: ReactElement, pageCount = 7, options?: Options) {
+export function renderWithPager(ui: ReactElement, pageCount = 9, options?: Options) {
   const { initialPageIndex = 0, ...renderOptions } = options ?? {};
   function Wrapper({ children }: { children: ReactNode }) {
     return (

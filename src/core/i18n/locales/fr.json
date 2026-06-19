@@ -239,6 +239,58 @@
     "invoice_amount_invalid": "Montant invalide",
     "invoice_amount_saved": "Montant et commission mis à jour"
   },
+  "commissionsHub": {
+    "company_required": "Sélectionnez une société.",
+    "guide": {
+      "value_label": "à payer ce mois",
+      "hint": "Touchez un technicien pour voir le détail.",
+      "chip_team": "Techniciens",
+      "chip_rules": "Réglages"
+    },
+    "mode": {
+      "team": "Équipe",
+      "rules": "Règles",
+      "manual": "Bonus",
+      "history": "Trace"
+    },
+    "kpi": {
+      "month_total": "Ce mois",
+      "active_techs": "Techniciens",
+      "exceptions": "Exceptions"
+    },
+    "company_rule": {
+      "label": "Règle société",
+      "applies_all": "Pour tous : {{value}}",
+      "empty": "Définir le % pour tous",
+      "empty_hint": "1 clic — s'applique à toute l'équipe"
+    },
+    "team": {
+      "empty": "Aucune commission ce mois",
+      "missions": "missions",
+      "no_missions": "0 mission",
+      "bonus": "bonus",
+      "rule": "Règle",
+      "personal": "perso",
+      "month_label": "Ce mois",
+      "add_bonus": "+ Bonus",
+      "set_rule": "Règle perso",
+      "edit_rule": "Modifier règle"
+    },
+    "level": {
+      "all": "Tout"
+    },
+    "level_filter_aria": "Filtrer par niveau",
+    "add": "Règle",
+    "save": "Enregistrer",
+    "pick_or_add": "Touchez un technicien à gauche.",
+    "history_hint": "Fil d’événements — centre",
+    "aria": {
+      "page": "Page",
+      "left": "résumé",
+      "center": "liste",
+      "right": "détail"
+    }
+  },
   "payment": {
     "pay_now": "Payer en ligne",
     "pay_by_card": "Payer par carte",
@@ -856,16 +908,29 @@
     "title": "Équipe",
     "subtitle": "Employés et techniciens de votre société",
     "company_required": "Sélectionnez une société active.",
+    "guide": {
+      "value_label": "personnes actives",
+      "hint": "Touchez un nom pour modifier.",
+      "chip_active": "Actifs",
+      "chip_all": "Tous"
+    },
     "empty": "Aucun employé pour ce filtre.",
     "no_email": "E-mail non renseigné",
-    "select_member": "Sélectionnez un employé pour modifier son profil.",
+    "select_member": "Touchez un nom à gauche.",
     "save": "Enregistrer",
     "deactivate": "Désactiver",
     "reactivate": "Réactiver",
+    "technician_badge": "Terrain",
+    "kpi": {
+      "total": "Effectif",
+      "active": "Actifs",
+      "technicians": "Terrain"
+    },
     "filter": {
+      "all": "Tous",
       "active": "Actifs",
       "inactive": "Inactifs",
-      "all": "Tous"
+      "technicians": "Terrain"
     },
     "status": {
       "active": "Actif",
@@ -882,7 +947,80 @@
       "vehicle": "Véhicule"
     },
     "aria": {
-      "page": "Page"
+      "page": "Page",
+      "left": "résumé",
+      "center": "liste",
+      "right": "profil"
+    }
+  },
+  "caseHub": {
+    "company_required": "Sélectionnez une société.",
+    "guide": {
+      "value_label": "dossiers en cours",
+      "hint": "Touchez un dossier pour tout voir.",
+      "chip_open": "En cours",
+      "chip_done": "Terminés"
+    },
+    "empty": "Aucun dossier pour ce filtre.",
+    "pick_case": "Touchez un dossier à gauche.",
+    "selected_label": "Dossier",
+    "kpi": {
+      "open": "Ouverts",
+      "active": "En cours",
+      "week": "Cette semaine"
+    },
+    "filter": {
+      "all": "Tous",
+      "open": "En cours",
+      "active": "En cours",
+      "done": "Terminés"
+    },
+    "status": {
+      "pending": "En attente",
+      "assigned": "Assigné",
+      "en_route": "En route",
+      "in_progress": "Sur place",
+      "waiting_material": "Matériel",
+      "done": "Terminé",
+      "invoiced": "Facturé",
+      "cancelled": "Annulé",
+      "pending_needs_address": "Adresse"
+    },
+    "aria": {
+      "page": "Page",
+      "left": "résumé",
+      "center": "liste",
+      "right": "détail"
+    }
+  },
+  "planningHub": {
+    "company_required": "Sélectionnez une société.",
+    "guide": {
+      "value_label": "missions aujourd'hui",
+      "hint": "Choisissez un technicien, puis une heure."
+    },
+    "no_technicians": "Aucun technicien.",
+    "missions_today": "missions",
+    "today": "Aujourd'hui",
+    "conflict_hint": "Deux missions en même temps — à décaler.",
+    "slot_detail": "Créneau",
+    "pending_title": "À faire aujourd'hui",
+    "pending_hint": "Missions sans technicien ou pas encore acceptées",
+    "pending_empty": "Tout est en ordre.",
+    "pending_state": {
+      "unassigned": "Sans tech",
+      "awaiting_accept": "À accepter"
+    },
+    "kpi": {
+      "missions": "Missions",
+      "conflicts": "Conflits",
+      "unassigned": "Sans tech"
+    },
+    "aria": {
+      "page": "Page",
+      "left": "équipe",
+      "center": "horaires",
+      "right": "détail"
     }
   },
   "spotlight": {
@@ -904,6 +1042,9 @@
     "nav_crm_history": "Quality Management",
     "nav_billing_hub": "Facturation",
     "nav_team_hub": "Équipe",
+    "nav_case_hub": "Dossiers",
+    "nav_commissions_hub": "Commissions",
+    "nav_planning_hub": "Planning",
     "open_aria": "Ouvrir la recherche",
     "active_label": "Actif",
     "nav_group_heading": "Navigation"
@@ -2146,6 +2287,9 @@
     "tab_crm": "CRM",
     "tab_billing": "Factures",
     "tab_team": "Équipe",
+    "tab_case": "Dossiers",
+    "tab_commissions": "Comm.",
+    "tab_planning": "Planning",
     "rail_segment_label": "Panneaux de la page",
     "rail_left": "Gauche",
     "rail_center": "Centre",

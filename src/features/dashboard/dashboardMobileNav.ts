@@ -1,9 +1,11 @@
 import {
-  BrainCircuit,
   Building2,
+  CalendarDays,
+  FolderOpen,
   Mail,
   Map,
   Package,
+  Percent,
   Receipt,
   Sparkles,
   Users,
@@ -23,7 +25,9 @@ export const DASHBOARD_MOBILE_NAV_ICONS: Record<DashboardMobileNavIconKey, Lucid
   "spotlight.nav_crm_history": Sparkles,
   "spotlight.nav_billing_hub": Receipt,
   "spotlight.nav_team_hub": Users,
-  "spotlight.nav_offline": BrainCircuit,
+  "spotlight.nav_case_hub": FolderOpen,
+  "spotlight.nav_commissions_hub": Percent,
+  "spotlight.nav_planning_hub": CalendarDays,
 };
 
 export type MobileHubRail = "left" | "center" | "right";
@@ -45,5 +49,7 @@ export const MOBILE_TAB_I18N: Record<DashboardMobileNavIconKey, string> = {
   "spotlight.nav_crm_history": "mobile.tab_crm",
   "spotlight.nav_billing_hub": "mobile.tab_billing",
   "spotlight.nav_team_hub": "mobile.tab_team",
-  "spotlight.nav_offline": "mobile.tab_ai",
+  "spotlight.nav_case_hub": "mobile.tab_case",
+  "spotlight.nav_commissions_hub": "mobile.tab_commissions",
+  "spotlight.nav_planning_hub": "mobile.tab_planning",
 };

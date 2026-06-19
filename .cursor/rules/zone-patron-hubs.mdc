@@ -1,0 +1,19 @@
+---
+description: Hubs patron — case, team, planning, commissions
+globs: src/features/caseHub/**,src/features/teamHub/**,src/features/planningHub/**,src/features/commissionsHub/**,src/core/ui/hub/**
+alwaysApply: false
+---
+
+# Hubs patron (draft)
+
+**Tests** : `npm run test:patron-hubs`
+
+**Layout** : triple panneau + KPI strip — voir `@docs/HUB_PAGE_PHILOSOPHY.md`.
+
+**Composants partagés** : `src/core/ui/hub/` (`PatronHubChipRow`, `PatronHubGuide`).
+
+**Métriques** : `*PatronMetrics.ts` colocalisés — tests dans `__tests__/`.
+
+**i18n** : préfixe par hub (`caseHub.*`, `teamHub.*`, …) — 3 fichiers locale, clés minimales.
+
+**Intégration carrousel** : coordination via `docs/PARALLEL_WORK.md` zone E avant `page.tsx`.

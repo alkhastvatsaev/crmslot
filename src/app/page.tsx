@@ -9,8 +9,10 @@ import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndic
 import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
 import DashboardPager from "@/features/dashboard/components/DashboardPager";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
-import { OFFLINE_HUB_SLOT_INDEX } from "@/features/offline/offlineHubConstants";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
+import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
+import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
+import { PLANNING_HUB_SLOT_INDEX } from "@/features/planningHub/planningHubConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
@@ -59,12 +61,22 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
   loading: () => null,
 });
 
-const OfflineHubPage = dynamic(
-  () => import("@/features/offline/components/TechnicianOfflineHubPage"),
+const TeamHubPage = dynamic(() => import("@/features/teamHub/components/TeamHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const CaseHubPage = dynamic(() => import("@/features/caseHub/components/CaseHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const CommissionsHubPage = dynamic(
+  () => import("@/features/commissionsHub/components/CommissionsHubPage"),
   { ssr: false, loading: () => null }
 );
 
-const TeamHubPage = dynamic(() => import("@/features/teamHub/components/TeamHubPage"), {
+const PlanningHubPage = dynamic(() => import("@/features/planningHub/components/PlanningHubPage"), {
   ssr: false,
   loading: () => null,
 });
@@ -89,7 +101,7 @@ const desktopHeader = (
   </>
 );
 
-/** Dashboard admin — 7 pages · client `/m/demande` · terrain `/m/technician`. */
+/** Dashboard admin — 9 pages · client `/m/demande` · terrain `/m/technician`. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
   const router = useRouter();
@@ -129,11 +141,17 @@ export default function Dashboard() {
       <ErrorBoundary key="gmail-hub" name="gmail-hub">
         <GmailHubPage slotIndex={GMAIL_HUB_SLOT_INDEX} />
       </ErrorBoundary>,
-      <ErrorBoundary key="offline-hub" name="offline-hub">
-        <OfflineHubPage slotIndex={OFFLINE_HUB_SLOT_INDEX} />
-      </ErrorBoundary>,
       <ErrorBoundary key="team-hub" name="team-hub">
         <TeamHubPage slotIndex={TEAM_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="case-hub" name="case-hub">
+        <CaseHubPage slotIndex={CASE_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="commissions-hub" name="commissions-hub">
+        <CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />
+      </ErrorBoundary>,
+      <ErrorBoundary key="planning-hub" name="planning-hub">
+        <PlanningHubPage slotIndex={PLANNING_HUB_SLOT_INDEX} />
       </ErrorBoundary>,
     ],
     []

@@ -1,0 +1,37 @@
+{
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/.next-e2e-gate/**": true,
+    "**/coverage/**": true,
+    "**/android/**": true,
+    "**/ios/**": true,
+    "**/playwright-report/**": true,
+    "**/test-results/**": true,
+    "**/functions/node_modules/**": true,
+    "**/functions/lib/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/.next-e2e-gate": true,
+    "**/coverage": true,
+    "**/android": true,
+    "**/ios": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/playwright-report": true,
+    "**/test-results/**": true,
+    "**/functions/node_modules": true,
+    "**/*.tsbuildinfo": true
+  },
+  "files.exclude": {
+    "**/.next": true,
+    "**/.next-e2e-gate": true
+  },
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "editor.formatOnSave": false
+}

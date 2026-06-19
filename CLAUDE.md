@@ -15,7 +15,7 @@ Si l’utilisateur a aussi **Cursor / l’Agent** ouvert sur ce repo :
 5. Pas de `git add .` ; commit seulement si l’utilisateur le demande.
 6. Hub partagé (`src/app/page.tsx`, `src/context/**`, i18n) → coordination obligatoire.
 
-Worktree pour deux clones physiques : voir PARALLEL_WORK.md.
+Worktree pour deux clones physiques : voir PARALLEL_WORK.md. Perf Cursor : **`docs/CURSOR_WORKFLOW.md`**.
 
 ## Commands
 

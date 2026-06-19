@@ -5,7 +5,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 describe("MobilePageDots", () => {
   it("affiche un dot actif par pageIndex", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={2}>
+      <DashboardPagerProvider pageCount={9} initialPageIndex={2}>
         <MobilePageDots />
       </DashboardPagerProvider>
     );
@@ -17,7 +17,7 @@ describe("MobilePageDots", () => {
 
   it("change de page au tap sur un dot", () => {
     render(
-      <DashboardPagerProvider pageCount={7} initialPageIndex={0}>
+      <DashboardPagerProvider pageCount={9} initialPageIndex={0}>
         <MobilePageDots />
       </DashboardPagerProvider>
     );

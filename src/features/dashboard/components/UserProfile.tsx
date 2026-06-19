@@ -20,7 +20,7 @@ export const appProfiles = DASHBOARD_CAROUSEL_PAGES.map((page) => ({
 }));
 
 type UserProfileProps = {
-  /** Clic sur le profil → panneau compte dans le panneau central. */
+  /** Desktop : navigation pages · mobile : panneau compte. */
   interactive?: boolean;
   variant?: "desktop" | "mobile";
 };
@@ -68,20 +68,29 @@ function UserProfileInteractive({ variant }: { variant: "desktop" | "mobile" }) 
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
   const currentProfile = useProfileIndex();
-  const accountOpen = pageSelector.view === "account";
+  const overlayOpen =
+    variant === "desktop" ? pageSelector.view === "pages" : pageSelector.view === "account";
 
   const mobileClasses =
     "mobile-header-chip mobile-header-chip--interactive mobile-profile-chip h-full w-full flex-row items-center justify-center gap-2 px-4";
   const desktopClasses = `${dashboardHeaderPanelShellClass} ${DASHBOARD_PANEL_SHADOW_HOVER_CLASS} w-full cursor-pointer items-center justify-center bg-white/70 ease-out hover:scale-[1.01] hover:bg-white/80 active:scale-[0.99]`;
+
+  const handleClick = () => {
+    if (variant === "desktop") {
+      pageSelector.toggle();
+      return;
+    }
+    pageSelector.toggleAccount();
+  };
 
   return (
     <button
       type="button"
       data-testid="user-profile-toggle"
       className={variant === "mobile" ? mobileClasses : desktopClasses}
-      aria-label="Ouvrir mon compte"
-      aria-expanded={accountOpen}
-      onClick={() => pageSelector.toggleAccount()}
+      aria-label={variant === "desktop" ? String(t("spotlight.open_aria")) : "Ouvrir mon compte"}
+      aria-expanded={overlayOpen}
+      onClick={handleClick}
     >
       <ProfileLabel variant={variant} currentProfile={currentProfile} t={t} />
     </button>

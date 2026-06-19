@@ -58,13 +58,13 @@ export default function TechnicianLabView({ embedInCarousel = false }: Props) {
           </Link>
         )}
         <div className="text-center">
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">Alexandre V.</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Mansour</h1>
           <span className="text-xs font-semibold uppercase tracking-widest text-blue-600">
             {t("technician_lab.van_label")}
           </span>
         </div>
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-xl font-bold text-white shadow-lg shadow-blue-500/30">
-          A
+          M
         </div>
       </header>
 

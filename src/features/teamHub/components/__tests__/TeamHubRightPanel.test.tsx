@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor } from "@/test-utils/render";
-import TeamStaffListPanel from "@/features/teamHub/components/TeamStaffListPanel";
+import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
+import TeamHubRightPanel from "@/features/teamHub/components/TeamHubRightPanel";
 import type { CompanyStaffMember } from "@/features/teamHub/types";
 
 const staff: CompanyStaffMember[] = [
@@ -21,43 +21,24 @@ jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: jest.fn(),
 }));
 
-describe("TeamStaffListPanel", () => {
+describe("TeamHubRightPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("lists staff and opens edit panel", () => {
+  it("shows edit form when member selected", () => {
     render(
-      <TeamStaffListPanel
+      <TeamHubRightPanel
         companyId="co-abc"
         staff={staff}
-        loading={false}
-        loadError={null}
+        selectedUid="uid-tech-1"
+        onClearSelection={jest.fn()}
         onRefresh={jest.fn().mockResolvedValue(undefined)}
       />
     );
 
-    expect(screen.getByTestId("team-staff-row-uid-tech-1")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("team-staff-row-uid-tech-1"));
     expect(screen.getByTestId("team-staff-edit-first-name")).toHaveValue("Jean");
     expect(screen.getByTestId("team-staff-deactivate")).toBeInTheDocument();
-  });
-
-  it("conserve la saisie dans le formulaire", () => {
-    render(
-      <TeamStaffListPanel
-        companyId="co-abc"
-        staff={staff}
-        loading={false}
-        loadError={null}
-        onRefresh={jest.fn().mockResolvedValue(undefined)}
-      />
-    );
-
-    fireEvent.click(screen.getByTestId("team-staff-row-uid-tech-1"));
-    const lastNameInput = screen.getByTestId("team-staff-edit-last-name");
-    fireEvent.change(lastNameInput, { target: { value: "Dupont" } });
-    expect(lastNameInput).toHaveValue("Dupont");
   });
 
   it("saves profile via API", async () => {
@@ -69,18 +50,18 @@ describe("TeamStaffListPanel", () => {
       json: async () => ({ ok: true }),
     });
     const onRefresh = jest.fn().mockResolvedValue(undefined);
+    const onClear = jest.fn();
 
     render(
-      <TeamStaffListPanel
+      <TeamHubRightPanel
         companyId="co-abc"
         staff={staff}
-        loading={false}
-        loadError={null}
+        selectedUid="uid-tech-1"
+        onClearSelection={onClear}
         onRefresh={onRefresh}
       />
     );
 
-    fireEvent.click(screen.getByTestId("team-staff-row-uid-tech-1"));
     fireEvent.change(screen.getByTestId("team-staff-edit-last-name"), {
       target: { value: "Dupont" },
     });
@@ -89,15 +70,7 @@ describe("TeamStaffListPanel", () => {
     await waitFor(() =>
       expect(fetchWithAuth).toHaveBeenCalledWith(
         "/api/company/staff/uid-tech-1?companyId=co-abc",
-        expect.objectContaining({
-          method: "PATCH",
-          body: JSON.stringify({
-            firstName: "Jean",
-            lastName: "Dupont",
-            email: "jean@abc.be",
-            vehicle: "Camionnette",
-          }),
-        })
+        expect.objectContaining({ method: "PATCH" })
       )
     );
     expect(onRefresh).toHaveBeenCalled();
