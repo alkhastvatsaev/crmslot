@@ -21,16 +21,24 @@ const baseIntervention = {
   scheduledTime: "10:00",
 };
 
-describe("WhatsApp status notifications", () => {
-  const realFetch = global.fetch;
+function whatsappCall() {
+  return (fetchWithAuth as jest.Mock).mock.calls.find(
+    (call) => call[0] === "/api/notifications/whatsapp"
+  );
+}
 
+function sendCall() {
+  return (fetchWithAuth as jest.Mock).mock.calls.find(
+    (call) => call[0] === "/api/notifications/send"
+  );
+}
+
+describe("WhatsApp status notifications", () => {
   beforeEach(() => {
-    global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    global.fetch = realFetch;
     delete process.env.NEXT_PUBLIC_FF_WHATSAPP;
   });
 
@@ -52,14 +60,9 @@ describe("WhatsApp status notifications", () => {
       toStatus: "en_route",
       intervention: baseIntervention,
     });
-    expect(fetchWithAuth).toHaveBeenCalledWith(
-      "/api/notifications/whatsapp",
-      expect.objectContaining({ method: "POST" })
-    );
-    const body = JSON.parse((fetchWithAuth as jest.Mock).mock.calls[0][1].body as string) as Record<
-      string,
-      string
-    >;
+    const call = whatsappCall();
+    expect(call).toBeDefined();
+    const body = JSON.parse(call![1].body as string) as Record<string, string>;
     expect(body.to).toBe("+32470000000");
     expect(body.interventionStatus).toBe("en_route");
   });
@@ -71,12 +74,8 @@ describe("WhatsApp status notifications", () => {
       toStatus: "en_route",
       intervention: baseIntervention,
     });
-    expect(fetchWithAuth).not.toHaveBeenCalled();
-    // Le canal email continue de partir vers /api/notifications/send
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/notifications/send",
-      expect.objectContaining({ method: "POST" })
-    );
+    expect(whatsappCall()).toBeUndefined();
+    expect(sendCall()).toBeDefined();
   });
 
   it("skips whatsapp when client has no phone", async () => {
@@ -86,6 +85,6 @@ describe("WhatsApp status notifications", () => {
       toStatus: "en_route",
       intervention: { ...baseIntervention, clientPhone: undefined },
     });
-    expect(fetchWithAuth).not.toHaveBeenCalled();
+    expect(whatsappCall()).toBeUndefined();
   });
 });
