@@ -7,10 +7,10 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { searchLecotViaApi } from "../src/features/catalog/lecotApiSearch";
-import { crawlLecotProductImage } from "../src/features/catalog/lecotImageCrawler";
-import { fetchLecotProductPageImage } from "../src/features/catalog/lecotProductPageImage";
-import { lecotShopOrigin } from "../src/features/catalog/lecotShopConfig";
+import { searchLecotViaApi } from "../../src/features/catalog/lecotApiSearch";
+import { crawlLecotProductImage } from "../../src/features/catalog/lecotImageCrawler";
+import { fetchLecotProductPageImage } from "../../src/features/catalog/lecotProductPageImage";
+import { lecotShopOrigin } from "../../src/features/catalog/lecotShopConfig";
 
 type CatalogRow = { sku: string; label: string };
 

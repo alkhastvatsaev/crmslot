@@ -11,11 +11,11 @@ import * as path from "node:path";
 import {
   buildLabelOverlayFromIndex,
   buildLegacySkuOverlayFromIndex,
-} from "../src/features/catalog/lecotImageCrawler";
-import { normalizeLecotImageLookupKey } from "../src/features/catalog/lecotProductImageCache";
-import type { LecotProductImageIndex } from "../src/features/catalog/lecotProductImageIndex";
-import { normalizeProductLabelKey } from "../src/features/catalog/lecotProductLabelImage";
-import { fetchLecotProductPageImage } from "../src/features/catalog/lecotProductPageImage";
+} from "../../src/features/catalog/lecotImageCrawler";
+import { normalizeLecotImageLookupKey } from "../../src/features/catalog/lecotProductImageCache";
+import type { LecotProductImageIndex } from "../../src/features/catalog/lecotProductImageIndex";
+import { normalizeProductLabelKey } from "../../src/features/catalog/lecotProductLabelImage";
+import { fetchLecotProductPageImage } from "../../src/features/catalog/lecotProductPageImage";
 
 const STOCK_ITEMS: Array<{ reference: string; lecotSku: string; label: string }> = [
   { reference: "CYL-EURO-80", lecotSku: "LEC-CYL-2012", label: "Cylindre européen 80 mm sécurité" },

@@ -9,7 +9,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { normalizeLecotImageLookupKey } from "../src/features/catalog/lecotProductImageCache";
+import { normalizeLecotImageLookupKey } from "../../src/features/catalog/lecotProductImageCache";
 import {
   buildCrawlReport,
   buildLabelOverlayFromIndex,
@@ -19,9 +19,9 @@ import {
   mergeResultsIntoIndex,
   type CrawlCatalogRow,
   type CrawlResult,
-} from "../src/features/catalog/lecotImageCrawler";
-import type { LecotProductImageIndex } from "../src/features/catalog/lecotProductImageIndex";
-import { normalizeProductLabelKey } from "../src/features/catalog/lecotProductLabelImage";
+} from "../../src/features/catalog/lecotImageCrawler";
+import type { LecotProductImageIndex } from "../../src/features/catalog/lecotProductImageIndex";
+import { normalizeProductLabelKey } from "../../src/features/catalog/lecotProductLabelImage";
 
 const DATA_DIR = path.join(process.cwd(), "data/catalog/lecot");
 const PRODUCTS_PATH = path.join(DATA_DIR, "products.json");

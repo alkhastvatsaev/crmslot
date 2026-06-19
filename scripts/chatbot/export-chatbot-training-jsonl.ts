@@ -15,7 +15,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { getAdminDb, isFirebaseAdminReady } from "../src/core/config/firebase-admin";
+import { getAdminDb, isFirebaseAdminReady } from "../../src/core/config/firebase-admin";
 
 function arg(name: string): string | null {
   const p = process.argv.find((a) => a.startsWith(`--${name}=`));

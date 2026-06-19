@@ -3,8 +3,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { normalizeLecotImageLookupKey } from "../src/features/catalog/lecotProductImageCache";
-import type { LecotProductImageIndex } from "../src/features/catalog/lecotProductImageIndex";
+import { normalizeLecotImageLookupKey } from "../../src/features/catalog/lecotProductImageCache";
+import type { LecotProductImageIndex } from "../../src/features/catalog/lecotProductImageIndex";
 
 const DATA_DIR = path.join(process.cwd(), "data/catalog/lecot");
 

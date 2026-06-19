@@ -5,7 +5,7 @@ import { loadEnvConfig } from "@next/env";
 // Load environment variables for Firebase Admin
 loadEnvConfig(process.cwd());
 
-import { getAdminDb, isFirebaseAdminReady } from "../src/core/config/firebase-admin";
+import { getAdminDb, isFirebaseAdminReady } from "../../src/core/config/firebase-admin";
 
 type TrainingExportMessage = {
   role: string;
