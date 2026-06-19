@@ -105,7 +105,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     profileRoleKey: "admin",
     spotlightLabelKey: "spotlight.nav_commissions_hub",
     guideTitle: "Commissions",
-    guideHint: "Tuiles de règles, saisie manuelle et trace — édition en un clic.",
+    guideHint: "Pipeline 1·Encaisser → 2·Distribuer → 3·Régler — vue patron temps réel.",
   },
   {
     slotIndex: PLANNING_HUB_SLOT_INDEX,

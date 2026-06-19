@@ -8,5 +8,5 @@ export type CommissionsHubSelection =
   | { kind: "none" }
   | { kind: "new-rule"; level?: CommissionLevel; targetId?: string }
   | { kind: "rule"; id: string }
-  | { kind: "manual"; id: string }
+  | { kind: "manual"; technicianUid?: string }
   | { kind: "technician"; uid: string };

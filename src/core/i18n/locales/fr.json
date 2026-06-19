@@ -254,9 +254,42 @@
       "history": "Trace"
     },
     "kpi": {
-      "month_total": "Ce mois",
+      "month_total": "À payer",
+      "revenue": "CA mois",
       "active_techs": "Techniciens",
       "exceptions": "Exceptions"
+    },
+    "sparkline": {
+      "title": "6 derniers mois",
+      "window": "{{n}} mois",
+      "sum": "Total {{value}}"
+    },
+    "steps": {
+      "revenue_verb": "1 · Encaisser",
+      "revenue_caption": "Ce que tu as facturé",
+      "revenue_hint": "{{count}} techniciens actifs",
+      "distribute_verb": "2 · Distribuer",
+      "distribute_caption": "Comment ça se répartit",
+      "distribute_total": "À payer ce mois",
+      "distribute_only_podium": "Tout est sur le podium.",
+      "rules_verb": "3 · Régler",
+      "rules_caption": "Les leviers à actionner",
+      "rules_focus": "Focus sur {{name}}",
+      "rules_editing": "Modifier la règle",
+      "rules_creating": "Nouvelle règle",
+      "rules_bonus": "Ajouter un bonus",
+      "rules_list_title": "Règles actives",
+      "flow_to_distribute": "vers distribution",
+      "flow_to_rules": "vers règles"
+    },
+    "cancel": "Annuler",
+    "tech_rates": {
+      "title": "Taux par technicien",
+      "personal": "Perso",
+      "inherited": "Hérité société",
+      "reset": "Retirer le taux perso",
+      "intervention_overrides": "Exceptions par dossier",
+      "add_override": "+ Exception dossier"
     },
     "company_rule": {
       "label": "Règle société",
@@ -274,7 +307,12 @@
       "month_label": "Ce mois",
       "add_bonus": "+ Bonus",
       "set_rule": "Règle perso",
-      "edit_rule": "Modifier règle"
+      "edit_rule": "Modifier règle",
+      "tech_rate_label": "Taux {{name}}",
+      "tech_rate_value_aria": "Valeur du taux",
+      "tech_rate_create": "Définir le taux",
+      "tech_rate_update": "Mettre à jour",
+      "tech_rate_reset": "× Retirer"
     },
     "level": {
       "all": "Tout"

@@ -1,22 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
-import CommissionsHubTechnicianGrid from "@/features/commissionsHub/components/CommissionsHubTechnicianGrid";
-import CommissionsHubRulesGrid from "@/features/commissionsHub/components/CommissionsHubRulesGrid";
-import CommissionsHubRightPanel from "@/features/commissionsHub/components/CommissionsHubRightPanel";
+import CommissionsHubRevenuePanel from "@/features/commissionsHub/components/CommissionsHubRevenuePanel";
+import CommissionsHubDistributionPanel from "@/features/commissionsHub/components/CommissionsHubDistributionPanel";
+import CommissionsHubRulesPanel from "@/features/commissionsHub/components/CommissionsHubRulesPanel";
 import { useCommissionsHubData } from "@/features/commissionsHub/hooks/useCommissionsHubData";
 import {
   buildPatronCommissionKpis,
+  buildPatronMonthlySeries,
   buildPatronTechnicianRows,
-  findCompanyGroupRule,
+  buildPatronTrend,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
-import type {
-  CommissionsHubMode,
-  CommissionsHubSelection,
-} from "@/features/commissionsHub/commissionsHubTypes";
-import { formatCommissionValue } from "@/features/commissionsHub/commissionsHubFormat";
+import type { CommissionsHubSelection } from "@/features/commissionsHub/commissionsHubTypes";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useTechnicians } from "@/features/technicians/hooks";
@@ -24,25 +21,14 @@ import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
-import { PatronHubChipRow, PatronHubGuide } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 type Props = { slotIndex?: number };
 
-type CommissionsView = "team" | "rules";
-
 const sideShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 const mainShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
-function formatEur(cents: number): string {
-  return new Intl.NumberFormat("fr-BE", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
-}
-
-/** Hub commissions — une info, une liste, un détail. */
+/** Hub commissions — pipeline lecture gauche→droite : 1. Encaisser · 2. Distribuer · 3. Régler. */
 export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_INDEX }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
@@ -50,8 +36,6 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { technicians } = useTechnicians();
 
-  const [view, setView] = useState<CommissionsView>("team");
-  const [rightMode, setRightMode] = useState<CommissionsHubMode>("team");
   const [selection, setSelection] = useState<CommissionsHubSelection>({ kind: "none" });
 
   const {
@@ -72,6 +56,16 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     [interventions, manualEntries, rules]
   );
 
+  const monthlySeries = useMemo(
+    () => buildPatronMonthlySeries({ interventions, manualEntries, months: 6 }),
+    [interventions, manualEntries]
+  );
+
+  const revenueTrend = useMemo(
+    () => buildPatronTrend(monthlySeries, "revenueCents"),
+    [monthlySeries]
+  );
+
   const technicianRows = useMemo(() => {
     if (!companyId) return [];
     return buildPatronTechnicianRows({
@@ -82,26 +76,6 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
       technicians,
     });
   }, [companyId, interventions, manualEntries, rules, technicians]);
-
-  const companyGroupRule = useMemo(
-    () => (companyId ? findCompanyGroupRule(rules, companyId) : null),
-    [rules, companyId]
-  );
-
-  useEffect(() => {
-    setSelection({ kind: "none" });
-    setRightMode(view);
-  }, [view]);
-
-  const openCompanyRule = () => {
-    setView("rules");
-    setRightMode("rules");
-    if (companyGroupRule) {
-      setSelection({ kind: "rule", id: companyGroupRule.id });
-    } else {
-      setSelection({ kind: "new-rule" });
-    }
-  };
 
   const gate =
     companyPhase === "loading" ? (
@@ -121,16 +95,8 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
       </div>
     ) : null;
 
-  const selectedRuleId = selection.kind === "rule" ? selection.id : null;
   const selectedTechUid = selection.kind === "technician" ? selection.uid : null;
   const teamLoading = interventionsLoading || rulesLoading || manualLoading;
-
-  const ruleFooterLabel = companyGroupRule
-    ? t("commissionsHub.company_rule.applies_all").replace(
-        "{{value}}",
-        formatCommissionValue(companyGroupRule.valueType, companyGroupRule.value)
-      )
-    : t("commissionsHub.company_rule.empty");
 
   return (
     <AdaptiveTriplePanelLayout
@@ -148,42 +114,12 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
         <section className={sideShell} data-testid="commissions-hub-page">
           {gate}
           {companyId && !gate ? (
-            <>
-              <PatronHubGuide
-                value={formatEur(patronKpis.monthTotalCents)}
-                label={t("commissionsHub.guide.value_label")}
-                hint={t("commissionsHub.guide.hint")}
-                valueTestId="commissions-hub-kpi-total"
-                rootTestId="commissions-hub-kpi-strip"
-                footer={
-                  <button
-                    type="button"
-                    data-testid="commissions-hub-company-rule-hero"
-                    onClick={openCompanyRule}
-                    className="mx-auto block w-full max-w-[240px] rounded-2xl border border-sky-200/80 bg-sky-50/90 px-3 py-2.5 text-center text-[13px] font-medium text-sky-900 transition hover:bg-sky-50"
-                  >
-                    {ruleFooterLabel}
-                  </button>
-                }
-              />
-              <PatronHubChipRow
-                testId="commissions-hub-view-chips"
-                value={view}
-                onChange={(id) => setView(id as CommissionsView)}
-                options={[
-                  {
-                    id: "team",
-                    label: t("commissionsHub.guide.chip_team"),
-                    testId: "commissions-hub-mode-team",
-                  },
-                  {
-                    id: "rules",
-                    label: t("commissionsHub.guide.chip_rules"),
-                    testId: "commissions-hub-mode-rules",
-                  },
-                ]}
-              />
-            </>
+            <CommissionsHubRevenuePanel
+              revenueCents={patronKpis.monthRevenueCents}
+              revenueTrend={revenueTrend}
+              series={monthlySeries}
+              technicianCount={patronKpis.activeTechnicianCount}
+            />
           ) : null}
         </section>
       }
@@ -191,45 +127,26 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
         <section className={mainShell}>
           {gate}
           {companyId && !gate ? (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {view === "team" ? (
-                <CommissionsHubTechnicianGrid
-                  rows={technicianRows}
-                  loading={teamLoading}
-                  selectedUid={selectedTechUid}
-                  onSelect={(uid) => setSelection({ kind: "technician", uid })}
-                />
-              ) : (
-                <CommissionsHubRulesGrid
-                  rules={rules}
-                  levelFilter="all"
-                  loading={rulesLoading}
-                  selectedRuleId={selectedRuleId}
-                  creating={selection.kind === "new-rule"}
-                  onSelectRule={(id) => setSelection({ kind: "rule", id })}
-                  onStartCreate={() => setSelection({ kind: "new-rule" })}
-                />
-              )}
-            </div>
+            <CommissionsHubDistributionPanel
+              rows={technicianRows}
+              loading={teamLoading}
+              selectedUid={selectedTechUid}
+              onSelect={(uid) => setSelection({ kind: "technician", uid })}
+              totalCents={patronKpis.monthTotalCents}
+            />
           ) : null}
         </section>
       }
       right={
         <section className={mainShell}>
           {companyId && !gate ? (
-            <CommissionsHubRightPanel
+            <CommissionsHubRulesPanel
               companyId={companyId}
-              mode={rightMode}
               selection={selection}
               rules={rules}
-              manualEntries={manualEntries}
               technicianRows={technicianRows}
               saving={saving}
               onSelectionChange={setSelection}
-              onModeChange={(m) => {
-                setRightMode(m);
-                if (m === "team" || m === "rules") setView(m);
-              }}
               onSaveRule={saveRule}
               onDeleteRule={removeRule}
               onSaveManual={saveManualEntry}
