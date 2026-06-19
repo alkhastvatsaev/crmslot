@@ -36,7 +36,7 @@ Cocher avant d’ouvrir l’app aux vrais clients / techniciens. Détail : [PLAN
 - [ ] `/api/demo/*` retourne 404 en production
 - [ ] `CRON_SECRET` configuré (Vercel + workflows GitHub) — `/api/cron/*` répond 401 sans header
 - [ ] Middleware sécurité actif (`src/middleware.ts`) — CSP report-only, basculer `CSP_ENFORCE=true` après audit
-- [ ] Firebase App Check activé (reCAPTCHA v3) + enforcement Firestore/Storage côté console
+- [ ] Firebase App Check activé (reCAPTCHA v3) + enforcement — **tutoriel complet** : [SECURITE_MAX_CHECKLIST.md](./SECURITE_MAX_CHECKLIST.md)
 
 ---
 
