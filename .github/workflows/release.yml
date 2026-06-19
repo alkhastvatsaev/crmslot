@@ -82,7 +82,7 @@ jobs:
 
       - name: Smoke deployed URL (auto)
         if: steps.deploy.outputs.url != ''
-        run: node scripts/smoke-url.mjs "${{ steps.deploy.outputs.url }}"
+        run: node scripts/ops/smoke-url.mjs "${{ steps.deploy.outputs.url }}"
 
   smoke-manual:
     name: Smoke URL (manuel)
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: node scripts/smoke-url.mjs "${{ inputs.smoke_url }}"
+      - run: node scripts/ops/smoke-url.mjs "${{ inputs.smoke_url }}"
 
   smoke-scheduled:
     name: Smoke production (hebdo)
@@ -105,4 +105,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: node scripts/smoke-url.mjs "${{ secrets.PRODUCTION_URL }}"
+      - run: node scripts/ops/smoke-url.mjs "${{ secrets.PRODUCTION_URL }}"

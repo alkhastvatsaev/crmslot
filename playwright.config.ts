@@ -33,7 +33,7 @@ const defaultDevWebServer = {
 
 /** Build + start port 3001 — Next 16 n’autorise qu’un seul `next dev` par repo. */
 const desktopGateProdWebServer = {
-  command: "bash scripts/e2e-desktop-gate-server.sh",
+  command: "bash scripts/dev/e2e-desktop-gate-server.sh",
   url: "http://localhost:3001",
   reuseExistingServer: !process.env.CI,
   timeout: 300_000,
