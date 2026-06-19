@@ -8,14 +8,14 @@ CRMSLOT. Plan mode gros diff. @fichier:ligne. Tests → AGENTS.md si besoin.
 
 Si l’utilisateur a aussi **Cursor / l’Agent** ouvert sur ce repo :
 
-1. Lire **`docs/PARALLEL_WORK.md`** — zones, propriétaire de session, branche.
+1. Lire **`docs/agents/PARALLEL_WORK.md`** — zones, propriétaire de session, branche.
 2. Ne modifier que les chemins de **ta** zone ; un fichier = un outil à la fois.
 3. Branche conseillée : `claude/<sujet>` (pas `cursor/*`, pas force-push sur `main`).
 4. Début de session : `git status` + annoncer les dossiers visés.
 5. Pas de `git add .` ; commit seulement si l’utilisateur le demande.
 6. Hub partagé (`src/app/page.tsx`, `src/context/**`, i18n) → coordination obligatoire.
 
-Worktree pour deux clones physiques : voir PARALLEL_WORK.md. Perf Cursor : **`docs/CURSOR_WORKFLOW.md`**.
+Worktree pour deux clones physiques : voir PARALLEL_WORK.md. Perf Cursor : **`docs/agents/CURSOR_WORKFLOW.md`**.
 
 ## Commands
 

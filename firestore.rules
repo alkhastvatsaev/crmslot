@@ -1,5 +1,5 @@
 rules_version = '2';
-// Production : voir docs/FIRESTORE_PRODUCTION_MIGRATION.md avant de durcir la lecture globale des interventions.
+// Production : voir docs/ops/FIRESTORE_PRODUCTION_MIGRATION.md avant de durcir la lecture globale des interventions.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -494,7 +494,7 @@ service cloud.firestore {
       /**
        * Plusieurs `allow read` → OU logique. Garder des règles **séparées** (pas un seul `||` géant)
        * pour que les requêtes filtrées (`companyId`, `assignedTechnicianUid`) passent la validation Firestore.
-       * Voir docs/FIRESTORE_PRODUCTION_MIGRATION.md
+       * Voir docs/ops/FIRESTORE_PRODUCTION_MIGRATION.md
        */
       allow read: if canReadInterventionViaTenantClaims();
       allow read: if canReadInterventionViaMembership();

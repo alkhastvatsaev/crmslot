@@ -25,7 +25,7 @@ Si cette PR touche `src/features/chatbot/**` ou `src/app/api/ai/chatbot/**` :
 - [ ] Nouvel outil OpenAI → `chatbot-tools.ts` + `chatbot-tool-executor.ts` + tests routing/executor
 - [ ] Logique API dans `chatbot-route-handler.ts` / `chatbot-document-action-handler.ts` (pas seulement `route.ts`)
 
-Voir [`docs/TESTING.md`](../docs/TESTING.md).
+Voir [`docs/agents/TESTING.md`](../docs/agents/TESTING.md).
 
 ### Interventions / facturation
 

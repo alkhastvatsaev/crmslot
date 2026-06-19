@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
-# Supprime les artefacts de dev lourds (≈2–3 Go .next). Safe : rebuild au prochain npm run dev.
+# Artefacts locaux lourds (safe — régénérables).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-
-echo "Avant :"
-du -sh .next .next-e2e-gate coverage 2>/dev/null || true
-
-rm -rf .next .next-e2e-gate
-# coverage optionnel — décommenter si besoin :
-# rm -rf coverage
-
-echo "Après :"
+echo "Nettoyage…"
+rm -rf .next .next-e2e-gate coverage test-results playwright-report .playwright-mcp
+find . -name '.DS_Store' -delete 2>/dev/null || true
+rm -f tsconfig.tsbuildinfo tsconfig.*.tsbuildinfo 2>/dev/null || true
 du -sh . 2>/dev/null
-echo "OK — lancer npm run dev pour reconstruire .next"
+echo "OK — npm run dev pour reconstruire .next"

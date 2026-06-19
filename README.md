@@ -38,20 +38,24 @@ npm run ci:all              # ci + Playwright E2E
 npx playwright install      # une fois, avant les E2E en local
 ```
 
-**GitHub Actions** : `test.yml` + `e2e.yml` sur chaque PR ; `release.yml` sur `main` (qualité + E2E, déploiement Vercel manuel via *Run workflow*). Secrets : `VERCEL_*`, `PRODUCTION_URL` (smoke hebdo).
+**GitHub Actions** : `test.yml` + `e2e.yml` sur chaque PR ; `release.yml` sur `main` (qualité + E2E, déploiement Vercel manuel via _Run workflow_). Secrets : `VERCEL_*`, `PRODUCTION_URL` (smoke hebdo).
 
-**Premier déploiement** : guide détaillé → [docs/SETUP_VERCEL_GITHUB.md](docs/SETUP_VERCEL_GITHUB.md)
+**Premier déploiement** : guide détaillé → [docs/ops/SETUP_VERCEL_GITHUB.md](docs/ops/SETUP_VERCEL_GITHUB.md)
 
-## Documentation stratégique
+## Documentation
 
-| Document | Contenu |
-|----------|---------|
-| [docs/PLAN_STRATEGIQUE.md](docs/PLAN_STRATEGIQUE.md) | Phases 0–6, ordre d’exécution, commandes |
-| [docs/CHANTIERS_COMPLEXES.md](docs/CHANTIERS_COMPLEXES.md) | Analyse des gros chantiers techniques |
-| [docs/CHECKLIST_PRODUCTION.md](docs/CHECKLIST_PRODUCTION.md) | Cases à cocher avant mise en prod |
-| [docs/FIRESTORE_PRODUCTION_MIGRATION.md](docs/FIRESTORE_PRODUCTION_MIGRATION.md) | Durcissement des rules Firestore |
-| [docs/TRAVAIL_AUTONOME.md](docs/TRAVAIL_AUTONOME.md) | Sessions longues / agent sans clic |
-| [docs/TECHNICIENS_AUTH_UID.md](docs/TECHNICIENS_AUTH_UID.md) | Lier techniciens Firestore ↔ Firebase Auth |
+Index complet → [**docs/README.md**](docs/README.md)
+
+### Référence stratégique
+
+| Document                                                                                 | Contenu                                    |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [docs/reference/PLAN_STRATEGIQUE.md](docs/reference/PLAN_STRATEGIQUE.md)                 | Phases 0–6, ordre d’exécution, commandes   |
+| [docs/reference/CHANTIERS_COMPLEXES.md](docs/reference/CHANTIERS_COMPLEXES.md)           | Analyse des gros chantiers techniques      |
+| [docs/ops/CHECKLIST_PRODUCTION.md](docs/ops/CHECKLIST_PRODUCTION.md)                     | Cases à cocher avant mise en prod          |
+| [docs/ops/FIRESTORE_PRODUCTION_MIGRATION.md](docs/ops/FIRESTORE_PRODUCTION_MIGRATION.md) | Durcissement des rules Firestore           |
+| [docs/reference/TRAVAIL_AUTONOME.md](docs/reference/TRAVAIL_AUTONOME.md)                 | Sessions longues / agent sans clic         |
+| [docs/ops/TECHNICIENS_AUTH_UID.md](docs/ops/TECHNICIENS_AUTH_UID.md)                     | Lier techniciens Firestore ↔ Firebase Auth |
 
 Voir `AGENTS.md` pour les règles de tests (colocation, `data-testid`, modules P0).
 
