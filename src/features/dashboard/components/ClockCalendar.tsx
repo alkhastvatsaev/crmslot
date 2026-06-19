@@ -8,13 +8,15 @@ import { cn } from "@/lib/utils";
 
 type ClockCalendarProps = {
   compact?: boolean;
-  /** Clic sur date/heure → grille de pages (mobile header). */
+  /** Clic sur date/heure → grille de pages (admin) ou calendrier mois (terrain). */
   interactive?: boolean;
+  toggleTarget?: "pages" | "calendar";
 };
 
 export default function ClockCalendar({
   compact = false,
   interactive = false,
+  toggleTarget = "pages",
 }: ClockCalendarProps) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
@@ -85,9 +87,17 @@ export default function ClockCalendar({
             type="button"
             data-testid="clock-calendar-toggle"
             className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
-            aria-label="Ouvrir la navigation"
-            aria-expanded={pageSelector.view === "pages"}
-            onClick={() => pageSelector.toggle()}
+            aria-label={
+              toggleTarget === "calendar" ? "Ouvrir le calendrier" : "Ouvrir la navigation"
+            }
+            aria-expanded={
+              toggleTarget === "calendar"
+                ? pageSelector.view === "calendar"
+                : pageSelector.view === "pages"
+            }
+            onClick={() =>
+              toggleTarget === "calendar" ? pageSelector.toggleCalendar() : pageSelector.toggle()
+            }
           >
             {compactDateTime}
           </button>

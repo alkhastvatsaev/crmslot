@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-export type DashboardOverlayView = "closed" | "pages" | "account";
+export type DashboardOverlayView = "closed" | "pages" | "account" | "calendar";
 
 type DashboardPageSelectorContextValue = {
   view: DashboardOverlayView;
@@ -10,6 +10,9 @@ type DashboardPageSelectorContextValue = {
   open: boolean;
   /** Bascule la grille de navigation (calendrier / horloge). */
   toggle: () => void;
+  /** Calendrier mois terrain (app technicien). */
+  toggleCalendar: () => void;
+  openCalendar: () => void;
   toggleAccount: () => void;
   openPages: () => void;
   openAccount: () => void;
@@ -37,12 +40,20 @@ export function DashboardPageSelectorProvider({
     setView("account");
   }, []);
 
+  const openCalendar = useCallback(() => {
+    setView("calendar");
+  }, []);
+
   const close = useCallback(() => {
     setView("closed");
   }, []);
 
   const toggle = useCallback(() => {
     setView((prev) => (prev === "pages" ? "closed" : "pages"));
+  }, []);
+
+  const toggleCalendar = useCallback(() => {
+    setView((prev) => (prev === "calendar" ? "closed" : "calendar"));
   }, []);
 
   const toggleAccount = useCallback(() => {
@@ -54,12 +65,14 @@ export function DashboardPageSelectorProvider({
       view,
       open: view !== "closed",
       toggle,
+      toggleCalendar,
       toggleAccount,
       openPages,
+      openCalendar,
       openAccount,
       close,
     }),
-    [view, toggle, toggleAccount, openPages, openAccount, close]
+    [view, toggle, toggleCalendar, toggleAccount, openPages, openCalendar, openAccount, close]
   );
 
   return (

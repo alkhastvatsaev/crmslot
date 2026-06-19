@@ -1152,6 +1152,25 @@
         "actions": "Actions rapides",
         "active": "Active"
       },
+      "calendar": {
+        "title": "Calendrier missions",
+        "subtitle": "Touchez un jour pour afficher ses missions",
+        "prev_month": "Mois précédent",
+        "next_month": "Mois suivant",
+        "legend_title": "Légende",
+        "legend_scheduled": "À faire",
+        "legend_completed": "Terminées",
+        "legend_awaiting": "À accepter",
+        "legend_mixed": "Plusieurs statuts",
+        "weekdays_short": ["L", "M", "M", "J", "V", "S", "D"],
+        "weekday_mon": "L",
+        "weekday_tue": "M",
+        "weekday_wed": "M",
+        "weekday_thu": "J",
+        "weekday_fri": "V",
+        "weekday_sat": "S",
+        "weekday_sun": "D"
+      },
       "images": {
         "no_mission_selected": "Sélectionnez une mission pour voir les photos du client",
         "no_photos": "Aucune photo fournie par le client",

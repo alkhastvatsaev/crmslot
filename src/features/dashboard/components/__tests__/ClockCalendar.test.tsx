@@ -27,15 +27,23 @@ describe("ClockCalendar", () => {
     expect(screen.getByTestId("selector-state")).toHaveTextContent("open");
   });
 
-  it("ne rend pas le bouton toggle sans mode interactif", () => {
+  it("toggle le calendrier terrain au clic quand toggleTarget=calendar", () => {
+    function ToggleProbe() {
+      const { view } = useDashboardPageSelector();
+      return <div data-testid="selector-view">{view}</div>;
+    }
+
     render(
       <DateProvider>
         <DashboardPageSelectorProvider>
-          <ClockCalendar compact />
+          <ClockCalendar compact interactive toggleTarget="calendar" />
+          <ToggleProbe />
         </DashboardPageSelectorProvider>
       </DateProvider>
     );
 
-    expect(screen.queryByTestId("clock-calendar-toggle")).not.toBeInTheDocument();
+    expect(screen.getByTestId("selector-view")).toHaveTextContent("closed");
+    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
+    expect(screen.getByTestId("selector-view")).toHaveTextContent("calendar");
   });
 });

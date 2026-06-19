@@ -30,6 +30,8 @@ import TechnicianGeofenceWatcher from "@/features/geofence/components/Technician
 import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
+import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
+import TechnicianMonthCalendar from "@/features/interventions/components/TechnicianMonthCalendar";
 
 type Props = { slotIndex: number };
 
@@ -52,6 +54,8 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   useTechnicianAssignmentPushBootstrap();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
   const { logIntervention } = useActivityLog();
+  const pageSelector = useDashboardPageSelectorOptional();
+  const calendarOpen = pageSelector?.view === "calendar";
 
   const selectedFromList = useMemo(
     () => (selectedCaseId ? (interventions.find((x) => x.id === selectedCaseId) ?? null) : null),
@@ -104,6 +108,12 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   };
 
   useEffect(() => {
+    if (calendarOpen) {
+      requestMobileHubRail("center");
+    }
+  }, [calendarOpen, requestMobileHubRail]);
+
+  useEffect(() => {
     if (finishJobInterventionId) {
       setSelectedCaseId(finishJobInterventionId);
       return;
@@ -140,7 +150,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     finishJobInterventionId,
   ]);
 
-  const centerView = finishJobInterventionId ? "finish" : "detail";
+  const centerView = calendarOpen ? "calendar" : finishJobInterventionId ? "finish" : "detail";
 
   const leftPanel = (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -154,7 +164,13 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       data-technician-center-view={centerView}
       className="flex min-h-0 flex-1 flex-col overflow-hidden scroll-mt-2"
     >
-      {finishJobInterventionId ? (
+      {calendarOpen ? (
+        <TechnicianMonthCalendar
+          interventions={interventions}
+          technicianUid={firebaseUid}
+          onClose={() => pageSelector?.close()}
+        />
+      ) : finishJobInterventionId ? (
         <TechnicianFinishJobPanel />
       ) : (
         <TechnicianDashboardDetailPanel
@@ -215,7 +231,9 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         center={centerPanel}
         right={rightPanel}
         centerPadding={false}
-        mobileSwipeDisabled={Boolean(finishJobInterventionId && finishWizardStep === "signature")}
+        mobileSwipeDisabled={
+          calendarOpen || Boolean(finishJobInterventionId && finishWizardStep === "signature")
+        }
       />
     </>
   );
