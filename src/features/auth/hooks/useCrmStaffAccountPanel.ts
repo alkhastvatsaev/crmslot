@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
-import { auth } from "@/core/config/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+
+type TechnicianFirestoreProfile = {
+  firstName: string;
+  lastName: string;
+};
 
 export type CrmStaffAccountFields = {
   email: string;
@@ -22,9 +28,12 @@ function splitDisplayName(displayName: string): { firstName: string; lastName: s
 
 function resolveStaffAccountFields(
   user: User | null,
-  workspace: ReturnType<typeof useCompanyWorkspaceOptional>
+  workspace: ReturnType<typeof useCompanyWorkspaceOptional>,
+  technicianProfile: TechnicianFirestoreProfile | null
 ): CrmStaffAccountFields {
-  const { firstName, lastName } = splitDisplayName(user?.displayName ?? "");
+  const fromAuth = splitDisplayName(user?.displayName ?? "");
+  const firstName = (technicianProfile?.firstName || fromAuth.firstName).trim();
+  const lastName = (technicianProfile?.lastName || fromAuth.lastName).trim();
   const membership = workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId);
   return {
     email: user?.email?.trim() ?? "",
@@ -38,6 +47,9 @@ function resolveStaffAccountFields(
 export function useCrmStaffAccountPanel() {
   const workspace = useCompanyWorkspaceOptional();
   const [user, setUser] = useState<User | null>(auth?.currentUser ?? null);
+  const [technicianProfile, setTechnicianProfile] = useState<TechnicianFirestoreProfile | null>(
+    null
+  );
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
@@ -45,7 +57,32 @@ export function useCrmStaffAccountPanel() {
     return onAuthStateChanged(auth, (next) => setUser(next));
   }, []);
 
-  const fields = resolveStaffAccountFields(user, workspace);
+  useEffect(() => {
+    const uid = user?.uid?.trim();
+    if (!firestore || !uid) {
+      setTechnicianProfile(null);
+      return () => {};
+    }
+
+    const ref = doc(firestore, "technicians", uid);
+    return onSnapshot(
+      ref,
+      (snap) => {
+        if (!snap.exists()) {
+          setTechnicianProfile(null);
+          return;
+        }
+        const data = snap.data();
+        setTechnicianProfile({
+          firstName: typeof data.firstName === "string" ? data.firstName.trim() : "",
+          lastName: typeof data.lastName === "string" ? data.lastName.trim() : "",
+        });
+      },
+      () => setTechnicianProfile(null)
+    );
+  }, [user?.uid]);
+
+  const fields = resolveStaffAccountFields(user, workspace, technicianProfile);
 
   const handleSignOut = async () => {
     if (!auth || signingOut) return;

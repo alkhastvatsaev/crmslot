@@ -1130,7 +1130,11 @@
         "assignment_action_failed": "Actie mislukt",
         "update_failed": "Bijwerken mislukt",
         "assignment_respond_in_list": "Accepteer of weiger deze opdracht via de lijst links.",
-        "description_label": "Beschrijving"
+        "description_label": "Beschrijving",
+        "early_start_title": "Afspraak nog niet aan de beurt",
+        "early_start_message": "Deze interventie is gepland op {{schedule}}. Wilt u vroeger beginnen?",
+        "early_start_wait": "Ik wacht",
+        "early_start_schedule_unknown": "op het geplande tijdstip"
       },
       "mission_action": {
         "depart": "Ik vertrek",

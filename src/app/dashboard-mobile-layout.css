@@ -108,6 +108,10 @@
   border-radius: 24px;
 }
 
+.technician-mobile-app .technician-mobile-profile-chip {
+  min-height: var(--mobile-galaxy-height);
+}
+
 .mobile-top-bar {
   display: flex;
   width: 100%;
