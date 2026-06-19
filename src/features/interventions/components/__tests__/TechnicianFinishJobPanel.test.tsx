@@ -212,11 +212,20 @@ describe("TechnicianFinishJobPanel", () => {
     });
   });
 
-  it("submit skips closure upload when intervention is already invoiced", async () => {
-    setupActive();
+  it("submit amends invoiced intervention and closes wizard", async () => {
+    const setFinishJobInterventionId = jest.fn();
+    mockUseFinishJob.mockReturnValue({
+      finishJobInterventionId: "iv-001",
+      finishJobEntryStep: null,
+      finishWizardStep: null,
+      setFinishJobInterventionId,
+      setFinishWizardStep: jest.fn(),
+      startFinishJob: jest.fn(),
+    });
     mockUseInterventionLive.mockReturnValue({
       ...MOCK_IV,
       status: "invoiced",
+      completionSignatureUrl: "https://example.com/sig.png",
     } as unknown as ReturnType<typeof mockUseInterventionLive>);
     render(<TechnicianFinishJobPanel />);
     await goToSignatureStep();
@@ -230,8 +239,13 @@ describe("TechnicianFinishJobPanel", () => {
     });
 
     await waitFor(() => {
-      expect(finalizeCompletionOfflineAware).not.toHaveBeenCalled();
-      expect(screen.getByTestId("finish-job-step-invoice")).toBeInTheDocument();
+      expect(finalizeCompletionOfflineAware).toHaveBeenCalledWith(
+        expect.objectContaining({
+          interventionId: "iv-001",
+          signaturePngDataUrl: "data:image/png;base64,signature",
+        })
+      );
+      expect(setFinishJobInterventionId).toHaveBeenCalledWith(null);
     });
   });
 
