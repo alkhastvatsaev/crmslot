@@ -34,6 +34,21 @@ Cocher avant d’ouvrir l’app aux vrais clients / techniciens. Détail : [PLAN
 - [ ] Routes `/api/*` sensibles : 401 sans Bearer (smoke `tests/e2e/api-security.spec.ts`)
 - [ ] `AUDIO_DISPATCH_SECRET` / Twilio secrets en prod uniquement
 - [ ] `/api/demo/*` retourne 404 en production
+- [ ] `CRON_SECRET` configuré (Vercel + workflows GitHub) — `/api/cron/*` répond 401 sans header
+- [ ] Middleware sécurité actif (`src/middleware.ts`) — CSP report-only, basculer `CSP_ENFORCE=true` après audit
+- [ ] Firebase App Check activé (reCAPTCHA v3) + enforcement Firestore/Storage côté console
+
+---
+
+## C.bis — Sauvegardes & continuité
+
+- [ ] **PITR Firestore** activé (Console Firebase → Firestore → Backups → Point-in-Time Recovery, 7 jours)
+- [ ] Bucket GCS `gs://<projet>-firestore-backups` créé, classe Coldline ou Archive, rétention >= 35 jours
+- [ ] Compte de service `firestore-backup@…` avec rôles `datastore.importExportAdmin` + `storage.objectAdmin`
+- [ ] Workload Identity Federation configuré pour GitHub Actions (provider OIDC)
+- [ ] Secrets GitHub renseignés : `GCP_PROJECT_ID`, `GCP_BACKUP_BUCKET`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`
+- [ ] Workflow `firestore-backup.yml` vert au moins une fois — vérifier dossier daté dans le bucket
+- [ ] Test restauration ponctuel documenté (1× / trimestre minimum)
 
 ---
 

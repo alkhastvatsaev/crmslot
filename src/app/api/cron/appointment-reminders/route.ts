@@ -1,6 +1,7 @@
 import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
+import { requireCronSecret } from "@/core/api/routeAuth";
 import {
   buildReminderMessage,
   findDueReminders,
@@ -16,15 +17,9 @@ export const runtime = "nodejs";
  * Auth : Bearer CRON_SECRET (Vercel Cron).
  */
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET?.trim();
-  const bearer = request.headers.get("authorization")?.trim();
-  const headerSecret = request.headers.get("x-cron-secret")?.trim();
-  const isAuthorizedCron =
-    Boolean(cronSecret) && (bearer === `Bearer ${cronSecret}` || headerSecret === cronSecret);
+  const guard = requireCronSecret(request);
+  if (guard) return guard;
 
-  if (!isAuthorizedCron) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
   if (!isFirebaseAdminReady()) {
     return NextResponse.json(
       { ok: false, error: "Firebase Admin not configured" },

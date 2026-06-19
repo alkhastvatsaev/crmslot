@@ -1,6 +1,7 @@
 import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
+import { requireCronSecret } from "@/core/api/routeAuth";
 import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
 import { computeContractChurnRisks } from "@/features/clients/contractChurnRisk";
 import { loadTechniciansAdmin } from "@/features/dispatch/server/loadTechniciansAdmin";
@@ -20,22 +21,13 @@ const CRON_ACTOR_UID = "cron-auto-agent";
 const UNPAID_REMINDER_DAYS = 7;
 const CHURN_REMINDER_DAYS = 3;
 
-function isAuthorized(request: Request): boolean {
-  const cronSecret = process.env.CRON_SECRET?.trim();
-  if (!cronSecret) return false;
-  const bearer = request.headers.get("authorization")?.trim();
-  const header = request.headers.get("x-cron-secret")?.trim();
-  return bearer === `Bearer ${cronSecret}` || header === cronSecret;
-}
-
 /**
  * GET /api/cron/auto-agent — automatise les relances, le dispatch et la rétention.
  * Tourne toutes les heures via Vercel Cron. Auth : CRON_SECRET.
  */
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = requireCronSecret(request);
+  if (guard) return guard;
   if (!isFirebaseAdminReady()) {
     return NextResponse.json(
       { ok: false, error: "Firebase Admin not configured" },

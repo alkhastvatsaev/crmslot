@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
+import { writeAuditLog, auditMetaFromRequest } from "@/core/services/audit/writeAuditLog";
 
 /**
  * Synchronise les custom claims Firebase à partir des documents
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   if (!admin.apps.length) {
     return NextResponse.json(
       { ok: false, error: "Firebase Admin non configuré (variables serveur manquantes)." },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -47,13 +48,22 @@ export async function POST(req: Request) {
 
   const fallbackActive = snap.docs[0]?.id ?? "";
   const activeCompanyId =
-    typeof body.activeCompanyId === "string" && tenants.some((t) => t.startsWith(`${body.activeCompanyId}:`))
+    typeof body.activeCompanyId === "string" &&
+    tenants.some((t) => t.startsWith(`${body.activeCompanyId}:`))
       ? body.activeCompanyId
       : fallbackActive;
 
   await admin.auth().setCustomUserClaims(uid, {
     bmTenants: tenants,
     bmActive: activeCompanyId || null,
+  });
+
+  await writeAuditLog({
+    action: "company.sync_claims",
+    actorUid: uid,
+    companyId: activeCompanyId || null,
+    ...auditMetaFromRequest(req),
+    meta: { tenantsCount: tenants.length },
   });
 
   return NextResponse.json({

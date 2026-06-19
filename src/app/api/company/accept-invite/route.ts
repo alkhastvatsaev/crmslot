@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
+import { writeAuditLog, auditMetaFromRequest } from "@/core/services/audit/writeAuditLog";
 
 export const runtime = "nodejs";
 
@@ -124,6 +125,16 @@ export async function POST(req: Request) {
   await admin.auth().setCustomUserClaims(uid, {
     bmTenants: tenants,
     bmActive: fallbackActive || null,
+  });
+
+  await writeAuditLog({
+    action: "company.accept_invite",
+    actorUid: uid,
+    companyId,
+    targetType: "company_invite",
+    targetId: inviteId,
+    ...auditMetaFromRequest(req),
+    meta: { tenantsCount: tenants.length },
   });
 
   return NextResponse.json({ ok: true, companyId });
