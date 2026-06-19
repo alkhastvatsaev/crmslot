@@ -23,6 +23,9 @@ export const PLANNING_WORK_SLOTS = [
   "14:00",
   "15:00",
   "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
 ] as const;
 
 const ACTIVE_STATUSES = new Set<Intervention["status"]>([
