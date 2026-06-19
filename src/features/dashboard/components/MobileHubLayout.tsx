@@ -36,6 +36,8 @@ type Props = {
   onRailChange?: (rail: MobileHubRail) => void;
   /** Mode contrôlé : force le rail actif depuis l'extérieur. */
   activeRail?: MobileHubRail;
+  /** Rail affiché au premier rendu mobile (défaut : centre). */
+  mobileInitialRail?: MobileHubRail;
   /** Bloque le swipe horizontal (ex. signature client sur le panneau central). */
   swipeDisabled?: boolean;
 };
@@ -70,13 +72,14 @@ export default function MobileHubLayout({
   sideScroll = true,
   onRailChange,
   activeRail,
+  mobileInitialRail = "center",
   swipeDisabled = false,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const registrationId = useId();
   const setRegistration = useMobileHubRailRegistration();
   const panelVisible = useMobileHubPanelVisible(rootRef);
-  const [rail, setRail] = useState<MobileHubRail>("center");
+  const [rail, setRail] = useState<MobileHubRail>(mobileInitialRail);
 
   const panels = { left, center, right };
   const testIds: Record<MobileHubRail, string | undefined> = {

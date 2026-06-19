@@ -180,14 +180,7 @@ export default function TechnicianDashboardDetailPanel({
 
   if (!caseId) {
     return (
-      <div
-        data-testid="technician-dashboard-detail-empty"
-        className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center"
-      >
-        <p className="text-[13px] font-bold text-slate-900">
-          {t("technician_hub.dashboard.detail.no_mission_selected")}
-        </p>
-      </div>
+      <div data-testid="technician-dashboard-detail-empty" className="min-h-0 flex-1" aria-hidden />
     );
   }
 

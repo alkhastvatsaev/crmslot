@@ -67,19 +67,52 @@ describe("TechnicianHubPage", () => {
     });
   });
 
-  it("renders missions layout with detail view by default", () => {
+  it("renders missions layout and auto-selects first mission of the day", () => {
+    const techUid = "tech-uid";
+    mockAssignments.mockReturnValue({
+      interventions: [
+        {
+          id: "iv-morning",
+          title: "Matin",
+          address: "Rue 1",
+          time: "09:00",
+          status: "en_route",
+          assignedTechnicianUid: techUid,
+          technicianAcceptedAt: "2026-05-16T08:00:00.000Z",
+          scheduledDate: "2026-05-16",
+          scheduledTime: "09:00",
+          clientFirstName: "Jean",
+          location: { lat: 50.8, lng: 4.35 },
+        },
+      ],
+      loading: false,
+      error: null,
+      firebaseUid: techUid,
+    });
+
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-05-16T12:00:00"));
     render(<TechnicianHubPage slotIndex={2} />);
 
     expect(screen.getByTestId("dashboard-pager-slot-2")).toBeInTheDocument();
-    expect(screen.getByTestId("daily-missions-empty-grid")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-dashboard-detail-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-mission-iv-morning")).toBeInTheDocument();
+    expect(screen.queryByTestId("technician-dashboard-detail-empty")).not.toBeInTheDocument();
+    expect(screen.getByTestId("technician-dashboard-detail")).toBeInTheDocument();
     expect(document.getElementById("technician-hub-missions")).toHaveAttribute(
       "data-technician-center-view",
       "detail"
     );
-    expect(screen.queryByTestId("finish-job-panel")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("technician-offline-sync-panel")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("technician-hub-vehicle-stock")).not.toBeInTheDocument();
+    jest.useRealTimers();
+  });
+
+  it("shows silent empty center when no missions exist for the day", () => {
+    render(<TechnicianHubPage slotIndex={2} />);
+
+    expect(screen.getByTestId("technician-dashboard-detail-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-dashboard-detail-empty")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
   });
 
   it("filters missions when calendar day changes", async () => {
@@ -138,6 +171,7 @@ describe("TechnicianHubPage", () => {
       expect(screen.getByTestId("daily-mission-iv-tomorrow")).toBeInTheDocument();
     });
     expect(screen.queryByTestId("daily-mission-iv-today")).not.toBeInTheDocument();
+    expect(screen.getByTestId("technician-dashboard-detail")).toBeInTheDocument();
 
     jest.useRealTimers();
   });

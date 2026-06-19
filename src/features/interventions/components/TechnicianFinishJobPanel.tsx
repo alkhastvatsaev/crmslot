@@ -89,6 +89,7 @@ export default function TechnicianFinishJobPanel() {
   const [draftBillingLines, setDraftBillingLines] = useState<DraftBillingLine[]>([]);
   const [draftAiNote, setDraftAiNote] = useState<string | null>(null);
   const [photos, setPhotos] = useState<FinishWizardPhoto[]>([]);
+  const [preservedSignatureUrl, setPreservedSignatureUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const sigRef = useRef<TechnicianSignaturePadHandle>(null);
@@ -165,6 +166,7 @@ export default function TechnicianFinishJobPanel() {
     stopCamera();
     setPhotos([]);
     sigRef.current?.clear();
+    setPreservedSignatureUrl(null);
     setStep("photos");
     setDraftBillingLines([]);
     setDraftAiNote(null);
@@ -224,6 +226,10 @@ export default function TechnicianFinishJobPanel() {
     if (existingPhotos.length > 0) {
       setPhotos(existingPhotos);
     }
+    const existingSignature = liveIv.completionSignatureUrl?.trim();
+    if (existingSignature) {
+      setPreservedSignatureUrl(existingSignature);
+    }
   }, [liveIv]);
 
   useEffect(() => {
@@ -267,7 +273,11 @@ export default function TechnicianFinishJobPanel() {
       toast.error(String(t("technician_hub.finish.toasts.login_required")));
       return;
     }
-    const sig = sigRef.current?.getPngDataUrl() ?? liveIv?.completionSignatureUrl ?? null;
+    const sig =
+      sigRef.current?.getPngDataUrl() ??
+      preservedSignatureUrl ??
+      liveIv?.completionSignatureUrl ??
+      null;
     if (!sig) {
       toast.error(String(t("technician_hub.finish.toasts.signature_missing")));
       return;
@@ -562,7 +572,12 @@ export default function TechnicianFinishJobPanel() {
               data-testid="finish-job-step-signature"
             >
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <TechnicianSignaturePad ref={sigRef} fillHeight className="min-h-0 flex-1" />
+                <TechnicianSignaturePad
+                  ref={sigRef}
+                  fillHeight
+                  className="min-h-0 flex-1"
+                  initialSignatureUrl={preservedSignatureUrl}
+                />
               </div>
             </motion.div>
           )}
@@ -607,7 +622,10 @@ export default function TechnicianFinishJobPanel() {
             <button
               type="button"
               data-testid="finish-job-clear-signature"
-              onClick={() => sigRef.current?.clear()}
+              onClick={() => {
+                sigRef.current?.clear();
+                setPreservedSignatureUrl(null);
+              }}
               aria-label={String(t("technician_hub.finish.clear_signature"))}
               className={cn(
                 "flex h-11 w-11 items-center justify-center bg-slate-100 text-rose-600 transition active:scale-95",
