@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { verifyPortalAccessAdmin } from "@/features/interventions/server/portalAccessVerifyAdmin";
+import { portalAccessDeniedResponse, rateLimitByIp } from "@/core/api/rateLimit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const limited = rateLimitByIp(request, "portal-access-verify", 20, 15 * 60 * 1000);
+  if (limited) return limited;
+
   let body: { email?: string; code?: string };
   try {
     body = (await request.json()) as { email?: string; code?: string };
@@ -23,7 +27,6 @@ export async function POST(request: Request) {
     const result = await verifyPortalAccessAdmin({ db: getAdminDb(), code, email });
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Accès refusé";
-    return NextResponse.json({ error: message }, { status: 403 });
+    return portalAccessDeniedResponse();
   }
 }

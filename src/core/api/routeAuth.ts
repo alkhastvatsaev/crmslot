@@ -52,7 +52,27 @@ export async function requireAuthenticatedUser(
     };
   }
 
+  const anonymousDenied = rejectAnonymousInProduction(decoded);
+  if (anonymousDenied) {
+    return { response: anonymousDenied };
+  }
+
   return { uid: decoded.uid, decoded };
+}
+
+export function isAnonymousFirebaseUser(decoded: admin.auth.DecodedIdToken): boolean {
+  const provider = decoded.firebase?.sign_in_provider;
+  return provider === "anonymous";
+}
+
+/** Refuse les jetons anonymes en production (widget / demandes client → Firestore direct). */
+export function rejectAnonymousInProduction(
+  decoded: admin.auth.DecodedIdToken
+): NextResponse | null {
+  if (isProductionNodeEnv() && isAnonymousFirebaseUser(decoded)) {
+    return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 403 });
+  }
+  return null;
 }
 
 /** UID synthétique — routes Gmail en `npm run dev` sans login manuel. */
@@ -114,7 +134,7 @@ export async function authorizeProcessUploads(request: Request): Promise<boolean
 
   if (await verifyBearerFromRequest(request)) return true;
 
-  const officeIp = process.env.NEXT_PUBLIC_OFFICE_IP?.trim();
+  const officeIp = process.env.OFFICE_IP?.trim() || process.env.NEXT_PUBLIC_OFFICE_IP?.trim();
   if (officeIp && process.env.OFFICE_ALLOW_UPLOAD_AUTO_PROCESS === "true") {
     if (clientIp(request) === officeIp) return true;
   }
