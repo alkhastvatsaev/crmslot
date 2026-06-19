@@ -21,6 +21,8 @@ type Props = {
   emptyMessage?: string;
   /** Nombre minimum de cases (emplacements vides comme page 0 / DailyMissions). */
   minSlots?: number;
+  /** Colonnes de la grille — 3×4 (12) ou 4×4 (16). */
+  columns?: 3 | 4;
   testId?: string;
   /** compact = panneau gauche carte (95px) · standard = hubs patron (108px). */
   size?: "compact" | "standard";
@@ -35,14 +37,26 @@ const TONE_RING: Record<HubSquareTileTone, string> = {
   danger: "border-red-200/80 ring-red-200/60",
 };
 
-function EmptySlot({ index, size }: { index: number; size: "compact" | "standard" }) {
+function EmptySlot({
+  index,
+  size,
+  columns,
+}: {
+  index: number;
+  size: "compact" | "standard";
+  columns: 3 | 4;
+}) {
   return (
     <div
       data-testid={`hub-square-empty-${index}`}
       aria-hidden
       className={cn(
-        "w-full justify-self-center rounded-[24px] border border-black/[0.06] bg-white/50 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6),0_4px_14px_-6px_rgba(15,23,42,0.08)]",
-        size === "compact" ? "aspect-square max-w-[95px]" : "min-h-[108px]"
+        "w-full rounded-[24px] border border-black/[0.06] bg-white/50 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6),0_4px_14px_-6px_rgba(15,23,42,0.08)]",
+        size === "compact"
+          ? columns === 4
+            ? "aspect-square w-full"
+            : "aspect-square max-w-[95px] justify-self-center"
+          : "min-h-[108px]"
       )}
     />
   );
@@ -56,6 +70,7 @@ export default function HubSquareGrid({
   loading = false,
   emptyMessage,
   minSlots = 12,
+  columns = 3,
   testId = "hub-square-grid",
   size = "compact",
 }: Props) {
@@ -82,13 +97,21 @@ export default function HubSquareGrid({
   }
 
   const trailingEmpty = Math.max(0, minSlots - tiles.length);
+  const tileCompactClass =
+    size === "compact"
+      ? columns === 4
+        ? "aspect-square w-full"
+        : "aspect-square max-w-[95px] justify-self-center"
+      : "min-h-[108px]";
 
   return (
     <div
       data-testid={testId}
       className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-6 pt-4"
     >
-      <div className="grid grid-cols-3 gap-3 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]">
+      <div
+        className={cn("grid gap-3 content-start", columns === 4 ? "grid-cols-4" : "grid-cols-3")}
+      >
         {tiles.map((tile) => {
           const active = selectedId === tile.id;
           const tone = tile.tone ?? "default";
@@ -101,9 +124,7 @@ export default function HubSquareGrid({
               onClick={() => onSelect(tile.id)}
               className={cn(
                 "group relative flex w-full flex-col items-center justify-center gap-1 rounded-[24px] border bg-white/95 p-3 text-center shadow-[0_6px_18px_-4px_rgba(15,23,42,0.1)] transition hover:scale-[1.02] active:scale-[0.96]",
-                size === "compact"
-                  ? "aspect-square max-w-[95px] justify-self-center"
-                  : "min-h-[108px]",
+                tileCompactClass,
                 active ? "border-slate-900 ring-2 ring-slate-900/15" : cn("ring-1", TONE_RING[tone])
               )}
             >
@@ -120,7 +141,12 @@ export default function HubSquareGrid({
         })}
         {trailingEmpty > 0
           ? Array.from({ length: trailingEmpty }, (_, i) => (
-              <EmptySlot key={`empty-${i}`} index={tiles.length + i} size={size} />
+              <EmptySlot
+                key={`empty-${i}`}
+                index={tiles.length + i}
+                size={size}
+                columns={columns}
+              />
             ))
           : null}
       </div>
