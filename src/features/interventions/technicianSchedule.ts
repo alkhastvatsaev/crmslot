@@ -48,6 +48,22 @@ export function coerceFirestoreLikeDate(value: unknown): Date | null {
   return null;
 }
 
+/** Valeur Firestore / formulaire → texte affichable (évite crash `.trim()` sur number, Timestamp…). */
+export function coerceDisplayString(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed || null;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value === "boolean") return value ? "✓" : null;
+  const d = coerceFirestoreLikeDate(value);
+  if (d) {
+    return d.toLocaleString("fr-BE", { dateStyle: "short", timeStyle: "short" });
+  }
+  return null;
+}
+
 /**
  * Ancrage à partir des champs historiques `date` (AAAA-MM-JJ) + `hour` ou `time`
  * (ex. flux audio / carte) — avant `createdAt`, pour aligner carte et hub technicien.
