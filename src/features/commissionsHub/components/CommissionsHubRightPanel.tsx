@@ -293,7 +293,7 @@ export default function CommissionsHubRightPanel({
         data-testid="commissions-hub-right-idle"
         className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center text-[12px] text-slate-400"
       >
-        {t("commissionsHub.pick_or_add")}
+        {mode === "rules" ? t("commissionsHub.pick_or_add_rule") : t("commissionsHub.pick_or_add")}
       </div>
     );
   }

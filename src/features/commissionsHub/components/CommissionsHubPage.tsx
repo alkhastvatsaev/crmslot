@@ -12,7 +12,10 @@ import {
   buildPatronTechnicianRows,
   findCompanyGroupRule,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
-import type { CommissionsHubSelection } from "@/features/commissionsHub/commissionsHubTypes";
+import type {
+  CommissionsHubMode,
+  CommissionsHubSelection,
+} from "@/features/commissionsHub/commissionsHubTypes";
 import { formatCommissionValue } from "@/features/commissionsHub/commissionsHubFormat";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
@@ -48,6 +51,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const { technicians } = useTechnicians();
 
   const [view, setView] = useState<CommissionsView>("team");
+  const [rightMode, setRightMode] = useState<CommissionsHubMode>("team");
   const [selection, setSelection] = useState<CommissionsHubSelection>({ kind: "none" });
 
   const {
@@ -86,10 +90,12 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
 
   useEffect(() => {
     setSelection({ kind: "none" });
+    setRightMode(view);
   }, [view]);
 
   const openCompanyRule = () => {
     setView("rules");
+    setRightMode("rules");
     if (companyGroupRule) {
       setSelection({ kind: "rule", id: companyGroupRule.id });
     } else {
@@ -118,7 +124,6 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const selectedRuleId = selection.kind === "rule" ? selection.id : null;
   const selectedTechUid = selection.kind === "technician" ? selection.uid : null;
   const teamLoading = interventionsLoading || rulesLoading || manualLoading;
-  const mode = view === "team" ? "team" : "rules";
 
   const ruleFooterLabel = companyGroupRule
     ? t("commissionsHub.company_rule.applies_all").replace(
@@ -214,14 +219,17 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
           {companyId && !gate ? (
             <CommissionsHubRightPanel
               companyId={companyId}
-              mode={mode}
+              mode={rightMode}
               selection={selection}
               rules={rules}
               manualEntries={manualEntries}
               technicianRows={technicianRows}
               saving={saving}
               onSelectionChange={setSelection}
-              onModeChange={(m) => setView(m === "team" ? "team" : "rules")}
+              onModeChange={(m) => {
+                setRightMode(m);
+                if (m === "team" || m === "rules") setView(m);
+              }}
               onSaveRule={saveRule}
               onDeleteRule={removeRule}
               onSaveManual={saveManualEntry}

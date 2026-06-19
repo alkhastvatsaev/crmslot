@@ -282,14 +282,15 @@
     "level_filter_aria": "Filtrer par niveau",
     "add": "Règle",
     "save": "Enregistrer",
-    "pick_or_add": "Touchez un technicien à gauche.",
+    "pick_or_add": "Touchez un technicien dans la liste.",
     "history_hint": "Fil d’événements — centre",
     "aria": {
       "page": "Page",
       "left": "résumé",
       "center": "liste",
       "right": "détail"
-    }
+    },
+    "pick_or_add_rule": "Touchez une règle ou « + Règle »."
   },
   "payment": {
     "pay_now": "Payer en ligne",

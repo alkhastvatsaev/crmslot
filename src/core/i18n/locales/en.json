@@ -282,14 +282,15 @@
     "level_filter_aria": "Filter by level",
     "add": "Rule",
     "save": "Save",
-    "pick_or_add": "Pick a tile or +",
+    "pick_or_add": "Tap a technician in the list.",
     "history_hint": "Event feed — center",
     "aria": {
       "page": "Page",
       "left": "modes",
       "center": "grid",
       "right": "detail"
-    }
+    },
+    "pick_or_add_rule": "Tap a rule or « + Rule »."
   },
   "payment": {
     "pay_now": "Pay online",

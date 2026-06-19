@@ -92,4 +92,14 @@ describe("CommissionsHubPage premium patron", () => {
     expect(screen.getByTestId("commissions-hub-rules-grid")).toBeInTheDocument();
     expect(screen.getByTestId("commissions-hub-rule-rule-1")).toBeInTheDocument();
   });
+  it("opens manual bonus form without switching center to rules", () => {
+    render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
+
+    fireEvent.click(screen.getByTestId("commissions-hub-tech-tech-a"));
+    fireEvent.click(screen.getByTestId("commissions-hub-tech-bonus"));
+
+    expect(screen.getByTestId("commissions-hub-team-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-right-manual")).toBeInTheDocument();
+    expect(screen.queryByTestId("commissions-hub-rules-grid")).not.toBeInTheDocument();
+  });
 });

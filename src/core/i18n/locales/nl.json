@@ -282,14 +282,15 @@
     "level_filter_aria": "Filter op niveau",
     "add": "Regel",
     "save": "Opslaan",
-    "pick_or_add": "Kies een tegel of +",
+    "pick_or_add": "Tik op een technicus in de lijst.",
     "history_hint": "Gebeurtenissen — midden",
     "aria": {
       "page": "Pagina",
       "left": "modi",
       "center": "raster",
       "right": "detail"
-    }
+    },
+    "pick_or_add_rule": "Tik op een regel of « + Regel »."
   },
   "payment": {
     "pay_now": "Online betalen",
