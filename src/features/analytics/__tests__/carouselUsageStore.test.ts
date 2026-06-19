@@ -6,6 +6,7 @@ import {
   mergeCarouselPageView,
   totalCarouselDwellMs,
 } from "../carouselUsageStore";
+import { DASHBOARD_CAROUSEL_PAGES } from "@/features/dashboard/dashboardCarouselRegistry";
 
 describe("carouselUsageStore", () => {
   it("incrémente les vues par page", () => {
@@ -22,12 +23,12 @@ describe("carouselUsageStore", () => {
     expect(snap.pages.billing_hub?.dwellMs).toBe(8000);
   });
 
-  it("retourne 7 lignes triées par dwell", () => {
+  it("retourne une ligne par page carrousel, triées par dwell", () => {
     let snap = emptyCarouselUsageSnapshot();
     snap = mergeCarouselDwell(snap, "map", 1000);
     snap = mergeCarouselDwell(snap, "billing_hub", 9000);
     const rows = carouselUsageRows(snap);
-    expect(rows).toHaveLength(7);
+    expect(rows).toHaveLength(DASHBOARD_CAROUSEL_PAGES.length);
     expect(rows[0]?.pageId).toBe("billing_hub");
     expect(totalCarouselDwellMs(rows)).toBe(10000);
   });
