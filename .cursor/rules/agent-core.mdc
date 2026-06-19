@@ -1,16 +1,13 @@
 ---
-description: Agent CRMSLOT — zones, git, exploration légère (seule règle always-on)
+description: CRMSLOT — zone, git, perf
 alwaysApply: true
 ---
 
-# Agent CRMSLOT
+# CRMSLOT
 
-**Zones** : `docs/agents/PARALLEL_WORK.md` — un fichier = un propriétaire. Hub partagé (`page.tsx`, `context/**`, i18n) = coordination.
+Zone : `docs/agents/PARALLEL_WORK.md` · workflow : `docs/agents/CURSOR_WORKFLOW.md`
 
-**Git** : jamais `git add .` · branche `cursor/<sujet>` · commit/push seulement si demandé.
-
-**Exploration** : chercher dans le dossier feature uniquement. i18n → `Grep` la clé, pas tout le JSON.
-
-**Tests** : `npx jest <zone> --no-coverage` · merge → `npm run test:ci`. Scripts : `docs/agents/CURSOR_WORKFLOW.md`.
-
-**Détail** : steppers/glossaire → `docs/agents/AGENTS_EXTENDED.md` · chatbot → `docs/agents/TESTING.md` §3.
+- Un dossier feature à la fois · `Grep`/`SemanticSearch` scopés · i18n → grep clé dans `src/core/i18n/locales/`
+- Jamais `git add .` · commit/push si demandé
+- Tests : `npx jest <zone> --no-coverage` · merge `npm run test:ci`
+- Fichiers hors index (tests, api, locales) : utiliser `@chemin/fichier` pour les ouvrir

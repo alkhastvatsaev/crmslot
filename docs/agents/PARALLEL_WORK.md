@@ -94,13 +94,13 @@ Avant merge : `npm run test:ci` (ou `npm run test:chatbot` si zone chatbot).
 ## Worktree (vrai parallèle, deux dossiers)
 
 ```bash
-cd /chemin/vers/testbelgium
-git worktree add ../testbelgium-claude claude/work
-# Cursor  → testbelgium (branche A)
-# Claude  → testbelgium-claude (branche B)
+cd /chemin/vers/CRMSLOT
+git worktree add ../CRMSLOT-claude claude/work
+# Cursor  → CRMSLOT (branche A)
+# Claude  → CRMSLOT-claude (branche B)
 ```
 
-Suppression après usage : `git worktree remove ../testbelgium-claude`
+Suppression après usage : `git worktree remove ../CRMSLOT-claude`
 
 ## Fin de session
 

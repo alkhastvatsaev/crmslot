@@ -53,12 +53,21 @@ Ne pas toucher : i18n, page.tsx, autres hubs
 | Un fichier                                      | `npx jest src/features/caseHub --no-coverage` |
 | Avant merge `main`                              | `npm run test:ci`                             |
 
-## Règles Cursor (`.cursor/rules/`)
+## Perf max (index Cursor)
 
-- **alwaysApply** : parallèle Claude, déploiement, hygiène index (léger).
-- **globs** : une règle par zone — chargée seulement quand tu ouvres/édites ces fichiers.
+| Exclu de l'index                   | Pourquoi        | Accès agent                  |
+| ---------------------------------- | --------------- | ---------------------------- |
+| `node_modules`, `ios/`, `android/` | ~2 Go           | —                            |
+| `**/__tests__/**`, `*.test.ts`     | ~700 fichiers   | `@src/.../MonTest.test.tsx`  |
+| `src/core/i18n/locales/`           | ~7k lignes × 3  | `Grep` la clé                |
+| `src/app/api/`                     | wrappers minces | logique dans `src/features/` |
+| `package-lock.json`                | 21k lignes      | —                            |
 
-Ne pas dupliquer `AGENTS.md` dans le chat : les rèles scoped suffisent.
+**Après modif `.cursorignore`** : Resync index Cursor.
+
+**Nettoyage disque** : `npm run clean:dev` (supprime `.next`, `ios/build`, `android/app/build`, coverage…).
+
+**Indexé** : `src/features/**`, `src/app/page.tsx`, `src/context/**`, 2 guides agents.
 
 ## i18n (2 300+ clés × 3 langues)
 
@@ -68,9 +77,9 @@ Ne pas dupliquer `AGENTS.md` dans le chat : les rèles scoped suffisent.
 ## Worktree (Cursor + Claude Code en vrai parallèle)
 
 ```bash
-git worktree add ../testbelgium-claude claude/work
-# Cursor  → testbelgium/
-# Claude  → testbelgium-claude/
+git worktree add ../CRMSLOT-claude claude/work
+# Cursor  → CRMSLOT/
+# Claude  → CRMSLOT-claude/
 ```
 
 Chaque clone a son index Cursor séparé → moins de conflits et moins de RAM partagée.
