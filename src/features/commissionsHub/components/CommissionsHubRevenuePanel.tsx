@@ -3,7 +3,6 @@
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import CommissionsHubStepHeader from "@/features/commissionsHub/components/CommissionsHubStepHeader";
 import type {
   PatronMonthlyPoint,
   PatronTrend,
@@ -72,14 +71,6 @@ export default function CommissionsHubRevenuePanel({
       data-testid="commissions-hub-revenue-panel"
       className="flex min-h-0 flex-1 flex-col gap-3 px-3 py-3"
     >
-      <CommissionsHubStepHeader
-        step={1}
-        verb={t("commissionsHub.steps.revenue_verb")}
-        caption={t("commissionsHub.steps.revenue_caption")}
-        tone="revenue"
-        testId="commissions-hub-step-1"
-      />
-
       <div
         data-testid="commissions-hub-kpi-strip"
         className="flex flex-col gap-3 rounded-[24px] border border-sky-100/80 bg-gradient-to-b from-sky-50/80 to-white p-4 shadow-[0_6px_18px_-6px_rgba(15,23,42,0.12)]"
@@ -107,43 +98,47 @@ export default function CommissionsHubRevenuePanel({
             {t("commissionsHub.sparkline.window").replace("{{n}}", String(series.length))}
           </span>
         </div>
-        <div className="flex h-16 items-end gap-1.5 px-1">
-          {series.map((p, idx) => {
-            const ratio = p.revenueCents / max;
-            const heightPct = Math.max(6, Math.round(ratio * 100));
-            const isCurrent = idx === lastIdx;
-            return (
-              <div
-                key={p.monthKey}
-                data-testid={`commissions-hub-sparkline-bar-${p.monthKey}`}
-                className="flex flex-1 flex-col items-center justify-end gap-1"
-              >
-                <div className="flex h-full w-full items-end">
+        <div className="flex flex-col gap-1.5 px-1">
+          <div className="flex h-14 items-end gap-1.5" aria-hidden>
+            {series.map((p, idx) => {
+              const ratio = p.revenueCents / max;
+              const barHeightPx = Math.max(4, Math.round(ratio * 52));
+              const isCurrent = idx === lastIdx;
+              return (
+                <div
+                  key={p.monthKey}
+                  data-testid={`commissions-hub-sparkline-bar-${p.monthKey}`}
+                  className="flex h-full flex-1 flex-col justify-end"
+                  title={formatEur(p.revenueCents)}
+                >
                   <div
                     className={cn(
                       "w-full rounded-t-md transition",
                       isCurrent ? "bg-sky-500" : p.revenueCents > 0 ? "bg-sky-200" : "bg-slate-100"
                     )}
-                    style={{ height: `${heightPct}%` }}
+                    style={{ height: `${barHeightPx}px` }}
                   />
                 </div>
+              );
+            })}
+          </div>
+          <div className="flex gap-1.5">
+            {series.map((p, idx) => {
+              const isCurrent = idx === lastIdx;
+              return (
                 <span
+                  key={`${p.monthKey}-label`}
                   className={cn(
-                    "text-[9px] font-semibold uppercase tabular-nums",
+                    "flex-1 text-center text-[9px] font-semibold uppercase tabular-nums",
                     isCurrent ? "text-sky-700" : "text-slate-400"
                   )}
                 >
                   {p.label}
                 </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-
-      <div className="mt-auto flex items-center justify-center gap-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-        <span>{t("commissionsHub.steps.flow_to_distribute")}</span>
-        <span aria-hidden>→</span>
       </div>
     </div>
   );

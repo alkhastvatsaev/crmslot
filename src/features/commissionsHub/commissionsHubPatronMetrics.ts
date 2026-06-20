@@ -1,8 +1,17 @@
 import type { ManualCommissionEntry } from "@/features/commissions/commissionFirestore";
-import type { CommissionRule } from "@/features/commissions/types";
+import type { CommissionRule, CommissionValueType } from "@/features/commissions/types";
+import { pickPersonalTechnicianRule } from "@/features/commissions/commissionRuleMatching";
+import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
+import {
+  canResolveTechnicianAssignUid,
+  resolveTechnicianAssignUid,
+} from "@/features/dispatch/technicianAssignUid";
 import type { Intervention } from "@/features/interventions/types";
+import type { Technician } from "@/features/technicians/types";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { formatCommissionValue } from "@/features/commissionsHub/commissionsHubFormat";
+
+const TECHNICIAN_REVENUE_STATUSES: Intervention["status"][] = ["done", "invoiced"];
 
 export type PatronCommissionKpis = {
   monthTotalCents: number;
@@ -30,9 +39,13 @@ export type PatronTechnicianRow = {
   uid: string;
   name: string;
   initial: string;
+  alternateTargetIds: string[];
   monthEarnedCents: number;
+  monthRevenueCents: number;
+  revenueMissionCount: number;
   missionCount: number;
   manualBonusCents: number;
+  personalRule: CommissionRule | null;
   displayRule: CommissionRule | null;
   hasPersonalRule: boolean;
 };
@@ -66,6 +79,22 @@ function interventionCommissionMonth(iv: Intervention): string | null {
   );
 }
 
+function interventionRevenueMonth(iv: Intervention): string | null {
+  return (
+    parseMonthKey(iv.completedAt) ??
+    parseMonthKey(iv.invoicedAt) ??
+    parseMonthKey(iv.paidAt) ??
+    parseMonthKey(iv.createdAt)
+  );
+}
+
+function interventionTechnicianRevenueCents(iv: Intervention): number {
+  if (!(iv.assignedTechnicianUid ?? "").trim()) return 0;
+  if (!TECHNICIAN_REVENUE_STATUSES.includes(iv.status)) return 0;
+  const cents = interventionBillingTotalCents(iv);
+  return cents > 0 ? cents : 0;
+}
+
 function manualEntryMonth(entry: ManualCommissionEntry): string | null {
   return parseMonthKey(entry.date);
 }
@@ -77,20 +106,79 @@ export function findCompanyGroupRule(
   return rules.find((r) => r.level === "group" && r.targetId === companyId) ?? null;
 }
 
+export function findPersonalTechnicianRule(
+  rules: CommissionRule[],
+  technicianUid: string,
+  alternateTargetIds: string[] = []
+): CommissionRule | null {
+  return pickPersonalTechnicianRule(rules, technicianUid, alternateTargetIds);
+}
+
 export function resolveTechnicianDisplayRule(
   rules: CommissionRule[],
   companyId: string,
-  technicianUid: string
-): { rule: CommissionRule | null; hasPersonalRule: boolean } {
-  const personal = rules.find((r) => r.level === "technician" && r.targetId === technicianUid);
-  if (personal) return { rule: personal, hasPersonalRule: true };
+  technicianUid: string,
+  alternateTargetIds: string[] = []
+): {
+  personalRule: CommissionRule | null;
+  displayRule: CommissionRule | null;
+  hasPersonalRule: boolean;
+} {
+  const personal = findPersonalTechnicianRule(rules, technicianUid, alternateTargetIds);
+  if (personal) {
+    return { personalRule: personal, displayRule: personal, hasPersonalRule: true };
+  }
   const group = findCompanyGroupRule(rules, companyId);
-  return { rule: group, hasPersonalRule: false };
+  return { personalRule: null, displayRule: group, hasPersonalRule: false };
 }
 
 export function formatRuleShort(rule: CommissionRule | null): string {
   if (!rule) return "—";
   return formatCommissionValue(rule.valueType, rule.value);
+}
+
+/** Montant de commission prévu à partir du CA ou du nombre de missions et du taux affiché. */
+export function computeTechnicianCommissionPreviewCents(params: {
+  revenueCents: number;
+  revenueMissionCount: number;
+  valueType: CommissionValueType;
+  value: number;
+}): number {
+  const { revenueCents, revenueMissionCount, valueType, value } = params;
+  if (value <= 0) return 0;
+
+  if (valueType === "percentage") {
+    if (revenueCents <= 0) return 0;
+    return Math.round((revenueCents * value) / 100);
+  }
+
+  if (revenueMissionCount <= 0) return 0;
+  return Math.round(value * 100 * revenueMissionCount);
+}
+
+export function resolveTechnicianRateValue(
+  row: PatronTechnicianRow,
+  pendingRateValue?: number
+): { valueType: CommissionValueType; value: number } {
+  const valueType = row.personalRule?.valueType ?? row.displayRule?.valueType ?? "percentage";
+  const liveValue = Number(row.displayRule?.value ?? 0);
+  const value = pendingRateValue ?? (Number.isFinite(liveValue) ? liveValue : 0);
+  return { valueType, value };
+}
+
+/** Montant à payer ce mois : commission calculée (CA × taux) + bonus manuels. */
+export function resolveTechnicianPayablePreviewCents(
+  row: PatronTechnicianRow,
+  pendingRateValue?: number
+): number {
+  const { valueType, value } = resolveTechnicianRateValue(row, pendingRateValue);
+  const projected = computeTechnicianCommissionPreviewCents({
+    revenueCents: row.monthRevenueCents,
+    revenueMissionCount: row.revenueMissionCount,
+    valueType,
+    value,
+  });
+  return projected + row.manualBonusCents;
 }
 
 export function buildPatronCommissionKpis(params: {
@@ -108,8 +196,7 @@ export function buildPatronCommissionKpis(params: {
 
   for (const iv of params.interventions) {
     if (interventionCommissionMonth(iv) !== monthKey) continue;
-    const revenue = iv.invoiceAmountCents ?? 0;
-    if (revenue > 0) monthRevenueCents += revenue;
+    monthRevenueCents += interventionTechnicianRevenueCents(iv);
     const cents = iv.commissionAmountCents ?? 0;
     if (cents <= 0) continue;
     monthMissionCents += cents;
@@ -181,14 +268,20 @@ export function buildPatronMonthlySeries(params: {
   }
 
   for (const iv of params.interventions) {
-    const key = interventionCommissionMonth(iv);
-    if (!key) continue;
-    const idx = indexByKey.get(key);
-    if (idx == null) continue;
-    const cents = iv.commissionAmountCents ?? 0;
-    if (cents > 0) points[idx]!.commissionCents += cents;
-    const revenue = iv.invoiceAmountCents ?? 0;
-    if (revenue > 0) points[idx]!.revenueCents += revenue;
+    const commissionKey = interventionCommissionMonth(iv);
+    if (commissionKey) {
+      const idx = indexByKey.get(commissionKey);
+      if (idx != null) {
+        const cents = iv.commissionAmountCents ?? 0;
+        if (cents > 0) points[idx]!.commissionCents += cents;
+      }
+    }
+
+    const revenueKey = interventionRevenueMonth(iv);
+    if (!revenueKey) continue;
+    const revenueIdx = indexByKey.get(revenueKey);
+    if (revenueIdx == null) continue;
+    points[revenueIdx]!.revenueCents += interventionTechnicianRevenueCents(iv);
   }
 
   for (const entry of params.manualEntries) {
@@ -221,7 +314,7 @@ export function buildPatronTechnicianRows(params: {
   manualEntries: ManualCommissionEntry[];
   rules: CommissionRule[];
   companyId: string;
-  technicians: { id: string; name: string; initial: string; authUid?: string | null }[];
+  technicians: Technician[];
   now?: Date;
 }): PatronTechnicianRow[] {
   const now = params.now ?? new Date();
@@ -232,28 +325,66 @@ export function buildPatronTechnicianRows(params: {
     {
       name: string;
       initial: string;
+      alternateTargetIds: string[];
       missionCents: number;
       missionCount: number;
       manualCents: number;
+      revenueCents: number;
+      revenueMissionCount: number;
     }
   >();
 
-  const ensure = (uid: string, name: string, initial: string) => {
-    if (!byUid.has(uid)) {
-      byUid.set(uid, { name, initial, missionCents: 0, missionCount: 0, manualCents: 0 });
+  const ensure = (
+    uid: string,
+    name: string,
+    initial: string,
+    alternateTargetIds: string[] = []
+  ) => {
+    const existing = byUid.get(uid);
+    if (!existing) {
+      byUid.set(uid, {
+        name,
+        initial,
+        alternateTargetIds: [...new Set(alternateTargetIds.filter(Boolean))],
+        missionCents: 0,
+        missionCount: 0,
+        manualCents: 0,
+        revenueCents: 0,
+        revenueMissionCount: 0,
+      });
+      return byUid.get(uid)!;
     }
-    return byUid.get(uid)!;
+    existing.alternateTargetIds = [
+      ...new Set([...existing.alternateTargetIds, ...alternateTargetIds.filter(Boolean)]),
+    ];
+    return existing;
   };
 
   for (const tech of params.technicians) {
-    const uid = (tech.authUid ?? tech.id).trim();
-    if (!uid) continue;
-    ensure(uid, tech.name, tech.initial);
+    if (canResolveTechnicianAssignUid(tech)) {
+      const uid = resolveTechnicianAssignUid(tech);
+      ensure(uid, tech.name, tech.initial, [tech.id]);
+      continue;
+    }
+    const fallbackId = tech.id.trim();
+    if (fallbackId) ensure(fallbackId, tech.name, tech.initial, []);
   }
+
+  const assignUidByDocId = new Map(
+    params.technicians
+      .filter((tech) => canResolveTechnicianAssignUid(tech))
+      .map((tech) => [tech.id.trim(), resolveTechnicianAssignUid(tech)] as const)
+      .filter(([docId]) => Boolean(docId))
+  );
+
+  const resolveAssignedUid = (rawUid: string): string => {
+    const trimmed = rawUid.trim();
+    return assignUidByDocId.get(trimmed) ?? trimmed;
+  };
 
   for (const iv of params.interventions) {
     if (interventionCommissionMonth(iv) !== monthKey) continue;
-    const uid = (iv.assignedTechnicianUid ?? "").trim();
+    const uid = resolveAssignedUid(iv.assignedTechnicianUid ?? "");
     if (!uid) continue;
     const cents = iv.commissionAmountCents ?? 0;
     if (cents <= 0) continue;
@@ -262,9 +393,20 @@ export function buildPatronTechnicianRows(params: {
     row.missionCount += 1;
   }
 
+  for (const iv of params.interventions) {
+    if (interventionRevenueMonth(iv) !== monthKey) continue;
+    const uid = resolveAssignedUid(iv.assignedTechnicianUid ?? "");
+    if (!uid) continue;
+    const revenueCents = interventionTechnicianRevenueCents(iv);
+    if (revenueCents <= 0) continue;
+    const row = ensure(uid, uid.slice(-6), uid.slice(0, 1).toUpperCase());
+    row.revenueCents += revenueCents;
+    row.revenueMissionCount += 1;
+  }
+
   for (const entry of params.manualEntries) {
     if (manualEntryMonth(entry) !== monthKey) continue;
-    const uid = entry.technicianUid.trim();
+    const uid = resolveAssignedUid(entry.technicianUid);
     if (!uid) continue;
     const row = ensure(uid, uid.slice(-6), uid.slice(0, 1).toUpperCase());
     row.manualCents += Math.round(entry.amountEuros * 100);
@@ -272,19 +414,24 @@ export function buildPatronTechnicianRows(params: {
 
   return [...byUid.entries()]
     .map(([uid, row]) => {
-      const { rule, hasPersonalRule } = resolveTechnicianDisplayRule(
+      const { personalRule, displayRule, hasPersonalRule } = resolveTechnicianDisplayRule(
         params.rules,
         params.companyId,
-        uid
+        uid,
+        row.alternateTargetIds
       );
       return {
         uid,
         name: row.name,
         initial: row.initial,
+        alternateTargetIds: row.alternateTargetIds,
         monthEarnedCents: row.missionCents + row.manualCents,
+        monthRevenueCents: row.revenueCents,
+        revenueMissionCount: row.revenueMissionCount,
         missionCount: row.missionCount,
         manualBonusCents: row.manualCents,
-        displayRule: rule,
+        personalRule,
+        displayRule,
         hasPersonalRule,
       };
     })

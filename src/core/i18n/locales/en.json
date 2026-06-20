@@ -289,7 +289,8 @@
       "inherited": "Inherited",
       "reset": "Remove custom rate",
       "intervention_overrides": "Job overrides",
-      "add_override": "+ Job override"
+      "add_override": "+ Job override",
+      "revenue_preview": "{{revenue}} → {{commission}} due"
     },
     "company_rule": {
       "label": "Company rule",
@@ -312,7 +313,8 @@
       "tech_rate_value_aria": "Rate value",
       "tech_rate_create": "Set rate",
       "tech_rate_update": "Update",
-      "tech_rate_reset": "× Remove"
+      "tech_rate_reset": "× Remove",
+      "revenue_missions": "{{count}} jobs · revenue {{revenue}}"
     },
     "level": {
       "all": "All"
@@ -1024,6 +1026,21 @@
       "invoiced": "Invoiced",
       "cancelled": "Cancelled",
       "pending_needs_address": "Address"
+    },
+    "next_action": {
+      "pending": "Assign a technician",
+      "pending_needs_address": "Add the address",
+      "assigned": "Wait for acceptance",
+      "en_route": "Tech on the way",
+      "in_progress": "Tech on site",
+      "waiting_material": "Parts pending",
+      "done": "Issue the invoice",
+      "invoiced": "Track payment",
+      "cancelled": "Case closed"
+    },
+    "right": {
+      "next": "Next step",
+      "status": "Status"
     },
     "aria": {
       "page": "Page",
