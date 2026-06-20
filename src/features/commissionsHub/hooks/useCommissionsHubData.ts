@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { auth, firestore } from "@/core/config/firebase";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { logger } from "@/core/logger";
 import { useCommissionRules } from "@/features/commissions/useCommissionRules";
 import {
   createCommissionRule,
@@ -38,6 +40,57 @@ export function useCommissionsHubData(companyId: string | null) {
     });
   }, [companyId]);
 
+  const saveTechnicianRate = useCallback(
+    async (input: {
+      technicianUid: string;
+      alternateTargetIds: string[];
+      valueType: CommissionValueType;
+      value: number;
+    }) => {
+      if (!companyId) return false;
+      const technicianUid = input.technicianUid.trim();
+      if (!technicianUid) return false;
+
+      try {
+        const res = await fetchWithAuth(
+          `/api/companies/${encodeURIComponent(companyId)}/commission-rules/technician`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              technicianUid,
+              alternateTargetIds: input.alternateTargetIds,
+              valueType: input.valueType,
+              value: input.value,
+            }),
+          }
+        );
+        const data = (await res.json().catch(() => null)) as {
+          ok?: boolean;
+          error?: string;
+        } | null;
+        if (!res.ok || !data?.ok) {
+          logger.warn("[useCommissionsHubData] saveTechnicianRate rejected", {
+            companyId,
+            technicianUid,
+            status: res.status,
+            error: data?.error ?? res.statusText,
+          });
+          return false;
+        }
+        return true;
+      } catch (error) {
+        logger.warn("[useCommissionsHubData] saveTechnicianRate failed", {
+          companyId,
+          technicianUid,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return false;
+      }
+    },
+    [companyId]
+  );
+
   const saveRule = useCallback(
     async (input: {
       editingRuleId: string | null;
@@ -65,6 +118,15 @@ export function useCommissionsHubData(companyId: string | null) {
           await createCommissionRule(firestore, companyId, { ...payload, createdByUid: uid });
         }
         return true;
+      } catch (error) {
+        logger.warn("[useCommissionsHubData] saveRule failed", {
+          companyId,
+          level: input.level,
+          targetId,
+          editingRuleId: input.editingRuleId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return false;
       } finally {
         setSaving(false);
       }
@@ -116,6 +178,7 @@ export function useCommissionsHubData(companyId: string | null) {
     manualLoading,
     saving,
     saveRule,
+    saveTechnicianRate,
     removeRule,
     saveManualEntry,
   };

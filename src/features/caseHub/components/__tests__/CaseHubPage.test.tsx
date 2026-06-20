@@ -40,13 +40,21 @@ jest.mock("@/features/emails/components/InterventionEmailPanel", () => ({
 }));
 
 describe("CaseHubPage premium patron", () => {
-  it("renders KPI strip, grid and unified drawer without draft banner", () => {
+  it("renders situation → choose → act pipeline without draft banner", () => {
     render(<CaseHubPage slotIndex={CASE_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
     expect(screen.getByTestId("case-hub-page")).toBeInTheDocument();
     expect(screen.queryByTestId("draft-hub-banner")).not.toBeInTheDocument();
-    expect(screen.getByTestId("case-hub-kpi-strip")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-overview-panel")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-choose-panel")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-step-act")).toBeInTheDocument();
+    expect(screen.queryByTestId("case-hub-kpi-strip")).not.toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-left-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-active-filter-open")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-list")).toBeInTheDocument();
     expect(screen.getByTestId("case-hub-row-iv-case-1")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-status-in_progress")).toBeInTheDocument();
+    expect(screen.getByTestId("case-hub-next-action")).toBeInTheDocument();
     expect(screen.getByTestId("unified-intervention-drawer")).toBeInTheDocument();
   });
 });

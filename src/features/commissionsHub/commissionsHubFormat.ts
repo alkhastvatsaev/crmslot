@@ -21,6 +21,15 @@ export function formatCommissionValue(valueType: CommissionValueType, value: num
   return `${value} €`;
 }
 
+export function formatPatronEuros(cents: number): string {
+  if (cents <= 0) return "0 €";
+  return new Intl.NumberFormat("fr-BE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(cents / 100);
+}
+
 export function formatCommissionTargetShort(rule: CommissionRule): string {
   const id = rule.targetId.trim();
   if (rule.level === "group") return "Société";

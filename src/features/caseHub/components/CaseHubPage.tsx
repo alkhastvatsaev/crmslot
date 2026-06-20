@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
-import CaseHubGrid from "@/features/caseHub/components/CaseHubGrid";
+import CaseHubChoosePanel from "@/features/caseHub/components/CaseHubChoosePanel";
+import CaseHubOverviewPanel from "@/features/caseHub/components/CaseHubOverviewPanel";
 import CaseHubRightPanel from "@/features/caseHub/components/CaseHubRightPanel";
 import {
-  buildCaseHubKpis,
+  countForCaseFilter,
   filterCaseInterventions,
   sortCaseInterventions,
 } from "@/features/caseHub/caseHubPatronMetrics";
@@ -18,17 +19,14 @@ import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
-import { PatronHubChipRow, PatronHubGuide } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 type Props = { slotIndex?: number };
 
-type CaseView = "open" | "done";
-
 const sideShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 const mainShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
-/** Hub dossiers — quelles affaires sont en cours, en clair. */
+/** Hub dossiers — pipeline patron gauche→droite : 1. Situation · 2. Choisir · 3. Agir. */
 export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
@@ -36,12 +34,19 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { interventions, loading } = useBackOfficeInterventions(companyId || null);
 
-  const [view, setView] = useState<CaseView>("open");
+  const [filter, setFilter] = useState<CaseHubStatusFilter>("open");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const sorted = useMemo(() => sortCaseInterventions(interventions), [interventions]);
-  const kpis = useMemo(() => buildCaseHubKpis({ interventions: sorted }), [sorted]);
-  const filter: CaseHubStatusFilter = view;
+  const filterCounts = useMemo(
+    () => ({
+      all: sorted.length,
+      open: countForCaseFilter(sorted, "open"),
+      active: countForCaseFilter(sorted, "active"),
+      done: countForCaseFilter(sorted, "done"),
+    }),
+    [sorted]
+  );
   const filtered = useMemo(
     () => sortCaseInterventions(filterCaseInterventions(sorted, filter)),
     [sorted, filter]
@@ -93,32 +98,11 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
         <section className={sideShell} data-testid="case-hub-page">
           {gate}
           {companyId && !gate ? (
-            <>
-              <PatronHubGuide
-                value={String(kpis.openCount)}
-                label={t("caseHub.guide.value_label")}
-                hint={t("caseHub.guide.hint")}
-                valueTestId="case-hub-kpi-open"
-                rootTestId="case-hub-kpi-strip"
-              />
-              <PatronHubChipRow
-                testId="case-hub-view-chips"
-                value={view}
-                onChange={(id) => setView(id as CaseView)}
-                options={[
-                  {
-                    id: "open",
-                    label: t("caseHub.guide.chip_open"),
-                    testId: "case-hub-filter-open",
-                  },
-                  {
-                    id: "done",
-                    label: t("caseHub.guide.chip_done"),
-                    testId: "case-hub-filter-done",
-                  },
-                ]}
-              />
-            </>
+            <CaseHubOverviewPanel
+              filter={filter}
+              counts={filterCounts}
+              onFilterChange={setFilter}
+            />
           ) : null}
         </section>
       }
@@ -126,11 +110,12 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
         <section className={mainShell}>
           {gate}
           {companyId && !gate ? (
-            <CaseHubGrid
+            <CaseHubChoosePanel
               interventions={filtered}
               loading={loading}
               selectedId={selectedId}
               onSelect={setSelectedId}
+              filter={filter}
             />
           ) : null}
         </section>

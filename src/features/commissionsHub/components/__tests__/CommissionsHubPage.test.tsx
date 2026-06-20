@@ -1,6 +1,8 @@
-import { render, screen, fireEvent } from "@/test-utils/render";
+import { fireEvent, render, screen, waitFor } from "@/test-utils/render";
 import CommissionsHubPage from "@/features/commissionsHub/components/CommissionsHubPage";
 import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
+
+const saveTechnicianRate = jest.fn().mockResolvedValue(true);
 
 jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: () => ({
@@ -14,7 +16,7 @@ jest.mock("@/features/commissionsHub/hooks/useCommissionsHubData", () => ({
   useCommissionsHubData: () => ({
     rules: [
       {
-        id: "rule-1",
+        id: "rule-group",
         companyId: "co-demo",
         isActive: true,
         level: "group",
@@ -44,7 +46,7 @@ jest.mock("@/features/commissionsHub/hooks/useCommissionsHubData", () => ({
     interventionsLoading: false,
     manualLoading: false,
     saving: false,
-    saveRule: jest.fn().mockResolvedValue(true),
+    saveTechnicianRate,
     removeRule: jest.fn().mockResolvedValue(undefined),
     saveManualEntry: jest.fn().mockResolvedValue(true),
   }),
@@ -67,39 +69,39 @@ jest.mock("@/features/technicians/hooks", () => ({
 }));
 
 describe("CommissionsHubPage premium patron", () => {
-  it("shows KPI strip, company rule hero and team grid by default", () => {
+  beforeEach(() => {
+    saveTechnicianRate.mockClear();
+  });
+
+  it("renders revenue, distribution and rates panels", () => {
     render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
-    expect(screen.getByTestId("commissions-hub-kpi-strip")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-kpi-total")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-company-rule-hero")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-page")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-kpi-revenue")).toBeInTheDocument();
     expect(screen.getByTestId("commissions-hub-team-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("commissions-hub-tech-rates")).toBeInTheDocument();
     expect(screen.getByTestId("commissions-hub-tech-tech-a")).toBeInTheDocument();
   });
 
-  it("opens technician detail panel on click", () => {
+  it("highlights technician in right panel after center selection", () => {
     render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
     fireEvent.click(screen.getByTestId("commissions-hub-tech-tech-a"));
     expect(screen.getByTestId("commissions-hub-right-technician")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-tech-bonus")).toBeInTheDocument();
-  });
-
-  it("shows the per-technician rates list in the right panel by default", () => {
-    render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
-
-    expect(screen.getByTestId("commissions-hub-tech-rates")).toBeInTheDocument();
     expect(screen.getByTestId("commissions-hub-tech-rate-row-tech-a")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-tech-rate-plus-tech-a")).toBeInTheDocument();
   });
-  it("opens manual bonus form without switching center to rules", () => {
+
+  it("persists a technician rate change through saveTechnicianRate", async () => {
     render(<CommissionsHubPage slotIndex={COMMISSIONS_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
-    fireEvent.click(screen.getByTestId("commissions-hub-tech-tech-a"));
-    fireEvent.click(screen.getByTestId("commissions-hub-tech-bonus"));
+    fireEvent.click(screen.getByTestId("commissions-hub-tech-rate-plus-tech-a"));
 
-    expect(screen.getByTestId("commissions-hub-team-grid")).toBeInTheDocument();
-    expect(screen.getByTestId("commissions-hub-right-manual")).toBeInTheDocument();
-    expect(screen.queryByTestId("commissions-hub-rules-grid")).not.toBeInTheDocument();
+    await waitFor(() => expect(saveTechnicianRate).toHaveBeenCalledTimes(1));
+    expect(saveTechnicianRate).toHaveBeenCalledWith({
+      technicianUid: "tech-a",
+      alternateTargetIds: ["t1"],
+      valueType: "percentage",
+      value: 13,
+    });
   });
 });

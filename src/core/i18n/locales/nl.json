@@ -289,7 +289,8 @@
       "inherited": "Bedrijfstarief",
       "reset": "Eigen tarief verwijderen",
       "intervention_overrides": "Dossier-uitzonderingen",
-      "add_override": "+ Dossier-uitzondering"
+      "add_override": "+ Dossier-uitzondering",
+      "revenue_preview": "{{revenue}} → {{commission}} verschuldigd"
     },
     "company_rule": {
       "label": "Bedrijfsregel",
@@ -312,7 +313,8 @@
       "tech_rate_value_aria": "Tariefwaarde",
       "tech_rate_create": "Tarief instellen",
       "tech_rate_update": "Bijwerken",
-      "tech_rate_reset": "× Verwijderen"
+      "tech_rate_reset": "× Verwijderen",
+      "revenue_missions": "{{count}} opdrachten · omzet {{revenue}}"
     },
     "level": {
       "all": "Alles"
@@ -1024,6 +1026,21 @@
       "invoiced": "Gefactureerd",
       "cancelled": "Geannuleerd",
       "pending_needs_address": "Adres"
+    },
+    "next_action": {
+      "pending": "Wijs een technieker toe",
+      "pending_needs_address": "Vul het adres in",
+      "assigned": "Wacht op acceptatie",
+      "en_route": "Technieker onderweg",
+      "in_progress": "Technieker ter plaatse",
+      "waiting_material": "Materiaal afwachten",
+      "done": "Stuur de factuur",
+      "invoiced": "Volg betaling op",
+      "cancelled": "Dossier afgesloten"
+    },
+    "right": {
+      "next": "Volgende stap",
+      "status": "Status"
     },
     "aria": {
       "page": "Pagina",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
 import CommissionsHubRevenuePanel from "@/features/commissionsHub/components/CommissionsHubRevenuePanel";
@@ -12,6 +12,7 @@ import {
   buildPatronMonthlySeries,
   buildPatronTechnicianRows,
   buildPatronTrend,
+  resolveTechnicianPayablePreviewCents,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
 import type { CommissionsHubSelection } from "@/features/commissionsHub/commissionsHubTypes";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -37,6 +38,20 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const { technicians } = useTechnicians();
 
   const [selection, setSelection] = useState<CommissionsHubSelection>({ kind: "none" });
+  const [pendingRateByUid, setPendingRateByUid] = useState<Record<string, number>>({});
+
+  const handlePendingRateChange = useCallback((uid: string, value: number) => {
+    setPendingRateByUid((prev) => ({ ...prev, [uid]: value }));
+  }, []);
+
+  const handlePendingRateClear = useCallback((uid: string) => {
+    setPendingRateByUid((prev) => {
+      if (!(uid in prev)) return prev;
+      const next = { ...prev };
+      delete next[uid];
+      return next;
+    });
+  }, []);
 
   const {
     rules,
@@ -45,10 +60,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     rulesLoading,
     interventionsLoading,
     manualLoading,
-    saving,
-    saveRule,
-    removeRule,
-    saveManualEntry,
+    saveTechnicianRate,
   } = useCommissionsHubData(companyId || null);
 
   const patronKpis = useMemo(
@@ -76,6 +88,15 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
       technicians,
     });
   }, [companyId, interventions, manualEntries, rules, technicians]);
+
+  const totalPayableCents = useMemo(
+    () =>
+      technicianRows.reduce(
+        (sum, row) => sum + resolveTechnicianPayablePreviewCents(row, pendingRateByUid[row.uid]),
+        0
+      ),
+    [technicianRows, pendingRateByUid]
+  );
 
   const gate =
     companyPhase === "loading" ? (
@@ -131,8 +152,9 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
               rows={technicianRows}
               loading={teamLoading}
               selectedUid={selectedTechUid}
+              pendingRateByUid={pendingRateByUid}
               onSelect={(uid) => setSelection({ kind: "technician", uid })}
-              totalCents={patronKpis.monthTotalCents}
+              totalCents={totalPayableCents}
             />
           ) : null}
         </section>
@@ -141,15 +163,13 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
         <section className={mainShell}>
           {companyId && !gate ? (
             <CommissionsHubRulesPanel
-              companyId={companyId}
               selection={selection}
-              rules={rules}
               technicianRows={technicianRows}
-              saving={saving}
+              pendingRateByUid={pendingRateByUid}
+              onPendingRateChange={handlePendingRateChange}
+              onPendingRateClear={handlePendingRateClear}
               onSelectionChange={setSelection}
-              onSaveRule={saveRule}
-              onDeleteRule={removeRule}
-              onSaveManual={saveManualEntry}
+              onSaveTechnicianRate={saveTechnicianRate}
             />
           ) : null}
         </section>

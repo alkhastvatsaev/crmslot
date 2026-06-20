@@ -14,6 +14,11 @@ import {
   type Firestore,
 } from "firebase/firestore";
 import type { CommissionRule, InterventionCommission } from "./types";
+import {
+  matchPersonalTechnicianRules,
+  normalizeCommissionRule,
+  pickPersonalTechnicianRule,
+} from "@/features/commissions/commissionRuleMatching";
 
 export const COMMISSION_RULES_COLLECTION = "commission_rules";
 export const COMMISSION_OVERRIDES_COLLECTION = "commission_overrides";
@@ -71,7 +76,7 @@ export async function appendCommissionAuditEntry(
     finalCommissionAmount: number;
     byUid: string;
     reason?: string | null;
-  },
+  }
 ): Promise<void> {
   const companyId = params.companyId.trim();
   if (!companyId) return;
@@ -92,23 +97,26 @@ export function subscribeCommissionRules(
   db: Firestore,
   companyId: string,
   onRows: (rows: CommissionRule[]) => void,
-  onError?: (e: Error) => void,
+  onError?: (e: Error) => void
 ): () => void {
   const cid = companyId.trim();
   if (!cid) {
     onRows([]);
     return () => {};
   }
-  const q = query(
-    collection(db, COMMISSION_RULES_COLLECTION),
-    where("companyId", "==", cid),
-    where("isActive", "==", true),
-    orderBy("createdAt", "asc"),
-  );
+  const q = query(collection(db, COMMISSION_RULES_COLLECTION), where("companyId", "==", cid));
   return onSnapshot(
     q,
-    (snap) => onRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as CommissionRule))),
-    (e) => onError?.(e instanceof Error ? e : new Error(String(e))),
+    (snap) => {
+      const rows = snap.docs
+        .map((d) => normalizeCommissionRule({ id: d.id, ...d.data() } as CommissionRule))
+        .filter((r) => r.isActive !== false)
+        .sort(
+          (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+        );
+      onRows(rows);
+    },
+    (e) => onError?.(e instanceof Error ? e : new Error(String(e)))
   );
 }
 
@@ -120,27 +128,31 @@ export async function appendCommissionRuleAuditEntry(
     action: CommissionRuleAuditAction;
     byUid: string;
     snapshot?: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">;
-  },
+  }
 ): Promise<void> {
   const companyId = params.companyId.trim();
   if (!companyId) return;
-  await addDoc(collection(db, COMMISSION_RULE_AUDIT_COLLECTION), {
-    companyId,
-    ruleId: params.ruleId,
-    action: params.action,
-    byUid: params.byUid,
-    level: params.snapshot?.level ?? null,
-    targetId: params.snapshot?.targetId ?? null,
-    valueType: params.snapshot?.valueType ?? null,
-    value: params.snapshot?.value ?? null,
-    at: serverTimestamp(),
-  });
+  try {
+    await addDoc(collection(db, COMMISSION_RULE_AUDIT_COLLECTION), {
+      companyId,
+      ruleId: params.ruleId,
+      action: params.action,
+      byUid: params.byUid,
+      level: params.snapshot?.level ?? null,
+      targetId: params.snapshot?.targetId ?? null,
+      valueType: params.snapshot?.valueType ?? null,
+      value: params.snapshot?.value ?? null,
+      at: serverTimestamp(),
+    });
+  } catch {
+    /* audit best-effort — ne bloque pas la règle métier */
+  }
 }
 
 export async function createCommissionRule(
   db: Firestore,
   companyId: string,
-  params: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value" | "createdByUid">,
+  params: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value" | "createdByUid">
 ): Promise<string> {
   const ref = await addDoc(collection(db, COMMISSION_RULES_COLLECTION), {
     companyId,
@@ -164,7 +176,7 @@ export async function updateCommissionRule(
   ruleId: string,
   companyId: string,
   patch: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">,
-  byUid: string,
+  byUid: string
 ): Promise<void> {
   await updateDoc(doc(db, COMMISSION_RULES_COLLECTION, ruleId), {
     ...patch,
@@ -184,7 +196,7 @@ export async function deleteCommissionRule(
   ruleId: string,
   companyId: string,
   byUid: string,
-  snapshot?: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">,
+  snapshot?: Pick<CommissionRule, "level" | "targetId" | "valueType" | "value">
 ): Promise<void> {
   await updateDoc(doc(db, COMMISSION_RULES_COLLECTION, ruleId), {
     isActive: false,
@@ -199,12 +211,58 @@ export async function deleteCommissionRule(
   });
 }
 
+export async function upsertTechnicianCommissionRule(
+  db: Firestore,
+  companyId: string,
+  params: {
+    technicianUid: string;
+    alternateTargetIds?: string[];
+    valueType: CommissionRule["valueType"];
+    value: number;
+    byUid: string;
+    activeRules: CommissionRule[];
+  }
+): Promise<string> {
+  const primaryUid = params.technicianUid.trim();
+  if (!primaryUid) throw new Error("technicianUid required");
+
+  const alternates = params.alternateTargetIds ?? [];
+  const matches = matchPersonalTechnicianRules(params.activeRules, primaryUid, alternates);
+  const payload = {
+    level: "technician" as const,
+    targetId: primaryUid,
+    valueType: params.valueType,
+    value: params.value,
+  };
+
+  const keeper = pickPersonalTechnicianRule(params.activeRules, primaryUid, alternates);
+  let ruleId: string;
+  if (keeper) {
+    await updateCommissionRule(db, keeper.id, companyId, payload, params.byUid);
+    ruleId = keeper.id;
+  } else {
+    ruleId = await createCommissionRule(db, companyId, { ...payload, createdByUid: params.byUid });
+  }
+
+  for (const duplicate of matches) {
+    if (duplicate.id === ruleId) continue;
+    await deleteCommissionRule(db, duplicate.id, companyId, params.byUid, {
+      level: duplicate.level,
+      targetId: duplicate.targetId,
+      valueType: duplicate.valueType,
+      value: duplicate.value,
+    });
+  }
+
+  return ruleId;
+}
+
 // ─── Override per intervention ──────────────────────────────────────────────────
 
 export function subscribeInterventionCommission(
   db: Firestore,
   interventionId: string,
-  onRow: (row: InterventionCommission | null) => void,
+  onRow: (row: InterventionCommission | null) => void
 ): () => void {
   const id = interventionId.trim();
   if (!id) {
@@ -220,13 +278,13 @@ export function subscribeInterventionCommission(
       }
       onRow({ id: snap.id, ...(snap.data() as Omit<InterventionCommission, "id">) });
     },
-    () => onRow(null),
+    () => onRow(null)
   );
 }
 
 export async function getInterventionCommission(
   db: Firestore,
-  interventionId: string,
+  interventionId: string
 ): Promise<InterventionCommission | null> {
   const snap = await getDoc(doc(db, COMMISSION_OVERRIDES_COLLECTION, interventionId.trim()));
   if (!snap.exists()) return null;
@@ -238,14 +296,10 @@ export async function saveCommissionOverride(
   companyId: string,
   override: Omit<InterventionCommission, "id">,
   auditByUid: string,
-  auditReason: string,
+  auditReason: string
 ): Promise<void> {
   const ref = doc(db, COMMISSION_OVERRIDES_COLLECTION, override.interventionId);
-  await setDoc(
-    ref,
-    { ...override, updatedAt: new Date().toISOString() },
-    { merge: true },
-  );
+  await setDoc(ref, { ...override, updatedAt: new Date().toISOString() }, { merge: true });
 
   await updateDoc(doc(db, "interventions", override.interventionId), {
     commissionAmountCents: Math.round(override.finalCommissionAmount * 100),
@@ -266,25 +320,31 @@ export async function saveCommissionOverride(
 export async function createManualCommission(
   db: Firestore,
   companyId: string,
-  params: Pick<ManualCommissionEntry, "technicianUid" | "amountEuros" | "reason" | "date" | "createdByUid">,
+  params: Pick<
+    ManualCommissionEntry,
+    "technicianUid" | "amountEuros" | "reason" | "date" | "createdByUid"
+  >
 ): Promise<string> {
-  const ref = await addDoc(
-    collection(db, MANUAL_COMMISSIONS_COLLECTION, companyId, "entries"),
-    { ...params, createdAt: serverTimestamp() },
-  );
+  const ref = await addDoc(collection(db, MANUAL_COMMISSIONS_COLLECTION, companyId, "entries"), {
+    ...params,
+    createdAt: serverTimestamp(),
+  });
   return ref.id;
 }
 
 export function subscribeManualCommissions(
   db: Firestore,
   companyId: string,
-  onRows: (rows: ManualCommissionEntry[]) => void,
+  onRows: (rows: ManualCommissionEntry[]) => void
 ): () => void {
   const cid = companyId.trim();
-  if (!cid) { onRows([]); return () => {}; }
+  if (!cid) {
+    onRows([]);
+    return () => {};
+  }
   const q = query(
     collection(db, MANUAL_COMMISSIONS_COLLECTION, cid, "entries"),
-    orderBy("createdAt", "desc"),
+    orderBy("createdAt", "desc")
   );
   return onSnapshot(
     q,
@@ -293,9 +353,9 @@ export function subscribeManualCommissions(
         snap.docs.map((d) => ({
           id: d.id,
           ...(d.data() as Omit<ManualCommissionEntry, "id">),
-        })),
+        }))
       ),
-    () => onRows([]),
+    () => onRows([])
   );
 }
 
@@ -303,7 +363,7 @@ export function subscribeCompanyCommissionAudit(
   db: Firestore,
   companyId: string,
   onRows: (rows: CompanyCommissionAuditRow[]) => void,
-  limitCount = 80,
+  limitCount = 80
 ): () => void {
   const cid = companyId.trim();
   if (!cid) {
@@ -313,7 +373,7 @@ export function subscribeCompanyCommissionAudit(
   const q = query(
     collection(db, COMMISSION_AUDIT_COLLECTION),
     where("companyId", "==", cid),
-    orderBy("at", "desc"),
+    orderBy("at", "desc")
   );
   return onSnapshot(
     q,
@@ -333,7 +393,7 @@ export function subscribeCompanyCommissionAudit(
       });
       onRows(rows);
     },
-    () => onRows([]),
+    () => onRows([])
   );
 }
 
@@ -341,7 +401,7 @@ export function subscribeCommissionRuleAudit(
   db: Firestore,
   companyId: string,
   onRows: (rows: CommissionRuleAuditRow[]) => void,
-  limitCount = 80,
+  limitCount = 80
 ): () => void {
   const cid = companyId.trim();
   if (!cid) {
@@ -351,7 +411,7 @@ export function subscribeCommissionRuleAudit(
   const q = query(
     collection(db, COMMISSION_RULE_AUDIT_COLLECTION),
     where("companyId", "==", cid),
-    orderBy("at", "desc"),
+    orderBy("at", "desc")
   );
   return onSnapshot(
     q,
@@ -371,23 +431,26 @@ export function subscribeCommissionRuleAudit(
             byUid: String(data.byUid ?? ""),
             at: data.at,
           };
-        }),
+        })
       );
     },
-    () => onRows([]),
+    () => onRows([])
   );
 }
 
 export function subscribeCommissionAudit(
   db: Firestore,
   interventionId: string,
-  onRows: (rows: CommissionAuditRow[]) => void,
+  onRows: (rows: CommissionAuditRow[]) => void
 ): () => void {
-  if (!interventionId) { onRows([]); return () => {}; }
+  if (!interventionId) {
+    onRows([]);
+    return () => {};
+  }
   const q = query(
     collection(db, COMMISSION_AUDIT_COLLECTION),
     where("interventionId", "==", interventionId),
-    orderBy("at", "asc"),
+    orderBy("at", "asc")
   );
   return onSnapshot(
     q,
@@ -404,8 +467,8 @@ export function subscribeCommissionAudit(
             byUid: String(data.byUid ?? ""),
             at: data.at,
           } satisfies CommissionAuditRow;
-        }),
+        })
       ),
-    () => onRows([]),
+    () => onRows([])
   );
 }

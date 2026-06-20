@@ -289,7 +289,8 @@
       "inherited": "Hérité société",
       "reset": "Retirer le taux perso",
       "intervention_overrides": "Exceptions par dossier",
-      "add_override": "+ Exception dossier"
+      "add_override": "+ Exception dossier",
+      "revenue_preview": "{{revenue}} → {{commission}} lui revient"
     },
     "company_rule": {
       "label": "Règle société",
@@ -312,7 +313,8 @@
       "tech_rate_value_aria": "Valeur du taux",
       "tech_rate_create": "Définir le taux",
       "tech_rate_update": "Mettre à jour",
-      "tech_rate_reset": "× Retirer"
+      "tech_rate_reset": "× Retirer",
+      "revenue_missions": "{{count}} missions · CA {{revenue}}"
     },
     "level": {
       "all": "Tout"
@@ -1024,6 +1026,21 @@
       "invoiced": "Facturé",
       "cancelled": "Annulé",
       "pending_needs_address": "Adresse"
+    },
+    "next_action": {
+      "pending": "Assigner un technicien",
+      "pending_needs_address": "Renseigner l'adresse",
+      "assigned": "Attendre l'acceptation",
+      "en_route": "Tech en route",
+      "in_progress": "Tech sur place",
+      "waiting_material": "Matériel en attente",
+      "done": "Émettre la facture",
+      "invoiced": "Suivre le paiement",
+      "cancelled": "Dossier clos"
+    },
+    "right": {
+      "next": "Prochaine étape",
+      "status": "Statut"
     },
     "aria": {
       "page": "Page",

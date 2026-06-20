@@ -97,7 +97,7 @@ export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
     profileRoleKey: "back_office",
     spotlightLabelKey: "spotlight.nav_case_hub",
     guideTitle: "Dossiers",
-    guideHint: "Ouverts, en cours et détail dossier en un clic.",
+    guideHint: "Pipeline 1·Situation → 2·Choisir → 3·Agir — pilotage dossier client.",
   },
   {
     slotIndex: COMMISSIONS_HUB_SLOT_INDEX,
