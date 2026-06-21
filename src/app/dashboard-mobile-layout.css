@@ -540,6 +540,37 @@
   padding: 0.875rem;
 }
 
+/**
+ * Scroll iOS fluide pour les conteneurs scrollables internes
+ * (caseHub right, commissions distribution, featureHub agent/center).
+ * Évite le rubber-band parasite quand le hub gère son propre overflow.
+ */
+[data-mobile-shell] .mobile-hub-panel-inner [class*="overflow-y-auto"],
+[data-mobile-shell] .mobile-hub-panel-inner [class*="overflow-auto"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/**
+ * Sticky pré-câblé pour headers internes des hubs mobile :
+ * tout enfant `.sticky` (Tailwind) ou marqué [data-mobile-sticky-header]
+ * obtient backdrop + z-index cohérents sans surcharge par hub.
+ */
+[data-mobile-shell] .mobile-hub-panel-inner :where(.sticky, [data-mobile-sticky-header]) {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+/** Tap highlight transparent partout dans les hubs mobile (boutons + liens). */
+[data-mobile-shell] .mobile-hub-panel-inner button,
+[data-mobile-shell] .mobile-hub-panel-inner a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ── Hub dots (indicateur rail — sous le galaxy dock) ─ */
 
 .mobile-hub-dots-bar {
