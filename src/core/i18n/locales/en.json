@@ -127,7 +127,7 @@
     }
   },
   "materials": {
-    "panel_title": "Material orders",
+    "panel_title": "Parts orders",
     "empty": "No orders for this case.",
     "new_order": "New order",
     "order_created": "Order saved",
@@ -715,7 +715,7 @@
         "email_from": "From",
         "email_to": "To",
         "commission": "Commission",
-        "commission_action": "Type",
+        "commission_action": "Action type",
         "technician": "Technician (UID)",
         "note": "Note"
       },
@@ -780,7 +780,7 @@
   "companyStock": {
     "title": "Materials",
     "pulse_aria": "Stock health",
-    "pulse_all_ok": "Stock OK",
+    "pulse_all_ok": "Stock healthy",
     "desc_short": "Description",
     "pro_preview_short": "14 locksmith SKUs · one-click install",
     "pro_cta_seed": "Install",
@@ -914,7 +914,7 @@
     "ask_chatbot": "Ask Chatbot",
     "center_main_title": "Material inventory",
     "center_main_subtitle": "Main table — select a row, details on the right",
-    "assist_left_title": "Navigation",
+    "assist_left_title": "Quick links",
     "assist_right_title": "Context",
     "quick_views": "Quick views",
     "urgent_jump_list": "Urgent access",
@@ -958,7 +958,7 @@
       "page": "Page",
       "left": "Billing agent",
       "center": "invoices",
-      "right": "documents"
+      "right": "Documents"
     },
     "mobile": {
       "rail_left": "Agent",
@@ -1016,7 +1016,7 @@
     },
     "mobile": {
       "rail_left": "Summary",
-      "rail_center": "List",
+      "rail_center": "Staff",
       "rail_right": "Profile"
     }
   },
@@ -1161,9 +1161,9 @@
       "act_hint": "Status of the case and the step ahead."
     },
     "mobile": {
-      "rail_left": "Queue",
+      "rail_left": "My queue",
       "rail_center": "Cases",
-      "rail_right": "To do"
+      "rail_right": "Next steps"
     },
     "aria": {
       "page": "Page",
@@ -1217,17 +1217,17 @@
       "short_emails": "Emails",
       "short_materials": "Materials",
       "short_billing": "Billing",
-      "short_crm": "Client"
+      "short_crm": "Customer"
     },
     "emails": {
       "panel_title": "Email thread",
-      "message_count": "messages",
+      "message_count": "{{count}} messages",
       "menu_thread": "View conversation",
       "menu_compose": "New message",
       "menu_reply": "Reply to client"
     },
     "pipeline": {
-      "step_situation": "Situation",
+      "step_situation": "Overview",
       "step_act": "Act",
       "step_detail": "Detail",
       "step_state": "Status",
@@ -1298,7 +1298,7 @@
     "mobile": {
       "rail_left": "Team",
       "rail_center": "Schedule",
-      "rail_right": "Detail"
+      "rail_right": "Details"
     }
   },
   "spotlight": {

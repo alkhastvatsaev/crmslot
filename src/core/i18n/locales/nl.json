@@ -294,8 +294,8 @@
       "personal": "Eigen",
       "inherited": "Bedrijfstarief",
       "reset": "Eigen tarief verwijderen",
-      "intervention_overrides": "Dossier-uitzonderingen",
-      "add_override": "+ Dossier-uitzondering",
+      "intervention_overrides": "Uitzonderingen per opdracht",
+      "add_override": "+ Uitzondering per opdracht",
       "revenue_preview": "{{revenue}} → {{commission}} verschuldigd"
     },
     "company_rule": {
@@ -689,7 +689,7 @@
     "new_activity_many": "{count} gebeurtenissen toegevoegd",
     "empty": "Geen activiteit voor deze periode",
     "actor": {
-      "dispatcher": "Back-office",
+      "dispatcher": "Backoffice",
       "technician": "Technicus",
       "client": "Klant",
       "system": "Systeem"
@@ -715,7 +715,7 @@
         "email_from": "Van",
         "email_to": "Aan",
         "commission": "Commissie",
-        "commission_action": "Type",
+        "commission_action": "Actietype",
         "technician": "Technicus (UID)",
         "note": "Notitie"
       },
@@ -801,7 +801,7 @@
     "seed_chatbot": "Voorraad opbouwen met Chatbot",
     "seed_chatbot_prompt": "Help me de materiaalvoorraad van een slotenmakerij in België structureren: families, drempels en eerste Lecot-bestellingen.",
     "pro_refs": "Referenties",
-    "pro_ruptures": "Ruptures",
+    "pro_ruptures": "Uitverkocht",
     "pro_low": "Lage voorraad",
     "pro_orders": "Aanvragen",
     "pro_empty_title": "Uw materiaalvoorraad",
@@ -822,17 +822,17 @@
     "autopilot_approved_toast": "aanvra(a)g(en) goedgekeurd",
     "autopilot_chatbot_toast": "Chatbot gestart met actieplan",
     "feed_pending": "technieker-aanvra(a)g(en) te behandelen",
-    "feed_out": "rupture(s)",
+    "feed_out": "{{count}} uitverkocht",
     "feed_low": "artikel(en) onder drempel",
     "feed_ok": "Niets urgent — één klik voor een samenvatting.",
     "patron_title": "Materiaalbeheer",
-    "patron_subtitle": "Ruptures, drempels en veldbestellingen — wat de zaakvoerder eerst ziet.",
+    "patron_subtitle": "Tekorten, drempels en veldbestellingen — wat de zaakvoerder eerst ziet.",
     "priorities_heading": "Prioriteiten vandaag",
-    "priority_out": "Ruptures",
+    "priority_out": "Uitverkocht",
     "priority_low": "Lage voorraad",
     "priority_orders": "Technieker-aanvragen",
     "filter_all": "Alles",
-    "filter_out": "Ruptures",
+    "filter_out": "Uitverkocht",
     "filter_low": "Lage voorraad",
     "filter_orders": "In bestelling",
     "filter_lecot": "Lecot",
@@ -851,7 +851,7 @@
     "company_required": "Selecteer een actief bedrijf om voorraad te beheren.",
     "kpi_skus": "Referenties",
     "kpi_coverage": "voorraad OK",
-    "kpi_out": "Ruptures",
+    "kpi_out": "Uitverkocht",
     "kpi_low": "Lage voorraad",
     "kpi_field_orders": "Veldaanvragen",
     "kpi_field_sub": "te valideren",
@@ -864,9 +864,9 @@
     "col_ref": "Ref.",
     "col_category": "Familie",
     "col_qty": "Aantal",
-    "col_health": "Niveau",
+    "col_health": "Voorraadniveau",
     "col_actions": "Aanpassen",
-    "status_out": "Rupture",
+    "status_out": "Uitverkocht",
     "status_low": "Laag",
     "status_ok": "OK",
     "inventory": "Inventaris",
@@ -899,7 +899,7 @@
     "ai_title": "Chatbot-copiloot",
     "ai_hint": "De Chatbot gebruikt dezelfde Firestore-voorraad.",
     "ai_hint_patron": "Valideer veldaanvragen, volg leveranciers, laat de Chatbot aankopen voorbereiden.",
-    "ai_suggestion_out": "referentie(s) in rupture",
+    "ai_suggestion_out": "referentie(s) niet op voorraad",
     "ai_jobs_waiting": "interventie(s) geblokkeerd zonder materiaal",
     "ai_suggestion_low": "artikel(en) onder drempel — Chatbot kan bij Lecot bestellen.",
     "ai_ruptures": "Aankoopplan ruptures",
@@ -958,7 +958,7 @@
       "page": "Pagina",
       "left": "Facturatieagent",
       "center": "facturen",
-      "right": "documents"
+      "right": "Documenten"
     },
     "mobile": {
       "rail_left": "Agent",
@@ -1016,7 +1016,7 @@
     },
     "mobile": {
       "rail_left": "Overzicht",
-      "rail_center": "Lijst",
+      "rail_center": "Team",
       "rail_right": "Profiel"
     }
   },
@@ -1030,7 +1030,7 @@
     },
     "empty": "Niets in deze categorie — kies links een andere.",
     "pick_case": "Tik in het midden op een dossier om te zien wat te doen.",
-    "selected_label": "Dossier",
+    "selected_label": "Geselecteerd dossier",
     "left": {
       "todo_label": "Te doen",
       "todo_hint": "Dossiers die actie vragen"
@@ -1817,7 +1817,7 @@
       }
     },
     "inbox": {
-      "report": "Rapport",
+      "report": "Werkrapport",
       "terrain_report": "Veldrapport",
       "back": "Terug",
       "anonymous_client": "Anonieme klant",
@@ -1834,7 +1834,7 @@
       "detail_title_report": "Rapportverificatie",
       "kind_request": "Aanvraag",
       "kind_returned": "Terug van terrein",
-      "kind_report": "Rapport",
+      "kind_report": "Werkrapport",
       "no_phone": "Geen telefoon",
       "location": "Locatie",
       "problem_label": "Probleem",

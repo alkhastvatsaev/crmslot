@@ -418,9 +418,10 @@ export function formatScheduledTimeOnly(iv: Intervention): string {
   return "common.dash";
 }
 
-export function mapI18nLanguageToLocale(language: "fr" | "en" | "nl"): string {
+export function mapI18nLanguageToLocale(language: "fr" | "en" | "nl" | "ru"): string {
   if (language === "en") return "en-GB";
   if (language === "nl") return "nl-BE";
+  if (language === "ru") return "ru-RU";
   return "fr-BE";
 }
 

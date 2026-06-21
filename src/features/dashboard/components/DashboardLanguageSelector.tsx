@@ -8,6 +8,7 @@ const languages: { code: Language; label: string }[] = [
   { code: "fr", label: "FR" },
   { code: "en", label: "EN" },
   { code: "nl", label: "NL" },
+  { code: "ru", label: "RU" },
 ];
 
 type Props = {
