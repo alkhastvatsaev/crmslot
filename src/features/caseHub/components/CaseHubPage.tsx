@@ -7,11 +7,11 @@ import CaseHubChoosePanel from "@/features/caseHub/components/CaseHubChoosePanel
 import CaseHubOverviewPanel from "@/features/caseHub/components/CaseHubOverviewPanel";
 import CaseHubRightPanel from "@/features/caseHub/components/CaseHubRightPanel";
 import {
-  countForCaseFilter,
-  filterCaseInterventions,
-  sortCaseInterventions,
+  countForBucket,
+  filterCaseInterventionsByBucket,
+  sortCaseInterventionsByUrgency,
 } from "@/features/caseHub/caseHubPatronMetrics";
-import type { CaseHubStatusFilter } from "@/features/caseHub/caseHubTypes";
+import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
@@ -34,23 +34,39 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { interventions, loading } = useBackOfficeInterventions(companyId || null);
 
-  const [filter, setFilter] = useState<CaseHubStatusFilter>("open");
+  const [bucket, setBucket] = useState<CaseHubBucket>("to_assign");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [bucketAutoPicked, setBucketAutoPicked] = useState(false);
 
-  const sorted = useMemo(() => sortCaseInterventions(interventions), [interventions]);
-  const filterCounts = useMemo(
+  const sorted = useMemo(() => sortCaseInterventionsByUrgency(interventions), [interventions]);
+  const bucketCounts = useMemo<Record<CaseHubBucket, number>>(
     () => ({
+      to_assign: countForBucket(sorted, "to_assign"),
+      in_progress: countForBucket(sorted, "in_progress"),
+      waiting: countForBucket(sorted, "waiting"),
+      to_invoice: countForBucket(sorted, "to_invoice"),
+      invoiced: countForBucket(sorted, "invoiced"),
+      cancelled: countForBucket(sorted, "cancelled"),
       all: sorted.length,
-      open: countForCaseFilter(sorted, "open"),
-      active: countForCaseFilter(sorted, "active"),
-      done: countForCaseFilter(sorted, "done"),
     }),
     [sorted]
   );
-  const filtered = useMemo(
-    () => sortCaseInterventions(filterCaseInterventions(sorted, filter)),
-    [sorted, filter]
-  );
+  const filtered = useMemo(() => filterCaseInterventionsByBucket(sorted, bucket), [sorted, bucket]);
+
+  useEffect(() => {
+    if (bucketAutoPicked || loading) return;
+    const priority: CaseHubBucket[] = [
+      "to_assign",
+      "waiting",
+      "to_invoice",
+      "in_progress",
+      "invoiced",
+      "cancelled",
+    ];
+    const firstNonEmpty = priority.find((b) => bucketCounts[b] > 0);
+    if (firstNonEmpty && firstNonEmpty !== bucket) setBucket(firstNonEmpty);
+    setBucketAutoPicked(true);
+  }, [bucketAutoPicked, bucket, bucketCounts, loading]);
 
   useEffect(() => {
     if (filtered.length === 0) {
@@ -91,6 +107,9 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
       leftAriaLabel={`${t("caseHub.aria.page")} ${humanPage} — ${t("caseHub.aria.left")}`}
       centerAriaLabel={`${t("caseHub.aria.page")} ${humanPage} — ${t("caseHub.aria.center")}`}
       rightAriaLabel={`${t("caseHub.aria.page")} ${humanPage} — ${t("caseHub.aria.right")}`}
+      mobileLeftLabel={String(t("caseHub.mobile.rail_left"))}
+      mobileCenterLabel={String(t("caseHub.mobile.rail_center"))}
+      mobileRightLabel={String(t("caseHub.mobile.rail_right"))}
       centerPadding={false}
       rightPadding={false}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
@@ -99,9 +118,9 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
           {gate}
           {companyId && !gate ? (
             <CaseHubOverviewPanel
-              filter={filter}
-              counts={filterCounts}
-              onFilterChange={setFilter}
+              bucket={bucket}
+              counts={bucketCounts}
+              onBucketChange={setBucket}
             />
           ) : null}
         </section>
@@ -115,14 +134,16 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
               loading={loading}
               selectedId={selectedId}
               onSelect={setSelectedId}
-              filter={filter}
+              bucket={bucket}
             />
           ) : null}
         </section>
       }
       right={
         <section className={mainShell}>
-          {companyId && !gate ? <CaseHubRightPanel intervention={selected} /> : null}
+          {companyId && !gate ? (
+            <CaseHubRightPanel intervention={selected} peerInterventions={sorted} />
+          ) : null}
         </section>
       }
     />

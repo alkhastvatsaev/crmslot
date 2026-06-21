@@ -1002,9 +1002,31 @@
       "chip_open": "Open",
       "chip_done": "Closed"
     },
-    "empty": "No cases for this filter.",
-    "pick_case": "Tap a case on the left.",
+    "empty": "Nothing in this bucket — pick another on the left.",
+    "pick_case": "Tap a case in the middle to see what to do.",
     "selected_label": "Case",
+    "left": {
+      "todo_label": "To handle",
+      "todo_hint": "Cases that need an action"
+    },
+    "bucket": {
+      "to_assign": "To assign",
+      "in_progress": "Tech on a job",
+      "waiting": "Waiting for parts",
+      "to_invoice": "To invoice",
+      "invoiced": "Invoiced",
+      "cancelled": "Cancelled",
+      "all": "All cases"
+    },
+    "bucket_hint": {
+      "to_assign": "Pick a tech and send them",
+      "in_progress": "Tech is on the way or on site",
+      "waiting": "Blocked until parts arrive",
+      "to_invoice": "Job done — send the invoice",
+      "invoiced": "Invoice sent, track payment",
+      "cancelled": "Cases closed without follow-up",
+      "all": "The full list"
+    },
     "kpi": {
       "open": "Open",
       "active": "In progress",
@@ -1040,13 +1062,111 @@
     },
     "right": {
       "next": "Next step",
-      "status": "Status"
+      "status": "Status",
+      "call_client": "Call the client",
+      "details": "Case details",
+      "case_id": "Case · {{id}}",
+      "alerts_aria": "Case alerts",
+      "kpi_billing": "Amount",
+      "kpi_commission": "Commission",
+      "kpi_payment": "Payment",
+      "kpi_schedule": "Appointment",
+      "open_map": "Map",
+      "payment_link": "Payment link",
+      "client_facts": "Client request",
+      "technician_facts": "Field report",
+      "actions": "Actions",
+      "audio": "Voice message",
+      "audio_loading": "Loading audio…",
+      "audio_failed": "Audio unavailable",
+      "billing_preview": "Invoice preview",
+      "equipment": "Client equipment",
+      "insights": "What this tells you"
+    },
+    "insight": {
+      "case_age": "Open for",
+      "case_age_stale": "No tech for",
+      "schedule_overdue": "Past the appointment",
+      "schedule_today": "Today's appointment",
+      "on_site": "On site",
+      "on_site_long": "On site — long",
+      "to_invoice_lag": "To invoice since",
+      "to_invoice_stale": "Invoice overdue",
+      "unpaid_age": "Unpaid for",
+      "unpaid_overdue": "Unpaid — follow up",
+      "margin": "Net margin",
+      "duration_overrun": "Time overrun",
+      "recurring_client": "Cases with this client"
+    },
+    "no_date": "Not scheduled yet",
+    "steps": {
+      "overview_title": "My queue",
+      "overview_hint": "Pick a bucket to open its list.",
+      "choose_title": "The cases",
+      "choose_hint": "Tap a case — the next action is at the bottom of each row.",
+      "act_title": "What to do?",
+      "act_hint": "Status of the case and the step ahead."
+    },
+    "mobile": {
+      "rail_left": "Queue",
+      "rail_center": "Cases",
+      "rail_right": "To do"
     },
     "aria": {
       "page": "Page",
-      "left": "summary",
-      "center": "list",
-      "right": "detail"
+      "left": "what's on my plate",
+      "center": "the queue",
+      "right": "what to do"
+    },
+    "payment": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "unpaid": "Unpaid",
+      "refunded": "Refunded"
+    },
+    "alert": {
+      "urgency": "Urgent — prioritize this case",
+      "needs_address": "Missing or incomplete address",
+      "waiting_material": "Waiting for parts or material",
+      "no_technician": "No technician assigned",
+      "report_rejected": "Report rejected — follow-up required",
+      "report_amended": "Report amended after closure",
+      "to_invoice": "To invoice — amount or lines missing",
+      "unpaid": "Invoice sent — payment not received",
+      "payment_pending": "Stripe payment in progress",
+      "client_rating": "Client review received",
+      "crm_unlinked": "CRM client not linked"
+    },
+    "actions": {
+      "assign_technician": "Assign technician",
+      "assigning": "Assigning…",
+      "assign_ok": "Technician assigned",
+      "assign_rescheduled": "Technician assigned — slot adjusted",
+      "assign_failed": "Assignment failed",
+      "whatsapp": "WhatsApp"
+    },
+    "quick_tab": {
+      "timeline": "Timeline",
+      "emails": "Emails",
+      "materials": "Materials",
+      "billing": "Billing",
+      "crm": "CRM"
+    },
+    "section_menu": {
+      "title": "Explore case",
+      "aria": "Case sections",
+      "timeline": "Event timeline",
+      "emails": "Emails",
+      "materials": "Materials",
+      "billing": "Billing",
+      "crm": "Client record"
+    },
+    "emails": {
+      "panel_title": "Email thread",
+      "message_count": "messages",
+      "menu_thread": "View conversation",
+      "menu_compose": "New message",
+      "menu_reply": "Reply to client"
     }
   },
   "planningHub": {

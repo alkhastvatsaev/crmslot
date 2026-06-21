@@ -1,32 +1,22 @@
 "use client";
 
 import CaseHubLeftRail from "@/features/caseHub/components/CaseHubLeftRail";
-import CaseHubStepHeader from "@/features/caseHub/components/CaseHubStepHeader";
-import type { CaseHubStatusFilter } from "@/features/caseHub/caseHubTypes";
-import { useTranslation } from "@/core/i18n/I18nContext";
+import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 
 type Props = {
-  filter: CaseHubStatusFilter;
-  counts: Record<CaseHubStatusFilter, number>;
-  onFilterChange: (filter: CaseHubStatusFilter) => void;
+  bucket: CaseHubBucket;
+  counts: Record<CaseHubBucket, number>;
+  onBucketChange: (bucket: CaseHubBucket) => void;
 };
 
-/** Step 1 — Situation : filtres-compteurs (chaque chip = KPI + filtre interactif). */
-export default function CaseHubOverviewPanel({ filter, counts, onFilterChange }: Props) {
-  const { t } = useTranslation();
-
+/** Step 1 — Situation : ce qui m'attend par type d'action. */
+export default function CaseHubOverviewPanel({ bucket, counts, onBucketChange }: Props) {
   return (
     <div
       data-testid="case-hub-overview-panel"
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CaseHubStepHeader
-        step={1}
-        title={t("caseHub.steps.overview_title")}
-        hint={t("caseHub.steps.overview_hint")}
-        testId="case-hub-step-overview"
-      />
-      <CaseHubLeftRail filter={filter} onFilterChange={onFilterChange} counts={counts} />
+      <CaseHubLeftRail bucket={bucket} onBucketChange={onBucketChange} counts={counts} />
     </div>
   );
 }

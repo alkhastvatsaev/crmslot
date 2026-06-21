@@ -1,15 +1,29 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import UnifiedInterventionDrawer from "@/features/interventions/components/UnifiedInterventionDrawer";
-import CaseHubStepHeader from "@/features/caseHub/components/CaseHubStepHeader";
+import UnifiedInterventionDrawer, {
+  type UnifiedDrawerTab,
+} from "@/features/interventions/components/UnifiedInterventionDrawer";
+import CaseHubDetailSectionMenu from "@/features/caseHub/components/CaseHubDetailSectionMenu";
+import CaseHubDetailActions from "@/features/caseHub/components/CaseHubDetailActions";
+import CaseHubDetailAudio from "@/features/caseHub/components/CaseHubDetailAudio";
+import CaseHubDetailBilling from "@/features/caseHub/components/CaseHubDetailBilling";
+import CaseHubDetailEquipment from "@/features/caseHub/components/CaseHubDetailEquipment";
+import CaseHubDetailFacts from "@/features/caseHub/components/CaseHubDetailFacts";
+import CaseHubDetailInsights from "@/features/caseHub/components/CaseHubDetailInsights";
+import CaseHubDetailSummary from "@/features/caseHub/components/CaseHubDetailSummary";
+import { buildCaseHubDetailSnapshot } from "@/features/caseHub/caseHubInterventionDetail";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useTechnicians } from "@/features/technicians/hooks";
 import type { Intervention } from "@/features/interventions/types";
-import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
+import { bucketForStatus } from "@/features/caseHub/caseHubPatronMetrics";
+import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 
 type Props = {
   intervention: Intervention | null;
+  peerInterventions: Intervention[];
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -24,9 +38,42 @@ const STATUS_BADGE: Record<string, string> = {
   pending_needs_address: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
-/** Step 3 — Agir : pilotage du dossier sélectionné + statut + prochaine étape. */
-export default function CaseHubRightPanel({ intervention }: Props) {
+const NEXT_ACTION_TONE: Record<CaseHubBucket, string> = {
+  to_assign: "bg-rose-50 border-rose-200 text-rose-900",
+  in_progress: "bg-violet-50 border-violet-200 text-violet-900",
+  waiting: "bg-amber-50 border-amber-200 text-amber-900",
+  to_invoice: "bg-emerald-50 border-emerald-200 text-emerald-900",
+  invoiced: "bg-green-50 border-green-200 text-green-900",
+  cancelled: "bg-slate-50 border-slate-200 text-slate-700",
+  all: "bg-slate-50 border-slate-200 text-slate-700",
+};
+
+const TAB_FOR_BUCKET: Record<CaseHubBucket, UnifiedDrawerTab> = {
+  to_assign: "timeline",
+  in_progress: "timeline",
+  waiting: "materials",
+  to_invoice: "billing",
+  invoiced: "billing",
+  cancelled: "timeline",
+  all: "timeline",
+};
+
+export default function CaseHubRightPanel({ intervention, peerInterventions }: Props) {
   const { t } = useTranslation();
+  const { technicians } = useTechnicians();
+  const [drawerTab, setDrawerTab] = useState<UnifiedDrawerTab>("timeline");
+
+  useEffect(() => {
+    if (!intervention) return;
+    setDrawerTab(TAB_FOR_BUCKET[bucketForStatus(intervention.status)]);
+  }, [intervention?.id]);
+
+  const techName = useMemo(() => {
+    const uid = intervention?.assignedTechnicianUid?.trim();
+    if (!uid) return null;
+    const found = technicians.find((tech) => (tech.authUid ?? tech.id) === uid);
+    return found?.name ?? null;
+  }, [intervention?.assignedTechnicianUid, technicians]);
 
   if (!intervention) {
     return (
@@ -34,12 +81,6 @@ export default function CaseHubRightPanel({ intervention }: Props) {
         data-testid="case-hub-right-panel"
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
       >
-        <CaseHubStepHeader
-          step={3}
-          title={t("caseHub.steps.act_title")}
-          hint={t("caseHub.steps.act_hint")}
-          testId="case-hub-step-act"
-        />
         <div
           data-testid="case-hub-empty-detail"
           className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center text-[12px] text-slate-400"
@@ -50,60 +91,83 @@ export default function CaseHubRightPanel({ intervention }: Props) {
     );
   }
 
-  const title =
-    resolveInterventionClientName(intervention) || intervention.title || intervention.id;
+  const snapshot = buildCaseHubDetailSnapshot(intervention, peerInterventions);
   const status = intervention.status ?? "pending";
+  const bucket = bucketForStatus(status);
   const statusLabel = t(`caseHub.status.${status}` as "caseHub.status.pending");
   const nextAction = t(`caseHub.next_action.${status}` as "caseHub.next_action.pending");
+  const defaultTab = TAB_FOR_BUCKET[bucket];
 
   return (
     <div
       data-testid="case-hub-right-panel"
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CaseHubStepHeader
-        step={3}
-        title={t("caseHub.steps.act_title")}
-        hint={t("caseHub.steps.act_hint")}
-        testId="case-hub-step-act"
-      />
-      <div className="shrink-0 border-b border-black/[0.05] bg-gradient-to-b from-sky-50/60 to-white px-4 py-3">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-          {t("caseHub.selected_label")}
-        </p>
-        <p
-          data-testid="case-hub-selected-title"
-          className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900"
-        >
-          {title}
-        </p>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span
-            data-testid={`case-hub-status-${status}`}
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
+        <CaseHubDetailSummary
+          intervention={intervention}
+          snapshot={snapshot}
+          techName={techName}
+          statusLabel={statusLabel}
+          statusBadgeClass={STATUS_BADGE[status] ?? STATUS_BADGE.pending}
+        />
+
+        <CaseHubDetailInsights insights={snapshot.insights} />
+
+        <CaseHubDetailActions
+          intervention={intervention}
+          peerInterventions={peerInterventions}
+          snapshot={snapshot}
+        />
+
+        <CaseHubDetailSectionMenu
+          interventionId={intervention.id}
+          activeTab={drawerTab}
+          onTabChange={setDrawerTab}
+          tabBadges={snapshot.drawerTabBadges}
+        />
+
+        <div className="shrink-0 border-b border-black/[0.05] bg-white px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            {t("caseHub.right.next")}
+          </p>
+          <div
+            data-testid="case-hub-next-action"
             className={cn(
-              "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
-              STATUS_BADGE[status] ?? STATUS_BADGE.pending
+              "mt-1 flex items-center gap-2 rounded-2xl border px-3 py-2.5",
+              NEXT_ACTION_TONE[bucket]
             )}
           >
-            {statusLabel}
-          </span>
-          <span
-            data-testid="case-hub-next-action"
-            className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600"
-          >
-            <ArrowRight className="h-3 w-3 text-slate-400" aria-hidden />
-            {nextAction}
-          </span>
+            <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="text-[14px] font-bold">{nextAction}</span>
+          </div>
         </div>
-      </div>
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-3">
-        <UnifiedInterventionDrawer
-          intervention={intervention}
-          technicianUid={intervention.assignedTechnicianUid ?? ""}
-          allowMaterialCreate
-          allowMaterialStatusUpdate
-          className="min-h-[420px]"
-        />
+
+        <CaseHubDetailAudio intervention={intervention} hasAudio={snapshot.hasAudio} />
+        <CaseHubDetailBilling intervention={intervention} />
+        <CaseHubDetailFacts intervention={intervention} />
+        <CaseHubDetailEquipment intervention={intervention} />
+
+        <div className="px-3 pb-3 pt-2">
+          <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            {t("caseHub.right.details")}
+          </p>
+          <UnifiedInterventionDrawer
+            key={intervention.id}
+            intervention={intervention}
+            technicianUid={intervention.assignedTechnicianUid ?? ""}
+            allowMaterialCreate
+            allowMaterialStatusUpdate
+            defaultTab={defaultTab}
+            activeTab={drawerTab}
+            onTabChange={setDrawerTab}
+            tabBadges={snapshot.drawerTabBadges}
+            hideTabBar
+            emailVariant="patron"
+            defaultComposeTo={snapshot.email}
+            className="min-h-[360px] border-0 bg-transparent shadow-none"
+          />
+        </div>
       </div>
     </div>
   );
