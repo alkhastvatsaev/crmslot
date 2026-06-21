@@ -1002,9 +1002,31 @@
       "chip_open": "En cours",
       "chip_done": "Terminés"
     },
-    "empty": "Aucun dossier pour ce filtre.",
-    "pick_case": "Touchez un dossier à gauche.",
+    "empty": "Rien dans cette catégorie — choisis-en une autre à gauche.",
+    "pick_case": "Touchez un dossier au centre pour voir quoi faire.",
     "selected_label": "Dossier",
+    "left": {
+      "todo_label": "À traiter",
+      "todo_hint": "Dossiers qui demandent une action"
+    },
+    "bucket": {
+      "to_assign": "À assigner",
+      "in_progress": "Tech en mission",
+      "waiting": "Attend matériel",
+      "to_invoice": "À facturer",
+      "invoiced": "Facturés",
+      "cancelled": "Annulés",
+      "all": "Tous les dossiers"
+    },
+    "bucket_hint": {
+      "to_assign": "Choisis un technicien et envoie-le",
+      "in_progress": "Le tech est en route ou sur place",
+      "waiting": "Bloqué le temps que le matériel arrive",
+      "to_invoice": "Travail fini, envoie la facture",
+      "invoiced": "Facture envoyée, suis le paiement",
+      "cancelled": "Dossiers fermés sans suite",
+      "all": "Toute la liste"
+    },
     "kpi": {
       "open": "Ouverts",
       "active": "En cours",
@@ -1040,13 +1062,111 @@
     },
     "right": {
       "next": "Prochaine étape",
-      "status": "Statut"
+      "status": "Statut",
+      "call_client": "Appeler le client",
+      "details": "Détails du dossier",
+      "case_id": "Dossier · {{id}}",
+      "alerts_aria": "Alertes dossier",
+      "kpi_billing": "Montant",
+      "kpi_commission": "Commission",
+      "kpi_payment": "Paiement",
+      "kpi_schedule": "RDV",
+      "open_map": "Carte",
+      "payment_link": "Lien paiement",
+      "client_facts": "Demande client",
+      "technician_facts": "Rapport terrain",
+      "actions": "Actions",
+      "audio": "Message vocal",
+      "audio_loading": "Chargement de l'audio…",
+      "audio_failed": "Audio indisponible",
+      "billing_preview": "Aperçu facture",
+      "equipment": "Matériel client",
+      "insights": "Ce que ça dit"
+    },
+    "insight": {
+      "case_age": "Ouvert depuis",
+      "case_age_stale": "Sans tech depuis",
+      "schedule_overdue": "En retard sur le RDV",
+      "schedule_today": "RDV aujourd'hui",
+      "on_site": "Sur place",
+      "on_site_long": "Sur place — long",
+      "to_invoice_lag": "À facturer depuis",
+      "to_invoice_stale": "Facture en retard",
+      "unpaid_age": "Impayé depuis",
+      "unpaid_overdue": "Impayé à relancer",
+      "margin": "Marge nette",
+      "duration_overrun": "Dépassement durée",
+      "recurring_client": "Dossiers avec ce client"
+    },
+    "no_date": "Pas encore programmé",
+    "steps": {
+      "overview_title": "Ma file",
+      "overview_hint": "Choisis une catégorie pour ouvrir la liste.",
+      "choose_title": "Les dossiers",
+      "choose_hint": "Touche un dossier — l'action à faire est en bas de chaque ligne.",
+      "act_title": "Quoi faire ?",
+      "act_hint": "L'état du dossier et l'étape à venir."
+    },
+    "mobile": {
+      "rail_left": "Ma file",
+      "rail_center": "Dossiers",
+      "rail_right": "Quoi faire"
     },
     "aria": {
       "page": "Page",
-      "left": "résumé",
-      "center": "liste",
-      "right": "détail"
+      "left": "ce qui m'attend",
+      "center": "la file",
+      "right": "quoi faire"
+    },
+    "payment": {
+      "paid": "Payé",
+      "pending": "En attente",
+      "unpaid": "Impayé",
+      "refunded": "Remboursé"
+    },
+    "alert": {
+      "urgency": "Urgence — prioriser ce dossier",
+      "needs_address": "Adresse manquante ou incomplète",
+      "waiting_material": "Pièce ou matériel en attente",
+      "no_technician": "Aucun technicien assigné",
+      "report_rejected": "Rapport refusé — complément demandé",
+      "report_amended": "Rapport modifié après clôture",
+      "to_invoice": "À facturer — montant ou lignes manquants",
+      "unpaid": "Facture émise — paiement non reçu",
+      "payment_pending": "Paiement Stripe en cours",
+      "client_rating": "Avis client reçu",
+      "crm_unlinked": "Client CRM non lié"
+    },
+    "actions": {
+      "assign_technician": "Assigner un technicien",
+      "assigning": "Assignation…",
+      "assign_ok": "Technicien assigné",
+      "assign_rescheduled": "Technicien assigné — créneau ajusté",
+      "assign_failed": "Assignation impossible",
+      "whatsapp": "WhatsApp"
+    },
+    "quick_tab": {
+      "timeline": "Fil",
+      "emails": "E-mails",
+      "materials": "Matériel",
+      "billing": "Facturation",
+      "crm": "CRM"
+    },
+    "section_menu": {
+      "title": "Explorer le dossier",
+      "aria": "Sections du dossier",
+      "timeline": "Fil d'événements",
+      "emails": "E-mails",
+      "materials": "Matériel",
+      "billing": "Facturation",
+      "crm": "Fiche client"
+    },
+    "emails": {
+      "panel_title": "Échanges e-mail",
+      "message_count": "messages",
+      "menu_thread": "Voir la conversation",
+      "menu_compose": "Nouveau message",
+      "menu_reply": "Répondre au client"
     }
   },
   "planningHub": {

@@ -1002,9 +1002,31 @@
       "chip_open": "Bezig",
       "chip_done": "Afgesloten"
     },
-    "empty": "Geen dossiers voor dit filter.",
-    "pick_case": "Tik links op een dossier.",
+    "empty": "Niets in deze categorie — kies links een andere.",
+    "pick_case": "Tik in het midden op een dossier om te zien wat te doen.",
     "selected_label": "Dossier",
+    "left": {
+      "todo_label": "Te doen",
+      "todo_hint": "Dossiers die actie vragen"
+    },
+    "bucket": {
+      "to_assign": "Toe te wijzen",
+      "in_progress": "Technieker op pad",
+      "waiting": "Wacht op materiaal",
+      "to_invoice": "Te factureren",
+      "invoiced": "Gefactureerd",
+      "cancelled": "Geannuleerd",
+      "all": "Alle dossiers"
+    },
+    "bucket_hint": {
+      "to_assign": "Kies een technieker en stuur hem",
+      "in_progress": "Technieker is onderweg of ter plaatse",
+      "waiting": "Geblokkeerd tot het materiaal er is",
+      "to_invoice": "Klaar — stuur de factuur",
+      "invoiced": "Factuur verstuurd, volg betaling op",
+      "cancelled": "Afgesloten zonder gevolg",
+      "all": "De volledige lijst"
+    },
     "kpi": {
       "open": "Open",
       "active": "Bezig",
@@ -1040,13 +1062,111 @@
     },
     "right": {
       "next": "Volgende stap",
-      "status": "Status"
+      "status": "Status",
+      "call_client": "Bel de klant",
+      "details": "Dossiergegevens",
+      "case_id": "Dossier · {{id}}",
+      "alerts_aria": "Dossierwaarschuwingen",
+      "kpi_billing": "Bedrag",
+      "kpi_commission": "Commissie",
+      "kpi_payment": "Betaling",
+      "kpi_schedule": "Afspraak",
+      "open_map": "Kaart",
+      "payment_link": "Betaallink",
+      "client_facts": "Klantaanvraag",
+      "technician_facts": "Terreinrapport",
+      "actions": "Acties",
+      "audio": "Spraakbericht",
+      "audio_loading": "Audio laden…",
+      "audio_failed": "Audio niet beschikbaar",
+      "billing_preview": "Factuurvoorbeeld",
+      "equipment": "Klantmateriaal",
+      "insights": "Wat dit betekent"
+    },
+    "insight": {
+      "case_age": "Open sinds",
+      "case_age_stale": "Zonder technieker sinds",
+      "schedule_overdue": "Afspraak verstreken",
+      "schedule_today": "Afspraak vandaag",
+      "on_site": "Ter plaatse",
+      "on_site_long": "Lang ter plaatse",
+      "to_invoice_lag": "Te factureren sinds",
+      "to_invoice_stale": "Factuur achterop",
+      "unpaid_age": "Onbetaald sinds",
+      "unpaid_overdue": "Onbetaald — opvolgen",
+      "margin": "Netto marge",
+      "duration_overrun": "Tijdoverschrijding",
+      "recurring_client": "Dossiers van deze klant"
+    },
+    "no_date": "Nog niet ingepland",
+    "steps": {
+      "overview_title": "Mijn wachtrij",
+      "overview_hint": "Kies een categorie om de lijst te openen.",
+      "choose_title": "De dossiers",
+      "choose_hint": "Tik op een dossier — de volgende actie staat onderaan elke rij.",
+      "act_title": "Wat doen?",
+      "act_hint": "Status van het dossier en wat er nu volgt."
+    },
+    "mobile": {
+      "rail_left": "Wachtrij",
+      "rail_center": "Dossiers",
+      "rail_right": "Wat doen"
     },
     "aria": {
       "page": "Pagina",
-      "left": "samenvatting",
-      "center": "lijst",
-      "right": "detail"
+      "left": "wat me te wachten staat",
+      "center": "de wachtrij",
+      "right": "wat doen"
+    },
+    "payment": {
+      "paid": "Betaald",
+      "pending": "In behandeling",
+      "unpaid": "Onbetaald",
+      "refunded": "Terugbetaald"
+    },
+    "alert": {
+      "urgency": "Urgent — prioriteer dit dossier",
+      "needs_address": "Adres ontbreekt of onvolledig",
+      "waiting_material": "Materiaal of onderdeel in afwachting",
+      "no_technician": "Geen technicus toegewezen",
+      "report_rejected": "Rapport geweigerd — opvolging nodig",
+      "report_amended": "Rapport gewijzigd na afsluiting",
+      "to_invoice": "Te factureren — bedrag of lijnen ontbreken",
+      "unpaid": "Factuur verstuurd — betaling niet ontvangen",
+      "payment_pending": "Stripe-betaling lopende",
+      "client_rating": "Klantbeoordeling ontvangen",
+      "crm_unlinked": "CRM-klant niet gekoppeld"
+    },
+    "actions": {
+      "assign_technician": "Technicus toewijzen",
+      "assigning": "Toewijzen…",
+      "assign_ok": "Technicus toegewezen",
+      "assign_rescheduled": "Technicus toegewezen — slot aangepast",
+      "assign_failed": "Toewijzing mislukt",
+      "whatsapp": "WhatsApp"
+    },
+    "quick_tab": {
+      "timeline": "Tijdlijn",
+      "emails": "E-mails",
+      "materials": "Materiaal",
+      "billing": "Facturatie",
+      "crm": "CRM"
+    },
+    "section_menu": {
+      "title": "Dossier verkennen",
+      "aria": "Dossiersecties",
+      "timeline": "Tijdlijn",
+      "emails": "E-mails",
+      "materials": "Materiaal",
+      "billing": "Facturatie",
+      "crm": "Klantfiche"
+    },
+    "emails": {
+      "panel_title": "E-mailuitwisseling",
+      "message_count": "berichten",
+      "menu_thread": "Conversatie bekijken",
+      "menu_compose": "Nieuw bericht",
+      "menu_reply": "Klant beantwoorden"
     }
   },
   "planningHub": {
