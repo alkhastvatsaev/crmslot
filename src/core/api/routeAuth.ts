@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
+
+/** Comparaison de secrets résistante au timing (les chaînes de tailles différentes => false). */
+function safeEqual(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const ba = Buffer.from(a, "utf8");
+  const bb = Buffer.from(b, "utf8");
+  if (ba.length !== bb.length) return false;
+  try {
+    return timingSafeEqual(ba, bb);
+  } catch {
+    return false;
+  }
+}
 
 export type AuthenticatedRequest = {
   uid: string;
@@ -13,10 +27,25 @@ export function isProductionNodeEnv(): boolean {
   return process.env.NODE_ENV === "production";
 }
 
+/**
+ * IP cliente "edge-trusted".
+ * Sur Vercel, `x-real-ip` est posé par l'edge avec la vraie IP TCP (non-spoofable).
+ * `x-forwarded-for` est concaténé : `client_envoyé, edge_ip` — si on prenait `[0]`,
+ * un attaquant pourrait spoofer son IP. On lit donc la **dernière** entrée XFF
+ * (celle ajoutée par l'edge) en dernier recours.
+ */
 export function clientIp(request: Request): string {
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
   const forwardedFor = request.headers.get("x-forwarded-for");
-  const realIp = request.headers.get("x-real-ip");
-  return forwardedFor?.split(",")[0]?.trim() || realIp?.trim() || "";
+  if (forwardedFor) {
+    const parts = forwardedFor
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1]!;
+  }
+  return "";
 }
 
 export async function verifyBearerFromRequest(
@@ -117,9 +146,10 @@ export function requireCronSecret(request: Request): NextResponse | null {
   if (!cronSecret) {
     return NextResponse.json({ ok: false, error: "CRON_SECRET non configuré." }, { status: 503 });
   }
-  const bearer = request.headers.get("authorization")?.trim();
-  const headerSecret = request.headers.get("x-cron-secret")?.trim();
-  if (bearer === `Bearer ${cronSecret}` || headerSecret === cronSecret) return null;
+  const bearer = request.headers.get("authorization")?.trim() ?? "";
+  const headerSecret = request.headers.get("x-cron-secret")?.trim() ?? "";
+  const expectedBearer = `Bearer ${cronSecret}`;
+  if (safeEqual(bearer, expectedBearer) || safeEqual(headerSecret, cronSecret)) return null;
   return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
 }
 
@@ -129,8 +159,8 @@ export function requireCronSecret(request: Request): NextResponse | null {
  */
 export async function authorizeProcessUploads(request: Request): Promise<boolean> {
   const secret = process.env.UPLOAD_AUTO_PROCESS_SECRET?.trim();
-  const hdr = request.headers.get("x-upload-auto-secret")?.trim();
-  if (secret && hdr === secret) return true;
+  const hdr = request.headers.get("x-upload-auto-secret")?.trim() ?? "";
+  if (secret && safeEqual(hdr, secret)) return true;
 
   if (await verifyBearerFromRequest(request)) return true;
 
@@ -152,10 +182,10 @@ export async function authorizeProcessUploads(request: Request): Promise<boolean
  */
 export async function authorizeAudioDispatch(request: Request): Promise<boolean> {
   const secret = process.env.AUDIO_DISPATCH_SECRET?.trim();
-  const dispatchHdr = request.headers.get("x-audio-dispatch-secret")?.trim();
+  const dispatchHdr = request.headers.get("x-audio-dispatch-secret")?.trim() ?? "";
 
   if (secret) {
-    if (dispatchHdr === secret) return true;
+    if (safeEqual(dispatchHdr, secret)) return true;
     return (await verifyBearerFromRequest(request)) !== null;
   }
 
@@ -182,8 +212,9 @@ export function requireInboundWebhookSecret(
   const url = new URL(request.url);
   const provided =
     url.searchParams.get("secret")?.trim() ||
-    request.headers.get("x-inbound-webhook-secret")?.trim();
-  if (provided !== expected) {
+    request.headers.get("x-inbound-webhook-secret")?.trim() ||
+    "";
+  if (!safeEqual(provided, expected)) {
     return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
   }
   return null;

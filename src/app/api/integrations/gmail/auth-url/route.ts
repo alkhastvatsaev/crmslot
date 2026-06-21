@@ -7,6 +7,7 @@ import {
   isGmailOAuthClientConfigured,
 } from "@/core/services/email/gmailOAuthConfig";
 import { setGmailHubDisconnectedCookie } from "@/core/services/email/gmailHubSession";
+import { issueGmailOAuthState } from "@/core/services/email/gmailOAuthState";
 
 export const runtime = "nodejs";
 
@@ -27,13 +28,28 @@ export async function GET(req: NextRequest) {
 
   const { clientId, clientSecret, redirectUri } = getGmailOAuthConfig();
   const oauth2 = new OAuth2Client(clientId, clientSecret, redirectUri);
+  const res = NextResponse.json({ url: "" });
+  let state: string;
+  try {
+    state = issueGmailOAuthState(res, auth.uid);
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error:
+          err instanceof Error
+            ? err.message
+            : "GMAIL_OAUTH_STATE_SECRET non configuré (anti-CSRF).",
+      },
+      { status: 500 }
+    );
+  }
   const url = oauth2.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
     scope: [...GMAIL_HUB_SCOPES],
+    state,
   });
 
-  const res = NextResponse.json({ url });
   setGmailHubDisconnectedCookie(res, false);
-  return res;
+  return NextResponse.json({ url }, { headers: res.headers });
 }

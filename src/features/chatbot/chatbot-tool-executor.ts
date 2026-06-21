@@ -86,6 +86,30 @@ function requireConfirmed(name: string, input: Record<string, unknown>): void {
   }
 }
 
+/**
+ * Tools qui mutent la facturation / champs sensibles (paymentStatus, invoiceAmountCents…).
+ * Côté firestore.rules ces champs sont réservés au rôle `admin` via `interventionSensitiveBillingUnchanged`,
+ * mais le chatbot passe par l'Admin SDK et contourne ces rules. On reproduit donc le check serveur.
+ *
+ * Le path `confirmTool` permet de forcer `userConfirmed: true` côté client — sans ce garde-fou,
+ * un collaborateur pourrait modifier les montants ou marquer paid sans Stripe.
+ */
+const CHATBOT_ADMIN_ONLY_TOOLS = new Set<string>([
+  "patch_intervention_billing",
+  "update_intervention_billing",
+  "append_intervention_billing_lines",
+  "approve_material_orders",
+]);
+
+function requireAdminRoleForSensitiveTool(name: string, ctx: ChatbotToolContext): void {
+  if (!CHATBOT_ADMIN_ONLY_TOOLS.has(name)) return;
+  if (ctx.role !== "admin") {
+    throw new Error(
+      "Action refusée : seul un administrateur de la société peut modifier la facturation."
+    );
+  }
+}
+
 export async function executeChatbotTool(
   name: string,
   rawInput: unknown,
@@ -96,6 +120,7 @@ export async function executeChatbotTool(
     unknown
   >;
   requireConfirmed(name, input);
+  requireAdminRoleForSensitiveTool(name, ctx);
   const result = await executeChatbotToolImpl(name, input, ctx);
   void logCrmFromChatbotTool(name, input, result, ctx);
   return result;

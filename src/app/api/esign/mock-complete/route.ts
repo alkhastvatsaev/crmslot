@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { blockIfProduction } from "@/core/api/routeAuth";
 import { parseMockSignRequestId } from "@/features/esign/parseMockSignRequestId";
 
 export const runtime = "nodejs";
@@ -10,8 +11,16 @@ type Body = {
   status?: "signed" | "declined";
 };
 
-/** Finalise une signature mock initiée depuis `/suivi/sign-mock` (portail public). */
+/**
+ * Finalise une signature mock initiée depuis `/suivi/sign-mock` (portail public).
+ * UNIQUEMENT en dev/preview : en production le vrai webhook signé `webhooks/esign` prend le relais.
+ * Sans ce garde-fou, quiconque devine `interventionId` + `Date.now()` d'initiation peut
+ * valider une signature légale sans authentification.
+ */
 export async function POST(request: Request) {
+  const blocked = blockIfProduction();
+  if (blocked) return blocked;
+
   let body: Body = {};
   try {
     body = (await request.json()) as Body;

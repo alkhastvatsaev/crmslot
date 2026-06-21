@@ -13,13 +13,29 @@ function digitsOnly(phone: string): string {
 
 function phonesMatch(a: string | undefined, b: string | undefined): boolean {
   if (!a || !b) return false;
-  const da = digitsOnly(a);
-  const db = digitsOnly(b);
+  const ta = a.trim();
+  const tb = b.trim();
+  const da = digitsOnly(ta);
+  const db = digitsOnly(tb);
+  if (!da || !db) return false;
   if (da === db) return true;
-  // Tolère préfixes pays différents si suffixe suffisant
-  return (
-    da.length >= 9 && db.length >= 9 && (da.endsWith(db.slice(-9)) || db.endsWith(da.slice(-9)))
-  );
+
+  // Si les deux sont en E.164 (préfixés +), exiger égalité stricte des digits —
+  // tolérer un suffixe commun ouvrait à des collisions inter-pays (cf. audit sécurité).
+  if (ta.startsWith("+") && tb.startsWith("+")) return false;
+
+  // Fallback : un seul des deux est en E.164. On compare le numéro local au suffixe
+  // de l'E.164 — mais on exige une longueur locale réaliste (≥ 9 digits) ET on retire
+  // les zéros de tête nationaux (0 6 12 34 56 78 → 612345678) pour éviter les collisions.
+  const stripLeadingZero = (s: string) => s.replace(/^0+/, "");
+  const localA = ta.startsWith("+") ? null : stripLeadingZero(da);
+  const localB = tb.startsWith("+") ? null : stripLeadingZero(db);
+  const e164A = ta.startsWith("+") ? da : null;
+  const e164B = tb.startsWith("+") ? db : null;
+
+  if (localA && e164B && localA.length >= 9) return e164B.endsWith(localA);
+  if (localB && e164A && localB.length >= 9) return e164A.endsWith(localB);
+  return false;
 }
 
 /**

@@ -30,7 +30,7 @@ function buildDbMock(params: {
 }
 
 describe("verifyPortalAccessAdmin", () => {
-  it("retourne les dossiers avec le numéro seul", async () => {
+  it("avec le numéro seul ne retourne que le dossier matché (pas d'expansion par e-mail)", async () => {
     const { db } = buildDbMock({
       codeDocs: [
         {
@@ -71,6 +71,54 @@ describe("verifyPortalAccessAdmin", () => {
     const result = await verifyPortalAccessAdmin({
       db: db as never,
       code: "ABCD 1234",
+    });
+
+    expect(result.emailNormalized).toBe("client@example.com");
+    expect(result.interventions.map((row) => row.id)).toEqual(["iv-1"]);
+  });
+
+  it("avec le numéro + e-mail valide étend à tous les dossiers du même e-mail", async () => {
+    const { db } = buildDbMock({
+      codeDocs: [
+        {
+          id: "iv-1",
+          data: {
+            portalAccessCode: "ABCD1234",
+            clientEmail: "client@example.com",
+            status: "pending",
+            title: "Porte claquée",
+            createdAt: "2026-06-01T10:00:00.000Z",
+          },
+        },
+      ],
+      emailDocs: [
+        {
+          id: "iv-1",
+          data: {
+            clientEmail: "client@example.com",
+            clientEmailNormalized: "client@example.com",
+            status: "pending",
+            title: "Porte claquée",
+            createdAt: "2026-06-01T10:00:00.000Z",
+          },
+        },
+        {
+          id: "iv-2",
+          data: {
+            clientEmail: "client@example.com",
+            clientEmailNormalized: "client@example.com",
+            status: "assigned",
+            title: "Serrure bloquée",
+            createdAt: "2026-05-01T10:00:00.000Z",
+          },
+        },
+      ],
+    });
+
+    const result = await verifyPortalAccessAdmin({
+      db: db as never,
+      code: "ABCD 1234",
+      email: "client@example.com",
     });
 
     expect(result.emailNormalized).toBe("client@example.com");

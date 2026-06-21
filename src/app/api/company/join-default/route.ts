@@ -73,6 +73,16 @@ export async function POST(req: Request) {
     options = undefined;
   }
 
+  // En production, ce endpoint self-service ne peut jamais provisionner un rôle "admin".
+  // Le flag ALLOW_OPEN_STAFF_JOIN permet l'auto-onboarding technicien uniquement —
+  // l'admin doit promouvoir explicitement via un autre flow.
+  if (isProductionNodeEnv() && options?.staffKind !== "technician") {
+    return NextResponse.json(
+      { ok: false, error: "Inscription staff ouverte limitée aux techniciens en production." },
+      { status: 403 }
+    );
+  }
+
   const result = await joinDefaultCompanyMembership(
     admin.firestore(),
     admin.auth,

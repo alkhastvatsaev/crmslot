@@ -39,10 +39,12 @@ function buildCsp(): string {
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
     // 'unsafe-inline' temporaire — Next.js inline les hash de boot ; on durcira avec un nonce ensuite.
+    // 'unsafe-eval' retiré : aucune lib runtime (Firebase, Mapbox, Stripe, Sentry) n'en a besoin.
+    // Si une dépendance échoue après durcissement, l'ajouter via `CSP_ALLOW_UNSAFE_EVAL=true`.
     "script-src": [
       "'self'",
       "'unsafe-inline'",
-      "'unsafe-eval'",
+      ...(process.env.CSP_ALLOW_UNSAFE_EVAL === "true" ? ["'unsafe-eval'"] : []),
       "https://js.stripe.com",
       "https://*.firebaseapp.com",
       "https://apis.google.com",
