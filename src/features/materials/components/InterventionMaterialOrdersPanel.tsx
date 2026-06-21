@@ -1,16 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Package, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { auth, firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import MaterialPartSuggestions from "@/features/materials/components/MaterialPartSuggestions";
 import { MaterialOrderForm } from "@/features/materials/components/MaterialOrderForm";
 import { createMaterialOrder } from "@/features/materials/createMaterialOrder";
 import { updateMaterialOrderStatus } from "@/features/materials/materialOrderFirestore";
+import { enrichMaterialPartSuggestions } from "@/features/materials/matchStockCatalogItem";
+import { orderInterventionPartViaMaterialAgent } from "@/features/materials/orderInterventionPartViaMaterialAgent";
+import { suggestMaterialPartsFromIntervention } from "@/features/materials/suggestMaterialPartsFromIntervention";
 import { useMaterialOrders } from "@/features/materials/useMaterialOrders";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
 import type { Intervention } from "@/features/interventions/types";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useCompanyStockItems } from "@/features/featureHub/hooks/useCompanyStockItems";
 import {
   dispatcherTransitionActor,
   technicianTransitionActor,
@@ -25,6 +31,9 @@ type Props = {
     | "assignedTechnicianUid"
     | "createdByUid"
     | "title"
+    | "problem"
+    | "transcription"
+    | "category"
     | "clientFirstName"
     | "clientLastName"
     | "clientName"
@@ -35,6 +44,10 @@ type Props = {
   allowStatusUpdate?: boolean;
   expanded?: boolean;
   onExpandedChange?: (v: boolean) => void;
+  defaultExpanded?: boolean;
+  showPartSuggestions?: boolean;
+  /** Commande via agent matériel (page Matériel) au clic sur une suggestion. */
+  orderSuggestionsViaAgent?: boolean;
   compact?: boolean;
 };
 
@@ -47,12 +60,24 @@ export default function InterventionMaterialOrdersPanel({
   allowStatusUpdate = false,
   expanded: controlledExpanded,
   onExpandedChange,
+  defaultExpanded = false,
+  showPartSuggestions = true,
+  orderSuggestionsViaAgent = true,
   compact = false,
 }: Props) {
   const { t } = useTranslation();
+  const pager = useDashboardPagerOptional();
   const { orders, loading } = useMaterialOrders(intervention.id);
-  const [internalExpanded, setInternalExpanded] = useState(false);
+  const { items: stockItems } = useCompanyStockItems(intervention.companyId ?? null);
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const [showForm, setShowForm] = useState(false);
+  const [formInitialParts, setFormInitialParts] = useState<MaterialOrderPart[] | undefined>();
+
+  const suggestions = useMemo(() => {
+    if (!showPartSuggestions) return [];
+    const raw = suggestMaterialPartsFromIntervention(intervention);
+    return enrichMaterialPartSuggestions(raw, stockItems);
+  }, [intervention, showPartSuggestions, stockItems]);
 
   const panelExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
 
@@ -79,11 +104,25 @@ export default function InterventionMaterialOrdersPanel({
         setWaitingMaterial: !allowStatusUpdate,
       });
       setShowForm(false);
+      setFormInitialParts(undefined);
       if (onExpandedChange) onExpandedChange(true);
       else setInternalExpanded(true);
       toast.success(String(t("materials.order_created")));
     },
-    [intervention, technicianUid, allowStatusUpdate, t]
+    [intervention, technicianUid, allowStatusUpdate, onExpandedChange, t]
+  );
+
+  const handleOrderSuggestion = useCallback(
+    (part: (typeof suggestions)[number]) => {
+      if (orderSuggestionsViaAgent) {
+        orderInterventionPartViaMaterialAgent(pager, intervention, part);
+        toast.message(String(t("materials.suggestions.opening_agent")));
+        return;
+      }
+      setFormInitialParts([part]);
+      setShowForm(true);
+    },
+    [intervention, orderSuggestionsViaAgent, pager, t]
   );
 
   const handleStatus = async (orderId: string, status: MaterialOrder["status"]) => {
@@ -140,10 +179,17 @@ export default function InterventionMaterialOrdersPanel({
               : "space-y-3 rounded-[18px] border border-slate-100 bg-white p-4"
           }
         >
+          {allowCreate && showPartSuggestions && !showForm && suggestions.length > 0 ? (
+            <MaterialPartSuggestions
+              suggestions={suggestions}
+              stockItems={stockItems}
+              onOrderPart={handleOrderSuggestion}
+            />
+          ) : null}
           {loading && orders.length === 0 ? (
             <p className="text-center text-[12px] text-slate-400">{t("common.loading")}</p>
           ) : null}
-          {orders.length === 0 && !loading && !showForm ? (
+          {orders.length === 0 && !loading && !showForm && suggestions.length === 0 ? (
             <p className="text-center text-[12px] text-slate-400">{t("materials.empty")}</p>
           ) : null}
           <ul className="space-y-2" data-testid="material-orders-list">
@@ -198,7 +244,10 @@ export default function InterventionMaterialOrdersPanel({
             <button
               type="button"
               data-testid="material-order-new"
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setFormInitialParts(undefined);
+                setShowForm(true);
+              }}
               className="w-full rounded-[12px] py-2.5 text-[12px] font-bold text-blue-600 hover:bg-blue-50"
             >
               {t("materials.new_order")}
@@ -206,10 +255,15 @@ export default function InterventionMaterialOrdersPanel({
           ) : null}
           {allowCreate && showForm ? (
             <MaterialOrderForm
+              key={formInitialParts?.map((p) => p.description).join("|") ?? "blank"}
               interventionId={intervention.id}
               technicianUid={technicianUid}
+              initialParts={formInitialParts}
               onSubmitOrder={handleSubmit}
-              onCancel={() => setShowForm(false)}
+              onCancel={() => {
+                setShowForm(false);
+                setFormInitialParts(undefined);
+              }}
             />
           ) : null}
         </div>
