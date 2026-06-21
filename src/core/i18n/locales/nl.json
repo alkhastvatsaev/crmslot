@@ -160,7 +160,9 @@
     },
     "suggestions": {
       "title": "Voorgestelde onderdelen",
-      "use": "Bestelling invullen"
+      "use": "Bestelling invullen",
+      "tap_to_order": "Tik op een onderdeel om Materiaal te openen en via de agent te bestellen.",
+      "opening_agent": "Materiaalagent openen…"
     }
   },
   "commissions": {
@@ -1109,6 +1111,27 @@
       "recurring_client": "Dossiers van deze klant"
     },
     "no_date": "Nog niet ingepland",
+    "list": {
+      "group": {
+        "overdue": "Te laat",
+        "today": "Vandaag",
+        "tomorrow": "Morgen",
+        "this_week": "Deze week",
+        "later": "Later",
+        "no_date": "Geen datum",
+        "older": "Ouder"
+      }
+    },
+    "dashboard": {
+      "title": "Vandaag",
+      "hint": "Tik in het midden op een dossier om het af te handelen.",
+      "to_assign_today": "Toe te wijzen",
+      "to_invoice": "Te factureren",
+      "to_invoice_potential": "Potentieel {{amount}}",
+      "unpaid_overdue": "Onbetaald > 14 d",
+      "calm_title": "Niets dringend.",
+      "calm_hint": "Je kan ademhalen."
+    },
     "steps": {
       "overview_title": "Mijn wachtrij",
       "overview_hint": "Kies een categorie om de lijst te openen.",

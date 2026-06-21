@@ -160,7 +160,9 @@
     },
     "suggestions": {
       "title": "Suggested parts",
-      "use": "Pre-fill order"
+      "use": "Pre-fill order",
+      "tap_to_order": "Tap a part to open Materials and order via the agent.",
+      "opening_agent": "Opening material agent…"
     }
   },
   "commissions": {
@@ -1109,6 +1111,27 @@
       "recurring_client": "Cases with this client"
     },
     "no_date": "Not scheduled yet",
+    "list": {
+      "group": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "this_week": "This week",
+        "later": "Later",
+        "no_date": "No date",
+        "older": "Older"
+      }
+    },
+    "dashboard": {
+      "title": "Today",
+      "hint": "Tap a case in the middle to handle it.",
+      "to_assign_today": "To assign",
+      "to_invoice": "To invoice",
+      "to_invoice_potential": "Potential {{amount}}",
+      "unpaid_overdue": "Unpaid > 14 d",
+      "calm_title": "Nothing urgent.",
+      "calm_hint": "You can breathe."
+    },
     "steps": {
       "overview_title": "My queue",
       "overview_hint": "Pick a bucket to open its list.",
