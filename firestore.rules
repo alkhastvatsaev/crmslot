@@ -152,7 +152,10 @@ service cloud.firestore {
       allow create: if isAuthed()
         && request.resource.data.createdByUid == request.auth.uid
         && request.resource.data.keys().hasAll(['name', 'createdAt', 'createdByUid']);
-      allow update: if isAuthed() && resource.data.createdByUid == request.auth.uid;
+      // createdByUid est IMMUTABLE — empêche un takeover de société par réécriture du propriétaire.
+      allow update: if isAuthed()
+        && resource.data.createdByUid == request.auth.uid
+        && request.resource.data.createdByUid == resource.data.createdByUid;
       allow delete: if false;
 
       match /billing/{docId} {
@@ -360,6 +363,28 @@ service cloud.firestore {
         || allowedUsersPhoneMatchesIvanaCompany(data.companyId);
     }
 
+    /**
+     * À la création, `assignedTechnicianUid` ne peut être que :
+     *  - absent / null / vide
+     *  - le créateur lui-même (auto-assignation technicien)
+     *  - un membre de la même société (vérifié via memberships)
+     * Empêche un staff de société A de pré-assigner une intervention au technicien de B,
+     * ce qui ouvrirait `canReadInterventionAsAssignee` cross-tenant.
+     */
+    function interventionCreateAssignmentAllowed(data) {
+      return !data.keys().hasAny(['assignedTechnicianUid'])
+        || data.assignedTechnicianUid == null
+        || data.assignedTechnicianUid == ''
+        || data.assignedTechnicianUid == request.auth.uid
+        || (
+          data.keys().hasAny(['companyId'])
+          && data.companyId is string
+          && data.companyId.size() > 0
+          && data.assignedTechnicianUid is string
+          && exists(/databases/$(database)/documents/users/$(data.assignedTechnicianUid)/company_memberships/$(data.companyId))
+        );
+    }
+
     /** Facturation / commissions : réservés admin tenant ou membership (webhook Stripe = Admin SDK). */
     function interventionSensitiveBillingUnchanged() {
       return !request.resource.data.diff(resource.data).changedKeys().hasAny([
@@ -536,7 +561,8 @@ service cloud.firestore {
       allow create: if isAuthed()
         && request.resource.data.keys().hasAny(['createdByUid'])
         && request.resource.data.createdByUid == request.auth.uid
-        && interventionCreateTenantAllowed(request.resource.data);
+        && interventionCreateTenantAllowed(request.resource.data)
+        && interventionCreateAssignmentAllowed(request.resource.data);
 
       allow update: if isAuthed() && (
         canUpdateInterventionAsTenantStaff()
@@ -555,7 +581,10 @@ service cloud.firestore {
       }
 
       match /timeline_events/{eventId} {
-        allow read: if isAuthed();
+        // Lecture scopée au tenant : staff de la société, créateur, ou technicien assigné.
+        // Avant : `isAuthed()` permettait à tout user authentifié de lire les commentaires
+        // de n'importe quelle intervention dont il connaissait l'ID.
+        allow read: if canReadInterventionSubresource(docId);
         allow create: if isAuthed()
           && request.resource.data.interventionId == docId
           && request.resource.data.createdByUid == request.auth.uid
@@ -600,8 +629,22 @@ service cloud.firestore {
         && request.auth.uid == uid
         && request.resource.data.uid == uid
         && (
+          // Pas de modif de companyId.
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['companyId'])
-          || request.resource.data.companyId == resource.data.companyId
+          // OU companyId déjà set et inchangé.
+          || (
+            resource.data.keys().hasAny(['companyId'])
+            && resource.data.companyId is string
+            && resource.data.companyId.size() > 0
+            && request.resource.data.companyId == resource.data.companyId
+          )
+          // OU nouveau companyId (1re affectation) — re-vérifier la whitelist allowed_users.
+          // Évite qu'un profil créé sans companyId puisse être "élevé" plus tard vers une société arbitraire.
+          || (
+            request.resource.data.companyId is string
+            && request.resource.data.companyId.size() > 0
+            && allowedUsersPhoneMatchesIvanaCompany(request.resource.data.companyId)
+          )
         );
       allow delete: if false;
     }
@@ -838,6 +881,17 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    /** Admin de la société uniquement (via membership OU bmTenants). */
+    function isCompanyAdmin(companyId) {
+      return isAuthed()
+        && companyId is string
+        && companyId.size() > 0
+        && (
+          (userBelongsToCompany(companyId) && userRoleInCompany(companyId) == 'admin')
+          || (isCompanyPortalUser() && request.auth.token.bmTenants.hasAny([companyId + ':admin']))
+        );
+    }
+
     match /clients/{clientId} {
       allow read: if isAuthed()
         && resource.data.companyId is string
@@ -858,12 +912,8 @@ service cloud.firestore {
           userBelongsToCompany(resource.data.companyId)
           || tenantClaimsIncludeCompany(resource.data.companyId)
         );
-      allow delete: if isAuthed()
-        && resource.data.companyId is string
-        && (
-          userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId)
-        );
+      // Suppression réservée admin — évite la suppression massive par un collaborateur.
+      allow delete: if isCompanyAdmin(resource.data.companyId);
     }
 
     match /sites/{siteId} {
@@ -886,12 +936,7 @@ service cloud.firestore {
           userBelongsToCompany(resource.data.companyId)
           || tenantClaimsIncludeCompany(resource.data.companyId)
         );
-      allow delete: if isAuthed()
-        && resource.data.companyId is string
-        && (
-          userBelongsToCompany(resource.data.companyId)
-          || tenantClaimsIncludeCompany(resource.data.companyId)
-        );
+      allow delete: if isCompanyAdmin(resource.data.companyId);
     }
 
     /** Jetons OAuth Gmail (Admin SDK uniquement). */
