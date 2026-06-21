@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import "@/core/config/firebase-admin";
 import { isProductionNodeEnv } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
 
 export const runtime = "nodejs";
 
@@ -86,6 +87,22 @@ export async function POST(request: Request) {
     createdByUid: "esign-webhook",
     companyId,
   });
+
+  if (companyId) {
+    const title = typeof data.title === "string" ? data.title : "Dossier";
+    void notifyCompanyAdminsPush({
+      companyId,
+      title: status === "signed" ? "Rapport signé" : "Signature refusée",
+      body:
+        status === "signed"
+          ? `${title} — prêt à facturer`
+          : `${title} — signature refusée par le client`,
+      data: {
+        type: status === "signed" ? "esign_signed" : "esign_declined",
+        bmInterventionId: interventionId,
+      },
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ received: true });
 }

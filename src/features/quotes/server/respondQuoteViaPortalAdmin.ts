@@ -5,6 +5,7 @@ import {
 } from "@/features/quotes/server/acceptQuoteAdmin";
 import { declineQuoteAdmin } from "@/features/quotes/server/declineQuoteAdmin";
 import { findInterventionByPortalToken } from "@/features/interventions/server/portalLookupAdmin";
+import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
 import type { Quote } from "@/features/quotes/types";
 
 export type PortalQuoteRespondAction = "accept" | "decline";
@@ -79,6 +80,8 @@ export async function respondQuoteViaPortalAdmin(params: {
 
   await loadQuoteForPortal(db, companyId, quoteId, iv.id);
 
+  const ivTitle = (iv.title ?? "Dossier").trim() || "Dossier";
+
   if (action === "accept") {
     const result = await acceptQuoteAdmin({
       db,
@@ -92,10 +95,32 @@ export async function respondQuoteViaPortalAdmin(params: {
       companyId,
       "Devis accepté par le client via le portail"
     );
+    // Admin doit transformer en intervention / lancer la suite.
+    void notifyCompanyAdminsPush({
+      companyId,
+      title: "Devis accepté",
+      body: `${ivTitle} — à transformer en intervention`,
+      data: {
+        type: "quote_accepted",
+        bmInterventionId: iv.id,
+        quoteId,
+      },
+    }).catch(() => {});
     return { action: "accept", ...result };
   }
 
   await declineQuoteAdmin({ db, companyId, quoteId });
   await logPortalQuoteTimeline(db, iv.id, companyId, "Devis refusé par le client via le portail");
+  // Admin doit relancer / proposer alternative.
+  void notifyCompanyAdminsPush({
+    companyId,
+    title: "Devis refusé",
+    body: `${ivTitle} — relance commerciale`,
+    data: {
+      type: "quote_declined",
+      bmInterventionId: iv.id,
+      quoteId,
+    },
+  }).catch(() => {});
   return { action: "decline" };
 }
