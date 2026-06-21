@@ -1,4 +1,5 @@
 import type * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import {
   COMMISSION_RULES_COLLECTION,
   COMMISSION_RULE_AUDIT_COLLECTION,
@@ -50,7 +51,7 @@ async function appendRuleAuditAdmin(
       targetId: params.snapshot?.targetId ?? null,
       valueType: params.snapshot?.valueType ?? null,
       value: params.snapshot?.value ?? null,
-      at: admin.firestore.FieldValue.serverTimestamp(),
+      at: FieldValue.serverTimestamp(),
     });
   } catch {
     /* audit best-effort */
