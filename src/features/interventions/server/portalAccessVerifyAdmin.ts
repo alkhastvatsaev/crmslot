@@ -103,7 +103,9 @@ export async function verifyPortalAccessAdmin(params: {
     toPortalAccessCase(docSnap.id, docSnap.data() as Intervention)
   );
 
-  if (primaryEmail && isValidPortalEmail(primaryEmail)) {
+  // Expansion vers tous les dossiers du même e-mail UNIQUEMENT si le visiteur
+  // a prouvé qu'il connaît cet e-mail. Code seul → on ne révèle que le dossier matché.
+  if (emailFilter && primaryEmail && isValidPortalEmail(primaryEmail)) {
     const emailSnap = await params.db
       .collection("interventions")
       .where("clientEmailNormalized", "==", primaryEmail)
