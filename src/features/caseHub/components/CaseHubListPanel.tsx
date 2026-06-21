@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Intervention } from "@/features/interventions/types";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
-import { bucketForStatus } from "@/features/caseHub/caseHubPatronMetrics";
+import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 
 const BUCKET_BORDER: Record<CaseHubBucket, string> = {
@@ -14,6 +14,7 @@ const BUCKET_BORDER: Record<CaseHubBucket, string> = {
   waiting: "border-l-amber-500",
   to_invoice: "border-l-emerald-500",
   invoiced: "border-l-green-500",
+  paid: "border-l-teal-500",
   cancelled: "border-l-slate-400",
   all: "border-l-slate-300",
 };
@@ -60,9 +61,12 @@ export default function CaseHubListPanel({ interventions, selectedId, loading, o
         const active = iv.id === selectedId;
         const label = resolveInterventionClientName(iv) || iv.title || iv.id.slice(0, 8);
         const status = iv.status ?? "pending";
-        const bucket = bucketForStatus(status);
+        const bucket = bucketForIntervention(iv);
         const when = iv.scheduledDate ?? iv.requestedDate ?? null;
-        const action = t(`caseHub.next_action.${status}` as "caseHub.next_action.pending");
+        const action =
+          bucket === "paid"
+            ? t("caseHub.next_action.paid")
+            : t(`caseHub.next_action.${status}` as "caseHub.next_action.pending");
 
         return (
           <li key={iv.id}>

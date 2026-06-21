@@ -4,6 +4,7 @@ export type CaseHubBucket =
   | "waiting"
   | "to_invoice"
   | "invoiced"
+  | "paid"
   | "cancelled"
   | "all";
 

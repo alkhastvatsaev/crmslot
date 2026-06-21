@@ -1,51 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HUB_SURFACE } from "@/core/ui/hub";
 import UnifiedInterventionDrawer, {
   type UnifiedDrawerTab,
 } from "@/features/interventions/components/UnifiedInterventionDrawer";
 import CaseHubDetailSectionMenu from "@/features/caseHub/components/CaseHubDetailSectionMenu";
 import CaseHubDetailActions from "@/features/caseHub/components/CaseHubDetailActions";
-import CaseHubDetailAudio from "@/features/caseHub/components/CaseHubDetailAudio";
-import CaseHubDetailBilling from "@/features/caseHub/components/CaseHubDetailBilling";
-import CaseHubDetailEquipment from "@/features/caseHub/components/CaseHubDetailEquipment";
-import CaseHubDetailFacts from "@/features/caseHub/components/CaseHubDetailFacts";
-import CaseHubDetailInsights from "@/features/caseHub/components/CaseHubDetailInsights";
-import CaseHubDetailSummary from "@/features/caseHub/components/CaseHubDetailSummary";
+import CaseHubDetailMedia from "@/features/caseHub/components/CaseHubDetailMedia";
+import CaseHubDetailPulse from "@/features/caseHub/components/CaseHubDetailPulse";
+import CaseHubDetailSituation from "@/features/caseHub/components/CaseHubDetailSituation";
+import CaseHubDetailStep from "@/features/caseHub/components/CaseHubDetailStep";
+import { CASE_HUB_DETAIL } from "@/features/caseHub/caseHubDetailTheme";
 import { buildCaseHubDetailSnapshot } from "@/features/caseHub/caseHubInterventionDetail";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useTechnicians } from "@/features/technicians/hooks";
 import type { Intervention } from "@/features/interventions/types";
-import { bucketForStatus } from "@/features/caseHub/caseHubPatronMetrics";
+import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 
 type Props = {
   intervention: Intervention | null;
   peerInterventions: Intervention[];
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  pending: "bg-slate-100 text-slate-700 border-slate-200",
-  assigned: "bg-blue-100 text-blue-700 border-blue-200",
-  en_route: "bg-indigo-100 text-indigo-700 border-indigo-200",
-  in_progress: "bg-violet-100 text-violet-700 border-violet-200",
-  waiting_material: "bg-amber-100 text-amber-800 border-amber-200",
-  done: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  invoiced: "bg-green-100 text-green-800 border-green-200",
-  cancelled: "bg-red-100 text-red-600 border-red-200",
-  pending_needs_address: "bg-orange-100 text-orange-800 border-orange-200",
-};
-
-const NEXT_ACTION_TONE: Record<CaseHubBucket, string> = {
-  to_assign: "bg-rose-50 border-rose-200 text-rose-900",
-  in_progress: "bg-violet-50 border-violet-200 text-violet-900",
-  waiting: "bg-amber-50 border-amber-200 text-amber-900",
-  to_invoice: "bg-emerald-50 border-emerald-200 text-emerald-900",
-  invoiced: "bg-green-50 border-green-200 text-green-900",
-  cancelled: "bg-slate-50 border-slate-200 text-slate-700",
-  all: "bg-slate-50 border-slate-200 text-slate-700",
 };
 
 const TAB_FOR_BUCKET: Record<CaseHubBucket, UnifiedDrawerTab> = {
@@ -54,6 +31,7 @@ const TAB_FOR_BUCKET: Record<CaseHubBucket, UnifiedDrawerTab> = {
   waiting: "materials",
   to_invoice: "billing",
   invoiced: "billing",
+  paid: "billing",
   cancelled: "timeline",
   all: "timeline",
 };
@@ -65,8 +43,8 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
 
   useEffect(() => {
     if (!intervention) return;
-    setDrawerTab(TAB_FOR_BUCKET[bucketForStatus(intervention.status)]);
-  }, [intervention?.id]);
+    setDrawerTab(TAB_FOR_BUCKET[bucketForIntervention(intervention)]);
+  }, [intervention?.id, intervention?.paymentStatus, intervention?.status]);
 
   const techName = useMemo(() => {
     const uid = intervention?.assignedTechnicianUid?.trim();
@@ -79,12 +57,10 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
     return (
       <div
         data-testid="case-hub-right-panel"
-        className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", CASE_HUB_DETAIL.panel)}
       >
-        <div
-          data-testid="case-hub-empty-detail"
-          className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center text-[12px] text-slate-400"
-        >
+        <div data-testid="case-hub-empty-detail" className={CASE_HUB_DETAIL.empty}>
+          <div className={CASE_HUB_DETAIL.emptyOrb} aria-hidden />
           {t("caseHub.pick_case")}
         </div>
       </div>
@@ -93,26 +69,28 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
 
   const snapshot = buildCaseHubDetailSnapshot(intervention, peerInterventions);
   const status = intervention.status ?? "pending";
-  const bucket = bucketForStatus(status);
+  const bucket = bucketForIntervention(intervention);
   const statusLabel = t(`caseHub.status.${status}` as "caseHub.status.pending");
-  const nextAction = t(`caseHub.next_action.${status}` as "caseHub.next_action.pending");
+  const nextAction =
+    bucket === "paid"
+      ? t("caseHub.next_action.paid")
+      : t(`caseHub.next_action.${status}` as "caseHub.next_action.pending");
   const defaultTab = TAB_FOR_BUCKET[bucket];
 
   return (
     <div
       data-testid="case-hub-right-panel"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", CASE_HUB_DETAIL.panel)}
     >
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
-        <CaseHubDetailSummary
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4">
+        <CaseHubDetailSituation
           intervention={intervention}
           snapshot={snapshot}
-          techName={techName}
           statusLabel={statusLabel}
-          statusBadgeClass={STATUS_BADGE[status] ?? STATUS_BADGE.pending}
+          nextAction={nextAction}
         />
 
-        <CaseHubDetailInsights insights={snapshot.insights} />
+        <CaseHubDetailPulse snapshot={snapshot} techName={techName} />
 
         <CaseHubDetailActions
           intervention={intervention}
@@ -120,54 +98,37 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
           snapshot={snapshot}
         />
 
-        <CaseHubDetailSectionMenu
-          interventionId={intervention.id}
-          activeTab={drawerTab}
-          onTabChange={setDrawerTab}
-          tabBadges={snapshot.drawerTabBadges}
-        />
-
-        <div className="shrink-0 border-b border-black/[0.05] bg-white px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("caseHub.right.next")}
-          </p>
-          <div
-            data-testid="case-hub-next-action"
-            className={cn(
-              "mt-1 flex items-center gap-2 rounded-2xl border px-3 py-2.5",
-              NEXT_ACTION_TONE[bucket]
-            )}
-          >
-            <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="text-[14px] font-bold">{nextAction}</span>
-          </div>
-        </div>
-
-        <CaseHubDetailAudio intervention={intervention} hasAudio={snapshot.hasAudio} />
-        <CaseHubDetailBilling intervention={intervention} />
-        <CaseHubDetailFacts intervention={intervention} />
-        <CaseHubDetailEquipment intervention={intervention} />
-
-        <div className="px-3 pb-3 pt-2">
-          <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("caseHub.right.details")}
-          </p>
-          <UnifiedInterventionDrawer
-            key={intervention.id}
-            intervention={intervention}
-            technicianUid={intervention.assignedTechnicianUid ?? ""}
-            allowMaterialCreate
-            allowMaterialStatusUpdate
-            defaultTab={defaultTab}
+        <CaseHubDetailStep step={4} title={t("caseHub.pipeline.step_detail")}>
+          <CaseHubDetailSectionMenu
+            interventionId={intervention.id}
             activeTab={drawerTab}
             onTabChange={setDrawerTab}
             tabBadges={snapshot.drawerTabBadges}
-            hideTabBar
-            emailVariant="patron"
-            defaultComposeTo={snapshot.email}
-            className="min-h-[360px] border-0 bg-transparent shadow-none"
           />
-        </div>
+          <div className="mt-3">
+            <UnifiedInterventionDrawer
+              key={intervention.id}
+              intervention={intervention}
+              technicianUid={intervention.assignedTechnicianUid ?? ""}
+              allowMaterialCreate
+              allowMaterialStatusUpdate
+              defaultTab={defaultTab}
+              activeTab={drawerTab}
+              onTabChange={setDrawerTab}
+              tabBadges={snapshot.drawerTabBadges}
+              hideTabBar
+              emailVariant="patron"
+              defaultComposeTo={snapshot.email}
+              className={cn(
+                CASE_HUB_DETAIL.drawerCard,
+                HUB_SURFACE.cardMuted,
+                "min-h-[280px] border-0 bg-slate-50/40 shadow-none"
+              )}
+            />
+          </div>
+        </CaseHubDetailStep>
+
+        <CaseHubDetailMedia intervention={intervention} hasAudio={snapshot.hasAudio} />
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ import {
 export type HubSegmentOption = {
   id: string;
   label: ReactNode;
+  /** Infobulle / aria complémentaire (ex. libellé long). */
+  title?: string;
   /** Count badge shown when > 0 */
   badge?: number;
   badgeAccent?: HubBadgeAccent;
@@ -58,7 +60,9 @@ export default function HubSegmentedControl({
       data-testid="hub-segmented-control"
       className={cn(
         "flex shrink-0 gap-1",
-        isScroll ? "overflow-x-auto border-b border-slate-100 p-2" : HUB_SURFACE.track,
+        isScroll
+          ? "overflow-x-auto p-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          : HUB_SURFACE.track,
         className
       )}
     >
@@ -74,6 +78,7 @@ export default function HubSegmentedControl({
             type="button"
             role="tab"
             aria-selected={active}
+            title={opt.title}
             data-testid={opt.testId}
             onClick={() => onChange(opt.id)}
             className={cn(
@@ -83,10 +88,10 @@ export default function HubSegmentedControl({
               isScroll
                 ? cn(
                     HUB_RADIUS.pill,
-                    "shrink-0 px-3 py-1.5 uppercase tracking-wide",
+                    "shrink-0 whitespace-nowrap px-3 py-2 text-[11px] font-semibold leading-none",
                     active
-                      ? "bg-slate-900 text-white"
-                      : "bg-white text-slate-600 hover:bg-slate-100"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "bg-white text-slate-600 ring-1 ring-inset ring-slate-200/80 hover:bg-slate-50"
                   )
                 : cn(
                     HUB_RADIUS.control,
@@ -98,7 +103,7 @@ export default function HubSegmentedControl({
             )}
           >
             {opt.icon}
-            <span className="text-center">{opt.label}</span>
+            <span className="whitespace-nowrap text-center">{opt.label}</span>
             {showBadge ? (
               <span
                 className={cn(

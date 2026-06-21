@@ -10,7 +10,7 @@ import {
   isInterventionInBackofficeRequestsQueue,
 } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions/types";
-import { bucketForStatus } from "@/features/caseHub/caseHubPatronMetrics";
+import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
 
 export type CaseHubAlertTone = "rose" | "amber" | "sky" | "violet" | "emerald";
@@ -66,13 +66,14 @@ export function canCaseHubAssignTechnician(iv: Intervention): boolean {
 export function buildCaseHubDrawerTabBadges(
   iv: Intervention
 ): Partial<Record<UnifiedDrawerTab, number>> {
-  const bucket = bucketForStatus(iv.status);
+  const bucket = bucketForIntervention(iv);
   const billingCents = interventionBillingTotalCents(iv);
   const payment = iv.paymentStatus ?? "unpaid";
   const badges: Partial<Record<UnifiedDrawerTab, number>> = {};
 
   if (bucket === "waiting") badges.materials = 1;
-  if (bucket === "to_invoice" || (billingCents > 0 && payment !== "paid")) badges.billing = 1;
+  if (bucket === "to_invoice" || (billingCents > 0 && payment !== "paid" && bucket !== "paid"))
+    badges.billing = 1;
   if (!iv.clientId?.trim()) badges.crm = 1;
   if (iv.reportRejectionReason?.trim() || hasPendingTechnicianReportAmendment(iv)) {
     badges.timeline = 1;
@@ -102,7 +103,7 @@ function readProblemPreview(iv: Intervention): string | null {
 export function buildCaseHubAlerts(iv: Intervention): CaseHubAlert[] {
   const alerts: CaseHubAlert[] = [];
   const status = iv.status ?? "pending";
-  const bucket = bucketForStatus(status);
+  const bucket = bucketForIntervention({ status, paymentStatus: iv.paymentStatus });
 
   if (iv.urgency) {
     alerts.push({ id: "urgency", tone: "rose", labelKey: "caseHub.alert.urgency" });
@@ -210,7 +211,7 @@ export function buildCaseHubInsights(
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   const status = iv.status ?? "pending";
-  const bucket = bucketForStatus(status);
+  const bucket = bucketForIntervention({ status, paymentStatus: iv.paymentStatus });
   const insights: CaseHubInsight[] = [];
 
   // 1. Âge du dossier (toujours utile)
@@ -230,7 +231,13 @@ export function buildCaseHubInsights(
 
   // 2. Planning en retard ou imminent
   const scheduled = parseScheduledDate(iv.scheduledDate, iv.scheduledTime);
-  if (scheduled && status !== "cancelled" && bucket !== "to_invoice" && bucket !== "invoiced") {
+  if (
+    scheduled &&
+    status !== "cancelled" &&
+    bucket !== "to_invoice" &&
+    bucket !== "invoiced" &&
+    bucket !== "paid"
+  ) {
     const dayDelta = diffDays(
       today,
       new Date(scheduled.getFullYear(), scheduled.getMonth(), scheduled.getDate())

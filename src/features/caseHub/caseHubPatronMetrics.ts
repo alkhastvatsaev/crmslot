@@ -26,16 +26,25 @@ const ACTIVE_STATUSES = new Set<Intervention["status"]>([
 
 const DONE_STATUSES = new Set<Intervention["status"]>(["done", "invoiced"]);
 
-/** Catégorie patron — l'action à faire, pas un statut technique. */
-export function bucketForStatus(status: Intervention["status"] | undefined): CaseHubBucket {
-  const s = status ?? "pending";
+type BucketInput = Pick<Intervention, "status" | "paymentStatus">;
+
+/** Catégorie patron — l'action à faire, pas un statut technique seul. */
+export function bucketForIntervention(iv: BucketInput): CaseHubBucket {
+  const s = iv.status ?? "pending";
   if (s === "pending" || s === "pending_needs_address") return "to_assign";
   if (s === "assigned" || s === "en_route" || s === "in_progress") return "in_progress";
   if (s === "waiting_material") return "waiting";
   if (s === "done") return "to_invoice";
-  if (s === "invoiced") return "invoiced";
+  if (s === "invoiced") {
+    return iv.paymentStatus === "paid" ? "paid" : "invoiced";
+  }
   if (s === "cancelled") return "cancelled";
   return "all";
+}
+
+/** @deprecated — préférer bucketForIntervention (ignore le paiement). */
+export function bucketForStatus(status: Intervention["status"] | undefined): CaseHubBucket {
+  return bucketForIntervention({ status, paymentStatus: "unpaid" });
 }
 
 /** Plus c'est petit, plus c'est urgent. Sert de tri principal de la file. */
@@ -45,7 +54,8 @@ export const BUCKET_PRIORITY: Record<CaseHubBucket, number> = {
   to_invoice: 2,
   in_progress: 3,
   invoiced: 4,
-  cancelled: 5,
+  paid: 5,
+  cancelled: 6,
   all: 99,
 };
 
@@ -94,7 +104,7 @@ export function filterCaseInterventionsByBucket(
   bucket: CaseHubBucket
 ): Intervention[] {
   if (bucket === "all") return interventions;
-  return interventions.filter((iv) => bucketForStatus(iv.status) === bucket);
+  return interventions.filter((iv) => bucketForIntervention(iv) === bucket);
 }
 
 export function countForBucket(interventions: Intervention[], bucket: CaseHubBucket): number {
@@ -104,8 +114,8 @@ export function countForBucket(interventions: Intervention[], bucket: CaseHubBuc
 /** Tri patron : urgence d'abord (bucket priority), puis date la plus récente. */
 export function sortCaseInterventionsByUrgency(interventions: Intervention[]): Intervention[] {
   return [...interventions].sort((a, b) => {
-    const ba = BUCKET_PRIORITY[bucketForStatus(a.status)];
-    const bb = BUCKET_PRIORITY[bucketForStatus(b.status)];
+    const ba = BUCKET_PRIORITY[bucketForIntervention(a)];
+    const bb = BUCKET_PRIORITY[bucketForIntervention(b)];
     if (ba !== bb) return ba - bb;
     return interventionSortTime(b) - interventionSortTime(a);
   });

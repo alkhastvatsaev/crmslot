@@ -157,6 +157,10 @@
       "template_placeholder": "-- Sélectionner un modèle --",
       "lecot_title": "Vérifier sur Lecot.be",
       "search_lecot_placeholder": "Rechercher sur le catalogue Lecot…"
+    },
+    "suggestions": {
+      "title": "Pièces suggérées",
+      "use": "Pré-remplir la commande"
     }
   },
   "commissions": {
@@ -1016,7 +1020,8 @@
       "to_invoice": "À facturer",
       "invoiced": "Facturés",
       "cancelled": "Annulés",
-      "all": "Tous les dossiers"
+      "all": "Tous les dossiers",
+      "paid": "Paiement reçu"
     },
     "bucket_hint": {
       "to_assign": "Choisis un technicien et envoie-le",
@@ -1058,7 +1063,8 @@
       "waiting_material": "Matériel en attente",
       "done": "Émettre la facture",
       "invoiced": "Suivre le paiement",
-      "cancelled": "Dossier clos"
+      "cancelled": "Dossier clos",
+      "paid": "Paiement reçu"
     },
     "right": {
       "next": "Prochaine étape",
@@ -1081,7 +1087,11 @@
       "audio_failed": "Audio indisponible",
       "billing_preview": "Aperçu facture",
       "equipment": "Matériel client",
-      "insights": "Ce que ça dit"
+      "insights": "Ce que ça dit",
+      "media": "Preuves terrain",
+      "client_photos": "Photos client",
+      "completion_photos": "Photos terrain",
+      "kpi_technician": "Technicien"
     },
     "insight": {
       "case_age": "Ouvert depuis",
@@ -1159,7 +1169,12 @@
       "emails": "E-mails",
       "materials": "Matériel",
       "billing": "Facturation",
-      "crm": "Fiche client"
+      "crm": "Fiche client",
+      "short_timeline": "Fil",
+      "short_emails": "E-mails",
+      "short_materials": "Matériel",
+      "short_billing": "Facture",
+      "short_crm": "Client"
     },
     "emails": {
       "panel_title": "Échanges e-mail",
@@ -1167,6 +1182,13 @@
       "menu_thread": "Voir la conversation",
       "menu_compose": "Nouveau message",
       "menu_reply": "Répondre au client"
+    },
+    "pipeline": {
+      "step_situation": "Situation",
+      "step_act": "Agir",
+      "step_detail": "Détail",
+      "step_state": "État",
+      "step_media": "Pièces"
     }
   },
   "planningHub": {
