@@ -21,20 +21,59 @@ export interface StatusNotificationRule {
 
 /**
  * Règles de notification par changement de statut.
- * Le dispatcher back-office est notifié par inbox alert (Firestore) ; ici on gère
- * uniquement les notifications email/SMS sortantes vers client et technicien.
+ *
+ * Critères d'utilité (pas de spam) :
+ *   - une **action** attendue de la personne notifiée (valider, payer, se préparer,
+ *     reprendre, compléter…) OU une info qu'elle **doit** savoir (annulation, refus).
+ *   - on évite les pushs aux acteurs qui déclenchent eux-mêmes la transition
+ *     (ex : admin notifié quand l'admin assigne → redondant).
+ *   - email/WhatsApp restent les canaux pour les milestones longue trace.
+ *
+ * Audiences :
+ *   - `client`     : demandeur (createdByUid) — voit sa demande progresser.
+ *   - `technician` : tech assigné (assignedTechnicianUid).
+ *   - `dispatcher` : tous les admins de la société (broadcast côté API).
  */
 export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
-  // Client notifié quand technicien assigné
+  // ─── Nouveau dossier → admin doit assigner ────────────────────────────────
+  // Action attendue : prendre en charge.
+  {
+    fromStatus: "*",
+    toStatus: "pending",
+    targets: ["dispatcher"],
+    channels: ["push", "email"],
+    subjectKey: "notifications.email.pending.subject",
+    bodyKey: "notifications.email.pending.body",
+  },
+
+  // ─── Adresse manquante → client doit compléter, admin doit relancer ───────
+  {
+    fromStatus: "*",
+    toStatus: "pending_needs_address",
+    targets: ["client"],
+    channels: ["push", "email"],
+    subjectKey: "notifications.email.needs_address.subject",
+    bodyKey: "notifications.email.needs_address.body",
+  },
+  {
+    fromStatus: "*",
+    toStatus: "pending_needs_address",
+    targets: ["dispatcher"],
+    channels: ["push"],
+    subjectKey: "notifications.push.needs_address_dispatcher.subject",
+    bodyKey: "notifications.push.needs_address_dispatcher.body",
+  },
+
+  // ─── Assignation → client rassuré, tech doit voir sa nouvelle mission ─────
+  // Pas de push admin : c'est l'admin qui assigne, redondant.
   {
     fromStatus: "*",
     toStatus: "assigned",
     targets: ["client"],
-    channels: ["email"],
+    channels: ["push", "email"],
     subjectKey: "notifications.email.assigned.subject",
     bodyKey: "notifications.email.assigned.body",
   },
-  // Technicien notifié par Push quand assigné
   {
     fromStatus: "*",
     toStatus: "assigned",
@@ -43,57 +82,131 @@ export const STATUS_NOTIFICATION_RULES: StatusNotificationRule[] = [
     subjectKey: "notifications.push.assigned.subject",
     bodyKey: "notifications.push.assigned.body",
   },
-  // Client notifié quand technicien en route (WhatsApp si flag whatsappNotifications)
+
+  // ─── En route → client se prépare (porte, accès) ──────────────────────────
+  // Pas de push admin : c'est le tech qui déclenche, l'admin n'a rien à faire.
   {
     fromStatus: "assigned",
     toStatus: "en_route",
     targets: ["client"],
-    channels: ["email", "whatsapp"],
+    channels: ["push", "email", "whatsapp"],
     subjectKey: "notifications.email.en_route.subject",
     bodyKey: "notifications.email.en_route.body",
   },
-  // Client notifié quand intervention terminée (WhatsApp si flag whatsappNotifications)
+
+  // ─── Démarrage intervention → client sait que ça commence ─────────────────
+  // Pas de push admin (info passive, le tech la déclenche).
+  {
+    fromStatus: "en_route",
+    toStatus: "in_progress",
+    targets: ["client"],
+    channels: ["push"],
+    subjectKey: "notifications.push.in_progress.subject",
+    bodyKey: "notifications.push.in_progress.body",
+  },
+  // Cas urgent (assigné → démarré sans en_route)
+  {
+    fromStatus: "assigned",
+    toStatus: "in_progress",
+    targets: ["client"],
+    channels: ["push"],
+    subjectKey: "notifications.push.in_progress.subject",
+    bodyKey: "notifications.push.in_progress.body",
+  },
+
+  // ─── Intervention terminée → client info + admin doit valider rapport ─────
   {
     fromStatus: "in_progress",
     toStatus: "done",
     targets: ["client"],
-    channels: ["email", "whatsapp"],
+    channels: ["push", "email", "whatsapp"],
     subjectKey: "notifications.email.done.subject",
     bodyKey: "notifications.email.done.body",
   },
-  // Client notifié quand facture générée
+  {
+    fromStatus: "in_progress",
+    toStatus: "done",
+    targets: ["dispatcher"],
+    channels: ["push", "email"],
+    subjectKey: "notifications.email.done_dispatcher.subject",
+    bodyKey: "notifications.email.done_dispatcher.body",
+  },
+
+  // ─── Facture émise → client doit payer ────────────────────────────────────
+  // Pas de push admin : l'admin facture lui-même.
   {
     fromStatus: "done",
     toStatus: "invoiced",
     targets: ["client"],
-    channels: ["email"],
+    channels: ["push", "email"],
     subjectKey: "notifications.email.invoiced.subject",
     bodyKey: "notifications.email.invoiced.body",
   },
-  // Client + technicien notifiés quand matériel en attente
+
+  // ─── Matériel attendu → client patiente, admin doit commander ─────────────
+  // Pas de push tech : c'est lui qui le déclenche.
   {
     fromStatus: "in_progress",
     toStatus: "waiting_material",
-    targets: ["client", "dispatcher"],
-    channels: ["email"],
+    targets: ["client"],
+    channels: ["push", "email"],
     subjectKey: "notifications.email.waiting_material.subject",
     bodyKey: "notifications.email.waiting_material.body",
   },
-  // Client notifié si annulation
+  {
+    fromStatus: "in_progress",
+    toStatus: "waiting_material",
+    targets: ["dispatcher"],
+    channels: ["push"],
+    subjectKey: "notifications.push.waiting_material.subject",
+    bodyKey: "notifications.push.waiting_material.body",
+  },
+
+  // ─── Matériel reçu (waiting_material → in_progress) → tech doit reprendre ─
+  // Pas de push client : info de coulisses, le déplacement tech va suivre.
+  {
+    fromStatus: "waiting_material",
+    toStatus: "in_progress",
+    targets: ["technician"],
+    channels: ["push"],
+    subjectKey: "notifications.push.material_received.subject",
+    bodyKey: "notifications.push.material_received.body",
+  },
+
+  // ─── Annulation → tous concernés doivent stopper ──────────────────────────
+  // Tech notifié seulement s'il était assigné (filtré côté dispatcher via prefs/UID).
+  // Admin notifié car l'annulation peut venir du client (portail).
   {
     fromStatus: "*",
     toStatus: "cancelled",
     targets: ["client"],
-    channels: ["email"],
+    channels: ["push", "email"],
     subjectKey: "notifications.email.cancelled.subject",
     bodyKey: "notifications.email.cancelled.body",
   },
-  // Technicien notifié quand back-office refuse le rapport
+  {
+    fromStatus: "*",
+    toStatus: "cancelled",
+    targets: ["technician"],
+    channels: ["push"],
+    subjectKey: "notifications.push.cancelled_staff.subject",
+    bodyKey: "notifications.push.cancelled_staff.body",
+  },
+  {
+    fromStatus: "*",
+    toStatus: "cancelled",
+    targets: ["dispatcher"],
+    channels: ["push"],
+    subjectKey: "notifications.push.cancelled_staff.subject",
+    bodyKey: "notifications.push.cancelled_staff.body",
+  },
+
+  // ─── Refus rapport (done → in_progress) → tech doit corriger ──────────────
   {
     fromStatus: "done",
     toStatus: "in_progress",
     targets: ["technician"],
-    channels: ["email"],
+    channels: ["push", "email"],
     subjectKey: "notifications.email.report_rejected.subject",
     bodyKey: "notifications.email.report_rejected.body",
   },

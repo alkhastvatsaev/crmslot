@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import * as admin from "firebase-admin";
 import nodemailer from "nodemailer";
+import "@/core/config/firebase-admin";
+import { getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
 import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
+import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 import { SendNotificationRequestSchema } from "@/core/api/schemas/notifications";
 import { requireAuthenticatedUser, requireAnyCompanyStaff } from "@/core/api/routeAuth";
 
@@ -73,17 +77,57 @@ export async function POST(req: Request) {
     }
 
     if (channel === "push") {
-      const uid = variables?.recipientUid?.trim();
-      if (!uid) {
-        logger.warn("[notifications] push send sans recipientUid", { subjectKey });
-        return NextResponse.json({ success: true, skipped: true, reason: "no-uid" });
-      }
-
       const title = interpolateTemplate(subjectKey, variables);
       const body = stripHtml(buildEmailHtml(bodyKey, variables)).slice(0, 220);
       const data: Record<string, string> = {};
       if (variables?.caseId) data.bmTechCase = variables.caseId;
       if (variables?.reminderId) data.bmTechReminder = variables.reminderId;
+      if (variables?.interventionId) data.bmInterventionId = variables.interventionId;
+
+      // Dispatcher → broadcast aux admins de la société.
+      if (recipientRole === "dispatcher") {
+        const companyId = variables?.companyId?.trim();
+        if (!companyId) {
+          logger.warn("[notifications] push dispatcher sans companyId", { subjectKey });
+          return NextResponse.json({ success: true, skipped: true, reason: "no-company" });
+        }
+        const adminUids = await listAdminUidsForCompany(companyId);
+        if (adminUids.length === 0) {
+          return NextResponse.json({ success: true, skipped: true, reason: "no-admins" });
+        }
+        let sent = 0;
+        let failed = 0;
+        let removedStale = 0;
+        for (const uid of adminUids) {
+          try {
+            const report = await sendNativePushToUser({ uid, title, body, data });
+            sent += report.sent;
+            failed += report.failed;
+            removedStale += report.removedStale;
+          } catch (err) {
+            failed += 1;
+            logger.warn("[notifications] push admin broadcast failed", {
+              uid,
+              error: err instanceof Error ? err.message : String(err),
+            });
+          }
+        }
+        return NextResponse.json({
+          success: true,
+          channel: "push",
+          recipientRole: "dispatcher",
+          broadcastTo: adminUids.length,
+          sent,
+          failed,
+          removedStale,
+        });
+      }
+
+      const uid = variables?.recipientUid?.trim();
+      if (!uid) {
+        logger.warn("[notifications] push send sans recipientUid", { subjectKey });
+        return NextResponse.json({ success: true, skipped: true, reason: "no-uid" });
+      }
 
       const report = await sendNativePushToUser({ uid, title, body, data });
       return NextResponse.json({ success: true, channel: "push", ...report });
@@ -107,6 +151,24 @@ export async function POST(req: Request) {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Liste les UIDs des admins actifs d'une société (broadcast push dispatcher). */
+async function listAdminUidsForCompany(companyId: string): Promise<string[]> {
+  try {
+    const db = getAdminDb();
+    const staff = await listCompanyStaff(db, admin.auth, companyId);
+    return staff
+      .filter((member) => member.role === "admin" && member.active !== false)
+      .map((member) => member.uid)
+      .filter((uid): uid is string => typeof uid === "string" && uid.length > 0);
+  } catch (err) {
+    logger.warn("[notifications] listAdminUidsForCompany failed", {
+      companyId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return [];
+  }
+}
 
 function resolveRecipientEmail(role: string, variables: Record<string, string>): string | null {
   // In a full implementation, we'd query Firestore for the user's email.
@@ -136,6 +198,7 @@ function stripHtml(html: string): string {
 function interpolateTemplate(key: string, vars: Record<string, string>): string {
   // Map i18n keys to French text templates
   const templates: Record<string, string> = {
+    // Emails existants
     "notifications.email.assigned.subject": "Votre intervention est confirmée — {{clientName}}",
     "notifications.email.en_route.subject": "Votre technicien est en route — {{technicianName}}",
     "notifications.email.done.subject": "Intervention terminée — {{title}}",
@@ -145,6 +208,19 @@ function interpolateTemplate(key: string, vars: Record<string, string>): string 
     "notifications.email.cancelled.subject": "Intervention annulée — {{title}}",
     "notifications.email.report_rejected.subject":
       "Rapport refusé — veuillez compléter l'intervention {{title}}",
+    // Emails nouveaux
+    "notifications.email.pending.subject": "Nouveau dossier reçu — {{title}}",
+    "notifications.email.needs_address.subject": "Adresse manquante — {{title}}",
+    "notifications.email.done_dispatcher.subject":
+      "Rapport à valider — {{title}} ({{technicianName}})",
+    // Push (titres courts)
+    "notifications.push.assigned.subject": "Nouvelle mission",
+    "notifications.push.in_progress.subject": "Intervention démarrée",
+    "notifications.push.waiting_material.subject": "Matériel à commander",
+    "notifications.push.material_received.subject": "Matériel reçu — on reprend",
+    "notifications.push.cancelled_staff.subject": "Dossier annulé",
+    "notifications.push.needs_address_dispatcher.subject": "Adresse manquante",
+    // Divers
     weekly_digest: "Résumé hebdomadaire facturation — société {{companyId}}",
     appointment_reminder: "{{subject}}",
   };
@@ -158,6 +234,29 @@ function interpolateTemplate(key: string, vars: Record<string, string>): string 
 
 function buildEmailHtml(bodyKey: string, vars: Record<string, string>): string {
   const bodyTemplates: Record<string, string> = {
+    // ── Push (texte court, mis directement dans `body` FCM) ──
+    "notifications.push.assigned.body": `{{title}} — {{address}}`,
+    "notifications.push.in_progress.body": `Votre technicien {{technicianName}} a commencé.`,
+    "notifications.push.waiting_material.body": `{{title}} — pièce à commander`,
+    "notifications.push.material_received.body": `Matériel reçu pour {{title}} — on reprend`,
+    "notifications.push.cancelled_staff.body": `Dossier {{title}} annulé`,
+    "notifications.push.needs_address_dispatcher.body": `{{title}} — adresse à compléter`,
+    // ── Emails nouveaux ──
+    "notifications.email.pending.body": `
+      <p>Nouveau dossier reçu :</p>
+      <ul>
+        <li><strong>Titre :</strong> {{title}}</li>
+        <li><strong>Adresse :</strong> {{address}}</li>
+        <li><strong>Client :</strong> {{clientName}} ({{clientPhone}})</li>
+      </ul>
+      <p>À traiter depuis le back-office.</p>`,
+    "notifications.email.needs_address.body": `
+      <p>L'adresse du dossier <strong>{{title}}</strong> est manquante.</p>
+      <p>Le dossier ne peut pas être assigné tant que l'adresse n'est pas renseignée.</p>`,
+    "notifications.email.done_dispatcher.body": `
+      <p>Le technicien <strong>{{technicianName}}</strong> a terminé l'intervention <strong>{{title}}</strong>.</p>
+      <p>Le rapport est à valider dans le back-office.</p>`,
+    // ── Emails existants ──
     "notifications.email.assigned.body": `
       <p>Bonjour <strong>{{clientName}}</strong>,</p>
       <p>Un technicien a été assigné à votre demande d'intervention.</p>
