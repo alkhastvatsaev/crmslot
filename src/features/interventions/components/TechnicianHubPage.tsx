@@ -197,6 +197,9 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         leftAriaLabel={layoutLabels.left}
         centerAriaLabel={layoutLabels.center}
         rightAriaLabel={layoutLabels.right}
+        mobileLeftLabel={String(t("technician_hub.mobile.rail_left"))}
+        mobileCenterLabel={String(t("technician_hub.mobile.rail_center"))}
+        mobileRightLabel={String(t("technician_hub.mobile.rail_right"))}
         left={leftPanel}
         center={centerPanel}
         right={rightPanel}

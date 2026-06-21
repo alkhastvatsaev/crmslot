@@ -332,11 +332,16 @@
     "history_hint": "Event feed — center",
     "aria": {
       "page": "Page",
-      "left": "modes",
-      "center": "grid",
-      "right": "detail"
+      "left": "collect",
+      "center": "distribute",
+      "right": "rules"
     },
-    "pick_or_add_rule": "Tap a rule or « + Rule »."
+    "pick_or_add_rule": "Tap a rule or « + Rule ».",
+    "mobile": {
+      "rail_left": "Collect",
+      "rail_center": "Distribute",
+      "rail_right": "Rules"
+    }
   },
   "payment": {
     "pay_now": "Pay online",
@@ -492,7 +497,12 @@
       "create_intervention": "Create case + AI assign",
       "create_intervention_ok": "Case created from email",
       "create_intervention_assigned": "Technician assigned: {{name}}",
-      "create_intervention_pending_assign": "Case created — assign a technician from back-office."
+      "create_intervention_pending_assign": "Case created — assign a technician from back-office.",
+      "mobile": {
+        "rail_left": "Folders",
+        "rail_center": "Messages",
+        "rail_right": "Read"
+      }
     }
   },
   "crm": {
@@ -949,6 +959,11 @@
       "left": "Billing agent",
       "center": "invoices",
       "right": "documents"
+    },
+    "mobile": {
+      "rail_left": "Agent",
+      "rail_center": "Invoices",
+      "rail_right": "Documents"
     }
   },
   "teamHub": {
@@ -998,6 +1013,11 @@
       "left": "summary",
       "center": "list",
       "right": "profile"
+    },
+    "mobile": {
+      "rail_left": "Summary",
+      "rail_center": "List",
+      "rail_right": "Profile"
     }
   },
   "caseHub": {
@@ -1274,6 +1294,11 @@
         "report_amended": "Report amended at",
         "rejection_reason": "Report rejection reason"
       }
+    },
+    "mobile": {
+      "rail_left": "Team",
+      "rail_center": "Schedule",
+      "rail_right": "Detail"
     }
   },
   "spotlight": {
@@ -1702,6 +1727,11 @@
     },
     "signature": {
       "client_signature": "Client signature"
+    },
+    "mobile": {
+      "rail_left": "Jobs",
+      "rail_center": "Detail",
+      "rail_right": "Photos"
     }
   },
   "common": {
