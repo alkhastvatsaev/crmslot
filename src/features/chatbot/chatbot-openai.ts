@@ -385,6 +385,10 @@ export async function runChatbotOpenAI(params: {
         }
         // Injecter le nom résolu pour que l'exécuteur n'ait pas besoin de re-résoudre.
         orderCall.arguments.clientName = effectiveClient;
+        const focusIv = params.toolCtx.materialOrderInterventionId?.trim();
+        if (focusIv && !String(orderCall.arguments.interventionId ?? "").trim()) {
+          orderCall.arguments.interventionId = focusIv;
+        }
       }
     } else if (params.hubAgentMode) {
       const orderCall = parsedCalls.find((c) => c.name === "order_lecot_parts");
@@ -394,6 +398,10 @@ export async function runChatbotOpenAI(params: {
           rawFromAI && !isMaterialAgentLecotCommandText(rawFromAI) && rawFromAI.length <= 80;
         if (!aiNameValid && params.toolCtx.materialOrderClientName?.trim()) {
           orderCall.arguments.clientName = params.toolCtx.materialOrderClientName.trim();
+        }
+        const focusIv = params.toolCtx.materialOrderInterventionId?.trim();
+        if (focusIv && !String(orderCall.arguments.interventionId ?? "").trim()) {
+          orderCall.arguments.interventionId = focusIv;
         }
       }
     }

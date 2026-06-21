@@ -6,6 +6,7 @@ import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAg
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import type { CompanyRole } from "@/features/company/types";
 import { MATERIAL_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
+import { parseInterventionMaterialOrderIntent } from "@/features/materials/interventionMaterialOrderPrompt";
 
 export { MATERIAL_AGENT_TOOL_SCOPE };
 
@@ -54,8 +55,11 @@ export async function handleMaterialAgentPost(
 
   const lastUser = (conversationCtx.lastUserText ?? lastUserMessageText(messages) ?? "").trim();
 
+  const interventionOrder = parseInterventionMaterialOrderIntent(lastUser);
+  const isInterventionDirectOrder = Boolean(interventionOrder);
   // "Commander N× "label" (réf. SKU) — société : X" → commande directe depuis le modal stock.
-  const isModalDirectOrder = /^commander\s+\d+[×x]\s+"/i.test(lastUser);
+  const isModalDirectOrder =
+    /^commander\s+\d+[×x]\s+"/i.test(lastUser) && !isInterventionDirectOrder;
 
   const system = buildMaterialAgentSystemPrompt({
     companyName,
@@ -63,6 +67,7 @@ export async function handleMaterialAgentPost(
     today,
     stockSnapshot: body?.stockSnapshot ?? null,
     lecotCatalogHint: conversationCtx.lecotSearchQuery,
+    interventionOrder,
   });
 
   const toolCtx: ChatbotToolContext = {
@@ -70,7 +75,8 @@ export async function handleMaterialAgentPost(
     actorUid: auth.uid,
     role,
     lastUserText: lastUser,
-    materialOrderClientName: companyName,
+    materialOrderClientName: interventionOrder?.clientName ?? companyName,
+    materialOrderInterventionId: interventionOrder?.interventionId ?? null,
     requireMaterialOrderClientName: false,
   };
 
@@ -88,7 +94,7 @@ export async function handleMaterialAgentPost(
         conversationContext: { ...conversationCtx, toolScope },
         hasWorkspaceSnapshot: false,
         hubAgentMode: true,
-        skipLecotChainGuard: isModalDirectOrder,
+        skipLecotChainGuard: isModalDirectOrder || isInterventionDirectOrder,
         temperature: 0.15,
         emit: enqueue,
       });

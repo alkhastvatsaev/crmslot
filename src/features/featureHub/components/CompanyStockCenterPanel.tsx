@@ -15,7 +15,10 @@ import {
 } from "@/features/featureHub/filterCompanyStock";
 import type { StockItem } from "@/features/materials/stockFirestore";
 import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import { dispatchMaterialAgentQuickPrompt } from "@/features/featureHub/companyStockChatbot";
+import {
+  dispatchMaterialAgentQuickPrompt,
+  buildStockCenterMaterialOrderPrompt,
+} from "@/features/featureHub/companyStockChatbot";
 
 type Props = {
   items: StockItem[];
@@ -66,17 +69,17 @@ export default function CompanyStockCenterPanel({
   const handleConfirmOrder = useCallback(
     (qty: number) => {
       if (!orderingItem) return;
-      const ref = orderingItem.reference?.trim();
       const companyName =
         workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId)
           ?.companyName ?? "";
-      const parts = [
-        `Commander ${qty}×`,
-        `"${orderingItem.description}"`,
-        ref ? `(réf. ${ref})` : null,
-        companyName ? `— société : ${companyName}` : null,
-      ].filter(Boolean);
-      dispatchMaterialAgentQuickPrompt(parts.join(" "));
+      dispatchMaterialAgentQuickPrompt(
+        buildStockCenterMaterialOrderPrompt({
+          quantity: qty,
+          description: orderingItem.description,
+          reference: orderingItem.reference,
+          companyName,
+        })
+      );
     },
     [orderingItem, workspace]
   );
