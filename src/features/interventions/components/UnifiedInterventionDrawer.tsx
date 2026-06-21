@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
@@ -22,6 +22,12 @@ type Props = {
   allowMaterialCreate?: boolean;
   allowMaterialStatusUpdate?: boolean;
   defaultTab?: UnifiedDrawerTab;
+  activeTab?: UnifiedDrawerTab;
+  onTabChange?: (tab: UnifiedDrawerTab) => void;
+  tabBadges?: Partial<Record<UnifiedDrawerTab, number>>;
+  hideTabBar?: boolean;
+  emailVariant?: "default" | "patron";
+  defaultComposeTo?: string | null;
   className?: string;
 };
 
@@ -33,6 +39,12 @@ export default function UnifiedInterventionDrawer({
   allowMaterialCreate = false,
   allowMaterialStatusUpdate = false,
   defaultTab = "timeline",
+  activeTab,
+  onTabChange,
+  tabBadges,
+  hideTabBar = false,
+  emailVariant = "default",
+  defaultComposeTo,
   className,
 }: Props) {
   const { t } = useTranslation();
@@ -42,7 +54,19 @@ export default function UnifiedInterventionDrawer({
     [crmEnabled]
   );
   const safeDefault = tabs.includes(defaultTab) ? defaultTab : "timeline";
-  const [tab, setTab] = useState<UnifiedDrawerTab>(safeDefault);
+  const [internalTab, setInternalTab] = useState<UnifiedDrawerTab>(safeDefault);
+  const tab = activeTab && tabs.includes(activeTab) ? activeTab : internalTab;
+
+  useEffect(() => {
+    if (activeTab != null) return;
+    setInternalTab(safeDefault);
+  }, [intervention.id, safeDefault, activeTab]);
+
+  const setTab = (next: UnifiedDrawerTab) => {
+    if (!tabs.includes(next)) return;
+    onTabChange?.(next);
+    if (activeTab == null) setInternalTab(next);
+  };
 
   const labelKey: Record<UnifiedDrawerTab, string> = {
     timeline: "intervention_drawer.tab_timeline",
@@ -57,18 +81,22 @@ export default function UnifiedInterventionDrawer({
       data-testid="unified-intervention-drawer"
       className={cn(HUB_SURFACE.cardMuted, "overflow-hidden", className)}
     >
-      <HubSegmentedControl
-        value={tab}
-        onChange={(id) => setTab(id as UnifiedDrawerTab)}
-        layout="scroll"
-        className="border-b border-slate-100"
-        options={tabs.map((id) => ({
-          id,
-          label: t(labelKey[id]),
-          testId: `unified-drawer-tab-${id}`,
-        }))}
-      />
-      <div className="p-4" data-testid={`unified-drawer-panel-${tab}`}>
+      {!hideTabBar ? (
+        <HubSegmentedControl
+          value={tab}
+          onChange={(id) => setTab(id as UnifiedDrawerTab)}
+          layout="scroll"
+          className="border-b border-slate-100"
+          options={tabs.map((id) => ({
+            id,
+            label: t(labelKey[id]),
+            testId: `unified-drawer-tab-${id}`,
+            badge: tabBadges?.[id],
+            badgeAccent: id === "billing" ? "emerald" : "blue",
+          }))}
+        />
+      ) : null}
+      <div className="min-w-0 p-3 sm:p-4" data-testid={`unified-drawer-panel-${tab}`}>
         {tab === "timeline" ? (
           <InterventionCaseTimeline
             interventionId={intervention.id}
@@ -80,6 +108,8 @@ export default function UnifiedInterventionDrawer({
           <InterventionEmailPanel
             interventionId={intervention.id}
             companyId={intervention.companyId ?? null}
+            variant={emailVariant}
+            defaultComposeTo={defaultComposeTo}
           />
         ) : null}
         {tab === "materials" ? (
@@ -88,6 +118,8 @@ export default function UnifiedInterventionDrawer({
             technicianUid={technicianUid}
             allowCreate={allowMaterialCreate}
             allowStatusUpdate={allowMaterialStatusUpdate}
+            defaultExpanded
+            showPartSuggestions
           />
         ) : null}
         {tab === "billing" ? (

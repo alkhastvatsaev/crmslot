@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { CentralizedTimeline } from "@/features/communications/components/CentralizedTimeline";
 import { useInterventionTimeline } from "@/features/interventions/timeline/useInterventionTimeline";
 
@@ -35,7 +36,7 @@ export default function InterventionCaseTimeline({
   }
 
   return (
-    <div data-testid="intervention-case-timeline" className={className}>
+    <div data-testid="intervention-case-timeline" className={cn("min-w-0", className)}>
       <CentralizedTimeline
         events={events}
         isLoading={loading}

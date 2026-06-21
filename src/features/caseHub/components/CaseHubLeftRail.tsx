@@ -1,6 +1,15 @@
 "use client";
 
-import { AlertTriangle, Banknote, CheckCircle2, Clock, List, Truck, XCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  Banknote,
+  CheckCircle2,
+  Clock,
+  List,
+  Truck,
+  Wallet,
+  XCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
@@ -78,6 +87,17 @@ const BUCKET_META: BucketMeta[] = [
     },
   },
   {
+    id: "paid",
+    icon: Wallet,
+    testId: "case-hub-bucket-paid",
+    tone: {
+      ring: "border-teal-200 bg-teal-50/50",
+      iconBg: "bg-teal-100 text-teal-800",
+      text: "text-teal-900",
+      activeBg: "bg-teal-700 text-white border-teal-700",
+    },
+  },
+  {
     id: "cancelled",
     icon: XCircle,
     testId: "case-hub-bucket-cancelled",
@@ -134,22 +154,14 @@ export default function CaseHubLeftRail({ bucket, onBucketChange, counts }: Prop
               >
                 <Icon className="h-4 w-4" aria-hidden />
               </span>
-              <span className="flex min-w-0 flex-1 flex-col">
+              <span className="flex min-w-0 flex-1 flex-col justify-center">
                 <span
                   className={cn(
-                    "truncate text-[13px] font-bold",
+                    "truncate text-[13px] font-bold leading-tight",
                     active ? "text-white" : tone.text
                   )}
                 >
                   {t(`caseHub.bucket.${id}` as "caseHub.bucket.all")}
-                </span>
-                <span
-                  className={cn(
-                    "truncate text-[10px] font-medium",
-                    active ? "text-white/80" : "text-slate-500"
-                  )}
-                >
-                  {t(`caseHub.bucket_hint.${id}` as "caseHub.bucket_hint.all")}
                 </span>
               </span>
               <span

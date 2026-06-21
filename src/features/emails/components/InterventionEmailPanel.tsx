@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Mail, Send, X, Reply, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -96,44 +96,83 @@ const EMPTY_COMPOSE: ComposeState = { to: "", subject: "", bodyText: "" };
 type Props = {
   interventionId: string;
   companyId: string | null;
+  variant?: "default" | "patron";
+  defaultComposeTo?: string | null;
 };
 
-export default function InterventionEmailPanel({ interventionId, companyId }: Props) {
+type PatronView = "thread" | "compose";
+
+export default function InterventionEmailPanel({
+  interventionId,
+  companyId,
+  variant = "default",
+  defaultComposeTo,
+}: Props) {
   const { t } = useTranslation();
   const { emails, loading, unreadCount } = useInterventionEmails(interventionId);
-  const [expanded, setExpanded] = useState(false);
+  const isPatron = variant === "patron";
+  const [expanded, setExpanded] = useState(isPatron);
+  const [patronView, setPatronView] = useState<PatronView>("thread");
   const [composing, setComposing] = useState(false);
   const [compose, setCompose] = useState<ComposeState>(EMPTY_COMPOSE);
   const [sending, setSending] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const panelExpanded = expanded || unreadCount > 0;
+  const panelExpanded = isPatron || expanded || unreadCount > 0;
+  const lastInbound = useMemo(
+    () => [...emails].reverse().find((e) => e.direction === "inbound"),
+    [emails]
+  );
+
+  useEffect(() => {
+    if (!isPatron) return;
+    setPatronView(emails.length > 0 ? "thread" : "compose");
+    setExpanded(true);
+  }, [interventionId, isPatron, emails.length]);
 
   useEffect(() => {
     if (panelExpanded && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
-  }, [panelExpanded, emails]);
+  }, [panelExpanded, emails, patronView]);
+
+  const openNewCompose = useCallback(() => {
+    setCompose({
+      ...EMPTY_COMPOSE,
+      to: defaultComposeTo?.trim() ?? "",
+    });
+    setComposing(true);
+    if (isPatron) setPatronView("compose");
+    setExpanded(true);
+  }, [defaultComposeTo, isPatron]);
 
   const handleMarkRead = useCallback((id: string) => {
     if (!firestore) return;
     markEmailRead(firestore, id).catch(() => {});
   }, []);
 
-  const openReply = useCallback((email: InterventionEmailDoc) => {
-    const fromEmail = email.from.match(/<([^>]+)>$/)?.[1] ?? email.from;
-    const subject = email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`;
-    const refs = email.references ? `${email.references} ${email.messageId}` : email.messageId;
-    setCompose({
-      to: fromEmail,
-      subject,
-      bodyText: "",
-      inReplyTo: email.messageId,
-      references: refs,
-    });
-    setComposing(true);
-    setExpanded(true);
-  }, []);
+  const openReply = useCallback(
+    (email: InterventionEmailDoc) => {
+      const fromEmail = email.from.match(/<([^>]+)>$/)?.[1] ?? email.from;
+      const subject = email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`;
+      const refs = email.references ? `${email.references} ${email.messageId}` : email.messageId;
+      setCompose({
+        to: fromEmail,
+        subject,
+        bodyText: "",
+        inReplyTo: email.messageId,
+        references: refs,
+      });
+      setComposing(true);
+      if (isPatron) setPatronView("compose");
+      setExpanded(true);
+    },
+    [isPatron]
+  );
+
+  const openReplyToLast = useCallback(() => {
+    if (lastInbound) openReply(lastInbound);
+  }, [lastInbound, openReply]);
 
   const handleSend = useCallback(async () => {
     if (!compose.to.trim() || !compose.subject.trim() || !compose.bodyText.trim()) {
@@ -168,6 +207,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
       toast.success(String(t("emails.toast_sent")));
       setCompose(EMPTY_COMPOSE);
       setComposing(false);
+      if (isPatron) setPatronView("thread");
     } catch (err) {
       toast.error(String(t("emails.toast_send_error")), {
         description: err instanceof Error ? err.message : String(t("common.try_again")),
@@ -175,43 +215,113 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
     } finally {
       setSending(false);
     }
-  }, [compose, interventionId, companyId, t]);
+  }, [compose, interventionId, companyId, t, isPatron]);
+
+  const showThread = isPatron ? patronView === "thread" && !composing : true;
+  const showCompose = isPatron ? patronView === "compose" || composing : composing;
 
   return (
     <div data-testid="intervention-email-panel" className="space-y-2">
-      <button
-        type="button"
-        data-testid="email-panel-toggle"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between rounded-[14px] bg-slate-50 px-4 py-3 border border-slate-100 hover:bg-slate-100/80 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <Mail className="w-4 h-4 text-slate-500" />
-          <span className="text-[12px] font-bold text-slate-700 uppercase tracking-widest">
-            {t("emails.panel_title")}
-          </span>
-          {unreadCount > 0 && (
-            <span
-              data-testid="email-unread-badge"
-              className="flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white"
-            >
-              {unreadCount}
+      {isPatron ? (
+        <div className="space-y-2" data-testid="case-hub-email-menu">
+          <div className="flex items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-sky-600" aria-hidden />
+              <span className="text-[12px] font-bold text-slate-800">
+                {t("caseHub.emails.panel_title")}
+              </span>
+              {unreadCount > 0 ? (
+                <span
+                  data-testid="case-hub-email-unread"
+                  className="rounded-full bg-sky-600 px-2 py-0.5 text-[10px] font-bold text-white tabular-nums"
+                >
+                  {unreadCount}
+                </span>
+              ) : null}
+            </div>
+            <span className="text-[10px] font-medium text-slate-400 tabular-nums">
+              {emails.length} {t("caseHub.emails.message_count")}
             </span>
-          )}
-          {emails.length > 0 && unreadCount === 0 && (
-            <span className="text-[10px] text-slate-400">{emails.length}</span>
-          )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              data-testid="case-hub-email-menu-thread"
+              onClick={() => {
+                setPatronView("thread");
+                setComposing(false);
+              }}
+              className={cn(
+                "rounded-xl border px-3 py-2 text-[11px] font-semibold transition",
+                patronView === "thread" && !composing
+                  ? "border-sky-300 bg-sky-50 text-sky-900"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              )}
+            >
+              {t("caseHub.emails.menu_thread")}
+            </button>
+            <button
+              type="button"
+              data-testid="case-hub-email-menu-compose"
+              onClick={openNewCompose}
+              className={cn(
+                "rounded-xl border px-3 py-2 text-[11px] font-semibold transition",
+                showCompose
+                  ? "border-sky-300 bg-sky-50 text-sky-900"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              )}
+            >
+              {t("caseHub.emails.menu_compose")}
+            </button>
+            <button
+              type="button"
+              data-testid="case-hub-email-menu-reply"
+              disabled={!lastInbound}
+              onClick={openReplyToLast}
+              className={cn(
+                "rounded-xl border px-3 py-2 text-[11px] font-semibold transition disabled:opacity-40",
+                "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              )}
+            >
+              {t("caseHub.emails.menu_reply")}
+            </button>
+          </div>
         </div>
-        {panelExpanded ? (
-          <ChevronUp className="w-4 h-4 text-slate-400" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-slate-400" />
-        )}
-      </button>
+      ) : (
+        <button
+          type="button"
+          data-testid="email-panel-toggle"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex w-full items-center justify-between rounded-[14px] bg-slate-50 px-4 py-3 border border-slate-100 hover:bg-slate-100/80 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-slate-500" />
+            <span className="text-[12px] font-bold text-slate-700 uppercase tracking-widest">
+              {t("emails.panel_title")}
+            </span>
+            {unreadCount > 0 && (
+              <span
+                data-testid="email-unread-badge"
+                className="flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white"
+              >
+                {unreadCount}
+              </span>
+            )}
+            {emails.length > 0 && unreadCount === 0 && (
+              <span className="text-[10px] text-slate-400">{emails.length}</span>
+            )}
+          </div>
+          {panelExpanded ? (
+            <ChevronUp className="w-4 h-4 text-slate-400" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-slate-400" />
+          )}
+        </button>
+      )}
 
       {panelExpanded && (
         <div className="rounded-[18px] border border-slate-100 bg-white overflow-hidden">
-          {emails.length > 0 && (
+          {showThread && emails.length > 0 && (
             <div
               ref={listRef}
               data-testid="email-thread-list"
@@ -235,7 +345,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
             </div>
           )}
 
-          {emails.length === 0 && !loading && !composing && (
+          {showThread && emails.length === 0 && !loading && !showCompose && (
             <div
               data-testid="email-panel-empty"
               className="px-4 py-6 text-center text-[12px] text-slate-400"
@@ -244,7 +354,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
             </div>
           )}
 
-          {composing ? (
+          {showCompose ? (
             <div
               className="border-t border-slate-100 p-4 space-y-3"
               data-testid="email-compose-form"
@@ -259,6 +369,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                   onClick={() => {
                     setComposing(false);
                     setCompose(EMPTY_COMPOSE);
+                    if (isPatron) setPatronView("thread");
                   }}
                   className="flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:bg-slate-100"
                 >
@@ -296,6 +407,7 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                   onClick={() => {
                     setComposing(false);
                     setCompose(EMPTY_COMPOSE);
+                    if (isPatron) setPatronView("thread");
                   }}
                   className="rounded-[10px] px-3 py-2 text-[12px] font-semibold text-slate-500 hover:bg-slate-100"
                 >
@@ -318,22 +430,19 @@ export default function InterventionEmailPanel({ interventionId, companyId }: Pr
                 </button>
               </div>
             </div>
-          ) : (
+          ) : !isPatron ? (
             <div className="border-t border-slate-100 p-3">
               <button
                 type="button"
                 data-testid="email-compose-open"
-                onClick={() => {
-                  setComposing(true);
-                  setCompose(EMPTY_COMPOSE);
-                }}
+                onClick={openNewCompose}
                 className="flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 <Mail className="w-4 h-4" />
                 {t("emails.write")}
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>

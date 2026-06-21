@@ -157,6 +157,10 @@
       "template_placeholder": "-- Select a template --",
       "lecot_title": "Check on Lecot.be",
       "search_lecot_placeholder": "Search the Lecot catalogue…"
+    },
+    "suggestions": {
+      "title": "Suggested parts",
+      "use": "Pre-fill order"
     }
   },
   "commissions": {
@@ -1016,7 +1020,8 @@
       "to_invoice": "To invoice",
       "invoiced": "Invoiced",
       "cancelled": "Cancelled",
-      "all": "All cases"
+      "all": "All cases",
+      "paid": "Payment received"
     },
     "bucket_hint": {
       "to_assign": "Pick a tech and send them",
@@ -1058,7 +1063,8 @@
       "waiting_material": "Parts pending",
       "done": "Issue the invoice",
       "invoiced": "Track payment",
-      "cancelled": "Case closed"
+      "cancelled": "Case closed",
+      "paid": "Payment received"
     },
     "right": {
       "next": "Next step",
@@ -1081,7 +1087,11 @@
       "audio_failed": "Audio unavailable",
       "billing_preview": "Invoice preview",
       "equipment": "Client equipment",
-      "insights": "What this tells you"
+      "insights": "What this tells you",
+      "media": "Field evidence",
+      "client_photos": "Client photos",
+      "completion_photos": "Field photos",
+      "kpi_technician": "Technician"
     },
     "insight": {
       "case_age": "Open for",
@@ -1159,7 +1169,12 @@
       "emails": "Emails",
       "materials": "Materials",
       "billing": "Billing",
-      "crm": "Client record"
+      "crm": "Client record",
+      "short_timeline": "Timeline",
+      "short_emails": "Emails",
+      "short_materials": "Materials",
+      "short_billing": "Billing",
+      "short_crm": "Client"
     },
     "emails": {
       "panel_title": "Email thread",
@@ -1167,6 +1182,13 @@
       "menu_thread": "View conversation",
       "menu_compose": "New message",
       "menu_reply": "Reply to client"
+    },
+    "pipeline": {
+      "step_situation": "Situation",
+      "step_act": "Act",
+      "step_detail": "Detail",
+      "step_state": "Status",
+      "step_media": "Evidence"
     }
   },
   "planningHub": {

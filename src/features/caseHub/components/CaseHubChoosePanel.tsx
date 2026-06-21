@@ -20,6 +20,7 @@ const BUCKET_BADGE: Record<CaseHubBucket, string> = {
   waiting: "bg-amber-100 text-amber-800 border-amber-200",
   to_invoice: "bg-emerald-100 text-emerald-800 border-emerald-200",
   invoiced: "bg-green-100 text-green-800 border-green-200",
+  paid: "bg-teal-100 text-teal-800 border-teal-200",
   cancelled: "bg-slate-100 text-slate-700 border-slate-200",
   all: "bg-slate-100 text-slate-800 border-slate-200",
 };

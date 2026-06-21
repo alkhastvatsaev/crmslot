@@ -157,6 +157,10 @@
       "template_placeholder": "-- Selecteer een sjabloon --",
       "lecot_title": "Controleren op Lecot.be",
       "search_lecot_placeholder": "Zoeken in de Lecot-catalogus…"
+    },
+    "suggestions": {
+      "title": "Voorgestelde onderdelen",
+      "use": "Bestelling invullen"
     }
   },
   "commissions": {
@@ -1016,7 +1020,8 @@
       "to_invoice": "Te factureren",
       "invoiced": "Gefactureerd",
       "cancelled": "Geannuleerd",
-      "all": "Alle dossiers"
+      "all": "Alle dossiers",
+      "paid": "Betaling ontvangen"
     },
     "bucket_hint": {
       "to_assign": "Kies een technieker en stuur hem",
@@ -1058,7 +1063,8 @@
       "waiting_material": "Materiaal afwachten",
       "done": "Stuur de factuur",
       "invoiced": "Volg betaling op",
-      "cancelled": "Dossier afgesloten"
+      "cancelled": "Dossier afgesloten",
+      "paid": "Betaling ontvangen"
     },
     "right": {
       "next": "Volgende stap",
@@ -1081,7 +1087,11 @@
       "audio_failed": "Audio niet beschikbaar",
       "billing_preview": "Factuurvoorbeeld",
       "equipment": "Klantmateriaal",
-      "insights": "Wat dit betekent"
+      "insights": "Wat dit betekent",
+      "media": "Terreinbewijs",
+      "client_photos": "Klantfoto's",
+      "completion_photos": "Terreinfoto's",
+      "kpi_technician": "Technieker"
     },
     "insight": {
       "case_age": "Open sinds",
@@ -1159,7 +1169,12 @@
       "emails": "E-mails",
       "materials": "Materiaal",
       "billing": "Facturatie",
-      "crm": "Klantfiche"
+      "crm": "Klantfiche",
+      "short_timeline": "Tijdlijn",
+      "short_emails": "E-mails",
+      "short_materials": "Materiaal",
+      "short_billing": "Factuur",
+      "short_crm": "Klant"
     },
     "emails": {
       "panel_title": "E-mailuitwisseling",
@@ -1167,6 +1182,13 @@
       "menu_thread": "Conversatie bekijken",
       "menu_compose": "Nieuw bericht",
       "menu_reply": "Klant beantwoorden"
+    },
+    "pipeline": {
+      "step_situation": "Situatie",
+      "step_act": "Handelen",
+      "step_detail": "Detail",
+      "step_state": "Status",
+      "step_media": "Bewijs"
     }
   },
   "planningHub": {

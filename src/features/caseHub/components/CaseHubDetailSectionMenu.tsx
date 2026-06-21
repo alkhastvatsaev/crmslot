@@ -12,12 +12,38 @@ const SECTIONS: Array<{
   id: UnifiedDrawerTab;
   icon: typeof Mail;
   labelKey: string;
+  shortLabelKey: string;
 }> = [
-  { id: "timeline", icon: Clock, labelKey: "caseHub.section_menu.timeline" },
-  { id: "emails", icon: Mail, labelKey: "caseHub.section_menu.emails" },
-  { id: "materials", icon: Package, labelKey: "caseHub.section_menu.materials" },
-  { id: "billing", icon: Receipt, labelKey: "caseHub.section_menu.billing" },
-  { id: "crm", icon: Users, labelKey: "caseHub.section_menu.crm" },
+  {
+    id: "timeline",
+    icon: Clock,
+    labelKey: "caseHub.section_menu.timeline",
+    shortLabelKey: "caseHub.section_menu.short_timeline",
+  },
+  {
+    id: "emails",
+    icon: Mail,
+    labelKey: "caseHub.section_menu.emails",
+    shortLabelKey: "caseHub.section_menu.short_emails",
+  },
+  {
+    id: "materials",
+    icon: Package,
+    labelKey: "caseHub.section_menu.materials",
+    shortLabelKey: "caseHub.section_menu.short_materials",
+  },
+  {
+    id: "billing",
+    icon: Receipt,
+    labelKey: "caseHub.section_menu.billing",
+    shortLabelKey: "caseHub.section_menu.short_billing",
+  },
+  {
+    id: "crm",
+    icon: Users,
+    labelKey: "caseHub.section_menu.crm",
+    shortLabelKey: "caseHub.section_menu.short_crm",
+  },
 ];
 
 type Props = {
@@ -51,26 +77,23 @@ export default function CaseHubDetailSectionMenu({
   const safeActive = sections.some((s) => s.id === activeTab) ? activeTab : "timeline";
 
   return (
-    <div
-      data-testid="case-hub-section-menu"
-      className="shrink-0 border-b border-black/[0.05] bg-white px-3 py-2"
-    >
-      <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-        {t("caseHub.section_menu.title")}
-      </p>
+    <div data-testid="case-hub-section-menu">
       <HubSegmentedControl
         value={safeActive}
         onChange={(id) => onTabChange(id as UnifiedDrawerTab)}
         layout="scroll"
+        size="compact"
         ariaLabel={String(t("caseHub.section_menu.aria"))}
-        options={sections.map(({ id, icon: Icon, labelKey }) => ({
+        className="w-full gap-1.5 rounded-[16px] bg-slate-100/80 p-1 ring-1 ring-inset ring-slate-200/60"
+        options={sections.map(({ id, icon: Icon, labelKey, shortLabelKey }) => ({
           id,
-          label: t(labelKey),
-          icon: <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />,
+          label: t(shortLabelKey as "caseHub.section_menu.short_timeline"),
+          title: String(t(labelKey)),
+          icon: <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />,
           testId: `case-hub-section-${id}`,
           badge: badges[id],
-          badgeAccent: id === "billing" ? "emerald" : "blue",
-          activeAccent: id === "emails" ? "blue" : "blue",
+          badgeAccent: "slate",
+          activeAccent: "slate",
         }))}
       />
     </div>

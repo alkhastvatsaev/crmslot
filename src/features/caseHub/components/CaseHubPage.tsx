@@ -46,6 +46,7 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
       waiting: countForBucket(sorted, "waiting"),
       to_invoice: countForBucket(sorted, "to_invoice"),
       invoiced: countForBucket(sorted, "invoiced"),
+      paid: countForBucket(sorted, "paid"),
       cancelled: countForBucket(sorted, "cancelled"),
       all: sorted.length,
     }),
