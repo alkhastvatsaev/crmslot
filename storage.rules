@@ -50,8 +50,10 @@ service firebase.storage {
     }
 
     // Extensions : WebM, MP4/M4A (Safari), OGG, WAV — cf. extFromBlob dans clientAudioUpload.ts
+    // Lecture : propriétaire du clip uniquement. Le pipeline serveur passe par Admin SDK
+    // (transcription, dispatch) qui contourne les rules. Évite la fuite cross-tenant des audio.
     match /interventions_audio/{uid}/{fileName} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if request.auth != null
         && request.auth.uid == uid
         && request.resource.size < 15 * 1024 * 1024
@@ -67,9 +69,18 @@ service firebase.storage {
     /**
      * Chat IVANA (portail / inbox) — images liées à `portal_ivana_chat_messages.imageUrls`.
      * Chemin : companyId / uid auteur / fichier.
+     * Lecture : staff de la société OU client lié à la société (même check que pour write).
+     * Avant : `request.auth != null` exposait les images du chat à toutes les sociétés.
      */
     match /portal_ivana_chat/{companyId}/{userId}/{fileName} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null
+        && (
+          firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)/company_memberships/$(companyId))
+          || (
+            firestore.exists(/databases/(default)/documents/client_portal_profiles/$(request.auth.uid))
+            && firestore.get(/databases/(default)/documents/client_portal_profiles/$(request.auth.uid)).data.companyId == companyId
+          )
+        );
       allow write: if request.auth != null
         && request.auth.uid == userId
         && request.resource.size < 8 * 1024 * 1024
