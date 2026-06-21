@@ -1,6 +1,7 @@
 import type { ManualCommissionEntry } from "@/features/commissions/commissionFirestore";
 import type { CommissionRule, CommissionValueType } from "@/features/commissions/types";
 import { pickPersonalTechnicianRule } from "@/features/commissions/commissionRuleMatching";
+import { buildDefaultGroupCommissionRule } from "@/features/commissions/commissionDefaults";
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
 import {
   canResolveTechnicianAssignUid,
@@ -128,7 +129,8 @@ export function resolveTechnicianDisplayRule(
   if (personal) {
     return { personalRule: personal, displayRule: personal, hasPersonalRule: true };
   }
-  const group = findCompanyGroupRule(rules, companyId);
+  const group =
+    findCompanyGroupRule(rules, companyId) ?? buildDefaultGroupCommissionRule(companyId);
   return { personalRule: null, displayRule: group, hasPersonalRule: false };
 }
 

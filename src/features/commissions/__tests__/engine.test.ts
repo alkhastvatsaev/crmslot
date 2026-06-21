@@ -47,7 +47,7 @@ describe("calculateCommission", () => {
     ];
     const result = calculateCommission(
       { interventionId: "iv-1", technicianUid: "tech-1", groupId: "co-1", baseAmount: 200 },
-      rules,
+      rules
     );
     expect(result.finalCommissionAmount).toBe(100);
     expect(result.appliedRuleId).toBe("i1");
@@ -56,25 +56,25 @@ describe("calculateCommission", () => {
   it("falls back to technician then group", () => {
     const techOnly = calculateCommission(
       { interventionId: "iv-2", technicianUid: "tech-1", groupId: "co-1", baseAmount: 200 },
-      baseRules,
+      baseRules
     );
     expect(techOnly.finalCommissionAmount).toBe(25);
     expect(techOnly.appliedRuleId).toBe("t1");
 
     const groupOnly = calculateCommission(
       { interventionId: "iv-3", technicianUid: "other", groupId: "co-1", baseAmount: 200 },
-      baseRules,
+      baseRules
     );
     expect(groupOnly.finalCommissionAmount).toBe(20);
     expect(groupOnly.appliedRuleId).toBe("g1");
   });
 
-  it("returns zero when no rule matches", () => {
+  it("falls back to the app-level 20% default when no rule matches", () => {
     const result = calculateCommission(
       { interventionId: "iv-x", technicianUid: null, groupId: null, baseAmount: 100 },
-      [],
+      []
     );
-    expect(result.finalCommissionAmount).toBe(0);
+    expect(result.finalCommissionAmount).toBe(20);
     expect(result.appliedRuleId).toBeNull();
   });
 });
