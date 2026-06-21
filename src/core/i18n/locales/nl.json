@@ -332,11 +332,16 @@
     "history_hint": "Gebeurtenissen — midden",
     "aria": {
       "page": "Pagina",
-      "left": "modi",
-      "center": "raster",
-      "right": "detail"
+      "left": "innen",
+      "center": "verdelen",
+      "right": "regels"
     },
-    "pick_or_add_rule": "Tik op een regel of « + Regel »."
+    "pick_or_add_rule": "Tik op een regel of « + Regel ».",
+    "mobile": {
+      "rail_left": "Innen",
+      "rail_center": "Verdelen",
+      "rail_right": "Regels"
+    }
   },
   "payment": {
     "pay_now": "Online betalen",
@@ -492,7 +497,12 @@
       "create_intervention": "Dossier + AI-toewijzing",
       "create_intervention_ok": "Dossier aangemaakt vanuit e-mail",
       "create_intervention_assigned": "Technicus toegewezen: {{name}}",
-      "create_intervention_pending_assign": "Dossier aangemaakt — wijs een technicus toe via backoffice."
+      "create_intervention_pending_assign": "Dossier aangemaakt — wijs een technicus toe via backoffice.",
+      "mobile": {
+        "rail_left": "Mappen",
+        "rail_center": "Berichten",
+        "rail_right": "Lezen"
+      }
     }
   },
   "crm": {
@@ -949,6 +959,11 @@
       "left": "Facturatieagent",
       "center": "facturen",
       "right": "documents"
+    },
+    "mobile": {
+      "rail_left": "Agent",
+      "rail_center": "Facturen",
+      "rail_right": "Documenten"
     }
   },
   "teamHub": {
@@ -998,6 +1013,11 @@
       "left": "samenvatting",
       "center": "lijst",
       "right": "profiel"
+    },
+    "mobile": {
+      "rail_left": "Overzicht",
+      "rail_center": "Lijst",
+      "rail_right": "Profiel"
     }
   },
   "caseHub": {
@@ -1274,6 +1294,11 @@
         "report_amended": "Rapport gewijzigd op",
         "rejection_reason": "Reden afkeuring rapport"
       }
+    },
+    "mobile": {
+      "rail_left": "Team",
+      "rail_center": "Uren",
+      "rail_right": "Detail"
     }
   },
   "spotlight": {
@@ -1702,6 +1727,11 @@
     },
     "signature": {
       "client_signature": "Klant handtekening"
+    },
+    "mobile": {
+      "rail_left": "Klussen",
+      "rail_center": "Detail",
+      "rail_right": "Foto's"
     }
   },
   "common": {

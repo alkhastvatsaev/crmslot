@@ -332,11 +332,16 @@
     "history_hint": "Fil d’événements — centre",
     "aria": {
       "page": "Page",
-      "left": "résumé",
-      "center": "liste",
-      "right": "détail"
+      "left": "encaisser",
+      "center": "distribuer",
+      "right": "régler"
     },
-    "pick_or_add_rule": "Touchez une règle ou « + Règle »."
+    "pick_or_add_rule": "Touchez une règle ou « + Règle ».",
+    "mobile": {
+      "rail_left": "Encaisser",
+      "rail_center": "Distribuer",
+      "rail_right": "Régler"
+    }
   },
   "payment": {
     "pay_now": "Payer en ligne",
@@ -492,7 +497,12 @@
       "create_intervention": "Créer dossier + assigner (IA)",
       "create_intervention_ok": "Dossier créé depuis l'e-mail",
       "create_intervention_assigned": "Technicien assigné : {{name}}",
-      "create_intervention_pending_assign": "Dossier créé — assignez un technicien depuis le back-office."
+      "create_intervention_pending_assign": "Dossier créé — assignez un technicien depuis le back-office.",
+      "mobile": {
+        "rail_left": "Dossiers",
+        "rail_center": "Messages",
+        "rail_right": "Lecture"
+      }
     }
   },
   "crm": {
@@ -949,6 +959,11 @@
       "left": "Agent facturation",
       "center": "factures",
       "right": "documents"
+    },
+    "mobile": {
+      "rail_left": "Agent",
+      "rail_center": "Factures",
+      "rail_right": "Documents"
     }
   },
   "teamHub": {
@@ -998,6 +1013,11 @@
       "left": "résumé",
       "center": "liste",
       "right": "profil"
+    },
+    "mobile": {
+      "rail_left": "Résumé",
+      "rail_center": "Liste",
+      "rail_right": "Profil"
     }
   },
   "caseHub": {
@@ -1274,6 +1294,11 @@
         "report_amended": "Rapport modifié le",
         "rejection_reason": "Motif rejet rapport"
       }
+    },
+    "mobile": {
+      "rail_left": "Équipe",
+      "rail_center": "Horaires",
+      "rail_right": "Détail"
     }
   },
   "spotlight": {
@@ -1702,6 +1727,11 @@
     },
     "signature": {
       "client_signature": "Signature client"
+    },
+    "mobile": {
+      "rail_left": "Missions",
+      "rail_center": "Détail",
+      "rail_right": "Photos"
     }
   },
   "common": {
