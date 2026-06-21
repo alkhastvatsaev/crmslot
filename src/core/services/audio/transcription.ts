@@ -30,7 +30,9 @@ function getDispatchModel(): string {
   return process.env.OPENAI_DISPATCH_MODEL?.trim() || "gpt-4o-mini";
 }
 
-async function audioBufferFromInput(audioInput: Buffer | string): Promise<{ buffer: Buffer; fileName: string }> {
+async function audioBufferFromInput(
+  audioInput: Buffer | string
+): Promise<{ buffer: Buffer; fileName: string }> {
   if (typeof audioInput === "string") {
     const response = await fetch(audioInput);
     if (!response.ok) {
@@ -54,7 +56,7 @@ export async function transcribeAudioToText(
   client: OpenAI,
   buffer: Buffer,
   fileName: string,
-  opts?: { language?: "fr" | "en" | "nl" }
+  opts?: { language?: "fr" | "en" | "nl" | "ru" }
 ): Promise<string> {
   const uploadable = await toFile(buffer, fileName);
   const model = getTranscriptionModel();
@@ -72,7 +74,10 @@ export async function transcribeAudioToText(
   return (result.text ?? "").trim();
 }
 
-async function synthesizeFromText(client: OpenAI, rawTranscript: string): Promise<SynthesizedTranscription> {
+async function synthesizeFromText(
+  client: OpenAI,
+  rawTranscript: string
+): Promise<SynthesizedTranscription> {
   const completion = await client.chat.completions.create({
     model: getDispatchModel(),
     temperature: 0.2,
@@ -87,7 +92,10 @@ async function synthesizeFromText(client: OpenAI, rawTranscript: string): Promis
   });
 
   const content = completion.choices[0]?.message?.content || "{}";
-  const jsonString = content.replace(/```json/g, "").replace(/```/g, "").trim();
+  const jsonString = content
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
   return JSON.parse(jsonString) as SynthesizedTranscription;
 }
 

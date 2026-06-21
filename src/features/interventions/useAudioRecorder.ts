@@ -5,11 +5,12 @@ import { logger } from "@/core/logger";
 import { toast } from "sonner";
 import { useBrowserSpeechDictation } from "./useBrowserSpeechDictation";
 
-type UiLanguage = "fr" | "en" | "nl";
+type UiLanguage = "fr" | "en" | "nl" | "ru";
 
 function uiLanguageToLocale(language: UiLanguage): string {
   if (language === "nl") return "nl-BE";
   if (language === "en") return "en-GB";
+  if (language === "ru") return "ru-RU";
   return "fr-BE";
 }
 

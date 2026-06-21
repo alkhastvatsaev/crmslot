@@ -82,7 +82,9 @@
     "test:e2e:satellite-apps": "playwright test tests/e2e/technician-mobile-app.spec.ts tests/e2e/client-mobile-app.spec.ts --project=technician-app --project=client-app",
     "test:native-infra": "jest src/core/native src/features/interventions/__tests__/technicianHubNavigation.test.ts src/features/company/__tests__/companyHubNavigation.test.ts src/features/company/components/__tests__/ClientMobileApp.test.tsx src/features/notifications/__tests__/technicianNotificationIntent.test.ts --no-coverage",
     "cap:install:android:debug": "cd android && ../scripts/mobile/gradlew-with-jbr.sh installDebug",
-    "prepare": "husky"
+    "prepare": "husky",
+    "i18n:parity": "node scripts/i18n/parity-check.mjs --require ru",
+    "test:i18n": "jest src/core/i18n --no-coverage"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

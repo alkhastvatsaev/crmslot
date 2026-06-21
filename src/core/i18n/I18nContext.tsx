@@ -4,8 +4,9 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import fr from "./locales/fr.json";
 import en from "./locales/en.json";
 import nl from "./locales/nl.json";
+import ru from "./locales/ru.json";
 
-export type Language = "fr" | "en" | "nl";
+export type Language = "fr" | "en" | "nl" | "ru";
 
 type Translations = Record<string, unknown>;
 
@@ -15,6 +16,7 @@ const dictionaries: Record<Language, Translations> = {
   fr,
   en,
   nl,
+  ru,
 };
 
 interface I18nContextType {
@@ -71,7 +73,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
     const storedLang = localStorage.getItem("crmslot_lang") as Language;
-    if (storedLang && ["fr", "en", "nl"].includes(storedLang)) {
+    if (storedLang && ["fr", "en", "nl", "ru"].includes(storedLang)) {
       setLanguageState(storedLang);
     }
   }, []);
