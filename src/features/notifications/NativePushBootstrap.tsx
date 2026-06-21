@@ -16,6 +16,10 @@ function wrap(
 }
 
 export default function NativePushBootstrap() {
+  // L'app native cible le terrain (technicien) et le portail client. L'admin reste
+  // sur PWA web — son token FCM est enregistré par BackofficePushBootstrap.
+  // (Si une app native admin apparaît, exposer `audience: "backoffice"` ici via un
+  // mount conditionnel — sinon le token tech serait écrasé sur le même device.)
   useNativePushRegistration({ audience: "technician", auth: wrap(auth) });
   useNativePushRegistration({ audience: "client", auth: wrap(clientPortalAuth) });
 
