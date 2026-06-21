@@ -23,6 +23,7 @@ import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBa
 import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
 import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
 import BackofficeChatNotificationBootstrap from "@/features/notifications/components/BackofficeChatNotificationBootstrap";
+import BackofficePushBootstrap from "@/features/notifications/components/BackofficePushBootstrap";
 import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
 
 type Props = {
@@ -56,6 +57,7 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                         <AuthActivityLogger />
                                         <ActivityLogPageObserver />
                                         <BackofficeChatNotificationBootstrap />
+                                        <BackofficePushBootstrap />
                                         {children}
                                       </RequesterHubProvider>
                                     </TechnicianQueryProvider>

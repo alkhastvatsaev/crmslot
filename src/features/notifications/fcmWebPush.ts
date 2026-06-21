@@ -92,10 +92,12 @@ export function tokenDocId(token: string, platform: FcmPlatform = "web"): string
   return `${PLATFORM_PREFIX[platform]}_${Math.abs(h).toString(36)}`;
 }
 
+export type FcmAudience = "technician" | "client" | "backoffice";
+
 export async function persistFcmToken(
   uid: string,
   token: string,
-  audience: "technician" | "client",
+  audience: FcmAudience,
   platform: FcmPlatform = "web"
 ): Promise<void> {
   if (!firestore) throw new Error("Firestore indisponible");

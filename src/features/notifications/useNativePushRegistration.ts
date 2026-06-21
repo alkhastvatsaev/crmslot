@@ -11,7 +11,7 @@ import {
 } from "@/core/native/nativeFcmToken";
 import { persistFcmToken } from "@/features/notifications/fcmWebPush";
 
-type Audience = "client" | "technician";
+type Audience = "client" | "technician" | "backoffice";
 
 type Args = {
   audience: Audience;
