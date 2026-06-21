@@ -8,6 +8,7 @@ import UnifiedInterventionDrawer, {
 } from "@/features/interventions/components/UnifiedInterventionDrawer";
 import CaseHubDetailSectionMenu from "@/features/caseHub/components/CaseHubDetailSectionMenu";
 import CaseHubDetailActions from "@/features/caseHub/components/CaseHubDetailActions";
+import CaseHubDetailDashboard from "@/features/caseHub/components/CaseHubDetailDashboard";
 import CaseHubDetailMedia from "@/features/caseHub/components/CaseHubDetailMedia";
 import CaseHubDetailPulse from "@/features/caseHub/components/CaseHubDetailPulse";
 import CaseHubDetailSituation from "@/features/caseHub/components/CaseHubDetailSituation";
@@ -59,10 +60,7 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
         data-testid="case-hub-right-panel"
         className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", CASE_HUB_DETAIL.panel)}
       >
-        <div data-testid="case-hub-empty-detail" className={CASE_HUB_DETAIL.empty}>
-          <div className={CASE_HUB_DETAIL.emptyOrb} aria-hidden />
-          {t("caseHub.pick_case")}
-        </div>
+        <CaseHubDetailDashboard interventions={peerInterventions} />
       </div>
     );
   }
@@ -82,14 +80,19 @@ export default function CaseHubRightPanel({ intervention, peerInterventions }: P
       data-testid="case-hub-right-panel"
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", CASE_HUB_DETAIL.panel)}
     >
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4">
+      <div
+        data-testid="case-hub-right-sticky"
+        className="shrink-0 border-b border-slate-100 bg-white/95 px-4 pb-3 pt-4 backdrop-blur-sm"
+      >
         <CaseHubDetailSituation
           intervention={intervention}
           snapshot={snapshot}
           statusLabel={statusLabel}
           nextAction={nextAction}
         />
+      </div>
 
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4">
         <CaseHubDetailPulse snapshot={snapshot} techName={techName} />
 
         <CaseHubDetailActions

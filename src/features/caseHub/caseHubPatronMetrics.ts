@@ -44,7 +44,82 @@ export function bucketForIntervention(iv: BucketInput): CaseHubBucket {
 
 /** @deprecated — préférer bucketForIntervention (ignore le paiement). */
 export function bucketForStatus(status: Intervention["status"] | undefined): CaseHubBucket {
-  return bucketForIntervention({ status, paymentStatus: "unpaid" });
+  return bucketForIntervention({ status: status ?? "pending", paymentStatus: "unpaid" });
+}
+
+export type CaseHubTimeGroup =
+  | "overdue"
+  | "today"
+  | "tomorrow"
+  | "this_week"
+  | "later"
+  | "no_date"
+  | "older";
+
+const TIME_GROUP_ORDER: CaseHubTimeGroup[] = [
+  "overdue",
+  "today",
+  "tomorrow",
+  "this_week",
+  "no_date",
+  "later",
+  "older",
+];
+
+function startOfDay(d: Date): Date {
+  const out = new Date(d);
+  out.setHours(0, 0, 0, 0);
+  return out;
+}
+
+function diffDays(a: Date, b: Date): number {
+  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function parseInterventionScheduledDate(iv: Intervention): Date | null {
+  const raw = (iv.scheduledDate ?? iv.requestedDate ?? "").trim();
+  if (!raw) return null;
+  const parsed = new Date(`${raw}T00:00:00`);
+  return Number.isFinite(parsed.getTime()) ? parsed : null;
+}
+
+/** Catégorise un dossier dans un bucket temporel pour le groupage de la file. */
+export function timeGroupForIntervention(
+  iv: Intervention,
+  now: Date = new Date()
+): CaseHubTimeGroup {
+  const bucket = bucketForIntervention(iv);
+  const historical = bucket === "invoiced" || bucket === "paid" || bucket === "cancelled";
+  const scheduled = parseInterventionScheduledDate(iv);
+
+  if (!scheduled) {
+    return historical ? "older" : "no_date";
+  }
+  const today = startOfDay(now);
+  const delta = diffDays(today, startOfDay(scheduled));
+  if (delta < 0) return historical ? "older" : "overdue";
+  if (delta === 0) return "today";
+  if (delta === 1) return "tomorrow";
+  if (delta <= 7) return "this_week";
+  return "later";
+}
+
+/** Groupe les dossiers par temps, en gardant l'ordre interne fourni. */
+export function groupInterventionsByTime(
+  interventions: Intervention[],
+  now: Date = new Date()
+): { group: CaseHubTimeGroup; interventions: Intervention[] }[] {
+  const map = new Map<CaseHubTimeGroup, Intervention[]>();
+  for (const iv of interventions) {
+    const group = timeGroupForIntervention(iv, now);
+    const list = map.get(group);
+    if (list) list.push(iv);
+    else map.set(group, [iv]);
+  }
+  return TIME_GROUP_ORDER.flatMap((group) => {
+    const list = map.get(group);
+    return list && list.length > 0 ? [{ group, interventions: list }] : [];
+  });
 }
 
 /** Plus c'est petit, plus c'est urgent. Sert de tri principal de la file. */

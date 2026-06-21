@@ -160,7 +160,9 @@
     },
     "suggestions": {
       "title": "Pièces suggérées",
-      "use": "Pré-remplir la commande"
+      "use": "Pré-remplir la commande",
+      "tap_to_order": "Toucher une pièce pour ouvrir Matériel et commander via l'agent.",
+      "opening_agent": "Ouverture de l'agent matériel…"
     }
   },
   "commissions": {
@@ -1109,6 +1111,27 @@
       "recurring_client": "Dossiers avec ce client"
     },
     "no_date": "Pas encore programmé",
+    "list": {
+      "group": {
+        "overdue": "En retard",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "this_week": "Cette semaine",
+        "later": "Plus tard",
+        "no_date": "Sans date",
+        "older": "Plus ancien"
+      }
+    },
+    "dashboard": {
+      "title": "Aujourd'hui",
+      "hint": "Touche un dossier au centre pour le traiter.",
+      "to_assign_today": "À assigner",
+      "to_invoice": "À facturer",
+      "to_invoice_potential": "Potentiel {{amount}}",
+      "unpaid_overdue": "Impayés > 14 j",
+      "calm_title": "Rien d'urgent.",
+      "calm_hint": "Tu peux respirer."
+    },
     "steps": {
       "overview_title": "Ma file",
       "overview_hint": "Choisis une catégorie pour ouvrir la liste.",
