@@ -26,6 +26,11 @@ const BRAND_ASSETS = {
     width: 210,
     height: 40,
   },
+  ru: {
+    src: "/brand/apple-sign-in-black-en.svg",
+    width: 200,
+    height: 40,
+  },
 } as const;
 
 /** Bouton Sign in with Apple (asset conforme HIG) — noir, logo Apple officiel. */

@@ -29,6 +29,11 @@ const BRAND_ASSETS = {
     width: 175,
     height: 40,
   },
+  ru: {
+    src: "/brand/google-sign-in-light-en.svg",
+    width: 175,
+    height: 40,
+  },
 } as const;
 
 /** Délai court pour voir l’animation avant redirection OAuth. */
