@@ -9,7 +9,8 @@ export type PlanningDetailField = {
 };
 
 function readTranscription(iv: Intervention): string | null {
-  const candidates = [iv.transcription, (iv as Record<string, unknown>).audioTranscription];
+  const legacy = iv as unknown as Record<string, unknown>;
+  const candidates = [iv.transcription, legacy.audioTranscription];
   for (const hit of candidates) {
     const text = coerceDisplayString(hit);
     if (text) return text;
