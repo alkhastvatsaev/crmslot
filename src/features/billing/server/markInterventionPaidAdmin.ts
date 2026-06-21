@@ -4,7 +4,15 @@ import { notifyClientPaymentReceived } from "@/core/services/notifications/clien
 import { notifyClient } from "@/core/services/email/clientNotifications/notifyClient";
 import { buildClientPaymentReceivedEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
 import { logCrmInterventionActionAdmin } from "@/features/crmHistory/logCrmInterventionActionAdmin";
+import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
 import type { Intervention } from "@/features/interventions/types";
+
+function formatAmount(amount: unknown, currency: unknown): string {
+  if (typeof amount !== "number" || !Number.isFinite(amount)) return "";
+  const cur = typeof currency === "string" && currency.trim() ? currency.trim().toUpperCase() : "";
+  const formatted = amount.toFixed(2).replace(".", ",");
+  return cur ? `${formatted} ${cur}` : formatted;
+}
 
 /**
  * Marque une intervention payée : statut paiement, timeline client,
@@ -70,6 +78,19 @@ export async function markInterventionPaidAdmin(
   }
 
   if (companyId) {
+    // Push aux admins de la société (cash in — action comptable + suivi).
+    const amountLabel = formatAmount(data.invoiceAmount, data.invoiceCurrency);
+    const title = typeof data.title === "string" ? data.title : "Dossier";
+    void notifyCompanyAdminsPush({
+      companyId,
+      title: "Paiement reçu",
+      body: amountLabel ? `${title} — ${amountLabel}` : `${title} — facture payée`,
+      data: {
+        type: "payment_received",
+        bmInterventionId: interventionId,
+      },
+    }).catch(() => {});
+
     void import("@/features/integrations/server/dispatchCompanyWebhooksAdmin")
       .then(({ dispatchCompanyWebhooksAdmin }) =>
         dispatchCompanyWebhooksAdmin(companyId, "intervention.payment_received", {

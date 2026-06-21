@@ -11,6 +11,7 @@ import {
 import { assertTechnicianMayRespondToAssignment } from "@/features/interventions/technicianAssignmentServerAuth";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
@@ -116,6 +117,21 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
           { ok: false, error: "Cette mission n'attend plus de réponse." },
           { status: 409 }
         );
+      }
+
+      // Refus mission tech → admin doit réassigner. Push urgent.
+      const companyId = (iv.companyId ?? "").trim();
+      if (companyId) {
+        const title = (iv.title || iv.problem || `Dossier #${interventionId.slice(-8)}`).trim();
+        void notifyCompanyAdminsPush({
+          companyId,
+          title: "Mission refusée par tech",
+          body: `${title} — à réassigner`,
+          data: {
+            type: "technician_declined",
+            bmInterventionId: interventionId,
+          },
+        }).catch(() => {});
       }
     }
     return NextResponse.json({ ok: true });
