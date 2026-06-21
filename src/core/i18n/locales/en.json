@@ -1017,7 +1017,7 @@
     },
     "bucket": {
       "to_assign": "To assign",
-      "in_progress": "Tech on a job",
+      "in_progress": "Technician on a job",
       "waiting": "Waiting for parts",
       "to_invoice": "To invoice",
       "invoiced": "Invoiced",
@@ -1026,8 +1026,8 @@
       "paid": "Payment received"
     },
     "bucket_hint": {
-      "to_assign": "Pick a tech and send them",
-      "in_progress": "Tech is on the way or on site",
+      "to_assign": "Pick a technician and send them",
+      "in_progress": "Technician is on the way or on site",
       "waiting": "Blocked until parts arrive",
       "to_invoice": "Job done — send the invoice",
       "invoiced": "Invoice sent, track payment",
@@ -1060,8 +1060,8 @@
       "pending": "Assign a technician",
       "pending_needs_address": "Add the address",
       "assigned": "Wait for acceptance",
-      "en_route": "Tech on the way",
-      "in_progress": "Tech on site",
+      "en_route": "Technician on the way",
+      "in_progress": "Technician on site",
       "waiting_material": "Parts pending",
       "done": "Issue the invoice",
       "invoiced": "Track payment",
@@ -1097,7 +1097,7 @@
     },
     "insight": {
       "case_age": "Open for",
-      "case_age_stale": "No tech for",
+      "case_age_stale": "No technician for",
       "schedule_overdue": "Past the appointment",
       "schedule_today": "Today's appointment",
       "on_site": "On site",
@@ -1229,13 +1229,13 @@
     "pending_hint": "Jobs without a technician or not accepted yet",
     "pending_empty": "All clear.",
     "pending_state": {
-      "unassigned": "No tech",
+      "unassigned": "No technician",
       "awaiting_accept": "To accept"
     },
     "kpi": {
       "missions": "Jobs",
       "conflicts": "Conflicts",
-      "unassigned": "Unassigned"
+      "unassigned": "No technician"
     },
     "aria": {
       "page": "Page",

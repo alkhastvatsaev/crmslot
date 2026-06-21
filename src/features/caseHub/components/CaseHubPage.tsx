@@ -130,6 +130,13 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
         <section className={mainShell}>
           {gate}
           {companyId && !gate ? (
+            <CaseHubRightPanel intervention={selected} peerInterventions={sorted} />
+          ) : null}
+        </section>
+      }
+      right={
+        <section className={mainShell}>
+          {companyId && !gate ? (
             <CaseHubChoosePanel
               interventions={filtered}
               loading={loading}
@@ -137,13 +144,6 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
               onSelect={setSelectedId}
               bucket={bucket}
             />
-          ) : null}
-        </section>
-      }
-      right={
-        <section className={mainShell}>
-          {companyId && !gate ? (
-            <CaseHubRightPanel intervention={selected} peerInterventions={sorted} />
           ) : null}
         </section>
       }

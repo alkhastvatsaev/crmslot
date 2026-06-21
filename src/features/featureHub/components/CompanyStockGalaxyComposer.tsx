@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import GalaxyButton from "@/core/ui/GalaxyButton/GalaxyButton";
 import {
@@ -13,6 +13,10 @@ import {
 } from "@/features/chatbot/components/GalaxyComposerControls";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyStockAgentBridgeOptional } from "@/context/CompanyStockAgentBridgeContext";
+import {
+  consumePendingMaterialAgentQuickPrompt,
+  MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT,
+} from "@/features/featureHub/companyStockChatbot";
 
 /** Dock Galaxy — saisie agent matériel (aligné ChatbotGalaxyComposer). */
 export default function CompanyStockGalaxyComposer() {
@@ -24,10 +28,22 @@ export default function CompanyStockGalaxyComposer() {
   const handlers = bridge?.handlers ?? null;
   const disabled = !handlers || handlers.disabled;
 
+  const flushPendingQuickPrompt = useCallback(() => {
+    if (!handlers || handlers.disabled) return;
+    const pending = consumePendingMaterialAgentQuickPrompt();
+    if (!pending) return;
+    handlers.sendMessage(pending);
+    setInput("");
+  }, [handlers]);
+
   useEffect(() => {
     if (bridge?.handlers) return;
     setInput("");
   }, [bridge?.handlers]);
+
+  useEffect(() => {
+    flushPendingQuickPrompt();
+  }, [flushPendingQuickPrompt]);
 
   useEffect(() => {
     const onQuick = (e: Event) => {
@@ -40,17 +56,22 @@ export default function CompanyStockGalaxyComposer() {
       const text = (e as CustomEvent<{ text?: string }>).detail?.text?.trim();
       if (text) setInput(text);
     };
+    const onPending = () => {
+      flushPendingQuickPrompt();
+    };
     window.addEventListener("material-agent-quick-prompt", onQuick);
     window.addEventListener("material-agent-draft-prompt", onDraft);
+    window.addEventListener(MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT, onPending);
     window.addEventListener("chatbot-quick-prompt", onQuick);
     window.addEventListener("chatbot-draft-prompt", onDraft);
     return () => {
       window.removeEventListener("material-agent-quick-prompt", onQuick);
       window.removeEventListener("material-agent-draft-prompt", onDraft);
+      window.removeEventListener(MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT, onPending);
       window.removeEventListener("chatbot-quick-prompt", onQuick);
       window.removeEventListener("chatbot-draft-prompt", onDraft);
     };
-  }, [handlers]);
+  }, [handlers, flushPendingQuickPrompt]);
 
   const handleSend = () => {
     const trimmed = input.trim();

@@ -1,3 +1,5 @@
+import type { InterventionMaterialOrderIntent } from "@/features/materials/interventionMaterialOrderPrompt";
+
 export function buildMaterialAgentSystemPrompt(params: {
   companyName: string;
   companyId: string;
@@ -5,6 +7,8 @@ export function buildMaterialAgentSystemPrompt(params: {
   stockSnapshot?: string | null;
   /** Requête catalogue déduite du message (aide OpenAI, pas de raccourci hors modèle). */
   lecotCatalogHint?: string | null;
+  /** Commande dossier détectée dans le message utilisateur. */
+  interventionOrder?: InterventionMaterialOrderIntent | null;
 }): string {
   const snapshotBlock = params.stockSnapshot
     ? `\nSnapshot stock actuel (utilise ces données en priorité avant d'appeler un outil) :\n\`\`\`json\n${params.stockSnapshot}\n\`\`\``
@@ -14,7 +18,21 @@ export function buildMaterialAgentSystemPrompt(params: {
     ? `\nIndice catalogue pour ce message utilisateur : recherche Lecot « ${params.lecotCatalogHint.trim()} » (appelle search_lecot_products avec cette requête ou une variante plus précise, jamais un autre type de pièce).`
     : "";
 
-  const stockOrderBlock = `\nCommandes stock société : page Matériel = réappro entreprise, pas un dossier client. Pour order_lecot_parts, utilise **${params.companyName}** comme clientName (réappro stock). Ne demande JAMAIS le nom d'un client — commande directement dès que l'article est identifié.`;
+  const interventionBlock = params.interventionOrder
+    ? `\nCommande DOSSIER (prioritaire) : interventionId=${params.interventionOrder.interventionId}, clientName=${params.interventionOrder.clientName}, pièce « ${params.interventionOrder.description} »${params.interventionOrder.reference ? ` (réf. ${params.interventionOrder.reference})` : ""}. Appelle search_lecot_products puis order_lecot_parts avec interventionId, clientName du dossier, linkMaterialOrder=true, syncBilling=true. Ne redemande rien.`
+    : "";
+
+  const stockOrderBlock = params.interventionOrder
+    ? `\nCommandes liées à un dossier : utilise le clientName et interventionId du bloc DOSSIER ci-dessus.`
+    : `\nCommandes stock société : page Matériel = réappro entreprise, pas un dossier client. Pour order_lecot_parts, utilise **${params.companyName}** comme clientName (réappro stock). Ne demande JAMAIS le nom d'un client — commande directement dès que l'article est identifié.`;
+
+  const clientNameRule = params.interventionOrder
+    ? `- clientName = **${params.interventionOrder.clientName}** (dossier ${params.interventionOrder.interventionId}). interventionId obligatoire sur order_lecot_parts.`
+    : `- clientName = toujours "${params.companyName}" (stock société). JAMAIS un texte de commande ("nouvelle commande lecot", "commander", "catalogue"…).`;
+
+  const orderRule = params.interventionOrder
+    ? `4. order_lecot_parts : clientName = "${params.interventionOrder.clientName}", interventionId = "${params.interventionOrder.interventionId}" + SKU et unitPriceEur EXACTS issus de search_lecot_products, quantity=1.`
+    : `4. order_lecot_parts : clientName = "${params.companyName}" + SKU et unitPriceEur EXACTS issus de search_lecot_products, quantity=1.`;
 
   return `Tu es l'Agent Matériel CRMSLOT — spécialiste EXCLUSIF du stock et des commandes matériel.
 
@@ -25,7 +43,7 @@ RÈGLE ABSOLUE : si la question ne concerne pas le matériel, le stock ou Lecot,
 Ne fournis aucune autre information hors périmètre, même si la question semble simple ou générale.
 
 Société : ${params.companyName} (${params.companyId}) · date : ${params.today}
-${stockOrderBlock}
+${interventionBlock}${stockOrderBlock}
 ${lecotHintBlock}
 ${snapshotBlock}
 
@@ -44,12 +62,12 @@ MÉTHODE (obligatoire — tout passe par toi + outils, pas de catalogue inventé
 1. Comprends la demande en langage naturel, puis appelle les outils nécessaires (un ou plusieurs tours).
 2. Catalogue Lecot : **toujours** search_lecot_products avant toute proposition ou commande. Requête = type de pièce demandé par l'utilisateur (ex. « poignée », « poignet » → poignée ; « cylindre Yale »). Ne jamais proposer des serrures si l'utilisateur a demandé une poignée. Résume uniquement les SKU/prix retournés par l'outil.
 3. Dès qu'un article est choisi (bouton Commander, « Commander N× », SKU explicite), appelle order_lecot_parts immédiatement — sans demander de confirmation ni de nom de client.
-4. order_lecot_parts : clientName = "${params.companyName}" + SKU et unitPriceEur EXACTS issus de search_lecot_products, quantity=1.
+${orderRule}
 5. Après chaque outil, synthétise le résultat en 2–4 phrases en français (ne répète pas mot pour mot le JSON brut).
 
 Règles opérationnelles :
 - Français, concis (2–4 phrases maximum)
-- clientName = toujours "${params.companyName}" (stock société). JAMAIS un texte de commande ("nouvelle commande lecot", "commander", "catalogue"…).
+${clientNameRule}
 - approve_material_orders : userConfirmed=true
 - Ne jamais inventer de références, SKU, prix ou quantités
 - Propose des <suggestion>Texte</suggestion> après les réponses

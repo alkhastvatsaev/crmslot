@@ -1229,13 +1229,13 @@
     "pending_hint": "Opdrachten zonder technicus of nog niet geaccepteerd",
     "pending_empty": "Alles in orde.",
     "pending_state": {
-      "unassigned": "Geen tech",
+      "unassigned": "Zonder technieker",
       "awaiting_accept": "Te accepteren"
     },
     "kpi": {
       "missions": "Opdrachten",
       "conflicts": "Conflicten",
-      "unassigned": "Zonder tech"
+      "unassigned": "Zonder technieker"
     },
     "aria": {
       "page": "Pagina",

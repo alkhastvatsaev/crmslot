@@ -9,7 +9,6 @@ import MaterialPartSuggestions from "@/features/materials/components/MaterialPar
 import { MaterialOrderForm } from "@/features/materials/components/MaterialOrderForm";
 import { createMaterialOrder } from "@/features/materials/createMaterialOrder";
 import { updateMaterialOrderStatus } from "@/features/materials/materialOrderFirestore";
-import { enrichMaterialPartSuggestions } from "@/features/materials/matchStockCatalogItem";
 import { orderInterventionPartViaMaterialAgent } from "@/features/materials/orderInterventionPartViaMaterialAgent";
 import { suggestMaterialPartsFromIntervention } from "@/features/materials/suggestMaterialPartsFromIntervention";
 import { useMaterialOrders } from "@/features/materials/useMaterialOrders";
@@ -75,8 +74,7 @@ export default function InterventionMaterialOrdersPanel({
 
   const suggestions = useMemo(() => {
     if (!showPartSuggestions) return [];
-    const raw = suggestMaterialPartsFromIntervention(intervention);
-    return enrichMaterialPartSuggestions(raw, stockItems);
+    return suggestMaterialPartsFromIntervention(intervention, stockItems);
   }, [intervention, showPartSuggestions, stockItems]);
 
   const panelExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;

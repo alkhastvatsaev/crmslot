@@ -1017,7 +1017,7 @@
     },
     "bucket": {
       "to_assign": "À assigner",
-      "in_progress": "Tech en mission",
+      "in_progress": "Technicien en mission",
       "waiting": "Attend matériel",
       "to_invoice": "À facturer",
       "invoiced": "Facturés",
@@ -1027,7 +1027,7 @@
     },
     "bucket_hint": {
       "to_assign": "Choisis un technicien et envoie-le",
-      "in_progress": "Le tech est en route ou sur place",
+      "in_progress": "Le technicien est en route ou sur place",
       "waiting": "Bloqué le temps que le matériel arrive",
       "to_invoice": "Travail fini, envoie la facture",
       "invoiced": "Facture envoyée, suis le paiement",
@@ -1060,8 +1060,8 @@
       "pending": "Assigner un technicien",
       "pending_needs_address": "Renseigner l'adresse",
       "assigned": "Attendre l'acceptation",
-      "en_route": "Tech en route",
-      "in_progress": "Tech sur place",
+      "en_route": "Technicien en route",
+      "in_progress": "Technicien sur place",
       "waiting_material": "Matériel en attente",
       "done": "Émettre la facture",
       "invoiced": "Suivre le paiement",
@@ -1097,7 +1097,7 @@
     },
     "insight": {
       "case_age": "Ouvert depuis",
-      "case_age_stale": "Sans tech depuis",
+      "case_age_stale": "Sans technicien depuis",
       "schedule_overdue": "En retard sur le RDV",
       "schedule_today": "RDV aujourd'hui",
       "on_site": "Sur place",
@@ -1229,13 +1229,13 @@
     "pending_hint": "Missions sans technicien ou pas encore acceptées",
     "pending_empty": "Tout est en ordre.",
     "pending_state": {
-      "unassigned": "Sans tech",
+      "unassigned": "Sans technicien",
       "awaiting_accept": "À accepter"
     },
     "kpi": {
       "missions": "Missions",
       "conflicts": "Conflits",
-      "unassigned": "Sans tech"
+      "unassigned": "Sans technicien"
     },
     "aria": {
       "page": "Page",

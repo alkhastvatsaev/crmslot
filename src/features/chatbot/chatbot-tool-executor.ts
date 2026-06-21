@@ -66,6 +66,8 @@ export type ChatbotToolContext = {
   materialOrderClientName?: string | null;
   /** Agent Matériel : refuser order_lecot sans clientName. */
   requireMaterialOrderClientName?: boolean;
+  /** Commande dossier — injectée dans order_lecot_parts. */
+  materialOrderInterventionId?: string | null;
   /** Clé API OpenAI — nécessaire pour les outils vision (diagnose_equipment_photo). */
   openAIApiKey?: string;
   /** Modèle OpenAI utilisé — transmis aux outils qui lancent leur propre appel. */
