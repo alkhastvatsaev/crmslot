@@ -38,6 +38,12 @@ export interface DispatchNotificationsParams {
   >;
   /** Nom du technicien assigné (affiché dans les emails). */
   technicianName?: string;
+  /** UID du demandeur (createdByUid) — requis pour le canal push client. */
+  clientUid?: string | null;
+  /** UID du technicien assigné — requis pour le canal push technician. */
+  technicianUid?: string | null;
+  /** ID société — l'API broadcaste le push aux admins de la société. */
+  companyId?: string | null;
   /** Préférences du destinataire client — canaux désactivés ignorés. */
   clientPreferences?: Partial<NotificationPreferences> | null;
   /** Préférences technicien assigné. */
@@ -59,6 +65,9 @@ export function buildNotificationPayloads(
     toStatus,
     intervention,
     technicianName,
+    clientUid,
+    technicianUid,
+    companyId,
     clientPreferences,
     technicianPreferences,
     dispatcherPreferences,
@@ -72,9 +81,10 @@ export function buildNotificationPayloads(
     intervention.clientName ||
     "Client";
 
-  const variables: Record<string, string> = {
+  const baseVariables: Record<string, string> = {
     clientName,
     interventionId: intervention.id,
+    caseId: intervention.id,
     clientPhone: intervention.clientPhone || "",
     address: intervention.address || "",
     title: intervention.title || "",
@@ -83,6 +93,7 @@ export function buildNotificationPayloads(
     technicianName: technicianName || "",
     newStatus: toStatus,
     oldStatus: fromStatus,
+    companyId: companyId?.trim() || "",
   };
 
   const payloads: NotificationPayload[] = [];
@@ -93,6 +104,18 @@ export function buildNotificationPayloads(
         if (target === "client" && !channelAllowed(clientPreferences, channel)) continue;
         if (target === "technician" && !channelAllowed(technicianPreferences, channel)) continue;
         if (target === "dispatcher" && !channelAllowed(dispatcherPreferences, channel)) continue;
+
+        // Pour le canal push : `recipientUid` indique le destinataire FCM.
+        // Dispatcher = broadcast côté API (résout admins via companyId).
+        const variables = { ...baseVariables };
+        if (channel === "push") {
+          if (target === "client" && clientUid?.trim()) variables.recipientUid = clientUid.trim();
+          if (target === "technician" && technicianUid?.trim()) {
+            variables.recipientUid = technicianUid.trim();
+          }
+          // dispatcher push : recipientUid laissé vide ; l'API broadcaste via companyId.
+        }
+
         payloads.push({
           channel,
           recipientRole: target,
