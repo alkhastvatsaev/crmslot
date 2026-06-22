@@ -7,13 +7,13 @@ jest.mock("@/features/company/components/CompanyHubPage", () => ({
   default: () => <div data-testid="company-hub-page-mock" />,
 }));
 
-jest.mock("@/features/company/components/ClientMobileGalaxyDock", () => ({
+jest.mock("@/features/company/components/ClientMobileProfileChip", () => ({
   __esModule: true,
-  default: () => <div data-testid="client-mobile-galaxy-dock" />,
+  default: () => <div data-testid="client-mobile-profile-chip" />,
 }));
 
 describe("ClientMobileApp", () => {
-  it("monte la shell client avec calendrier, hub et galaxy dock", () => {
+  it("monte la shell client avec calendrier, hub et profil footer", () => {
     render(<ClientMobileApp />);
     expect(screen.getByTestId("client-mobile-app")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-header-calendar")).toBeInTheDocument();
@@ -21,6 +21,6 @@ describe("ClientMobileApp", () => {
     expect(screen.getByTestId("company-hub-page-mock")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-shell-footer")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-shell-galaxy")).toBeInTheDocument();
-    expect(screen.getByTestId("client-mobile-galaxy-dock")).toBeInTheDocument();
+    expect(screen.getByTestId("client-mobile-profile-chip")).toBeInTheDocument();
   });
 });
