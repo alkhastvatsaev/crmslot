@@ -16,7 +16,6 @@ import {
   subscribeCompletionQueueChanged,
   type FlushCompletionReport,
 } from "@/features/offline/completionSync";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type OfflineSyncContextValue = {
   navigatorOnline: boolean;
@@ -31,20 +30,12 @@ export type OfflineSyncContextValue = {
 const OfflineSyncContext = createContext<OfflineSyncContextValue | null>(null);
 
 export function OfflineSyncProvider({ children }: { children: ReactNode }) {
-  const [syncPollVisible, setSyncPollVisible] = useState(false);
   const [navigatorOnline, setNavigatorOnline] = useState(() =>
     typeof navigator !== "undefined" ? navigator.onLine : true
   );
   const [pendingCompletionCount, setPendingCompletionCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastFlushReport, setLastFlushReport] = useState<FlushCompletionReport | null>(null);
-  useDevEnergyProbe(
-    "offline-sync-poll",
-    "Sync offline (60s)",
-    "poll",
-    syncPollVisible,
-    pendingCompletionCount > 0 ? `${pendingCompletionCount} en file` : "idle"
-  );
 
   const refreshPendingCount = useCallback(async () => {
     const n = await getCompletionQueueLength();
@@ -141,9 +132,6 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
   /** Retry périodique (60s) — déclenche flush si la queue contient des items en cooldown devenus dus. */
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const syncPoll = () => setSyncPollVisible(!document.hidden);
-    syncPoll();
-    document.addEventListener("visibilitychange", syncPoll);
     const intervalId = window.setInterval(() => {
       if (!navigator.onLine || document.hidden) return;
       void (async () => {
@@ -152,9 +140,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
       })();
     }, 60_000);
     return () => {
-      document.removeEventListener("visibilitychange", syncPoll);
       window.clearInterval(intervalId);
-      setSyncPollVisible(false);
     };
   }, [runFlushWithToasts]);
 

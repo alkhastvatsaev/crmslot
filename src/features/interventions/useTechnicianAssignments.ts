@@ -23,7 +23,6 @@ import {
   showTechnicianNewAssignmentNotification,
 } from "@/features/interventions/technicianNewAssignmentAlerts";
 import { toast } from "sonner";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
@@ -61,21 +60,6 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
-
-  useDevEnergyProbe(
-    "tech-assignments-poll",
-    "Poll missions technicien",
-    "poll",
-    hookEnabled && pollArmed,
-    `${resolveTechnicianAssignmentsPollMs()}ms`
-  );
-  useDevEnergyProbe(
-    "tech-assignments-snapshot",
-    "Firestore missions (snapshot)",
-    "firestore",
-    hookEnabled && Boolean(firebaseUid),
-    firebaseUid ?? undefined
-  );
 
   const [prevHookEnabled, setPrevHookEnabled] = useState(hookEnabled);
   if (prevHookEnabled !== hookEnabled) {
