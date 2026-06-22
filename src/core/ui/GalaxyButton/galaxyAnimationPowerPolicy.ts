@@ -47,14 +47,15 @@ function defaultProfile(starCount: number): GalaxyAnimationProfile {
 }
 
 function mobileProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
+  /** iPhone PWA : fond bleu statique uniquement — le canvas 24 fps chauffe le GPU en continu. */
   return {
-    starCount: GALAXY_MOBILE_STAR_COUNT,
-    maxFps: GALAXY_MOBILE_MAX_FPS,
+    starCount: 0,
+    maxFps: 0,
     maxDevicePixelRatio: 1.75,
     pauseWhenHidden: true,
     interactive: false,
-    baseSpeed: 0.55,
-    backgroundEveryNFrames: 2,
+    baseSpeed: 0,
+    backgroundEveryNFrames: 1,
     ...overrides,
   };
 }

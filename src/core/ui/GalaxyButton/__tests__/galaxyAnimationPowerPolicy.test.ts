@@ -34,8 +34,8 @@ describe("galaxyAnimationPowerPolicy", () => {
   it("utilise un profil compact premium sur téléphone", () => {
     mockMatchMedia(true);
     const profile = resolveGalaxyAnimationProfile();
-    expect(profile.starCount).toBe(72);
-    expect(profile.maxFps).toBe(24);
+    expect(profile.starCount).toBe(0);
+    expect(profile.maxFps).toBe(0);
     expect(profile.maxDevicePixelRatio).toBe(1.75);
     expect(profile.interactive).toBe(false);
   });
@@ -43,8 +43,8 @@ describe("galaxyAnimationPowerPolicy", () => {
   it("profil mobilePowerSave explicite sur téléphone", () => {
     mockMatchMedia(true);
     const profile = resolveGalaxyAnimationProfile({ mobilePowerSave: true });
-    expect(profile.starCount).toBe(72);
-    expect(profile.maxFps).toBe(24);
+    expect(profile.starCount).toBe(0);
+    expect(profile.maxFps).toBe(0);
   });
 
   it("utilise 6000 étoiles sur desktop", () => {
