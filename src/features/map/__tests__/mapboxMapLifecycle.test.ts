@@ -17,10 +17,10 @@ describe("mapboxMapLifecycle", () => {
     expect(stop).toHaveBeenCalled();
   });
 
-  it("ne stop pas la carte sur WebView Android", () => {
+  it("stop toujours la carte à la pause (batterie — même WebView Android)", () => {
     const stop = jest.fn();
     pauseMapboxMap({ stop }, { skipStop: true });
-    expect(stop).not.toHaveBeenCalled();
+    expect(stop).toHaveBeenCalled();
   });
 
   it("resume appelle resize sans throw", () => {

@@ -133,7 +133,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const intervalId = window.setInterval(() => {
-      if (!navigator.onLine) return;
+      if (!navigator.onLine || document.hidden) return;
       void (async () => {
         const n = await getCompletionQueueLength();
         if (n > 0) await runFlushWithToasts();

@@ -45,16 +45,14 @@ function defaultProfile(starCount: number): GalaxyAnimationProfile {
 
 function mobileProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
   return {
-    /** Compact dock (≤120 étoiles, ≤20 fps) — fluide sur iPhone sans RAM excessive. */
-    starCount: 100,
-    maxFps: 20,
-    /** Retina net — l’ancien plafond à 1 provoquait le rendu pixelisé. */
-    maxDevicePixelRatio: 3,
+    /** PWA mobile : fond CSS statique uniquement — zéro boucle canvas (surchauffe batterie). */
+    starCount: 0,
+    maxFps: 0,
+    maxDevicePixelRatio: 1.5,
     pauseWhenHidden: true,
-    /** Pas de parallax / boost vitesse au toucher — évite le lag au clic. */
     interactive: false,
-    baseSpeed: 0.5,
-    backgroundEveryNFrames: 12,
+    baseSpeed: 0,
+    backgroundEveryNFrames: 1,
     ...overrides,
   };
 }
