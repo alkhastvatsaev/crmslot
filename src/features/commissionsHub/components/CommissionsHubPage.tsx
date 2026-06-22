@@ -23,6 +23,7 @@ import {
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -34,6 +35,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { technicians } = useTechnicians();
 
@@ -61,7 +63,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     interventionsLoading,
     manualLoading,
     saveTechnicianRate,
-  } = useCommissionsHubData(companyId || null);
+  } = useCommissionsHubData(pageActive ? companyId || null : null);
 
   const patronKpis = useMemo(
     () => buildPatronCommissionKpis({ interventions, manualEntries, rules }),

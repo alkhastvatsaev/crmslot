@@ -16,6 +16,7 @@ import {
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
 import { PatronHubChipRow, PatronHubGuide } from "@/core/ui/hub";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -29,8 +30,9 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { staff, loading, error, refresh } = useCompanyStaff(companyId);
+  const { staff, loading, error, refresh } = useCompanyStaff(pageActive ? companyId : null);
 
   const [view, setView] = useState<TeamView>("active");
   const [selectedUid, setSelectedUid] = useState<string | null>(null);

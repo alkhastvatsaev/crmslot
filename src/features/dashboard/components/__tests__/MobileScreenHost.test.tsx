@@ -4,7 +4,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 
 describe("MobileScreenHost", () => {
-  it("affiche la page active et garde toutes les pages montées (comme desktop)", () => {
+  it("affiche la page active et ne monte que la carte + la page visitée", () => {
     render(
       <DashboardPagerProvider pageCount={3} initialPageIndex={1}>
         <DashboardPageSelectorProvider>
@@ -21,9 +21,8 @@ describe("MobileScreenHost", () => {
 
     expect(screen.getByText("Page B")).toBeInTheDocument();
     expect(screen.getByText("Page A")).toBeInTheDocument();
-    expect(screen.getByText("Page C")).toBeInTheDocument();
+    expect(screen.queryByText("Page C")).not.toBeInTheDocument();
     expect(screen.getByText("Page A").closest("[aria-hidden='true']")).toBeTruthy();
-    expect(screen.getByText("Page C").closest("[aria-hidden='true']")).toBeTruthy();
     expect(screen.getByText("Page B").closest("[aria-hidden='false']")).toBeTruthy();
   });
 });

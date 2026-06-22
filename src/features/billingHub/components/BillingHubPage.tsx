@@ -15,7 +15,7 @@ import {
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -28,12 +28,11 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
-  const pager = useDashboardPagerOptional();
-  const pageActive = pager == null || pager.pageIndex === slotIndex;
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
 
   const { interventions, loading, isPreviewCatalog } = useCompanyBillingInterventions(
-    companyId || null
+    pageActive ? companyId || null : null
   );
 
   const metrics = useMemo(() => computeBillingHubMetrics(interventions), [interventions]);
