@@ -6,8 +6,8 @@ import {
 } from "@/features/map/mapboxMapLifecycle";
 
 describe("mapboxMapLifecycle", () => {
-  it("mobile → pause, desktop → destroy", () => {
-    expect(resolveMapboxLifecycleMode(true)).toBe("pause");
+  it("mobile et desktop → destroy hors écran (libère WebGL)", () => {
+    expect(resolveMapboxLifecycleMode(true)).toBe("destroy");
     expect(resolveMapboxLifecycleMode(false)).toBe("destroy");
   });
 

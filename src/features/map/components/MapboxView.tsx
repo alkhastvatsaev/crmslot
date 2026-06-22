@@ -49,7 +49,6 @@ import {
 import {
   destroyMapboxMap,
   pauseMapboxMap,
-  resolveMapboxLifecycleMode,
   resolveMapboxPauseOptions,
   resumeMapboxMap,
   scheduleMapboxResizeBurst,
@@ -108,6 +107,8 @@ export default function MapboxView() {
   const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
   const dashboardPageIndex = pager?.pageIndex ?? 0;
   const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
+  const mapWebGLActiveRef = useRef(mapWebGLActive);
+  mapWebGLActiveRef.current = mapWebGLActive;
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
   const mapPauseOptions = useMemo(() => resolveMapboxPauseOptions(), []);
@@ -396,9 +397,12 @@ export default function MapboxView() {
         localStorage.setItem("mapboxViewState", JSON.stringify(currentState));
       });
 
+      let resizeRaf = 0;
       sizeObserver = new ResizeObserver(() => {
-        if (document.hidden) return;
-        window.requestAnimationFrame(() => {
+        if (document.hidden || !mapWebGLActiveRef.current) return;
+        if (resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = window.requestAnimationFrame(() => {
+          resizeRaf = 0;
           try {
             map.resize();
           } catch {
@@ -458,19 +462,15 @@ export default function MapboxView() {
     };
   }, []);
 
-  /** Mobile : pause WebGL (tuiles en cache). Desktop : détruit si hub masqué. */
+  /** Hors écran : détruit le contexte WebGL (évite GPU actif en arrière-plan). */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     if (!mapWebGLActive) {
-      if (resolveMapboxLifecycleMode(isMobile) === "pause") {
-        pauseMapboxMap(map, mapPauseOptions);
-      } else {
-        destroyMapboxMap(map);
-        mapRef.current = null;
-        setMapReady(false);
-      }
+      destroyMapboxMap(map);
+      mapRef.current = null;
+      setMapReady(false);
       return;
     }
 
@@ -491,7 +491,7 @@ export default function MapboxView() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !mapWebGLActive) return;
 
     Object.values(markersRef.current).forEach((marker) => marker.remove());
     markersRef.current = {};
@@ -584,7 +584,7 @@ export default function MapboxView() {
       const markerKey = mission.key ?? String(mission.id);
       markersRef.current[markerKey] = marker;
     });
-  }, [visibleMissions, mapReady, isDispatchMap, isMobile]);
+  }, [visibleMissions, mapReady, mapWebGLActive, isDispatchMap, isMobile]);
 
   const handleMobileMapResize = React.useCallback((rail: MobileHubRail) => {
     if (rail !== "center") return;
@@ -595,7 +595,7 @@ export default function MapboxView() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !mapWebGLActive) return;
     const SOURCE = "route-optimize-line";
     const LAYER = "route-optimize-layer";
     const geoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
@@ -620,7 +620,7 @@ export default function MapboxView() {
         },
       });
     }
-  }, [routeLine, mapReady]);
+  }, [routeLine, mapReady, mapWebGLActive]);
 
   const userLocation = useNativeUserLocation(mapReady && mapRenderActive && mapWebGLActive, {
     lowAccuracy: isMobile === true,

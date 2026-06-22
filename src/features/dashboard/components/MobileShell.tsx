@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import dynamic from "next/dynamic";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
@@ -24,12 +23,6 @@ import {
 } from "@/core/ui/dashboardMobileLayout";
 
 type Props = { pages: ReactNode[] };
-
-function DeferredMobileGalaxyDock() {
-  const ready = useDeferredMount({ minDelayMs: 1_500, idleTimeoutMs: 4_500 });
-  if (!ready) return null;
-  return <DashboardGalaxyLayer />;
-}
 
 export default function MobileShell({ pages }: Props) {
   const { open: pageSelectorOpen } = useDashboardPageSelector();
@@ -62,7 +55,7 @@ export default function MobileShell({ pages }: Props) {
             chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
             data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
           >
-            <DeferredMobileGalaxyDock />
+            <DashboardGalaxyLayer />
           </MobileShellSlotGrid>
           <MobileHubDotsBar />
         </footer>
