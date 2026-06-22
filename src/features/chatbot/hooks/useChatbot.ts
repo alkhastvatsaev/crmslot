@@ -38,6 +38,7 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRMSLOT_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
 
@@ -125,18 +126,18 @@ export function useChatbot() {
   const isMobile = useIsMobile();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
-  const [mobileBackgroundArmed, setMobileBackgroundArmed] = useState(false);
+  const documentVisible = useDocumentPageVisible();
   const [streaming, setStreaming] = useState(false);
   const workspaceReady = workspace?.workspaceReady === true;
   const hasDocumentPreview = Boolean(documentPreviewApi.documentPreview.interventionId?.trim());
   const documentLibraryEnabled = Boolean(
     companyId &&
     workspaceReady &&
+    documentVisible &&
     (isMobile !== true ||
       (powerGate.documentsTabActive && powerGate.inboxDataActive) ||
       hasDocumentPreview ||
-      streaming ||
-      mobileBackgroundArmed)
+      streaming)
   );
 
   const supplierOrdersPanelApi = useChatbotSupplierOrdersPanel(
@@ -146,11 +147,11 @@ export function useChatbot() {
   );
 
   const chatbotBackgroundEnabled =
-    isMobile !== true ||
-    mobileBackgroundArmed ||
-    streaming ||
-    supplierOrdersPanelApi.supplierOrdersPanel.open ||
-    Boolean(documentPreviewApi.documentPreview.interventionId?.trim());
+    documentVisible &&
+    (isMobile !== true ||
+      streaming ||
+      supplierOrdersPanelApi.supplierOrdersPanel.open ||
+      Boolean(documentPreviewApi.documentPreview.interventionId?.trim()));
 
   const invoicesPanelApi = useChatbotInvoicesPanel(companyId, documentLibraryEnabled);
   const companyName =
@@ -571,8 +572,6 @@ export function useChatbot() {
     async (text: string, imageDataUrl?: string) => {
       const trimmed = text.trim();
       if (!trimmed || streaming) return;
-
-      if (isMobile === true) setMobileBackgroundArmed(true);
 
       if (pendingTool && isChatbotConfirmationUtterance(trimmed)) {
         await confirmPendingTool();

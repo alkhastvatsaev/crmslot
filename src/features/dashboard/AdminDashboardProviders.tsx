@@ -9,6 +9,7 @@ import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPag
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
+import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
 import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
@@ -35,36 +36,38 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
         <LoginOverlay>
           <DevServiceWorkerCleanup />
           <CompanyWorkspaceProvider>
-            <GalaxyLayerBridgeProvider>
-              <DashboardPagerProvider pageCount={pageCount}>
-                <DashboardPageSelectorProvider>
-                  <ChatbotProvider>
-                    <BackofficeInboxIntentProvider>
-                      <CompanyStockIntentProvider>
-                        <CompanyStockAgentBridgeProvider>
-                          <CrmHistoryAgentBridgeProvider>
-                            <BillingHubAgentBridgeProvider>
-                              <BillingHubIntentProvider>
-                                <TechnicianBackofficeReportBridgeProvider>
-                                  <OfflineSyncProvider>
-                                    <TechnicianQueryProvider>
-                                      <RequesterHubProvider>
-                                        <DeferredAdminBootstraps />
-                                        {children}
-                                      </RequesterHubProvider>
-                                    </TechnicianQueryProvider>
-                                  </OfflineSyncProvider>
-                                </TechnicianBackofficeReportBridgeProvider>
-                              </BillingHubIntentProvider>
-                            </BillingHubAgentBridgeProvider>
-                          </CrmHistoryAgentBridgeProvider>
-                        </CompanyStockAgentBridgeProvider>
-                      </CompanyStockIntentProvider>
-                    </BackofficeInboxIntentProvider>
-                  </ChatbotProvider>
-                </DashboardPageSelectorProvider>
-              </DashboardPagerProvider>
-            </GalaxyLayerBridgeProvider>
+            <FeatureFlagsProvider>
+              <GalaxyLayerBridgeProvider>
+                <DashboardPagerProvider pageCount={pageCount}>
+                  <DashboardPageSelectorProvider>
+                    <ChatbotProvider>
+                      <BackofficeInboxIntentProvider>
+                        <CompanyStockIntentProvider>
+                          <CompanyStockAgentBridgeProvider>
+                            <CrmHistoryAgentBridgeProvider>
+                              <BillingHubAgentBridgeProvider>
+                                <BillingHubIntentProvider>
+                                  <TechnicianBackofficeReportBridgeProvider>
+                                    <OfflineSyncProvider>
+                                      <TechnicianQueryProvider>
+                                        <RequesterHubProvider>
+                                          <DeferredAdminBootstraps />
+                                          {children}
+                                        </RequesterHubProvider>
+                                      </TechnicianQueryProvider>
+                                    </OfflineSyncProvider>
+                                  </TechnicianBackofficeReportBridgeProvider>
+                                </BillingHubIntentProvider>
+                              </BillingHubAgentBridgeProvider>
+                            </CrmHistoryAgentBridgeProvider>
+                          </CompanyStockAgentBridgeProvider>
+                        </CompanyStockIntentProvider>
+                      </BackofficeInboxIntentProvider>
+                    </ChatbotProvider>
+                  </DashboardPageSelectorProvider>
+                </DashboardPagerProvider>
+              </GalaxyLayerBridgeProvider>
+            </FeatureFlagsProvider>
           </CompanyWorkspaceProvider>
         </LoginOverlay>
       </DesktopOnlyGate>

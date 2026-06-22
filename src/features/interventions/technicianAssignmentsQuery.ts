@@ -30,7 +30,7 @@ export async function fetchTechnicianAssignments(
 
 /** Intervalle de resync quand l’app terrain reste ouverte (listener Firestore parfois muet sur mobile). */
 export const TECHNICIAN_ASSIGNMENTS_POLL_MS = 12_000;
-export const TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE = 60_000;
+export const TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE = 180_000;
 
 export function resolveTechnicianAssignmentsPollMs(
   userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""

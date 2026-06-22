@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
+import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
@@ -27,20 +28,22 @@ export default function ClientMobileProviders({ children }: Props) {
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
         <CompanyWorkspaceProvider>
-          <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
-            <DashboardPageSelectorProvider>
-              <RequesterHubProvider>
-                <ClientPortalPushProvider>
-                  <ClientPortalAuthEffects />
-                  <Suspense fallback={null}>
-                    <ClientPortalPaymentReturnEffects />
-                  </Suspense>
-                  <DeferredClientBootstraps />
-                  {children}
-                </ClientPortalPushProvider>
-              </RequesterHubProvider>
-            </DashboardPageSelectorProvider>
-          </DashboardPagerProvider>
+          <FeatureFlagsProvider>
+            <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
+              <DashboardPageSelectorProvider>
+                <RequesterHubProvider>
+                  <ClientPortalPushProvider>
+                    <ClientPortalAuthEffects />
+                    <Suspense fallback={null}>
+                      <ClientPortalPaymentReturnEffects />
+                    </Suspense>
+                    <DeferredClientBootstraps />
+                    {children}
+                  </ClientPortalPushProvider>
+                </RequesterHubProvider>
+              </DashboardPageSelectorProvider>
+            </DashboardPagerProvider>
+          </FeatureFlagsProvider>
         </CompanyWorkspaceProvider>
       </DesktopOnlyGate>
     </DateProvider>

@@ -41,7 +41,11 @@ function mergeInterventionRows(byCompany: Record<string, Intervention[]>): Inter
   return [...merged.values()];
 }
 
-export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCompanyScope) {
+export function useBackOfficeInterventions(
+  companyId: BackOfficeInterventionsCompanyScope,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
   const cidKey = companyScopeKey(companyId);
   const cidList = useMemo(() => (cidKey ? cidKey.split("|") : []), [cidKey]);
   const noFirestore = !isConfigured || !firestore;
@@ -51,7 +55,7 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (noFirestore || cidList.length === 0) return () => {};
+    if (noFirestore || cidList.length === 0 || !enabled) return () => {};
 
     setRowsByCompany({});
     setLoadedCompanyKeys("");
@@ -98,7 +102,7 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
       clearTimeout(timeout);
       for (const unsub of unsubs) unsub();
     };
-  }, [cidKey, cidList, noFirestore]);
+  }, [cidKey, cidList, noFirestore, enabled]);
 
   const interventions = useMemo(
     () => filterInterventionsByCompanyIds(cidList, mergeInterventionRows(rowsByCompany)),

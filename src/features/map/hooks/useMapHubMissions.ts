@@ -26,6 +26,7 @@ import { missionStableKey } from "@/features/map/missionStableKey";
 import type { Mission } from "@/features/map/missionTypes";
 import type { Intervention } from "@/features/interventions/types";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
+import { useFirestoreLiveEnabled } from "@/core/perf/useFirestoreLiveEnabled";
 
 function interventionHasMapCoordinates(iv: Intervention): boolean {
   const loc = iv.location;
@@ -46,13 +47,15 @@ export function useMapHubMissions({ mapHubDataActive = true }: Options = {}) {
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
   const { selectedDate } = useDateContext();
   const requestMobileHubRail = useRequestMobileHubRail();
+  const missionsLive = useFirestoreLiveEnabled(mapHubDataActive);
 
   const { interventions: boInterventions } = useBackOfficeInterventions(
-    isDispatchMap && mapHubDataActive ? (workspace?.activeCompanyId ?? null) : null
+    isDispatchMap && missionsLive ? (workspace?.activeCompanyId ?? null) : null,
+    { enabled: missionsLive }
   );
   const { interventions: techInterventions, firebaseUid: technicianUid } = useTechnicianAssignments(
     {
-      enabled: !isDispatchMap && mapHubDataActive,
+      enabled: !isDispatchMap && missionsLive,
     }
   );
 

@@ -23,6 +23,7 @@ import {
   showTechnicianNewAssignmentNotification,
 } from "@/features/interventions/technicianNewAssignmentAlerts";
 import { toast } from "sonner";
+import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
@@ -53,6 +54,8 @@ function applyAssignmentsToCache(
 export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
   const [pollArmed, setPollArmed] = useState(false);
   const hookEnabled = options.enabled !== false;
+  const documentVisible = useDocumentPageVisible();
+  const listenerEnabled = hookEnabled && documentVisible;
   const queryClient = useQueryClient();
 
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
@@ -161,7 +164,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   syncFromServerRef.current = syncAssignmentsFromServer;
 
   useEffect(() => {
-    if (!hookEnabled || noFirebaseAuth) return () => {};
+    if (!listenerEnabled || noFirebaseAuth) return () => {};
 
     let unsubSnap: (() => void) | undefined;
 
@@ -263,7 +266,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       clearSnap();
       unsubAuth();
     };
-  }, [queryClient, hookEnabled, noFirebaseAuth, notifyNewAssignments]);
+  }, [queryClient, listenerEnabled, noFirebaseAuth, notifyNewAssignments]);
 
   useEffect(() => {
     if (!hookEnabled || !firebaseUid || noFirebaseAuth) return () => {};
