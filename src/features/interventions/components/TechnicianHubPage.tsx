@@ -28,6 +28,7 @@ import {
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import TechnicianMonthCalendar from "@/features/interventions/components/TechnicianMonthCalendar";
@@ -50,6 +51,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const [commandOpen, setCommandOpen] = useState(false);
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
   const geofenceAuto = useFeatureFlag("geofenceAuto");
+  const documentPageVisible = useDocumentPageVisible();
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
@@ -174,7 +176,9 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   return (
     <>
-      {geofenceAuto ? <TechnicianGeofenceWatcher missions={interventions} /> : null}
+      {geofenceAuto && documentPageVisible ? (
+        <TechnicianGeofenceWatcher missions={interventions} />
+      ) : null}
       {commandPaletteEnabled ? (
         <InterventionCommandPalette
           open={commandOpen}

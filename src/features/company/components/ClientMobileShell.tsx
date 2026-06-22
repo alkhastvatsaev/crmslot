@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
-import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
+import ClientMobileGalaxyDock from "@/features/company/components/ClientMobileGalaxyDock";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -68,7 +68,7 @@ export default function ClientMobileShell({ children }: Props) {
           chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
           data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
         >
-          <DashboardGalaxyLayer />
+          <ClientMobileGalaxyDock />
         </MobileShellSlotGrid>
       </footer>
     </div>

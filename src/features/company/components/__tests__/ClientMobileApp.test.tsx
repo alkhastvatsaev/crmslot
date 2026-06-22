@@ -7,9 +7,9 @@ jest.mock("@/features/company/components/CompanyHubPage", () => ({
   default: () => <div data-testid="company-hub-page-mock" />,
 }));
 
-jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
+jest.mock("@/features/company/components/ClientMobileGalaxyDock", () => ({
   __esModule: true,
-  default: () => <div data-testid="client-galaxy-layer" />,
+  default: () => <div data-testid="client-mobile-galaxy-dock" />,
 }));
 
 describe("ClientMobileApp", () => {
@@ -20,6 +20,7 @@ describe("ClientMobileApp", () => {
     expect(screen.getByTestId("client-mobile-page-0")).toBeInTheDocument();
     expect(screen.getByTestId("company-hub-page-mock")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-shell-footer")).toBeInTheDocument();
-    expect(screen.getByTestId("client-galaxy-layer")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-shell-galaxy")).toBeInTheDocument();
+    expect(screen.getByTestId("client-mobile-galaxy-dock")).toBeInTheDocument();
   });
 });
