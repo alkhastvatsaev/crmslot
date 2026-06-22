@@ -4,15 +4,18 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 
 ## Points d'entrée
 
-| Fichier                                     | Rôle                                                         |
-| ------------------------------------------- | ------------------------------------------------------------ |
-| `types.ts`                                  | Type `Intervention` — **import public #1** pour toute l'app  |
-| `technicianSchedule.ts`                     | Filtres/tri missions (utilisé par map, backoffice, hubs)     |
-| `hooks/useSmartForm.ts`                     | Wizard demande client 5 steps — **968 lignes, P0 découpage** |
-| `components/TechnicianMobileApp.tsx`        | App terrain `/m/technician`                                  |
-| `components/RequesterInterventionPanel.tsx` | Portail demandeur                                            |
-| `workflow/interventionWorkflow.ts`          | Transitions statut                                           |
-| `assignInterventionToTechnician.ts`         | Assignation (seuil coverage P0 100 %)                        |
+| Fichier                                     | Rôle                                                        |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| `types.ts`                                  | Type `Intervention` — **import public #1** pour toute l'app |
+| `technicianSchedule.ts`                     | Filtres/tri missions (utilisé par map, backoffice, hubs)    |
+| `hooks/useSmartForm.ts`                     | Orchestrateur wizard demande client (~220 lignes)           |
+| `smartFormDraftStorage.ts`                  | Brouillon localStorage + step initial                       |
+| `smartFormSubmit.ts`                        | Soumission Firestore + upload audio                         |
+| `hooks/useSmartFormDraftEffects.ts`         | Autosave, prefill, slots pris                               |
+| `components/TechnicianMobileApp.tsx`        | App terrain `/m/technician`                                 |
+| `components/RequesterInterventionPanel.tsx` | Portail demandeur                                           |
+| `workflow/interventionWorkflow.ts`          | Transitions statut                                          |
+| `assignInterventionToTechnician.ts`         | Assignation (seuil coverage P0 100 %)                       |
 
 ## Données
 
