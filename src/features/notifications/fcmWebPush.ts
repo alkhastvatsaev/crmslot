@@ -15,9 +15,11 @@ export type FcmUiStatus =
 
 const SW_READY_MS = 14_000;
 
-/** Service worker PWA enregistré (false en `npm run dev` sans `npm run dev:pwa`). */
+import { isMobileServiceWorkerAllowed } from "@/core/pwa/mobileServiceWorkerPolicy";
+
+/** Service worker PWA enregistré (false en dev sans PWA, false sur iPhone). */
 export function isPushServiceWorkerEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED === "true";
+  return isMobileServiceWorkerAllowed();
 }
 
 /** Attendu en dev local sans PWA — pas de bruit console. */
