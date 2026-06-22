@@ -1787,7 +1787,12 @@
     "mobile": {
       "rail_missions": "Jobs",
       "rail_map": "Map",
-      "rail_inbox": "Inbox"
+      "rail_inbox": "Inbox",
+      "webgl_off_title": "Eco map (no WebGL)",
+      "webgl_off_body": "Battery test mode — Mapbox is off on mobile. Missions and inbox still work.",
+      "webgl_off_empty": "No missions with an address for today.",
+      "webgl_off_hint": "Ultra mode: enable mobileMapWebGL in company feature flags.",
+      "open_in_maps": "Open in Maps"
     },
     "daily_missions": {
       "archive_aria": "Archive — hide this mission from today’s map on this device",

@@ -33,9 +33,10 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import {
   applyMapboxPremiumBasemapConfig,
-  isMapWebGLActive,
   markerGlowBlurClass,
   resolveMapboxInitOptions,
   resolveMapboxMapRuntimeOptions,
@@ -103,10 +104,16 @@ export default function MapboxView() {
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
+  const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
   const dashboardPageIndex = pager?.pageIndex ?? 0;
-  const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
+  const mapWebGLActive = resolveMapWebGLActive(
+    isMobile,
+    dashboardPageIndex,
+    mapRenderActive,
+    mobileMapWebGL
+  );
   const mapWebGLActiveRef = useRef(mapWebGLActive);
   mapWebGLActiveRef.current = mapWebGLActive;
   const workspace = useCompanyWorkspaceOptional();
