@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { parseBackofficeChatNotificationSearchParams } from "@/features/notifications/backofficeChatNotificationUrls";
 
 const BackofficeChatNotificationBootstrap = dynamic(
@@ -29,10 +30,11 @@ const ActivityLogPageObserver = dynamic(
 
 function DeferredAdminBootstrapsInner() {
   const searchParams = useSearchParams();
+  const isMobile = useIsMobile();
   const pushIntent = parseBackofficeChatNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
-    minDelayMs: pushIntent ? 0 : 2_500,
-    idleTimeoutMs: 5_000,
+    minDelayMs: pushIntent || isMobile !== true ? 0 : 2_500,
+    idleTimeoutMs: isMobile === true ? 5_000 : 0,
   });
 
   if (!pushIntent && !idleReady) return null;
