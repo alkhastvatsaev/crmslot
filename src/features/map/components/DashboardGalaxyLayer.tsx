@@ -6,6 +6,7 @@ import { useGalaxyLayerBridge } from "@/features/map/GalaxyLayerBridgeContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { useMobileEmergencyLite } from "@/core/perf/useMobileEmergencyLite";
 import BillingHubGalaxyComposer from "@/features/billingHub/components/BillingHubGalaxyComposer";
 import CrmHistoryGalaxyComposer from "@/features/crmHistory/components/CrmHistoryGalaxyComposer";
 import CompanyStockGalaxyComposer from "@/features/featureHub/components/CompanyStockGalaxyComposer";
@@ -21,7 +22,12 @@ export default function DashboardGalaxyLayer() {
   const pager = useDashboardPagerOptional();
   const pageIndex = pager?.pageIndex;
   const isMobile = useIsMobile();
+  const emergencyLite = useMobileEmergencyLite();
   const dispatchVoice = useFeatureFlag("dispatchVoice");
+
+  if (emergencyLite) {
+    return null;
+  }
 
   let hubComposer: ReactNode = null;
   if (pageIndex === FEATURE_HUB_SLOT_INDEX) hubComposer = <CompanyStockGalaxyComposer />;
