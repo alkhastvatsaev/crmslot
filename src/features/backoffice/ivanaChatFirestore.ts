@@ -1,7 +1,6 @@
 import {
   addDoc,
   collection,
-  getDocs,
   limit,
   onSnapshot,
   orderBy,
@@ -9,12 +8,7 @@ import {
   serverTimestamp,
   where,
   type Firestore,
-  type Query,
 } from "firebase/firestore";
-import {
-  shouldUseIosFirestorePolling,
-  startIosFirestorePoll,
-} from "@/core/firestore/iosFirestorePolling";
 
 export const IVANA_PORTAL_CHAT_COLLECTION = "portal_ivana_chat_messages";
 
@@ -31,37 +25,6 @@ export type IvanaPortalChatDoc = {
   interventionId?: string | null;
   imageUrls?: string[];
 };
-
-function mapIvanaChatDocs(snap: {
-  docs: Array<{ id: string; data: () => unknown }>;
-}): IvanaPortalChatDoc[] {
-  return snap.docs.map((d) => {
-    const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
-    return { id: d.id, ...data } as IvanaPortalChatDoc;
-  });
-}
-
-function subscribeFirestoreQueryIosPoll<T>(
-  q: Query,
-  onRows: (rows: T[]) => void,
-  onError: ((e: Error) => void) | undefined,
-  mapRows: (snap: { docs: Array<{ id: string; data: () => unknown }> }) => T[]
-): () => void {
-  let cancelled = false;
-  const pull = async () => {
-    try {
-      const snap = await getDocs(q);
-      if (!cancelled) onRows(mapRows(snap));
-    } catch (e) {
-      onError?.(e instanceof Error ? e : new Error(String(e)));
-    }
-  };
-  const stop = startIosFirestorePoll(() => void pull(), true);
-  return () => {
-    cancelled = true;
-    stop();
-  };
-}
 
 export function subscribeIvanaPortalMessages(
   db: Firestore,
@@ -80,16 +43,17 @@ export function subscribeIvanaPortalMessages(
     orderBy("createdAt", "asc"),
     limit(200)
   );
-
-  if (shouldUseIosFirestorePolling()) {
-    return subscribeFirestoreQueryIosPoll(q, onRows, onError, mapIvanaChatDocs);
-  }
-
   let unsub: (() => void) | undefined;
   const timeout = setTimeout(() => {
     unsub = onSnapshot(
       q,
-      (snap) => onRows(mapIvanaChatDocs(snap)),
+      (snap) => {
+        const rows = snap.docs.map((d) => {
+          const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
+          return { id: d.id, ...data } as IvanaPortalChatDoc;
+        });
+        onRows(rows);
+      },
       (e) => {
         onError?.(e instanceof Error ? e : new Error(String(e)));
       }
@@ -118,16 +82,18 @@ export function subscribePortalChatForIntervention(
     orderBy("createdAt", "asc"),
     limit(200)
   );
-
-  if (shouldUseIosFirestorePolling()) {
-    return subscribeFirestoreQueryIosPoll(q, onRows, onError, mapIvanaChatDocs);
-  }
-
   let unsub: (() => void) | undefined;
   const timeout = setTimeout(() => {
     unsub = onSnapshot(
       q,
-      (snap) => onRows(mapIvanaChatDocs(snap)),
+      (snap) => {
+        onRows(
+          snap.docs.map((d) => {
+            const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
+            return { id: d.id, ...data };
+          })
+        );
+      },
       (e) => onError?.(e instanceof Error ? e : new Error(String(e)))
     );
   }, 10);

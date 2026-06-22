@@ -1,20 +1,11 @@
 import { isMapWebGLActive } from "@/features/map/mapboxPowerProfile";
 
-/**
- * WebGL Mapbox sur téléphone — désactivé par défaut (batterie / diagnostic).
- * Activer via feature flag `mobileMapWebGL` (mode ultra premium).
- */
+/** WebGL Mapbox sur téléphone — toujours actif quand la carte est visible. */
 export function resolveMapWebGLActive(
   isMobile: boolean | null,
   dashboardPageIndex: number,
   mapRenderActive: boolean,
-  mobileMapWebGLEnabled: boolean
+  _mobileMapWebGLEnabled: boolean
 ): boolean {
-  if (!isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive)) {
-    return false;
-  }
-  if (isMobile === true && !mobileMapWebGLEnabled) {
-    return false;
-  }
-  return true;
+  return isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
 }

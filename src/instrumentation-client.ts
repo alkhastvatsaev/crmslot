@@ -1,12 +1,9 @@
-import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
-
 import { clientSentryDsn, sentryEnabled } from "@/core/monitoring/sentry";
 import { initProductAnalytics } from "@/core/analytics/productAnalytics";
 
 const dsn = clientSentryDsn();
-const iosPhonePowerSave = typeof navigator !== "undefined" && isIosPhonePowerSave();
 
-if (!iosPhonePowerSave && sentryEnabled(dsn)) {
+if (sentryEnabled(dsn)) {
   void import("@sentry/nextjs").then((Sentry) => {
     Sentry.init({
       dsn,
@@ -16,6 +13,4 @@ if (!iosPhonePowerSave && sentryEnabled(dsn)) {
   });
 }
 
-if (!iosPhonePowerSave) {
-  initProductAnalytics();
-}
+initProductAnalytics();

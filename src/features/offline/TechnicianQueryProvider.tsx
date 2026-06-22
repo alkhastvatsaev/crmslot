@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
-import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 
 function createQueryClient() {
   return new QueryClient({
@@ -26,7 +25,6 @@ export function TechnicianQueryProvider({ children }: { children: React.ReactNod
     // In Jest/jsdom, persistence is not needed and some persist-client builds can be problematic.
     if (process.env.NODE_ENV === "test") return null;
     if (typeof window === "undefined") return null;
-    if (isMobilePowerSaveClient()) return null;
     return createSyncStoragePersister({
       storage: window.localStorage,
       key: "bm_tanstack_technician_v1",

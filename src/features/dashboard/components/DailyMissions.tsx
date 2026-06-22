@@ -1,5 +1,6 @@
 "use client";
 import React, { useMemo } from "react";
+import { motion } from "framer-motion";
 import type { Mission } from "@/features/map/missionTypes";
 import { dailyMissionCardToneFromStatus } from "@/features/interventions/technicianSchedule";
 import {
@@ -49,33 +50,61 @@ export default function DailyMissions({
         className="grid shrink-0 grid-cols-3 gap-3 px-3 pb-6 pt-4 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]"
         data-testid={isEmpty ? "daily-missions-empty-grid" : "daily-missions-grid"}
       >
-        {gridMissions.map((mission) => {
+        {gridMissions.map((mission, index) => {
           const tone = mission.statusCode
             ? dailyMissionCardToneFromStatus(mission.statusCode)
             : "upcoming";
           const isDone = tone === "done";
           const inProgress = tone === "active";
 
-          const glow = isDone
+          const baseShadow = "0 6px 18px -4px rgba(15,23,42,0.1)";
+
+          const activeGlow = isDone
             ? "0 0 15px rgba(40,224,90,0.1), 0 5px 20px rgba(40,224,90,0.08)"
             : inProgress
               ? "0 0 15px rgba(255,149,0,0.1), 0 5px 20px rgba(255,149,0,0.08)"
               : "0 0 15px rgba(0,0,0,0.05), 0 5px 20px rgba(0,0,0,0.04)";
 
-          const cardShadow = `0 6px 18px -4px rgba(15,23,42,0.1), ${glow}`;
+          const transparentGlow = isDone
+            ? "0 0 15px rgba(40,224,90,0), 0 5px 20px rgba(40,224,90,0)"
+            : inProgress
+              ? "0 0 15px rgba(255,149,0,0), 0 5px 20px rgba(255,149,0,0)"
+              : "0 0 15px rgba(0,0,0,0), 0 5px 20px rgba(0,0,0,0)";
+
+          const fullShadow = `${baseShadow}, ${activeGlow}`;
+          const offShadow = `${baseShadow}, ${transparentGlow}`;
 
           const textGradient = isDone
             ? "from-green-500 via-emerald-600 to-teal-800"
             : "from-slate-700 via-slate-900 to-black";
 
           return (
-            <button
-              type="button"
+            <motion.div
               key={mission.key ?? String(mission.id)}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{
+                opacity: 1,
+                scale: [1, 1, 1.02, 1],
+                boxShadow: [offShadow, offShadow, fullShadow, offShadow],
+              }}
+              transition={{
+                boxShadow: {
+                  duration: 15,
+                  repeat: Infinity,
+                  times: [0, 0.666, 0.833, 1],
+                  ease: "easeInOut",
+                },
+                scale: {
+                  duration: 15,
+                  repeat: Infinity,
+                  times: [0, 0.666, 0.833, 1],
+                  ease: "easeInOut",
+                },
+                opacity: { duration: 0.4, delay: index * 0.1 },
+              }}
               onClick={() => onMissionClick && onMissionClick(mission)}
               data-testid={mission.key ? `daily-mission-${mission.key}` : undefined}
-              style={{ boxShadow: cardShadow }}
-              className="group relative w-full max-w-[95px] justify-self-center p-3 rounded-[24px] bg-white cursor-pointer flex flex-col items-center justify-center gap-1.5 aspect-square text-center active:scale-[0.97] transition-transform duration-150"
+              className={`group relative w-full max-w-[95px] justify-self-center p-3 rounded-[24px] bg-white/95 backdrop-blur-xl transition-all duration-[400ms] ease-out cursor-pointer flex flex-col items-center justify-center gap-1.5 aspect-square text-center hover:scale-[1.02] active:scale-[0.96]`}
             >
               <h3
                 className={`text-[14px] font-bold tracking-[-0.02em] leading-tight bg-gradient-to-br ${textGradient} bg-clip-text text-transparent`}
@@ -90,7 +119,7 @@ export default function DailyMissions({
                   {mission.time}
                 </span>
               </div>
-            </button>
+            </motion.div>
           );
         })}
         {trailingEmptySlots > 0

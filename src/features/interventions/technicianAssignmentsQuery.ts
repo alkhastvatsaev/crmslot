@@ -1,5 +1,3 @@
-import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
-import { IOS_FIRESTORE_POLL_MS } from "@/core/firestore/iosFirestorePolling";
 import {
   collection,
   getDocs,
@@ -29,13 +27,11 @@ export async function fetchTechnicianAssignments(
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
 }
 
-/** Intervalle de resync quand l’app terrain reste ouverte (listener Firestore parfois muet sur mobile). */
+/** Resync terrain — intervalle court (mode capacité max). */
 export const TECHNICIAN_ASSIGNMENTS_POLL_MS = 12_000;
-export const TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE = 180_000;
 
 export function resolveTechnicianAssignmentsPollMs(
-  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+  _userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): number {
-  if (isIosPhonePowerSave(userAgent)) return IOS_FIRESTORE_POLL_MS;
   return TECHNICIAN_ASSIGNMENTS_POLL_MS;
 }

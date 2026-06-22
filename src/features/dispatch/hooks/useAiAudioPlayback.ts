@@ -18,7 +18,6 @@ import {
   uploadPathCandidatesFromUrl,
   waitForCanPlay,
 } from "@/features/dispatch/audioUtils";
-import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 
 export type AiPlaybackSync = {
   clipUrl: string;
@@ -616,7 +615,7 @@ export function useAiAudioPlayback({
       }
     };
 
-    const pollIntervalMs = isMobilePowerSaveClient() ? 30_000 : 5_000;
+    const pollIntervalMs = 5_000;
     setPollActive(true);
     const iv = setInterval(poll, pollIntervalMs);
     poll();

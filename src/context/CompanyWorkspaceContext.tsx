@@ -9,17 +9,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
-import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
-import {
-  IOS_FIRESTORE_SLOW_POLL_MS,
-  shouldUseIosFirestorePolling,
-  startIosFirestorePoll,
-} from "@/core/firestore/iosFirestorePolling";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
 
@@ -58,7 +52,6 @@ export function CompanyWorkspaceProvider({
   const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
   const [membershipJoinPending, setMembershipJoinPending] = useState(false);
   const [membershipJoinError, setMembershipJoinError] = useState<string | null>(null);
-  const documentVisible = useDocumentPageVisible();
 
   const persistActiveId = useCallback((id: string) => {
     if (typeof window !== "undefined") {
@@ -104,83 +97,54 @@ export function CompanyWorkspaceProvider({
       return () => {};
     }
 
-    if (!documentVisible) {
-      return () => {};
-    }
-
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMembershipsReady(false);
     setMemberships([]);
 
     let unsub: (() => void) | undefined;
-    let stopPoll: (() => void) | undefined;
     const bootstrapTimeout = setTimeout(() => {
       setMembershipsReady(true);
     }, 8000);
 
-    const applyMembershipSnap = (snap: { docs: Array<{ id: string; data: () => unknown }> }) => {
-      clearTimeout(bootstrapTimeout);
-      const rows: CompanyMembershipRow[] = snap.docs.map((d) => {
-        const data = d.data() as { role?: string; companyName?: string };
-        return {
-          companyId: d.id,
-          companyName: typeof data.companyName === "string" ? data.companyName : "Sans nom",
-          role: data.role === "admin" ? "admin" : "collaborateur",
-        };
-      });
-      setMemberships(rows);
-      setMembershipsReady(true);
-
-      const stored =
-        typeof window !== "undefined"
-          ? window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)
-          : null;
-
-      setActiveCompanyIdState((prev) => {
-        const storedTrimmed = stored?.trim() ?? "";
-        if (rows.length === 0) {
-          return storedTrimmed || prev.trim();
-        }
-        let next = "";
-        if (storedTrimmed && rows.some((r) => r.companyId === storedTrimmed)) next = storedTrimmed;
-        else if (prev && rows.some((r) => r.companyId === prev)) next = prev;
-        else next = rows[0]?.companyId ?? "";
-        if (typeof window !== "undefined") {
-          if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
-          else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
-        }
-        return next;
-      });
-    };
-
     const timeout = setTimeout(() => {
       const membershipsCol = collection(firestore!, "users", firebaseUid, "company_memberships");
-
-      if (shouldUseIosFirestorePolling()) {
-        const cancelled = false;
-        const pull = async () => {
-          try {
-            const snap = await getDocs(membershipsCol);
-            if (!cancelled) applyMembershipSnap(snap);
-          } catch {
-            if (!cancelled) {
-              clearTimeout(bootstrapTimeout);
-              setMemberships([]);
-              setMembershipsReady(true);
-            }
-          }
-        };
-        stopPoll = startIosFirestorePoll(
-          () => void pull(),
-          documentVisible,
-          IOS_FIRESTORE_SLOW_POLL_MS
-        );
-        return;
-      }
-
       unsub = onSnapshot(
         membershipsCol,
-        (snap) => applyMembershipSnap(snap),
+        (snap) => {
+          clearTimeout(bootstrapTimeout);
+          const rows: CompanyMembershipRow[] = snap.docs.map((d) => {
+            const data = d.data() as { role?: string; companyName?: string };
+            return {
+              companyId: d.id,
+              companyName: typeof data.companyName === "string" ? data.companyName : "Sans nom",
+              role: data.role === "admin" ? "admin" : "collaborateur",
+            };
+          });
+          setMemberships(rows);
+          setMembershipsReady(true);
+
+          const stored =
+            typeof window !== "undefined"
+              ? window.localStorage.getItem(ACTIVE_COMPANY_STORAGE_KEY)
+              : null;
+
+          setActiveCompanyIdState((prev) => {
+            const storedTrimmed = stored?.trim() ?? "";
+            if (rows.length === 0) {
+              return storedTrimmed || prev.trim();
+            }
+            let next = "";
+            if (storedTrimmed && rows.some((r) => r.companyId === storedTrimmed))
+              next = storedTrimmed;
+            else if (prev && rows.some((r) => r.companyId === prev)) next = prev;
+            else next = rows[0]?.companyId ?? "";
+            if (typeof window !== "undefined") {
+              if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
+              else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
+            }
+            return next;
+          });
+        },
         () => {
           clearTimeout(bootstrapTimeout);
           setMemberships([]);
@@ -193,9 +157,8 @@ export function CompanyWorkspaceProvider({
       clearTimeout(bootstrapTimeout);
       clearTimeout(timeout);
       unsub?.();
-      stopPoll?.();
     };
-  }, [firebaseUid, documentVisible]);
+  }, [firebaseUid]);
 
   const retryDefaultCompanyJoin = useCallback(async () => {
     const user = auth?.currentUser;

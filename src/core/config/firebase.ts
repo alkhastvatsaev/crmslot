@@ -1,7 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { logger } from "@/core/logger";
 import { maybeInitializeAppCheck } from "@/core/config/firebase-app-check";
-import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 import { getDatabase, type Database } from "firebase/database";
 import {
   enableMultiTabIndexedDbPersistence,
@@ -89,13 +88,8 @@ const clientPortalAuth = clientPortalApp ? getAuth(clientPortalApp) : null;
 const clientPortalFirestore = clientPortalApp ? getOrInitFirestore(clientPortalApp) : null;
 const storage = app ? getStorage(app) : null;
 
-/** Persistence IndexedDB : desktop PWA ; désactivée sur mobile (sync + chauffe). */
-if (
-  typeof window !== "undefined" &&
-  firestore &&
-  process.env.NODE_ENV === "production" &&
-  !isMobilePowerSaveClient()
-) {
+/** Persistence IndexedDB — PWA premium (tous appareils). */
+if (typeof window !== "undefined" && firestore && process.env.NODE_ENV === "production") {
   enableMultiTabIndexedDbPersistence(firestore).catch((err: { code?: string }) => {
     if (err.code === "failed-precondition") {
       logger.warn("Le mode hors-ligne ne peut être activé que sur un seul onglet à la fois.");
