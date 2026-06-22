@@ -9,13 +9,10 @@ import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentCont
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
-import TechnicianNotificationBootstrap from "@/features/notifications/components/TechnicianNotificationBootstrap";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
-import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
-import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
-import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
+import DeferredTechnicianBootstraps from "@/features/interventions/components/DeferredTechnicianBootstraps";
 
 const TECHNICIAN_MOBILE_PAGE_COUNT = 1;
 
@@ -29,26 +26,21 @@ export default function TechnicianMobileProviders({ children }: Props) {
     <DateProvider>
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
-        <AndroidAppInstallPromoBootstrap surface="technician" presentation="toast" />
         <CompanyWorkspaceProvider>
-          <GalaxyLayerBridgeProvider>
-            <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
-              <DashboardPageSelectorProvider>
-                <ChatbotProvider>
-                  <TechnicianQueryProvider>
-                    <OfflineSyncProvider>
-                      <TechnicianCaseIntentProvider>
-                        <TechnicianFinishJobProvider>
-                          <TechnicianNotificationBootstrap />
-                          <TechnicianLoginGate>{children}</TechnicianLoginGate>
-                        </TechnicianFinishJobProvider>
-                      </TechnicianCaseIntentProvider>
-                    </OfflineSyncProvider>
-                  </TechnicianQueryProvider>
-                </ChatbotProvider>
-              </DashboardPageSelectorProvider>
-            </DashboardPagerProvider>
-          </GalaxyLayerBridgeProvider>
+          <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
+            <DashboardPageSelectorProvider>
+              <TechnicianQueryProvider>
+                <OfflineSyncProvider>
+                  <TechnicianCaseIntentProvider>
+                    <TechnicianFinishJobProvider>
+                      <DeferredTechnicianBootstraps />
+                      <TechnicianLoginGate>{children}</TechnicianLoginGate>
+                    </TechnicianFinishJobProvider>
+                  </TechnicianCaseIntentProvider>
+                </OfflineSyncProvider>
+              </TechnicianQueryProvider>
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
         </CompanyWorkspaceProvider>
       </DesktopOnlyGate>
     </DateProvider>

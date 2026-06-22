@@ -27,7 +27,6 @@ import {
 } from "@/features/interventions/technicianSchedule";
 import InterventionCommandPalette from "@/features/interventions/components/InterventionCommandPalette";
 import TechnicianGeofenceWatcher from "@/features/geofence/components/TechnicianGeofenceWatcher";
-import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
@@ -52,7 +51,6 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
-  useTechnicianAssignmentPushBootstrap();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
   const { logIntervention } = useActivityLog();
   const pageSelector = useDashboardPageSelectorOptional();

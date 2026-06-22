@@ -74,14 +74,17 @@ export async function getCurrentNativePosition(
 
 export async function watchNativePosition(
   onUpdate: (coords: NativeCoords) => void,
+  opts?: { highAccuracy?: boolean },
   deps: NativeGeolocationDeps = PROD_DEPS
 ): Promise<(() => Promise<void>) | null> {
   if (!deps.isNative()) return null;
   const plugin = await deps.loadPlugin();
   if (!(await ensurePermission(plugin))) return null;
 
+  const highAccuracy = opts?.highAccuracy === true;
+
   const watchId = await plugin.watchPosition(
-    { enableHighAccuracy: true, timeout: 15_000 },
+    { enableHighAccuracy: highAccuracy, timeout: 15_000 },
     (pos, err) => {
       if (err || !pos) return;
       onUpdate({

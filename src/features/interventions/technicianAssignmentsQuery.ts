@@ -1,3 +1,4 @@
+import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 import {
   collection,
   getDocs,
@@ -29,3 +30,12 @@ export async function fetchTechnicianAssignments(
 
 /** Intervalle de resync quand l’app terrain reste ouverte (listener Firestore parfois muet sur mobile). */
 export const TECHNICIAN_ASSIGNMENTS_POLL_MS = 12_000;
+export const TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE = 60_000;
+
+export function resolveTechnicianAssignmentsPollMs(
+  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+): number {
+  return isMobilePowerSaveClient(userAgent)
+    ? TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE
+    : TECHNICIAN_ASSIGNMENTS_POLL_MS;
+}

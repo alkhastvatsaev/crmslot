@@ -20,12 +20,16 @@ type Options = {
 
 type LatLngSample = { latitude: number; longitude: number };
 
+const WEB_GEO_OPTIONS: PositionOptions = {
+  enableHighAccuracy: false,
+  maximumAge: 30_000,
+  timeout: 20_000,
+};
+
 /**
  * Surveille la position GPS et déclenche onArrival quand le technicien
  * arrive à moins de radiusMeters d'une intervention en cours.
- *
- * En Capacitor native : utilise @capacitor/geolocation (permissions natives).
- * En web : fallback navigator.geolocation.watchPosition.
+ * Pause en arrière-plan pour préserver la batterie.
  */
 export function useGeofenceMonitor(
   activeMissions: Intervention[],
@@ -64,36 +68,57 @@ export function useGeofenceMonitor(
     if (!enabled) return;
     triggeredRef.current = new Set();
 
-    // Capacitor native : plugin Geolocation (permissions natives + background fiabilité).
-    if (isCapacitorNative()) {
-      let cancelled = false;
-      let unwatch: (() => Promise<void>) | null = null;
+    let cancelled = false;
+    let cleanup: (() => void | Promise<void>) | null = null;
 
-      void (async () => {
-        const stop = await watchNativePosition((coords) => {
-          if (cancelled) return;
-          check({ latitude: coords.latitude, longitude: coords.longitude });
-        });
-        if (cancelled) {
-          await stop?.();
-          return;
-        }
-        unwatch = stop;
-      })();
+    const stopWatch = () => {
+      const fn = cleanup;
+      cleanup = null;
+      if (fn) void fn();
+    };
 
-      return () => {
-        cancelled = true;
-        void unwatch?.();
-      };
-    }
+    const startWatch = () => {
+      if (cancelled || cleanup || typeof document === "undefined") return;
+      if (document.hidden) return;
 
-    // Web : navigator.geolocation
-    if (typeof navigator === "undefined" || !navigator.geolocation) return;
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => check({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      undefined,
-      { enableHighAccuracy: true, maximumAge: 10_000 }
-    );
-    return () => navigator.geolocation.clearWatch(watchId);
+      if (isCapacitorNative()) {
+        void (async () => {
+          const stop = await watchNativePosition((coords) => {
+            if (cancelled || document.hidden) return;
+            check({ latitude: coords.latitude, longitude: coords.longitude });
+          });
+          if (cancelled) {
+            await stop?.();
+            return;
+          }
+          cleanup = () => {
+            void stop?.();
+          };
+        })();
+        return;
+      }
+
+      if (typeof navigator === "undefined" || !navigator.geolocation) return;
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => check({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+        undefined,
+        WEB_GEO_OPTIONS
+      );
+      cleanup = () => navigator.geolocation.clearWatch(watchId);
+    };
+
+    const onVisibility = () => {
+      if (document.hidden) stopWatch();
+      else startWatch();
+    };
+
+    startWatch();
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      stopWatch();
+    };
   }, [enabled, check]);
 }
