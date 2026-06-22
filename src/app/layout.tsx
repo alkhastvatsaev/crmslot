@@ -50,6 +50,7 @@ import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
 import DeferredRootBootstraps from "@/core/native/DeferredRootBootstraps";
 import PwaStaleBundleGuard from "@/core/pwa/PwaStaleBundleGuard";
+import LivePerfProbeRoot from "@/core/perf/LivePerfProbeRoot";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -68,6 +69,7 @@ export default function RootLayout({
       <body className="notranslate" suppressHydrationWarning>
         <NativeShellBootstrap />
         <PwaStaleBundleGuard />
+        <LivePerfProbeRoot />
         <DeferredRootBootstraps />
         <I18nProvider>{children}</I18nProvider>
         <Toaster position="top-center" theme="light" richColors closeButton />

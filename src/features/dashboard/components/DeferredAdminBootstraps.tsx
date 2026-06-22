@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileEmergencyLite } from "@/core/perf/useMobileEmergencyLite";
 import { parseBackofficeChatNotificationSearchParams } from "@/features/notifications/backofficeChatNotificationUrls";
 
 const BackofficeChatNotificationBootstrap = dynamic(
@@ -31,18 +32,21 @@ const ActivityLogPageObserver = dynamic(
 function DeferredAdminBootstrapsInner() {
   const searchParams = useSearchParams();
   const isMobile = useIsMobile();
+  const emergencyLite = useMobileEmergencyLite();
   const pushIntent = parseBackofficeChatNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
-    minDelayMs: pushIntent || isMobile !== true ? 0 : 2_500,
-    idleTimeoutMs: isMobile === true ? 5_000 : 0,
+    minDelayMs: pushIntent || isMobile !== true ? 0 : emergencyLite ? 8_000 : 2_500,
+    idleTimeoutMs: isMobile === true ? (emergencyLite ? 12_000 : 5_000) : 0,
   });
 
   if (!pushIntent && !idleReady) return null;
 
+  const skipHeavyMobile = isMobile === true && emergencyLite && !pushIntent;
+
   return (
     <>
       {pushIntent || idleReady ? <BackofficeChatNotificationBootstrap /> : null}
-      {idleReady ? (
+      {idleReady && !skipHeavyMobile ? (
         <>
           <BackofficePushBootstrap />
           <AndroidAppInstallPromoBootstrap surface="admin" presentation="dialog" />

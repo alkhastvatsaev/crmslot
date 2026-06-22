@@ -19,6 +19,8 @@ export type CrmslotFeatureFlags = {
   dispatchVoice: boolean;
   /** Mode ultra : carte Mapbox WebGL sur téléphone (désactivé par défaut — batterie). */
   mobileMapWebGL: boolean;
+  /** Mode urgence mobile : un hub, pas push/dispatch lourd (deadline perf). */
+  mobileEmergencyLite: boolean;
   /** Géofencing auto — changement de statut à l'arrivée sur site. */
   geofenceAuto: boolean;
   /** Gestion du stock véhicule par technicien. */
@@ -53,6 +55,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   slaTracker: true,
   dispatchVoice: true,
   mobileMapWebGL: false,
+  mobileEmergencyLite: true,
   geofenceAuto: false,
   vehicleStock: true,
   whatsappNotifications: true,
@@ -107,6 +110,10 @@ export function featureFlagsFromEnv(): CrmslotFeatureFlags {
     mobileMapWebGL: readEnvBool(
       "NEXT_PUBLIC_FF_MOBILE_MAP_WEBGL",
       DEFAULT_FEATURE_FLAGS.mobileMapWebGL
+    ),
+    mobileEmergencyLite: readEnvBool(
+      "NEXT_PUBLIC_FF_MOBILE_EMERGENCY_LITE",
+      DEFAULT_FEATURE_FLAGS.mobileEmergencyLite
     ),
     geofenceAuto: readEnvBool("NEXT_PUBLIC_FF_GEOFENCE", DEFAULT_FEATURE_FLAGS.geofenceAuto),
     vehicleStock: readEnvBool("NEXT_PUBLIC_FF_VEHICLE_STOCK", DEFAULT_FEATURE_FLAGS.vehicleStock),
