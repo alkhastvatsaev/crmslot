@@ -110,6 +110,9 @@ export default function MapboxView() {
   const mapWebGLActive = isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const mapWebGLActiveRef = useRef(mapWebGLActive);
   mapWebGLActiveRef.current = mapWebGLActive;
+  const workspace = useCompanyWorkspaceOptional();
+  // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
+  const isDispatchMap = isCompanyDispatchViewer(workspace);
   useDevEnergyProbe(
     "mapbox-main-webgl",
     "Carte Mapbox (WebGL)",
@@ -131,10 +134,6 @@ export default function MapboxView() {
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
 
   const { selectedDate } = useDateContext();
-  const workspace = useCompanyWorkspaceOptional();
-
-  // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
-  const isDispatchMap = isCompanyDispatchViewer(workspace);
   const { interventions: boInterventions } = useBackOfficeInterventions(
     isDispatchMap && mapHubDataActive ? (workspace?.activeCompanyId ?? null) : null
   );
