@@ -1,0 +1,23 @@
+/**
+ * API publique chatbot — imports cross-feature autorisés via ce barrel.
+ * Ne pas importer deep dans hooks internes depuis d'autres features.
+ */
+export { ChatbotProvider, useChatbotContext } from "@/features/chatbot/ChatbotContext";
+export { useChatbot } from "@/features/chatbot/hooks/useChatbot";
+export {
+  runChatbotOpenAI,
+  normalizeLecotOrderToolArguments,
+} from "@/features/chatbot/chatbot-openai";
+export type { OpenAIRunResult } from "@/features/chatbot/chatbot-openai";
+export type {
+  ChatbotConversation,
+  ChatbotPendingTool,
+  ChatbotStreamEvent,
+  ChatbotUiMessage,
+} from "@/features/chatbot/chatbot-types";
+export type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+export { executeChatbotTool } from "@/features/chatbot/chatbot-tool-executor";
+export { CHATBOT_TOOL_LABELS } from "@/features/chatbot/chatbot-tool-labels";
+export { isChatbotZeroTokenUiTool } from "@/features/chatbot/chatbot-document-side-effect";
+export type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-client-document";
+export { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
