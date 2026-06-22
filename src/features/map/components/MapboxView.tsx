@@ -42,6 +42,11 @@ import {
   resolveMapCameraDuration,
 } from "@/features/map/mapboxPowerProfile";
 import {
+  markMapboxPerf,
+  measureMapboxPerf,
+  resolveMapboxDeviceTier,
+} from "@/features/map/mapboxDeviceProfile";
+import {
   destroyMapboxMap,
   pauseMapboxMap,
   resolveMapboxLifecycleMode,
@@ -299,9 +304,12 @@ export default function MapboxView() {
       configureMapboxWebView(mapboxgl);
       const initialCenter: [number, number] = [4.3522, 50.8466];
       const mobileMap = isMobile === true;
-      const powerOptions = resolveMapboxInitOptions(mobileMap);
-      const runtimeOptions = resolveMapboxMapRuntimeOptions(mobileMap);
+      const deviceTier = mobileMap ? resolveMapboxDeviceTier() : "high";
+      const powerOptions = resolveMapboxInitOptions(mobileMap, deviceTier);
+      const runtimeOptions = resolveMapboxMapRuntimeOptions(mobileMap, undefined, deviceTier);
       const style = resolveMapboxStyleUrl(resolveMapboxStyleSlug(mobileMap), token);
+
+      markMapboxPerf("init-start");
 
       if (
         typeof mapboxgl.supported === "function" &&
@@ -340,6 +348,11 @@ export default function MapboxView() {
 
       mapRef.current = map;
       setMapBootError(null);
+      markMapboxPerf("init-end");
+
+      if (mobileMap) {
+        map.getContainer().dataset.mapboxDeviceTier = deviceTier;
+      }
 
       if (isMobile) {
         map.dragPan.disable();
@@ -351,6 +364,9 @@ export default function MapboxView() {
 
       map.on("load", () => {
         if (cancelled) return;
+        markMapboxPerf("load");
+        const perf = measureMapboxPerf(deviceTier);
+        logger.info("[mapbox-perf]", perf);
         setMapReady(true);
         scheduleMapboxResizeBurst(map);
       });

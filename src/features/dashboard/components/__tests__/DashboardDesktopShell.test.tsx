@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, fireEvent } from "@/test-utils/render";
 import {
   DASHBOARD_DESKTOP_GALAXY_DOCK_CLASS,
@@ -8,20 +9,25 @@ import {
 import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
-import UserProfile from "@/features/dashboard/components/UserProfile";
+import { DateProvider } from "@/context/DateContext";
+
+function renderShell(ui: React.ReactElement) {
+  return render(
+    <DateProvider>
+      <DashboardPagerProvider pageCount={9}>
+        <DashboardPageSelectorProvider>{ui}</DashboardPageSelectorProvider>
+      </DashboardPagerProvider>
+    </DateProvider>
+  );
+}
 
 describe("DashboardDesktopShell", () => {
   it("renders galaxy dock in center grid slot (column 2)", () => {
-    render(
-      <DashboardPagerProvider pageCount={9}>
-        <DashboardPageSelectorProvider>
-          <DashboardDesktopShell
-            header={<span data-testid="shell-header">header</span>}
-            pager={<span data-testid="shell-pager">pager</span>}
-            galaxy={<button type="button">Galaxy</button>}
-          />
-        </DashboardPageSelectorProvider>
-      </DashboardPagerProvider>
+    renderShell(
+      <DashboardDesktopShell
+        pager={<span data-testid="shell-pager">pager</span>}
+        galaxy={<button type="button">Galaxy</button>}
+      />
     );
 
     expect(screen.getByTestId("dashboard-desktop-stack")).toHaveClass(
@@ -42,16 +48,11 @@ describe("DashboardDesktopShell", () => {
   });
 
   it("affiche le menu pages à droite au clic profil desktop", () => {
-    render(
-      <DashboardPagerProvider pageCount={9}>
-        <DashboardPageSelectorProvider>
-          <DashboardDesktopShell
-            header={<UserProfile interactive />}
-            pager={<span data-testid="shell-pager">pager</span>}
-            galaxy={<span>galaxy</span>}
-          />
-        </DashboardPageSelectorProvider>
-      </DashboardPagerProvider>
+    renderShell(
+      <DashboardDesktopShell
+        pager={<span data-testid="shell-pager">pager</span>}
+        galaxy={<span>galaxy</span>}
+      />
     );
 
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();

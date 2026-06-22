@@ -1,10 +1,14 @@
 "use client";
 
 import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
-import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
+const DashboardGalaxyLayer = dynamic(
+  () => import("@/features/map/components/DashboardGalaxyLayer"),
+  { ssr: false, loading: () => null }
+);
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";

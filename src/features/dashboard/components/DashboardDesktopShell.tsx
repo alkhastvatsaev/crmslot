@@ -23,9 +23,11 @@ import {
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
+import SpotlightSearch from "@/features/dashboard/components/SpotlightSearch";
+import UserProfile from "@/features/dashboard/components/UserProfile";
 
 type Props = {
-  header: ReactNode;
   pager: ReactNode;
   galaxy: ReactNode;
 };
@@ -34,7 +36,29 @@ type Props = {
  * Desktop shell — rails 1–4 via `.dashboard-desktop-grid`.
  * Page 6 (`/technician`) : mode immersif sans header ni galaxy (écran autonome).
  */
-export default function DashboardDesktopShell({ header, pager, galaxy }: Props) {
+function DashboardDesktopHeader() {
+  return (
+    <>
+      <aside
+        className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
+      >
+        <ClockCalendar />
+      </aside>
+      <div
+        className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
+      >
+        <SpotlightSearch />
+      </div>
+      <aside
+        className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
+      >
+        <UserProfile interactive />
+      </aside>
+    </>
+  );
+}
+
+export default function DashboardDesktopShell({ pager, galaxy }: Props) {
   const dashboardPager = useDashboardPagerOptional();
   const { view, close: closeOverlay } = useDashboardPageSelector();
   const overlayOpen = view !== "closed";
@@ -61,7 +85,9 @@ export default function DashboardDesktopShell({ header, pager, galaxy }: Props) 
               className={DASHBOARD_DESKTOP_STACK_HEADER_CLASS}
               data-testid="dashboard-global-header"
             >
-              <div className={DASHBOARD_DESKTOP_GRID_CLASS}>{header}</div>
+              <div className={DASHBOARD_DESKTOP_GRID_CLASS}>
+                <DashboardDesktopHeader />
+              </div>
             </header>
           ) : null}
 

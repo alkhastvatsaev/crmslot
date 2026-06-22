@@ -48,7 +48,7 @@ export const viewport: Viewport = {
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
-import NativePushBootstrap from "@/features/notifications/NativePushBootstrap";
+import DeferredRootBootstraps from "@/core/native/DeferredRootBootstraps";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -66,7 +66,7 @@ export default function RootLayout({
     >
       <body className="notranslate" suppressHydrationWarning>
         <NativeShellBootstrap />
-        <NativePushBootstrap />
+        <DeferredRootBootstraps />
         <I18nProvider>{children}</I18nProvider>
         <Toaster position="top-center" theme="light" richColors closeButton />
       </body>

@@ -73,6 +73,7 @@ export const MOBILE_SHELL_CONTRACT = {
     "src/features/dashboard/AdminDashboardProviders.tsx": [
       "DashboardPageSelectorProvider",
       "DashboardPagerProvider",
+      "DeferredAdminBootstraps",
     ],
     "src/app/dashboard-mobile-layout.css": [
       "--mobile-stack-gap",
