@@ -353,6 +353,20 @@ service cloud.firestore {
         && resource.data.createdByUid == request.auth.uid;
     }
 
+    /**
+     * Société qui a explicitement opt-in pour recevoir des demandes anonymes
+     * (formulaire public /m/demande, particulier non connecté).
+     * Doc `companies/{id}` doit porter `acceptsPublicInterventions: true`.
+     * Permet aux anonymes de créer une intervention scopée à CETTE société
+     * sans ouvrir la création cross-tenant.
+     */
+    function companyAcceptsPublicInterventions(companyId) {
+      return companyId is string
+        && companyId.size() > 0
+        && exists(/databases/$(database)/documents/companies/$(companyId))
+        && get(/databases/$(database)/documents/companies/$(companyId)).data.get('acceptsPublicInterventions', false) == true;
+    }
+
     function interventionCreateTenantAllowed(data) {
       return !data.keys().hasAny(['companyId'])
         || !(data.companyId is string)
@@ -360,7 +374,8 @@ service cloud.firestore {
         || tenantClaimsIncludeCompany(data.companyId)
         || userBelongsToCompany(data.companyId)
         || clientPortalLinkedToCompany(data.companyId)
-        || allowedUsersPhoneMatchesIvanaCompany(data.companyId);
+        || allowedUsersPhoneMatchesIvanaCompany(data.companyId)
+        || companyAcceptsPublicInterventions(data.companyId);
     }
 
     /**
