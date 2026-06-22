@@ -132,6 +132,13 @@ export interface Intervention {
   /** Rapport refusé par IVANA — renvoi au technicien pour complément. */
   reportRejectionReason?: string | null;
   reportRejectedAt?: string | null;
+  /** Cron `operations-tick` : timestamp de la notif « tech en retard » (anti-spam). */
+  lateNotificationSentAt?: string | null;
+  /** Cron `operations-tick` : timestamps des relances impayés par borne (J+7, J+14). */
+  unpaidReminders?: {
+    j7?: string;
+    j14?: string;
+  } | null;
   /** Durée prévue de l'intervention (minutes). Améliore la précision des conflits de planning. */
   estimatedDurationMinutes?: number | null;
   /** Durée réelle calculée à la clôture (completedAt − technicianAcceptedAt). */
