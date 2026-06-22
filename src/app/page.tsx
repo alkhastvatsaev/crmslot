@@ -2,12 +2,6 @@
 import React, { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import SpotlightSearch from "@/features/dashboard/components/SpotlightSearch";
-import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
-import UserProfile from "@/features/dashboard/components/UserProfile";
-import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndicator";
-import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
-import DashboardPager from "@/features/dashboard/components/DashboardPager";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
@@ -16,10 +10,6 @@ import { PLANNING_HUB_SLOT_INDEX } from "@/features/planningHub/planningHubConst
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
-import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
-import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
-import MobileShell from "@/features/dashboard/components/MobileShell";
-import AdminDashboardProviders from "@/features/dashboard/AdminDashboardProviders";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
@@ -28,6 +18,31 @@ import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { useAccountRole } from "@/features/auth/useAccountRole";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company/clientMobileAppConstants";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+
+const AdminDashboardProviders = dynamic(
+  () => import("@/features/dashboard/AdminDashboardProviders"),
+  { ssr: false, loading: () => null }
+);
+
+const MobileShell = dynamic(() => import("@/features/dashboard/components/MobileShell"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const DashboardDesktopShell = dynamic(
+  () => import("@/features/dashboard/components/DashboardDesktopShell"),
+  { ssr: false, loading: () => null }
+);
+
+const DashboardPager = dynamic(() => import("@/features/dashboard/components/DashboardPager"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const DashboardGalaxyLayer = dynamic(
+  () => import("@/features/map/components/DashboardGalaxyLayer"),
+  { ssr: false, loading: () => null }
+);
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -41,10 +56,15 @@ const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"),
   ),
 });
 
-const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubPage"), {
-  ssr: false,
-  loading: () => null,
-});
+const MacroDroidIndicator = dynamic(
+  () => import("@/features/dashboard/components/MacroDroidIndicator"),
+  { ssr: false, loading: () => null }
+);
+
+const AutoProcessUploads = dynamic(
+  () => import("@/features/dashboard/components/AutoProcessUploads"),
+  { ssr: false, loading: () => null }
+);
 
 const FeatureHubPage = dynamic(() => import("@/features/featureHub/components/FeatureHubPage"), {
   ssr: false,
@@ -57,6 +77,11 @@ const CrmHistoryPage = dynamic(() => import("@/features/crmHistory/components/Cr
 });
 
 const BillingHubPage = dynamic(() => import("@/features/billingHub/components/BillingHubPage"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const GmailHubPage = dynamic(() => import("@/features/gmail/components/GmailHubPage"), {
   ssr: false,
   loading: () => null,
 });
@@ -80,26 +105,6 @@ const PlanningHubPage = dynamic(() => import("@/features/planningHub/components/
   ssr: false,
   loading: () => null,
 });
-
-const desktopHeader = (
-  <>
-    <aside
-      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
-    >
-      <ClockCalendar />
-    </aside>
-    <div
-      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
-    >
-      <SpotlightSearch />
-    </div>
-    <aside
-      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
-    >
-      <UserProfile interactive />
-    </aside>
-  </>
-);
 
 /** Dashboard admin — 9 pages · client `/m/demande` · terrain `/m/technician`. */
 export default function Dashboard() {
@@ -190,7 +195,6 @@ export default function Dashboard() {
       ) : (
         <LayoutShellProvider mode="desktop">
           <DashboardDesktopShell
-            header={desktopHeader}
             pager={<DashboardPager pages={dashboardPages} />}
             galaxy={<DashboardGalaxyLayer />}
           />

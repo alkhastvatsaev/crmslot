@@ -1,4 +1,5 @@
 import { detectMobileClient } from "@/core/config/mobileClientDetection";
+import type { MapboxDeviceTier } from "@/features/map/mapboxDeviceProfile";
 
 /** Style premium léger — tuiles vectorielles propres (mobile). */
 export const MAPBOX_STYLE_MOBILE = "mapbox://styles/mapbox/streets-v12";
@@ -20,9 +21,14 @@ export function prefersReducedMotion(): boolean {
 
 export function resolveMapboxPixelRatio(
   isMobile: boolean,
-  devicePixelRatio: number = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
+  devicePixelRatio: number = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+  tier: MapboxDeviceTier = "standard"
 ): number {
-  if (isMobile) return Math.min(devicePixelRatio, 1.5);
+  if (isMobile) {
+    if (tier === "low") return 1;
+    if (tier === "high") return Math.min(devicePixelRatio, 1.75);
+    return Math.min(devicePixelRatio, 1.5);
+  }
   return Math.min(devicePixelRatio, 2);
 }
 
@@ -55,13 +61,18 @@ export function isAndroidUserAgent(
   return /Android/i.test(userAgent);
 }
 
-export function resolveMapboxInitOptions(isMobile: boolean): MapboxInitPowerOptions {
+export function resolveMapboxInitOptions(
+  isMobile: boolean,
+  tier: MapboxDeviceTier = "standard"
+): MapboxInitPowerOptions {
+  const mobileTileCache = tier === "low" ? 24 : tier === "high" ? 48 : 40;
+
   return {
     style: isMobile ? MAPBOX_STYLE_MOBILE : MAPBOX_STYLE_DESKTOP,
-    antialias: !isMobile,
+    antialias: !isMobile && tier !== "low",
     fadeDuration: prefersReducedMotion() ? 0 : isMobile ? 0 : 240,
     refreshExpiredTiles: false,
-    maxTileCacheSize: isMobile ? 40 : 96,
+    maxTileCacheSize: isMobile ? mobileTileCache : 96,
     renderWorldCopies: false,
     collectResourceTiming: false,
     respectPrefersReducedMotion: true,
@@ -71,12 +82,14 @@ export function resolveMapboxInitOptions(isMobile: boolean): MapboxInitPowerOpti
 /** Options runtime Mapbox GL — WebView Android / émulateur souvent « slow » mais utilisable. */
 export function resolveMapboxMapRuntimeOptions(
   isMobile: boolean,
-  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : "",
+  tier: MapboxDeviceTier = "standard"
 ): MapboxMapRuntimeOptions {
   const android = isAndroidUserAgent(userAgent);
+  const allowSlowGpu = isMobile && android && tier !== "low";
   return {
-    failIfMajorPerformanceCaveat: !(isMobile && android),
-    pixelRatio: resolveMapboxPixelRatio(isMobile),
+    failIfMajorPerformanceCaveat: tier === "low" || !allowSlowGpu,
+    pixelRatio: resolveMapboxPixelRatio(isMobile, undefined, tier),
   };
 }
 

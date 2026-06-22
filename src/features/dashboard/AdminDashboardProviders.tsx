@@ -20,11 +20,7 @@ import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvi
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
-import ActivityLogPageObserver from "@/features/crmHistory/components/ActivityLogPageObserver";
-import AuthActivityLogger from "@/features/crmHistory/components/AuthActivityLogger";
-import BackofficeChatNotificationBootstrap from "@/features/notifications/components/BackofficeChatNotificationBootstrap";
-import BackofficePushBootstrap from "@/features/notifications/components/BackofficePushBootstrap";
-import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
+import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";
 
 type Props = {
   pageCount: number;
@@ -38,7 +34,6 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
       <DesktopOnlyGate>
         <LoginOverlay>
           <DevServiceWorkerCleanup />
-          <AndroidAppInstallPromoBootstrap surface="admin" presentation="dialog" />
           <CompanyWorkspaceProvider>
             <GalaxyLayerBridgeProvider>
               <DashboardPagerProvider pageCount={pageCount}>
@@ -54,10 +49,7 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                   <OfflineSyncProvider>
                                     <TechnicianQueryProvider>
                                       <RequesterHubProvider>
-                                        <AuthActivityLogger />
-                                        <ActivityLogPageObserver />
-                                        <BackofficeChatNotificationBootstrap />
-                                        <BackofficePushBootstrap />
+                                        <DeferredAdminBootstraps />
                                         {children}
                                       </RequesterHubProvider>
                                     </TechnicianQueryProvider>
