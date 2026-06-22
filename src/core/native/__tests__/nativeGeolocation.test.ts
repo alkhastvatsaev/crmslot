@@ -58,7 +58,7 @@ describe("getCurrentNativePosition", () => {
 describe("watchNativePosition", () => {
   it("retourne null si pas natif", async () => {
     const plugin = makePlugin();
-    const unsub = await watchNativePosition(() => {}, makeDeps(plugin, false));
+    const unsub = await watchNativePosition(() => {}, undefined, makeDeps(plugin, false));
     expect(unsub).toBeNull();
   });
 
@@ -72,7 +72,7 @@ describe("watchNativePosition", () => {
       }),
     });
 
-    await watchNativePosition(onUpdate, makeDeps(plugin));
+    await watchNativePosition(onUpdate, undefined, makeDeps(plugin));
     watchCallback?.({ timestamp: 999, coords: { latitude: 1, longitude: 2, accuracy: 3 } }, null);
 
     expect(onUpdate).toHaveBeenCalledWith({
@@ -93,7 +93,7 @@ describe("watchNativePosition", () => {
       }),
     });
 
-    await watchNativePosition(onUpdate, makeDeps(plugin));
+    await watchNativePosition(onUpdate, undefined, makeDeps(plugin));
     watchCallback?.(null, new Error("GPS unavailable"));
 
     expect(onUpdate).not.toHaveBeenCalled();
@@ -103,7 +103,7 @@ describe("watchNativePosition", () => {
     const plugin = makePlugin({
       watchPosition: jest.fn(async () => "id-42"),
     });
-    const unsub = await watchNativePosition(() => {}, makeDeps(plugin));
+    const unsub = await watchNativePosition(() => {}, undefined, makeDeps(plugin));
     await unsub?.();
     expect(plugin.clearWatch).toHaveBeenCalledWith({ id: "id-42" });
   });
