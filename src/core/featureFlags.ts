@@ -49,7 +49,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   quotesEnabled: true,
   maintenanceContracts: true,
   slaTracker: true,
-  dispatchVoice: false,
+  dispatchVoice: true,
   geofenceAuto: false,
   vehicleStock: true,
   whatsappNotifications: true,
