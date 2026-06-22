@@ -15,7 +15,8 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 | `backOfficeInboxLists.ts`                  | Pure functions — listes inbox        |
 | `useBackOfficeInterventions.ts`            | Hook Firestore interventions société |
 | `assignInterventionFromBackoffice.ts`      | Assignation depuis inbox             |
-| `components/IvanaClientChatPanel.tsx`      | Chat portail client — **706 lignes** |
+| `components/IvanaClientChatPanel.tsx`      | Chat portail client (~80 lignes)     |
+| `hooks/useIvanaClientChatPanel.ts`         | État + envoi messages portail        |
 | `ivanaChatFirestore.ts`                    | Messages portail Firestore           |
 
 ## Données
