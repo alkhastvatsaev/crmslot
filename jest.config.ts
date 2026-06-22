@@ -163,4 +163,5 @@ const config: Config = {
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+// @ts-expect-error jest 30 vs @types/jest — fakeTimers.doNotFake (Temporal)
 export default createJestConfig(config);
