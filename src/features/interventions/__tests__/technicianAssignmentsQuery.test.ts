@@ -1,10 +1,11 @@
+import { IOS_FIRESTORE_POLL_MS } from "@/core/firestore/iosFirestorePolling";
 import { resolveTechnicianAssignmentsPollMs } from "@/features/interventions/technicianAssignmentsQuery";
 
 describe("resolveTechnicianAssignmentsPollMs", () => {
-  it("ralentit le polling sur téléphone", () => {
+  it("aligne le polling iPhone sur le fetch Firestore (pas de snapshot)", () => {
     expect(
       resolveTechnicianAssignmentsPollMs("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)")
-    ).toBe(180_000);
+    ).toBe(IOS_FIRESTORE_POLL_MS);
   });
 
   it("garde 12s sur desktop", () => {
