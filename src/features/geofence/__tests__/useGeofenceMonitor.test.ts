@@ -23,15 +23,30 @@ describe("useGeofenceMonitor — consommation énergie", () => {
     expect(mockWatchPosition).not.toHaveBeenCalled();
   });
 
-  it("appelle watchPosition avec enableHighAccuracy quand enabled=true", () => {
+  it("n'appelle pas watchPosition sans mission assignée/en route", () => {
     renderHook(() => useGeofenceMonitor([], { enabled: true }));
+    expect(mockWatchPosition).not.toHaveBeenCalled();
+  });
+
+  it("appelle watchPosition pour une mission assignée avec coordonnées", () => {
+    const mission = {
+      id: "m1",
+      status: "assigned",
+      location: { lat: 50.8, lng: 4.3 },
+    } as Intervention;
+    renderHook(() => useGeofenceMonitor([mission], { enabled: true }));
     expect(mockWatchPosition).toHaveBeenCalled();
     const opts = mockWatchPosition.mock.calls[0]?.[2];
     expect(opts?.enableHighAccuracy).toBe(false);
   });
 
   it("nettoie le watch à l'unmount (pas de GPS zombie)", () => {
-    const { unmount } = renderHook(() => useGeofenceMonitor([], { enabled: true }));
+    const mission = {
+      id: "m1",
+      status: "en_route",
+      location: { lat: 50.8, lng: 4.3 },
+    } as Intervention;
+    const { unmount } = renderHook(() => useGeofenceMonitor([mission], { enabled: true }));
     unmount();
     expect(mockClearWatch).toHaveBeenCalledWith(42);
   });
