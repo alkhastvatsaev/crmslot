@@ -17,9 +17,9 @@ export type CrmslotFeatureFlags = {
   slaTracker: boolean;
   /** Dispatch vocal MacroDroid — écoute audio, transcription, file de lecture carte. */
   dispatchVoice: boolean;
-  /** Mode ultra : carte Mapbox WebGL sur téléphone (désactivé par défaut — batterie). */
+  /** Carte Mapbox WebGL sur téléphone (mode premium). */
   mobileMapWebGL: boolean;
-  /** Mode urgence mobile : un hub, pas push/dispatch lourd (deadline perf). */
+  /** Désactivé — conservé pour compat Firestore / env. */
   mobileEmergencyLite: boolean;
   /** Géofencing auto — changement de statut à l'arrivée sur site. */
   geofenceAuto: boolean;
@@ -54,8 +54,8 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   maintenanceContracts: true,
   slaTracker: true,
   dispatchVoice: true,
-  mobileMapWebGL: false,
-  mobileEmergencyLite: true,
+  mobileMapWebGL: true,
+  mobileEmergencyLite: false,
   geofenceAuto: false,
   vehicleStock: true,
   whatsappNotifications: true,

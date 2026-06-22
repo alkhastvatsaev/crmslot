@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
 import { trackCarouselPageLeave, trackCarouselPageView } from "@/core/analytics/productAnalytics";
 
 /**
@@ -14,7 +13,6 @@ export function useCarouselPageAnalytics(pageIndex: number, pageCount: number): 
   const isFirstRef = useRef(true);
 
   useEffect(() => {
-    if (typeof navigator !== "undefined" && isIosPhonePowerSave()) return;
     if (isFirstRef.current) {
       isFirstRef.current = false;
       activeIndexRef.current = pageIndex;
@@ -35,7 +33,6 @@ export function useCarouselPageAnalytics(pageIndex: number, pageCount: number): 
   }, [pageIndex, pageCount]);
 
   useEffect(() => {
-    if (typeof navigator !== "undefined" && isIosPhonePowerSave()) return;
     return () => {
       const dwellMs = Date.now() - enteredAtRef.current;
       trackCarouselPageLeave(activeIndexRef.current, dwellMs, -1, pageCount);

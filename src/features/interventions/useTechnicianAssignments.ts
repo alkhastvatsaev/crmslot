@@ -23,8 +23,6 @@ import {
   showTechnicianNewAssignmentNotification,
 } from "@/features/interventions/technicianNewAssignmentAlerts";
 import { toast } from "sonner";
-import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
-import { shouldUseIosFirestorePolling } from "@/core/firestore/iosFirestorePolling";
 
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
@@ -55,8 +53,6 @@ function applyAssignmentsToCache(
 export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
   const [pollArmed, setPollArmed] = useState(false);
   const hookEnabled = options.enabled !== false;
-  const documentVisible = useDocumentPageVisible();
-  const listenerEnabled = hookEnabled && documentVisible;
   const queryClient = useQueryClient();
 
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
@@ -165,7 +161,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   syncFromServerRef.current = syncAssignmentsFromServer;
 
   useEffect(() => {
-    if (!listenerEnabled || noFirebaseAuth) return () => {};
+    if (!hookEnabled || noFirebaseAuth) return () => {};
 
     let unsubSnap: (() => void) | undefined;
 
@@ -207,27 +203,6 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
 
       const db = firestore!;
       const q = technicianAssignmentsFirestoreQuery(db, technicianUid);
-
-      const hydrateFromServer = (data: Intervention[]) => {
-        listenerHydratedRef.current = true;
-        knownAssignmentIdsRef.current = new Set(data.map((row) => row.id));
-        applyAssignmentsToCache(queryClient, technicianUid, data);
-        setSnapshotReady(true);
-        setError(null);
-      };
-
-      if (shouldUseIosFirestorePolling()) {
-        void fetchTechnicianAssignments(db, technicianUid, { fromServer: true })
-          .then(hydrateFromServer)
-          .catch((e) => {
-            logger.warn("[useTechnicianAssignments] iOS poll hydrate", {
-              error: e instanceof Error ? e.message : String(e),
-            });
-            setError(e instanceof Error ? e.message : "Erreur Firestore");
-            setSnapshotReady(true);
-          });
-        return;
-      }
 
       unsubSnap = onSnapshot(
         q,
@@ -288,7 +263,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       clearSnap();
       unsubAuth();
     };
-  }, [queryClient, listenerEnabled, noFirebaseAuth, notifyNewAssignments]);
+  }, [queryClient, hookEnabled, noFirebaseAuth, notifyNewAssignments]);
 
   useEffect(() => {
     if (!hookEnabled || !firebaseUid || noFirebaseAuth) return () => {};

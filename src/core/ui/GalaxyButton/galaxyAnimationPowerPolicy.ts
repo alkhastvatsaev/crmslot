@@ -1,4 +1,3 @@
-import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
 import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
 
 export const GALAXY_STAR_COUNT = 6000;
@@ -26,15 +25,8 @@ function hasMatchMedia(query: string): boolean {
   return window.matchMedia(query).matches;
 }
 
-/** WebKit iPhone — SW, Firestore persist, analytics, canvas 0 fps. */
+/** Téléphone / touch-first — profil canvas compact. */
 export function isMobilePowerSaveClient(
-  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
-): boolean {
-  return isIosPhonePowerSave(userAgent);
-}
-
-/** Téléphone / touch-first — galaxy allégé (Android inclus). */
-export function isCompactTouchClient(
   userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): boolean {
   if (hasMatchMedia("(pointer: coarse)")) return true;
@@ -54,7 +46,7 @@ function defaultProfile(starCount: number): GalaxyAnimationProfile {
   };
 }
 
-function compactTouchProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
+function mobileProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
   return {
     starCount: GALAXY_MOBILE_STAR_COUNT,
     maxFps: GALAXY_MOBILE_MAX_FPS,
@@ -63,19 +55,6 @@ function compactTouchProfile(overrides: Partial<GalaxyAnimationProfile>): Galaxy
     interactive: false,
     baseSpeed: 0.55,
     backgroundEveryNFrames: 2,
-    ...overrides,
-  };
-}
-function iosPowerSaveProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
-  /** iPhone : fond bleu statique — canvas 24 fps chauffe le GPU en continu. */
-  return {
-    starCount: 0,
-    maxFps: 0,
-    maxDevicePixelRatio: 1.75,
-    pauseWhenHidden: true,
-    interactive: false,
-    baseSpeed: 0,
-    backgroundEveryNFrames: 1,
     ...overrides,
   };
 }
@@ -96,19 +75,15 @@ export function resolveGalaxyAnimationProfile(
     };
   }
 
-  const iosSave =
+  const mobile =
     overrides.mobilePowerSave === true
       ? true
       : overrides.mobilePowerSave === false
         ? false
         : isMobilePowerSaveClient();
 
-  if (iosSave) {
-    return iosPowerSaveProfile(overrides);
-  }
-
-  if (isCompactTouchClient()) {
-    return compactTouchProfile(overrides);
+  if (mobile) {
+    return mobileProfile(overrides);
   }
 
   return { ...defaultProfile(GALAXY_STAR_COUNT), ...overrides };

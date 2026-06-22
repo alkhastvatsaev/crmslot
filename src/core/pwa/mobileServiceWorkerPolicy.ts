@@ -1,12 +1,8 @@
-import { isIphoneUserAgent } from "@/core/config/mobileClientDetection";
-
-/** Service worker : désactivé sur **iPhone** seulement (WebKit chauffe). Android : PWA normale. */
+/** Service worker PWA — actif sur tous les appareils si configuré. */
 export function isMobileServiceWorkerAllowed(
-  userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
+  _userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): boolean {
-  if (process.env.NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED !== "true") return false;
-  if (process.env.NEXT_PUBLIC_MOBILE_PWA_SW === "true") return true;
-  return !isIphoneUserAgent(userAgent);
+  return process.env.NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED === "true";
 }
 
 export async function purgeMobileServiceWorkersAndCaches(): Promise<void> {
@@ -21,18 +17,6 @@ export async function purgeMobileServiceWorkersAndCaches(): Promise<void> {
   }
 }
 
-/** Empêche next-pwa de ré-enregistrer un SW après purge. */
 export function blockServiceWorkerRegistrationOnMobile(): void {
-  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
-  if (isMobileServiceWorkerAllowed()) return;
-
-  const sw = navigator.serviceWorker;
-  const blocked = () =>
-    Promise.reject(new Error("Service worker désactivé sur mobile (perf batterie)"));
-
-  try {
-    sw.register = blocked as typeof sw.register;
-  } catch {
-    /* readonly sur certains navigateurs */
-  }
+  /* no-op — mode premium : PWA active partout */
 }

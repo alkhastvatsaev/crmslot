@@ -4,10 +4,7 @@ import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { startGalaxyStarsAnimation } from "@/core/ui/GalaxyButton/galaxyStarsAnimation";
 import "@/core/ui/GalaxyButton/GalaxyButton.css";
-import {
-  isCompactTouchClient,
-  isMobilePowerSaveClient,
-} from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
+import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 
 const STAR_COUNT_SM = 60;
 const STAR_COUNT_HERO = 180;
@@ -32,14 +29,13 @@ export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
 
     const start = () => {
       if (surface.offsetWidth < 2) return undefined;
-      const compact = isCompactTouchClient();
-      const iosSave = isMobilePowerSaveClient();
+      const mobile = isMobilePowerSaveClient();
       return startGalaxyStarsAnimation(canvas, surface, {
-        starCount: compact ? STAR_COUNT_MOBILE : isHero ? STAR_COUNT_HERO : STAR_COUNT_SM,
+        starCount: mobile ? STAR_COUNT_MOBILE : isHero ? STAR_COUNT_HERO : STAR_COUNT_SM,
         interactive: false,
-        baseSpeed: compact ? 0.55 : 1.1,
+        baseSpeed: mobile ? 0.55 : 1.1,
         variant: "avatar",
-        mobilePowerSave: iosSave,
+        mobilePowerSave: mobile,
       });
     };
 
