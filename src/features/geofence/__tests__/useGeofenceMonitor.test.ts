@@ -27,7 +27,7 @@ describe("useGeofenceMonitor — consommation énergie", () => {
     renderHook(() => useGeofenceMonitor([], { enabled: true }));
     expect(mockWatchPosition).toHaveBeenCalledTimes(1);
     const opts = mockWatchPosition.mock.calls[0]?.[2];
-    expect(opts?.enableHighAccuracy).toBe(true);
+    expect(opts?.enableHighAccuracy).toBe(false);
   });
 
   it("nettoie le watch à l'unmount (pas de GPS zombie)", () => {

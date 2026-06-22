@@ -12,7 +12,7 @@ import { buildTechnicianInterventionList } from "@/features/interventions/techni
 import { getTechnicianAssignmentUid } from "@/features/interventions/technicianAssignmentActions";
 import {
   fetchTechnicianAssignments,
-  TECHNICIAN_ASSIGNMENTS_POLL_MS,
+  resolveTechnicianAssignmentsPollMs,
   technicianAssignmentsFirestoreQuery,
 } from "@/features/interventions/technicianAssignmentsQuery";
 import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
@@ -322,14 +322,38 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       return () => {};
     }
 
+    const pollMs = resolveTechnicianAssignmentsPollMs();
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const tick = () => {
       if (document.visibilityState === "visible") {
         void syncFromServerRef.current?.();
       }
     };
 
-    const intervalId = window.setInterval(tick, TECHNICIAN_ASSIGNMENTS_POLL_MS);
-    return () => window.clearInterval(intervalId);
+    const start = () => {
+      if (intervalId || document.visibilityState !== "visible") return;
+      tick();
+      intervalId = window.setInterval(tick, pollMs);
+    };
+
+    const stop = () => {
+      if (!intervalId) return;
+      window.clearInterval(intervalId);
+      intervalId = null;
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") start();
+      else stop();
+    };
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [hookEnabled, firebaseUid, noFirebaseAuth]);
 
   return { interventions, loading, error, firebaseUid };
