@@ -15,6 +15,8 @@ export type CrmslotFeatureFlags = {
   maintenanceContracts: boolean;
   /** Suivi SLA par priorité (low/medium/high/urgent). */
   slaTracker: boolean;
+  /** Dispatch vocal MacroDroid — écoute audio, transcription, file de lecture carte. */
+  dispatchVoice: boolean;
   /** Géofencing auto — changement de statut à l'arrivée sur site. */
   geofenceAuto: boolean;
   /** Gestion du stock véhicule par technicien. */
@@ -47,6 +49,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   quotesEnabled: true,
   maintenanceContracts: true,
   slaTracker: true,
+  dispatchVoice: false,
   geofenceAuto: false,
   vehicleStock: true,
   whatsappNotifications: true,
@@ -94,6 +97,10 @@ export function featureFlagsFromEnv(): CrmslotFeatureFlags {
       DEFAULT_FEATURE_FLAGS.maintenanceContracts
     ),
     slaTracker: readEnvBool("NEXT_PUBLIC_FF_SLA", DEFAULT_FEATURE_FLAGS.slaTracker),
+    dispatchVoice: readEnvBool(
+      "NEXT_PUBLIC_FF_DISPATCH_VOICE",
+      DEFAULT_FEATURE_FLAGS.dispatchVoice
+    ),
     geofenceAuto: readEnvBool("NEXT_PUBLIC_FF_GEOFENCE", DEFAULT_FEATURE_FLAGS.geofenceAuto),
     vehicleStock: readEnvBool("NEXT_PUBLIC_FF_VEHICLE_STOCK", DEFAULT_FEATURE_FLAGS.vehicleStock),
     whatsappNotifications: readEnvBool(

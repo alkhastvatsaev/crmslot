@@ -5,6 +5,7 @@ import MapGalaxyTranscriptionLayer from "@/features/map/components/MapGalaxyTran
 import { useGalaxyLayerBridge } from "@/features/map/GalaxyLayerBridgeContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import BillingHubGalaxyComposer from "@/features/billingHub/components/BillingHubGalaxyComposer";
 import CrmHistoryGalaxyComposer from "@/features/crmHistory/components/CrmHistoryGalaxyComposer";
 import CompanyStockGalaxyComposer from "@/features/featureHub/components/CompanyStockGalaxyComposer";
@@ -20,6 +21,7 @@ export default function DashboardGalaxyLayer() {
   const pager = useDashboardPagerOptional();
   const pageIndex = pager?.pageIndex;
   const isMobile = useIsMobile();
+  const dispatchVoice = useFeatureFlag("dispatchVoice");
 
   let hubComposer: ReactNode = null;
   if (pageIndex === FEATURE_HUB_SLOT_INDEX) hubComposer = <CompanyStockGalaxyComposer />;
@@ -27,18 +29,20 @@ export default function DashboardGalaxyLayer() {
   else if (pageIndex === BILLING_HUB_SLOT_INDEX) hubComposer = <BillingHubGalaxyComposer />;
 
   const hideMapGalaxyDockStrip = hubComposer != null;
-  const audioBackgroundTasksEnabled = isMobile !== true || transcriptionArmed;
+  const audioBackgroundTasksEnabled = dispatchVoice && (isMobile !== true || transcriptionArmed);
 
   return (
     <>
-      <MapGalaxyTranscriptionLayer
-        hideDockStrip={hideMapGalaxyDockStrip}
-        transcriptionArmed={transcriptionArmed}
-        onUserPressPlay={armTranscription}
-        onInterventionCreated={emitInterventionCreated}
-        backgroundTasksEnabled={audioBackgroundTasksEnabled}
-        mobilePowerSave={isMobile === true}
-      />
+      {dispatchVoice ? (
+        <MapGalaxyTranscriptionLayer
+          hideDockStrip={hideMapGalaxyDockStrip}
+          transcriptionArmed={transcriptionArmed}
+          onUserPressPlay={armTranscription}
+          onInterventionCreated={emitInterventionCreated}
+          backgroundTasksEnabled={audioBackgroundTasksEnabled}
+          mobilePowerSave={isMobile === true}
+        />
+      ) : null}
       {hubComposer}
     </>
   );

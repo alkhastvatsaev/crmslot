@@ -1,14 +1,13 @@
-import { featureFlagsFromEnv, mergeFeatureFlags, DEFAULT_FEATURE_FLAGS } from "@/core/featureFlags";
+import { DEFAULT_FEATURE_FLAGS, featureFlagsFromEnv, mergeFeatureFlags } from "@/core/featureFlags";
 
 describe("featureFlags", () => {
-  it("merges remote overrides", () => {
-    const merged = mergeFeatureFlags(DEFAULT_FEATURE_FLAGS, { crmContacts: true });
-    expect(merged.crmContacts).toBe(true);
-    expect(merged.unifiedFieldCockpit).toBe(true);
+  it("dispatchVoice est désactivé par défaut", () => {
+    expect(DEFAULT_FEATURE_FLAGS.dispatchVoice).toBe(false);
+    expect(featureFlagsFromEnv().dispatchVoice).toBe(false);
   });
 
-  it("reads env defaults when unset", () => {
-    const flags = featureFlagsFromEnv();
-    expect(typeof flags.interventionCommandPalette).toBe("boolean");
+  it("mergeFeatureFlags peut activer dispatchVoice via override Firestore", () => {
+    const merged = mergeFeatureFlags(featureFlagsFromEnv(), { dispatchVoice: true });
+    expect(merged.dispatchVoice).toBe(true);
   });
 });
