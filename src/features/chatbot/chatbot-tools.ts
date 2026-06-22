@@ -641,7 +641,7 @@ export const CHATBOT_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   {
     name: "open_crm_dossier",
     description:
-      "Ouvre le dossier dans le back-office (hub interventions) pour suivi détaillé après analyse historique.",
+      "Ouvre le dossier dans le dispatcher (hub interventions) pour suivi détaillé après analyse historique.",
     input_schema: {
       type: "object",
       properties: {

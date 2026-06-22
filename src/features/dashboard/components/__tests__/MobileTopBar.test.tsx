@@ -13,7 +13,7 @@ jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
 }));
 
 describe("MobileTopBar", () => {
-  it("affiche le bouton profil interactif", () => {
+  it("affiche le titre hub et le calendrier", () => {
     render(
       <DateProvider>
         <DashboardPagerProvider pageCount={3}>
@@ -24,7 +24,7 @@ describe("MobileTopBar", () => {
       </DateProvider>
     );
     expect(screen.getByTestId("mobile-top-bar")).toBeInTheDocument();
-    expect(screen.getByTestId("user-profile-toggle")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-hub-title-chip")).toBeInTheDocument();
     expect(screen.getByTestId("clock-calendar-toggle")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-header-rail")).toBeInTheDocument();
     expect(screen.getByTestId("clock-calendar-widget")).toBeInTheDocument();

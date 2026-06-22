@@ -26,6 +26,7 @@ import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestor
 import {
   countClientPortalThreadsNeedingReply,
   filterNewClientPortalMessages,
+  interventionIdsWithClientPortalChat,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
 import { useTechnicianBackofficeReportBridgeOptional } from "@/context/TechnicianBackofficeReportBridgeContext";
@@ -116,8 +117,9 @@ export function useBackOfficeInboxState(
         dayMissions,
         selectedDate,
         workspace,
+        includeInterventionIds: interventionIdsWithClientPortalChat(portalChatMessages),
       }),
-    [dayMissions, interventions, selectedDate, workspace]
+    [dayMissions, interventions, selectedDate, workspace, portalChatMessages]
   );
 
   const chatThreadsNeedingReply = useMemo(
@@ -299,7 +301,7 @@ export function useBackOfficeInboxState(
           iv: row,
           actorUid,
           actorRole: "dispatcher",
-          note: "Suppression dossier (IVANA / back-office)",
+          note: "Suppression dossier (IVANA / dispatcher)",
         });
       }
       await deleteDoc(doc(firestore, "interventions", id));
@@ -375,7 +377,7 @@ export function useBackOfficeInboxState(
         iv: row,
         toStatus: "cancelled",
         actor: dispatcherTransitionActor(actorUid),
-        note: "Annulé depuis le back-office",
+        note: "Annulé depuis le dispatcher",
       });
       toast.success(t("backoffice.toasts.request_cancelled"));
       setSelectedItemId(null);

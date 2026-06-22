@@ -63,7 +63,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     logger.error("[request-invoice-review]", {
       error: e instanceof Error ? e.message : String(e),
     });
-    const message = e instanceof Error ? e.message : "Transmission back-office impossible";
+    const message = e instanceof Error ? e.message : "Transmission dispatcher impossible";
     const status = message.includes("clôture") ? 409 : 500;
     return NextResponse.json({ ok: false, error: message }, { status });
   }

@@ -1,7 +1,7 @@
 {
   "name": "CRMSLOT Admin",
   "short_name": "Admin",
-  "description": "Back-office et pilotage CRMSLOT",
+  "description": "Dispatcher et pilotage CRMSLOT",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

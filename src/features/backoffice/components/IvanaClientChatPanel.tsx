@@ -22,6 +22,12 @@ import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaCh
 import { logger } from "@/core/logger";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import { requestStaffPortalChatNotification } from "@/features/backoffice/requestStaffPortalChatNotification";
+import { requestClientPortalChatNotification } from "@/features/backoffice/requestClientPortalChatNotification";
+import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
+import { resolveIvanaChatSenderName } from "@/features/backoffice/resolveIvanaChatSenderName";
+import { isVerifiedClientPortalUser } from "@/features/auth/hooks/useClientPortalAccount";
+import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
+import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 const STORAGE_PREFIX = "map-belgique-ivana-chat-v1";
@@ -33,6 +39,10 @@ export type IvanaChatMessage = {
   text: string;
   images?: string[];
   createdAt: number;
+  senderName?: string;
+  senderUid?: string;
+  pending?: boolean;
+  failed?: boolean;
 };
 
 function pickIvanaReply(userText: string, t: (key: string) => string): string {
@@ -75,6 +85,8 @@ export default function IvanaClientChatPanel({
   onRemoteClientMessage,
 }: PanelProps) {
   const { t } = useTranslation();
+  const { fields: staffFields } = useCrmStaffAccountPanel();
+  const { profile: requesterProfile, clientAccountFields } = useRequesterHub();
   const [user, setUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<IvanaChatMessage[]>(() => [welcomeMessage(t)]);
   const [draft, setDraft] = useState("");
@@ -87,6 +99,7 @@ export default function IvanaClientChatPanel({
   const seenPortalIdsRef = useRef<Set<string>>(new Set());
   const fsHydratedRef = useRef(false);
   const seenFsIdsRef = useRef<Set<string>>(new Set());
+  const pendingDocIdRef = useRef<Map<string, string>>(new Map());
 
   const { chatAuth, chatDb } = useMemo(
     () => resolveIvanaChatFirebaseSession(publishAsPortal),
@@ -94,7 +107,10 @@ export default function IvanaClientChatPanel({
   );
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
-  const firestoreSyncEnabled = Boolean(companyIdTrimmed && isConfigured && chatDb);
+  const portalAuthReady = !publishAsPortal || isVerifiedClientPortalUser(user);
+  const firestoreSyncEnabled = Boolean(
+    companyIdTrimmed && isConfigured && chatDb && portalAuthReady
+  );
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
   const storageKey = useMemo(() => `${STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`, [user?.uid]);
@@ -169,10 +185,7 @@ export default function IvanaClientChatPanel({
       chatDb,
       companyIdTrimmed,
       (rows) => {
-        const threadIvId = (chatInterventionId ?? "").trim();
-        const filteredRows = threadIvId
-          ? rows.filter((r) => (r.interventionId?.trim() ?? "") === threadIvId)
-          : rows;
+        const filteredRows = filterPortalChatMessagesForThread(rows, chatInterventionId);
 
         const mapped: IvanaChatMessage[] = filteredRows
           .map((r) => {
@@ -185,6 +198,8 @@ export default function IvanaClientChatPanel({
               role,
               text: r.body,
               createdAt: ts,
+              senderName: typeof r.senderName === "string" ? r.senderName : undefined,
+              senderUid: r.senderUid,
               images:
                 Array.isArray(r.imageUrls) && r.imageUrls.length > 0 ? r.imageUrls : undefined,
             };
@@ -194,8 +209,6 @@ export default function IvanaClientChatPanel({
         if (!fsHydratedRef.current) {
           fsHydratedRef.current = true;
           rows.forEach((r) => seenFsIdsRef.current.add(r.id));
-          setMessages(mapped.length === 0 ? [welcomeMessage(t)] : mapped);
-          return;
         }
 
         const uid = chatAuth?.currentUser?.uid;
@@ -209,7 +222,30 @@ export default function IvanaClientChatPanel({
           onRemoteClientMessage();
         }
 
-        setMessages(mapped.length === 0 ? [welcomeMessage(t)] : mapped);
+        setMessages((prev) => {
+          const confirmedIds = new Set(filteredRows.map((r) => r.id));
+          const contentKeys = new Set(
+            filteredRows.map((r) => `${(r.senderUid ?? "").trim()}::${r.body}`)
+          );
+          const optimistic = prev.filter((m) => {
+            if (!m.id.startsWith("pending-")) return false;
+            if (m.failed) return true;
+            const tempId = m.id.slice("pending-".length);
+            const docId = pendingDocIdRef.current.get(tempId);
+            if (docId && confirmedIds.has(docId)) {
+              pendingDocIdRef.current.delete(tempId);
+              return false;
+            }
+            if (contentKeys.has(`${(m.senderUid ?? "").trim()}::${m.text}`)) {
+              pendingDocIdRef.current.delete(tempId);
+              return false;
+            }
+            return true;
+          });
+          const base =
+            mapped.length === 0 && optimistic.length === 0 ? [welcomeMessage(t)] : mapped;
+          return [...base, ...optimistic].sort((a, b) => a.createdAt - b.createdAt);
+        });
       },
       (err) => {
         logger.error("[IvanaClientChatPanel] Firestore chat", {
@@ -302,41 +338,97 @@ export default function IvanaClientChatPanel({
     const text = draft.trim();
     if ((!text && pendingImages.length === 0) || ivanaTyping) return;
 
-    if (firestoreSyncEnabled && chatDb && chatAuth?.currentUser) {
+    const wantsFirestore = Boolean(companyIdTrimmed && isConfigured && chatDb);
+
+    if (wantsFirestore) {
+      if (publishAsPortal && !portalAuthReady) {
+        toast.error(t("chat.toast_login_required"), {
+          description: t("chat.toast_login_description"),
+        });
+        return;
+      }
+      if (!chatAuth?.currentUser) {
+        toast.error(t("chat.toast_login_required"), {
+          description: t("chat.toast_login_description"),
+        });
+        return;
+      }
+
       if (pendingImages.length > 0 && !storage) {
         toast.error("Chat", {
           description: t("chat.toast_storage_unavailable"),
         });
         return;
       }
+
+      const role = publishAsPortal ? "client" : "staff";
+      const currentUser = chatAuth.currentUser;
+      const senderName = resolveIvanaChatSenderName({
+        publishAsPortal,
+        user: currentUser,
+        staffFields,
+        clientAccountFields,
+        requesterProfile,
+        t,
+      });
+      const tempId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+      const optimisticImages = pendingImages.length > 0 ? [...pendingImages] : undefined;
+      const optimisticMsg: IvanaChatMessage = {
+        id: `pending-${tempId}`,
+        role,
+        text,
+        createdAt: Date.now(),
+        senderName,
+        senderUid: currentUser.uid,
+        images: optimisticImages,
+        pending: true,
+      };
+
+      setMessages((prev) => [...prev, optimisticMsg]);
+      setDraft("");
+      setPendingImages([]);
+
       try {
-        const role = publishAsPortal ? "client" : "staff";
         if (publishAsPortal) {
-          await ensureIvanaChatPortalProfile(chatDb, chatAuth.currentUser, companyIdTrimmed);
+          await ensureIvanaChatPortalProfile(chatDb, currentUser, companyIdTrimmed);
         }
         let imageUrls: string[] | undefined;
-        if (pendingImages.length > 0 && storage) {
+        if (optimisticImages && optimisticImages.length > 0 && storage) {
           imageUrls = await uploadIvanaChatImagesFromDataUrls(storage, {
             companyId: companyIdTrimmed,
-            uid: chatAuth.currentUser.uid,
-            dataUrls: pendingImages,
+            uid: currentUser.uid,
+            dataUrls: optimisticImages,
           });
         }
-        await sendIvanaPortalMessage(chatDb, {
+        const docId = await sendIvanaPortalMessage(chatDb, {
           companyId: companyIdTrimmed,
           body: text,
           role,
-          senderUid: chatAuth.currentUser.uid,
+          senderUid: currentUser.uid,
+          senderName,
           interventionId: chatInterventionId,
           ...(imageUrls && imageUrls.length > 0 ? { imageUrls } : {}),
         });
-        setDraft("");
-        setPendingImages([]);
+        pendingDocIdRef.current.set(tempId, docId);
+        if (imageUrls && imageUrls.length > 0) {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === optimisticMsg.id ? { ...m, images: imageUrls } : m))
+          );
+        }
+        const preview = text || (imageUrls?.length ? "Photo jointe" : "");
         if (publishAsPortal) {
           void requestStaffPortalChatNotification({
             companyId: companyIdTrimmed,
             interventionId: chatInterventionId,
-            preview: text || (imageUrls?.length ? "Photo jointe" : ""),
+            preview,
+            clientLabel: senderName,
+          });
+        } else {
+          void requestClientPortalChatNotification({
+            companyId: companyIdTrimmed,
+            interventionId: chatInterventionId,
+            preview,
+            staffLabel: senderName,
           });
         }
       } catch (e) {
@@ -346,14 +438,10 @@ export default function IvanaClientChatPanel({
         toast.error("Chat", {
           description: e instanceof Error ? e.message : t("chat.toast_send_failed"),
         });
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticMsg.id ? { ...m, pending: false, failed: true } : m))
+        );
       }
-      return;
-    }
-
-    if (firestoreSyncEnabled && !chatAuth?.currentUser) {
-      toast.error(t("chat.toast_login_required"), {
-        description: t("chat.toast_login_description"),
-      });
       return;
     }
 
@@ -404,6 +492,10 @@ export default function IvanaClientChatPanel({
     chatAuth,
     chatInterventionId,
     t,
+    staffFields,
+    clientAccountFields,
+    requesterProfile,
+    portalAuthReady,
   ]);
 
   const bubbleTestId = (m: IvanaChatMessage) => {
@@ -423,8 +515,16 @@ export default function IvanaClientChatPanel({
         ? "rounded-br-md bg-blue-600 text-white"
         : m.role === "staff"
           ? "rounded-bl-md border border-blue-200/90 bg-blue-50 text-slate-900"
-          : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800"
+          : "rounded-bl-md border border-slate-200/80 bg-white text-slate-800",
+      m.pending && "opacity-70",
+      m.failed && "ring-1 ring-red-400/70"
     );
+
+  const senderHeader = (m: IvanaChatMessage): string | null => {
+    if (m.role === "client") return m.senderName?.trim() || t("chat.role_client");
+    if (m.role === "staff") return m.senderName?.trim() || t("chat.role_staff");
+    return null;
+  };
 
   return (
     <div
@@ -438,6 +538,14 @@ export default function IvanaClientChatPanel({
           "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4"
         )}
       >
+        {publishAsPortal && companyIdTrimmed && !portalAuthReady ? (
+          <div
+            data-testid="ivana-chat-login-hint"
+            className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-900"
+          >
+            {t("chat.toast_login_description")}
+          </div>
+        ) : null}
         {messages.map((m) => (
           <div
             key={m.id}
@@ -445,17 +553,25 @@ export default function IvanaClientChatPanel({
             className={cn("flex w-full", bubbleAlign(m))}
           >
             <div className={bubbleShellClass(m)}>
-              {m.role === "client" ? (
-                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-blue-100/90">
-                  {t("chat.role_client")}
-                </span>
-              ) : null}
-              {m.role === "staff" ? (
-                <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-blue-800/80">
-                  {t("chat.role_staff")}
+              {senderHeader(m) ? (
+                <span
+                  className={cn(
+                    "mb-1 block text-[11px] font-semibold tracking-wide",
+                    m.role === "client" ? "text-blue-100/90" : "text-blue-800/80"
+                  )}
+                >
+                  {senderHeader(m)}
                 </span>
               ) : null}
               {m.text}
+              {m.failed ? (
+                <span
+                  className="ml-2 inline-block align-baseline text-[10px] font-semibold uppercase tracking-wide text-red-500"
+                  data-testid="ivana-chat-bubble-failed"
+                >
+                  {t("chat.toast_send_failed")}
+                </span>
+              ) : null}
               {m.images && m.images.length > 0 ? (
                 <div
                   className="mt-2 grid grid-cols-3 gap-1.5"

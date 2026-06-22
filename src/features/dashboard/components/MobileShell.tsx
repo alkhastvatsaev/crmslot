@@ -1,14 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import dynamic from "next/dynamic";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
-const DashboardGalaxyLayer = dynamic(
-  () => import("@/features/map/components/DashboardGalaxyLayer"),
-  { ssr: false, loading: () => null }
-);
+import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
@@ -55,7 +51,7 @@ export default function MobileShell({ pages }: Props) {
             chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
             data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
           >
-            <DashboardGalaxyLayer />
+            <MobileShellFooterDock />
           </MobileShellSlotGrid>
           <MobileHubDotsBar />
         </footer>

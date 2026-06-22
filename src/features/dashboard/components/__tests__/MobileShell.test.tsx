@@ -4,20 +4,41 @@ import MobileShell from "@/features/dashboard/components/MobileShell";
 import { DateProvider } from "@/context/DateContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
+import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
 
-jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
+jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
-  default: () => <div data-testid="galaxy-layer" />,
+  default: () => null,
+}));
+
+jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
+  useCrmStaffAccountPanel: () => ({
+    fields: {
+      email: "admin@test.com",
+      firstName: "Jean",
+      lastName: "Dupont",
+      companyName: "Test Co",
+      roleLabel: "admin",
+    },
+    ready: true,
+    signingOut: false,
+    signOut: jest.fn(),
+  }),
 }));
 
 function renderMobileShell(pages: ReactNode[]) {
   return render(
     <DateProvider>
-      <DashboardPagerProvider pageCount={pages.length}>
-        <DashboardPageSelectorProvider>
-          <MobileShell pages={pages} />
-        </DashboardPageSelectorProvider>
-      </DashboardPagerProvider>
+      <GalaxyLayerBridgeProvider>
+        <MobileGalaxyComposerOpenProvider>
+          <DashboardPagerProvider pageCount={pages.length}>
+            <DashboardPageSelectorProvider>
+              <MobileShell pages={pages} />
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
+        </MobileGalaxyComposerOpenProvider>
+      </GalaxyLayerBridgeProvider>
     </DateProvider>
   );
 }
@@ -27,7 +48,8 @@ describe("MobileShell", () => {
     renderMobileShell([<div key="0">Hub A</div>, <div key="1">Hub B</div>]);
 
     expect(screen.getByTestId("mobile-shell")).toBeInTheDocument();
-    expect(screen.getByTestId("user-profile-toggle")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-hub-title-chip")).toBeInTheDocument();
+    expect(screen.getByTestId("admin-mobile-profile-chip")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-screen-host")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-shell-footer")).toBeInTheDocument();
     expect(screen.queryByTestId("mobile-hub-dots-bar")).not.toBeInTheDocument();
@@ -40,7 +62,7 @@ describe("MobileShell", () => {
     expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
     expect(screen.getByTestId("mobile-page-0")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId("user-profile-toggle"));
+    fireEvent.click(screen.getByTestId("admin-mobile-profile-chip"));
     expect(screen.getByTestId("dashboard-account-panel-host")).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
     expect(screen.getByText("A").closest("[aria-hidden='true']")).toBeTruthy();

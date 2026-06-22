@@ -104,7 +104,7 @@ export function hubUiToolSuccessMessage(toolName: string, result: unknown): stri
         ? `Dossier ${r.interventionId} sélectionné dans la facturation.`
         : "Liste facturation filtrée.";
     case "open_crm_dossier":
-      return `Ouverture du dossier ${r.interventionId} dans le back-office.`;
+      return `Ouverture du dossier ${r.interventionId} dans le dispatcher.`;
     default:
       return "Action interface effectuée.";
   }

@@ -18,7 +18,7 @@
       "chrome_manual_hint": "Menu ⋮ en haut à droite → Installer l'application ou Ajouter à l'écran d'accueil",
       "admin": {
         "title": "Installer l'app Admin",
-        "description": "Accédez au back-office plus rapidement depuis votre écran d'accueil."
+        "description": "Accédez au dispatcher plus rapidement depuis votre écran d'accueil."
       },
       "demande": {
         "title": "Installer l'app Demande",
@@ -497,7 +497,7 @@
       "create_intervention": "Créer dossier + assigner (IA)",
       "create_intervention_ok": "Dossier créé depuis l'e-mail",
       "create_intervention_assigned": "Technicien assigné : {{name}}",
-      "create_intervention_pending_assign": "Dossier créé — assignez un technicien depuis le back-office.",
+      "create_intervention_pending_assign": "Dossier créé — assignez un technicien depuis le dispatcher.",
       "mobile": {
         "rail_left": "Dossiers",
         "rail_center": "Messages",
@@ -543,7 +543,7 @@
     "interventions_title": "Interventions liées",
     "interventions_empty": "Aucune intervention liée à ce client.",
     "offline_hint": "Mode hors ligne — liste clients en cache local.",
-    "open_in_backoffice": "Ouvrir dans le back-office",
+    "open_in_backoffice": "Ouvrir dans le dispatcher",
     "export_csv": "Exporter CSV",
     "recurring_request": "Nouvelle demande (même client)",
     "delete_client": "Supprimer",
@@ -570,7 +570,7 @@
     "done_not_invoiced": "Terminée — à facturer",
     "material_pending": "Matériel en attente",
     "unassigned_stale": "Non assignée — à traiter",
-    "push_title": "Relances back-office",
+    "push_title": "Relances dispatcher",
     "push_body": "{count} dossier(s) nécessitent votre attention."
   },
   "workspace_switcher": {
@@ -689,7 +689,7 @@
     "new_activity_many": "{count} événements ajoutés à l'historique",
     "empty": "Aucune activité sur cette période",
     "actor": {
-      "dispatcher": "Back-office",
+      "dispatcher": "Dispatcher",
       "technician": "Technicien",
       "client": "Client",
       "system": "Système"
@@ -730,17 +730,17 @@
         "intervention_completed": "Les travaux sur site sont terminés côté technicien. Le dossier peut passer en validation ou facturation.",
         "intervention_invoiced": "Le dossier est marqué comme facturé : la facture a été générée ou le statut commercial est passé à « facturé ».",
         "intervention_technician_declined": "Le technicien assigné a refusé la mission. Le dossier retourne en file d'attente ou doit être réassigné.",
-        "intervention_returned_to_requests": "Le dossier a été renvoyé dans la file « Demandes » du back-office, sans technicien actif.",
+        "intervention_returned_to_requests": "Le dossier a été renvoyé dans la file « Demandes » du dispatcher, sans technicien actif.",
         "intervention_deleted": "Le dossier a été supprimé ou archivé de manière définitive dans l'espace société.",
         "intervention_report_validated": "Le rapport terrain a été validé ; le dossier est prêt pour la facturation ou la clôture administrative.",
-        "intervention_report_rejected": "Le rapport terrain a été refusé par le back-office ; le technicien doit le compléter avant nouvelle soumission.",
+        "intervention_report_rejected": "Le rapport terrain a été refusé par le dispatcher ; le technicien doit le compléter avant nouvelle soumission.",
         "intervention_report_archived": "Le rapport a été retiré de la liste active de l'inbox rapports et placé dans l'archive.",
         "intervention_cancelled": "L'intervention a été annulée : plus de passage terrain prévu pour ce dossier.",
         "intervention_schedule_updated": "La date ou le créneau d'intervention a été modifié (planning client ou dispatch).",
         "intervention_billing_updated": "Les lignes de facturation (HT/TVA, libellés) ou le montant du dossier ont été mis à jour.",
         "intervention_payment_updated": "Le statut de paiement ou l'enregistrement d'un encaissement a été modifié sur ce dossier.",
         "intervention_terrain_report_received": "Un rapport de fin de mission (texte, photos, signature) a été déposé par le technicien.",
-        "bridged_report_dismissed": "Un rapport terrain importé automatiquement a été ignoré ou masqué par le back-office.",
+        "bridged_report_dismissed": "Un rapport terrain importé automatiquement a été ignoré ou masqué par le dispatcher.",
         "ivana_chat_message": "Échange dans le chat Ivana lié au portail client ou au suivi du dossier.",
         "material_order_status_changed": "Le statut d'une commande de matériel interne a évolué (brouillon, envoyée, reçue, etc.).",
         "supplier_order_lecot": "Une commande fournisseur Lecot a été créée ou mise à jour via le chatbot ou le hub matériel.",
@@ -1311,7 +1311,7 @@
     "nav_map": "Carte",
     "nav_company": "Espace société",
     "nav_technician": "Technicien",
-    "nav_backoffice": "Back-office",
+    "nav_backoffice": "Dispatcher",
     "nav_offline": "Assistant IA",
     "nav_chatbot": "Chatbot",
     "nav_technician_lab": "Lab technicien",
@@ -1623,7 +1623,7 @@
         "reopen_success": "Intervention rouverte — vous pouvez compléter le dossier.",
         "reopen_failed": "Impossible de rouvrir l'intervention",
         "reopen_blocked_status": "Seules les interventions terminées (non facturées) peuvent être rouvertes.",
-        "reopen_blocked_invoiced": "Intervention déjà facturée — contactez le back-office.",
+        "reopen_blocked_invoiced": "Intervention déjà facturée — contactez le dispatcher.",
         "reopen_blocked_invoice_pdf": "Une facture PDF existe déjà — réouverture impossible.",
         "reopen_blocked_not_assigned": "Cette mission n'est pas assignée à votre compte."
       }
@@ -1683,9 +1683,9 @@
         "report_updated": "Rapport mis à jour",
         "report_updated_desc": "La mission reste terminée. Vos corrections sont enregistrées.",
         "invoiced_report_updated": "Modifications enregistrées",
-        "invoiced_report_updated_desc": "Le back-office a été notifié de vos changements.",
+        "invoiced_report_updated_desc": "Le dispatcher a été notifié de vos changements.",
         "presentation_mode": "Mode présentation",
-        "presentation_mode_desc": "Sauvegarde cloud allégée. Le back-office voit le rapport via le mode démo.",
+        "presentation_mode_desc": "Sauvegarde cloud allégée. Le dispatcher voit le rapport via le mode démo.",
         "send_failed": "Envoi impossible",
         "already_invoiced": "Déjà facturée",
         "already_invoiced_desc": "Cette intervention est facturée — le rapport ne peut plus être modifié."
@@ -1797,12 +1797,15 @@
     "daily_missions": {
       "archive_aria": "Archiver — masquer cette mission de la vue du jour sur cet appareil",
       "archive_label": "Archiver",
-      "archived_toast": "Mission masquée sur la carte (archive locale). Elle reste dans le back-office.",
+      "archived_toast": "Mission masquée sur la carte (archive locale). Elle reste dans le dispatcher.",
       "delete_aria": "Supprimer définitivement cette intervention",
       "delete_label": "Supprimer",
       "deleted_toast": "Intervention supprimée définitivement.",
       "delete_confirm": "Voulez-vous vraiment supprimer cette intervention ?",
       "mission_actions_aria": "Actions sur la mission"
+    },
+    "dispatch": {
+      "arm_audio": "Dispatch vocal"
     }
   },
   "backoffice": {
@@ -2272,7 +2275,7 @@
   },
   "profiles": {
     "roles": {
-      "back_office": "BACK OFFICE",
+      "back_office": "DISPATCHER",
       "client": "CLIENT",
       "technician": "TECHNICIEN",
       "admin": "ADMIN"
@@ -2464,12 +2467,12 @@
     "documents_search_aria": "Rechercher dans les documents de l'entreprise",
     "documents_search_clear": "Effacer la recherche",
     "documents_no_results": "Aucun document ne correspond à votre recherche.",
-    "welcome": "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le back-office vous répondra ici.",
-    "reply_urgent": "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le back-office traite ces dossiers en priorité.",
+    "welcome": "Bonjour — écrivez-nous pour toute question sur une intervention, un rendez-vous ou une facture. Le dispatcher vous répondra ici.",
+    "reply_urgent": "Pour une urgence, indiquez votre adresse complète et un numéro joignable ; le dispatcher traite ces dossiers en priorité.",
     "reply_billing": "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l'intervention : je transmets au service concerné.",
-    "reply_schedule": "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le back-office vous confirmera la planification.",
+    "reply_schedule": "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le dispatcher vous confirmera la planification.",
     "reply_thanks": "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
-    "reply_default": "Merci pour votre message. Le back-office a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
+    "reply_default": "Merci pour votre message. Le dispatcher a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
   },
   "copilot": {
     "aria": {
@@ -2505,7 +2508,7 @@
     "prompt_unpaid": "Liste les interventions terminées mais non payées avec montants.",
     "prompt_urgent": "Résume les dossiers urgents encore ouverts.",
     "prompt_clients": "Quels clients ont le plus de dossiers actifs ?",
-    "prompt_summary_day": "Fais un briefing opérationnel de la journée pour le back-office."
+    "prompt_summary_day": "Fais un briefing opérationnel de la journée pour le dispatcher."
   },
   "chatbot": {
     "no_company": "Connectez-vous avec une société active pour utiliser le Chatbot.",

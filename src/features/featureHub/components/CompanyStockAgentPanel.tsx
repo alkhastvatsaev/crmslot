@@ -5,6 +5,7 @@ import { Loader2, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useMobileGalaxyComposerOpenApi } from "@/context/MobileGalaxyComposerOpenContext";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import ChatbotGalaxyOrb from "@/features/chatbot/components/ChatbotGalaxyOrb";
 import { renderChatbotMarkdownLite } from "@/features/chatbot/chatbot-message-markdown";
@@ -98,6 +99,7 @@ export default function CompanyStockAgentPanel({
   enabled = true,
 }: Props) {
   const { t } = useTranslation();
+  const composerApi = useMobileGalaxyComposerOpenApi();
   const { setSearch, setSelectedStockItemId } = useCompanyStockIntent();
   const { registerHandlers } = useCompanyStockAgentBridge();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -129,6 +131,10 @@ export default function CompanyStockAgentPanel({
   }, []);
 
   const isEmpty = agent.messages.length === 0;
+
+  useEffect(() => {
+    if (agent.messages.length > 0) composerApi?.requestOpen();
+  }, [agent.messages.length, composerApi]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -191,7 +197,7 @@ export default function CompanyStockAgentPanel({
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
             >
-              <ChatbotGalaxyOrb size="hero" />
+              <ChatbotGalaxyOrb size="hero" onPress={() => composerApi?.requestOpen()} />
             </motion.div>
           ) : null}
         </AnimatePresence>

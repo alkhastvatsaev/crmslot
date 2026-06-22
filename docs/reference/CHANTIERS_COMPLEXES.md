@@ -25,7 +25,7 @@ Dernière mise à jour : mai 2026.
 
 Faire tourner de bout en bout, **en prod**, le parcours :
 
-**Client (portail) → demande → back-office → assignation → technicien → clôture → facture**
+**Client (portail) → demande → dispatcher → assignation → technicien → clôture → facture**
 
 …avec **isolation par société**, **rôles** (admin / collaborateur / technicien / client) et **règles Firestore cohérentes**.
 
@@ -60,7 +60,7 @@ Faire tourner de bout en bout, **en prod**, le parcours :
 ### Critères de « terminé »
 
 - [ ] Un admin crée une société, invite un collaborateur, les deux voient **uniquement** leurs dossiers.
-- [ ] Un client portail crée une demande ; le back-office la voit ; assignation à un technicien **réel** ; le technicien accepte sur son hub.
+- [ ] Un client portail crée une demande ; le dispatcher la voit ; assignation à un technicien **réel** ; le technicien accepte sur son hub.
 - [ ] Clôture terrain → statut `done` → facture auto (`invoiced`) si checklist complète.
 - [ ] Aucune fuite cross-tenant en lecture / écriture (audit rules + tests E2E).
 - [ ] Parcours reproductible sur Vercel staging avec Firebase prod-like (voir `docs/ops/SETUP_VERCEL_GITHUB.md`).
@@ -81,7 +81,7 @@ Gestion de la **file d’attente locale** (photos + signature), reprise au retou
 ### Ce qui rend le chantier difficile
 
 - Bugs **non déterministes** : réseau lent, timeout 3–6 min, double clic, onglet en arrière-plan.
-- Conflit **back-office vs terrain** (déjà partiellement géré ; UI utilisateur encore limitée).
+- Conflit **dispatcher vs terrain** (déjà partiellement géré ; UI utilisateur encore limitée).
 - Tests difficiles (IndexedDB, `navigator.onLine`, Firebase Storage mock).
 
 ### Fichiers clés
@@ -106,7 +106,7 @@ Aujourd’hui l’app est centrée sur un **carrousel 3 pages** (carte / hub soc
 ### Contraintes actuelles
 
 - `src/features/app/DesktopOnlyGate.tsx` sur la page principale (`src/app/page.tsx`).
-- Parcours terrain réparti entre hub technicien, bridge back-office, et route legacy `/technician`.
+- Parcours terrain réparti entre hub technicien, bridge dispatcher, et route legacy `/technician`.
 - Mapbox, caméra, signature : utilisables mais pas optimisés **téléphone en véhicule**.
 
 ### Travail à prévoir
@@ -176,7 +176,7 @@ Relativement **cadrée** côté backend ; le risque est en amont (statuts + méd
 ### Dépendances
 
 - Checklist complète côté terrain (section 2).
-- Validation back-office (`tenantCollaborateurCanValidateReport` dans les rules).
+- Validation dispatcher (`tenantCollaborateurCanValidateReport` dans les rules).
 
 ---
 

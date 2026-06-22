@@ -42,7 +42,7 @@ export function emailToInterventionEvent(email: InterventionEmailDoc): Intervent
 
 export function commissionAuditToInterventionEvent(
   row: CommissionAuditRow,
-  interventionId: string,
+  interventionId: string
 ): InterventionEvent {
   const euros = row.finalCommissionAmount.toFixed(2);
   const reasonPart = row.reason?.trim() ? ` — ${row.reason.trim()}` : "";
@@ -64,9 +64,7 @@ export function commissionAuditToInterventionEvent(
 }
 
 export function materialOrderToInterventionEvent(order: MaterialOrderDoc): InterventionEvent {
-  const parts = order.partsRequested
-    .map((p) => `${p.quantity}× ${p.description}`)
-    .join(", ");
+  const parts = order.partsRequested.map((p) => `${p.quantity}× ${p.description}`).join(", ");
   return {
     id: `material-${order.id}`,
     interventionId: order.interventionId,
@@ -80,24 +78,23 @@ export function materialOrderToInterventionEvent(order: MaterialOrderDoc): Inter
 
 export function portalChatToInterventionEvent(msg: IvanaPortalChatDoc): InterventionEvent {
   const fromClient = msg.role === "client";
+  const label = msg.senderName?.trim() || (fromClient ? "Client" : "Équipe");
   const imageNote =
-    msg.imageUrls && msg.imageUrls.length > 0
-      ? `\n[${msg.imageUrls.length} image(s)]`
-      : "";
+    msg.imageUrls && msg.imageUrls.length > 0 ? `\n[${msg.imageUrls.length} image(s)]` : "";
   return {
     id: `portal-chat-${msg.id}`,
     interventionId: msg.interventionId?.trim() ?? "",
     type: "portal_chat",
     createdAt: toIsoString(msg.createdAt),
     createdByUid: msg.senderUid,
-    content: `${fromClient ? "Client" : "Équipe"} : ${msg.body}${imageNote}`,
+    content: `${label} : ${msg.body}${imageNote}`,
     visibility: "client",
   };
 }
 
 export function timelineDocToInterventionEvent(
   id: string,
-  doc: InterventionTimelineDoc,
+  doc: InterventionTimelineDoc
 ): InterventionEvent {
   return {
     id: `timeline-${id}`,
@@ -120,7 +117,7 @@ export function mergeInterventionTimelineEvents(
     materialOrders?: MaterialOrderDoc[];
     commissionAudit?: CommissionAuditRow[];
     portalChat?: IvanaPortalChatDoc[];
-  },
+  }
 ): InterventionEvent[] {
   const clientOnly = options?.clientVisibleOnly === true;
   const rows: InterventionEvent[] = [
@@ -129,7 +126,7 @@ export function mergeInterventionTimelineEvents(
     ...(options?.emails ?? []).map(emailToInterventionEvent),
     ...(options?.materialOrders ?? []).map(materialOrderToInterventionEvent),
     ...(options?.commissionAudit ?? []).map((row) =>
-      commissionAuditToInterventionEvent(row, row.interventionId),
+      commissionAuditToInterventionEvent(row, row.interventionId)
     ),
     ...(options?.portalChat ?? []).map(portalChatToInterventionEvent),
   ];
@@ -142,11 +139,9 @@ export function mergeInterventionTimelineEvents(
           (r.visibility === "client" &&
             r.type !== "email" &&
             r.type !== "material_order" &&
-            r.type !== "commission"),
+            r.type !== "commission")
       )
     : rows;
 
-  return filtered.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-  );
+  return filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }

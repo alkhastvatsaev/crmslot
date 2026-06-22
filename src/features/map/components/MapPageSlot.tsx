@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import MapMobileDispatchArmButton from "@/features/map/components/MapMobileDispatchArmButton";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -15,5 +16,10 @@ const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"),
 
 /** Page carte admin — Mapbox WebGL (mobile + desktop). */
 export default function MapPageSlot() {
-  return <MapboxView />;
+  return (
+    <>
+      <MapboxView />
+      <MapMobileDispatchArmButton />
+    </>
+  );
 }

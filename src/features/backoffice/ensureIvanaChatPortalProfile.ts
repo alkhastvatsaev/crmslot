@@ -19,7 +19,8 @@ export async function ensureIvanaChatPortalProfile(
       companyId: trimmed,
       role: "client",
       email: user.email ?? null,
-      displayName: user.displayName ?? null,
+      displayName:
+        user.displayName?.trim() || [user.email?.split("@")[0]].filter(Boolean).join(" ") || null,
       updatedAt: serverTimestamp(),
     },
     { merge: true }

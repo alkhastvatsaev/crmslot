@@ -249,13 +249,13 @@ function buildEmailHtml(bodyKey: string, vars: Record<string, string>): string {
         <li><strong>Adresse :</strong> {{address}}</li>
         <li><strong>Client :</strong> {{clientName}} ({{clientPhone}})</li>
       </ul>
-      <p>À traiter depuis le back-office.</p>`,
+      <p>À traiter depuis le dispatcher.</p>`,
     "notifications.email.needs_address.body": `
       <p>L'adresse du dossier <strong>{{title}}</strong> est manquante.</p>
       <p>Le dossier ne peut pas être assigné tant que l'adresse n'est pas renseignée.</p>`,
     "notifications.email.done_dispatcher.body": `
       <p>Le technicien <strong>{{technicianName}}</strong> a terminé l'intervention <strong>{{title}}</strong>.</p>
-      <p>Le rapport est à valider dans le back-office.</p>`,
+      <p>Le rapport est à valider dans le dispatcher.</p>`,
     // ── Emails existants ──
     "notifications.email.assigned.body": `
       <p>Bonjour <strong>{{clientName}}</strong>,</p>
@@ -290,7 +290,7 @@ function buildEmailHtml(bodyKey: string, vars: Record<string, string>): string {
       <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>`,
     "notifications.email.report_rejected.body": `
       <p>Bonjour,</p>
-      <p>Le back-office a refusé votre rapport pour l'intervention <strong>{{title}}</strong>.</p>
+      <p>Le dispatcher a refusé votre rapport pour l'intervention <strong>{{title}}</strong>.</p>
       <p><strong>Motif :</strong> {{rejectionReason}}</p>
       <p>Merci de rouvrir la mission et de compléter ou corriger le rapport avant de le soumettre à nouveau.</p>`,
     weekly_digest_body: `

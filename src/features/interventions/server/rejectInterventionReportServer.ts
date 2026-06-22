@@ -33,8 +33,8 @@ export async function rejectInterventionReportServer(params: {
 
   const rejectionReason = reason?.trim() || "";
   const note = rejectionReason
-    ? `Rapport refusé par le back-office — ${rejectionReason}`
-    : "Rapport refusé par le back-office — complément demandé au technicien";
+    ? `Rapport refusé par le dispatcher — ${rejectionReason}`
+    : "Rapport refusé par le dispatcher — complément demandé au technicien";
 
   const rejectedAt = new Date().toISOString();
 
@@ -60,14 +60,14 @@ export async function rejectInterventionReportServer(params: {
       const techEmail = techUser.email?.trim();
       if (techEmail) {
         const title = (iv.title || iv.problem || `Dossier #${interventionId.slice(-8)}`).trim();
-        const displayReason = rejectionReason || "Complément demandé par le back-office";
+        const displayReason = rejectionReason || "Complément demandé par le dispatcher";
         await sendInterventionEmail({
           interventionId,
           companyId,
           to: techEmail,
           subject: `Rapport refusé — veuillez compléter l'intervention ${title}`,
-          bodyText: `Le back-office a refusé votre rapport.\n\nMotif : ${displayReason}\n\nMerci de rouvrir la mission et de compléter le rapport.`,
-          bodyHtml: `<p>Le back-office a refusé votre rapport pour l'intervention <strong>${title}</strong>.</p><p><strong>Motif :</strong> ${displayReason}</p><p>Merci de rouvrir la mission et de compléter ou corriger le rapport avant de le soumettre à nouveau.</p>`,
+          bodyText: `Le dispatcher a refusé votre rapport.\n\nMotif : ${displayReason}\n\nMerci de rouvrir la mission et de compléter le rapport.`,
+          bodyHtml: `<p>Le dispatcher a refusé votre rapport pour l'intervention <strong>${title}</strong>.</p><p><strong>Motif :</strong> ${displayReason}</p><p>Merci de rouvrir la mission et de compléter ou corriger le rapport avant de le soumettre à nouveau.</p>`,
           sentByUid: actorUid,
           sentVia: "reject-report",
           attachDocumentType: "none",

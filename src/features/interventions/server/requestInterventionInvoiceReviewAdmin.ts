@@ -23,7 +23,7 @@ export async function requestInterventionInvoiceReviewAdmin(params: {
 
   const iv = { id: snap.id, ...snap.data() } as Intervention;
   if (iv.status !== "done") {
-    throw new Error("La facture ne peut être transmise au back-office qu'après clôture terrain.");
+    throw new Error("La facture ne peut être transmise au dispatcher qu'après clôture terrain.");
   }
 
   const now = new Date().toISOString();
@@ -39,8 +39,8 @@ export async function requestInterventionInvoiceReviewAdmin(params: {
     actorUid,
     actorRole: "technician",
     note: note
-      ? `Facture à valider par le back-office — note technicien : ${note}`
-      : "Facture à valider par le back-office (technicien)",
+      ? `Facture à valider par le dispatcher — note technicien : ${note}`
+      : "Facture à valider par le dispatcher (technicien)",
   });
 
   return { ok: true };

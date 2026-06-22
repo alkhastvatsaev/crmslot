@@ -7,6 +7,8 @@ import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import { DateProvider } from "@/context/DateContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
+import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -14,9 +16,24 @@ import {
   MOBILE_SHELL_SLOT_GRID_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
 
-jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
+jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
-  default: () => <div data-testid="galaxy-layer" />,
+  default: () => null,
+}));
+
+jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
+  useCrmStaffAccountPanel: () => ({
+    fields: {
+      email: "admin@test.com",
+      firstName: "Jean",
+      lastName: "Dupont",
+      companyName: "Test Co",
+      roleLabel: "admin",
+    },
+    ready: true,
+    signingOut: false,
+    signOut: jest.fn(),
+  }),
 }));
 
 const repoRoot = path.resolve(__dirname, "../../../../");
@@ -24,11 +41,15 @@ const repoRoot = path.resolve(__dirname, "../../../../");
 function renderMobileShell(pages: ReactNode[], initialOpen = false) {
   return render(
     <DateProvider>
-      <DashboardPagerProvider pageCount={pages.length}>
-        <DashboardPageSelectorProvider initialOpen={initialOpen}>
-          <MobileShell pages={pages} />
-        </DashboardPageSelectorProvider>
-      </DashboardPagerProvider>
+      <GalaxyLayerBridgeProvider>
+        <MobileGalaxyComposerOpenProvider>
+          <DashboardPagerProvider pageCount={pages.length}>
+            <DashboardPageSelectorProvider initialOpen={initialOpen}>
+              <MobileShell pages={pages} />
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
+        </MobileGalaxyComposerOpenProvider>
+      </GalaxyLayerBridgeProvider>
     </DateProvider>
   );
 }
