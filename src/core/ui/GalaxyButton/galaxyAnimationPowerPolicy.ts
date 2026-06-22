@@ -1,6 +1,9 @@
 import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
 
 export const GALAXY_STAR_COUNT = 6000;
+/** Orbe / dock mobile — fluide mais léger (pas 6000 étoiles desktop). */
+export const GALAXY_MOBILE_STAR_COUNT = 72;
+export const GALAXY_MOBILE_MAX_FPS = 24;
 
 export type GalaxyAnimationProfile = {
   starCount: number;
@@ -22,7 +25,7 @@ function hasMatchMedia(query: string): boolean {
   return window.matchMedia(query).matches;
 }
 
-/** Téléphone / touch-first — profil basse consommation. */
+/** Téléphone / touch-first — profil canvas compact. */
 export function isMobilePowerSaveClient(
   userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): boolean {
@@ -45,14 +48,13 @@ function defaultProfile(starCount: number): GalaxyAnimationProfile {
 
 function mobileProfile(overrides: Partial<GalaxyAnimationProfile>): GalaxyAnimationProfile {
   return {
-    /** PWA mobile : fond CSS statique uniquement — zéro boucle canvas (surchauffe batterie). */
-    starCount: 0,
-    maxFps: 0,
-    maxDevicePixelRatio: 1.5,
+    starCount: GALAXY_MOBILE_STAR_COUNT,
+    maxFps: GALAXY_MOBILE_MAX_FPS,
+    maxDevicePixelRatio: 1.75,
     pauseWhenHidden: true,
     interactive: false,
-    baseSpeed: 0,
-    backgroundEveryNFrames: 1,
+    baseSpeed: 0.55,
+    backgroundEveryNFrames: 2,
     ...overrides,
   };
 }

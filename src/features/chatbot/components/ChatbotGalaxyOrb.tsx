@@ -8,7 +8,7 @@ import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationP
 
 const STAR_COUNT_SM = 60;
 const STAR_COUNT_HERO = 180;
-const STAR_COUNT_MOBILE = 0;
+const STAR_COUNT_MOBILE = 72;
 
 type Props = {
   className?: string;
@@ -33,7 +33,7 @@ export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
       return startGalaxyStarsAnimation(canvas, surface, {
         starCount: mobile ? STAR_COUNT_MOBILE : isHero ? STAR_COUNT_HERO : STAR_COUNT_SM,
         interactive: false,
-        baseSpeed: mobile ? 0 : 1.1,
+        baseSpeed: mobile ? 0.55 : 1.1,
         variant: "avatar",
         mobilePowerSave: mobile,
       });

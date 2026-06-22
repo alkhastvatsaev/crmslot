@@ -31,20 +31,20 @@ describe("galaxyAnimationPowerPolicy", () => {
     });
   });
 
-  it("utilise un profil statique sur téléphone (batterie)", () => {
+  it("utilise un profil compact premium sur téléphone", () => {
     mockMatchMedia(true);
     const profile = resolveGalaxyAnimationProfile();
-    expect(profile.starCount).toBe(0);
-    expect(profile.maxFps).toBe(0);
-    expect(profile.maxDevicePixelRatio).toBe(1.5);
+    expect(profile.starCount).toBe(72);
+    expect(profile.maxFps).toBe(24);
+    expect(profile.maxDevicePixelRatio).toBe(1.75);
     expect(profile.interactive).toBe(false);
   });
 
-  it("reste statique avec mobilePowerSave explicite", () => {
+  it("profil mobilePowerSave explicite sur téléphone", () => {
     mockMatchMedia(true);
     const profile = resolveGalaxyAnimationProfile({ mobilePowerSave: true });
-    expect(profile.starCount).toBe(0);
-    expect(profile.maxFps).toBe(0);
+    expect(profile.starCount).toBe(72);
+    expect(profile.maxFps).toBe(24);
   });
 
   it("utilise 6000 étoiles sur desktop", () => {

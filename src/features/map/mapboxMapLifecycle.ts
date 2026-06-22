@@ -15,8 +15,9 @@ export function resolveMapboxPauseOptions(
   return { skipStop: needsHttpsMapboxStyleUrl(userAgent) };
 }
 
-export function resolveMapboxLifecycleMode(isMobile: boolean): MapboxLifecycleMode {
-  return isMobile ? "pause" : "destroy";
+export function resolveMapboxLifecycleMode(_isMobile: boolean): MapboxLifecycleMode {
+  /** Toujours détruire hors écran — `map.stop()` laisse le GPU actif sur WebView Android. */
+  return "destroy";
 }
 
 export function pauseMapboxMap(map: { stop: () => void }, _options?: MapboxPauseOptions): void {
