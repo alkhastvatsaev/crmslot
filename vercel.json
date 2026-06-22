@@ -65,7 +65,7 @@
     },
     {
       "path": "/api/cron/operations-tick",
-      "schedule": "0 * * * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }
