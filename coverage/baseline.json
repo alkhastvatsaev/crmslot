@@ -1063,20 +1063,6 @@
       "pct": 100
     }
   },
-  "src/features/ai/chatbotGeminiTools.ts": {
-    "statements": {
-      "pct": 0
-    },
-    "branches": {
-      "pct": 0
-    },
-    "functions": {
-      "pct": 0
-    },
-    "lines": {
-      "pct": 0
-    }
-  },
   "src/features/app/DesktopOnlyGate.tsx": {
     "statements": {
       "pct": 75
@@ -2559,20 +2545,6 @@
     },
     "lines": {
       "pct": 93.54
-    }
-  },
-  "src/features/chatbot/chatbot-gemini.ts": {
-    "statements": {
-      "pct": 0
-    },
-    "branches": {
-      "pct": 0
-    },
-    "functions": {
-      "pct": 0
-    },
-    "lines": {
-      "pct": 0
     }
   },
   "src/features/chatbot/chatbot-gmail.ts": {
