@@ -9,7 +9,7 @@
  * (WebGL) ou le carrousel sans réintégrer le sélecteur de pages.
  */
 export const MOBILE_SHELL_CONTRACT = {
-  /** Page carte — toujours montée (WebGL). Autres hubs : lazy mount mobile. */
+  /** Page carte — montée seulement quand active (WebGL libéré hors page 0). Autres hubs : lazy keep-alive. */
   mapPageIndex: 0,
   layout: {
     slotGridClass: "mobile-shell-slot-grid",
