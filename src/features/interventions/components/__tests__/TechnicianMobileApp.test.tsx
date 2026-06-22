@@ -51,7 +51,7 @@ describe("TechnicianMobileApp", () => {
     expect(screen.queryByTestId("technician-mobile-header-profile")).not.toBeInTheDocument();
     expect(screen.getByTestId("technician-hub-slot-0")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-shell-footer")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-mobile-profile-dock")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-shell-galaxy")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-profile-chip")).toBeInTheDocument();
     expect(screen.queryByTestId("technician-galaxy-layer")).not.toBeInTheDocument();
   });
