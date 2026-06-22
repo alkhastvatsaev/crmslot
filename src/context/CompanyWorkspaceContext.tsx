@@ -14,6 +14,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
+import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
 
@@ -52,6 +53,7 @@ export function CompanyWorkspaceProvider({
   const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
   const [membershipJoinPending, setMembershipJoinPending] = useState(false);
   const [membershipJoinError, setMembershipJoinError] = useState<string | null>(null);
+  const documentVisible = useDocumentPageVisible();
 
   const persistActiveId = useCallback((id: string) => {
     if (typeof window !== "undefined") {
@@ -94,6 +96,10 @@ export function CompanyWorkspaceProvider({
       setMemberships([]);
       setActiveCompanyIdState("");
       setMembershipsReady(true);
+      return () => {};
+    }
+
+    if (!documentVisible) {
       return () => {};
     }
 
@@ -158,7 +164,7 @@ export function CompanyWorkspaceProvider({
       clearTimeout(timeout);
       unsub?.();
     };
-  }, [firebaseUid]);
+  }, [firebaseUid, documentVisible]);
 
   const retryDefaultCompanyJoin = useCallback(async () => {
     const user = auth?.currentUser;
