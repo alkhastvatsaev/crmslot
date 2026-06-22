@@ -62,6 +62,10 @@
     {
       "path": "/api/cron/auto-agent",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/operations-tick",
+      "schedule": "0 * * * *"
     }
   ]
 }
