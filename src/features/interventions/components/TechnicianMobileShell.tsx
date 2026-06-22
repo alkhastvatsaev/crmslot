@@ -100,7 +100,8 @@ export default function TechnicianMobileShell({ children }: Props) {
         <MobileShellSlotGrid
           rootClassName={MOBILE_GALAXY_DOCK_CLASS}
           chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
-          data-testid="technician-mobile-profile-dock"
+          data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
+          data-technician-profile-dock="true"
         >
           <TechnicianMobileProfileChip />
         </MobileShellSlotGrid>

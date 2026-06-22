@@ -10,11 +10,9 @@ import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPag
 import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
 import { ClientPortalPushProvider } from "@/features/notifications/ClientPortalPushContext";
 import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuthEffects";
-import ClientPortalNotificationBootstrap from "@/features/notifications/components/ClientPortalNotificationBootstrap";
 import ClientPortalPaymentReturnEffects from "@/features/auth/components/ClientPortalPaymentReturnEffects";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
-import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
-import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
+import DeferredClientBootstraps from "@/features/company/components/DeferredClientBootstraps";
 
 const CLIENT_MOBILE_PAGE_COUNT = 1;
 
@@ -28,24 +26,21 @@ export default function ClientMobileProviders({ children }: Props) {
     <DateProvider>
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
-        <AndroidAppInstallPromoBootstrap surface="demande" presentation="toast" />
         <CompanyWorkspaceProvider>
-          <GalaxyLayerBridgeProvider>
-            <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
-              <DashboardPageSelectorProvider>
-                <RequesterHubProvider>
-                  <ClientPortalPushProvider>
-                    <ClientPortalAuthEffects />
-                    <Suspense fallback={null}>
-                      <ClientPortalNotificationBootstrap />
-                      <ClientPortalPaymentReturnEffects />
-                    </Suspense>
-                    {children}
-                  </ClientPortalPushProvider>
-                </RequesterHubProvider>
-              </DashboardPageSelectorProvider>
-            </DashboardPagerProvider>
-          </GalaxyLayerBridgeProvider>
+          <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
+            <DashboardPageSelectorProvider>
+              <RequesterHubProvider>
+                <ClientPortalPushProvider>
+                  <ClientPortalAuthEffects />
+                  <Suspense fallback={null}>
+                    <ClientPortalPaymentReturnEffects />
+                  </Suspense>
+                  <DeferredClientBootstraps />
+                  {children}
+                </ClientPortalPushProvider>
+              </RequesterHubProvider>
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
         </CompanyWorkspaceProvider>
       </DesktopOnlyGate>
     </DateProvider>
