@@ -4,13 +4,18 @@ Carte Mapbox (slot 0 du DashboardPager) : missions dispatch/terrain, markers, ro
 
 ## Points d'entrée
 
-| Fichier                               | Rôle                                                                  |
-| ------------------------------------- | --------------------------------------------------------------------- |
-| `components/MapPageSlot.tsx`          | Slot lazy-loadé depuis `src/app/page.tsx`                             |
-| `components/MapboxView.tsx`           | Hub carte desktop (3 colonnes) — **1137 lignes, P0 découpage**        |
-| `components/DashboardGalaxyLayer.tsx` | Overlay galaxy + bridge chatbot                                       |
-| `components/MobileMapHubLite.tsx`     | Variante mobile allégée                                               |
-| `missionTypes.ts`                     | Type `Mission` — importable par dashboard sans toucher aux composants |
+| Fichier                                  | Rôle                                                                  |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `components/MapPageSlot.tsx`             | Slot lazy-loadé depuis `src/app/page.tsx`                             |
+| `components/MapboxView.tsx`              | Orchestrateur carte (~230 lignes)                                     |
+| `hooks/useMapHubMissions.ts`             | Missions + inbox partagé avec MobileMapHubLite                        |
+| `mapMissionTransforms.ts`                | Pure functions Intervention → Mission                                 |
+| `hooks/useMapboxInstance.ts`             | Init / lifecycle WebGL Mapbox                                         |
+| `hooks/useMapMissionMarkers.ts`          | Sync markers DOM                                                      |
+| `components/MapboxViewDesktopLayout.tsx` | Layout 3 colonnes desktop                                             |
+| `components/DashboardGalaxyLayer.tsx`    | Overlay galaxy + bridge chatbot                                       |
+| `components/MobileMapHubLite.tsx`        | Variante mobile allégée                                               |
+| `missionTypes.ts`                        | Type `Mission` — importable par dashboard sans toucher aux composants |
 
 ## Données
 
@@ -31,7 +36,7 @@ Carte Mapbox (slot 0 du DashboardPager) : missions dispatch/terrain, markers, ro
 
 ## Pièges
 
-- `MapboxView.tsx` mélange init WebGL, markers, layout 3 colonnes et inbox
+- `MapboxView.tsx` découpé en hooks + layout — ne pas ré-agglomérer
 - Policy mobile : `mapMobileWebGLPolicy.ts`, `useMobileMapRenderGate.ts`, `mapMobilePower.ts`
 - Doublons macOS `* 2.ts` — supprimer immédiatement
 
