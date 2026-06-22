@@ -21,7 +21,7 @@ const pwaDisabledInDev =
 const withPWA = withPWAInit({
   dest: "public",
   cacheOnFrontEndNav: true,
-  reloadOnOnline: true,
+  reloadOnOnline: false,
   disable: pwaDisabledInDev,
   workboxOptions: {
     disableDevLogs: true,
