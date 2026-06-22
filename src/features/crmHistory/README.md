@@ -1,19 +1,32 @@
 # crmHistory
 
-Historique CRM unifié (slot pager) : timeline activité société, détail événement, agent IA.
+Historique CRM unifié — slot Quality Management (`CRM_HISTORY_SLOT_INDEX`).
 
 ## Points d'entrée
 
-| Fichier                               | Rôle                                   |
-| ------------------------------------- | -------------------------------------- |
-| `components/CrmHistoryPage.tsx`       | Page slot lazy-loadée                  |
-| `components/CrmHistoryCenterFeed.tsx` | Feed central grille (~120 lignes)      |
-| `crmHistoryEventMeta.tsx`             | Icônes / couleurs par type d'événement |
-| `hooks/useCrmActivityFeed.ts`         | Agrégation feeds Firestore             |
-| `crmActivityTypes.ts`                 | Type `CrmActivityEvent`                |
+| Fichier                               | Rôle                        |
+| ------------------------------------- | --------------------------- |
+| `components/CrmHistoryPage.tsx`       | Page slot triple panel      |
+| `components/CrmHistoryCenterFeed.tsx` | Feed central (~120 lignes)  |
+| `hooks/useCrmActivityFeed.ts`         | Agrégation feeds            |
+| `logCrmInterventionAction.ts`         | Log actions (import public) |
+
+## Données
+
+- Feeds synthétisés : interventions, emails, commandes, chat portail
+- Agent : `crmHistoryAgentRouteHandler.ts`
+
+## Dépendances
+
+- `backoffice`, `featureHub`, `clients`, `dashboard`, `interventions`, `billingHub`, `chatbot`
+
+## Pièges
+
+- Event `CRMSLOT_CRM_ORDERS_CHANGED_EVENT` pour refresh commandes
+- Filtres dans `crmActivityFilters.ts`
 
 ## Tests
 
 ```bash
-npx jest src/features/crmHistory --no-coverage
+npm run test:crm
 ```
