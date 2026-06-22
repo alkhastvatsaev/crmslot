@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-type BackofficeInboxIntentApi = {
+export type BackofficeInboxIntentApi = {
   pendingInboxId: string | null;
   setPendingInboxId: (id: string | null) => void;
   /** Dossier sélectionné dans l’inbox Demandes (partagé avec la page 4). */
