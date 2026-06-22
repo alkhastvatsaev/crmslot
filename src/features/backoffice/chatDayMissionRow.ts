@@ -72,7 +72,7 @@ export function buildChatDayRows({
   selectedDate = new Date(),
   workspace,
   mapDispatchFilter = false,
-  includeInterventionIds: _includeInterventionIds = [],
+  includeInterventionIds = [],
 }: BuildChatDayRowsInput): ChatDayMissionRow[] {
   const isDispatchMap = isCompanyDispatchViewer(workspace);
 
@@ -103,6 +103,33 @@ export function buildChatDayRows({
   if (dayMissions) {
     for (const row of missionsToChatDayRows(dayMissions)) {
       if (!byThread.has(row.threadId)) byThread.set(row.threadId, row);
+    }
+  }
+
+  for (const ivId of includeInterventionIds) {
+    const trimmed = ivId.trim();
+    if (!trimmed || byThread.has(trimmed)) continue;
+    const iv = interventions.find((x) => x.id === trimmed);
+    if (iv) {
+      byThread.set(trimmed, {
+        threadId: iv.id,
+        clientName:
+          interventionClientLabel(iv) ||
+          iv.clientCompanyName?.trim() ||
+          iv.clientName?.trim() ||
+          "",
+        time: formatScheduledTimeOnly(iv),
+        address: iv.address,
+        statusCode: iv.status,
+        isToday: interventionMatchesTab(iv, "today", selectedDate),
+      });
+    } else {
+      byThread.set(trimmed, {
+        threadId: trimmed,
+        clientName: "",
+        time: "",
+        isToday: false,
+      });
     }
   }
 

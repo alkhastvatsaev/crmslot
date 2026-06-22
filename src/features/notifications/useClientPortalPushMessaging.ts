@@ -42,6 +42,19 @@ export function useClientPortalPushMessaging(
   const [lastError, setLastError] = useState<string | null>(null);
   const unsubForegroundRef = useRef<(() => void) | undefined>(undefined);
 
+  const openChatFromPayload = useCallback(
+    (interventionId: string | undefined) => {
+      if (interventionId?.trim()) {
+        const id = interventionId.trim();
+        setLastSubmittedInterventionId(id);
+        setPendingTrackingInterventionId(id);
+      }
+      navigateCompanyHub(pager, COMPANY_HUB_ANCHOR_CLIENT_PORTAL);
+      setPortalRightTab("chat");
+    },
+    [pager, setLastSubmittedInterventionId, setPendingTrackingInterventionId, setPortalRightTab]
+  );
+
   const openTrackingFromPayload = useCallback(
     (interventionId: string | undefined) => {
       if (!interventionId?.trim()) return;
@@ -65,11 +78,13 @@ export function useClientPortalPushMessaging(
       const pushType = typeof payload.data?.type === "string" ? payload.data.type : "";
       const id =
         typeof payload.data?.interventionId === "string" ? payload.data.interventionId : undefined;
-      if (pushType === "payment_received" || pushType === "status_change") {
+      if (pushType === "portal_chat") {
+        openChatFromPayload(id);
+      } else if (pushType === "payment_received" || pushType === "status_change") {
         openTrackingFromPayload(id);
       }
     });
-  }, [openTrackingFromPayload]);
+  }, [openChatFromPayload, openTrackingFromPayload]);
 
   const syncTokenForUser = useCallback(
     async (uid: string): Promise<void> => {

@@ -23,12 +23,8 @@ function formatWhen(raw: string | null): string {
 /** Panneau droit — liste factures + aperçu PDF. */
 export default function ChatbotInvoicesPanel() {
   const { t } = useTranslation();
-  const {
-    chatbotInvoices,
-    chatbotInvoicesLoading,
-    documentPreview,
-    openDocumentPreview,
-  } = useChatbotContext();
+  const { chatbotInvoices, chatbotInvoicesLoading, documentPreview, openDocumentPreview } =
+    useChatbotContext();
 
   const selectedId = documentPreview.kind === "invoice" ? documentPreview.interventionId : "";
 
@@ -50,8 +46,12 @@ export default function ChatbotInvoicesPanel() {
             <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
           </div>
         ) : chatbotInvoices.length === 0 ? (
-          <p className="px-2 py-4 text-center text-[12px] text-slate-500" data-testid="chatbot-invoices-empty">
-            Aucune facture pour cette société. Facturez un dossier terminé via le chatbot ou le back-office.
+          <p
+            className="px-2 py-4 text-center text-[12px] text-slate-500"
+            data-testid="chatbot-invoices-empty"
+          >
+            Aucune facture pour cette société. Facturez un dossier terminé via le chatbot ou le
+            dispatcher.
           </p>
         ) : (
           <ul className="space-y-1.5" data-testid="chatbot-invoices-list">
@@ -67,17 +67,21 @@ export default function ChatbotInvoicesPanel() {
                       "w-full rounded-xl border px-3 py-2.5 text-left transition-colors",
                       active
                         ? "border-emerald-300 bg-emerald-50/90 ring-1 ring-emerald-200"
-                        : "border-slate-100 bg-white hover:bg-slate-50",
+                        : "border-slate-100 bg-white hover:bg-slate-50"
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="truncate text-[13px] font-bold text-slate-900">{row.clientLabel}</p>
+                        <p className="truncate text-[13px] font-bold text-slate-900">
+                          {row.clientLabel}
+                        </p>
                         <p className="truncate text-[10px] text-slate-500">
                           {formatWhen(row.invoicedAt)} · {row.status}
                         </p>
                         {row.problem ? (
-                          <p className="mt-0.5 truncate text-[11px] text-slate-600">{row.problem}</p>
+                          <p className="mt-0.5 truncate text-[11px] text-slate-600">
+                            {row.problem}
+                          </p>
                         ) : null}
                       </div>
                       <span className="shrink-0 text-[12px] font-bold text-emerald-800">
@@ -101,7 +105,10 @@ export default function ChatbotInvoicesPanel() {
               Aperçu facture
             </div>
             {documentPreview.loading ? (
-              <div className="flex flex-1 items-center justify-center" data-testid="chatbot-invoice-pdf-loading">
+              <div
+                className="flex flex-1 items-center justify-center"
+                data-testid="chatbot-invoice-pdf-loading"
+              >
                 <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
               </div>
             ) : documentPreview.error ? (

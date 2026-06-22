@@ -20,6 +20,8 @@ export type IvanaPortalChatDoc = {
   body: string;
   role: IvanaPortalChatRole;
   senderUid: string;
+  /** Affichage UI — displayName/email/n° de dossier figé au moment de l'envoi. */
+  senderName?: string;
   createdAt: unknown;
   /** Dossier lié (portail / timeline) — optionnel pour messages historiques. */
   interventionId?: string | null;
@@ -110,18 +112,22 @@ export async function sendIvanaPortalMessage(
     body: string;
     role: IvanaPortalChatRole;
     senderUid: string;
+    senderName?: string | null;
     interventionId?: string | null;
     imageUrls?: string[];
   }
-): Promise<void> {
+): Promise<string> {
   const ivId = params.interventionId?.trim();
-  await addDoc(collection(db, IVANA_PORTAL_CHAT_COLLECTION), {
+  const senderName = params.senderName?.trim();
+  const ref = await addDoc(collection(db, IVANA_PORTAL_CHAT_COLLECTION), {
     companyId: params.companyId.trim(),
     body: params.body,
     role: params.role,
     senderUid: params.senderUid,
     createdAt: serverTimestamp(),
+    ...(senderName ? { senderName } : {}),
     ...(ivId ? { interventionId: ivId } : {}),
     ...(params.imageUrls && params.imageUrls.length > 0 ? { imageUrls: params.imageUrls } : {}),
   });
+  return ref.id;
 }

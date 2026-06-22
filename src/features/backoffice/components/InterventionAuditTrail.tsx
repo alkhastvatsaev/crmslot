@@ -22,7 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  dispatcher: "Back-office",
+  dispatcher: "Dispatcher",
   technician: "Technicien",
   client: "Client",
   system: "Système",

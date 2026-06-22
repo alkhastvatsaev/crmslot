@@ -18,7 +18,7 @@
       "chrome_manual_hint": "Tap ⋮ top right → Install app or Add to Home screen",
       "admin": {
         "title": "Install Admin app",
-        "description": "Open the back-office faster from your home screen."
+        "description": "Open the dispatcher faster from your home screen."
       },
       "demande": {
         "title": "Install Request app",
@@ -497,7 +497,7 @@
       "create_intervention": "Create case + AI assign",
       "create_intervention_ok": "Case created from email",
       "create_intervention_assigned": "Technician assigned: {{name}}",
-      "create_intervention_pending_assign": "Case created — assign a technician from back-office.",
+      "create_intervention_pending_assign": "Case created — assign a technician from dispatcher.",
       "mobile": {
         "rail_left": "Folders",
         "rail_center": "Messages",
@@ -543,7 +543,7 @@
     "interventions_title": "Linked jobs",
     "interventions_empty": "No jobs linked to this client.",
     "offline_hint": "Offline mode — showing cached client list.",
-    "open_in_backoffice": "Open in back-office",
+    "open_in_backoffice": "Open in dispatcher",
     "export_csv": "Export CSV",
     "recurring_request": "New request (same client)",
     "delete_client": "Delete",
@@ -570,7 +570,7 @@
     "done_not_invoiced": "Done — needs invoicing",
     "material_pending": "Material pending",
     "unassigned_stale": "Unassigned — action needed",
-    "push_title": "Back-office reminders",
+    "push_title": "Dispatcher reminders",
     "push_body": "{count} case(s) need your attention."
   },
   "workspace_switcher": {
@@ -689,7 +689,7 @@
     "new_activity_many": "{count} events added to the timeline",
     "empty": "No activity for this period",
     "actor": {
-      "dispatcher": "Back-office",
+      "dispatcher": "Dispatcher",
       "technician": "Technician",
       "client": "Client",
       "system": "System"
@@ -730,17 +730,17 @@
         "intervention_completed": "Field work was completed by the technician. The case can move to validation or billing.",
         "intervention_invoiced": "The case is marked as invoiced: an invoice was generated or the commercial status is now invoiced.",
         "intervention_technician_declined": "The assigned technician declined the job. The case returns to the queue or must be reassigned.",
-        "intervention_returned_to_requests": "The case was sent back to the back-office Requests queue with no active technician.",
+        "intervention_returned_to_requests": "The case was sent back to the dispatcher Requests queue with no active technician.",
         "intervention_deleted": "The case was permanently deleted or archived from the company workspace.",
         "intervention_report_validated": "The field report was validated; the case is ready for billing or administrative closure.",
-        "intervention_report_rejected": "The field report was rejected by back-office; the technician must complete it before resubmission.",
+        "intervention_report_rejected": "The field report was rejected by dispatcher; the technician must complete it before resubmission.",
         "intervention_report_archived": "The report was removed from the active inbox list and moved to the archive.",
         "intervention_cancelled": "The intervention was cancelled: no further field visit is planned.",
         "intervention_schedule_updated": "The intervention date or time slot was updated (client or dispatch planning).",
         "intervention_billing_updated": "Billing lines (excl. VAT, labels) or case amounts were updated.",
         "intervention_payment_updated": "Payment status or a recorded payment was updated on this case.",
         "intervention_terrain_report_received": "An end-of-job report (text, photos, signature) was submitted by the technician.",
-        "bridged_report_dismissed": "An automatically imported field report was dismissed or hidden by back-office.",
+        "bridged_report_dismissed": "An automatically imported field report was dismissed or hidden by dispatcher.",
         "ivana_chat_message": "A message in the Ivana chat linked to the client portal or case tracking.",
         "material_order_status_changed": "An internal material order status changed (draft, sent, received, etc.).",
         "supplier_order_lecot": "A Lecot supplier order was created or updated via the chatbot or materials hub.",
@@ -1311,7 +1311,7 @@
     "nav_map": "Map",
     "nav_company": "Company Hub",
     "nav_technician": "Technician",
-    "nav_backoffice": "Back office",
+    "nav_backoffice": "Dispatcher",
     "nav_offline": "AI assistant",
     "nav_chatbot": "Chatbot",
     "nav_technician_lab": "Technician lab",
@@ -1531,7 +1531,7 @@
         "mission_done_badge": "Done",
         "invoice_backoffice_pending": "Send the invoice to the client below.",
         "edit_report": "Edit report",
-        "report_rejected_title": "Report needs fixes (back office)",
+        "report_rejected_title": "Report needs fixes (dispatcher)",
         "report_rejected_hint": "Close the job again: photos, signature, then invoice.",
         "finish_job": "Finish Job",
         "updating": "Updating...",
@@ -1623,7 +1623,7 @@
         "reopen_success": "Job reopened — you can update the case.",
         "reopen_failed": "Could not reopen this job",
         "reopen_blocked_status": "Only completed (not yet invoiced) jobs can be reopened.",
-        "reopen_blocked_invoiced": "This job is already invoiced — contact back-office.",
+        "reopen_blocked_invoiced": "This job is already invoiced — contact dispatcher.",
         "reopen_blocked_invoice_pdf": "An invoice PDF already exists — cannot reopen.",
         "reopen_blocked_not_assigned": "This job is not assigned to your account."
       }
@@ -1683,9 +1683,9 @@
         "report_updated": "Report updated",
         "report_updated_desc": "The job stays marked done. Your changes are saved.",
         "invoiced_report_updated": "Changes saved",
-        "invoiced_report_updated_desc": "The back office has been notified of your changes.",
+        "invoiced_report_updated_desc": "The dispatcher has been notified of your changes.",
         "presentation_mode": "Presentation mode",
-        "presentation_mode_desc": "Lightweight cloud save. Back-office sees the report via demo mode.",
+        "presentation_mode_desc": "Lightweight cloud save. Dispatcher sees the report via demo mode.",
         "send_failed": "Unable to send",
         "already_invoiced": "Already invoiced",
         "already_invoiced_desc": "This job is invoiced — the field report can no longer be changed."
@@ -1797,12 +1797,15 @@
     "daily_missions": {
       "archive_aria": "Archive — hide this mission from today’s map on this device",
       "archive_label": "Archive",
-      "archived_toast": "Mission hidden on the map (local archive). It remains in the back office.",
+      "archived_toast": "Mission hidden on the map (local archive). It remains in the dispatcher.",
       "delete_aria": "Permanently delete this intervention",
       "delete_label": "Delete",
       "deleted_toast": "Intervention permanently deleted.",
       "delete_confirm": "Do you really want to delete this intervention?",
       "mission_actions_aria": "Mission actions"
+    },
+    "dispatch": {
+      "arm_audio": "Voice dispatch"
     }
   },
   "backoffice": {
@@ -2249,7 +2252,7 @@
   },
   "profiles": {
     "roles": {
-      "back_office": "BACK OFFICE",
+      "back_office": "DISPATCHER",
       "client": "CLIENT",
       "technician": "TECHNICIAN",
       "admin": "ADMIN"
@@ -2464,12 +2467,12 @@
     "documents_search_aria": "Search company documents",
     "documents_search_clear": "Clear search",
     "documents_no_results": "No documents match your search.",
-    "welcome": "Hello — write to us for any question about an intervention, an appointment or an invoice. The back-office will reply here.",
-    "reply_urgent": "For an emergency, please provide your full address and a contact number; the back-office handles these cases as a priority.",
+    "welcome": "Hello — write to us for any question about an intervention, an appointment or an invoice. The dispatcher will reply here.",
+    "reply_urgent": "For an emergency, please provide your full address and a contact number; the dispatcher handles these cases as a priority.",
     "reply_billing": "For billing or a quote, provide the name on the file or the last digits of the intervention reference — I will forward it to the relevant team.",
-    "reply_schedule": "To change a time slot, indicate the desired date and city; the back-office will confirm your schedule.",
+    "reply_schedule": "To change a time slot, indicate the desired date and city; the dispatcher will confirm your schedule.",
     "reply_thanks": "You're welcome! Don't hesitate if you have other questions.",
-    "reply_default": "Thank you for your message. The back-office has been notified and will get back to you shortly. You can also submit a request from the company space."
+    "reply_default": "Thank you for your message. The dispatcher has been notified and will get back to you shortly. You can also submit a request from the company space."
   },
   "copilot": {
     "aria": {
@@ -2505,7 +2508,7 @@
     "prompt_unpaid": "List completed but unpaid interventions with amounts.",
     "prompt_urgent": "Summarize open urgent cases.",
     "prompt_clients": "Which clients have the most active cases?",
-    "prompt_summary_day": "Give an operational briefing for the back office today."
+    "prompt_summary_day": "Give an operational briefing for the dispatcher today."
   },
   "chatbot": {
     "no_company": "Connect with an active company to use the Chatbot.",

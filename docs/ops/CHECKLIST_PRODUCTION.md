@@ -74,7 +74,7 @@ Cocher avant d’ouvrir l’app aux vrais clients / techniciens. Détail : [PLAN
 
 - [ ] Cloud Function `invoiceAutomation` déployée
 - [ ] Dossier `done` + photos + signature → `invoiced` + PDF Storage
-- [ ] Back-office peut valider `done` → `invoiced` (collaborateur selon rules)
+- [ ] Dispatcher peut valider `done` → `invoiced` (collaborateur selon rules)
 
 ---
 

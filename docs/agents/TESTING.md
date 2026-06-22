@@ -291,7 +291,7 @@ npx jest src/context/__tests__/CompanyWorkspaceContext.test.tsx src/features/cha
 
 ## 6. E2E existants (ne pas surcharger)
 
-Parcours déjà couverts : dispatch, assignation back-office, hub technicien, pager dashboard, portail client, API health/security.
+Parcours déjà couverts : dispatch, assignation dispatcher, hub technicien, pager dashboard, portail client, API health/security.
 
 **Ne pas dupliquer** la logique métier en E2E : une seule assertion de bout en bout par flux chatbot ; le détail reste en unitaires.
 

@@ -24,7 +24,7 @@ export const MOBILE_SHELL_CONTRACT = {
   testIds: {
     shell: "mobile-shell",
     topBar: "mobile-top-bar",
-    profileToggle: "user-profile-toggle",
+    profileToggle: "admin-mobile-profile-chip",
     screenHost: "mobile-screen-host",
     mapPage: "mobile-page-0",
     pageSelector: "dashboard-page-selector",
@@ -54,7 +54,7 @@ export const MOBILE_SHELL_CONTRACT = {
       "data-page-selector-open",
       "MobileScreenHost",
       "MobileTopBar",
-      "DashboardGalaxyLayer",
+      "MobileShellFooterDock",
     ],
     "src/features/dashboard/components/DashboardPageSelector.tsx": [
       "MobileCentralPanelFrame",
@@ -73,6 +73,7 @@ export const MOBILE_SHELL_CONTRACT = {
     "src/features/dashboard/AdminDashboardProviders.tsx": [
       "DashboardPageSelectorProvider",
       "DashboardPagerProvider",
+      "MobileGalaxyComposerOpenProvider",
       "DeferredAdminBootstraps",
     ],
     "src/app/dashboard-mobile-layout.css": [

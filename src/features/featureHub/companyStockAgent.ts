@@ -43,7 +43,7 @@ function buildSummary(ctx: CompanyStockAgentContext): string {
 function handleIntent(
   intent: ReturnType<typeof classifyCompanyStockAgentIntent>,
   userText: string,
-  ctx: CompanyStockAgentContext,
+  ctx: CompanyStockAgentContext
 ): CompanyStockAgentTurnResult {
   const outItems = ctx.items.filter((i) => i.quantity <= 0);
   const lowItems = ctx.items.filter((i) => i.quantity > 0 && i.quantity <= i.alertThreshold);
@@ -56,11 +56,7 @@ function handleIntent(
         refused: true,
         reply:
           "Je suis l'agent **Matériel** de votre société — stock, seuils, demandes terrain et commandes fournisseur uniquement. Pour facturation, planning, mails ou dossiers clients, utilisez l'assistant principal (page Ivana).",
-        suggestions: [
-          "État du stock",
-          "Articles en rupture",
-          "Demandes technicien",
-        ],
+        suggestions: ["État du stock", "Articles en rupture", "Demandes technicien"],
       };
 
     case "greeting":
@@ -86,9 +82,7 @@ function handleIntent(
         refused: false,
         reply: buildSummary(ctx),
         suggestions:
-          ctx.metrics.outCount > 0
-            ? ["Lister ruptures", "Stock bas"]
-            : ["Rechercher un article"],
+          ctx.metrics.outCount > 0 ? ["Lister ruptures", "Stock bas"] : ["Rechercher un article"],
       };
 
     case "list_out":
@@ -97,7 +91,9 @@ function handleIntent(
         refused: false,
         reply: listLines(outItems, "Aucune rupture — toutes les quantités sont > 0."),
         action:
-          outItems[0] != null ? { focusStockItemId: sortStockByPatronPriority(outItems)[0]!.id } : undefined,
+          outItems[0] != null
+            ? { focusStockItemId: sortStockByPatronPriority(outItems)[0]!.id }
+            : undefined,
       };
 
     case "list_low":
@@ -106,7 +102,9 @@ function handleIntent(
         refused: false,
         reply: listLines(lowItems, "Aucun article sous le seuil d'alerte."),
         action:
-          lowItems[0] != null ? { focusStockItemId: sortStockByPatronPriority(lowItems)[0]!.id } : undefined,
+          lowItems[0] != null
+            ? { focusStockItemId: sortStockByPatronPriority(lowItems)[0]!.id }
+            : undefined,
       };
 
     case "list_alerts": {
@@ -116,7 +114,9 @@ function handleIntent(
         refused: false,
         reply: listLines(alerts, "Aucune alerte stock — tout est au-dessus des seuils."),
         action:
-          alerts[0] != null ? { focusStockItemId: sortStockByPatronPriority(alerts)[0]!.id } : undefined,
+          alerts[0] != null
+            ? { focusStockItemId: sortStockByPatronPriority(alerts)[0]!.id }
+            : undefined,
       };
     }
 
@@ -147,13 +147,12 @@ function handleIntent(
       }
       const lines = pendingOrders.slice(0, MAX_LINES).map((o) => {
         const part = o.partsRequested?.[0];
-        const label = part?.description?.trim() || part?.reference?.trim() || o.interventionId || o.id;
+        const label =
+          part?.description?.trim() || part?.reference?.trim() || o.interventionId || o.id;
         return `• ${label} (${o.status})`;
       });
       const more =
-        pendingOrders.length > MAX_LINES
-          ? `\n… +${pendingOrders.length - MAX_LINES} autres`
-          : "";
+        pendingOrders.length > MAX_LINES ? `\n… +${pendingOrders.length - MAX_LINES} autres` : "";
       return {
         intent,
         refused: false,
@@ -167,7 +166,7 @@ function handleIntent(
       return {
         intent,
         refused: false,
-        reply: `${ctx.metrics.waitingMaterialJobs} intervention(s) en attente matériel — consultez le back-office pour les dossiers concernés.`,
+        reply: `${ctx.metrics.waitingMaterialJobs} intervention(s) en attente matériel — consultez le dispatcher pour les dossiers concernés.`,
       };
 
     case "lecot":
@@ -207,7 +206,7 @@ function handleIntent(
 /** Tour agent 100 % logique — pas d'appel LLM. */
 export function runCompanyStockAgentTurn(
   userText: string,
-  ctx: CompanyStockAgentContext,
+  ctx: CompanyStockAgentContext
 ): CompanyStockAgentTurnResult {
   const trimmed = userText.trim();
   if (!ctx.companyId) {

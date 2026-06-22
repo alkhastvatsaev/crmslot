@@ -48,6 +48,7 @@ export async function notifyStaffPortalChatAdmin(params: {
         body,
         data: {
           type: "portal_chat",
+          audience: "staff",
           companyId,
           ...(params.interventionId?.trim()
             ? { interventionId: params.interventionId.trim() }

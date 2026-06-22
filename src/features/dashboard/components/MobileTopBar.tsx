@@ -2,7 +2,7 @@
 
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
-import UserProfile from "@/features/dashboard/components/UserProfile";
+import MobileHubTitleChip from "@/features/dashboard/components/MobileHubTitleChip";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import {
@@ -23,10 +23,10 @@ export default function MobileTopBar() {
       <MobileHeaderRailLayout
         rootTestId="mobile-header-rail"
         leftTestId="mobile-header-calendar"
-        centerTestId="mobile-header-profile"
+        centerTestId="mobile-header-title"
         swipeDisabled={pageSelectorOpen}
         left={<ClockCalendar compact interactive />}
-        center={<UserProfile interactive variant="mobile" />}
+        center={<MobileHubTitleChip />}
       />
     </MobileShellSlotGrid>
   );

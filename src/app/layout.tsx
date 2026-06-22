@@ -18,7 +18,7 @@ const appGitSha = process.env.NEXT_PUBLIC_APP_GIT_SHA ?? "";
 
 export const metadata: Metadata = {
   title: PWA_ADMIN_TITLE,
-  description: "Back-office et pilotage des interventions",
+  description: "Dispatcher et pilotage des interventions",
   applicationName: PWA_ADMIN_SHORT_NAME,
   manifest: PWA_MANIFEST_ADMIN,
   icons: {

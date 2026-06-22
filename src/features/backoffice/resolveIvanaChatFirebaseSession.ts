@@ -27,5 +27,5 @@ export function resolveIvanaChatFirebaseSession(
     };
   }
 
-  return { chatAuth: auth, chatDb: firestore };
+  return { chatAuth: null, chatDb: null };
 }

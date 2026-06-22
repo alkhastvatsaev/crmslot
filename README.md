@@ -71,7 +71,7 @@ Les routes `/api/*` sensibles exigent un jeton Firebase (`Authorization: Bearer`
 
 ## Structure
 
-- `src/features` — modules métier (map, interventions, auth, backoffice…)
+- `src/features` — modules métier (map, interventions, auth, dispatcher…)
 - `src/core` — config Firebase, i18n, helpers API (`src/core/api/routeAuth.ts`)
 - `src/app` — pages et routes API Next
 - `tests/e2e` — Playwright

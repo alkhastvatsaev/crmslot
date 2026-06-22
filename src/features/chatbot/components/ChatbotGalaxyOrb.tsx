@@ -14,13 +14,16 @@ type Props = {
   className?: string;
   /** `hero` = orbe vide au démarrage (~83 px) ; défaut = bulles (32 px). */
   size?: "sm" | "hero";
+  /** Ouvre le dock Galaxy mobile (saisie chatbot). */
+  onPress?: () => void;
 };
 
 /** Cercle avatar Chatbot — animation étoiles / fond bleu (GalaxyButton). */
-export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
-  const surfaceRef = useRef<HTMLDivElement>(null);
+export default function ChatbotGalaxyOrb({ className, size = "sm", onPress }: Props) {
+  const surfaceRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isHero = size === "hero";
+  const interactive = Boolean(onPress);
 
   useEffect(() => {
     const surface = surfaceRef.current;
@@ -51,6 +54,33 @@ export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
     };
   }, [isHero]);
 
+  const surface = (
+    <>
+      <canvas ref={canvasRef} className="chatbot-galaxy-orb__canvas" />
+    </>
+  );
+
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        ref={surfaceRef as React.RefObject<HTMLButtonElement>}
+        className={cn(
+          "chatbot-galaxy-orb shrink-0",
+          isHero && "chatbot-galaxy-orb--hero",
+          "cursor-pointer border-0 bg-transparent p-0",
+          className
+        )}
+        data-testid="chatbot-galaxy-orb"
+        data-size={size}
+        aria-label="Ouvrir la saisie"
+        onClick={onPress}
+      >
+        {surface}
+      </button>
+    );
+  }
+
   return (
     <div
       ref={surfaceRef}
@@ -59,7 +89,7 @@ export default function ChatbotGalaxyOrb({ className, size = "sm" }: Props) {
       data-size={size}
       aria-hidden
     >
-      <canvas ref={canvasRef} className="chatbot-galaxy-orb__canvas" />
+      {surface}
     </div>
   );
 }

@@ -49,7 +49,7 @@ OUTILS disponibles :
 - add_timeline_comment(userConfirmed=true) → note interne sur un dossier
 - update_intervention_status(userConfirmed=true) → changer le statut
 - send_intervention_email(userConfirmed=true) → envoyer un email
-- open_crm_dossier → ouvre le dossier dans le back-office (UI, immédiat)
+- open_crm_dossier → ouvre le dossier dans le dispatcher (UI, immédiat)
 
 COMPORTEMENT AUTOMATIQUE :
 1. Question KPI (taux, volume, annulations…) → utilise d'abord le KPI Snapshot ci-dessus ; appelle statistiques_periode si besoin d'une autre période.

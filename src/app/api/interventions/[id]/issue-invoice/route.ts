@@ -63,7 +63,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       actorRole: isTechnician ? "technician" : "dispatcher",
       transitionNote: isTechnician
         ? "Facture émise par le technicien terrain"
-        : "Facture émise par le back-office",
+        : "Facture émise par le dispatcher",
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
