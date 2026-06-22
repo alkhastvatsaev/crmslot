@@ -40,6 +40,7 @@ import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileM
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CRMSLOT_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
+import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 const STORAGE_PREFIX = "crmslot-chatbot-v2";
 function loadConversations(key: string): ChatbotConversation[] {
@@ -151,6 +152,14 @@ export function useChatbot() {
     streaming ||
     supplierOrdersPanelApi.supplierOrdersPanel.open ||
     Boolean(documentPreviewApi.documentPreview.interventionId?.trim());
+
+  useDevEnergyProbe(
+    "chatbot-background",
+    "Chatbot (listeners / docs)",
+    "firestore",
+    chatbotBackgroundEnabled,
+    streaming ? "streaming" : documentLibraryEnabled ? "docs" : "idle"
+  );
 
   const invoicesPanelApi = useChatbotInvoicesPanel(companyId, documentLibraryEnabled);
   const companyName =

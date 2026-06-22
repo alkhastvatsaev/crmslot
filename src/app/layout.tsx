@@ -49,6 +49,7 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
 import DeferredRootBootstraps from "@/core/native/DeferredRootBootstraps";
+import DevEnergyOverlayRoot from "@/features/dev/DevEnergyOverlayRoot";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -68,6 +69,7 @@ export default function RootLayout({
         <NativeShellBootstrap />
         <DeferredRootBootstraps />
         <I18nProvider>{children}</I18nProvider>
+        <DevEnergyOverlayRoot />
         <Toaster position="top-center" theme="light" richColors closeButton />
       </body>
     </html>

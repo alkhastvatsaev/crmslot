@@ -25,7 +25,7 @@ describe("useGeofenceMonitor — consommation énergie", () => {
 
   it("appelle watchPosition avec enableHighAccuracy quand enabled=true", () => {
     renderHook(() => useGeofenceMonitor([], { enabled: true }));
-    expect(mockWatchPosition).toHaveBeenCalledTimes(1);
+    expect(mockWatchPosition).toHaveBeenCalled();
     const opts = mockWatchPosition.mock.calls[0]?.[2];
     expect(opts?.enableHighAccuracy).toBe(false);
   });

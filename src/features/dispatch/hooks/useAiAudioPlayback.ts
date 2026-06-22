@@ -19,6 +19,7 @@ import {
   waitForCanPlay,
 } from "@/features/dispatch/audioUtils";
 import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
+import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type AiPlaybackSync = {
   clipUrl: string;
@@ -59,6 +60,7 @@ export function useAiAudioPlayback({
   const [queue, setQueue] = useState<QueuedClip[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [pollActive, setPollActive] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
@@ -185,6 +187,21 @@ export function useAiAudioPlayback({
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  useDevEnergyProbe(
+    "dispatch-audio-poll",
+    "Dispatch audio (poll disque)",
+    "audio",
+    backgroundTasksEnabled && pollActive,
+    isMobilePowerSaveClient() ? "30s" : "5s"
+  );
+  useDevEnergyProbe(
+    "dispatch-audio-playback",
+    "Lecture audio (RAF)",
+    "audio",
+    isPlaying,
+    queue.length ? `${queue.length} clip(s)` : undefined
+  );
 
   const stopBufferPlayback = useCallback(() => {
     if (bufferSourceRef.current) {
@@ -616,10 +633,12 @@ export function useAiAudioPlayback({
     };
 
     const pollIntervalMs = isMobilePowerSaveClient() ? 30_000 : 5_000;
+    setPollActive(true);
     const iv = setInterval(poll, pollIntervalMs);
     poll();
     return () => {
       cancelled = true;
+      setPollActive(false);
       clearInterval(iv);
     };
   }, [backgroundTasksEnabled]);
