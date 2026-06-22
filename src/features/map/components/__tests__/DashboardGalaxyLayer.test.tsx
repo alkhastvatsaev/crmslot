@@ -11,6 +11,10 @@ jest.mock("@/features/map/GalaxyLayerBridgeContext", () => ({
 
 const mapGalaxyTranscriptionProps: { hideDockStrip?: boolean }[] = [];
 
+jest.mock("@/core/useFeatureFlags", () => ({
+  useFeatureFlag: jest.fn(() => true),
+}));
+
 jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
   useIsMobile: jest.fn(() => false),
 }));

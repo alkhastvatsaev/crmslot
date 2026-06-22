@@ -1,3 +1,11 @@
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+
+jest.mock("@/core/useFeatureFlags", () => ({
+  useFeatureFlag: jest.fn(() => true),
+}));
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<typeof useFeatureFlag>;
+
 import { screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndicator";
@@ -10,6 +18,7 @@ describe("MacroDroidIndicator", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockState.reset();
+    mockUseFeatureFlag.mockReturnValue(true);
   });
 
   it("ne souscrit pas Firestore quand non authentifié", () => {
@@ -33,6 +42,12 @@ describe("MacroDroidIndicator", () => {
 
     render(<MacroDroidIndicator />);
     expect(screen.getByText(/Transcription test macrodroid/)).toBeInTheDocument();
+  });
+
+  it("ne souscrit pas Firestore quand dispatchVoice est désactivé", () => {
+    mockUseFeatureFlag.mockReturnValue(false);
+    render(<MacroDroidIndicator />);
+    expect(mockOnSnapshot).not.toHaveBeenCalled();
   });
 
   it("n'affiche rien si le statut est waiting", () => {
