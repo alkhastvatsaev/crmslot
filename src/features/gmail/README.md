@@ -1,10 +1,32 @@
-# Gmail hub (page carrousel)
+# gmail
 
-Hub Gmail intégré au carrousel (`GMAIL_HUB_SLOT_INDEX`). Layout dans `components/GmailHubPage.tsx` ; logique dans `hooks/useGmailHubPageController.ts`.
+Hub Gmail carrousel (`GMAIL_HUB_SLOT_INDEX`, accès Spotlight). OAuth, lecture/envoi, lien ou création intervention.
 
-- **`useGmailHub`** — état API (liste, fil, envoi, pièces jointes).
-- **`useGmailHubPageController`** — état UI, effets OAuth, handlers clavier/actions.
-- **`useGmailHubPdfPreview`** — aperçu PDF inline (blob URL, cache miniature).
-- **API** — routes `/api/integrations/gmail/*` (OAuth, messages, lien intervention).
+## Points d'entrée
 
-Tests : `npm run test:gmail` ou `npx jest src/features/gmail --no-coverage`.
+| Fichier                              | Rôle                             |
+| ------------------------------------ | -------------------------------- |
+| `components/GmailHubPage.tsx`        | Layout page (~136 lignes)        |
+| `hooks/useGmailHubPageController.ts` | Orchestrateur UI, OAuth, clavier |
+| `useGmailHub.ts`                     | État API Gmail                   |
+| `hooks/useGmailHubPdfPreview.ts`     | Aperçu PDF inline                |
+
+## Données
+
+- API : `/api/integrations/gmail/*`
+- Firestore : tokens OAuth (via routes admin)
+
+## Dépendances
+
+- `backoffice`, `crmHistory`, `dashboard`, `interventions`
+
+## Pièges
+
+- Chargement différé si page inactive (`pageActive`)
+- OAuth callback : ref anti double-mount
+
+## Tests
+
+```bash
+npm run test:gmail
+```
