@@ -1,5 +1,5 @@
 import { featureFlagsFromEnv } from "@/core/featureFlags";
-import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
+import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
 import { ga4TrackEvent, initGa4Client } from "@/core/analytics/ga4";
 import { captureEvent, initPosthogClient, posthogEnabled } from "@/core/analytics/posthog";
 import {
@@ -17,7 +17,7 @@ export type ProductEventProps = Record<string, string | number | boolean>;
 
 export function productAnalyticsEnabled(): boolean {
   if (typeof window === "undefined") return false;
-  if (isPhoneUserAgent(navigator.userAgent)) return false;
+  if (isIosPhonePowerSave()) return false;
   return (
     featureFlagsFromEnv().analyticsReports ||
     posthogEnabled() ||

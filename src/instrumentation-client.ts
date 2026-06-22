@@ -1,12 +1,12 @@
-import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
+import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
 
 import { clientSentryDsn, sentryEnabled } from "@/core/monitoring/sentry";
 import { initProductAnalytics } from "@/core/analytics/productAnalytics";
 
 const dsn = clientSentryDsn();
-const mobilePhone = typeof navigator !== "undefined" && isPhoneUserAgent(navigator.userAgent);
+const iosPhonePowerSave = typeof navigator !== "undefined" && isIosPhonePowerSave();
 
-if (!mobilePhone && sentryEnabled(dsn)) {
+if (!iosPhonePowerSave && sentryEnabled(dsn)) {
   void import("@sentry/nextjs").then((Sentry) => {
     Sentry.init({
       dsn,
@@ -16,6 +16,6 @@ if (!mobilePhone && sentryEnabled(dsn)) {
   });
 }
 
-if (!mobilePhone) {
+if (!iosPhonePowerSave) {
   initProductAnalytics();
 }

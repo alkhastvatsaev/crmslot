@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useMapboxMiniMapLifecycle } from "@/features/map/hooks/useMapboxMiniMapLifecycle";
 import { resolveMapboxInitOptions } from "@/features/map/mapboxPowerProfile";
 import { resolveMapboxStyleSlug, resolveMapboxStyleUrl } from "@/features/map/mapboxStyleUrl";
-import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
+import { isCompactTouchClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
 
 /** Centre — Région de Bruxelles */
 const BRUSSELS: [number, number] = [4.3522, 50.8466];
@@ -33,7 +33,7 @@ export default function SmartFormAddressMiniMap({ address, placeLatLng, classNam
   const createMap = useCallback(
     (container: HTMLDivElement) => {
       mapboxgl.accessToken = token;
-      const isMobile = isMobilePowerSaveClient();
+      const isMobile = isCompactTouchClient();
       const power = resolveMapboxInitOptions(isMobile);
       const style = resolveMapboxStyleUrl(resolveMapboxStyleSlug(isMobile), token);
       const map = new mapboxgl.Map({

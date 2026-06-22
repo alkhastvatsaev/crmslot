@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
@@ -27,13 +28,14 @@ const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileM
 });
 
 /**
- * Page carte admin — mobile sans WebGL par défaut (flag `mobileMapWebGL` = mode ultra).
+ * Page carte admin — lite sans WebGL sur **iPhone** (flag `mobileMapWebGL` = mode ultra).
+ * Android : Mapbox normale.
  */
 export default function MapPageSlot() {
   const isMobile = useIsMobile();
   const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
 
-  if (isMobile === true && !mobileMapWebGL) {
+  if (isMobile === true && !mobileMapWebGL && isIosPhonePowerSave()) {
     return <MobileMapHubLite />;
   }
 
