@@ -4,14 +4,19 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 
 ## Points d'entrée
 
-| Fichier                               | Rôle                                      |
-| ------------------------------------- | ----------------------------------------- |
-| `components/BackOfficeInboxPanel.tsx` | Panel inbox (rail droit carte + hub)      |
-| `hooks/useBackOfficeInboxState.ts`    | État inbox — **758 lignes, P0 découpage** |
-| `useBackOfficeInterventions.ts`       | Hook Firestore interventions société      |
-| `assignInterventionFromBackoffice.ts` | Assignation depuis inbox                  |
-| `components/IvanaClientChatPanel.tsx` | Chat portail client — **706 lignes**      |
-| `ivanaChatFirestore.ts`               | Messages portail Firestore                |
+| Fichier                                    | Rôle                                 |
+| ------------------------------------------ | ------------------------------------ |
+| `components/BackOfficeInboxPanel.tsx`      | Panel inbox (rail droit carte + hub) |
+| `hooks/useBackOfficeInboxState.ts`         | Orchestrateur inbox (~270 lignes)    |
+| `hooks/useBackOfficeInboxSelection.ts`     | Tabs, sélection, intent pager        |
+| `hooks/useBackOfficeInboxPortalChat.ts`    | Abonnement chat portail Ivana        |
+| `hooks/useBackOfficeInboxActions.ts`       | Handlers assign / verify / delete    |
+| `hooks/useBackOfficeInboxTerrainBridge.ts` | Rapports terrain bridgés offline     |
+| `backOfficeInboxLists.ts`                  | Pure functions — listes inbox        |
+| `useBackOfficeInterventions.ts`            | Hook Firestore interventions société |
+| `assignInterventionFromBackoffice.ts`      | Assignation depuis inbox             |
+| `components/IvanaClientChatPanel.tsx`      | Chat portail client — **706 lignes** |
+| `ivanaChatFirestore.ts`                    | Messages portail Firestore           |
 
 ## Données
 
@@ -30,7 +35,7 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 
 ## Pièges
 
-- `useBackOfficeInboxState` concentre tabs, chat Ivana, assignation, terrain bridge
+- Inbox découpée en sous-hooks — ne pas rajouter de logique dans l'orchestrateur sans extraire
 - Inbox aussi embarquée dans `MapboxView.tsx` — tester les deux layouts
 - `isSyntheticInterventionId` pour démos
 
