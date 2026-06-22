@@ -891,8 +891,14 @@ export function useSmartForm() {
       setStep(1);
       toast.success("Demande enregistrée");
     } catch (e) {
-      logger.error("useSmartForm submit", { error: e instanceof Error ? e.message : String(e) });
-      toast.error("Envoi impossible");
+      const errMsg = e instanceof Error ? e.message : String(e);
+      const errCode =
+        e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
+      logger.error("useSmartForm submit", { error: errMsg, code: errCode });
+      toast.error("Envoi impossible", {
+        description: errCode ? `${errCode} — ${errMsg}` : errMsg,
+        duration: 12_000,
+      });
     } finally {
       setBusy(false);
     }

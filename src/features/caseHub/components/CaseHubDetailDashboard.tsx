@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { AlertTriangle, Banknote, CalendarClock, Receipt } from "lucide-react";
+import { AlertTriangle, Banknote, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { formatPatronEuros } from "@/features/commissionsHub/commissionsHubFormat";
@@ -53,69 +53,44 @@ export default function CaseHubDetailDashboard({ interventions, now = new Date()
   const stats = useMemo(() => buildAggregates(interventions, now), [interventions, now]);
   const isCalm = stats.toAssignToday === 0 && stats.toInvoice === 0 && stats.unpaidOverdue === 0;
 
+  if (isCalm) return null;
+
   return (
     <div
       data-testid="case-hub-detail-dashboard"
       className="flex min-h-0 flex-1 flex-col gap-5 px-5 py-6"
     >
-      <header className="flex flex-col gap-1">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-          {t("caseHub.dashboard.title")}
-        </p>
-        <p className="text-[14px] leading-snug text-slate-500">
-          {isCalm ? t("caseHub.dashboard.calm_hint") : t("caseHub.dashboard.hint")}
-        </p>
-      </header>
-
-      {isCalm ? (
-        <div
-          data-testid="case-hub-dashboard-calm"
-          className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl bg-slate-50 px-6 py-10 text-center"
-        >
-          <span className="text-3xl">☕️</span>
-          <p className="text-[16px] font-semibold text-slate-700">
-            {t("caseHub.dashboard.calm_title")}
-          </p>
-          <p className="text-[12px] text-slate-500">{t("caseHub.dashboard.calm_hint")}</p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2.5">
-          <DashboardTile
-            testId="case-hub-dashboard-to-assign"
-            icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
-            label={t("caseHub.dashboard.to_assign_today")}
-            value={stats.toAssignToday}
-            tone="rose"
-          />
-          <DashboardTile
-            testId="case-hub-dashboard-to-invoice"
-            icon={<Receipt className="h-4 w-4" aria-hidden />}
-            label={t("caseHub.dashboard.to_invoice")}
-            value={stats.toInvoice}
-            tone="emerald"
-            sub={
-              stats.toInvoicePotentialCents > 0
-                ? t("caseHub.dashboard.to_invoice_potential").replace(
-                    "{{amount}}",
-                    formatPatronEuros(stats.toInvoicePotentialCents)
-                  )
-                : undefined
-            }
-          />
-          <DashboardTile
-            testId="case-hub-dashboard-unpaid"
-            icon={<Banknote className="h-4 w-4" aria-hidden />}
-            label={t("caseHub.dashboard.unpaid_overdue")}
-            value={stats.unpaidOverdue}
-            tone="sky"
-          />
-        </div>
-      )}
-
-      <p className="mt-auto inline-flex items-center gap-1.5 text-[11px] text-slate-400">
-        <CalendarClock className="h-3.5 w-3.5" aria-hidden />
-        {t("caseHub.pick_case")}
-      </p>
+      <div className="flex flex-col gap-2.5">
+        <DashboardTile
+          testId="case-hub-dashboard-to-assign"
+          icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
+          label={t("caseHub.dashboard.to_assign_today")}
+          value={stats.toAssignToday}
+          tone="rose"
+        />
+        <DashboardTile
+          testId="case-hub-dashboard-to-invoice"
+          icon={<Receipt className="h-4 w-4" aria-hidden />}
+          label={t("caseHub.dashboard.to_invoice")}
+          value={stats.toInvoice}
+          tone="emerald"
+          sub={
+            stats.toInvoicePotentialCents > 0
+              ? t("caseHub.dashboard.to_invoice_potential").replace(
+                  "{{amount}}",
+                  formatPatronEuros(stats.toInvoicePotentialCents)
+                )
+              : undefined
+          }
+        />
+        <DashboardTile
+          testId="case-hub-dashboard-unpaid"
+          icon={<Banknote className="h-4 w-4" aria-hidden />}
+          label={t("caseHub.dashboard.unpaid_overdue")}
+          value={stats.unpaidOverdue}
+          tone="sky"
+        />
+      </div>
     </div>
   );
 }

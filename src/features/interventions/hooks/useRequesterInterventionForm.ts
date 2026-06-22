@@ -590,10 +590,14 @@ export function useRequesterInterventionForm() {
         toast.success(String(t("requester.toasts.request_saved")));
       }
     } catch (e) {
-      logger.error("useRequesterInterventionForm submit", {
-        error: e instanceof Error ? e.message : String(e),
+      const errMsg = e instanceof Error ? e.message : String(e);
+      const errCode =
+        e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
+      logger.error("useRequesterInterventionForm submit", { error: errMsg, code: errCode });
+      toast.error(String(t("requester.toasts.send_failed")), {
+        description: errCode ? `${errCode} — ${errMsg}` : errMsg,
+        duration: 12_000,
       });
-      toast.error(String(t("requester.toasts.send_failed")));
     } finally {
       setIsSubmitting(false);
     }
