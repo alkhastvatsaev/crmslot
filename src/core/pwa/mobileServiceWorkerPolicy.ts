@@ -1,12 +1,12 @@
-import { isPhoneUserAgent } from "@/core/config/mobileClientDetection";
+import { isIphoneUserAgent } from "@/core/config/mobileClientDetection";
 
-/** iPhone / Android phone : pas de service worker (chauffe + cache Workbox). */
+/** Service worker : désactivé sur **iPhone** seulement (WebKit chauffe). Android : PWA normale. */
 export function isMobileServiceWorkerAllowed(
   userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): boolean {
   if (process.env.NEXT_PUBLIC_PWA_SERVICE_WORKER_ENABLED !== "true") return false;
   if (process.env.NEXT_PUBLIC_MOBILE_PWA_SW === "true") return true;
-  return !isPhoneUserAgent(userAgent);
+  return !isIphoneUserAgent(userAgent);
 }
 
 export async function purgeMobileServiceWorkersAndCaches(): Promise<void> {
