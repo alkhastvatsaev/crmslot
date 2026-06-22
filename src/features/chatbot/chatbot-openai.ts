@@ -1,15 +1,11 @@
 import OpenAI from "openai";
 import { logger } from "@/core/logger";
-import type {
-  ChatCompletionMessageParam,
-  ChatCompletionTool,
-} from "openai/resources/chat/completions";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { CHATBOT_TOOL_DEFINITIONS, isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
 import { shouldAutoConfirmChatbotBillingWrite } from "@/features/chatbot/chatbot-billing-parse";
 import { normalizeSendInterventionEmailArguments } from "@/features/chatbot/chatbot-email-attach";
 import { shouldAutoConfirmChatbotEmailWrite } from "@/features/chatbot/chatbot-email-intent";
 import { buildChatbotPostToolReply } from "@/features/chatbot/chatbot-post-tool-reply";
-import { filterChatbotToolDefinitions } from "@/features/chatbot/chatbot-tool-routing";
 import { stringifyChatbotToolResult } from "@/features/chatbot/compactChatbotToolResult";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import type { ChatbotConversationContext } from "@/features/chatbot/chatbot-conversation-context";
@@ -40,6 +36,14 @@ import {
   type ChatbotStoredMessage,
 } from "@/features/chatbot/chatbot-stored-messages";
 import type { ChatbotStreamEmit } from "@/features/chatbot/chatbot-types";
+import { CHATBOT_TOOL_LABELS } from "@/features/chatbot/chatbot-tool-labels";
+import { chatbotPendingToolSummary } from "@/features/chatbot/chatbot-openai-pending";
+import {
+  CHATBOT_OPENAI_MAX_ROUNDS,
+  chatbotOpenaiTools,
+  chatbotStoredToOpenAIMessages,
+  type ChatbotOpenAIToolCallAccum,
+} from "@/features/chatbot/chatbot-openai-messages";
 
 export type { ChatbotStoredMessage } from "@/features/chatbot/chatbot-stored-messages";
 export { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
@@ -56,56 +60,7 @@ export function normalizeLecotOrderToolArguments(args: Record<string, unknown>):
   }
 }
 
-const TOOL_LABELS: Record<string, string> = {
-  get_workspace_summary: "Vue d'ensemble",
-  list_interventions: "Interventions",
-  get_intervention_detail: "Détails dossier",
-  search_workspace: "Recherche",
-  list_clients: "Clients",
-  get_client_detail: "Fiche client",
-  list_quotes: "Devis",
-  list_technicians: "Techniciens",
-  list_stock_alerts: "Stock",
-  list_material_orders: "Commandes matériel",
-
-  list_inbox_notifications: "Inbox",
-  list_gmail_inbox: "Gmail — boîte",
-  get_gmail_message: "Gmail — lecture",
-  suggest_gmail_intervention_links: "Gmail — dossiers suggérés",
-  send_gmail_reply: "Gmail — réponse",
-  link_gmail_to_intervention: "Gmail — lien dossier",
-  list_intervention_emails: "Emails dossier",
-  get_intervention_billing: "Facturation",
-  list_portal_chat: "Chat portail",
-  get_technician_planning: "Planning technicien",
-  statistiques_periode: "Statistiques",
-  create_intervention: "Création dossier",
-  update_intervention_status: "Mise à jour statut",
-  assign_technician: "Assignation technicien",
-  update_intervention_schedule: "Planification",
-  add_timeline_comment: "Note interne",
-  save_client_email: "Email client",
-  send_intervention_email: "Envoi email",
-  focus_intervention_document: "PDF PWA",
-  patch_intervention_billing: "Facturation",
-  update_intervention_billing: "Facturation",
-  search_lecot_products: "Catalogue Lecot",
-  list_supplier_orders: "Commandes fournisseur",
-  order_lecot_parts: "Commande Lecot",
-  list_company_material_orders: "Bons matériel société",
-  approve_material_orders: "Validation demandes matériel",
-  focus_stock_item: "Focus stock",
-  focus_billing_case: "Focus facturation",
-  open_crm_dossier: "Ouvrir dossier",
-  trigger_accounting_export: "Export comptable CSV",
-  trigger_payroll_export: "Export feuilles de temps",
-  list_vehicle_stock: "Stock véhicule",
-  add_vehicle_stock_item: "Ajout stock véhicule",
-  update_vehicle_stock_item: "Mise à jour stock véhicule",
-  diagnose_equipment_photo: "Diagnostic IA photo",
-  parse_voice_job_closure: "Clôture vocale IA",
-  get_contract_churn_risks: "Risque résiliation contrats",
-};
+const MAX_ROUNDS = CHATBOT_OPENAI_MAX_ROUNDS;
 
 export type OpenAIRunResult =
   | { status: "done"; apiMessages: ChatbotStoredMessage[] }
@@ -119,86 +74,6 @@ export type OpenAIRunResult =
         summary: string;
       };
     };
-
-const MAX_ROUNDS = 5;
-
-function openaiTools(toolScope?: string[]): ChatCompletionTool[] {
-  const defs = filterChatbotToolDefinitions(CHATBOT_TOOL_DEFINITIONS, toolScope);
-  return defs.map((t) => ({
-    type: "function",
-    function: {
-      name: t.name,
-      description: t.description,
-      parameters: t.input_schema,
-    },
-  }));
-}
-
-function pendingSummary(name: string, input: Record<string, unknown>): string {
-  switch (name) {
-    case "update_intervention_status":
-      return `Passer l'intervention ${input.interventionId} au statut « ${input.status} »`;
-    case "assign_technician":
-      return `Assigner le technicien ${input.technicianUid} sur ${input.interventionId}`;
-    case "update_intervention_schedule":
-      return `Planifier ${input.interventionId} le ${input.scheduledDate} à ${input.scheduledTime}`;
-    case "add_timeline_comment":
-      return `Ajouter une note interne sur ${input.interventionId}`;
-    case "send_intervention_email":
-      return `Envoyer un email à ${input.to} — objet : « ${String(input.subject || "").slice(0, 80)} » (dossier ${input.interventionId})`;
-    case "patch_intervention_billing": {
-      const eur =
-        input.unitPriceEur ??
-        (input.unitPriceCents != null ? Number(input.unitPriceCents) / 100 : null);
-      const bits = [
-        eur != null ? `prix ${eur} €` : null,
-        input.clientName ? `client « ${String(input.clientName).slice(0, 40)} »` : null,
-      ].filter(Boolean);
-      return `Facture ${input.interventionId}${bits.length ? ` — ${bits.join(", ")}` : ""}`;
-    }
-    case "update_intervention_billing":
-      return `Mettre à jour les lignes de facturation du dossier ${input.interventionId}`;
-    case "order_lecot_parts": {
-      const parts = Array.isArray(input.lines) ? input.lines : [];
-      const count = parts.reduce((acc, p) => acc + (Number(p.quantity) || 1), 0);
-      return `Commander ${count} pièce(s) chez Lecot`;
-    }
-    case "send_gmail_reply":
-      return `Répondre au mail ${input.messageId} : « ${String(input.bodyText || "").slice(0, 80)} »`;
-    case "link_gmail_to_intervention":
-      return `Lier le mail ${input.messageId} au dossier ${input.interventionId}`;
-    default:
-      return `Action : ${name}`;
-  }
-}
-
-function toOpenAIMessages(stored: ChatbotStoredMessage[]): ChatCompletionMessageParam[] {
-  return stored.map((m) => {
-    if (m.role === "user") {
-      return { role: "user", content: m.content };
-    }
-    if (m.role === "tool") {
-      return { role: "tool", tool_call_id: m.tool_call_id, content: m.content };
-    }
-    if (m.tool_calls?.length) {
-      return {
-        role: "assistant",
-        content: m.content ?? null,
-        tool_calls: m.tool_calls.map((tc) => ({
-          id: tc.id,
-          type: "function" as const,
-          function: {
-            name: tc.name,
-            arguments: JSON.stringify(tc.arguments),
-          },
-        })),
-      };
-    }
-    return { role: "assistant", content: m.content ?? "" };
-  });
-}
-
-type ToolCallAccum = { id: string; name: string; arguments: string };
 
 export async function runChatbotOpenAI(params: {
   apiKey: string;
@@ -237,7 +112,7 @@ export async function runChatbotOpenAI(params: {
   let apiMessages = [...stored];
   const openaiMessages: ChatCompletionMessageParam[] = [
     { role: "system", content: params.system },
-    ...toOpenAIMessages(stored),
+    ...chatbotStoredToOpenAIMessages(stored),
   ];
 
   // Pré-exécution garantie : si le contexte détecte une requête Lecot, on appelle
@@ -253,7 +128,7 @@ export async function runChatbotOpenAI(params: {
     params.emit({
       type: "tool_start",
       tool: "search_lecot_products",
-      label: TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot",
+      label: CHATBOT_TOOL_LABELS["search_lecot_products"] ?? "Recherche Lecot",
     });
     const preResult = await executeChatbotTool("search_lecot_products", preArgs, {
       ...params.toolCtx,
@@ -306,7 +181,7 @@ export async function runChatbotOpenAI(params: {
       params.hubAgentMode && searchedLecotInHub
         ? (effectiveToolScope ?? []).filter((t) => t !== "order_lecot_parts")
         : effectiveToolScope;
-    const resolvedTools = openaiTools(scopeForRound);
+    const resolvedTools = chatbotOpenaiTools(scopeForRound);
     const maxTokens = round === 0 ? 640 : 480;
 
     const stream = await client.chat.completions.create({
@@ -319,7 +194,7 @@ export async function runChatbotOpenAI(params: {
     });
 
     let textAcc = "";
-    const toolAcc: Record<number, ToolCallAccum> = {};
+    const toolAcc: Record<number, ChatbotOpenAIToolCallAccum> = {};
 
     for await (const chunk of stream) {
       const choice = chunk.choices[0];
@@ -448,7 +323,7 @@ export async function runChatbotOpenAI(params: {
             toolUseId: call.id,
             name: call.name,
             input: call.arguments,
-            summary: pendingSummary(call.name, call.arguments),
+            summary: chatbotPendingToolSummary(call.name, call.arguments),
           },
         };
       }
@@ -466,7 +341,7 @@ export async function runChatbotOpenAI(params: {
       params.emit({
         type: "tool_start",
         tool: call.name,
-        label: TOOL_LABELS[call.name] ?? call.name,
+        label: CHATBOT_TOOL_LABELS[call.name] ?? call.name,
       });
     }
 
