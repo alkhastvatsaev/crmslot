@@ -1,34 +1,29 @@
 # dispatch
 
-Dispatch IA et audio MacroDroid : assistant vocal sur la carte, ranking techniciens, calendrier semaine.
+Dispatch IA et audio MacroDroid : assistant vocal carte, ranking techniciens.
 
 ## Points d'entrée
 
-| Fichier                             | Rôle                                              |
-| ----------------------------------- | ------------------------------------------------- |
-| `components/AiAssistant.tsx`        | Bande audio IA (carte)                            |
-| `hooks/useAiAudioPlayback.ts`       | Orchestrateur queue audio — découpe en sous-hooks |
-| `hooks/useAiAudioPlaybackEngine.ts` | Lecture Web Audio / HTMLAudioElement              |
-| `hooks/useAiAudioFirestoreQueue.ts` | Listener `ai_status/macrodroid`                   |
-| `hooks/useAiAudioDiskPoll.ts`       | Polling `/api/ai/audios`                          |
-| `audioUtils.ts`                     | Helpers purs (URL, mime, queue dedup)             |
-| `rankTechniciansForIntervention.ts` | Algo assignation                                  |
+| Fichier                                 | Rôle                                    |
+| --------------------------------------- | --------------------------------------- |
+| `hooks/useAiAudioPlayback.ts`           | Orchestrateur queue audio (~139 lignes) |
+| `components/AiAssistant.tsx`            | Strip audio carte                       |
+| `components/TechnicianAssignPicker.tsx` | Assignation + scoring IA                |
+| `rankTechniciansForIntervention.ts`     | Classement pure                         |
 
 ## Données
 
 - Firestore : `ai_status/macrodroid`
 - API : `/api/ai/audios`, `/api/ai/resolve-audio-url`
-- localStorage : `ai_upload_last_seen_mtime`, `ai_last_listened_updated_at`
 
-## Dépendances autorisées
+## Dépendances
 
-- `interventions` — types pour ranking/assign
-- `map` — AiAssistant monté depuis MapboxView / overlay
+- `map`, `interventions`, `technicians`, `backoffice`, `caseHub`
 
 ## Pièges
 
-- `backgroundTasksEnabled=false` hors page carte mobile (économie batterie)
-- Lecture audio : fallback blob URL puis decodeAudioData si autoplay bloqué
+- `backgroundTasksEnabled` hors page carte mobile
+- `DispatchWeekCalendar` non monté
 
 ## Tests
 
