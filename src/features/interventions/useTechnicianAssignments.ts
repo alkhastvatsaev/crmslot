@@ -23,6 +23,7 @@ import {
   showTechnicianNewAssignmentNotification,
 } from "@/features/interventions/technicianNewAssignmentAlerts";
 import { toast } from "sonner";
+import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type UseTechnicianAssignmentsResult = {
   interventions: Intervention[];
@@ -51,6 +52,7 @@ function applyAssignmentsToCache(
  * assignations IVANA tant que l’app mobile reste ouverte (WebView / PWA).
  */
 export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
+  const [pollArmed, setPollArmed] = useState(false);
   const hookEnabled = options.enabled !== false;
   const queryClient = useQueryClient();
 
@@ -59,6 +61,21 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [snapshotReady, setSnapshotReady] = useState(() => noFirebaseAuth);
+
+  useDevEnergyProbe(
+    "tech-assignments-poll",
+    "Poll missions technicien",
+    "poll",
+    hookEnabled && pollArmed,
+    `${resolveTechnicianAssignmentsPollMs()}ms`
+  );
+  useDevEnergyProbe(
+    "tech-assignments-snapshot",
+    "Firestore missions (snapshot)",
+    "firestore",
+    hookEnabled && Boolean(firebaseUid),
+    firebaseUid ?? undefined
+  );
 
   const [prevHookEnabled, setPrevHookEnabled] = useState(hookEnabled);
   if (prevHookEnabled !== hookEnabled) {
@@ -335,12 +352,14 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
       if (intervalId || document.visibilityState !== "visible") return;
       tick();
       intervalId = window.setInterval(tick, pollMs);
+      setPollArmed(true);
     };
 
     const stop = () => {
       if (!intervalId) return;
       window.clearInterval(intervalId);
       intervalId = null;
+      setPollArmed(false);
     };
 
     const onVisibility = () => {

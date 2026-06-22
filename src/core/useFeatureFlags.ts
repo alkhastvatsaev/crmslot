@@ -10,11 +10,20 @@ import {
 } from "@/core/featureFlags";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
+import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export function useFeatureFlags(): CrmslotFeatureFlags {
   const workspace = useCompanyWorkspaceOptional();
   const companyId = workspace?.activeCompanyId?.trim() ?? "";
   const [remote, setRemote] = useState<Partial<CrmslotFeatureFlags> | null>(null);
+  const listening = Boolean(firestore && isConfigured && companyId && workspace?.firebaseUid);
+  useDevEnergyProbe(
+    "feature-flags-doc",
+    "Firestore flags société",
+    "firestore",
+    listening,
+    companyId || undefined
+  );
 
   useEffect(() => {
     const firebaseUid = workspace?.firebaseUid;
