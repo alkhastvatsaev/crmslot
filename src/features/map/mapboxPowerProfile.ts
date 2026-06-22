@@ -124,14 +124,15 @@ export function markerGlowBlurClass(isMobile: boolean): string {
 }
 
 /**
- * WebGL actif : page carte visible. Démonte uniquement sur les autres pages hub.
+ * WebGL actif : page carte visible. Sur mobile, pause dès que le rail centre est masqué
+ * (missions / inbox) ou l’onglet est en arrière-plan.
  */
 export function isMapWebGLActive(
   isMobile: boolean | null,
   dashboardPageIndex: number,
-  mapCenterRailActive: boolean
+  mapRenderActive: boolean
 ): boolean {
-  void isMobile;
-  void mapCenterRailActive;
-  return dashboardPageIndex === 0;
+  if (dashboardPageIndex !== 0) return false;
+  if (isMobile === true) return mapRenderActive;
+  return true;
 }

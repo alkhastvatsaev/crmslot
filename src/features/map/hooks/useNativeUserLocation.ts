@@ -10,7 +10,9 @@ export type UserLocation = {
   accuracy: number;
 };
 
-export function useNativeUserLocation(active: boolean): UserLocation | null {
+type Options = { lowAccuracy?: boolean };
+
+export function useNativeUserLocation(active: boolean, options: Options = {}): UserLocation | null {
   const [coords, setCoords] = useState<UserLocation | null>(null);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export function useNativeUserLocation(active: boolean): UserLocation | null {
           });
         },
         () => {},
-        { enableHighAccuracy: true, maximumAge: 5_000, timeout: 15_000 }
+        { enableHighAccuracy: options.lowAccuracy !== true, maximumAge: 15_000, timeout: 20_000 }
       );
       cleanup = () => navigator.geolocation.clearWatch(watchId);
     })();
@@ -53,7 +55,7 @@ export function useNativeUserLocation(active: boolean): UserLocation | null {
       cancelled = true;
       void cleanup?.();
     };
-  }, [active]);
+  }, [active, options.lowAccuracy]);
 
   return coords;
 }

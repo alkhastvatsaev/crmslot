@@ -5,11 +5,11 @@ import { AI_STRIP_EDGE_INSET_PX, getAiStripAnchorEl } from "@/features/dispatch/
 
 export type AiStripInsetRect = { left: number; width: number };
 
-
-export function useAiStripInsetRect(): AiStripInsetRect | null {
+export function useAiStripInsetRect(enabled = true): AiStripInsetRect | null {
   const [mapPanelRect, setMapPanelRect] = useState<AiStripInsetRect | null>(null);
 
   useLayoutEffect(() => {
+    if (!enabled) return;
     if (typeof ResizeObserver === "undefined") return;
 
     const read = () => {
@@ -49,7 +49,7 @@ export function useAiStripInsetRect(): AiStripInsetRect | null {
       window.visualViewport?.removeEventListener("resize", read);
       window.visualViewport?.removeEventListener("scroll", read);
     };
-  }, []);
+  }, [enabled]);
 
   return mapPanelRect;
 }

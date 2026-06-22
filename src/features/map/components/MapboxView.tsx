@@ -397,6 +397,7 @@ export default function MapboxView() {
       });
 
       sizeObserver = new ResizeObserver(() => {
+        if (document.hidden) return;
         window.requestAnimationFrame(() => {
           try {
             map.resize();
@@ -621,7 +622,9 @@ export default function MapboxView() {
     }
   }, [routeLine, mapReady]);
 
-  const userLocation = useNativeUserLocation(mapReady && mapHubDataActive);
+  const userLocation = useNativeUserLocation(mapReady && mapRenderActive && mapWebGLActive, {
+    lowAccuracy: isMobile === true,
+  });
 
   useEffect(() => {
     const map = mapRef.current;

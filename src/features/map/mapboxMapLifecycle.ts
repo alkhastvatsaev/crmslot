@@ -19,8 +19,7 @@ export function resolveMapboxLifecycleMode(isMobile: boolean): MapboxLifecycleMo
   return isMobile ? "pause" : "destroy";
 }
 
-export function pauseMapboxMap(map: { stop: () => void }, options?: MapboxPauseOptions): void {
-  if (options?.skipStop) return;
+export function pauseMapboxMap(map: { stop: () => void }, _options?: MapboxPauseOptions): void {
   try {
     map.stop();
   } catch {

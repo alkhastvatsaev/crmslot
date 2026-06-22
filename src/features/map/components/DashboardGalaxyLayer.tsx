@@ -37,6 +37,7 @@ export default function DashboardGalaxyLayer() {
         onUserPressPlay={armTranscription}
         onInterventionCreated={emitInterventionCreated}
         backgroundTasksEnabled={audioBackgroundTasksEnabled}
+        mobilePowerSave={isMobile === true}
       />
       {hubComposer}
     </>

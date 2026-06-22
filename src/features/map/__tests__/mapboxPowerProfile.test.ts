@@ -40,11 +40,11 @@ describe("mapboxPowerProfile", () => {
     ).toBe(true);
   });
 
-  it("coupe WebGL hors page carte", () => {
+  it("coupe WebGL hors page carte ou rail centre mobile", () => {
     expect(isMapWebGLActive(false, 0, false)).toBe(true);
     expect(isMapWebGLActive(false, 2, false)).toBe(false);
     expect(isMapWebGLActive(true, 0, true)).toBe(true);
-    expect(isMapWebGLActive(true, 0, false)).toBe(true);
+    expect(isMapWebGLActive(true, 0, false)).toBe(false);
     expect(isMapWebGLActive(true, 3, true)).toBe(false);
   });
 });

@@ -30,7 +30,7 @@ export default function AiAssistantStrip({
   onUserLongPress,
   mobilePowerSave,
 }: AiAssistantStripProps) {
-  const mapPanelRect = useAiStripInsetRect();
+  const mapPanelRect = useAiStripInsetRect(!dockLayout);
 
   const stripInsetTotal = AI_STRIP_EDGE_INSET_PX * 2;
   const stripFallbackWidth = `calc(min(var(--dashboard-stack-max-width), calc(100vw - 2 * var(--dashboard-canvas-pad-x))) - ${stripInsetTotal}px)`;

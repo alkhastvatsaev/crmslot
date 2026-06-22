@@ -550,6 +550,7 @@ export function useAiAudioPlayback({
     let cancelled = false;
 
     const poll = async () => {
+      if (typeof document !== "undefined" && document.hidden) return;
       if (!auth?.currentUser) return;
       try {
         const res = await fetchWithAuth("/api/ai/audios");
