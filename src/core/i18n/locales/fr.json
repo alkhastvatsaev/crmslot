@@ -1787,7 +1787,12 @@
     "mobile": {
       "rail_missions": "Missions",
       "rail_map": "Carte",
-      "rail_inbox": "Inbox"
+      "rail_inbox": "Inbox",
+      "webgl_off_title": "Carte éco (sans WebGL)",
+      "webgl_off_body": "Mode test batterie — la carte Mapbox est désactivée sur mobile. Missions et inbox restent disponibles.",
+      "webgl_off_empty": "Aucune mission avec adresse pour aujourd'hui.",
+      "webgl_off_hint": "Mode ultra : activez mobileMapWebGL dans les feature flags société.",
+      "open_in_maps": "Ouvrir dans Plans"
     },
     "daily_missions": {
       "archive_aria": "Archiver — masquer cette mission de la vue du jour sur cet appareil",

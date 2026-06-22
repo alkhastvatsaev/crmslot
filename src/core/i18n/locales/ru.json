@@ -1787,7 +1787,12 @@
     "mobile": {
       "rail_missions": "Выезды",
       "rail_map": "Карта",
-      "rail_inbox": "Входящие"
+      "rail_inbox": "Входящие",
+      "webgl_off_title": "Эко-карта (без WebGL)",
+      "webgl_off_body": "Режим теста батареи — Mapbox отключён на мобильном. Миссии и inbox доступны.",
+      "webgl_off_empty": "Нет миссий с адресом на сегодня.",
+      "webgl_off_hint": "Ultra: включите mobileMapWebGL в feature flags компании.",
+      "open_in_maps": "Открыть в Картах"
     },
     "daily_missions": {
       "archive_aria": "Архивировать — скрыть этот выезд из дневного вида на этом устройстве",

@@ -26,7 +26,7 @@ import { useAccountRole } from "@/features/auth/useAccountRole";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company/clientMobileAppConstants";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
 
-const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
+const MapPageSlot = dynamic(() => import("@/features/map/components/MapPageSlot"), {
   ssr: false,
   loading: () => (
     <main
@@ -102,7 +102,7 @@ export default function Dashboard() {
   const dashboardPages = useMemo(
     () => [
       <ErrorBoundary key="map" name="map">
-        <MapboxView />
+        <MapPageSlot />
         <MacroDroidIndicator />
         <AutoProcessUploads />
       </ErrorBoundary>,

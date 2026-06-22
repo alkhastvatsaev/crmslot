@@ -1787,7 +1787,12 @@
     "mobile": {
       "rail_missions": "Missies",
       "rail_map": "Kaart",
-      "rail_inbox": "Inbox"
+      "rail_inbox": "Inbox",
+      "webgl_off_title": "Eco-kaart (zonder WebGL)",
+      "webgl_off_body": "Batterijtest — Mapbox is uit op mobiel. Missies en inbox blijven beschikbaar.",
+      "webgl_off_empty": "Geen missies met adres voor vandaag.",
+      "webgl_off_hint": "Ultra-modus: schakel mobileMapWebGL in via bedrijfs-feature flags.",
+      "open_in_maps": "Openen in Kaarten"
     },
     "daily_missions": {
       "archive_aria": "Archiveren — deze missie verbergen op de kaart van vandaag op dit apparaat",
