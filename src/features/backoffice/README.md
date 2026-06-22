@@ -4,20 +4,23 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 
 ## Points d'entrée
 
-| Fichier                                    | Rôle                                 |
-| ------------------------------------------ | ------------------------------------ |
-| `components/BackOfficeInboxPanel.tsx`      | Panel inbox (rail droit carte + hub) |
-| `hooks/useBackOfficeInboxState.ts`         | Orchestrateur inbox (~270 lignes)    |
-| `hooks/useBackOfficeInboxSelection.ts`     | Tabs, sélection, intent pager        |
-| `hooks/useBackOfficeInboxPortalChat.ts`    | Abonnement chat portail Ivana        |
-| `hooks/useBackOfficeInboxActions.ts`       | Handlers assign / verify / delete    |
-| `hooks/useBackOfficeInboxTerrainBridge.ts` | Rapports terrain bridgés offline     |
-| `backOfficeInboxLists.ts`                  | Pure functions — listes inbox        |
-| `useBackOfficeInterventions.ts`            | Hook Firestore interventions société |
-| `assignInterventionFromBackoffice.ts`      | Assignation depuis inbox             |
-| `components/IvanaClientChatPanel.tsx`      | Chat portail client (~80 lignes)     |
-| `hooks/useIvanaClientChatPanel.ts`         | État + envoi messages portail        |
-| `ivanaChatFirestore.ts`                    | Messages portail Firestore           |
+| Fichier                                       | Rôle                                              |
+| --------------------------------------------- | ------------------------------------------------- |
+| `components/BackOfficeInboxPanel.tsx`         | Panel inbox (rail droit carte + hub)              |
+| `components/InterventionDetailPanel.tsx`      | Orchestrateur détail dossier (~187 lignes)        |
+| `components/InterventionDetailScrollBody.tsx` | Contenu scroll détail (client, médias, alertes)   |
+| `components/InterventionDetailActionBar.tsx`  | Barre d'actions (assign, créneaux, verify/reject) |
+| `hooks/useBackOfficeInboxState.ts`            | Orchestrateur inbox (~270 lignes)                 |
+| `hooks/useBackOfficeInboxSelection.ts`        | Tabs, sélection, intent pager                     |
+| `hooks/useBackOfficeInboxPortalChat.ts`       | Abonnement chat portail Ivana                     |
+| `hooks/useBackOfficeInboxActions.ts`          | Handlers assign / verify / delete                 |
+| `hooks/useBackOfficeInboxTerrainBridge.ts`    | Rapports terrain bridgés offline                  |
+| `backOfficeInboxLists.ts`                     | Pure functions — listes inbox                     |
+| `useBackOfficeInterventions.ts`               | Hook Firestore interventions société              |
+| `assignInterventionFromBackoffice.ts`         | Assignation depuis inbox                          |
+| `components/IvanaClientChatPanel.tsx`         | Chat portail client (~80 lignes)                  |
+| `hooks/useIvanaClientChatPanel.ts`            | État + envoi messages portail                     |
+| `ivanaChatFirestore.ts`                       | Messages portail Firestore                        |
 
 ## Données
 
