@@ -2,15 +2,7 @@ export type AndroidInstallPromoSurface = "admin" | "demande" | "technician";
 
 const DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
 
-export function isPwaStandalone(): boolean {
-  if (typeof window === "undefined") return false;
-  if ((navigator as Navigator & { standalone?: boolean }).standalone) return true;
-  if (typeof window.matchMedia !== "function") return false;
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.matchMedia("(display-mode: fullscreen)").matches
-  );
-}
+export { isPwaStandalone } from "@/core/pwa/isPwaStandalone";
 
 /** Chrome Android navigateur — pas WebView Capacitor (`; wv)`). */
 export function isAndroidChromeBrowser(userAgent: string): boolean {
