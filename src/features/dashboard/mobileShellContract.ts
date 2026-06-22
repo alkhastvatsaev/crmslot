@@ -9,7 +9,7 @@
  * (WebGL) ou le carrousel sans réintégrer le sélecteur de pages.
  */
 export const MOBILE_SHELL_CONTRACT = {
-  /** Page carte — toujours montée (WebGL). */
+  /** Page carte — toujours montée (WebGL). Autres hubs : lazy mount mobile. */
   mapPageIndex: 0,
   layout: {
     slotGridClass: "mobile-shell-slot-grid",
@@ -45,6 +45,7 @@ export const MOBILE_SHELL_CONTRACT = {
       "useDashboardPageSelector",
       "dashboard-page-selector-host",
       "dashboard-account-panel-host",
+      "useMobileMountedPageIndices",
       "pages.slice",
       "overlayOpen",
       "MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS",

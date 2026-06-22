@@ -8,6 +8,7 @@ import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveT
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
@@ -37,13 +38,13 @@ export default function CrmHistoryPage({ slotIndex = CRM_HISTORY_SLOT_INDEX }: P
 
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
-  const pageActive = pager == null || pager.pageIndex === slotIndex;
+  const pageActive = useHubPageActive(slotIndex);
   const crmContactsEnabled = useFeatureFlag("crmContacts");
 
   const { selectedDate } = useDateContext();
   const selectedDayKey = selectedDate.toLocaleDateString("en-CA");
   const { events, loading, refreshing, feedError } = useCrmActivityFeed(
-    companyId,
+    pageActive ? companyId : null,
     "all",
     "all",
     "",

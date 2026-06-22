@@ -20,6 +20,7 @@ import {
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -31,8 +32,11 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { interventions, loading } = useBackOfficeInterventions(companyId || null);
+  const { interventions, loading } = useBackOfficeInterventions(
+    pageActive ? companyId || null : null
+  );
 
   const [bucket, setBucket] = useState<CaseHubBucket>("to_assign");
   const [selectedId, setSelectedId] = useState<string | null>(null);

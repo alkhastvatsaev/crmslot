@@ -20,6 +20,7 @@ import {
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -31,8 +32,11 @@ export default function PlanningHubPage({ slotIndex = PLANNING_HUB_SLOT_INDEX }:
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { interventions, technicians, loading } = usePlanningHubData(companyId || null);
+  const { interventions, technicians, loading } = usePlanningHubData(
+    pageActive ? companyId || null : null
+  );
 
   const [selectedTechUid, setSelectedTechUid] = useState<string | null>(null);
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);

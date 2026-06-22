@@ -123,11 +123,11 @@ describe("mobileShellContract — MobileScreenHost", () => {
     ).toThrow(/DashboardPageSelectorProvider/);
   });
 
-  it("garde toutes les pages montées quand le sélecteur est ouvert", () => {
+  it("ne monte pas les hubs non visités quand le sélecteur est ouvert", () => {
     renderMobileShell([<div key="0">Map</div>, <div key="1">Hub</div>], true);
 
     expect(screen.getByText("Map")).toBeInTheDocument();
-    expect(screen.getByText("Hub")).toBeInTheDocument();
+    expect(screen.queryByText("Hub")).not.toBeInTheDocument();
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.mapPage)).toHaveAttribute(
       "aria-hidden",
       "true"

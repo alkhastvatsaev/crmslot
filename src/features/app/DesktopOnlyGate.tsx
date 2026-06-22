@@ -45,7 +45,7 @@ export default function DesktopOnlyGate({ children }: { children: React.ReactNod
       const runtimeAllowed = await Promise.race([
         resolveRuntimeMobileAccessAllowed(fetchMobileRuntimeConfig),
         new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(mobileAccessAllowed), 5000);
+          setTimeout(() => resolve(mobileAccessAllowed), 1500);
         }),
       ]);
       if (cancelled) return;

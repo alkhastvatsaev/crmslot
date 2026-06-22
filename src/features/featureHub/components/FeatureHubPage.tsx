@@ -20,7 +20,7 @@ import {
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
 
 type Props = { slotIndex?: number };
 
@@ -35,15 +35,11 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
-  const pager = useDashboardPagerOptional();
-  const pageActive = pager == null || pager.pageIndex === slotIndex;
+  const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
+  const dataCompanyId = pageActive ? companyId || null : null;
 
-  const {
-    items,
-    loading: stockLoading,
-    isPreviewCatalog,
-  } = useCompanyStockItems(companyId || null);
+  const { items, loading: stockLoading, isPreviewCatalog } = useCompanyStockItems(dataCompanyId);
   const requestMobileHubRail = useRequestMobileHubRail();
 
   useEffect(() => {
@@ -56,12 +52,11 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
     orders,
     loading: ordersLoading,
     dismissDemoOrder,
-  } = useCompanyMaterialOrdersRecent(companyId || null);
+  } = useCompanyMaterialOrdersRecent(dataCompanyId);
 
-  const { orders: supplierOrders, loading: supplierLoading } = useCompanySupplierOrdersRecent(
-    companyId || null
-  );
-  const { interventions, loading: ivLoading } = useBackOfficeInterventions(companyId || null);
+  const { orders: supplierOrders, loading: supplierLoading } =
+    useCompanySupplierOrdersRecent(dataCompanyId);
+  const { interventions, loading: ivLoading } = useBackOfficeInterventions(dataCompanyId);
 
   const waitingMaterialJobs = useMemo(
     () => interventions.filter((iv) => iv.status === "waiting_material").length,
