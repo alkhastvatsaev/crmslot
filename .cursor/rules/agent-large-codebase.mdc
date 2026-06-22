@@ -1,0 +1,20 @@
+---
+description: CRMSLOT — protocole agent sur gros codebase (features, god files, hubs)
+alwaysApply: true
+---
+
+# Travail agent — gros codebase
+
+Avant toute modification :
+
+1. Lire `src/features/<zone>/README.md` si présent.
+2. `Grep` / `SemanticSearch` **scopés** à `src/features/<zone>/` — pas de search globale sauf i18n (`src/core/i18n/locales/`).
+3. Ne pas ouvrir plus de **5 fichiers source** en parallèle sans raison.
+4. Fichier **>400 lignes** : proposer découpage **avant** d'ajouter des lignes.
+5. **Une tâche** = un dossier feature **OU** un fichier god — pas les deux.
+6. Hubs partagés (`src/app/page.tsx`, `src/context/*`) : **demander confirmation** avant modification.
+7. Fin de tâche : `npx jest <zone> --no-coverage` (merge : `npm run test:ci`).
+
+**Interdit** : `git add .`, refonte globale, déplacer des fichiers entre features sans demande explicite.
+
+Voir aussi : `docs/agents/PARALLEL_WORK.md`, `docs/agents/CURSOR_WORKFLOW.md`.
