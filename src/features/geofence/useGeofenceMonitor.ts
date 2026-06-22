@@ -35,6 +35,14 @@ export function useGeofenceMonitor(
   activeMissions: Intervention[],
   { enabled = true, radiusMeters = ARRIVAL_RADIUS_METERS, onArrival }: Options = {}
 ) {
+  const missionsNeedingGps = activeMissions.filter(
+    (mission) =>
+      (mission.status === "assigned" || mission.status === "en_route") &&
+      mission.location?.lat != null &&
+      mission.location?.lng != null
+  );
+  const gpsEnabled = enabled && missionsNeedingGps.length > 0;
+
   const triggeredRef = useRef<Set<string>>(new Set());
   const onArrivalRef = useRef(onArrival);
   useEffect(() => {
@@ -44,16 +52,14 @@ export function useGeofenceMonitor(
   const check = useCallback(
     (sample: LatLngSample) => {
       const { latitude, longitude } = sample;
-      for (const mission of activeMissions) {
-        if (!mission.location?.lat || !mission.location?.lng) continue;
+      for (const mission of missionsNeedingGps) {
         if (triggeredRef.current.has(mission.id)) continue;
-        if (mission.status !== "assigned" && mission.status !== "en_route") continue;
 
         const dist = haversineMeters(
           latitude,
           longitude,
-          mission.location.lat,
-          mission.location.lng
+          mission.location!.lat,
+          mission.location!.lng
         );
         if (dist <= radiusMeters) {
           triggeredRef.current.add(mission.id);
@@ -61,11 +67,11 @@ export function useGeofenceMonitor(
         }
       }
     },
-    [activeMissions, radiusMeters]
+    [missionsNeedingGps, radiusMeters]
   );
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!gpsEnabled) return;
     triggeredRef.current = new Set();
 
     let cancelled = false;
@@ -120,5 +126,5 @@ export function useGeofenceMonitor(
       document.removeEventListener("visibilitychange", onVisibility);
       stopWatch();
     };
-  }, [enabled, check]);
+  }, [gpsEnabled, check]);
 }
