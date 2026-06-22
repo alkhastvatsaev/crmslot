@@ -323,7 +323,7 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
     }
 
     const pollMs = resolveTechnicianAssignmentsPollMs();
-    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let intervalId: number | null = null;
 
     const tick = () => {
       if (document.visibilityState === "visible") {
