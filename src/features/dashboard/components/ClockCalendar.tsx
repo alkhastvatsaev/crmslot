@@ -27,8 +27,16 @@ export default function ClockCalendar({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTime(new Date());
-    const timer = setInterval(() => setTime(new Date()), 10_000);
-    return () => clearInterval(timer);
+    const sync = () => setTime(new Date());
+    const onVisibility = () => {
+      if (!document.hidden) sync();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    const timer = document.hidden ? null : setInterval(sync, 60_000);
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [selectedDate]);
 
   const timeString = time?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) || "";

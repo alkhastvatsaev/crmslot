@@ -90,9 +90,14 @@ function BridgedTerrainReportCard({
 type BackOfficeInboxPanelProps = {
   /** Missions affichées dans le rail gauche « du jour » (y compris démo). */
   dayMissions?: Mission[];
+  /** Coupe listeners Firestore inbox hors rail droit. */
+  inboxDataActive?: boolean;
 };
 
-export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPanelProps) {
+export default function BackOfficeInboxPanel({
+  dayMissions,
+  inboxDataActive = true,
+}: BackOfficeInboxPanelProps) {
   const { t } = useTranslation();
   const {
     cid,
@@ -154,7 +159,7 @@ export default function BackOfficeInboxPanel({ dayMissions }: BackOfficeInboxPan
     handleDragBoardSchedule,
     handleUpdateDateTime,
     handleDownloadQuotePdf,
-  } = useBackOfficeInboxState(dayMissions);
+  } = useBackOfficeInboxState(dayMissions, { inboxDataActive });
 
   if (!isTenant) {
     if (!workspaceReady) {

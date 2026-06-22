@@ -896,7 +896,12 @@ export default function MapboxView() {
             {mapPanelInner}
           </div>
         }
-        right={<BackOfficeInboxPanel dayMissions={visibleMissions} />}
+        right={
+          <BackOfficeInboxPanel
+            dayMissions={visibleMissions}
+            inboxDataActive={powerGate.inboxDataActive}
+          />
+        }
       />
     );
   }
@@ -1117,7 +1122,10 @@ export default function MapboxView() {
           innerClassName="flex min-h-0 flex-1 flex-col"
         >
           <div className={cn("flex min-h-0 flex-1 flex-col", dashboardPageIndex !== 0 && "hidden")}>
-            <BackOfficeInboxPanel dayMissions={visibleMissions} />
+            <BackOfficeInboxPanel
+              dayMissions={visibleMissions}
+              inboxDataActive={isMobile !== true || powerGate.inboxDataActive}
+            />
           </div>
           <div className={cn("flex min-h-0 flex-1 flex-col", dashboardPageIndex === 0 && "hidden")}>
             <RequesterTrackingPanel />

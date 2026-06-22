@@ -5,6 +5,7 @@ import TechnicianLoginGate from "@/features/auth/components/TechnicianLoginGate"
 import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
+import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";
 import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContext";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
@@ -27,20 +28,22 @@ export default function TechnicianMobileProviders({ children }: Props) {
       <DesktopOnlyGate>
         <DevServiceWorkerCleanup />
         <CompanyWorkspaceProvider>
-          <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
-            <DashboardPageSelectorProvider>
-              <TechnicianQueryProvider>
-                <OfflineSyncProvider>
-                  <TechnicianCaseIntentProvider>
-                    <TechnicianFinishJobProvider>
-                      <DeferredTechnicianBootstraps />
-                      <TechnicianLoginGate>{children}</TechnicianLoginGate>
-                    </TechnicianFinishJobProvider>
-                  </TechnicianCaseIntentProvider>
-                </OfflineSyncProvider>
-              </TechnicianQueryProvider>
-            </DashboardPageSelectorProvider>
-          </DashboardPagerProvider>
+          <FeatureFlagsProvider>
+            <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
+              <DashboardPageSelectorProvider>
+                <TechnicianQueryProvider>
+                  <OfflineSyncProvider>
+                    <TechnicianCaseIntentProvider>
+                      <TechnicianFinishJobProvider>
+                        <DeferredTechnicianBootstraps />
+                        <TechnicianLoginGate>{children}</TechnicianLoginGate>
+                      </TechnicianFinishJobProvider>
+                    </TechnicianCaseIntentProvider>
+                  </OfflineSyncProvider>
+                </TechnicianQueryProvider>
+              </DashboardPageSelectorProvider>
+            </DashboardPagerProvider>
+          </FeatureFlagsProvider>
         </CompanyWorkspaceProvider>
       </DesktopOnlyGate>
     </DateProvider>

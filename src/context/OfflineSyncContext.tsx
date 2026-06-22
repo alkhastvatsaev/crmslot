@@ -16,6 +16,7 @@ import {
   subscribeCompletionQueueChanged,
   type FlushCompletionReport,
 } from "@/features/offline/completionSync";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 
 export type OfflineSyncContextValue = {
   navigatorOnline: boolean;
@@ -30,6 +31,7 @@ export type OfflineSyncContextValue = {
 const OfflineSyncContext = createContext<OfflineSyncContextValue | null>(null);
 
 export function OfflineSyncProvider({ children }: { children: ReactNode }) {
+  const isMobile = useIsMobile();
   const [navigatorOnline, setNavigatorOnline] = useState(() =>
     typeof navigator !== "undefined" ? navigator.onLine : true
   );
@@ -129,9 +131,9 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional once on mount
   }, []);
 
-  /** Retry périodique (60s) — déclenche flush si la queue contient des items en cooldown devenus dus. */
+  /** Retry périodique desktop — mobile : flush uniquement online / visibility. */
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isMobile === true) return;
     const intervalId = window.setInterval(() => {
       if (!navigator.onLine || document.hidden) return;
       void (async () => {
@@ -142,7 +144,21 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [runFlushWithToasts]);
+  }, [runFlushWithToasts, isMobile]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || isMobile !== true) return;
+    const onVisible = () => {
+      if (!document.hidden && navigator.onLine) {
+        void (async () => {
+          const n = await getCompletionQueueLength();
+          if (n > 0) await runFlushWithToasts();
+        })();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [isMobile, runFlushWithToasts]);
 
   /** Capacitor : flush quand l'app revient au premier plan (sortie de background). */
   useEffect(() => {

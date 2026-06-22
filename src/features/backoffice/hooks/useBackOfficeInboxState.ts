@@ -59,8 +59,17 @@ import {
   readClientPortalDefaultCompanyIdFromEnv,
   resolveBackofficeInboxCompanyIds,
 } from "@/features/company/clientPortalCompanyId";
+import { useFirestoreLiveEnabled } from "@/core/perf/useFirestoreLiveEnabled";
 
-export function useBackOfficeInboxState(dayMissions?: Mission[]) {
+export type BackOfficeInboxStateOptions = {
+  /** Coupe Firestore inbox hors rail droit / onglet caché. */
+  inboxDataActive?: boolean;
+};
+
+export function useBackOfficeInboxState(
+  dayMissions?: Mission[],
+  options?: BackOfficeInboxStateOptions
+) {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const { logIntervention } = useActivityLog();
@@ -70,8 +79,10 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   const [activeTab, setActiveTab] = useState<"chat" | "requests" | "reports" | "documents">("chat");
   const portalChatHydratedRef = useRef(false);
   const inboxFirestoreEnabled = inboxCompanyIds.length > 0;
+  const inboxLive = useFirestoreLiveEnabled(options?.inboxDataActive ?? true);
   const { interventions, loading } = useBackOfficeInterventions(
-    inboxFirestoreEnabled ? inboxCompanyIds : null
+    inboxFirestoreEnabled ? inboxCompanyIds : null,
+    { enabled: inboxLive }
   );
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
   const bridgedTerrainReports = useMemo(
@@ -79,7 +90,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
     [terrainBridge?.reports]
   );
   const pwaV2 = useFeatureFlag("pwaV2Bundle");
-  useBackofficeReminderPush(interventions);
+  useBackofficeReminderPush(inboxLive ? interventions : []);
 
   const [dragBoardTechUid, setDragBoardTechUid] = useState("");
   const [dragBoardDate, setDragBoardDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -618,7 +629,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
   }, [isTenant]);
 
   useEffect(() => {
-    if (!isConfigured || !firestore || !ivanaChatCompanyId || !isTenant) return;
+    if (!inboxLive || !isConfigured || !firestore || !ivanaChatCompanyId || !isTenant) return;
 
     portalChatHydratedRef.current = false;
     const seen = new Set<string>();
@@ -655,7 +666,7 @@ export function useBackOfficeInboxState(dayMissions?: Mission[]) {
         });
       }
     );
-  }, [ivanaChatCompanyId, isTenant, t]);
+  }, [inboxLive, ivanaChatCompanyId, isTenant, t]);
 
   const reportsTabBadgeCount =
     reportsToValidateList.filter((iv) => iv.status === "done").length + bridgedTerrainCount;

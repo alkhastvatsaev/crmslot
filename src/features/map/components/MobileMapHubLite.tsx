@@ -106,7 +106,12 @@ export default function MobileMapHubLite() {
           </AnimatePresence>
         </div>
       }
-      right={<BackOfficeInboxPanel dayMissions={visibleMissions} />}
+      right={
+        <BackOfficeInboxPanel
+          dayMissions={visibleMissions}
+          inboxDataActive={powerGate.inboxDataActive}
+        />
+      }
     />
   );
 }
