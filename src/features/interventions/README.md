@@ -12,7 +12,8 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `smartFormDraftStorage.ts`                  | Brouillon localStorage + step initial                       |
 | `smartFormSubmit.ts`                        | Soumission Firestore + upload audio                         |
 | `hooks/useSmartFormDraftEffects.ts`         | Autosave, prefill, slots pris                               |
-| `components/TechnicianMobileApp.tsx`        | App terrain `/m/technician`                                 |
+| `components/TechnicianFinishJobPanel.tsx`   | Wizard clôture terrain (~155 lignes)                        |
+| `hooks/useFinishJobWizard.ts`               | État photos / signature / facture                           |
 | `components/RequesterInterventionPanel.tsx` | Portail demandeur                                           |
 | `workflow/interventionWorkflow.ts`          | Transitions statut                                          |
 | `assignInterventionToTechnician.ts`         | Assignation (seuil coverage P0 100 %)                       |
