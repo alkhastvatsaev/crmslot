@@ -1,4 +1,5 @@
-import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
+import { isIosPhonePowerSave } from "@/core/perf/iosPhonePowerSave";
+import { IOS_FIRESTORE_POLL_MS } from "@/core/firestore/iosFirestorePolling";
 import {
   collection,
   getDocs,
@@ -35,7 +36,6 @@ export const TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE = 180_000;
 export function resolveTechnicianAssignmentsPollMs(
   userAgent: string = typeof navigator !== "undefined" ? navigator.userAgent : ""
 ): number {
-  return isMobilePowerSaveClient(userAgent)
-    ? TECHNICIAN_ASSIGNMENTS_POLL_MS_MOBILE
-    : TECHNICIAN_ASSIGNMENTS_POLL_MS;
+  if (isIosPhonePowerSave(userAgent)) return IOS_FIRESTORE_POLL_MS;
+  return TECHNICIAN_ASSIGNMENTS_POLL_MS;
 }

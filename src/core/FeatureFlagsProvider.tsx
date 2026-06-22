@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import {
   DEFAULT_FEATURE_FLAGS,
   featureFlagsFromEnv,
@@ -11,6 +11,11 @@ import {
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
+import {
+  IOS_FIRESTORE_SLOW_POLL_MS,
+  shouldUseIosFirestorePolling,
+  startIosFirestorePoll,
+} from "@/core/firestore/iosFirestorePolling";
 
 const FeatureFlagsContext = createContext<CrmslotFeatureFlags | null>(null);
 
@@ -28,15 +33,41 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       return () => {};
     }
     const ref = doc(firestore, "companies", companyId);
+
+    const applyRemote = (raw: unknown) => {
+      if (!raw || typeof raw !== "object") {
+        setRemote(null);
+        return;
+      }
+      setRemote(raw as Partial<CrmslotFeatureFlags>);
+    };
+
+    if (shouldUseIosFirestorePolling()) {
+      let cancelled = false;
+      const pull = async () => {
+        try {
+          const snap = await getDoc(ref);
+          if (cancelled) return;
+          applyRemote(snap.data()?.featureFlags);
+        } catch {
+          if (!cancelled) setRemote(null);
+        }
+      };
+      const stop = startIosFirestorePoll(
+        () => void pull(),
+        documentVisible,
+        IOS_FIRESTORE_SLOW_POLL_MS
+      );
+      return () => {
+        cancelled = true;
+        stop();
+      };
+    }
+
     return onSnapshot(
       ref,
       (snap) => {
-        const raw = snap.data()?.featureFlags;
-        if (!raw || typeof raw !== "object") {
-          setRemote(null);
-          return;
-        }
-        setRemote(raw as Partial<CrmslotFeatureFlags>);
+        applyRemote(snap.data()?.featureFlags);
       },
       () => setRemote(null)
     );
