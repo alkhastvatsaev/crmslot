@@ -4,7 +4,6 @@ import {
   resolveGalaxyAnimationProfile,
   type GalaxyAnimationProfile,
 } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
-import { clearDevEnergyProbe, setDevEnergyProbe } from "@/features/dev/devEnergyMonitor";
 
 export type GalaxyStarsOptions = {
   starCount?: number;
@@ -93,23 +92,8 @@ export function startGalaxyStarsAnimation(
     starCount > 0 &&
     starCount <= 120;
 
-  const probeId = `galaxy-stars-${options.variant ?? "dock"}`;
-  const syncGalaxyProbe = (on: boolean) => {
-    if (on) {
-      setDevEnergyProbe(probeId, {
-        label: options.variant === "avatar" ? "Galaxy orbe" : "Galaxy dock",
-        category: "animation",
-        active: true,
-        detail: `${starCount} étoiles · ${profile.maxFps} fps`,
-      });
-    } else {
-      clearDevEnergyProbe(probeId);
-    }
-  };
-
   const scheduleNextFrame = () => {
     animationFrameId = requestAnimationFrame(animate);
-    syncGalaxyProbe(true);
   };
 
   const ensureAnimationRunning = () => {
@@ -323,7 +307,6 @@ export function startGalaxyStarsAnimation(
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = 0;
-        syncGalaxyProbe(false);
       }
       return;
     }
@@ -342,7 +325,6 @@ export function startGalaxyStarsAnimation(
               if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = 0;
-                syncGalaxyProbe(false);
               }
             } else {
               ensureAnimationRunning();
@@ -363,7 +345,6 @@ export function startGalaxyStarsAnimation(
   });
 
   return () => {
-    syncGalaxyProbe(false);
     window.cancelAnimationFrame(layoutKickId);
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     if (interactive) {

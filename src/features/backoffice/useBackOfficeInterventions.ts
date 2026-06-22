@@ -7,7 +7,6 @@ import { logger } from "@/core/logger";
 import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type BackOfficeInterventionsCompanyScope = string | readonly string[] | null;
 
@@ -46,13 +45,6 @@ export function useBackOfficeInterventions(companyId: BackOfficeInterventionsCom
   const cidKey = companyScopeKey(companyId);
   const cidList = useMemo(() => (cidKey ? cidKey.split("|") : []), [cidKey]);
   const noFirestore = !isConfigured || !firestore;
-  useDevEnergyProbe(
-    "backoffice-interventions",
-    "Firestore interventions BO",
-    "firestore",
-    !noFirestore && cidList.length > 0,
-    cidList.join(",") || undefined
-  );
 
   const [rowsByCompany, setRowsByCompany] = useState<Record<string, Intervention[]>>({});
   const [loadedCompanyKeys, setLoadedCompanyKeys] = useState("");

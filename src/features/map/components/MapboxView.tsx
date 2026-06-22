@@ -61,7 +61,6 @@ import { useNativeUserLocation } from "@/features/map/hooks/useNativeUserLocatio
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
@@ -113,20 +112,6 @@ export default function MapboxView() {
   const workspace = useCompanyWorkspaceOptional();
   // Carte dispatch (admin/collaborateur tenant) vs missions assignées au technicien terrain.
   const isDispatchMap = isCompanyDispatchViewer(workspace);
-  useDevEnergyProbe(
-    "mapbox-main-webgl",
-    "Carte Mapbox (WebGL)",
-    "webgl",
-    mapWebGLActive,
-    `page=${dashboardPageIndex} render=${mapRenderActive}`
-  );
-  useDevEnergyProbe(
-    "mapbox-missions-data",
-    "Données missions carte",
-    "firestore",
-    mapHubDataActive,
-    isDispatchMap ? "back-office" : "technicien"
-  );
   const galaxyBridge = useGalaxyLayerBridgeOptional();
   const { t } = useTranslation();
   const mapPauseOptions = useMemo(() => resolveMapboxPauseOptions(), []);

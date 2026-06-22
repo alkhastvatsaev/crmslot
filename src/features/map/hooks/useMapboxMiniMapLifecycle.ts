@@ -4,7 +4,6 @@ import { useEffect, useState, type RefObject } from "react";
 import type mapboxgl from "mapbox-gl";
 import { destroyMapboxMap } from "@/features/map/mapboxMapLifecycle";
 import { useElementPageVisible } from "@/core/perf/useElementPageVisible";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 type Options = {
   enabled?: boolean;
@@ -24,13 +23,6 @@ export function useMapboxMiniMapLifecycle(
   const elementVisible = useElementPageVisible(containerRef);
   const active = enabled && elementVisible;
   const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
-  useDevEnergyProbe(
-    "mapbox-mini-address",
-    "Mini-carte adresse",
-    "webgl",
-    Boolean(active && mapInstance),
-    active ? "visible" : "hidden"
-  );
 
   useEffect(() => {
     const container = containerRef.current;

@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ARRIVAL_RADIUS_METERS } from "./geofenceConstants";
 import { haversineMeters } from "./geofenceUtils";
 import type { Intervention } from "@/features/interventions/types";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { watchNativePosition } from "@/core/native/nativeGeolocation";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 type GeofenceEvent = {
   intervention: Intervention;
@@ -36,14 +35,6 @@ export function useGeofenceMonitor(
   activeMissions: Intervention[],
   { enabled = true, radiusMeters = ARRIVAL_RADIUS_METERS, onArrival }: Options = {}
 ) {
-  const [gpsWatchActive, setGpsWatchActive] = useState(false);
-  useDevEnergyProbe(
-    "geofence-gps",
-    "Géofence GPS",
-    "gps",
-    enabled && gpsWatchActive,
-    `${activeMissions.length} missions`
-  );
   const triggeredRef = useRef<Set<string>>(new Set());
   const onArrivalRef = useRef(onArrival);
   useEffect(() => {
@@ -83,7 +74,6 @@ export function useGeofenceMonitor(
     const stopWatch = () => {
       const fn = cleanup;
       cleanup = null;
-      setGpsWatchActive(false);
       if (fn) void fn();
     };
 
@@ -104,7 +94,6 @@ export function useGeofenceMonitor(
           cleanup = () => {
             void stop?.();
           };
-          setGpsWatchActive(true);
         })();
         return;
       }
@@ -116,7 +105,6 @@ export function useGeofenceMonitor(
         WEB_GEO_OPTIONS
       );
       cleanup = () => navigator.geolocation.clearWatch(watchId);
-      setGpsWatchActive(true);
     };
 
     const onVisibility = () => {

@@ -14,7 +14,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company/types";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 const ACTIVE_COMPANY_STORAGE_KEY = "crmslot_active_company_id";
 
@@ -53,13 +52,6 @@ export function CompanyWorkspaceProvider({
   const [claimsInitialSyncDone, setClaimsInitialSyncDone] = useState(false);
   const [membershipJoinPending, setMembershipJoinPending] = useState(false);
   const [membershipJoinError, setMembershipJoinError] = useState<string | null>(null);
-  useDevEnergyProbe(
-    "company-workspace-memberships",
-    "Firestore memberships",
-    "firestore",
-    Boolean(firestore && firebaseUid && isConfigured),
-    firebaseUid ?? undefined
-  );
 
   const persistActiveId = useCallback((id: string) => {
     if (typeof window !== "undefined") {

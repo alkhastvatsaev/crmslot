@@ -19,7 +19,6 @@ import {
   waitForCanPlay,
 } from "@/features/dispatch/audioUtils";
 import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
-import { useDevEnergyProbe } from "@/features/dev/useDevEnergyProbe";
 
 export type AiPlaybackSync = {
   clipUrl: string;
@@ -187,21 +186,6 @@ export function useAiAudioPlayback({
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
-
-  useDevEnergyProbe(
-    "dispatch-audio-poll",
-    "Dispatch audio (poll disque)",
-    "audio",
-    backgroundTasksEnabled && pollActive,
-    isMobilePowerSaveClient() ? "30s" : "5s"
-  );
-  useDevEnergyProbe(
-    "dispatch-audio-playback",
-    "Lecture audio (RAF)",
-    "audio",
-    isPlaying,
-    queue.length ? `${queue.length} clip(s)` : undefined
-  );
 
   const stopBufferPlayback = useCallback(() => {
     if (bufferSourceRef.current) {
