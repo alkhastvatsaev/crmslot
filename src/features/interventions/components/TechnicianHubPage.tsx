@@ -49,6 +49,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const requestMobileHubRail = useRequestMobileHubRail();
   const [commandOpen, setCommandOpen] = useState(false);
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
+  const geofenceAuto = useFeatureFlag("geofenceAuto");
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
@@ -173,7 +174,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   return (
     <>
-      <TechnicianGeofenceWatcher missions={interventions} />
+      {geofenceAuto ? <TechnicianGeofenceWatcher missions={interventions} /> : null}
       {commandPaletteEnabled ? (
         <InterventionCommandPalette
           open={commandOpen}

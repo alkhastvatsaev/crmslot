@@ -6,6 +6,7 @@ import { auth } from "@/core/config/firebase";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { logger } from "@/core/logger";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 
 const DESKTOP_INTERVAL_MS = Number(process.env.NEXT_PUBLIC_PROCESS_UPLOADS_INTERVAL_MS) || 15_000;
 const MOBILE_INTERVAL_MS = 120_000;
@@ -24,9 +25,10 @@ async function postProcessUploads(): Promise<void> {
  */
 export default function AutoProcessUploads() {
   const isMobile = useIsMobile();
+  const dispatchVoice = useFeatureFlag("dispatchVoice");
 
   useEffect(() => {
-    if (isMobile === null || isMobile) return;
+    if (!dispatchVoice || isMobile === null || isMobile) return;
 
     const intervalMs = isMobile ? MOBILE_INTERVAL_MS : DESKTOP_INTERVAL_MS;
 
@@ -62,7 +64,7 @@ export default function AutoProcessUploads() {
       if (interval) clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [isMobile]);
+  }, [dispatchVoice, isMobile]);
 
   return null;
 }

@@ -6,11 +6,13 @@ import { auth, firestore as db } from "@/core/config/firebase";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 
 const SESSION_LAST_PROCESSED = "crmslot_macrodroid_last_processed_at";
 
 export default function MacroDroidIndicator() {
   const isMobile = useIsMobile();
+  const dispatchVoice = useFeatureFlag("dispatchVoice");
   const [statusData, setStatusData] = useState<Record<string, unknown> | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [authed, setAuthed] = useState(false);
@@ -32,7 +34,7 @@ export default function MacroDroidIndicator() {
   }, []);
 
   useEffect(() => {
-    if (isMobile === true || !db || !authed) return;
+    if (!dispatchVoice || isMobile === true || !db || !authed) return;
 
     const unsub = onSnapshot(
       doc(db, "ai_status", "macrodroid"),
@@ -76,10 +78,12 @@ export default function MacroDroidIndicator() {
     );
 
     return () => unsub();
-  }, [authed, isMobile]);
+  }, [authed, dispatchVoice, isMobile]);
 
   const transcript =
     statusData && typeof statusData.transcript === "string" ? statusData.transcript.trim() : null;
+
+  if (!dispatchVoice) return null;
 
   return (
     <>
