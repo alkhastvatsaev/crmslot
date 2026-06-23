@@ -28,7 +28,17 @@
         "title": "Install Technician app",
         "description": "Missions and field closure work best as an installed app."
       }
+    },
+    "update_banner": {
+      "title": "A new version is available.",
+      "later": "Later",
+      "update": "Update"
     }
+  },
+  "admin_mobile": {
+    "full_crm_link": "Full CRM",
+    "offline_banner": "Offline — cached data",
+    "empty_missions": "No missions today"
   },
   "tracking": {
     "waiting_material_banner": "Waiting for parts. We will contact you when they arrive.",

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/core/i18n/I18nContext";
 
 /** Bandeau discret quand le réseau est coupé (données cache inbox). */
 export default function AdminMobileOfflineBar() {
+  const { t } = useTranslation();
   const [offline, setOffline] = useState(
     () => typeof navigator !== "undefined" && !navigator.onLine
   );
@@ -27,7 +29,7 @@ export default function AdminMobileOfflineBar() {
       role="status"
       data-testid="admin-mobile-offline-bar"
     >
-      Hors ligne — données en cache
+      {String(t("admin_mobile.offline_banner"))}
     </div>
   );
 }
