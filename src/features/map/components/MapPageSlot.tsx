@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import MapMobileDispatchArmButton from "@/features/map/components/MapMobileDispatchArmButton";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { resolveAdminMapPageMode } from "@/features/map/resolveAdminMapPageMode";
@@ -30,10 +29,5 @@ export default function MapPageSlot() {
   const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
   const mode = resolveAdminMapPageMode(isMobile, mobileMapWebGL);
 
-  return (
-    <>
-      {mode === "lite" ? <MobileMapHubLite /> : <MapboxView />}
-      <MapMobileDispatchArmButton />
-    </>
-  );
+  return <>{mode === "lite" ? <MobileMapHubLite /> : <MapboxView />}</>;
 }

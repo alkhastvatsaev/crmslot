@@ -24,6 +24,7 @@ export function useAiAudioPlayback({
   onPlaybackSync,
   onActiveClipUrlChange,
   onQueueChange,
+  onNewFirestoreClip,
   backgroundTasksEnabled = true,
 }: UseAiAudioPlaybackOptions = {}): UseAiAudioPlaybackReturn {
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
@@ -113,7 +114,8 @@ export function useAiAudioPlayback({
     queueRef,
     pausedByUserRef,
     isPlayingRef,
-    pendingPlayRef
+    pendingPlayRef,
+    onNewFirestoreClip
   );
 
   useAiAudioDiskPoll(

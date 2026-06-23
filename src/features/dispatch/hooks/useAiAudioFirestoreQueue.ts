@@ -16,7 +16,8 @@ export function useAiAudioFirestoreQueue(
   queueRef: React.MutableRefObject<QueuedClip[]>,
   pausedByUserRef: React.MutableRefObject<boolean>,
   isPlayingRef: React.MutableRefObject<boolean>,
-  pendingPlayRef: React.MutableRefObject<boolean>
+  pendingPlayRef: React.MutableRefObject<boolean>,
+  onNewFirestoreClip?: () => void
 ) {
   const isFirstFirestoreSnapshot = useRef(true);
 
@@ -71,6 +72,7 @@ export function useAiAudioFirestoreQueue(
       if (!pausedByUserRef.current && !isPlayingRef.current) {
         pendingPlayRef.current = true;
       }
+      onNewFirestoreClip?.();
     });
 
     return () => unsub();

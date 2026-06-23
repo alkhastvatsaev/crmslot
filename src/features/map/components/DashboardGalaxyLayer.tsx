@@ -32,7 +32,7 @@ export default function DashboardGalaxyLayer() {
 
   const showHubComposer = hubComposer != null && (isMobile !== true || composerOpen);
   const hideMapGalaxyDockStrip = showHubComposer;
-  const audioBackgroundTasksEnabled = dispatchVoice && (isMobile !== true || transcriptionArmed);
+  const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
 
   return (
     <>

@@ -22,6 +22,8 @@ export type MapTranscriptionActionsControllerOptions = {
   openEditSignal?: number;
   /** Si défini : poller `/api/ai/audio-for-url` pour ce clip uniquement (aligné sur la file Galaxy). */
   scopedClipPublicUrl?: string | null;
+  /** Refus ou intervention créée — masquer le dock Galaxy mobile. */
+  onVoiceReviewComplete?: () => void;
 };
 
 export function useMapTranscriptionActionsController({
@@ -29,6 +31,7 @@ export function useMapTranscriptionActionsController({
   onInterventionCreated,
   openEditSignal = 0,
   scopedClipPublicUrl,
+  onVoiceReviewComplete,
 }: MapTranscriptionActionsControllerOptions) {
   const [busy, setBusy] = useState<null | "refuse" | "create">(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -90,6 +93,7 @@ export function useMapTranscriptionActionsController({
     setEditOpen,
     setBusy,
     onInterventionCreated,
+    onVoiceReviewComplete,
   });
 
   return {

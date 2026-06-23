@@ -8,7 +8,6 @@ import AdminMobileProviders from "@/features/dashboard/AdminMobileProviders";
 import AdminMobileOfflineBar from "@/features/dashboard/components/AdminMobileOfflineBar";
 import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
-import MapMobileDispatchArmButton from "@/features/map/components/MapMobileDispatchArmButton";
 import { buildFullCrmMobileHref } from "@/features/dashboard/adminMobileFullCrm";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
@@ -59,7 +58,6 @@ export default function AdminMobileApp() {
               <ErrorBoundary name="admin-mobile-inbox">
                 <MobileMapHubLite />
               </ErrorBoundary>
-              <MapMobileDispatchArmButton />
             </div>
           </AdminMobileShell>
         </MobileHubRailProvider>

@@ -27,6 +27,7 @@ type UseMapTranscriptionActionsCreateOptions = {
   setEditOpen: (open: boolean) => void;
   setBusy: (busy: null | "refuse" | "create") => void;
   onInterventionCreated?: (mission: MapTranscriptionCreatedMission) => void;
+  onVoiceReviewComplete?: () => void;
 };
 
 export function useMapTranscriptionActionsCreate({
@@ -37,6 +38,7 @@ export function useMapTranscriptionActionsCreate({
   setEditOpen,
   setBusy,
   onInterventionCreated,
+  onVoiceReviewComplete,
 }: UseMapTranscriptionActionsCreateOptions) {
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
@@ -74,10 +76,11 @@ export function useMapTranscriptionActionsCreate({
           : prev
       );
       setEditOpen(false);
+      onVoiceReviewComplete?.();
     } finally {
       setBusy(null);
     }
-  }, [fileName, setEditOpen, setLatest, setBusy]);
+  }, [fileName, setEditOpen, setLatest, setBusy, onVoiceReviewComplete]);
 
   const create = useCallback(async () => {
     if (!fileName) return;
@@ -131,6 +134,7 @@ export function useMapTranscriptionActionsCreate({
             : prev
         );
         setEditOpen(false);
+        onVoiceReviewComplete?.();
         return;
       }
 
@@ -232,6 +236,7 @@ export function useMapTranscriptionActionsCreate({
           : prev
       );
       setEditOpen(false);
+      onVoiceReviewComplete?.();
     } catch (e) {
       logger.error(e instanceof Error ? e.message : String(e));
     } finally {
@@ -247,6 +252,7 @@ export function useMapTranscriptionActionsCreate({
     setLatest,
     setEditOpen,
     setBusy,
+    onVoiceReviewComplete,
   ]);
 
   return { supprimer, create };

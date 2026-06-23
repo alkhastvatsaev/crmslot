@@ -19,11 +19,6 @@ jest.mock("@/features/map/components/MobileMapHubLite", () => ({
   default: () => <div data-testid="mobile-map-hub-lite-stub" />,
 }));
 
-jest.mock("@/features/map/components/MapMobileDispatchArmButton", () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
 const useIsMobile = jest.requireMock("@/features/dashboard/hooks/useIsMobile")
   .useIsMobile as jest.Mock;
 const useFeatureFlag = jest.requireMock("@/core/useFeatureFlags").useFeatureFlag as jest.Mock;

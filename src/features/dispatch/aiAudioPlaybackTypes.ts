@@ -14,6 +14,8 @@ export type UseAiAudioPlaybackOptions = {
   onQueueChange?: (queue: QueuedClip[]) => void;
   /** Firestore + polling disque — désactiver hors page carte mobile. */
   backgroundTasksEnabled?: boolean;
+  /** Nouveau clip MacroDroid / Firestore (mobile : ouvre le dock Galaxy). */
+  onNewFirestoreClip?: () => void;
 };
 
 export type UseAiAudioPlaybackReturn = {

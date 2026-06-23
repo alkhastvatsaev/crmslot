@@ -13,6 +13,7 @@ export function useMapTranscriptionOverlayController({
   scopedClipPublicUrl,
   onVisibleChange,
   forceVisible = false,
+  onVoiceReviewComplete,
 }: MapTranscriptionOverlayProps) {
   const [visible, setVisible] = useState(false);
   const resetRevealRef = useRef<(() => void) | null>(null);
@@ -23,7 +24,8 @@ export function useMapTranscriptionOverlayController({
 
   const onDecisionRefused = useCallback(() => {
     setVisible(false);
-  }, []);
+    onVoiceReviewComplete?.();
+  }, [onVoiceReviewComplete]);
 
   const poll = useMapTranscriptionOverlayPoll({
     armed,

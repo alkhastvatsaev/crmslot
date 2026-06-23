@@ -22,6 +22,7 @@ type AiAssistantProps = {
   transcriptOverlayVisible?: boolean;
   onUserLongPress?: () => void;
   onQueueChange?: (queue: QueuedClip[]) => void;
+  onNewFirestoreClip?: () => void;
   backgroundTasksEnabled?: boolean;
   mobilePowerSave?: boolean;
 };
@@ -35,6 +36,7 @@ export default function AiAssistant({
   transcriptOverlayVisible = false,
   onUserLongPress,
   onQueueChange,
+  onNewFirestoreClip,
   backgroundTasksEnabled = true,
   mobilePowerSave,
 }: AiAssistantProps = {}) {
@@ -43,6 +45,7 @@ export default function AiAssistant({
     onPlaybackSync,
     onActiveClipUrlChange,
     onQueueChange,
+    onNewFirestoreClip,
     backgroundTasksEnabled,
   });
 
