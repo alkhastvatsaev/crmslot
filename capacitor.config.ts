@@ -1,8 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
-const serverUrl =
-  process.env.CAPACITOR_SERVER_URL?.trim() || "https://crmslot.vercel.app/m/technician";
+const serverUrl = process.env.CAPACITOR_SERVER_URL?.trim() || "https://crmslot.vercel.app/m/admin";
 
 const config: CapacitorConfig = {
   appId: "com.crmslot.app",

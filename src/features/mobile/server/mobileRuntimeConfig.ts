@@ -1,5 +1,5 @@
 import { DASHBOARD_CAROUSEL_PAGE_COUNT } from "@/features/dashboard/dashboardCarouselRegistry";
-import { mobileAccessAllowed } from "@/core/config/mobileAccess";
+import { resolveMobileAccessAllowed } from "@/core/config/resolveMobileAccessAllowed";
 
 export type MobileRuntimeConfig = {
   /** Build autorisé sur téléphone (env staging/prod). */
@@ -20,8 +20,7 @@ export type MobileRuntimeConfig = {
 export function buildMobileRuntimeConfig(
   env: NodeJS.ProcessEnv = process.env
 ): MobileRuntimeConfig {
-  const allowMobile =
-    env.NEXT_PUBLIC_ALLOW_MOBILE === "true" || env.NEXT_PUBLIC_ALLOW_MOBILE_TECHNICIAN === "true";
+  const allowMobile = resolveMobileAccessAllowed(env);
 
   const nodeEnv = env.NODE_ENV;
   const normalizedEnv = nodeEnv === "production" || nodeEnv === "test" ? nodeEnv : "development";
@@ -38,5 +37,5 @@ export function buildMobileRuntimeConfig(
 
 /** Alias build-time pour le client bundle (tree-shake identique à mobileAccess.ts). */
 export function isMobileAccessAllowedAtBuild(): boolean {
-  return mobileAccessAllowed;
+  return resolveMobileAccessAllowed();
 }

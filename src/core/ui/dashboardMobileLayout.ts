@@ -1,7 +1,12 @@
 /**
  * Dashboard mobile layout — TypeScript surface (classes + numeric constants).
  * CSS source of truth: `src/app/dashboard-mobile-layout.css`
+ *
+ * Panneaux hub : même chrome `.panel-glass` que desktop (`panel-tokens.css`).
+ * Mapping rails : `docs/agents/MOBILE_DESKTOP_PANELS.md`
  */
+
+import { glassPanelShellClass } from "@/core/ui/glassPanelChrome";
 
 export const MOBILE_SHELL_PAD_X_PX = 16;
 
@@ -11,7 +16,8 @@ export const MOBILE_TAB_BAR_HEIGHT_PX = 52;
 
 export const MOBILE_GALAXY_HEIGHT_PX = 56;
 
-export const MOBILE_PANEL_RADIUS_PX = 20;
+/** Aligné sur desktop `.panel-glass` (24px). */
+export const MOBILE_PANEL_RADIUS_PX = 24;
 
 export const MOBILE_PANEL_GAP_PX = 16;
 
@@ -54,7 +60,18 @@ export const MOBILE_HUB_LAYOUT_CLASS = "mobile-hub-layout";
 export const MOBILE_HUB_DOTS_BAR_CLASS = "mobile-hub-dots-bar";
 export const MOBILE_RAIL_SEGMENT_CLASS = "mobile-rail-segment";
 export const MOBILE_RAIL_SEGMENT_BTN_CLASS = "mobile-rail-segment-btn";
+export const MOBILE_HUB_PANEL_SHELL_CLASS = "mobile-hub-panel-shell";
+
+/** @deprecated Préférer `mobileHubPanelGlassShellClass` + `GlassPanel`. */
 export const MOBILE_HUB_PANEL_CLASS = "mobile-hub-panel";
+
+/** Coque glass mobile — ombres et blur identiques au desktop, radius via `--mobile-panel-radius`. */
+export const mobileHubPanelGlassShellClass = glassPanelShellClass({
+  bg: "bg-white/76",
+  layoutClass: `${MOBILE_HUB_PANEL_SHELL_CLASS} relative flex min-h-0 w-full max-w-full flex-col`,
+  heightClass: "",
+  extra: "rounded-[var(--mobile-panel-radius)]",
+});
 export const MOBILE_HUB_PANEL_INNER_CLASS = "mobile-hub-panel-inner";
 export const MOBILE_HUB_PANEL_INNER_SCROLL_CLASS =
   "mobile-hub-panel-inner mobile-hub-panel-inner--scroll";

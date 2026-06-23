@@ -13,17 +13,23 @@ describe("buildMobileRuntimeConfig", () => {
     expect(cfg.forceMobileQueryKey).toBe("forceMobile");
     expect(cfg.pwaServiceWorkerEnabled).toBe(false);
     expect(cfg.gitSha).toBe("abc123");
-    // Carrousel actuel : carte + matériel + crm + facturation + gmail + assistant = 6 pages.
-    // Régression: si on retombe sous 6, c'est qu'un hub a sauté du registre.
     expect(cfg.hubPageCount).toBeGreaterThanOrEqual(6);
     expect(cfg.nodeEnv).toBe("development");
   });
 
-  it("mobileAccessAllowed false par défaut", () => {
+  it("mobileAccessAllowed true en production par défaut", () => {
     const cfg = buildMobileRuntimeConfig({
       NODE_ENV: "production",
     });
-    expect(cfg.mobileAccessAllowed).toBe(false);
+    expect(cfg.mobileAccessAllowed).toBe(true);
     expect(cfg.nodeEnv).toBe("production");
+  });
+
+  it("mobileAccessAllowed false si opt-out explicite", () => {
+    const cfg = buildMobileRuntimeConfig({
+      NODE_ENV: "production",
+      NEXT_PUBLIC_ALLOW_MOBILE: "false",
+    });
+    expect(cfg.mobileAccessAllowed).toBe(false);
   });
 });

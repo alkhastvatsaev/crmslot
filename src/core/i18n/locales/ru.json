@@ -1789,6 +1789,7 @@
     "mission_overlay": {
       "phone": "Телефон",
       "address": "Адрес",
+      "view_on_map": "Показать выезд на карте?",
       "problem_description": "Описание проблемы"
     },
     "mission": {

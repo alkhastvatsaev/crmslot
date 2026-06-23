@@ -116,7 +116,7 @@ describe("mobileShellContract — navigation profil", () => {
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.pageSelectorHost)).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-page-selector-layout")).toHaveClass("mobile-hub-layout");
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.pageSelector)).toHaveClass(
-      "mobile-hub-panel"
+      "panel-glass"
     );
   });
 

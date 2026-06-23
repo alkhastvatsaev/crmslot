@@ -2,10 +2,11 @@
 
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import GlassPanel from "@/core/ui/GlassPanel";
 import {
   MOBILE_HUB_LAYOUT_CLASS,
-  MOBILE_HUB_PANEL_CLASS,
   MOBILE_HUB_PANEL_INNER_CLASS,
+  mobileHubPanelGlassShellClass,
 } from "@/core/ui/dashboardMobileLayout";
 
 type Props = {
@@ -20,7 +21,7 @@ type Props = {
 
 /**
  * Gabarit du panneau central mobile (carte Mapbox, sélecteur de pages, hubs).
- * Même chaîne que `MobileHubLayout` : layout gouttières + panel blanc arrondi.
+ * Même chrome `.panel-glass` que desktop et `MobileHubLayout`.
  */
 export default function MobileCentralPanelFrame({
   children,
@@ -33,14 +34,16 @@ export default function MobileCentralPanelFrame({
 }: Props) {
   return (
     <div className={MOBILE_HUB_LAYOUT_CLASS} data-testid={layoutTestId}>
-      <section
+      <GlassPanel
+        as="section"
         {...sectionProps}
         data-variant={sectionDataVariant}
-        className={cn(MOBILE_HUB_PANEL_CLASS, sectionClassName)}
         data-testid={testId}
+        shellClassName={cn(mobileHubPanelGlassShellClass, sectionClassName)}
+        innerClassName={innerClassName}
       >
-        <div className={innerClassName}>{children}</div>
-      </section>
+        {children}
+      </GlassPanel>
     </div>
   );
 }
