@@ -1,153 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, Send, Save } from "lucide-react";
-import { toast } from "sonner";
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import { firestore } from "@/core/config/firebase";
-import { useTranslation } from "@/core/i18n/I18nContext";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
-import { createQuote, updateQuote } from "../quoteFirestore";
-import QuoteStatusBadge from "./QuoteStatusBadge";
-import type { Quote, QuoteLine } from "../types";
+import QuoteStatusBadge from "@/features/quotes/components/QuoteStatusBadge";
+import QuoteEditorClientFields from "@/features/quotes/components/QuoteEditorClientFields";
+import QuoteEditorLinesTable from "@/features/quotes/components/QuoteEditorLinesTable";
+import QuoteEditorTotals from "@/features/quotes/components/QuoteEditorTotals";
+import QuoteEditorMetaFields from "@/features/quotes/components/QuoteEditorMetaFields";
+import QuoteEditorActions from "@/features/quotes/components/QuoteEditorActions";
+import { useQuoteEditorPanelController } from "@/features/quotes/hooks/useQuoteEditorPanelController";
+import type { QuoteEditorPanelProps } from "@/features/quotes/quoteEditorPanelTypes";
 
-function formatEur(cents: number): string {
-  return (cents / 100).toFixed(2).replace(".", ",") + " €";
-}
-
-type Props = {
-  quote?: Quote;
-  interventionId?: string;
-  onSaved?: (id: string) => void;
-};
-
-export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Props) {
-  const { t } = useTranslation();
-  const workspace = useCompanyWorkspaceOptional();
-  const companyId = workspace?.activeCompanyId?.trim() ?? "";
-
-  const [lines, setLines] = useState<QuoteLine[]>(
-    quote?.lines ?? [{ description: "", quantity: 1, unitPriceCents: 0 }]
-  );
-  const [notes, setNotes] = useState(quote?.notes ?? "");
-  const [validityDays, setValidityDays] = useState(quote?.validityDays ?? 30);
-  const [clientName, setClientName] = useState(quote?.clientName ?? "");
-  const [clientEmail, setClientEmail] = useState(quote?.clientEmail ?? "");
-  const [busy, setBusy] = useState(false);
-
-  const totalHT = lines.reduce((s, l) => s + Math.round(l.quantity * l.unitPriceCents), 0);
-  const tva = Math.round(totalHT * 0.06);
-  const totalTTC = totalHT + tva;
-
-  const addLine = () =>
-    setLines((prev) => [...prev, { description: "", quantity: 1, unitPriceCents: 0 }]);
-
-  const removeLine = (i: number) => setLines((prev) => prev.filter((_, idx) => idx !== i));
-
-  const updateLine = (i: number, patch: Partial<QuoteLine>) =>
-    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
-
-  const sendQuoteEmail = async (quoteId: string, statusBefore: string) => {
-    if (!clientEmail.trim()) {
-      toast.error(String(t("quotes.error_no_email")));
-      return false;
-    }
-    const res = await fetchWithAuth(
-      `/api/companies/${encodeURIComponent(companyId)}/quotes/${encodeURIComponent(quoteId)}/send`,
-      { method: "POST" }
-    );
-    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
-    if (!res.ok || !data.ok) {
-      toast.error(data.error ?? String(t("quotes.toast_send_email_failed")));
-      return false;
-    }
-    await logCrmCompanyAction({
-      companyId,
-      kind: "quote_status_changed",
-      actorUid: workspace?.firebaseUid ?? "system",
-      actorRole: "dispatcher",
-      statusBefore,
-      statusAfter: "sent",
-      note: notes.trim() || undefined,
-      intervention: {
-        id: quoteId,
-        title: `Devis ${quoteId.substring(0, 8)}`,
-        status: "sent",
-        clientName: clientName.trim() || undefined,
-        clientCompanyName: clientName.trim() || undefined,
-        address: "",
-      },
-    });
-    return true;
-  };
-
-  const handleSave = async (andSend = false) => {
-    if (!firestore || !companyId) return;
-    const validLines = lines.filter((l) => l.description.trim());
-    if (validLines.length === 0) {
-      toast.error(String(t("quotes.error_no_lines")));
-      return;
-    }
-    setBusy(true);
-    try {
-      let quoteId: string;
-      let statusBefore: string;
-
-      if (quote) {
-        quoteId = quote.id;
-        statusBefore = quote.status;
-        await updateQuote(firestore, companyId, quote.id, {
-          lines: validLines,
-          notes: notes.trim() || null,
-          validityDays,
-          clientName: clientName.trim() || null,
-          clientEmail: clientEmail.trim() || null,
-        });
-      } else {
-        statusBefore = "draft";
-        quoteId = await createQuote(firestore, companyId, {
-          lines: validLines,
-          notes: notes.trim() || null,
-          validityDays,
-          clientName: clientName.trim() || null,
-          clientEmail: clientEmail.trim() || null,
-          interventionId: interventionId ?? null,
-          clientId: null,
-          createdByUid: workspace?.firebaseUid ?? null,
-        });
-        await logCrmCompanyAction({
-          companyId,
-          kind: "quote_created",
-          actorUid: workspace?.firebaseUid ?? "system",
-          actorRole: "dispatcher",
-          note: notes.trim() || undefined,
-          statusAfter: "draft",
-          intervention: {
-            id: quoteId,
-            title: `Devis ${quoteId.substring(0, 8)}`,
-            status: "draft",
-            clientName: clientName.trim() || undefined,
-            clientCompanyName: clientName.trim() || undefined,
-            address: "",
-          },
-        });
-      }
-
-      if (andSend) {
-        const sent = await sendQuoteEmail(quoteId, statusBefore);
-        if (!sent) return;
-        toast.success(String(t("quotes.toast_sent_email")));
-      } else {
-        toast.success(String(t("quotes.toast_saved")));
-      }
-      onSaved?.(quoteId);
-    } catch {
-      toast.error(String(t("common.error")));
-    } finally {
-      setBusy(false);
-    }
-  };
+export default function QuoteEditorPanel(props: QuoteEditorPanelProps) {
+  const c = useQuoteEditorPanelController(props);
 
   return (
     <div
@@ -155,155 +18,56 @@ export default function QuoteEditorPanel({ quote, interventionId, onSaved }: Pro
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-900">{t("quotes.editor_title")}</h3>
-        {quote && <QuoteStatusBadge status={quote.status} />}
+        <h3 className="text-sm font-bold text-slate-900">{c.t("quotes.editor_title")}</h3>
+        {c.quote ? <QuoteStatusBadge status={c.quote.status} /> : null}
       </div>
 
-      {/* Client info */}
-      <div className="grid gap-2 sm:grid-cols-2">
-        <input
-          data-testid="quote-client-name"
-          value={clientName}
-          onChange={(e) => setClientName(e.target.value)}
-          placeholder={String(t("quotes.client_name"))}
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-        />
-        <input
-          data-testid="quote-client-email"
-          value={clientEmail}
-          onChange={(e) => setClientEmail(e.target.value)}
-          placeholder={String(t("quotes.client_email"))}
-          type="email"
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-        />
-      </div>
+      <QuoteEditorClientFields
+        clientName={c.clientName}
+        clientEmail={c.clientEmail}
+        clientNamePlaceholder={String(c.t("quotes.client_name"))}
+        clientEmailPlaceholder={String(c.t("quotes.client_email"))}
+        onClientNameChange={c.setClientName}
+        onClientEmailChange={c.setClientEmail}
+      />
 
-      {/* Lines */}
-      <div className="space-y-2">
-        <div className="grid grid-cols-[1fr_60px_80px_32px] gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-          <span>{t("quotes.col_description")}</span>
-          <span className="text-right">{t("quotes.col_qty")}</span>
-          <span className="text-right">{t("quotes.col_price")}</span>
-          <span />
-        </div>
-        {lines.map((line, i) => (
-          <div key={i} className="grid grid-cols-[1fr_60px_80px_32px] gap-1 items-center">
-            <input
-              data-testid={`quote-line-desc-${i}`}
-              value={line.description}
-              onChange={(e) => updateLine(i, { description: e.target.value })}
-              placeholder={String(t("quotes.line_placeholder"))}
-              className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
-            />
-            <input
-              data-testid={`quote-line-qty-${i}`}
-              type="number"
-              min={1}
-              value={line.quantity}
-              onChange={(e) => updateLine(i, { quantity: Math.max(1, Number(e.target.value)) })}
-              className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-right"
-            />
-            <input
-              data-testid={`quote-line-price-${i}`}
-              type="number"
-              min={0}
-              step={0.01}
-              value={(line.unitPriceCents / 100).toFixed(2)}
-              onChange={(e) =>
-                updateLine(i, { unitPriceCents: Math.round(Number(e.target.value) * 100) })
-              }
-              className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-right"
-            />
-            <button
-              type="button"
-              onClick={() => removeLine(i)}
-              disabled={lines.length === 1}
-              data-testid={`quote-line-remove-${i}`}
-              className="flex items-center justify-center rounded-lg p-1.5 text-slate-400 hover:text-red-500 disabled:opacity-30"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={addLine}
-          data-testid="quote-add-line"
-          className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          {t("quotes.add_line")}
-        </button>
-      </div>
+      <QuoteEditorLinesTable
+        lines={c.lines}
+        colDescription={String(c.t("quotes.col_description"))}
+        colQty={String(c.t("quotes.col_qty"))}
+        colPrice={String(c.t("quotes.col_price"))}
+        linePlaceholder={String(c.t("quotes.line_placeholder"))}
+        addLineLabel={String(c.t("quotes.add_line"))}
+        onAddLine={c.addLine}
+        onRemoveLine={c.removeLine}
+        onUpdateLine={c.updateLine}
+      />
 
-      {/* Totals */}
-      <div className="rounded-lg bg-slate-50 px-3 py-2 space-y-1 text-xs">
-        <div className="flex justify-between text-slate-500">
-          <span>{t("quotes.total_ht")}</span>
-          <span>{formatEur(totalHT)}</span>
-        </div>
-        <div className="flex justify-between text-slate-500">
-          <span>{t("quotes.tva_6")}</span>
-          <span>{formatEur(tva)}</span>
-        </div>
-        <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-1 mt-1">
-          <span>{t("quotes.total_ttc")}</span>
-          <span>{formatEur(totalTTC)}</span>
-        </div>
-      </div>
+      <QuoteEditorTotals
+        totalHT={c.totalHT}
+        tva={c.tva}
+        totalTTC={c.totalTTC}
+        totalHtLabel={String(c.t("quotes.total_ht"))}
+        tvaLabel={String(c.t("quotes.tva_6"))}
+        totalTtcLabel={String(c.t("quotes.total_ttc"))}
+      />
 
-      {/* Validity + notes */}
-      <div className="grid gap-2 sm:grid-cols-2">
-        <div>
-          <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t("quotes.validity_days")}
-          </label>
-          <input
-            data-testid="quote-validity"
-            type="number"
-            min={1}
-            value={validityDays}
-            onChange={(e) => setValidityDays(Math.max(1, Number(e.target.value)))}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t("quotes.notes")}
-          </label>
-          <textarea
-            data-testid="quote-notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={2}
-            className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm resize-none"
-          />
-        </div>
-      </div>
+      <QuoteEditorMetaFields
+        validityDays={c.validityDays}
+        notes={c.notes}
+        validityDaysLabel={String(c.t("quotes.validity_days"))}
+        notesLabel={String(c.t("quotes.notes"))}
+        onValidityDaysChange={c.setValidityDays}
+        onNotesChange={c.setNotes}
+      />
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <button
-          type="button"
-          data-testid="quote-save"
-          disabled={busy}
-          onClick={() => void handleSave(false)}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-        >
-          <Save className="h-4 w-4" />
-          {t("quotes.save")}
-        </button>
-        <button
-          type="button"
-          data-testid="quote-send"
-          disabled={busy}
-          onClick={() => void handleSave(true)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          <Send className="h-4 w-4" />
-          {t("quotes.send")}
-        </button>
-      </div>
+      <QuoteEditorActions
+        busy={c.busy}
+        saveLabel={String(c.t("quotes.save"))}
+        sendLabel={String(c.t("quotes.send"))}
+        onSave={() => void c.handleSave(false)}
+        onSend={() => void c.handleSave(true)}
+      />
     </div>
   );
 }
