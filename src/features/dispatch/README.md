@@ -4,12 +4,17 @@ Dispatch IA et audio MacroDroid : assistant vocal carte, ranking techniciens.
 
 ## Points d'entrée
 
-| Fichier                                 | Rôle                                    |
-| --------------------------------------- | --------------------------------------- |
-| `hooks/useAiAudioPlayback.ts`           | Orchestrateur queue audio (~139 lignes) |
-| `components/AiAssistant.tsx`            | Strip audio carte                       |
-| `components/TechnicianAssignPicker.tsx` | Assignation + scoring IA                |
-| `rankTechniciansForIntervention.ts`     | Classement pure                         |
+| Fichier                                       | Rôle                                    |
+| --------------------------------------------- | --------------------------------------- |
+| `hooks/useAiAudioPlayback.ts`                 | Orchestrateur queue audio (~139 lignes) |
+| `hooks/useTechnicianAssignPicker.ts`          | Logique assignation + scoring IA        |
+| `components/TechnicianAssignPicker.tsx`       | Shell UI assignation (~130 lignes)      |
+| `components/TechnicianAssignPickerHeader.tsx` | En-tête adresse + fermer                |
+| `components/TechnicianAssignPickerFooter.tsx` | Actions annuler / confirmer             |
+| `components/TechnicianAssignPickerOption.tsx` | Ligne technicien classée                |
+| `technicianAssignPickerFormat.ts`             | Distance km, clés statut                |
+| `components/AiAssistant.tsx`                  | Strip audio carte                       |
+| `rankTechniciansForIntervention.ts`           | Classement pure                         |
 
 ## Données
 
