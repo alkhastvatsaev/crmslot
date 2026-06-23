@@ -19,6 +19,11 @@ Auth staff + portail client, détection rôle, guards session.
 | `components/ClientPortalAuthCard.tsx`        | Carte login / register (hub complet)    |
 | `components/ClientPortalAuthRailContent.tsx` | Formulaire rail hub demandeur           |
 | `components/ClientPortalAuthOffline.tsx`     | Firebase non configuré                  |
+| `hooks/useClientPortalAuth.ts`               | Orchestrateur auth portail (~70 lignes) |
+| `hooks/useClientPortalAuthSignIn.ts`         | Google, email/mdp, lien magique         |
+| `hooks/useClientPortalAuthMfa.ts`            | SMS / TOTP + reCAPTCHA invisible        |
+| `hooks/useClientPortalAuthTypes.ts`          | Types `ClientPortalAuthTab`             |
+| `clientPortalMagicLinkFeedback.ts`           | Messages erreur lien magique Firebase   |
 | `useAccountRole.ts`                          | Admin / technicien / client satellite   |
 
 ## Données
