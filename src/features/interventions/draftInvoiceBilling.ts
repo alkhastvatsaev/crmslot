@@ -100,7 +100,7 @@ export async function refineDraftBillingWithOpenAI(
 }
 
 /**
- * Brouillon facture pour validation IVANA (pas de facture PDF tant que non validé).
+ * Brouillon facture pour validation back-office (pas de facture PDF tant que non validé).
  * Réutilise les lignes existantes si déjà présentes et cohérentes.
  */
 export async function buildDraftBillingPackage(

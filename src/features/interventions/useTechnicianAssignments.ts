@@ -20,9 +20,9 @@ import type {
 export type { UseTechnicianAssignmentsResult } from "@/features/interventions/useTechnicianAssignmentsTypes";
 
 /**
- * Temps réel — interventions visibles par le technicien **après** le goulot IVANA.
+ * Temps réel — interventions visibles par le technicien **après** validation dispatch.
  * Resync serveur périodique : le listener Firestore peut ne pas pousser les nouvelles
- * assignations IVANA tant que l’app mobile reste ouverte (WebView / PWA).
+ * assignations tant que l’app mobile reste ouverte (WebView / PWA).
  */
 export function useTechnicianAssignments(
   options: UseTechnicianAssignmentsOptions = {}

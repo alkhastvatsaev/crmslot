@@ -71,7 +71,7 @@ export function useTechnicianAssignmentsPolling(params: ResyncEffectsParams): vo
   const { hookEnabled, firebaseUid, noFirebaseAuth, syncFromServerRef } = params;
   const [, setPollArmed] = useState(false);
 
-  /** Polling léger tant que l’écran terrain est visible (nouvelle assignation IVANA). */
+  /** Polling léger tant que l’écran terrain est visible (nouvelle assignation dispatch). */
   useEffect(() => {
     if (!hookEnabled || !firebaseUid || noFirebaseAuth || typeof window === "undefined") {
       return () => {};

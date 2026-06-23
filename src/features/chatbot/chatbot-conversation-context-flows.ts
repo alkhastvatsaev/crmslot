@@ -35,7 +35,7 @@ const FLOW_HINTS: Record<ChatbotFlowId, RegExp> = {
   email: /email|mail|courriel|envoyer.*(?:mail|email)|pièce jointe/i,
   planning: /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i,
   stats: /statistique|chiffre|ca\b|chiffre d'affaires|trimestre|mois|kpi/i,
-  inbox: /inbox|notification|portail|chat client|ivana/i,
+  inbox: /inbox|notification|portail|chat client|back.?office|dispatch/i,
   gmail:
     /gmail|bo[iî]te\s+(?:mail|réception)|mes\s+mails|colis|livraison|bpost|colissimo|dpd|tracking|suivi\s+colis|exp[eé]dition/i,
   stock: /stock|alerte stock|rupture/i,

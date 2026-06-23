@@ -60,7 +60,7 @@ export function useCrmActivityFeed(
     loading: crmLogLoading,
     error: crmLogError,
   } = useCompanyCrmActivityLog(feedCompanyId);
-  const { messages: ivanaMessages, loading: ivanaLoading } =
+  const { messages: portalChatMessages, loading: portalChatLoading } =
     useCompanyPortalChatFeed(feedCompanyId);
 
   const anySourceLoading =
@@ -71,7 +71,7 @@ export function useCrmActivityFeed(
     commLoading ||
     statusLoading ||
     crmLogLoading ||
-    ivanaLoading;
+    portalChatLoading;
 
   const interventionMap = useMemo<Map<string, Intervention>>(
     () => new Map(interventions.map((iv) => [iv.id, iv])),
@@ -86,7 +86,7 @@ export function useCrmActivityFeed(
           synthesizeInterventionLifecycleEvents(interventions),
           synthesizeStatusEvents(statusEvents, interventionMap),
           synthesizeCompanyCrmLogEvents(crmLogRows),
-          synthesizePortalChatEvents(ivanaMessages, interventionMap),
+          synthesizePortalChatEvents(portalChatMessages, interventionMap),
           synthesizeMaterialOrderEvents(materialOrders),
           synthesizeSupplierOrderEvents(supplierOrders),
           synthesizeEmailEvents(emails, interventionMap),
@@ -102,7 +102,7 @@ export function useCrmActivityFeed(
       interventionMap,
       statusEvents,
       crmLogRows,
-      ivanaMessages,
+      portalChatMessages,
       ordersRevision,
     ]
   );

@@ -50,7 +50,7 @@ export function useBackOfficeInboxMiscActions({ interventions, setSelectedItemId
             iv: row,
             actorUid,
             actorRole: "dispatcher",
-            note: "Suppression dossier (IVANA / dispatcher)",
+            note: "Suppression dossier (back-office / dispatcher)",
           });
         }
         await deleteDoc(doc(firestore, "interventions", id));

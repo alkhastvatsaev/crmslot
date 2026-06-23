@@ -75,7 +75,7 @@ const EMAIL_HINT =
 const PLANNING_HINT =
   /planning|planifier|assign|technicien|créneau|horaire|rdv|rendez-vous|en_route|statut/i;
 const STATS_HINT = /statistique|chiffre|ca\b|chiffre d'affaires|trimestre|mois|kpi/i;
-const INBOX_HINT = /inbox|notification|portail|chat client|ivana/i;
+const INBOX_HINT = /inbox|notification|portail|chat client|back.?office|dispatch/i;
 const GMAIL_HINT =
   /gmail|bo[iî]te\s+(?:mail|réception)|mes\s+mails|nouveau(?:x)?\s+mails?|colis|livraison|bpost|colissimo|dpd|chronopost|gls|tracking|num[eé]ro\s+de\s+suivi|exp[eé]dition|transporteur|mail\s+re[cç]u/i;
 const STOCK_HINT = /stock|alerte stock|rupture/i;

@@ -9,7 +9,7 @@ const DEFAULT_COMPANY_ID =
     ? process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID.trim() || null
     : null;
 
-/** Champs optionnels sur `allowed_users/{phone}` pour aligner le chat IVANA sur la société (prioritaire pour la synchro téléphone). */
+/** Champs optionnels sur `allowed_users/{phone}` pour aligner le chat portail sur la société (prioritaire pour la synchro téléphone). */
 export function companyIdFromAllowedUsersDoc(
   data: Record<string, unknown> | undefined
 ): string | null {

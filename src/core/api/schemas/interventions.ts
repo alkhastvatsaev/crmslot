@@ -23,7 +23,7 @@ export const DocumentPdfQuerySchema = z.object({
   type: InterventionDocumentKindSchema.default("invoice"),
 });
 
-/** POST /api/interventions/[id]/validate-report — back-office IVANA. */
+/** POST /api/interventions/[id]/validate-report — validation rapport back-office. */
 export const ValidateReportRequestSchema = z.object({
   validated: z.boolean(),
   rejectionReason: z.string().min(3).optional(),

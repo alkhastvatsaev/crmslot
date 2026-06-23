@@ -74,7 +74,7 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `technicianAssignmentsHookCache.ts`                  | Mise à jour cache React Query + terrain offline                            |
 | `technicianAssignmentsSync.ts`                       | Resync serveur + notifications nouvelles missions                          |
 | `hooks/useTechnicianAssignmentsFirestoreListener.ts` | Listener auth + snapshot Firestore                                         |
-| `hooks/useTechnicianAssignmentsResyncEffects.ts`     | Resync foreground, réseau, Capacitor, polling IVANA                        |
+| `hooks/useTechnicianAssignmentsResyncEffects.ts`     | Resync foreground, réseau, Capacitor, polling dispatch                     |
 | `assignInterventionToTechnician.ts`                  | Assignation (seuil coverage P0 100 %)                                      |
 
 ## Données

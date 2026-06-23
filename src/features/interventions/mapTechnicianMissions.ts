@@ -5,11 +5,11 @@ import {
   type TechnicianTabFilter,
 } from "@/features/interventions/technicianSchedule";
 
-/** Interventions affichables sur la carte hub (libérées IVANA + onglet date + géoloc valide). */
+/** Interventions affichables sur la carte hub (libérées dispatch + onglet date + géoloc valide). */
 export function filterInterventionsForMapTechnicianMissions(
   rows: Intervention[],
   tab: TechnicianTabFilter,
-  anchorDate: Date,
+  anchorDate: Date
 ): Intervention[] {
   return rows
     .filter((iv) => isInterventionVisibleOnTechnicianMap(iv))
@@ -18,6 +18,6 @@ export function filterInterventionsForMapTechnicianMissions(
       (iv) =>
         iv.location != null &&
         typeof iv.location.lat === "number" &&
-        typeof iv.location.lng === "number",
+        typeof iv.location.lng === "number"
     );
 }

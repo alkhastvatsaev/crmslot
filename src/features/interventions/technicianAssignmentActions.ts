@@ -28,7 +28,7 @@ export function isTechnicianActiveFieldMission(
   return false;
 }
 
-/** IVANA vient d’assigner — le technicien doit accepter ou refuser. */
+/** Le dispatch vient d’assigner — le technicien doit accepter ou refuser. */
 export function isTechnicianAssignmentAwaitingResponse(
   iv: Pick<Intervention, "status" | "assignedTechnicianUid" | "technicianAcceptedAt">,
   technicianUid: string | null | undefined

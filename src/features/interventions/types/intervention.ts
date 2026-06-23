@@ -69,7 +69,7 @@ export interface Intervention {
   technicianAcceptedAt?: string | null;
   technicianDeclinedAt?: string | null;
   technicianDeclinedByUid?: string | null;
-  /** Retour file IVANA « Demandes » (refus terrain ou acceptation non confirmée). */
+  /** Retour file dispatch « Demandes » (refus terrain ou acceptation non confirmée). */
   returnedToRequestsAt?: string | null;
   returnedToRequestsReason?: "technician_declined" | "accept_failed" | null;
 
@@ -144,14 +144,14 @@ export interface Intervention {
   // === Clôture & validation back-office ===
   completedAt?: string | null;
   completedByUid?: string | null;
-  /** Validation Ivana (back-office). */
+  /** Validation back-office (champ Firestore legacy `ivanaVerified`). */
   ivanaVerified?: boolean;
-  /** Rapport masqué dans l’inbox IVANA (section Archive) — horodatage ISO. */
+  /** Rapport masqué dans l’inbox dispatch (section Archive) — horodatage ISO. */
   backofficeReportsArchivedAt?: string | null;
   /** Technicien — rapport modifié après clôture / facturation (alerte QM). */
   technicianReportAmendedAt?: string | null;
   technicianReportAmendedByUid?: string | null;
-  /** Rapport refusé par IVANA — renvoi au technicien pour complément. */
+  /** Rapport refusé par le back-office — renvoi au technicien pour complément. */
   reportRejectionReason?: string | null;
   reportRejectedAt?: string | null;
 

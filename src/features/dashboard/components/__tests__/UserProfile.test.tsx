@@ -12,7 +12,7 @@ describe("UserProfile", () => {
   it("shows one profile per carousel page (9 admin hubs)", () => {
     expect(appProfiles).toHaveLength(DASHBOARD_CAROUSEL_PAGE_COUNT);
     expect(appProfiles.map((p) => p.name)).toEqual([
-      "IVANA",
+      "DISPATCH",
       "MATÉRIEL",
       "QUALITY MANAGEMENT",
       "FACTURATION",

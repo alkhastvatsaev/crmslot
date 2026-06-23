@@ -44,7 +44,7 @@ export type DashboardCarouselPageDef = {
 export const DASHBOARD_CAROUSEL_PAGES: readonly DashboardCarouselPageDef[] = [
   {
     slotIndex: 0,
-    profileName: "IVANA",
+    profileName: "DISPATCH",
     profileRoleKey: "back_office",
     spotlightLabelKey: "spotlight.nav_map",
     guideTitle: "Carte",
