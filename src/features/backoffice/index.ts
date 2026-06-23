@@ -26,4 +26,3 @@ export type {
 
 // Modules consommés cross-feature (audit:barrels:public).
 export * from "@/features/backoffice/useResolvedInterventionAudio";
-export * from "@/features/backoffice/applyBackofficeTechnicianAssignmentAdmin";

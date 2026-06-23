@@ -1,6 +1,6 @@
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import type { DashboardPagerApi } from "@/features/dashboard";
-import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice";
+import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
 import { BM_BACKOFFICE_CHAT_PARAM } from "@/features/notifications/notificationConstants";
 import type { BackofficeChatNotificationIntent } from "@/features/notifications/backofficeChatNotificationUrls";
 

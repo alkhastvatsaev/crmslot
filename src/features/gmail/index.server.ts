@@ -3,3 +3,4 @@
  */
 export type { CreateInterventionFromGmailResult } from "@/features/gmail/server/createInterventionFromGmailAdmin";
 export { createInterventionFromGmailAdmin } from "@/features/gmail/server/createInterventionFromGmailAdmin";
+export { verifyGmailRouteCompanyAccess } from "@/features/gmail/gmailRouteCompany";

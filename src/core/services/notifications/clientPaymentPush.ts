@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { clientNotificationCaseUrl } from "@/features/notifications";
+import { clientNotificationCaseUrl } from "@/features/notifications/clientNotificationUrls";
 
 async function listFcmTokens(uid: string): Promise<string[]> {
   const snap = await getAdminDb().collection("users").doc(uid).collection("fcm_tokens").get();

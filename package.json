@@ -94,7 +94,8 @@
     "cap:install:android:debug": "cd android && ../scripts/mobile/gradlew-with-jbr.sh installDebug",
     "prepare": "husky",
     "i18n:parity": "node scripts/i18n/parity-check.mjs --require ru",
-    "test:i18n": "jest src/core/i18n --no-coverage"
+    "test:i18n": "jest src/core/i18n --no-coverage",
+    "audit:barrels:client-safe": "node scripts/ci/detect-cross-feature-imports.mjs --verify-client-safe"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
