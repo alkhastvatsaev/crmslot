@@ -82,6 +82,9 @@ functions/lib/
 # Fichiers de dev / scratch (scripts de test manuels, pas du code prod)
 scratch.ts
 scratch/
+backups/
+scripts/dev/ram-*.sh
+scripts/dev/stop-dev-servers.sh
 
 # Photos de test (images téléchargées manuellement, pas du code)
 photos portes/
