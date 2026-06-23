@@ -222,7 +222,7 @@ export function getTechnicianMissionListSortAnchor(
 }
 
 /**
- * Lorsqu’IVANA confirme / envoie au technicien : figer une planification lisible par
+ * Lorsque le back-office confirme / envoie au technicien : figer une planification lisible par
  * {@link getScheduleAnchor} pour le filtre « jour » du hub (évite de rester sur
  * `createdAt` = jour de soumission si la validation a lieu plus tard).
  */

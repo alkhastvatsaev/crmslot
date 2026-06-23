@@ -38,7 +38,7 @@ Si cette PR touche `src/features/interventions/**` ou `src/app/api/interventions
 ## E2E (si parcours UI critique)
 
 - [ ] `npm run test:e2e` (serveur `localhost:3000` requis)
-- [ ] Facturation / IVANA : `npm run test:e2e:invoice`
+- [ ] Facturation / back-office : `npm run test:e2e:invoice`
 - [ ] Non concerné
 
 ## Captures / notes

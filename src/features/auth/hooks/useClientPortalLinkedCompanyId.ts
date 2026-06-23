@@ -7,7 +7,7 @@ import { clientPortalAuth, clientPortalFirestore, isConfigured } from "@/core/co
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
 import { isVerifiedClientPortalUser } from "@/features/auth/hooks/useClientPortalAccount";
 
-/** `companyId` du profil portail client — pour chat IVANA et demandes. */
+/** `companyId` du profil portail client — pour chat entreprise et demandes. */
 export function useClientPortalLinkedCompanyId(): string | null {
   const [companyId, setCompanyId] = useState<string | null>(null);
 

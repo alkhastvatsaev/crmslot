@@ -46,7 +46,7 @@ export type TechnicianBackofficeReportBridgeApi = {
     }[];
   }) => void;
   dismissReport: (localId: string) => void;
-  /** Réouverture terrain : retire le rapport de l’onglet Rapports IVANA. */
+  /** Réouverture terrain : retire le rapport de l’onglet Rapports back-office. */
   withdrawReportsForIntervention: (interventionId: string) => void;
 };
 

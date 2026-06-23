@@ -3,7 +3,7 @@ const CRM_PATTERNS: { re: RegExp; weight: number }[] = [
   { re: /quality|qualité|qualite|management|qm|kpi|performance|indicateur/i, weight: 3 },
   { re: /taux|clôture|cloture|annul|refus|retour|problème|probleme/i, weight: 3 },
   { re: /intervention|dossier|client|technicien|chantier/i, weight: 2 },
-  { re: /email|mail|courriel|communication|ivana|portail/i, weight: 2 },
+  { re: /email|mail|courriel|communication|back.?office|dispatch|portail/i, weight: 2 },
   { re: /commande|matériel|materiel|fournisseur|lecot/i, weight: 2 },
   { re: /résumé|resume|synthèse|synthese|semaine|mois|aujourd'hui/i, weight: 2 },
   { re: /statistique|combien|pourquoi|analyse|comparer|tendance/i, weight: 2 },

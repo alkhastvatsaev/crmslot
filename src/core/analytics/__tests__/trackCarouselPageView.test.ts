@@ -6,7 +6,7 @@ describe("carouselPageViewProps", () => {
     expect(props.page_index).toBe(0);
     expect(props.page_id).toBe("map");
     expect(props.page_title).toBe("Carte");
-    expect(props.profile_name).toBe("IVANA");
+    expect(props.profile_name).toBe("DISPATCH");
   });
 
   it("mappe l'index 3 vers facturation", () => {

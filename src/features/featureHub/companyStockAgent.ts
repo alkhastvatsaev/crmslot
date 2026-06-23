@@ -55,7 +55,7 @@ function handleIntent(
         intent,
         refused: true,
         reply:
-          "Je suis l'agent **Matériel** de votre société — stock, seuils, demandes terrain et commandes fournisseur uniquement. Pour facturation, planning, mails ou dossiers clients, utilisez l'assistant principal (page Ivana).",
+          "Je suis l'agent **Matériel** de votre société — stock, seuils, demandes terrain et commandes fournisseur uniquement. Pour facturation, planning, mails ou dossiers clients, utilisez l'assistant principal (carte / back-office).",
         suggestions: ["État du stock", "Articles en rupture", "Demandes technicien"],
       };
 
@@ -174,7 +174,7 @@ function handleIntent(
         intent,
         refused: false,
         reply:
-          "Pour commander chez Lecot : utilisez le bouton ✨ (autopilot) au centre, ou l'assistant Ivana avec le catalogue. Indiquez la référence ou le produit ; je peux d'abord chercher un article dans votre stock.",
+          "Pour commander chez Lecot : utilisez le bouton ✨ (autopilot) au centre, ou l'assistant principal avec le catalogue. Indiquez la référence ou le produit ; je peux d'abord chercher un article dans votre stock.",
         suggestions: ["Recherche lecot", "État du stock"],
       };
 

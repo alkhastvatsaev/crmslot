@@ -94,7 +94,7 @@ export function sortInterventionsByScheduleAsc(
 }
 
 /**
- * Dossier encore uniquement dans le file IVANA « Demandes » (soumission client),
+ * Dossier encore uniquement dans la file dispatch « Demandes » (soumission client),
  * avant validation / envoi terrain. {@link isInterventionReleasedToTechnicianField} est l’inverse.
  */
 export function isPendingIntakeStatus(status: Intervention["status"]): boolean {
@@ -115,7 +115,7 @@ export function isInterventionAwaitingTechnicianAcceptance(
 }
 
 /**
- * Onglet IVANA « Demandes » : nouvelles soumissions + dossiers revenus du terrain
+ * Onglet dispatch « Demandes » : nouvelles soumissions + dossiers revenus du terrain
  * (refus technicien ou acceptation jamais confirmée).
  */
 export function isInterventionInBackofficeRequestsQueue(

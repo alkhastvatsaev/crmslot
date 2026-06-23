@@ -3,7 +3,7 @@ import type { Intervention } from "@/features/interventions/types";
 import { matchesAssignedTechnician } from "@/features/interventions/technicianAssignmentActions";
 import { isInterventionReleasedToTechnicianField } from "@/features/interventions/technicianSchedule";
 
-/** Dossiers visibles par le technicien après le goulot IVANA + correspondance UID. */
+/** Dossiers visibles par le technicien après validation dispatch + correspondance UID. */
 export function filterInterventionsReleasedToTechnician(
   rows: Intervention[],
   technicianUid: string | null | undefined

@@ -64,8 +64,8 @@ export function useBackOfficeInboxReportActions({
           statusBefore: row.status,
           statusAfter: "invoiced",
           note: data.emailSent
-            ? "Validation rapport IVANA — facture PDF + e-mail client"
-            : "Validation rapport IVANA — facture PDF",
+            ? "Validation rapport back-office — facture PDF + e-mail client"
+            : "Validation rapport back-office — facture PDF",
         });
         if (data.emailError) {
           toast.message(String(t("backoffice.toasts.report_verified")), {
@@ -124,7 +124,7 @@ export function useBackOfficeInboxReportActions({
           iv: row,
           actorUid,
           actorRole: "dispatcher",
-          note: "Rapport archivé (inbox IVANA)",
+          note: "Rapport archivé (inbox dispatch)",
         });
         toast.success(t("backoffice.toasts.report_archived"));
         setSelectedItemId(null);

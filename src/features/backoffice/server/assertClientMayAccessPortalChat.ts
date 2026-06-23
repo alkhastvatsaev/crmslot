@@ -3,7 +3,7 @@ import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 type Gate = { allowed: true } | { allowed: false; status: number; error: string };
 
-/** Même périmètre que `canAccessIvanaPortalChatCompany` (règles Firestore). */
+/** Même périmètre que les règles Firestore portail client (`assertClientMayAccessPortalChat`). */
 export async function assertClientMayAccessPortalChat(
   db: admin.firestore.Firestore,
   uid: string,

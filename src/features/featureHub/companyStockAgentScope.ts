@@ -17,7 +17,7 @@ const OFF_TOPIC_PATTERNS: { re: RegExp; weight: number }[] = [
   { re: /email|mail|courriel|gmail|boîte\s+mail/i, weight: 4 },
   { re: /planning|planifier|assigner?\s+.*technicien|créneau|rdv|rendez-vous/i, weight: 4 },
   { re: /carte|mapbox|itinéraire|navigation/i, weight: 4 },
-  { re: /chat\s+client|portail\s+client|ivana|demande\s+client/i, weight: 3 },
+  { re: /chat\s+client|portail\s+client|back.?office|dispatch|demande\s+client/i, weight: 3 },
   { re: /statistique|chiffre\s+d'affaires|\bca\b|kpi\s+global/i, weight: 3 },
   { re: /crm|historique\s+crm/i, weight: 3 },
   { re: /intervention(?!.*mat)|dossier(?!.*mat)|client(?!.*mat)/i, weight: 2 },
@@ -62,21 +62,45 @@ const INTENT_RULES: { intent: CompanyStockAgentIntent; re: RegExp; priority: num
   { intent: "off_topic", re: /^$/, priority: 0 },
   { intent: "greeting", re: GREETING_RE, priority: 10 },
   { intent: "help", re: HELP_RE, priority: 9 },
-  { intent: "autopilot", re: /autopilot|régler\s+(?:le\s+)?stock|regler\s+(?:le\s+)?stock|tout\s+régler/i, priority: 8 },
+  {
+    intent: "autopilot",
+    re: /autopilot|régler\s+(?:le\s+)?stock|regler\s+(?:le\s+)?stock|tout\s+régler/i,
+    priority: 8,
+  },
   { intent: "lecot", re: /lecot|catalogue\s+fournisseur|commander\s+(?:chez|via)/i, priority: 8 },
   { intent: "add_item", re: /ajouter|créer|creer|nouveau\s+article|nouvelle\s+réf/i, priority: 7 },
-  { intent: "waiting_jobs", re: /chantier|intervention.*attente|waiting_material|attente\s+mat/i, priority: 7 },
-  { intent: "pending_orders", re: /demandes?|commandes?\s+(?:en\s+attente|terrain)|pending|bons?\s+mat|technicien.*mat|matériel\s+demand/i, priority: 7 },
-  { intent: "list_alerts", re: /alertes?|problème|probleme|urgent|priorité|priorite/i, priority: 6 },
-  { intent: "list_out", re: /rupture|épuisé|epuise|plus\s+en\s+stock|qty\s*0|quantité\s*0/i, priority: 6 },
+  {
+    intent: "waiting_jobs",
+    re: /chantier|intervention.*attente|waiting_material|attente\s+mat/i,
+    priority: 7,
+  },
+  {
+    intent: "pending_orders",
+    re: /demandes?|commandes?\s+(?:en\s+attente|terrain)|pending|bons?\s+mat|technicien.*mat|matériel\s+demand/i,
+    priority: 7,
+  },
+  {
+    intent: "list_alerts",
+    re: /alertes?|problème|probleme|urgent|priorité|priorite/i,
+    priority: 6,
+  },
+  {
+    intent: "list_out",
+    re: /rupture|épuisé|epuise|plus\s+en\s+stock|qty\s*0|quantité\s*0/i,
+    priority: 6,
+  },
   { intent: "list_low", re: /stock\s+bas|sous\s+(?:le\s+)?seuil|faible|bas\s+seuil/i, priority: 6 },
-  { intent: "summary", re: /résumé|resume|état|etat|situation|combien|vue\s+d'ensemble|synthèse|synthese|couverture/i, priority: 5 },
+  {
+    intent: "summary",
+    re: /résumé|resume|état|etat|situation|combien|vue\s+d'ensemble|synthèse|synthese|couverture/i,
+    priority: 5,
+  },
   { intent: "search", re: /.+/i, priority: 1 },
 ];
 
 export function classifyCompanyStockAgentIntent(
   text: string,
-  inScope: boolean,
+  inScope: boolean
 ): CompanyStockAgentIntent {
   if (!inScope) return "off_topic";
   const trimmed = text.trim();
@@ -102,7 +126,7 @@ export function extractStockSearchQuery(text: string): string {
   return text
     .replace(
       /^(?:cherche|chercher|trouve|trouver|recherche|où\s+est|ou\s+est|affiche|montre|liste)\s+/i,
-      "",
+      ""
     )
     .replace(/^(?:l['']|la|le|les|un|une|des)\s+/i, "")
     .trim();

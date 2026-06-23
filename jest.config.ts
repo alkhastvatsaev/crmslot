@@ -134,7 +134,7 @@ const config: Config = {
       functions: 100,
       lines: 80,
     },
-    // Facturation auto (terrain → IVANA)
+    // Facturation auto (terrain → back-office)
     "./src/features/interventions/draftInvoiceBilling.ts": {
       statements: 70,
       branches: 44,
