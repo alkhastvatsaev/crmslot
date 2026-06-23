@@ -36,7 +36,6 @@
     }
   },
   "admin_mobile": {
-    "full_crm_link": "Полная CRM",
     "offline_banner": "Нет сети — данные из кэша",
     "empty_missions": "Сегодня нет миссий"
   },

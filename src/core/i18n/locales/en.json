@@ -36,7 +36,6 @@
     }
   },
   "admin_mobile": {
-    "full_crm_link": "Full CRM",
     "offline_banner": "Offline — cached data",
     "empty_missions": "No missions today"
   },

@@ -36,7 +36,6 @@
     }
   },
   "admin_mobile": {
-    "full_crm_link": "Volledige CRM",
     "offline_banner": "Offline — gegevens in cache",
     "empty_missions": "Geen missies vandaag"
   },

@@ -7,10 +7,10 @@ jest.mock("@/features/map/components/MobileMapHubLite", () => ({
 }));
 
 describe("AdminMobileApp", () => {
-  it("monte la shell admin, la carte lite et le lien CRM complet", async () => {
+  it("monte la shell admin et la carte lite", async () => {
     render(<AdminMobileApp />);
     expect(screen.getByTestId("admin-mobile-app")).toBeInTheDocument();
     expect(await screen.findByTestId("mobile-map-hub-lite-stub")).toBeInTheDocument();
-    expect(screen.getByTestId("admin-mobile-full-crm-link")).toHaveAttribute("href", "/?fullCrm=1");
+    expect(screen.getByTestId("admin-mobile-shell-dock")).toBeInTheDocument();
   });
 });

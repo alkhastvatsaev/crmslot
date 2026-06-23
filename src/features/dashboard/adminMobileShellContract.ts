@@ -1,11 +1,10 @@
 /**
- * Contrat `/m/admin` — shell allégé, providers, redirect satellite.
+ * Contrat shell admin legacy (`AdminMobileShell` — tests) · `/m/admin` → redirect `/`.
  *
  *   npm run test:mobile-admin
  */
 export const ADMIN_MOBILE_SHELL_CONTRACT = {
-  route: "/m/admin",
-  fullCrmQueryParam: "fullCrm",
+  legacyRoute: "/m/admin",
   testIds: {
     app: "admin-mobile-app",
     headerRail: "admin-mobile-header-rail",
@@ -13,7 +12,6 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
     footerProfileDock: "admin-mobile-shell-dock",
     footer: "admin-mobile-shell-footer",
     dock: "admin-mobile-shell-dock",
-    fullCrmLink: "admin-mobile-full-crm-link",
     offlineBar: "admin-mobile-offline-bar",
     inboxLoading: "admin-mobile-inbox-loading",
   },
@@ -35,8 +33,6 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
       "AdminMobileOfflineBar",
       "MobileShellFooterDock",
       "MobileHubRailProvider",
-      "buildFullCrmMobileHref",
-      "admin-mobile-full-crm-link",
     ],
     "src/features/dashboard/components/AdminMobileShell.tsx": [
       "admin-mobile-app",
@@ -44,8 +40,8 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
       "MobileHubDotsBar",
       "data-admin-shell-dock",
     ],
-    "src/app/m/admin/page.tsx": ["AdminMobileApp"],
-    "src/app/page.tsx": ["ADMIN_MOBILE_APP_ROUTE", "prefersFullCrmOnMobile", "isCrmTenantAccount"],
+    "src/app/m/admin/page.tsx": ['redirect("/")'],
+    "src/app/page.tsx": ["MobileShell", "isTechnicianAccount", "isClientPortalAccount"],
   } as const,
   /** Providers desktop lourds — ne doivent pas apparaître dans AdminMobileProviders. */
   forbiddenProviderSnippets: [
