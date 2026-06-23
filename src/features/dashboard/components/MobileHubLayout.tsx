@@ -137,11 +137,10 @@ export default function MobileHubLayout({
 
   const innerClassFor = useCallback(
     (railKey: MobileHubRail) => {
-      if (panelPadding && sideScroll && railKey !== "center") {
+      if (sideScroll && railKey !== "center") {
         return `${MOBILE_HUB_PANEL_INNER_SCROLL_CLASS} mobile-hub-panel-inner--padded`;
       }
       if (panelPadding) return MOBILE_HUB_PANEL_INNER_PADDED_CLASS;
-      if (sideScroll && railKey !== "center") return MOBILE_HUB_PANEL_INNER_SCROLL_CLASS;
       return MOBILE_HUB_PANEL_INNER_CLASS;
     },
     [panelPadding, sideScroll]

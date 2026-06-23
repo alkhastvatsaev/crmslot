@@ -56,7 +56,7 @@ export default function ClientPortalAuthPanel(props: ClientPortalAuthPanelProps)
       data-testid="client-portal-container"
       data-auth-rail={authRailMode ? "true" : undefined}
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-5 pb-1 w-full",
+        "flex min-h-0 flex-1 flex-col gap-5 pb-1 w-full min-w-0",
         authRailMode ? "max-w-none" : "max-w-[440px] mx-auto"
       )}
     >

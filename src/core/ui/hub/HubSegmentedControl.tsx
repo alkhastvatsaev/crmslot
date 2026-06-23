@@ -103,7 +103,7 @@ export default function HubSegmentedControl({
             )}
           >
             {opt.icon}
-            <span className="whitespace-nowrap text-center">{opt.label}</span>
+            <span className="min-w-0 truncate text-center">{opt.label}</span>
             {showBadge ? (
               <span
                 className={cn(

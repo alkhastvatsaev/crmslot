@@ -1507,6 +1507,9 @@
       "view_pdf": "Factuur bekijken",
       "view_pdf_hint": "Open de PDF in dit tabblad",
       "download_storage": "PDF downloaden"
+    },
+    "requester": {
+      "guest": "Gast"
     }
   },
   "technician_lab": {

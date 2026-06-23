@@ -102,7 +102,7 @@ export default function CompanyHubPage() {
           logNote(`Espace société / ${id}`);
         }}
         ariaLabel={t("company_hub.right_tabs.aria")}
-        className="mx-4 mt-4 shrink-0"
+        className="shrink-0"
         options={[
           {
             id: "tracking",

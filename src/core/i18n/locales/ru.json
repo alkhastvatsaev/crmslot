@@ -1507,6 +1507,9 @@
       "view_pdf": "Открыть счёт",
       "view_pdf_hint": "Открыть PDF на этой вкладке",
       "download_storage": "Скачать PDF"
+    },
+    "requester": {
+      "guest": "Гость"
     }
   },
   "technician_lab": {
