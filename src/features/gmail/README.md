@@ -7,7 +7,11 @@ Hub Gmail carrousel (`GMAIL_HUB_SLOT_INDEX`, accès Spotlight). OAuth, lecture/e
 | Fichier                              | Rôle                             |
 | ------------------------------------ | -------------------------------- |
 | `components/GmailHubPage.tsx`        | Layout page (~136 lignes)        |
-| `hooks/useGmailHubPageController.ts` | Orchestrateur UI, OAuth, clavier |
+| `hooks/useGmailHubPageController.ts` | Orchestrateur hub (~230 lignes)  |
+| `hooks/useGmailHubCompose.ts`        | Rédaction / envoi / réponse      |
+| `hooks/useGmailHubReaderActions.ts`  | Star, archive, corbeille, labels |
+| `hooks/useGmailHubOAuthReturn.ts`    | Callback OAuth au retour URL     |
+| `hooks/useGmailHubAccountActions.ts` | Connexion / déconnexion Gmail    |
 | `useGmailHub.ts`                     | État API Gmail                   |
 | `hooks/useGmailHubPdfPreview.ts`     | Aperçu PDF inline                |
 
