@@ -44,3 +44,7 @@ export {
   writeAdminInboxInterventionsCache,
   splitInterventionsByCompanyIds,
 } from "@/features/offline/adminInboxInterventionsCache";
+export {
+  readAdminInterventionDetailCache,
+  writeAdminInterventionDetailCache,
+} from "@/features/offline/adminInterventionDetailCache";
