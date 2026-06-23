@@ -38,7 +38,3 @@ export {
 } from "@/features/gmail/gmailHubMappers";
 export { parseSenderName, parseSenderEmail } from "@/features/gmail/gmailSenderParse";
 export type { GmailLinkCandidate } from "@/features/gmail/useGmailHubLinkIntervention";
-
-// Modules consommés cross-feature (audit:barrels:public).
-export * from "@/features/gmail/gmailRouteCompany";
-export * from "@/features/gmail/renderPdfThumbnail";

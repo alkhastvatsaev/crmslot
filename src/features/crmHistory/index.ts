@@ -32,10 +32,3 @@ export {
 } from "@/features/crmHistory/components/crmHistoryEventDetailFormat";
 export { default as CrmHistoryPage } from "@/features/crmHistory/components/CrmHistoryPage";
 export { default as CrmHistoryGalaxyComposer } from "@/features/crmHistory/components/CrmHistoryGalaxyComposer";
-
-// Modules consommés cross-feature (audit:barrels:public).
-export * from "@/features/crmHistory/logCrmInterventionActionAdmin";
-export * from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
-export * from "@/features/crmHistory/crmActivityLog";
-export * from "@/features/crmHistory/crmHistoryAgentRouteHandler";
-export * from "@/features/crmHistory/logCrmFromChatbotTool";

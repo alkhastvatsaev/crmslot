@@ -17,6 +17,3 @@ export {
   applyBillingListFilters,
 } from "@/features/billingHub/filterBillingHub";
 export { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
-
-// Modules consommés cross-feature (audit:barrels:public).
-export * from "@/features/billingHub/billingHubAgentRouteHandler";

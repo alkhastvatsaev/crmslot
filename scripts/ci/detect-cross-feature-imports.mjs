@@ -18,6 +18,7 @@ const FEATURES = path.join(SRC, "features");
 
 const JSON_OUT = process.argv.includes("--json");
 const SUGGEST = process.argv.includes("--suggest");
+const VERIFY_CLIENT_SAFE = process.argv.includes("--verify-client-safe");
 const FEATURE = (process.argv.find((a) => a.startsWith("--feature=")) || "")
   .split("=")[1];
 
@@ -67,6 +68,70 @@ const features = fs
   .map((e) => e.name)
   .filter((n) => !FEATURE || n === FEATURE)
   .sort();
+
+
+function resolveAliasSpec(spec) {
+  if (!spec.startsWith("@/")) return null;
+  const rel = spec.slice(2);
+  const base = path.join(SRC, rel);
+  for (const ext of [".ts", ".tsx", "/index.ts", "/index.tsx"]) {
+    const candidate = base.endsWith(".ts") || base.endsWith(".tsx") ? base : base + ext;
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate;
+  }
+  return null;
+}
+
+function fileImportsFirebaseAdmin(filePath) {
+  const src = fs.readFileSync(filePath, "utf8");
+  return /from\s+["']firebase-admin/.test(src) || /import\s+["']firebase-admin/.test(src);
+}
+
+function isServerOnlyModule(featDir, mod) {
+  for (const ext of [".ts", ".tsx"]) {
+    const filePath = path.join(featDir, `${mod}${ext}`);
+    if (!fs.existsSync(filePath)) continue;
+    if (fileImportsFirebaseAdmin(filePath)) return true;
+    if (/Admin$/.test(mod) || /RouteHandler$/.test(mod)) return true;
+  }
+  for (const ext of [".ts", ".tsx"]) {
+    const serverPath = path.join(featDir, "server", `${mod}${ext}`);
+    if (fs.existsSync(serverPath)) return true;
+  }
+  return false;
+}
+
+function verifyClientBarrelsSafe(featureNames) {
+  const violations = [];
+  for (const feat of featureNames) {
+    const barrel = path.join(FEATURES, feat, "index.ts");
+    if (!fs.existsSync(barrel)) continue;
+    const src = fs.readFileSync(barrel, "utf8");
+    const re = /export\s+\*\s+from\s+["']([^"']+)["']/g;
+    let m;
+    while ((m = re.exec(src))) {
+      const resolved = resolveAliasSpec(m[1]);
+      if (resolved && fileImportsFirebaseAdmin(resolved)) {
+        violations.push({ feature: feat, spec: m[1], file: path.relative(ROOT, resolved) });
+      }
+    }
+  }
+  return violations;
+}
+
+if (VERIFY_CLIENT_SAFE) {
+  const violations = verifyClientBarrelsSafe(features);
+  if (violations.length === 0) {
+    console.log("OK Barrels client sans export firebase-admin.");
+    process.exit(0);
+  }
+  console.error(`Barrels client dangereux — ${violations.length} violation(s)
+`);
+  for (const v of violations) {
+    console.error(`  ${v.feature}/index.ts → ${v.spec} (${v.file})`);
+  }
+  console.error("\nDéplacer vers index.server.ts ; consommateurs API → index.server.");
+  process.exit(1);
+}
 
 const report = [];
 
@@ -118,7 +183,7 @@ for (const feat of features) {
   }
   publicModules.sort((a, b) => b.consumers - a.consumers);
 
-  const gaps = publicModules.filter((p) => !p.inBarrel);
+  const gaps = publicModules.filter((p) => !p.inBarrel && !isServerOnlyModule(featDir, p.module));
   if (gaps.length === 0 && publicModules.length === 0) continue;
 
   report.push({
@@ -151,9 +216,18 @@ for (const r of report) {
     console.log(`  - ${g.module}  (${g.consumers} consommateur(s))`);
   }
   if (SUGGEST) {
-    console.log(`\n  // À ajouter dans src/features/${r.feature}/index.ts :`);
+    const serverGaps = publicModules.filter(
+      (p) => !p.inBarrel && isServerOnlyModule(featDir, p.module),
+    );
+    console.log(`\n  // Client — src/features/${r.feature}/index.ts :`);
     for (const g of r.gaps) {
       console.log(`  export * from "@/features/${r.feature}/${g.module}";`);
+    }
+    if (serverGaps.length > 0) {
+      console.log(`\n  // Serveur — src/features/${r.feature}/index.server.ts :`);
+      for (const g of serverGaps) {
+        console.log(`  export * from "@/features/${r.feature}/${g.module}";`);
+      }
     }
   }
   console.log();

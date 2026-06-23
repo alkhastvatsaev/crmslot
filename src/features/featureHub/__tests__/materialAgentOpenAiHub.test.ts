@@ -7,7 +7,7 @@
 
 import type { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { readSseJsonLines } from "@/features/chatbot/testFixtures/readSseJsonLines";
-import { executeChatbotTool } from "@/features/chatbot";
+import { executeChatbotTool } from "@/features/chatbot/chatbot-tool-executor";
 import { handleMaterialAgentPost } from "@/features/featureHub/materialAgentRouteHandler";
 jest.mock("@/features/chatbot/chatbot-tool-executor", () => ({
   ...jest.requireActual("@/features/chatbot/chatbot-tool-executor"),
