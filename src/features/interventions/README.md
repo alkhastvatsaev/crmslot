@@ -12,6 +12,11 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `technicianScheduleVisibility.ts`                  | Filtres onglets / file back-office                          |
 | `technicianScheduleLabels.ts`                      | Libellés horaires et client                                 |
 | `hooks/useSmartForm.ts`                            | Orchestrateur wizard demande client (~220 lignes)           |
+| `components/SmartFormStep5Recap.tsx`               | Orchestrateur étape 5 récap (~95 lignes)                    |
+| `components/SmartFormRecapTiles.tsx`               | Tuiles contact / lieu / détail / vocal / créneau            |
+| `components/SmartFormRecapPhotosSheet.tsx`         | Bandeau photos + modal aperçu                               |
+| `components/SmartFormRecapActionBar.tsx`           | Urgence + envoi                                             |
+| `smartFormRecapStyles.ts`                          | Classes Tailwind partagées tuiles récap                     |
 | `smartFormDraftStorage.ts`                         | Brouillon localStorage + step initial                       |
 | `smartFormSubmit.ts`                               | Soumission Firestore + upload audio                         |
 | `hooks/useSmartFormDraftEffects.ts`                | Autosave, prefill, slots pris                               |
