@@ -112,12 +112,7 @@ export default function MobileHubLayout({
   const navigateLeft = useCallback(() => {
     if (availableRails.length <= 1) return;
     const next = stepMobileHubRail(availableRails, rail, "next");
-    if (
-      dockOnboarding?.swipeRightHintActive &&
-      rail === "center" &&
-      next === "right" &&
-      next !== rail
-    ) {
+    if (dockOnboarding?.swipeRightHintActive && rail === "center" && next === "right") {
       dockOnboarding.dismissSwipeRightHint();
     }
     pickRail(next);
@@ -126,12 +121,7 @@ export default function MobileHubLayout({
   const navigateRight = useCallback(() => {
     if (availableRails.length <= 1) return;
     const next = stepMobileHubRail(availableRails, rail, "prev");
-    if (
-      dockOnboarding?.swipeLeftHintActive &&
-      rail === "right" &&
-      next !== "right" &&
-      next !== rail
-    ) {
+    if (dockOnboarding?.swipeLeftHintActive && rail === "right" && next !== "right") {
       dockOnboarding.dismissSwipeLeftHint();
     }
     pickRail(next);
