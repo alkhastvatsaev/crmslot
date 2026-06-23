@@ -6,11 +6,7 @@
  * Mapping rails : `docs/agents/MOBILE_DESKTOP_PANELS.md`
  */
 
-import {
-  glassPanelShellClass,
-  PANEL_GLASS_BLUR_CLASS,
-  PANEL_GLASS_CLASS,
-} from "@/core/ui/glassPanelChrome";
+import { glassPanelShellClass } from "@/core/ui/glassPanelChrome";
 
 export const MOBILE_SHELL_PAD_X_PX = 16;
 
@@ -45,13 +41,12 @@ export const MOBILE_SHELL_FOOTER_CLASS = "mobile-shell-footer";
 export const MOBILE_GALAXY_DOCK_CLASS = "mobile-galaxy-dock";
 export const MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS = "mobile-galaxy-dock-chrome";
 
-/** Même chrome glass que desktop `dashboard-desktop-galaxy-dock-chrome panel-glass`. */
-export const MOBILE_GALAXY_DOCK_CHROME_CLASS = [
-  MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS,
-  PANEL_GLASS_CLASS,
-  PANEL_GLASS_BLUR_CLASS,
-  "bg-white/76",
-].join(" ");
+/**
+ * Coque dock footer — le chip `mobile-header-chip` porte le chrome visuel
+ * (identique au calendrier header). Pas de `.panel-glass` ici : évite le
+ * double calque ombre + blur iOS sous le pill profil.
+ */
+export const MOBILE_GALAXY_DOCK_CHROME_CLASS = MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS;
 
 /** Grille gouttière | contenu | gouttière (profil + galaxy). */
 export const MOBILE_SHELL_SLOT_GRID_CLASS = "mobile-shell-slot-grid";
