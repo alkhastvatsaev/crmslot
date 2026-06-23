@@ -1,278 +1,45 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { FileText, Loader2, Search, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
-import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
-  buildInterventionClientLabelMap,
-  buildSupplierOrderClientNameByOrderId,
-  buildSupplierOrderInterventionIdByOrderId,
-  resolveSupplierOrderListClientLabel,
-} from "@/features/chatbot/chatbotOrderClientLabels";
+  formatEur,
+  formatWhen,
+  supplierOrderTitle,
+} from "@/features/chatbot/chatbotDocumentsPanelHelpers";
+import { ChatbotDocumentTile } from "@/features/chatbot/components/ChatbotDocumentTile";
 import ChatbotPdfPreviewOverlay from "@/features/chatbot/components/ChatbotPdfPreviewOverlay";
-import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
-import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import {
-  documentCreatedAtMs,
-  filterChatbotInvoices,
-  filterChatbotSupplierOrders,
-  mergeChatbotDocumentsByCreatedAt,
-  parseDocumentsSearchQuery,
-} from "@/features/chatbot/filterChatbotDocuments";
-import {
-  invoiceTileKey,
-  supplierTileKey,
-  useChatbotDocumentTileThumbnails,
-} from "@/features/chatbot/hooks/useChatbotDocumentTileThumbnails";
+import { useChatbotDocumentsRightPanelController } from "@/features/chatbot/hooks/useChatbotDocumentsRightPanelController";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { SupplierOrder } from "@/features/suppliers/types";
-
-function formatEur(cents: number): string {
-  return `${(cents / 100).toLocaleString("fr-BE", { maximumFractionDigits: 0 })} €`;
-}
-
-function formatWhen(raw: unknown): string {
-  const ms = documentCreatedAtMs(raw);
-  if (!ms) return "";
-  return new Date(ms).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
-}
-
-function supplierOrderTitle(order: SupplierOrder): string {
-  const lines = order.lines ?? [];
-  const first = lines[0]?.label?.trim();
-  if (!first) return "Commande";
-  if (lines.length === 1) return first;
-  return first;
-}
-
-function resolveSelectedKey(preview: {
-  kind: string;
-  interventionId: string;
-  supplierOrderId?: string | null;
-  loading: boolean;
-  blobUrl: string | null;
-  error: string | null;
-}): string | null {
-  if (!preview.loading && !preview.blobUrl && !preview.error) return null;
-  if (preview.kind === "invoice" && preview.interventionId) {
-    return `invoice:${preview.interventionId}`;
-  }
-  if (preview.supplierOrderId) {
-    return `supplier:${preview.supplierOrderId}`;
-  }
-  if (preview.kind === "material_order" && preview.interventionId) {
-    return `material:${preview.interventionId}`;
-  }
-  return null;
-}
-
-type DocTileKind = "invoice" | "order";
-
-type DocumentTileProps = {
-  testId: string;
-  active: boolean;
-  disabled?: boolean;
-  kind: DocTileKind;
-  title: string;
-  subtitle?: string;
-  meta?: string;
-  thumbnailUrl?: string | null;
-  thumbnailLoading?: boolean;
-  onClick: () => void;
-};
-
-function DocumentTile({
-  testId,
-  active,
-  disabled,
-  kind,
-  title,
-  subtitle,
-  meta,
-  thumbnailUrl,
-  thumbnailLoading,
-  onClick,
-}: DocumentTileProps) {
-  const { t } = useTranslation();
-  return (
-    <button
-      type="button"
-      data-testid={testId}
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        "group relative aspect-square w-full overflow-hidden rounded-[18px] text-left",
-        "border border-black/[0.06] bg-white/55 backdrop-blur-[2px]",
-        "transition-[border-color,box-shadow,background-color] duration-300 ease-out",
-        "hover:border-black/[0.09] hover:bg-white/80 hover:shadow-[0_12px_32px_-20px_rgba(15,23,42,0.35)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15",
-        "disabled:pointer-events-none disabled:opacity-40",
-        active &&
-          "border-black/[0.1] bg-white shadow-[0_10px_28px_-18px_rgba(15,23,42,0.28)] ring-1 ring-inset ring-black/[0.06]"
-      )}
-    >
-      <div className="relative size-full overflow-hidden bg-slate-100/80">
-        {thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- miniature pdf.js
-          <img
-            data-testid={`${testId}-preview`}
-            src={thumbnailUrl}
-            alt=""
-            className="pointer-events-none absolute inset-0 size-full object-cover object-top"
-          />
-        ) : (
-          <span
-            className={cn(
-              "pointer-events-none absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2",
-              "text-slate-300/90 transition-colors duration-300 group-hover:text-slate-400/90",
-              active && "text-slate-400"
-            )}
-            aria-hidden
-          >
-            {thumbnailLoading ? (
-              <Loader2 className="h-7 w-7 animate-spin" strokeWidth={1.15} />
-            ) : (
-              <FileText className="h-7 w-7" strokeWidth={1.15} />
-            )}
-          </span>
-        )}
-        <span
-          className={cn(
-            "absolute left-2 top-2 rounded-md bg-white/90 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em] text-slate-500 shadow-sm",
-            active && "text-slate-600"
-          )}
-        >
-          {kind === "invoice"
-            ? String(t("chatbot.doc_badge_invoice"))
-            : String(t("chatbot.doc_badge_order"))}
-        </span>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] bg-gradient-to-t from-white/95 via-white/85 to-transparent px-2 pb-1.5 pt-6">
-        <span className="block truncate text-[12px] font-medium leading-tight tracking-[-0.02em] text-slate-800">
-          {title}
-        </span>
-        {subtitle ? (
-          <span className="mt-0.5 block truncate text-[10px] leading-tight text-slate-500">
-            {subtitle}
-          </span>
-        ) : null}
-        {meta ? (
-          <span className="mt-0.5 block truncate text-[10px] tabular-nums text-slate-400">
-            {meta}
-          </span>
-        ) : null}
-      </div>
-    </button>
-  );
-}
 
 /** Rail droit page 5 — liste plein écran ; PDF en overlay + fermeture. */
 export default function ChatbotDocumentsRightPanel() {
   const { t } = useTranslation();
   const {
     companyId,
-    chatbotInvoices,
     chatbotInvoicesLoading,
-    supplierOrders,
-    materialOrders,
-    workspaceSnapshot,
     documentPreview,
     openDocumentPreview,
     openSupplierOrderPdf,
     closeDocumentPreview,
-  } = useChatbotContext();
-
-  const workspace = useCompanyWorkspaceOptional();
-  const isMobile = useIsMobile();
-  const inboxIntent = useBackofficeInboxIntentOptional();
-  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
-  const interventionsCompanyId =
-    (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
-  const interventionsFirestoreEnabled =
-    isMobile !== true || (powerGate.inboxDataActive && powerGate.documentsTabActive);
-  const { interventions } = useBackOfficeInterventions(
-    interventionsFirestoreEnabled ? interventionsCompanyId : null
-  );
-
-  const clientLabelByInterventionId = useMemo(
-    () => buildInterventionClientLabelMap(chatbotInvoices, workspaceSnapshot, interventions),
-    [chatbotInvoices, workspaceSnapshot, interventions]
-  );
-
-  const orderInterventionIdByOrderId = useMemo(
-    () => buildSupplierOrderInterventionIdByOrderId(supplierOrders, materialOrders),
-    [supplierOrders, materialOrders]
-  );
-
-  const clientNameBySupplierOrderId = useMemo(
-    () => buildSupplierOrderClientNameByOrderId(supplierOrders, materialOrders),
-    [supplierOrders, materialOrders]
-  );
-
-  const invoiceClientLabel = useCallback(
-    (interventionId: string, fallback: string) =>
-      clientLabelByInterventionId.get(interventionId)?.trim() || fallback,
-    [clientLabelByInterventionId]
-  );
-
-  const supplierOrderClientLabel = useCallback(
-    (order: SupplierOrder) =>
-      resolveSupplierOrderListClientLabel(
-        order,
-        clientNameBySupplierOrderId,
-        orderInterventionIdByOrderId,
-        clientLabelByInterventionId
-      ),
-    [clientNameBySupplierOrderId, orderInterventionIdByOrderId, clientLabelByInterventionId]
-  );
-
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const selectedKey = resolveSelectedKey(documentPreview);
-  const previewOpen = isPreviewOverlayForTarget(documentPreview, "right");
-
-  const parsedSearch = useMemo(() => parseDocumentsSearchQuery(searchQuery), [searchQuery]);
-
-  const filteredInvoices = useMemo(
-    () => filterChatbotInvoices(chatbotInvoices, parsedSearch),
-    [chatbotInvoices, parsedSearch]
-  );
-
-  const filteredOrders = useMemo(
-    () => filterChatbotSupplierOrders(supplierOrders, parsedSearch),
-    [supplierOrders, parsedSearch]
-  );
-
-  const documentItems = useMemo(
-    () => mergeChatbotDocumentsByCreatedAt(filteredInvoices, filteredOrders),
-    [filteredInvoices, filteredOrders]
-  );
-
-  const docCount = documentItems.length;
-  const libraryCount = chatbotInvoices.length + supplierOrders.length;
-  const hasLibrary = libraryCount > 0;
-  const hasList = docCount > 0;
-  const showSearchNoResults =
-    parsedSearch.hasQuery && !chatbotInvoicesLoading && hasLibrary && !hasList;
-
-  const filteredInvoiceIds = useMemo(
-    () => filteredInvoices.map((row) => row.interventionId),
-    [filteredInvoices]
-  );
-  const filteredOrderIds = useMemo(() => filteredOrders.map((order) => order.id), [filteredOrders]);
-  const { thumbnails, thumbnailLoading } = useChatbotDocumentTileThumbnails(
-    companyId,
-    filteredInvoiceIds,
-    filteredOrderIds,
-    interventionsFirestoreEnabled
-  );
+    searchQuery,
+    setSearchQuery,
+    selectedKey,
+    previewOpen,
+    parsedSearch,
+    documentItems,
+    docCount,
+    libraryCount,
+    hasLibrary,
+    hasList,
+    showSearchNoResults,
+    thumbnails,
+    thumbnailLoading,
+    invoiceClientLabel,
+    supplierOrderClientLabel,
+    invoiceTileKey,
+    supplierTileKey,
+  } = useChatbotDocumentsRightPanelController();
 
   return (
     <div
@@ -344,7 +111,7 @@ export default function ChatbotDocumentsRightPanel() {
                   const key = `invoice:${row.interventionId}`;
                   return (
                     <li key={key} className="min-w-0">
-                      <DocumentTile
+                      <ChatbotDocumentTile
                         testId={`chatbot-document-invoice-${row.interventionId}`}
                         active={selectedKey === key}
                         kind="invoice"
@@ -365,7 +132,7 @@ export default function ChatbotDocumentsRightPanel() {
                 const key = `supplier:${order.id}`;
                 return (
                   <li key={key} className="min-w-0">
-                    <DocumentTile
+                    <ChatbotDocumentTile
                       testId={`chatbot-document-order-${order.id}`}
                       active={selectedKey === key}
                       disabled={!companyId}
