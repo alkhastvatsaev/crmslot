@@ -27,6 +27,7 @@ import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { useAccountRole } from "@/features/auth";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions";
+import { ADMIN_MOBILE_APP_ROUTE } from "@/features/dashboard/adminMobileAppConstants";
 
 const MapPageSlot = dynamic(() => import("@/features/map").then((m) => m.MapPageSlot), {
   ssr: false,
@@ -80,13 +81,14 @@ const PlanningHubPage = dynamic(() => import("@/features/planningHub/components/
   loading: () => null,
 });
 
-/** Dashboard admin — 9 pages · client `/m/demande` · terrain `/m/technician`. */
+/** Dashboard admin — 9 pages desktop · satellites `/m/admin` · `/m/demande` · `/m/technician`. */
 export default function Dashboard() {
   const isMobile = useIsMobile();
   const router = useRouter();
   const {
     isTechnicianAccount,
     isClientPortalAccount,
+    isCrmTenantAccount,
     isLoading: isAccountRoleLoading,
   } = useAccountRole();
 
@@ -94,12 +96,17 @@ export default function Dashboard() {
     !isAccountRoleLoading &&
     isMobile === true &&
     !isCapacitorNative() &&
-    (isTechnicianAccount || isClientPortalAccount);
+    (isTechnicianAccount || isClientPortalAccount || isCrmTenantAccount);
 
   useEffect(() => {
     if (!satelliteAppRedirectPending) return;
-    router.replace(isTechnicianAccount ? TECHNICIAN_MOBILE_APP_ROUTE : CLIENT_MOBILE_APP_ROUTE);
-  }, [satelliteAppRedirectPending, isTechnicianAccount, router]);
+    const route = isTechnicianAccount
+      ? TECHNICIAN_MOBILE_APP_ROUTE
+      : isClientPortalAccount
+        ? CLIENT_MOBILE_APP_ROUTE
+        : ADMIN_MOBILE_APP_ROUTE;
+    router.replace(route);
+  }, [satelliteAppRedirectPending, isTechnicianAccount, isClientPortalAccount, router]);
 
   const dashboardPages = useMemo(
     () => [
