@@ -62,6 +62,12 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `filterChatbotDocumentsParse.ts`                   | Normalisation + tokenisation requête               |
 | `filterChatbotDocumentsHaystack.ts`                | Haystack facture / bon fournisseur                 |
 | `filterChatbotDocumentsScore.ts`                   | Score fuzzy, filtre, tri, merge par date           |
+| `chatbot-gmail.ts`                                 | Barrel outils Gmail chatbot (~10 lignes)           |
+| `chatbot-gmail-shared.ts`                          | OAuth guard, parse expéditeur, accès intervention  |
+| `chatbot-gmail-inbox.ts`                           | Liste inbox + détail message                       |
+| `chatbot-gmail-intervention-links.ts`              | Scoring candidats liaison mail ↔ dossier           |
+| `chatbot-gmail-reply.ts`                           | Réponse fil Gmail (confirmation requise)           |
+| `chatbot-gmail-link.ts`                            | Événement timeline `gmail_link` Firestore          |
 
 ## Données
 
