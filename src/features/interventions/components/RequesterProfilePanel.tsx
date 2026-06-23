@@ -59,11 +59,12 @@ export default function RequesterProfilePanel() {
   };
 
   return (
-    <div data-testid="requester-profile-panel" className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
+    <div data-testid="requester-profile-panel" className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
         <HubSegmentedControl
           value={profile.type}
           onChange={(id) => handleTypeChange(id as RequesterType)}
+          layout="scroll"
           size="compact"
           className="shrink-0"
           options={[

@@ -1507,6 +1507,9 @@
       "view_pdf": "Voir la facture",
       "view_pdf_hint": "Ouvrir le PDF dans cet onglet",
       "download_storage": "Télécharger le PDF"
+    },
+    "requester": {
+      "guest": "Invité"
     }
   },
   "technician_lab": {

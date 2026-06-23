@@ -36,7 +36,7 @@ export default function ClientPortalAuthForm({
 
   return (
     <form
-      className="flex w-full flex-col gap-3"
+      className="flex w-full min-w-0 flex-col gap-3"
       autoComplete="off"
       onSubmit={(e) => e.preventDefault()}
     >

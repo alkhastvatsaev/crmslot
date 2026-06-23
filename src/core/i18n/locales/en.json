@@ -1507,6 +1507,9 @@
       "view_pdf": "View invoice",
       "view_pdf_hint": "Open the PDF in this tab",
       "download_storage": "Download PDF"
+    },
+    "requester": {
+      "guest": "Guest"
     }
   },
   "technician_lab": {
