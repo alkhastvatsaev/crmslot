@@ -50,6 +50,12 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `chatbot-tools-lecot-definitions.ts`               | Catalogue Lecot + commandes                        |
 | `chatbot-tools-stock-definitions.ts`               | Stock véhicule + focus inventaire                  |
 | `chatbot-tools-ai-definitions.ts`                  | Vision, clôture vocale, churn                      |
+| `chatbot-tool-executor.ts`                         | Barrel exécuteur outils (~45 lignes)               |
+| `chatbot-tool-executor-context.ts`                 | Contexte + garde-fous confirmation / admin         |
+| `chatbot-tool-executor-workspace.ts`               | Dispatch outils lecture workspace / CRM            |
+| `chatbot-tool-executor-orders-comms.ts`            | Dispatch commandes, Lecot, Gmail, inbox            |
+| `chatbot-tool-executor-intervention-tools.ts`      | Dispatch mutations dossier + stock véhicule        |
+| `chatbot-tool-executor-ai-tools.ts`                | Dispatch vision, voix, churn, exports              |
 | `chatbot-executor-queries.ts`                      | Barrel requêtes exécuteur (~35 lignes)             |
 | `chatbot-executor-db.ts`                           | `db()`, accès intervention, labels                 |
 | `chatbot-executor-workspace-queries.ts`            | Interventions, workspace, stats, facturation       |
@@ -87,7 +93,7 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 
 ## Pièges
 
-- Ajouter un outil = 4 fichiers : `chatbot-tools.ts`, `chatbot-tool-executor.ts`, `CHATBOT_WRITE_TOOLS`, `TOOL_LABELS`
+- Ajouter un outil = 4 fichiers : `chatbot-tools.ts`, `chatbot-tool-executor-*.ts` (domaine), `CHATBOT_WRITE_TOOLS`, `TOOL_LABELS`
 - Zero-token tools : `isChatbotZeroTokenUiTool`
 
 ## Tests
