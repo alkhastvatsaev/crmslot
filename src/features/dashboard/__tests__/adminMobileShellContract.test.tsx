@@ -31,9 +31,7 @@ function renderAdminShell(children: ReactNode = <div data-testid="admin-body">In
     <DateProvider>
       <DashboardPagerProvider pageCount={1}>
         <DashboardPageSelectorProvider>
-          <AdminMobileShell footer={<button type="button">Dock</button>}>
-            {children}
-          </AdminMobileShell>
+          <AdminMobileShell dock={<span>Dock</span>}>{children}</AdminMobileShell>
         </DashboardPageSelectorProvider>
       </DashboardPagerProvider>
     </DateProvider>

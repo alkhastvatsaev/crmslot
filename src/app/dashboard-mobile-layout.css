@@ -118,7 +118,7 @@
 /* ── Admin mobile shell (`/m/admin`) ──────────────────────── */
 
 /**
- * Shell admin mobile : header (calendrier + profil), body, footer dock.
+ * Shell admin mobile : calendrier (header) · panneaux centraux · profil/Galaxy (footer).
  * Hérite des variables `--mobile-*` et de `.mobile-shell` ; les règles ci-dessous
  * sont strictement scopées `.admin-mobile-app` pour ne pas affecter `/`.
  */
@@ -126,29 +126,15 @@
 .admin-mobile-app .admin-mobile-header-rail {
   display: flex;
   align-items: stretch;
-  gap: 0.5rem;
   height: 100%;
   width: 100%;
-}
-
-.admin-mobile-app [data-testid="admin-mobile-header-profile"] {
-  flex-shrink: 0;
-  height: 100%;
-  display: flex;
-  align-items: stretch;
-}
-
-.admin-mobile-app [data-testid="admin-mobile-header-profile"] .mobile-profile-chip {
-  width: auto;
-  min-width: 6rem;
-  max-width: 14rem;
-  padding-inline: 0.625rem;
 }
 
 .admin-mobile-app [data-testid="admin-mobile-header-calendar"] {
   border-radius: var(--mobile-panel-radius);
   background: rgb(248 250 252);
   overflow: hidden;
+  width: 100%;
 }
 
 .admin-mobile-app [data-testid="admin-mobile-shell-dock"] {
