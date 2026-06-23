@@ -34,14 +34,6 @@ export {
 export { readMaterialAgentStream } from "@/features/featureHub/materialAgentStream";
 export { useMaterialAgent } from "@/features/featureHub/hooks/useMaterialAgent";
 export {
-  MATERIAL_AGENT_TOOL_SCOPE,
-  handleMaterialAgentPost,
-} from "@/features/featureHub/materialAgentRouteHandler";
-export type {
-  MaterialAgentPostBody,
-  MaterialAgentRouteAuth,
-} from "@/features/featureHub/materialAgentRouteHandler";
-export {
   MATERIAL_AGENT_CLIENT_NAME_MARKER,
   MATERIAL_AGENT_ASK_CLIENT_NAME_TEXT,
   materialAgentAskClientNameAssistantContent,
@@ -79,3 +71,4 @@ export {
   computeCompanyStockMetrics,
 } from "@/features/featureHub/companyStockMetrics";
 export type { StockImageMap } from "@/features/featureHub/hooks/useCompanyStockImages";
+export { useCompanyStockImages } from "@/features/featureHub/hooks/useCompanyStockImages";
