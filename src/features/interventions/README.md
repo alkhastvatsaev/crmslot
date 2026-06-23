@@ -25,7 +25,11 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `components/RequesterStepTimeSlot.tsx`             | Étape créneau portail                                       |
 | `components/RequesterStepAddressSubmit.tsx`        | Étape adresse + envoi                                       |
 | `requesterInterventionStepMotion.ts`               | Variants Framer Motion steps                                |
-| `requesterInterventionFormSubmit.ts`               | Soumission Firestore portail client                         |
+| `requesterInterventionFormSubmit.ts`               | Orchestrateur soumission portail (~205 lignes)              |
+| `requesterInterventionSubmitValidation.ts`         | Validation pré-soumission portail                           |
+| `requesterInterventionSubmitQueries.ts`            | Déduplication + géocodage                                   |
+| `requesterInterventionSubmitPayload.ts`            | Champs client + payload Firestore                           |
+| `requesterInterventionSubmitBackground.ts`         | Audio async, alerte doublon, notify portal                  |
 | `requesterInterventionFormHelpers.ts`              | Auth anonyme + timeout géoloc                               |
 | `workflow/interventionWorkflow.ts`                 | Transitions statut                                          |
 | `assignInterventionToTechnician.ts`                | Assignation (seuil coverage P0 100 %)                       |
