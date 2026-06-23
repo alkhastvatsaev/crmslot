@@ -324,62 +324,56 @@
 
 /**
  * Étape 3 onboarding : swipe du panneau central (droite puis gauche).
+ * Droite sur le rail centre ; gauche une fois sur le rail droit. Validé au swipe.
  */
-.mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel],
-.mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel] {
-  position: relative;
+.mobile-hub-layout[data-mobile-hub-swipe-hint="right"],
+.mobile-hub-layout[data-mobile-hub-swipe-hint="left"] {
   overflow: visible;
 }
 
-.mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel]::before {
-  content: "";
+.mobile-hub-panel-stack {
+  overflow: visible;
+}
+
+.mobile-hub-swipe-hint {
   position: absolute;
-  top: 7%;
-  right: -0.5rem;
-  bottom: 7%;
-  width: 3.5rem;
-  z-index: 4;
+  top: 8%;
+  bottom: 8%;
+  width: 3.75rem;
+  z-index: 6;
   pointer-events: none;
   opacity: 0;
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse 100% 72% at 100% 50%,
-    rgb(59 130 246 / 0.42) 0%,
-    rgb(59 130 246 / 0.16) 46%,
-    transparent 74%
-  );
-  filter: blur(11px);
-  box-shadow: 10px 0 40px -10px rgb(37 99 235 / 0.34);
-  animation: mobile-dock-hint-spill-right 5.8s ease-in-out infinite;
+  filter: blur(12px);
   will-change: opacity, transform;
 }
 
-.mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel]::after {
-  content: "";
-  position: absolute;
-  top: 7%;
-  left: -0.5rem;
-  bottom: 7%;
-  width: 3.5rem;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0;
-  border-radius: 50%;
+.mobile-hub-swipe-hint--right {
+  right: -0.15rem;
   background: radial-gradient(
-    ellipse 100% 72% at 0% 50%,
-    rgb(59 130 246 / 0.42) 0%,
-    rgb(59 130 246 / 0.16) 46%,
+    ellipse 100% 72% at 100% 50%,
+    rgb(59 130 246 / 0.46) 0%,
+    rgb(59 130 246 / 0.18) 46%,
     transparent 74%
   );
-  filter: blur(11px);
-  box-shadow: -10px 0 40px -10px rgb(37 99 235 / 0.34);
+  box-shadow: 12px 0 44px -10px rgb(37 99 235 / 0.38);
+  animation: mobile-dock-hint-spill-right 5.8s ease-in-out infinite;
+}
+
+.mobile-hub-swipe-hint--left {
+  left: -0.15rem;
+  background: radial-gradient(
+    ellipse 100% 72% at 0% 50%,
+    rgb(59 130 246 / 0.46) 0%,
+    rgb(59 130 246 / 0.18) 46%,
+    transparent 74%
+  );
+  box-shadow: -12px 0 44px -10px rgb(37 99 235 / 0.38);
   animation: mobile-dock-hint-spill-left 5.8s ease-in-out infinite;
-  will-change: opacity, transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel]::before,
-  .mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel]::after {
+  .mobile-hub-swipe-hint {
     animation: none;
     opacity: 0;
   }
