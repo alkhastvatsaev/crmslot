@@ -8,8 +8,8 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
   testIds: {
     app: "admin-mobile-app",
     headerRail: "admin-mobile-header-rail",
-    headerCalendar: "admin-mobile-header-calendar",
-    footerProfileDock: "admin-mobile-shell-dock",
+    headerProfile: "admin-mobile-header-profile",
+    footerCalendar: "admin-mobile-footer-calendar",
     footer: "admin-mobile-shell-footer",
     dock: "admin-mobile-shell-dock",
     offlineBar: "admin-mobile-offline-bar",
@@ -36,7 +36,7 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
     ],
     "src/features/dashboard/components/AdminMobileShell.tsx": [
       "admin-mobile-app",
-      "admin-mobile-header-calendar",
+      "admin-mobile-header-profile",
       "MobileHubDotsBar",
       "data-admin-shell-dock",
     ],

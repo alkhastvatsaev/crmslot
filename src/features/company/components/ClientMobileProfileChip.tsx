@@ -4,7 +4,7 @@ import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAcc
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
-/** Profil demandeur — dock bas portail client. */
+/** Profil demandeur — dock haut portail client. */
 export default function ClientMobileProfileChip() {
   const { t } = useTranslation();
   const { fields } = useClientPortalAccount();

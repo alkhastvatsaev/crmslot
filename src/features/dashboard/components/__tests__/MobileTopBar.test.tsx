@@ -12,8 +12,23 @@ jest.mock("@/features/map/components/DashboardGalaxyLayer", () => ({
   default: () => null,
 }));
 
+jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
+  useCrmStaffAccountPanel: () => ({
+    fields: {
+      email: "admin@test.com",
+      firstName: "Jean",
+      lastName: "Dupont",
+      companyName: "Test Co",
+      roleLabel: "admin",
+    },
+    ready: true,
+    signingOut: false,
+    signOut: jest.fn(),
+  }),
+}));
+
 describe("MobileTopBar", () => {
-  it("affiche le calendrier fixe en header", () => {
+  it("affiche le profil fixe en header", () => {
     render(
       <DateProvider>
         <DashboardPagerProvider pageCount={3}>
@@ -24,19 +39,18 @@ describe("MobileTopBar", () => {
       </DateProvider>
     );
     expect(screen.getByTestId("mobile-top-bar")).toBeInTheDocument();
-    expect(screen.getByTestId("clock-calendar-toggle")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-header-rail")).toBeInTheDocument();
-    expect(screen.getByTestId("clock-calendar-widget")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-header-calendar")).toHaveAttribute(
+    expect(screen.getByTestId("mobile-header-profile-rail")).toBeInTheDocument();
+    expect(screen.getByTestId("admin-mobile-profile-chip")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-header-profile")).toHaveAttribute(
       "data-mobile-header-rail-active",
       "true"
     );
   });
 
-  it("toggle le sélecteur de pages au clic calendrier", () => {
+  it("toggle le panneau compte au clic profil", () => {
     function ToggleProbe() {
-      const { open } = useDashboardPageSelector();
-      return <div data-testid="selector-state">{open ? "open" : "closed"}</div>;
+      const { view } = useDashboardPageSelector();
+      return <div data-testid="account-state">{view === "account" ? "open" : "closed"}</div>;
     }
 
     render(
@@ -50,8 +64,8 @@ describe("MobileTopBar", () => {
       </DateProvider>
     );
 
-    expect(screen.getByTestId("selector-state")).toHaveTextContent("closed");
-    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
-    expect(screen.getByTestId("selector-state")).toHaveTextContent("open");
+    expect(screen.getByTestId("account-state")).toHaveTextContent("closed");
+    fireEvent.click(screen.getByTestId("admin-mobile-profile-chip"));
+    expect(screen.getByTestId("account-state")).toHaveTextContent("open");
   });
 });

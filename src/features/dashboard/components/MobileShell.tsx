@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import MobileTopBar from "@/features/dashboard/components/MobileTopBar";
+import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
@@ -49,6 +50,7 @@ export default function MobileShell({ pages }: Props) {
         </div>
 
         <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="mobile-shell-footer">
+          <MobileCalendarFooterBar />
           <MobileShellSlotGrid
             rootClassName={MOBILE_GALAXY_DOCK_CLASS}
             chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}

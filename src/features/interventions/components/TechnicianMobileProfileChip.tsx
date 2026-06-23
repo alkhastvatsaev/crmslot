@@ -10,7 +10,7 @@ import {
 } from "@/features/interventions/technicianMobileProfileLabel";
 import { cn } from "@/lib/utils";
 
-/** Profil technicien connecté — dock bas (remplace Galaxy temporairement). */
+/** Profil technicien connecté — dock haut. */
 export default function TechnicianMobileProfileChip() {
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
@@ -37,7 +37,7 @@ export default function TechnicianMobileProfileChip() {
       aria-expanded={accountOpen}
       disabled={!ready}
       onClick={() => {
-        dockOnboarding?.dismissFooterHint();
+        dockOnboarding?.dismissHeaderHint();
         pageSelector.toggleAccount();
       }}
     >

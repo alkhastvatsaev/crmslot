@@ -1,29 +1,22 @@
 "use client";
 
 import type { ReactNode } from "react";
-import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
-import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
+import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
+import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTopBar";
 import ClientMobileProfileChip from "@/features/company/components/ClientMobileProfileChip";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
-import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
-  MOBILE_GALAXY_DOCK_CHROME_CLASS,
-  MOBILE_GALAXY_DOCK_CLASS,
-  MOBILE_HEADER_RAIL_HOST_CLASS,
-  MOBILE_PROFILE_BAR_CHROME_CLASS,
-  MOBILE_PROFILE_BAR_CLASS,
   MOBILE_SHELL_BODY_CLASS,
   MOBILE_SHELL_CLASS,
   MOBILE_SHELL_FOOTER_CLASS,
   MOBILE_SHELL_HEADER_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
-import { cn } from "@/lib/utils";
 
 type Props = {
   children: ReactNode;
 };
 
-/** Shell portail client — calendrier (header) + profil dock (footer), hub unique. */
+/** Shell portail client — profil (header) + calendrier (footer), hub unique. */
 export default function ClientMobileShell({ children }: Props) {
   const dockHintAttrs = useMobileShellDockHintAttrs();
 
@@ -41,25 +34,13 @@ export default function ClientMobileShell({ children }: Props) {
       />
 
       <header className={MOBILE_SHELL_HEADER_CLASS}>
-        <MobileShellSlotGrid
-          rootClassName={MOBILE_PROFILE_BAR_CLASS}
-          chromeClassName={MOBILE_PROFILE_BAR_CHROME_CLASS}
-          data-testid="client-mobile-top-bar"
+        <MobileProfileTopBar
+          topBarTestId="client-mobile-top-bar"
+          railTestId="client-mobile-header-rail"
+          profileTestId="client-mobile-header-profile"
         >
-          <div
-            className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, "mobile-header-rail-host h-full w-full")}
-            data-testid="client-mobile-header-rail"
-          >
-            <div
-              data-testid="client-mobile-header-calendar"
-              data-mobile-header-rail="left"
-              data-mobile-header-rail-active="true"
-              className="mobile-header-rail-layer flex h-full w-full min-h-0 items-stretch"
-            >
-              <ClockCalendar compact interactive />
-            </div>
-          </div>
-        </MobileShellSlotGrid>
+          <ClientMobileProfileChip />
+        </MobileProfileTopBar>
       </header>
 
       <div className={`${MOBILE_SHELL_BODY_CLASS} min-h-0 flex-1`}>
@@ -67,13 +48,11 @@ export default function ClientMobileShell({ children }: Props) {
       </div>
 
       <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="client-mobile-shell-footer">
-        <MobileShellSlotGrid
-          rootClassName={MOBILE_GALAXY_DOCK_CLASS}
-          chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
-          data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
-        >
-          <ClientMobileProfileChip />
-        </MobileShellSlotGrid>
+        <MobileCalendarFooterBar
+          footerTestId="client-mobile-footer-calendar-bar"
+          railTestId="client-mobile-footer-calendar-rail"
+          calendarTestId="client-mobile-footer-calendar"
+        />
       </footer>
     </div>
   );
