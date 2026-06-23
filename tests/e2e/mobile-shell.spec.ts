@@ -17,6 +17,12 @@ const PWA_MANIFESTS: { path: string; start_url: string; id: string; short_name: 
     short_name: "Demande",
   },
   {
+    path: "/manifest-admin-mobile.json",
+    start_url: "/m/admin",
+    id: "/m/admin",
+    short_name: "Inbox",
+  },
+  {
     path: "/manifest-technician.json",
     start_url: "/m/technician",
     id: "/m/technician",
@@ -56,6 +62,7 @@ test.describe("Mobile shell (infra)", () => {
     const cases: { route: string; manifestPath: string }[] = [
       { route: "/", manifestPath: "/manifest.json" },
       { route: "/m/demande", manifestPath: "/manifest-demande.json" },
+      { route: "/m/admin", manifestPath: "/manifest-admin-mobile.json" },
       { route: "/m/technician", manifestPath: "/manifest-technician.json" },
     ];
 
@@ -64,5 +71,12 @@ test.describe("Mobile shell (infra)", () => {
       const manifestHref = await page.locator('link[rel="manifest"]').getAttribute("href");
       expect(manifestHref, route).toContain(manifestPath);
     }
+  });
+
+  test("/m/admin affiche la shell admin mobile", async ({ page }) => {
+    await page.goto("/m/admin");
+
+    await expect(page.getByTestId("admin-mobile-app")).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByTestId("admin-mobile-full-crm-link")).toBeVisible();
   });
 });
