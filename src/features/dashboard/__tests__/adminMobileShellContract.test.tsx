@@ -6,8 +6,13 @@ import { DateProvider } from "@/context/DateContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 import AdminMobileShell from "@/features/dashboard/components/AdminMobileShell";
+import * as mobileFooterGalaxyVisible from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { ADMIN_MOBILE_SHELL_CONTRACT } from "@/features/dashboard/adminMobileShellContract";
 import { MOBILE_SHELL_SLOT_GRID_CLASS } from "@/core/ui/dashboardMobileLayout";
+
+jest.mock("@/features/dashboard/hooks/useMobileFooterGalaxyVisible", () => ({
+  useMobileFooterGalaxyVisible: jest.fn(() => false),
+}));
 
 jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
   useCrmStaffAccountPanel: () => ({
@@ -62,6 +67,7 @@ describe("adminMobileShellContract — source guards", () => {
 
 describe("adminMobileShellContract — layout", () => {
   it("expose le shell admin avec header rail et footer dock", () => {
+    jest.mocked(mobileFooterGalaxyVisible.useMobileFooterGalaxyVisible).mockReturnValue(true);
     renderAdminShell();
     expect(screen.getByTestId(ADMIN_MOBILE_SHELL_CONTRACT.testIds.app)).toHaveClass(
       "admin-mobile-app"
