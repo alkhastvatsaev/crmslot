@@ -4,19 +4,21 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 
 ## Points d'entrée
 
-| Fichier                                     | Rôle                                                        |
-| ------------------------------------------- | ----------------------------------------------------------- |
-| `types.ts`                                  | Type `Intervention` — **import public #1** pour toute l'app |
-| `technicianSchedule.ts`                     | Filtres/tri missions (utilisé par map, backoffice, hubs)    |
-| `hooks/useSmartForm.ts`                     | Orchestrateur wizard demande client (~220 lignes)           |
-| `smartFormDraftStorage.ts`                  | Brouillon localStorage + step initial                       |
-| `smartFormSubmit.ts`                        | Soumission Firestore + upload audio                         |
-| `hooks/useSmartFormDraftEffects.ts`         | Autosave, prefill, slots pris                               |
-| `components/TechnicianFinishJobPanel.tsx`   | Wizard clôture terrain (~155 lignes)                        |
-| `hooks/useFinishJobWizard.ts`               | État photos / signature / facture                           |
-| `components/RequesterInterventionPanel.tsx` | Portail demandeur                                           |
-| `workflow/interventionWorkflow.ts`          | Transitions statut                                          |
-| `assignInterventionToTechnician.ts`         | Assignation (seuil coverage P0 100 %)                       |
+| Fichier                                   | Rôle                                                        |
+| ----------------------------------------- | ----------------------------------------------------------- |
+| `types.ts`                                | Type `Intervention` — **import public #1** pour toute l'app |
+| `technicianSchedule.ts`                   | Filtres/tri missions (utilisé par map, backoffice, hubs)    |
+| `hooks/useSmartForm.ts`                   | Orchestrateur wizard demande client (~220 lignes)           |
+| `smartFormDraftStorage.ts`                | Brouillon localStorage + step initial                       |
+| `smartFormSubmit.ts`                      | Soumission Firestore + upload audio                         |
+| `hooks/useSmartFormDraftEffects.ts`       | Autosave, prefill, slots pris                               |
+| `components/TechnicianFinishJobPanel.tsx` | Wizard clôture terrain (~155 lignes)                        |
+| `hooks/useFinishJobWizard.ts`             | État photos / signature / facture                           |
+| `hooks/useRequesterInterventionForm.ts`   | Portail demandeur (~195 lignes)                             |
+| `requesterInterventionFormSubmit.ts`      | Soumission Firestore portail client                         |
+| `requesterInterventionFormHelpers.ts`     | Auth anonyme + timeout géoloc                               |
+| `workflow/interventionWorkflow.ts`        | Transitions statut                                          |
+| `assignInterventionToTechnician.ts`       | Assignation (seuil coverage P0 100 %)                       |
 
 ## Données
 
