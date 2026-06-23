@@ -40,3 +40,8 @@ export {
   LOCKSMITH_STOCK_SEED_CATALOG,
   locksmithStockCatalogRows,
 } from "@/features/catalog/locksmithStockSeedCatalog";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/catalog/lecotProductImageResolve";
+export * from "@/features/catalog/resolveLecotProductImage";
+export * from "@/features/catalog/useLecotProductSearch";

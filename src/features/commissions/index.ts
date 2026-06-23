@@ -41,3 +41,7 @@ export { CommissionDashboard } from "@/features/commissions/components/Commissio
 export { useCommissionDashboardController } from "@/features/commissions/hooks/useCommissionDashboardController";
 export { default as InterventionCommissionPanel } from "@/features/commissions/components/InterventionCommissionPanel";
 export { default as InterventionInvoiceAmountField } from "@/features/commissions/components/InterventionInvoiceAmountField";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/commissions/commissionDefaults";
+export * from "@/features/commissions/commissionRuleMatching";
