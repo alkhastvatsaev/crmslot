@@ -30,7 +30,7 @@ describe("DashboardAccountPanel", () => {
     expect(screen.getByTestId("dashboard-account-last-name")).toHaveTextContent("Dupont");
     expect(screen.getByTestId("dashboard-account-email")).toHaveTextContent("test@example.com");
     expect(screen.getByTestId("dashboard-account-company")).toHaveTextContent("ABC");
-    expect(screen.getByTestId("dashboard-account-role")).toHaveTextContent("Administrateur");
+    expect(screen.getByTestId("dashboard-account-role")).toHaveTextContent("ADMIN");
     expect(screen.getByTestId("dashboard-account-signout")).toBeInTheDocument();
   });
 

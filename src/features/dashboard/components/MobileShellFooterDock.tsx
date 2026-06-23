@@ -53,11 +53,7 @@ export default function MobileShellFooterDock() {
         />
       ) : null}
       {showHubComposer ? hubComposer : null}
-      {showProfileOverlay ? (
-        <div className="absolute inset-0 z-10 flex min-h-0 items-stretch bg-white/95">
-          <AdminMobileProfileChip />
-        </div>
-      ) : null}
+      {showProfileOverlay ? <AdminMobileProfileChip /> : null}
     </div>
   );
 }

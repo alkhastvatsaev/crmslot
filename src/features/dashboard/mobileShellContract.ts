@@ -16,7 +16,7 @@ export const MOBILE_SHELL_CONTRACT = {
     profileBarClass: "mobile-profile-bar",
     profileBarChromeClass: "mobile-profile-bar-chrome",
     galaxyDockClass: "mobile-galaxy-dock",
-    galaxyDockChromeClass: "mobile-galaxy-dock-chrome",
+    galaxyDockChromeClass: "mobile-galaxy-dock-chrome panel-glass",
     profileChipClass: "mobile-profile-chip",
     galaxyHeightCssVar: "--mobile-galaxy-height",
     stackGapCssVar: "--mobile-stack-gap",
