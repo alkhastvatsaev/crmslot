@@ -2506,7 +2506,9 @@
     "reply_thanks": "Graag gedaan! Aarzel niet als u andere vragen heeft.",
     "reply_default": "Bedankt voor uw bericht. De dispatcher is op de hoogte en neemt snel contact met u op. U kunt ook een verzoek indienen via de bedrijfsruimte.",
     "connecting": "Verbinden met chat…",
-    "company_unconfigured": "Chat niet beschikbaar: portaalbedrijf is niet geconfigureerd."
+    "company_unconfigured": "Chat niet beschikbaar: portaalbedrijf is niet geconfigureerd.",
+    "profile_sync_failed": "Chat openen mislukt. Probeer het zo meteen opnieuw.",
+    "profile_permission_denied": "Chat niet beschikbaar: ontbrekende Firestore-rechten. Een beheerder moet acceptsPublicInterventions op het bedrijf inschakelen en de regels deployen."
   },
   "copilot": {
     "aria": {

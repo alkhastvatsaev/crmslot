@@ -69,6 +69,10 @@ service cloud.firestore {
             && get(/databases/$(database)/documents/allowed_users/$(request.auth.token.phone_number)).data.portalCompanyId == companyId
           )
           || (
+            get(/databases/$(database)/documents/allowed_users/$(request.auth.token.phone_number)).data.keys().hasAny(['portalChatCompanyId'])
+            && get(/databases/$(database)/documents/allowed_users/$(request.auth.token.phone_number)).data.portalChatCompanyId == companyId
+          )
+          || (
             get(/databases/$(database)/documents/allowed_users/$(request.auth.token.phone_number)).data.keys().hasAny(['ivanaChatCompanyId'])
             && get(/databases/$(database)/documents/allowed_users/$(request.auth.token.phone_number)).data.ivanaChatCompanyId == companyId
           )

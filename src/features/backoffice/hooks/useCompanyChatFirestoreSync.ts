@@ -10,7 +10,7 @@ import {
 import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
 import { toast } from "sonner";
-import { logger } from "@/core/logger";
+import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
 import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
 import {
@@ -79,7 +79,12 @@ export function useCompanyChatFirestoreSync(
         logger.error("[CompanyChatPanel] Firestore chat", {
           error: err instanceof Error ? err.message : String(err),
         });
-        toast.error("Chat", { description: err.message });
+        const description = isFirestorePermissionDenied(err)
+          ? t("chat.profile_permission_denied")
+          : err instanceof Error
+            ? err.message
+            : t("chat.toast_send_failed");
+        toast.error("Chat", { description: String(description) });
       }
     );
     return unsub;
