@@ -44,19 +44,18 @@ jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
 }));
 
 describe("TechnicianMobileApp", () => {
-  it("monte la shell terrain avec calendrier, hub et dock profil", () => {
+  it("monte la shell terrain avec profil header, hub et calendrier footer", () => {
     render(<TechnicianMobileApp />);
     expect(screen.getByTestId("technician-mobile-app")).toBeInTheDocument();
-    expect(screen.getByTestId("technician-mobile-header-calendar")).toBeInTheDocument();
-    expect(screen.queryByTestId("technician-mobile-header-profile")).not.toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-header-profile")).toBeInTheDocument();
+    expect(screen.getByTestId("technician-mobile-footer-calendar")).toBeInTheDocument();
     expect(screen.getByTestId("technician-hub-slot-0")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-shell-footer")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-shell-galaxy")).toBeInTheDocument();
     expect(screen.getByTestId("technician-mobile-profile-chip")).toBeInTheDocument();
     expect(screen.queryByTestId("technician-galaxy-layer")).not.toBeInTheDocument();
   });
 
-  it("clic profil dock ouvre le panneau compte avec déconnexion", () => {
+  it("clic profil header ouvre le panneau compte avec déconnexion", () => {
     render(<TechnicianMobileApp />);
 
     expect(screen.getByTestId("technician-profile-first-name")).toHaveTextContent("Jean");

@@ -13,14 +13,14 @@ jest.mock("@/features/company/components/ClientMobileProfileChip", () => ({
 }));
 
 describe("ClientMobileApp", () => {
-  it("monte la shell client avec calendrier, hub et profil footer", () => {
+  it("monte la shell client avec profil header, hub et calendrier footer", () => {
     render(<ClientMobileApp />);
     expect(screen.getByTestId("client-mobile-app")).toBeInTheDocument();
-    expect(screen.getByTestId("client-mobile-header-calendar")).toBeInTheDocument();
+    expect(screen.getByTestId("client-mobile-header-profile")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-page-0")).toBeInTheDocument();
     expect(screen.getByTestId("company-hub-page-mock")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-shell-footer")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-shell-galaxy")).toBeInTheDocument();
+    expect(screen.getByTestId("client-mobile-footer-calendar")).toBeInTheDocument();
     expect(screen.getByTestId("client-mobile-profile-chip")).toBeInTheDocument();
   });
 });
