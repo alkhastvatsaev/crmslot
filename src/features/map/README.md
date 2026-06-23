@@ -14,6 +14,11 @@ Carte Mapbox (slot 0 du DashboardPager) : missions dispatch/terrain, markers, ro
 | `hooks/useMapMissionMarkers.ts`                 | Sync markers DOM                                                      |
 | `components/MapboxViewDesktopLayout.tsx`        | Layout 3 colonnes desktop                                             |
 | `components/DashboardGalaxyLayer.tsx`           | Overlay galaxy + bridge chatbot                                       |
+| `components/MapTranscriptionActionsPanel.tsx`   | Panneau création intervention depuis audio                            |
+| `hooks/useMapTranscriptionActionsController.ts` | Orchestrateur actions transcription (~105 lignes)                     |
+| `hooks/useMapTranscriptionActionsPoll.ts`       | Polling `/api/ai/latest-audio` ou clip scopé                          |
+| `hooks/useMapTranscriptionActionsRailRect.ts`   | Alignement panneau édition sur rail gauche                            |
+| `hooks/useMapTranscriptionActionsCreate.ts`     | Refus + création intervention (API / fallback Firestore)              |
 | `components/MapTranscriptionOverlay.tsx`        | Orchestrateur calque transcription (~35 lignes)                       |
 | `hooks/useMapTranscriptionOverlayController.ts` | Polling API + révélation texte/audio                                  |
 | `components/MapTranscriptionOverlayView.tsx`    | Scrim + texte + fermeture                                             |
