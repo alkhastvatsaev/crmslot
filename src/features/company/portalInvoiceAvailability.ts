@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 /** Facture visible côté client (back-office a saisi la facturation ou PDF finalisé). */
 export function isPortalInvoiceAvailable(

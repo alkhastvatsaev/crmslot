@@ -5,7 +5,7 @@ import {
   buildBackofficeAssignPatch,
   canApplyBackofficeTechnicianAssignment,
 } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";

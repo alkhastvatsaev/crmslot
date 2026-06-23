@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type ChatbotBillingLine = {
   description: string;
@@ -13,12 +13,16 @@ export function billingLinesTotalCents(lines: ChatbotBillingLine[]): number {
 
 export function parseUnitPriceCents(input: Record<string, unknown>): number | null {
   if (input.unitPriceCents != null) {
-    const clean = String(input.unitPriceCents).replace(/,/g, ".").replace(/[^0-9.-]/g, "");
+    const clean = String(input.unitPriceCents)
+      .replace(/,/g, ".")
+      .replace(/[^0-9.-]/g, "");
     const val = Number(clean);
     if (clean && Number.isFinite(val) && !isNaN(val)) return Math.round(val);
   }
   if (input.unitPriceEur != null) {
-    const clean = String(input.unitPriceEur).replace(/,/g, ".").replace(/[^0-9.-]/g, "");
+    const clean = String(input.unitPriceEur)
+      .replace(/,/g, ".")
+      .replace(/[^0-9.-]/g, "");
     const val = Number(clean);
     if (clean && Number.isFinite(val) && !isNaN(val)) return Math.round(val * 100);
   }
@@ -33,10 +37,13 @@ export function applyBillingLinePatch(
     unitPriceCents?: number | null;
     quantity?: number;
     description?: string;
-  },
+  }
 ): ChatbotBillingLine[] {
   const idx = Math.max(0, patch.lineIndex ?? 0);
-  const lines = existing.length > 0 ? [...existing] : [{ description: "Prestation", quantity: 1, unitPriceCents: 0 }];
+  const lines =
+    existing.length > 0
+      ? [...existing]
+      : [{ description: "Prestation", quantity: 1, unitPriceCents: 0 }];
 
   while (lines.length <= idx) {
     lines.push({ description: "Prestation", quantity: 1, unitPriceCents: 0 });
@@ -83,7 +90,7 @@ export function normalizeBillingLinesFromFirestore(raw: unknown): ChatbotBilling
 export function interventionForPdf(
   data: Record<string, unknown>,
   billingLines: ChatbotBillingLine[],
-  totalCents: number,
+  totalCents: number
 ): Intervention {
   const clientName =
     typeof data.clientName === "string" && data.clientName.trim()
@@ -92,7 +99,10 @@ export function interventionForPdf(
   return {
     id: String(data.id || ""),
     title: typeof data.title === "string" ? data.title : "",
-    ...(data as Omit<Intervention, "id" | "title" | "clientName" | "billingLines" | "invoiceAmountCents">),
+    ...(data as Omit<
+      Intervention,
+      "id" | "title" | "clientName" | "billingLines" | "invoiceAmountCents"
+    >),
     clientName: clientName ?? undefined,
     billingLines,
     invoiceAmountCents: totalCents,

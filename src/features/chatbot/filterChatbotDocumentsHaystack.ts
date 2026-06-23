@@ -1,6 +1,6 @@
 import type { ChatbotInvoiceRow } from "@/features/chatbot/chatbotInvoiceRows";
 import { normalizeDocumentSearchText } from "@/features/chatbot/filterChatbotDocumentsParse";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 import { SUPPLIER_ORDER_STATUS_LABELS } from "@/features/suppliers/types";
 
 function formatAmountHaystack(cents: number): string {

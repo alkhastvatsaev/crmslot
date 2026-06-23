@@ -8,7 +8,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
 
 export default function BackOfficeInboxChatTab({

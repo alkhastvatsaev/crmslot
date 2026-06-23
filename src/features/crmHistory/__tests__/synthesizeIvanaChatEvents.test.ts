@@ -1,6 +1,6 @@
 import { synthesizeIvanaChatEvents } from "@/features/crmHistory/synthesizeIvanaChatEvents";
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { IvanaPortalChatDoc } from "@/features/backoffice";
+import type { Intervention } from "@/features/interventions";
 
 describe("synthesizeIvanaChatEvents", () => {
   it("maps staff chat to ivana_chat_message", () => {

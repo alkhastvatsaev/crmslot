@@ -4,8 +4,8 @@ import {
   CHURN_RISK_LABELS,
   type ChurnRiskLevel,
 } from "@/features/clients/contractChurnRisk";
-import type { MaintenanceContract } from "@/features/maintenance/types";
-import type { Intervention } from "@/features/interventions/types";
+import type { MaintenanceContract } from "@/features/maintenance";
+import type { Intervention } from "@/features/interventions";
 
 const NOW = new Date("2026-06-11T12:00:00Z");
 

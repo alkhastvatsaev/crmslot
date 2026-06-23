@@ -7,9 +7,9 @@ import {
   resolveSupplierOrderListClientLabel,
 } from "@/features/chatbot/chatbotOrderClientLabels";
 import { MATERIAL_ORDER_CLIENT_FALLBACK } from "@/features/materials/materialOrderClientName";
-import type { Intervention } from "@/features/interventions/types";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { Intervention } from "@/features/interventions";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 
 const intervention: Intervention = {
   id: "iv-dupont-42",
@@ -61,8 +61,8 @@ describe("chatbotOrderClientLabels", () => {
         orderWithoutIv.id,
         orderWithoutIv.interventionId,
         orderToIv,
-        labels,
-      ),
+        labels
+      )
     ).toMatch(/Dupont/i);
   });
 
@@ -83,14 +83,9 @@ describe("chatbotOrderClientLabels", () => {
     const byId = buildSupplierOrderClientNameByOrderId([orderWithoutName], [material]);
     const ivMap = buildInterventionClientLabelMap([], null, []);
     const ivByOrder = buildSupplierOrderInterventionIdByOrderId([orderWithoutName], [material]);
-    expect(
-      resolveSupplierOrderListClientLabel(
-        orderWithoutName,
-        byId,
-        ivByOrder,
-        ivMap,
-      ),
-    ).toBe("Dupont depuis bon matériel");
+    expect(resolveSupplierOrderListClientLabel(orderWithoutName, byId, ivByOrder, ivMap)).toBe(
+      "Dupont depuis bon matériel"
+    );
   });
 
   it("resolveOrderListClientLabel prefers stored name then intervention then fallback", () => {
@@ -101,7 +96,16 @@ describe("chatbotOrderClientLabels", () => {
 
   it("prefers invoice label over snapshot for same intervention", () => {
     const map = buildInterventionClientLabelMap(
-      [{ interventionId: "iv-1", clientLabel: "Dupont", status: "invoiced", totalCents: 0, invoicedAt: null, problem: null }],
+      [
+        {
+          interventionId: "iv-1",
+          clientLabel: "Dupont",
+          status: "invoiced",
+          totalCents: 0,
+          invoicedAt: null,
+          problem: null,
+        },
+      ],
       {
         generatedAt: "",
         locale: "fr",
@@ -119,9 +123,25 @@ describe("chatbotOrderClientLabels", () => {
           navigatorOnline: true,
         },
         clients: [],
-        interventions: [{ id: "iv-1", title: "", status: "pending", clientName: "Autre", address: null, problem: null, scheduled: null, paymentStatus: null, invoiceAmountEur: null, urgency: false, hasAudio: false, hasInvoicePdf: false, clientEmail: null }],
+        interventions: [
+          {
+            id: "iv-1",
+            title: "",
+            status: "pending",
+            clientName: "Autre",
+            address: null,
+            problem: null,
+            scheduled: null,
+            paymentStatus: null,
+            invoiceAmountEur: null,
+            urgency: false,
+            hasAudio: false,
+            hasInvoicePdf: false,
+            clientEmail: null,
+          },
+        ],
       },
-      [],
+      []
     );
     expect(resolveSupplierOrderClientLabel("ord-x", "iv-1", new Map(), map)).toBe("Dupont");
   });

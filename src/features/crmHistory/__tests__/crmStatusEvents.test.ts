@@ -1,8 +1,5 @@
-import {
-  dedupeCrmEvents,
-  statusEventToCrmEvent,
-} from "@/features/crmHistory/crmStatusEvents";
-import type { Intervention } from "@/features/interventions/types";
+import { dedupeCrmEvents, statusEventToCrmEvent } from "@/features/crmHistory/crmStatusEvents";
+import type { Intervention } from "@/features/interventions";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 
 const iv: Intervention = {
@@ -43,7 +40,7 @@ describe("statusEventToCrmEvent", () => {
         actorRole: "technician",
         at: "2024-01-15T12:00:00Z",
       },
-      new Map([["iv1", iv]]),
+      new Map([["iv1", iv]])
     )!;
     const coarse = {
       id: "iv1:status",

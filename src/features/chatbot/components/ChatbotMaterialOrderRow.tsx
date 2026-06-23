@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { formatWhenShort } from "@/features/chatbot/chatbotOrderListFormat";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { MaterialOrderDoc } from "@/features/materials";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

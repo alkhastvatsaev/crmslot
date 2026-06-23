@@ -5,7 +5,7 @@ import { Loader2, Plus, Search } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   STUB_CATALOG,
   catalogLineFromProduct,
@@ -30,15 +30,15 @@ export default function ProductQuickAddBar({ intervention, onAddLine }: Props) {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const category = intervention.category?.trim() || undefined;
-  const { products: remoteProducts, loading, error } = useLecotProductSearch(
-    query,
-    enabled,
-    { category, companyId: companyId || undefined },
-  );
+  const {
+    products: remoteProducts,
+    loading,
+    error,
+  } = useLecotProductSearch(query, enabled, { category, companyId: companyId || undefined });
 
   const localProducts = useMemo(
     () => filterCatalogForIntervention(LOCAL_CATALOG, intervention),
-    [intervention],
+    [intervention]
   );
 
   const filtered = useMemo(() => {
@@ -77,9 +77,15 @@ export default function ProductQuickAddBar({ intervention, onAddLine }: Props) {
         </p>
       ) : null}
 
-      <ul className="flex max-h-36 flex-col gap-1 overflow-y-auto" data-testid="product-quick-add-results">
+      <ul
+        className="flex max-h-36 flex-col gap-1 overflow-y-auto"
+        data-testid="product-quick-add-results"
+      >
         {filtered.length === 0 && query.trim().length >= 2 && !loading ? (
-          <li data-testid="product-quick-add-empty" className="px-2 py-2 text-center text-sm text-slate-500">
+          <li
+            data-testid="product-quick-add-empty"
+            className="px-2 py-2 text-center text-sm text-slate-500"
+          >
             {t("catalog.no_results")}
           </li>
         ) : (

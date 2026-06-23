@@ -1,7 +1,7 @@
 import { logger } from "@/core/logger";
 import { featureFlagsFromEnv } from "@/core/featureFlags";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { findApplicableRules } from "@/features/notifications/statusNotificationRules";
 import {
   channelAllowed,

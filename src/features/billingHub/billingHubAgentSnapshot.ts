@@ -2,18 +2,18 @@ import {
   interventionBillingTotalCents,
   type BillingHubMetrics,
 } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function buildBillingHubSnapshot(
   interventions: Intervention[],
-  metrics: BillingHubMetrics,
+  metrics: BillingHubMetrics
 ): string | null {
   try {
     const urgent = interventions
       .filter(
         (iv) =>
           (iv.paymentStatus === "unpaid" || !iv.paymentStatus) &&
-          interventionBillingTotalCents(iv) > 0,
+          interventionBillingTotalCents(iv) > 0
       )
       .slice(0, 12)
       .map((iv) => ({

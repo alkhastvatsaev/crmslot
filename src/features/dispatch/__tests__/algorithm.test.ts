@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { findBestTechnician } from "@/features/dispatch/algorithm";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 const mockFetch = jest.fn();
 
@@ -8,10 +8,7 @@ jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: (...args: unknown[]) => mockFetch(...args),
 }));
 
-function tech(
-  id: string,
-  opts: Partial<Technician> = {},
-): Technician {
+function tech(id: string, opts: Partial<Technician> = {}): Technician {
   return {
     id,
     name: `Tech ${id}`,
@@ -50,7 +47,7 @@ describe("findBestTechnician", () => {
     const result = await findBestTechnician(
       [tech("a", { status: "on_site" }), tech("b", { status: "en_route" })],
       50.85,
-      4.35,
+      4.35
     );
     expect(result).toBeNull();
   });
@@ -59,17 +56,13 @@ describe("findBestTechnician", () => {
     const result = await findBestTechnician(
       [tech("a", { location: { lat: NaN, lng: 4.35 } })],
       50.85,
-      4.35,
+      4.35
     );
     expect(result).toBeNull();
   });
 
   it("returns null when technician has no authUid (canResolveTechnicianAssignUid fails)", async () => {
-    const result = await findBestTechnician(
-      [tech("a", { authUid: undefined })],
-      50.85,
-      4.35,
-    );
+    const result = await findBestTechnician([tech("a", { authUid: undefined })], 50.85, 4.35);
     expect(result).toBeNull();
   });
 
@@ -82,7 +75,7 @@ describe("findBestTechnician", () => {
     const result = await findBestTechnician(
       [tech("tech-a"), tech("tech-b", { location: { lat: 50.9, lng: 4.4 } })],
       50.85,
-      4.35,
+      4.35
     );
 
     expect(result?.technician.id).toBe("tech-b");
@@ -98,7 +91,7 @@ describe("findBestTechnician", () => {
     const result = await findBestTechnician(
       [tech("tech-a"), tech("tech-b", { location: { lat: 50.9, lng: 4.4 } })],
       50.85,
-      4.35,
+      4.35
     );
 
     expect(result?.technician.id).toBe("tech-a");
@@ -118,7 +111,7 @@ describe("findBestTechnician", () => {
         tech("tech-near", { location: { lat: 50.851, lng: 4.351 } }),
       ],
       50.85,
-      4.35,
+      4.35
     );
 
     expect(result?.technician.id).toBe("tech-near");
@@ -138,7 +131,7 @@ describe("findBestTechnician", () => {
       4.35,
       null,
       null,
-      ["alarme"],
+      ["alarme"]
     );
 
     // unskilled shouldn't be passed to AI; result should be skilled
@@ -148,7 +141,7 @@ describe("findBestTechnician", () => {
   it("considers only top 3 technicians for maps+AI calls", async () => {
     // 5 available technicians — only top 3 get maps/AI calls
     const technicians = Array.from({ length: 5 }, (_, i) =>
-      tech(`t${i}`, { location: { lat: 50.85 + i * 0.01, lng: 4.35 + i * 0.01 } }),
+      tech(`t${i}`, { location: { lat: 50.85 + i * 0.01, lng: 4.35 + i * 0.01 } })
     );
 
     mockFetch.mockResolvedValue(mapsOk(100));

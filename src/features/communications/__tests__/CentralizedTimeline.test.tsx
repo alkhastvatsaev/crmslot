@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
 import { CentralizedTimeline } from "@/features/communications/components/CentralizedTimeline";
-import type { InterventionEvent } from "@/features/interventions/types";
+import type { InterventionEvent } from "@/features/interventions";
 
 const sampleEvents: InterventionEvent[] = [
   {
@@ -64,7 +64,7 @@ describe("CentralizedTimeline", () => {
             visibility: "internal",
           },
         ]}
-      />,
+      />
     );
     expect(screen.getByTestId("timeline-event-commission-commission-a1")).toBeInTheDocument();
     expect(screen.getByText(/42\.50/)).toBeInTheDocument();

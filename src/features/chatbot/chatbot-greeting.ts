@@ -1,4 +1,4 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 /** Normalise le texte utilisateur (emoji, espaces) avant détection d'intent local. */
 export function normalizeChatbotUserText(text: string): string {

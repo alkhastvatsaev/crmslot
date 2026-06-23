@@ -11,7 +11,7 @@ import {
   interventionBillingTotalCents,
 } from "@/features/billingHub/billingHubMetrics";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const BILLING_GRID_MIN_SLOTS = 9;
 

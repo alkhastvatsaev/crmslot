@@ -3,7 +3,7 @@
  * All factories accept a Partial override so tests only specify what they care about.
  */
 
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 let _seq = 0;
 const seq = () => String(++_seq).padStart(3, "0");
@@ -13,7 +13,7 @@ const seq = () => String(++_seq).padStart(3, "0");
 // ---------------------------------------------------------------------------
 
 export function makeIntervention(
-  partial: Partial<Intervention> & { id?: string } = {},
+  partial: Partial<Intervention> & { id?: string } = {}
 ): Intervention {
   const id = partial.id ?? `iv-${seq()}`;
   return {
@@ -31,7 +31,7 @@ export function makeIntervention(
 
 /** Shorthand: assigned to a technician, scheduled for today. */
 export function makeAssignedIntervention(
-  partial: Partial<Intervention> & { id?: string } = {},
+  partial: Partial<Intervention> & { id?: string } = {}
 ): Intervention {
   return makeIntervention({
     status: "assigned",
@@ -44,7 +44,7 @@ export function makeAssignedIntervention(
 
 /** Shorthand: completed intervention with billing. */
 export function makeDoneIntervention(
-  partial: Partial<Intervention> & { id?: string } = {},
+  partial: Partial<Intervention> & { id?: string } = {}
 ): Intervention {
   return makeIntervention({
     status: "done",

@@ -1,7 +1,7 @@
 /** @jest-environment node */
 
 import { autoAssignBestTechnicianAdmin } from "@/features/dispatch/server/autoAssignBestTechnicianAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const mockApply = jest.fn();
 

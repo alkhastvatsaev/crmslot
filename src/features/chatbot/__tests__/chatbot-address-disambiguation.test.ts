@@ -10,7 +10,7 @@ import {
   resolveNumericInterventionChoice,
   shouldAutoPreviewInvoiceInPanel,
 } from "@/features/chatbot/chatbot-address-disambiguation";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 const snapshot: WorkspaceCopilotSnapshot = {
   generatedAt: "2026-05-18T10:00:00Z",
@@ -119,7 +119,7 @@ describe("chatbot-address-disambiguation", () => {
       findClientQueryFromConversation([
         { role: "user", content: "facture monsieur vatsaev" },
         { role: "assistant", content: "1. test" },
-      ]),
+      ])
     ).toMatch(/vatsaev/i);
   });
 
@@ -132,7 +132,7 @@ describe("chatbot-address-disambiguation", () => {
         { role: "user", content: "facture monsieur vatsaev" },
         { role: "assistant", content: assistant },
       ],
-      null,
+      null
     );
     expect(choice?.interventionId).toBe("iv-2");
   });
@@ -145,7 +145,7 @@ describe("chatbot-address-disambiguation", () => {
         { role: "user", content: "facture monsieur vatsaev" },
         { role: "assistant", content: disambiguationAssistant },
       ],
-      null,
+      null
     );
     expect(choice?.interventionId).toBe("iv-2");
   });
@@ -153,8 +153,8 @@ describe("chatbot-address-disambiguation", () => {
   it("should auto-preview when invoice already exists", () => {
     expect(
       shouldAutoPreviewInvoiceInPanel(
-        "La facture pour l'intervention de Monsieur Vatsaev à la Rue de la Fourche 9 est déjà créée avec un total de 350 €.",
-      ),
+        "La facture pour l'intervention de Monsieur Vatsaev à la Rue de la Fourche 9 est déjà créée avec un total de 350 €."
+      )
     ).toBe(true);
   });
 
@@ -182,7 +182,7 @@ describe("chatbot-address-disambiguation", () => {
     const id = extractInterventionIdFromInvoiceReply(
       "Facture pour Monsieur Vatsaev — Rue de la Fourche 9, 1000 Bruxelles — total 350 €.",
       snapshot,
-      [{ role: "user", content: "facture monsieur vatsaev" }],
+      [{ role: "user", content: "facture monsieur vatsaev" }]
     );
     expect(id).toBe("iv-2");
   });
@@ -191,5 +191,4 @@ describe("chatbot-address-disambiguation", () => {
     const choice = resolveNumericInterventionChoice("2", snapshot, [], ["iv-a", "iv-b"]);
     expect(choice?.interventionId).toBe("iv-b");
   });
-
 });

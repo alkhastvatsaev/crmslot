@@ -1,7 +1,7 @@
 /** @jest-environment node */
 
 import { createInterventionPaymentIntentAdmin } from "@/features/billing/server/createInterventionPaymentIntentAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(partial: Partial<Intervention> = {}): Intervention {
   return {

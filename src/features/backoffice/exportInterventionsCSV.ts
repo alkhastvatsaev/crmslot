@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 // ---------------------------------------------------------------------------
 // CSV Export for Interventions
@@ -45,15 +45,13 @@ function centsToEuros(cents: number | null | undefined): string {
 
 export function interventionsToCSV(
   interventions: Intervention[],
-  technicianNames?: Record<string, string>,
+  technicianNames?: Record<string, string>
 ): string {
   const rows: string[][] = [CSV_HEADERS as unknown as string[]];
 
   for (const iv of interventions) {
     const clientName =
-      [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") ||
-      iv.clientName ||
-      "";
+      [iv.clientFirstName, iv.clientLastName].filter(Boolean).join(" ") || iv.clientName || "";
 
     rows.push([
       iv.id,
@@ -100,7 +98,7 @@ export function downloadCSV(csv: string, filename: string): void {
  */
 export function exportInterventionsCSV(
   interventions: Intervention[],
-  technicianNames?: Record<string, string>,
+  technicianNames?: Record<string, string>
 ): void {
   const csv = interventionsToCSV(interventions, technicianNames);
   const date = new Date().toISOString().slice(0, 10);

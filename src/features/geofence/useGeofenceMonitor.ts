@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { ARRIVAL_RADIUS_METERS } from "./geofenceConstants";
 import { haversineMeters } from "./geofenceUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { watchNativePosition } from "@/core/native/nativeGeolocation";
 

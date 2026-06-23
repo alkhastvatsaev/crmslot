@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   selectedItem: Intervention;

@@ -7,7 +7,7 @@ import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
 import { formatCrmFeedTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   event: CrmActivityEvent;

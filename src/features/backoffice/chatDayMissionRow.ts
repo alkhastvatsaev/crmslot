@@ -1,14 +1,14 @@
 import type { CompanyWorkspaceApi } from "@/context/CompanyWorkspaceContext";
 import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
 import { missionStableKey } from "@/features/map/missionStableKey";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   formatScheduledTimeOnly,
   interventionClientLabel,
   interventionMatchesTab,
   isInterventionReleasedToTechnicianField,
 } from "@/features/interventions/technicianSchedule";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Mission } from "@/features/map";
 import { sortChatDayRows } from "@/features/backoffice/portalChatInboxLogic";
 
 /** Une ligne client pour le picker chat (jour en tête, puis historique). */

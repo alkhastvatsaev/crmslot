@@ -2,8 +2,8 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import CompanyStockOrdersTrackPanel from "@/features/featureHub/components/CompanyStockOrdersTrackPanel";
 import { updateMaterialOrderStatus } from "@/features/materials/materialOrderFirestore";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 import { toast } from "sonner";
 
 jest.mock("sonner", () => ({

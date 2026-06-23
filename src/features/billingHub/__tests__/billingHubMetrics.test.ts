@@ -2,7 +2,7 @@ import {
   computeBillingHubMetrics,
   interventionBillingTotalCents,
 } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(partial: Partial<Intervention> & { id: string }): Intervention {
   return {
@@ -16,8 +16,12 @@ describe("interventionBillingTotalCents", () => {
   it("prefers invoiceAmountCents when set", () => {
     expect(
       interventionBillingTotalCents(
-        iv({ id: "a", invoiceAmountCents: 12_500, billingLines: [{ description: "", quantity: 1, unitPriceCents: 1 }] }),
-      ),
+        iv({
+          id: "a",
+          invoiceAmountCents: 12_500,
+          billingLines: [{ description: "", quantity: 1, unitPriceCents: 1 }],
+        })
+      )
     ).toBe(12_500);
   });
 
@@ -30,8 +34,8 @@ describe("interventionBillingTotalCents", () => {
             { description: "", quantity: 2, unitPriceCents: 1000 },
             { description: "", quantity: 1, unitPriceCents: 500 },
           ],
-        }),
-      ),
+        })
+      )
     ).toBe(2500);
   });
 });
@@ -39,9 +43,21 @@ describe("interventionBillingTotalCents", () => {
 describe("computeBillingHubMetrics", () => {
   it("counts unpaid, pending, paid and to_bill", () => {
     const rows = [
-      iv({ id: "1", paymentStatus: "unpaid", billingLines: [{ description: "", quantity: 1, unitPriceCents: 1000 }] }),
-      iv({ id: "2", paymentStatus: "pending", billingLines: [{ description: "", quantity: 1, unitPriceCents: 2000 }] }),
-      iv({ id: "3", paymentStatus: "paid", billingLines: [{ description: "", quantity: 1, unitPriceCents: 3000 }] }),
+      iv({
+        id: "1",
+        paymentStatus: "unpaid",
+        billingLines: [{ description: "", quantity: 1, unitPriceCents: 1000 }],
+      }),
+      iv({
+        id: "2",
+        paymentStatus: "pending",
+        billingLines: [{ description: "", quantity: 1, unitPriceCents: 2000 }],
+      }),
+      iv({
+        id: "3",
+        paymentStatus: "paid",
+        billingLines: [{ description: "", quantity: 1, unitPriceCents: 3000 }],
+      }),
       iv({ id: "4", paymentStatus: "unpaid", billingLines: [] }),
     ];
     const m = computeBillingHubMetrics(rows);

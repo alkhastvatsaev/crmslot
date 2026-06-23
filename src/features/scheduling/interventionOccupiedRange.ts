@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { getInterventionScheduledRange } from "@/features/calendar/interventionScheduleRange";
 import {
   SCHEDULING_BLOCKING_STATUSES,

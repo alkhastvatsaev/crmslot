@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { localDayKeyFromParts } from "@/features/calendar/calendarGrid";
 
 export default function InterventionCalendarMonthGrid({

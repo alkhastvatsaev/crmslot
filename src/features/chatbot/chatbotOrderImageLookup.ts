@@ -1,10 +1,10 @@
-import type { LecotImageLookupInput } from "@/features/catalog/lecotProductImageTypes";
+import type { LecotImageLookupInput } from "@/features/catalog";
 import {
   matchStockCatalogImageLookup,
   resolveOrderLineImageLookup,
 } from "@/features/catalog/matchStockCatalogImageLookup";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder, SupplierOrderLine } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder, SupplierOrderLine } from "@/features/suppliers";
 
 export type ChatbotOrderImageLookup = LecotImageLookupInput & {
   orderId: string;

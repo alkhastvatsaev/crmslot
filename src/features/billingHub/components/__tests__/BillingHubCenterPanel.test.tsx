@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import BillingHubCenterPanel from "@/features/billingHub/components/BillingHubCenterPanel";
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(partial: Partial<Intervention> & Pick<Intervention, "id">): Intervention {
   return {

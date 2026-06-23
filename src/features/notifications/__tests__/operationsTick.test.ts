@@ -3,7 +3,7 @@ import {
   findUnpaidInvoices,
   LATE_THRESHOLD_MIN,
 } from "@/features/notifications/operationsTick";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const baseIv = (overrides: Partial<Intervention> = {}): Intervention =>
   ({

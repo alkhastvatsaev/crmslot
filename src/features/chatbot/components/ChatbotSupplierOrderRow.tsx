@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { formatWhenShort, isOpenSupplierOrder } from "@/features/chatbot/chatbotOrderListFormat";
 import SupplierOrderDemoProgress from "@/features/chatbot/components/SupplierOrderDemoProgress";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

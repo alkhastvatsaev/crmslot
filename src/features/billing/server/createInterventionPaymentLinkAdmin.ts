@@ -3,7 +3,7 @@ import type * as admin from "firebase-admin";
 import Stripe from "stripe";
 import { resolvePublicAppBaseUrl } from "@/core/config/publicAppUrl";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type CreateInterventionPaymentLinkResult = {
   url: string | null;

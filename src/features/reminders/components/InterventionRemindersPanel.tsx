@@ -7,7 +7,7 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { openBackofficeIntervention } from "@/features/backoffice/openBackofficeIntervention";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
 
 type Props = {
@@ -24,7 +24,10 @@ export default function InterventionRemindersPanel({ interventions }: Props) {
   if (!enabled || reminders.length === 0) return null;
 
   return (
-    <section data-testid="intervention-reminders-panel" className="rounded-xl border border-amber-100 bg-amber-50/80 p-3">
+    <section
+      data-testid="intervention-reminders-panel"
+      className="rounded-xl border border-amber-100 bg-amber-50/80 p-3"
+    >
       <p className="mb-2 text-xs font-bold uppercase text-amber-800">{t("reminders.title")}</p>
       <ul className="space-y-1">
         {reminders.map((r) => (

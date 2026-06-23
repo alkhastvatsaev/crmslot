@@ -1,8 +1,8 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 /** Snapshot minimal pour tests chatbot (Vatsaev, 3 adresses, pas de fiche CRM). */
 export function buildChatbotTestSnapshot(
-  overrides?: Partial<WorkspaceCopilotSnapshot>,
+  overrides?: Partial<WorkspaceCopilotSnapshot>
 ): WorkspaceCopilotSnapshot {
   return {
     generatedAt: "2026-05-18T10:00:00Z",

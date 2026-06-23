@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type InterventionReminder = {
   id: string;
@@ -12,7 +12,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function buildInterventionReminders(
   interventions: Intervention[],
-  nowMs = Date.now(),
+  nowMs = Date.now()
 ): InterventionReminder[] {
   const out: InterventionReminder[] = [];
 

@@ -1,6 +1,6 @@
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export type ChatbotPwaRegistry = {
   supplierOrders: SupplierOrder[];
@@ -12,7 +12,7 @@ export type FetchChatbotPwaRegistryResult =
   | { ok: false; status: number; message: string };
 
 export async function fetchChatbotPwaRegistry(
-  companyId: string,
+  companyId: string
 ): Promise<FetchChatbotPwaRegistryResult> {
   const cid = companyId.trim();
   if (!cid) {

@@ -6,7 +6,7 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import { trackProductEvent } from "@/core/analytics/productAnalytics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = { interventions: Intervention[] };
 

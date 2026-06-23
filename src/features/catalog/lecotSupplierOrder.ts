@@ -5,7 +5,7 @@ import {
   type LecotGuestInfo,
 } from "@/features/catalog/lecotPlaywrightScraper";
 import { loadLecotGuestInfo } from "@/features/catalog/lecotGuestInfoFromFirestore";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 export type LecotSupplierOrderResult =
   | { ok: true; source: "api"; orderId?: string }

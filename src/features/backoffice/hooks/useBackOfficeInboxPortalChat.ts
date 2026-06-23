@@ -15,8 +15,8 @@ import {
 } from "@/features/backoffice/portalChatInboxLogic";
 import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
-import type { Mission } from "@/features/map/missionTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Mission } from "@/features/map";
+import type { Intervention } from "@/features/interventions";
 
 type PortalChatArgs = {
   dayMissions?: Mission[];

@@ -5,7 +5,7 @@ import { GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
 import { SCHEDULING_WORK_SLOTS } from "@/features/scheduling/schedulingConstants";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
@@ -42,9 +42,9 @@ export default function ScheduleDragBoard({
         (iv) =>
           isInterventionPendingBackOfficeIntake(iv) &&
           !iv.assignedTechnicianUid?.trim() &&
-          iv.id !== excludeInterventionId,
+          iv.id !== excludeInterventionId
       ),
-    [interventions, excludeInterventionId],
+    [interventions, excludeInterventionId]
   );
 
   const freeSlots = useMemo(() => {
@@ -67,7 +67,10 @@ export default function ScheduleDragBoard({
   };
 
   return (
-    <section data-testid="schedule-drag-board" className="rounded-[14px] border border-blue-100 bg-blue-50/40 p-3">
+    <section
+      data-testid="schedule-drag-board"
+      className="rounded-[14px] border border-blue-100 bg-blue-50/40 p-3"
+    >
       <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-blue-800">
         {t("scheduling.drag_board.title")}
       </p>
@@ -102,7 +105,9 @@ export default function ScheduleDragBoard({
 
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <p className="mb-1 text-xs font-semibold text-slate-600">{t("scheduling.drag_board.unassigned")}</p>
+          <p className="mb-1 text-xs font-semibold text-slate-600">
+            {t("scheduling.drag_board.unassigned")}
+          </p>
           <ul className="max-h-36 space-y-1 overflow-y-auto" data-testid="schedule-drag-sources">
             {unassigned.length === 0 ? (
               <li className="text-xs text-slate-500">{t("scheduling.drag_board.no_unassigned")}</li>
@@ -128,7 +133,9 @@ export default function ScheduleDragBoard({
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-semibold text-slate-600">{t("scheduling.drag_board.drop_slots")}</p>
+          <p className="mb-1 text-xs font-semibold text-slate-600">
+            {t("scheduling.drag_board.drop_slots")}
+          </p>
           <div className="flex flex-wrap gap-1.5" data-testid="schedule-drag-slots">
             {SCHEDULING_WORK_SLOTS.map((time) => {
               const free = freeSlots.includes(time);
@@ -154,7 +161,7 @@ export default function ScheduleDragBoard({
                       ? active
                         ? "border-emerald-600 bg-emerald-600 text-white"
                         : "border-emerald-200 bg-white text-emerald-800"
-                      : "border-slate-100 bg-slate-100 text-slate-400",
+                      : "border-slate-100 bg-slate-100 text-slate-400"
                   )}
                 >
                   {time}

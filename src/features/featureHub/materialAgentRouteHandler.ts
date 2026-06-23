@@ -3,8 +3,8 @@ import { resolveChatbotConversationContext } from "@/features/chatbot/chatbot-co
 import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildMaterialAgentSystemPrompt } from "@/features/featureHub/materialAgentSystemPrompt";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import type { CompanyRole } from "@/features/company/types";
+import type { ChatbotToolContext } from "@/features/chatbot";
+import type { CompanyRole } from "@/features/company";
 import { MATERIAL_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
 import { parseInterventionMaterialOrderIntent } from "@/features/materials/interventionMaterialOrderPrompt";
 

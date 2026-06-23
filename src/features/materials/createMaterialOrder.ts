@@ -1,6 +1,6 @@
 import type { Firestore } from "firebase/firestore";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
 import { createMaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
@@ -74,11 +74,7 @@ export async function createMaterialOrder(params: CreateMaterialOrderParams): Pr
     });
   }
 
-  if (
-    setWaitingMaterial &&
-    intervention.status === "in_progress" &&
-    partsRequested.length > 0
-  ) {
+  if (setWaitingMaterial && intervention.status === "in_progress" && partsRequested.length > 0) {
     await transitionInterventionStatus({
       db,
       interventionId: intervention.id,

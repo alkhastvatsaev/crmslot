@@ -3,7 +3,7 @@
 import { Archive, CheckCircle2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton } from "@/core/ui/hub";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { BridgedTechnicianReport } from "@/context/TechnicianBackofficeReportBridgeContext";
 
 type Props = {

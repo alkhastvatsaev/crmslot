@@ -1,4 +1,4 @@
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import {
   TECHNICIAN_MOBILE_APP_ROUTE,
   TECHNICIAN_MOBILE_APP_SLOT_INDEX,

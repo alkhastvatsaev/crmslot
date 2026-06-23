@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type BillingPaymentFilter = "all" | "unpaid" | "pending" | "paid" | "to_bill";
 
@@ -6,7 +6,7 @@ export function interventionBillingTotalCents(iv: Intervention): number {
   if (typeof iv.invoiceAmountCents === "number") return iv.invoiceAmountCents;
   return (iv.billingLines ?? []).reduce(
     (s, l) => s + Math.round((l.quantity ?? 1) * (l.unitPriceCents ?? 0)),
-    0,
+    0
   );
 }
 

@@ -1,6 +1,6 @@
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
 import type { AssignInterventionSchedule } from "@/features/backoffice/assignInterventionFromBackoffice";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   isInterventionAwaitingTechnicianAcceptance,
   isInterventionPendingBackOfficeIntake,

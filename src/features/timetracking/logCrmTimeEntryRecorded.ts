@@ -1,6 +1,6 @@
 import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   buildCompanyCrmActivityPayload,
   logCompanyCrmActivity,

@@ -8,7 +8,7 @@ import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventi
 import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
 import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedInterventionAudio";

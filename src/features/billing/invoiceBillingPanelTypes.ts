@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type PaymentStatus = "unpaid" | "pending" | "paid" | "refunded";
 

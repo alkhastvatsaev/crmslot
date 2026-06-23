@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import { INTERVENTION_EMAILS_COLLECTION } from "@/features/emails/interventionEmailFirestore";
-import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
+import type { InterventionEmailDoc } from "@/features/emails";
 
 const FEED_LIMIT = 300;
 

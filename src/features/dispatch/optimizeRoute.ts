@@ -1,5 +1,5 @@
 import { optimizeTourOrder } from "@/features/interventions/optimizeTourOrder";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Coords = { lat: number; lng: number };
 

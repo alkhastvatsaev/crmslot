@@ -4,7 +4,7 @@ import HubAgentPanel from "@/features/hubAgents/HubAgentPanel";
 import { useBillingHubAgentBridgeOptional } from "@/context/BillingHubAgentBridgeContext";
 import { useBillingHubAgent } from "@/features/billingHub/hooks/useBillingHubAgent";
 import type { BillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   companyId: string;

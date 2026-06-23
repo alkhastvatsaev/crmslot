@@ -1,4 +1,4 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 /** Contexte PWA compact pour limiter les tokens (le détail = outils ciblés). */
 export function formatWorkspaceSnapshotForPrompt(snapshot: WorkspaceCopilotSnapshot): string {
@@ -6,7 +6,14 @@ export function formatWorkspaceSnapshotForPrompt(snapshot: WorkspaceCopilotSnaps
     snapshot.summary;
   return JSON.stringify({
     company: { id: snapshot.company.id, name: snapshot.company.name, role: snapshot.company.role },
-    summary: { totalInterventions, byStatus, urgentOpen, awaitingAssignment, inProgress, unpaidCount },
+    summary: {
+      totalInterventions,
+      byStatus,
+      urgentOpen,
+      awaitingAssignment,
+      inProgress,
+      unpaidCount,
+    },
     clients: snapshot.clients.slice(0, 6).map((c) => ({ n: c.name, i: c.interventionCount })),
     dossiers: snapshot.interventions.slice(0, 15).map((iv) => ({
       id: iv.id,

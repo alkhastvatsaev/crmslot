@@ -1,9 +1,9 @@
-import type { BillingPdfBranding } from "@/features/billing/billingPdfBranding";
+import type { BillingPdfBranding } from "@/features/billing";
 import {
   defaultBillingPdfBranding,
   generateInterventionQuotePdf,
 } from "@/features/billing/generateQuotePdf";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { quoteToBillingLines } from "./convertQuoteToInvoice";
 import type { Quote } from "./types";
 

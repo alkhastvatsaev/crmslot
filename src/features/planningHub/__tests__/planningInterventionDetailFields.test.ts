@@ -4,7 +4,7 @@ import {
   clientIntakePhotoUrls,
   technicianCompletionPhotoUrls,
 } from "@/features/planningHub/planningInterventionDetailFields";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const baseIv = {
   id: "iv-1",

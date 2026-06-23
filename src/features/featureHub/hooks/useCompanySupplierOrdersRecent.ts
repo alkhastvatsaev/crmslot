@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { subscribeSupplierOrders } from "@/features/suppliers/supplierFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 /** Commandes fournisseur (Lecot, etc.) — temps réel. */
 export function useCompanySupplierOrdersRecent(companyId: string | null) {

@@ -3,8 +3,8 @@ import { buildWorkspaceCopilotSnapshot } from "@/features/copilot/buildWorkspace
 import { handleChatbotPwaIntentRoute } from "@/features/chatbot/chatbot-pwa-route";
 import { fetchInterventionsForCompany } from "@/features/chatbot/chatbot-intervention-source";
 import { lastUserMessageText } from "@/features/chatbot/chatbot-route-handler";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import type { Intervention } from "@/features/interventions/types";
+import type { ChatbotToolContext } from "@/features/chatbot";
+import type { Intervention } from "@/features/interventions";
 
 /** Charge les dossiers société pour la résolution locale « facture M. Dupont » (sans OpenAI). */
 export async function handleBillingHubPwaIntentRoute(params: {

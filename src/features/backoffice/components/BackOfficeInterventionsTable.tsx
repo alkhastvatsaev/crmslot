@@ -13,8 +13,8 @@ import {
   formatScheduledLabel,
   interventionClientLabel,
 } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
-import type { Technician } from "@/features/technicians/types";
+import type { Intervention } from "@/features/interventions";
+import type { Technician } from "@/features/technicians";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];

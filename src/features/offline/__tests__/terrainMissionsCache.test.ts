@@ -2,7 +2,7 @@ import {
   readTerrainMissionsCache,
   writeTerrainMissionsCache,
 } from "@/features/offline/terrainMissionsCache";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 describe("terrainMissionsCache", () => {
   beforeEach(() => {

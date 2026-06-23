@@ -1,5 +1,5 @@
 import type { ChatbotInvoiceRow } from "@/features/chatbot/chatbotInvoiceRows";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export type DocumentsSearchKindFilter = "all" | "invoice" | "order";
 

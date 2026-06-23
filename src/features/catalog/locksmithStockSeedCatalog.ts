@@ -1,4 +1,4 @@
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const NOW = "2026-05-21T12:00:00.000Z";
 

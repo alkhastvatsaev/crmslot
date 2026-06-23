@@ -1,5 +1,5 @@
 import { optimizeTourOrder } from "@/features/interventions/optimizeTourOrder";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const base: Pick<Intervention, "status" | "location" | "title" | "address" | "time"> = {
   status: "assigned",
@@ -19,9 +19,9 @@ describe("optimizeTourOrder", () => {
   const start = { lat: 50.85, lng: 4.35 }; // Brussels
 
   it("returns missions in nearest-first order", () => {
-    const a = makeMission("near", 50.852, 4.352);   // ~0.3 km
-    const b = makeMission("far", 50.900, 4.400);    // ~5 km
-    const c = makeMission("medium", 50.870, 4.360); // ~2 km
+    const a = makeMission("near", 50.852, 4.352); // ~0.3 km
+    const b = makeMission("far", 50.9, 4.4); // ~5 km
+    const c = makeMission("medium", 50.87, 4.36); // ~2 km
 
     const ordered = optimizeTourOrder([b, c, a], start);
     expect(ordered[0]?.id).toBe("near");

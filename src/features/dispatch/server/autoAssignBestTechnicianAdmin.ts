@@ -10,7 +10,7 @@ import {
   resolveTechnicianAssignUid,
 } from "@/features/dispatch/technicianAssignUid";
 import { interventionLocationOrDefault } from "@/features/interventions/interventionLocation";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { canApplyBackofficeTechnicianAssignment } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
 
 export type AutoAssignResult = {

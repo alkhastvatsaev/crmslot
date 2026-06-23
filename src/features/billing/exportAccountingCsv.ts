@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export interface AccountingRow {
   date: string;
@@ -25,7 +25,7 @@ export function interventionsToAccountingRows(interventions: Intervention[]): Ac
     .map((iv) => {
       const subtotalHtCents = (iv.billingLines ?? []).reduce(
         (s, l) => s + l.quantity * l.unitPriceCents,
-        0,
+        0
       );
       const tvaCents = Math.round(subtotalHtCents * TVA_RATE);
       const totalTtcCents = subtotalHtCents + tvaCents;
@@ -33,8 +33,9 @@ export function interventionsToAccountingRows(interventions: Intervention[]): Ac
         .map((l) => `${l.description} x${l.quantity}`)
         .join(" | ");
 
-      const rawDate = (iv as unknown as { createdAt?: unknown; scheduledAt?: unknown }).createdAt
-        ?? (iv as unknown as { scheduledAt?: unknown }).scheduledAt;
+      const rawDate =
+        (iv as unknown as { createdAt?: unknown; scheduledAt?: unknown }).createdAt ??
+        (iv as unknown as { scheduledAt?: unknown }).scheduledAt;
       const date = rawDate ? new Date(rawDate as string).toISOString().slice(0, 10) : "";
 
       return {
@@ -78,7 +79,7 @@ export function accountingRowsToCsv(rows: AccountingRow[]): string {
       escapeCell((r.tvaCents / 100).toFixed(2)),
       escapeCell((r.totalTtcCents / 100).toFixed(2)),
       escapeCell(r.lines),
-    ].join(";"),
+    ].join(";")
   );
 
   return [header, ...body].join("\n");
@@ -86,7 +87,7 @@ export function accountingRowsToCsv(rows: AccountingRow[]): string {
 
 export function downloadAccountingCsv(
   interventions: Intervention[],
-  filename = "export-comptable.csv",
+  filename = "export-comptable.csv"
 ): void {
   if (typeof document === "undefined") return;
   const rows = interventionsToAccountingRows(interventions);

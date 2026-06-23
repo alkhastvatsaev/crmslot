@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const STORAGE_KEY = "crmslot_bo_reminder_push_day";
 

@@ -6,7 +6,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import CaseHubDetailStep from "@/features/caseHub/components/CaseHubDetailStep";
 import { CASE_HUB_DETAIL, CASE_HUB_STATUS_DOT } from "@/features/caseHub/caseHubDetailTheme";
 import type { CaseHubDetailSnapshot } from "@/features/caseHub/caseHubInterventionDetail";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Intervention;

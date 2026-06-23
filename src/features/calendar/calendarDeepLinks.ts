@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import { getInterventionScheduledRange } from "@/features/calendar/interventionScheduleRange";
 
@@ -23,7 +23,9 @@ export function buildCalendarExportPayload(iv: Intervention): {
   if (!range) return null;
 
   const title = interventionClientLabel(iv);
-  const details = [iv.title?.trim(), iv.problem?.trim(), `Dossier ${iv.id}`].filter(Boolean).join("\n\n");
+  const details = [iv.title?.trim(), iv.problem?.trim(), `Dossier ${iv.id}`]
+    .filter(Boolean)
+    .join("\n\n");
   const location = (iv.address ?? "").trim();
 
   return {
@@ -34,7 +36,6 @@ export function buildCalendarExportPayload(iv: Intervention): {
     end: range.end,
   };
 }
-
 
 export function googleCalendarTemplateUrl(iv: Intervention): string | null {
   const p = buildCalendarExportPayload(iv);
@@ -51,7 +52,6 @@ export function googleCalendarTemplateUrl(iv: Intervention): string | null {
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
-
 
 export function outlookOfficeComposeUrl(iv: Intervention): string | null {
   const p = buildCalendarExportPayload(iv);

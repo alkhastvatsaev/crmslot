@@ -5,7 +5,7 @@ import {
   filterStockItemsBySearch,
   isLowStockItem,
 } from "@/features/featureHub/filterCompanyStock";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const base: StockItem = {
   id: "s1",
@@ -42,7 +42,7 @@ describe("filterCompanyStock", () => {
   it("applyStockListFilters sorts ruptures first", () => {
     const rows = applyStockListFilters(
       [base, { ...base, id: "s2", quantity: 0, description: "Rupture" }],
-      { filter: "all", category: "all", search: "", openOrderRefs: new Set() },
+      { filter: "all", category: "all", search: "", openOrderRefs: new Set() }
     );
     expect(rows[0].quantity).toBe(0);
   });

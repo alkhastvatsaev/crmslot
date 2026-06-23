@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const BILLABLE_STATUSES = new Set(["done", "invoiced", "waiting_material"]);
 

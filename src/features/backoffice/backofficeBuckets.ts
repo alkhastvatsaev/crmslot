@@ -1,5 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
-
+import type { Intervention } from "@/features/interventions";
 
 export type BackofficeBucket = "pending" | "in_progress" | "done" | "invoiced";
 
@@ -33,7 +32,6 @@ export function backofficeBucketLabel(bucket: BackofficeBucket): string {
   }
 }
 
-
 export function backofficeRowStatusLabel(status: Intervention["status"]): string {
   if (status === "pending_needs_address") return "En attente · à compléter";
   if (status === "waiting_material") return "En attente matériel";
@@ -42,6 +40,9 @@ export function backofficeRowStatusLabel(status: Intervention["status"]): string
   return backofficeBucketLabel(interventionBackofficeBucket(status));
 }
 
-export function interventionMatchesStatusBucket(iv: Intervention, bucket: BackofficeBucket): boolean {
+export function interventionMatchesStatusBucket(
+  iv: Intervention,
+  bucket: BackofficeBucket
+): boolean {
   return interventionBackofficeBucket(iv.status) === bucket;
 }

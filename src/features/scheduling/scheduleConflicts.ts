@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   getInterventionOccupiedRange,
   interventionBlocksSchedule,
@@ -29,7 +29,7 @@ function interventionClientShort(iv: Intervention): string {
 }
 
 export function findTechnicianScheduleConflicts(
-  params: FindScheduleConflictsParams,
+  params: FindScheduleConflictsParams
 ): ScheduleConflict[] {
   const { interventions, technicianUid, candidateRange, excludeInterventionId } = params;
   const tech = technicianUid.trim();
@@ -60,7 +60,7 @@ export function findTechnicianScheduleConflicts(
 export function candidateRangeFromScheduleFields(
   scheduledDate: string,
   scheduledTime: string,
-  durationMs?: number,
+  durationMs?: number
 ): OccupiedTimeRange | null {
   const mock = {
     scheduledDate,

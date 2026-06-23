@@ -30,7 +30,7 @@ import {
   resolveBackofficeInboxCompanyIds,
 } from "@/features/company/clientPortalCompanyId";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Mission } from "@/features/map";
 import { useBackofficeReminderPush } from "@/features/reminders/useBackofficeReminderPush";
 import {
   candidateRangeFromScheduleFields,

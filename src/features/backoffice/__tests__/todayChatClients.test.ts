@@ -1,5 +1,5 @@
 import { filterTodayChatClients } from "@/features/backoffice/todayChatClients";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const today = new Date("2026-05-18T12:00:00");
 
@@ -23,7 +23,7 @@ describe("filterTodayChatClients", () => {
         iv({ id: "a", scheduledTime: "09:00" }),
         iv({ id: "other", scheduledDate: "2026-05-19" }),
       ],
-      today,
+      today
     );
     expect(rows.map((r) => r.id)).toEqual(["a", "b"]);
   });
@@ -32,7 +32,7 @@ describe("filterTodayChatClients", () => {
     const rows = filterTodayChatClients(
       [iv({ id: "pending", status: "pending" }), iv({ id: "ok", status: "assigned" })],
       today,
-      { dispatchMap: true },
+      { dispatchMap: true }
     );
     expect(rows.map((r) => r.id)).toEqual(["ok"]);
   });

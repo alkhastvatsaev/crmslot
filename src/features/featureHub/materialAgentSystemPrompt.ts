@@ -1,4 +1,4 @@
-import type { InterventionMaterialOrderIntent } from "@/features/materials/interventionMaterialOrderPrompt";
+import type { InterventionMaterialOrderIntent } from "@/features/materials";
 
 export function buildMaterialAgentSystemPrompt(params: {
   companyName: string;

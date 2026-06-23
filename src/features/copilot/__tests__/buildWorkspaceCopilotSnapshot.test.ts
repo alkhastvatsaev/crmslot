@@ -1,5 +1,5 @@
 import { buildWorkspaceCopilotSnapshot } from "@/features/copilot/buildWorkspaceCopilotSnapshot";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(partial: Partial<Intervention> & { id: string }): Intervention {
   const { id, ...rest } = partial;

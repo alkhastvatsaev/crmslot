@@ -2,8 +2,8 @@
 
 import { UserRound } from "lucide-react";
 import BackOfficeInterventionsTable from "@/features/backoffice/components/BackOfficeInterventionsTable";
-import type { Intervention } from "@/features/interventions/types";
-import type { Technician } from "@/features/technicians/types";
+import type { Intervention } from "@/features/interventions";
+import type { Technician } from "@/features/technicians";
 
 type Props = {
   loading: boolean;

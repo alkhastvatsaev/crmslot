@@ -2,8 +2,8 @@ import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildCrmHistoryAgentSystemPrompt } from "@/features/crmHistory/crmHistoryAgentSystemPrompt";
 import type { QmKpiSnapshot } from "@/features/crmHistory/crmHistoryAgentSystemPrompt";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import type { CompanyRole } from "@/features/company/types";
+import type { ChatbotToolContext } from "@/features/chatbot";
+import type { CompanyRole } from "@/features/company";
 import { CRM_HISTORY_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
 
 export { CRM_HISTORY_AGENT_TOOL_SCOPE };

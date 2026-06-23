@@ -2,7 +2,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { sendLecotOrderEmail } from "@/features/chatbot/sendLecotOrderEmail";
 import { logger } from "@/core/logger";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 /**
  * Envoie les bons de commande Lecot dont l'email était en attente (Gmail déconnecté).

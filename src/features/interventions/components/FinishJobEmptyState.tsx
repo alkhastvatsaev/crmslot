@@ -8,7 +8,7 @@ import {
   navigateTechnicianHub,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 
 type Props = {
   pager: DashboardPagerApi | null | undefined;

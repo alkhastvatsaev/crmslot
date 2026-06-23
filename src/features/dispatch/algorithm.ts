@@ -1,5 +1,5 @@
-import type { Technician } from "@/features/technicians/types";
-import type { Intervention } from "@/features/interventions/types";
+import type { Technician } from "@/features/technicians";
+import type { Intervention } from "@/features/interventions";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { haversineDistanceKm } from "@/features/dispatch/rankTechniciansForIntervention";
 import { canResolveTechnicianAssignUid } from "@/features/dispatch/technicianAssignUid";

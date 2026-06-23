@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 /** Mission affichée sur la carte / rail « du jour » (Firestore ou création live Galaxy). */
 export type Mission = {

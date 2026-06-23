@@ -1,5 +1,5 @@
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { IvanaPortalChatDoc } from "@/features/backoffice";
+import type { Intervention } from "@/features/interventions";
 import type { CrmActivityEvent } from "./crmActivityTypes";
 import { parseTs } from "./crmActivityLog";
 
@@ -11,7 +11,7 @@ function excerpt(body: string, max = 120): string {
 
 export function synthesizeIvanaChatEvents(
   messages: IvanaPortalChatDoc[],
-  interventionMap: Map<string, Intervention>,
+  interventionMap: Map<string, Intervention>
 ): CrmActivityEvent[] {
   return messages
     .map((m) => {

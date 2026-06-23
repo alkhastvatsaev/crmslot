@@ -1,7 +1,7 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { issueInterventionInvoiceAdmin } from "@/features/interventions/server/issueInterventionInvoiceAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { quoteToBillingLines } from "@/features/quotes/convertQuoteToInvoice";
 import { isQuoteExpired } from "@/features/quotes/quoteExpiration";
 import type { Quote } from "@/features/quotes/types";

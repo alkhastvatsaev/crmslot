@@ -1,4 +1,4 @@
-import type { SupplierOrderStatus } from "@/features/suppliers/types";
+import type { SupplierOrderStatus } from "@/features/suppliers";
 
 /** Étapes affichées en démo (suivi client / fournisseur). */
 export const DEMO_SUPPLIER_ORDER_STEPS = [

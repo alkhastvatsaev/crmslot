@@ -6,7 +6,7 @@ import {
   assignPickerStatusLabelKey,
   formatAssignPickerDistanceKm,
 } from "@/features/dispatch/technicianAssignPickerFormat";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 type Props = {
   technician: Technician;

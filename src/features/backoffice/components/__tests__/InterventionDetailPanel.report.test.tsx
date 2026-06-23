@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@/test-utils/render";
 import InterventionDetailPanel from "@/features/backoffice/components/InterventionDetailPanel";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function doneReport(): Intervention {
   return {

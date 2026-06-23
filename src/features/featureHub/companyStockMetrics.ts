@@ -1,8 +1,11 @@
-import { inferStockCategory, type StockCategoryId } from "@/features/featureHub/companyStockCategories";
+import {
+  inferStockCategory,
+  type StockCategoryId,
+} from "@/features/featureHub/companyStockCategories";
 import { isLowStockItem } from "@/features/featureHub/filterCompanyStock";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { StockItem } from "@/features/materials/stockFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { StockItem } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export type StockHealth = "ok" | "low" | "out";
 
@@ -20,7 +23,7 @@ export function sortStockByPatronPriority(items: StockItem[]): StockItem[] {
     return 2;
   };
   return [...items].sort(
-    (a, b) => rank(a) - rank(b) || a.description.localeCompare(b.description, "fr"),
+    (a, b) => rank(a) - rank(b) || a.description.localeCompare(b.description, "fr")
   );
 }
 
@@ -40,7 +43,7 @@ export function computeCompanyStockMetrics(
   items: StockItem[],
   materialOrders: MaterialOrderDoc[],
   supplierOrders: SupplierOrder[],
-  waitingMaterialJobs: number,
+  waitingMaterialJobs: number
 ): CompanyStockDashboardMetrics {
   const outCount = items.filter((i) => i.quantity <= 0).length;
   const lowCount = items.filter((i) => i.quantity > 0 && isLowStockItem(i)).length;
@@ -56,7 +59,7 @@ export function computeCompanyStockMetrics(
 
   const pendingFieldOrders = materialOrders.filter((o) => o.status === "pending").length;
   const openSupplierOrders = supplierOrders.filter(
-    (o) => o.status === "sent" || o.status === "confirmed" || o.status === "draft",
+    (o) => o.status === "sent" || o.status === "confirmed" || o.status === "draft"
   ).length;
 
   return {

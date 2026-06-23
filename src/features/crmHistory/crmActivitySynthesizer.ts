@@ -1,8 +1,8 @@
-import type { Intervention } from "@/features/interventions/types";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
-import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
-import type { CompanyCommissionAuditRow } from "@/features/commissions/commissionFirestore";
+import type { Intervention } from "@/features/interventions";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
+import type { InterventionEmailDoc } from "@/features/emails";
+import type { CompanyCommissionAuditRow } from "@/features/commissions";
 import type { CrmActivityEvent } from "./crmActivityTypes";
 import { parseTs } from "./crmActivityLog";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import PortalQuotePanel from "@/features/quotes/components/PortalQuotePanel";
-import type { PortalQuoteSummary } from "@/features/quotes/portalQuoteSummary";
+import type { PortalQuoteSummary } from "@/features/quotes";
 
 type Props = {
   portalToken: string;

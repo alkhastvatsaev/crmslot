@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { Route, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  optimizeTourOrder,
-  getCurrentPosition,
-} from "@/features/interventions/optimizeTourOrder";
-import type { Intervention } from "@/features/interventions/types";
+import { optimizeTourOrder, getCurrentPosition } from "@/features/interventions/optimizeTourOrder";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   missions: Intervention[];

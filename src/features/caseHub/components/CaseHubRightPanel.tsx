@@ -17,7 +17,7 @@ import { CASE_HUB_DETAIL } from "@/features/caseHub/caseHubDetailTheme";
 import { buildCaseHubDetailSnapshot } from "@/features/caseHub/caseHubInterventionDetail";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useTechnicians } from "@/features/technicians/hooks";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 

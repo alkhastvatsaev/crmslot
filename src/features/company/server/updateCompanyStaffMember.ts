@@ -1,6 +1,6 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import type { CompanyStaffUpdateInput } from "@/features/teamHub/types";
+import type { CompanyStaffUpdateInput } from "@/features/teamHub";
 import {
   buildTechnicianDisplayName,
   technicianInitialFromName,

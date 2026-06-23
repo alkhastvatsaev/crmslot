@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const STORAGE_PREFIX = "crmslot_terrain_missions_";
 

@@ -2,8 +2,8 @@ import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildBillingHubAgentSystemPrompt } from "@/features/billingHub/billingHubAgentSystemPrompt";
 import { handleBillingHubPwaIntentRoute } from "@/features/billingHub/billingHubPwaRoute";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import type { CompanyRole } from "@/features/company/types";
+import type { ChatbotToolContext } from "@/features/chatbot";
+import type { CompanyRole } from "@/features/company";
 import { BILLING_HUB_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
 
 export { BILLING_HUB_AGENT_TOOL_SCOPE };
@@ -22,7 +22,7 @@ export type BillingHubAgentRouteAuth = { uid: string };
 
 export async function handleBillingHubAgentPost(
   body: BillingHubAgentPostBody | null,
-  auth: BillingHubAgentRouteAuth,
+  auth: BillingHubAgentRouteAuth
 ): Promise<Response> {
   const companyId = (body?.companyId ?? "").trim();
   if (!companyId) {

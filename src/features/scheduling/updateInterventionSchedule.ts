@@ -1,6 +1,6 @@
 import { doc, updateDoc } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import {
@@ -23,10 +23,14 @@ export type UpdateInterventionScheduleParams = {
 
 export type UpdateInterventionScheduleResult =
   | { ok: true }
-  | { ok: false; reason: "no_schedule" | "conflict"; conflicts: ReturnType<typeof findTechnicianScheduleConflicts> };
+  | {
+      ok: false;
+      reason: "no_schedule" | "conflict";
+      conflicts: ReturnType<typeof findTechnicianScheduleConflicts>;
+    };
 
 export async function updateInterventionSchedule(
-  params: UpdateInterventionScheduleParams,
+  params: UpdateInterventionScheduleParams
 ): Promise<UpdateInterventionScheduleResult> {
   const {
     db,
@@ -45,8 +49,18 @@ export async function updateInterventionSchedule(
   if (scheduledDate !== undefined) patch.scheduledDate = scheduledDate;
   if (scheduledTime !== undefined) patch.scheduledTime = scheduledTime;
 
-  const dateForCheck = scheduledDate ?? requestedDate ?? intervention.scheduledDate ?? intervention.requestedDate ?? "";
-  const timeForCheck = scheduledTime ?? requestedTime ?? intervention.scheduledTime ?? intervention.requestedTime ?? "";
+  const dateForCheck =
+    scheduledDate ??
+    requestedDate ??
+    intervention.scheduledDate ??
+    intervention.requestedDate ??
+    "";
+  const timeForCheck =
+    scheduledTime ??
+    requestedTime ??
+    intervention.scheduledTime ??
+    intervention.requestedTime ??
+    "";
 
   const techUid = (intervention.assignedTechnicianUid ?? "").trim();
   const candidateRange = candidateRangeFromScheduleFields(dateForCheck, timeForCheck);

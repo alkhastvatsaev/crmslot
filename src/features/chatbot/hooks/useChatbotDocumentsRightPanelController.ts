@@ -26,7 +26,7 @@ import {
   supplierTileKey,
   useChatbotDocumentTileThumbnails,
 } from "@/features/chatbot/hooks/useChatbotDocumentTileThumbnails";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export function useChatbotDocumentsRightPanelController() {
   const {

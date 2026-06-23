@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { formatBillingDate, STATUS_STYLES } from "@/features/billing/invoiceBillingPanelUtils";
 import { PAYMENT_STATUSES, type PaymentStatus } from "@/features/billing/invoiceBillingPanelTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Intervention;

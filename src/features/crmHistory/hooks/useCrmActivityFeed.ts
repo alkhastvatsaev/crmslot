@@ -20,7 +20,7 @@ import { synthesizeCompanyCrmLogEvents } from "../crmActivityLog";
 import { dedupeCrmEvents, synthesizeStatusEvents } from "../crmStatusEvents";
 import { applyPeriod, applyTypeFilter, applySearch, applyDateFilter } from "../crmActivityFilters";
 import type { CrmPeriodFilter, CrmTypeFilter } from "../crmActivityTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useCompanyStatusEventsFeed } from "./useCompanyStatusEventsFeed";
 import { useCompanyCrmActivityLog } from "./useCompanyCrmActivityLog";
 import { useCompanyIvanaChatFeed } from "./useCompanyIvanaChatFeed";

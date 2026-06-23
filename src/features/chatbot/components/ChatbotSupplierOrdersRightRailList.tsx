@@ -11,8 +11,8 @@ import {
 } from "@/features/chatbot/chatbotOrderTrackingProgress";
 import ChatbotOrderListTile from "@/features/chatbot/components/ChatbotOrderListTile";
 import type { useChatbotSupplierOrdersPanelView } from "@/features/chatbot/hooks/useChatbotSupplierOrdersPanelView";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 import { capitalizeName } from "@/utils/stringUtils";
 
 type View = ReturnType<typeof useChatbotSupplierOrdersPanelView>;

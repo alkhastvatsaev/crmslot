@@ -1,7 +1,7 @@
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
 import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
 import type { CaseHubAlert } from "@/features/caseHub/caseHubInterventionDetailTypes";

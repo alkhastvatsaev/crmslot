@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Mission } from "@/features/map";
 import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
 import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
 import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";

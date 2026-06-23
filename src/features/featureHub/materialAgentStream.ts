@@ -1,4 +1,4 @@
-import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
+import type { ChatbotStreamEvent } from "@/features/chatbot";
 
 export async function readMaterialAgentStream(
   res: Response,

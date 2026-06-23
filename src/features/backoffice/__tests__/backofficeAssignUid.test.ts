@@ -1,7 +1,7 @@
 import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
 import { resolveTechnicianAssignUid } from "@/features/dispatch/technicianAssignUid";
 import { matchesAssignedTechnician } from "@/features/interventions/technicianAssignmentActions";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 const technician: Technician = {
   id: "tech-doc-1",
@@ -18,7 +18,7 @@ describe("back-office assign → technicien hub parity", () => {
     const uid = resolveTechnicianAssignUid(technician);
     const patch = buildAssignInterventionToTechnicianUpdate(
       { requestedDate: "2026-05-16", requestedTime: "14:00" },
-      uid,
+      uid
     );
     expect(patch.assignedTechnicianUid).toBe("firebase-real-uid-99");
     expect(patch.status).toBe("assigned");
@@ -28,8 +28,7 @@ describe("back-office assign → technicien hub parity", () => {
     const uid = resolveTechnicianAssignUid(technician);
     const patch = buildAssignInterventionToTechnicianUpdate(null, uid);
     expect(
-      matchesAssignedTechnician({ assignedTechnicianUid: patch.assignedTechnicianUid }, uid),
+      matchesAssignedTechnician({ assignedTechnicianUid: patch.assignedTechnicianUid }, uid)
     ).toBe(true);
   });
-
 });

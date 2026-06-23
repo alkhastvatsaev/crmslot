@@ -10,7 +10,7 @@ import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_SMART_FORM,
 } from "@/features/company/companyHubNavigation";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 
 export default function ClientsCrmClientDetail({
   selected,

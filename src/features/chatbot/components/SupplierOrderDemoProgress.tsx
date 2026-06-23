@@ -5,7 +5,7 @@ import {
   DEMO_SUPPLIER_ORDER_STEPS,
   resolveDemoSupplierOrderProgress,
 } from "@/features/chatbot/supplierOrderDemoProgress";
-import type { SupplierOrderStatus } from "@/features/suppliers/types";
+import type { SupplierOrderStatus } from "@/features/suppliers";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 type Props = {

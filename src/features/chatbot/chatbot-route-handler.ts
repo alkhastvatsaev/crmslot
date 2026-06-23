@@ -21,7 +21,7 @@ import {
   streamDocumentToolOutcome,
   streamLecotOrderToolOutcome,
 } from "@/features/chatbot/chatbot-sse";
-import type { CompanyRole } from "@/features/company/types";
+import type { CompanyRole } from "@/features/company";
 
 export type ChatbotPostBody = {
   companyId?: string;

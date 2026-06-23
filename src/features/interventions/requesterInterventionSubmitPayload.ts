@@ -1,4 +1,4 @@
-import type { ClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
+import type { ClientPortalAccountFields } from "@/features/auth";
 import { clientPortalAuth } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import type { User } from "firebase/auth";

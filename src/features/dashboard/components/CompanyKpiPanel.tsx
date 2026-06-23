@@ -6,7 +6,7 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { computeCompanyKpi } from "@/features/dashboard/companyKpi";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function KpiSparkline({ values, color }: { values: number[]; color: string }) {
   if (values.length < 2) return null;

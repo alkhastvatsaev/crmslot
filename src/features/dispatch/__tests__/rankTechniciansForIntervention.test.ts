@@ -4,7 +4,7 @@ import {
   rankTechniciansForIntervention,
 } from "@/features/dispatch/rankTechniciansForIntervention";
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 const baseTech = (overrides: Partial<Technician> & Pick<Technician, "id">): Technician => ({
   name: overrides.name ?? "Tech",
@@ -55,7 +55,7 @@ describe("prioritizeDefaultAssignTechnician", () => {
         }),
       ],
       50.85,
-      4.35,
+      4.35
     );
 
     const ordered = prioritizeDefaultAssignTechnician(ranked);

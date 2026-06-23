@@ -6,7 +6,7 @@ import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function useBackOfficeHubSelectedIntervention(): {
   intervention: Intervention | null;

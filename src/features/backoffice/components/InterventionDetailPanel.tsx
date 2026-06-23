@@ -9,9 +9,9 @@ import {
   isInterventionInBackofficeRequestsQueue,
 } from "@/features/interventions/technicianSchedule";
 import { canArchiveBackofficeReportInInbox } from "@/features/backoffice/backofficeReportsInboxArchive";
-import type { Intervention } from "@/features/interventions/types";
-import type { ScheduleConflict } from "@/features/scheduling/scheduleConflicts";
-import type { ProposedSlot } from "@/features/scheduling/proposeAvailableSlots";
+import type { Intervention } from "@/features/interventions";
+import type { ScheduleConflict } from "@/features/scheduling";
+import type { ProposedSlot } from "@/features/scheduling";
 import InterventionDetailScrollBody from "@/features/backoffice/components/InterventionDetailScrollBody";
 import InterventionDetailActionBar from "@/features/backoffice/components/InterventionDetailActionBar";
 

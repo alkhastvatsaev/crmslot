@@ -1,4 +1,4 @@
-import type { CommissionRule, CommissionValueType } from "@/features/commissions/types";
+import type { CommissionRule, CommissionValueType } from "@/features/commissions";
 import { pickPersonalTechnicianRule } from "@/features/commissions/commissionRuleMatching";
 import { buildDefaultGroupCommissionRule } from "@/features/commissions/commissionDefaults";
 import { formatCommissionValue } from "@/features/commissionsHub/commissionsHubFormat";

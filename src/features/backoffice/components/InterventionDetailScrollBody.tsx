@@ -15,7 +15,7 @@ import InterventionDetailSignatureSection from "@/features/backoffice/components
 import InterventionDetailAlertsSection from "@/features/backoffice/components/InterventionDetailAlertsSection";
 import InterventionDetailQuotePdfButton from "@/features/backoffice/components/InterventionDetailQuotePdfButton";
 import { useInterventionDetailScrollBody } from "@/features/backoffice/hooks/useInterventionDetailScrollBody";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   selectedItem: Intervention;

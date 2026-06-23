@@ -1,6 +1,6 @@
 import type { User } from "firebase/auth";
-import type { CrmStaffAccountFields } from "@/features/auth/hooks/useCrmStaffAccountPanel";
-import type { ClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
+import type { CrmStaffAccountFields } from "@/features/auth";
+import type { ClientPortalAccountFields } from "@/features/auth";
 import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
 
 type Params = {

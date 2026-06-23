@@ -7,7 +7,7 @@ import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedI
 import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
 import CaseHubDetailStep from "@/features/caseHub/components/CaseHubDetailStep";
 import { CASE_HUB_DETAIL } from "@/features/caseHub/caseHubDetailTheme";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   clientIntakePhotoUrls,
   technicianCompletionPhotoUrls,

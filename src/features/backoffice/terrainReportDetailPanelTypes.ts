@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function readTerrainReportTranscription(inv: unknown): string | null {
   if (!inv || typeof inv !== "object") return null;

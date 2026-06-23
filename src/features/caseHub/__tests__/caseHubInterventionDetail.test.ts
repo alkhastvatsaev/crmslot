@@ -5,7 +5,7 @@ import {
   buildCaseHubInsights,
   canCaseHubAssignTechnician,
 } from "@/features/caseHub/caseHubInterventionDetail";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const base: Intervention = {
   id: "iv-case-detail-001",

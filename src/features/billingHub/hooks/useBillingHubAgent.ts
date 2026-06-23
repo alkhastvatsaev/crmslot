@@ -12,7 +12,7 @@ import { downloadPayrollCsv } from "@/features/timetracking/exportPayrollCsv";
 import { useTimeEntries } from "@/features/timetracking/hooks/useTimeEntries";
 import { auth } from "@/core/config/firebase";
 import type { BillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const STORAGE_KEY = "crmslot-billing-hub-agent-v1";
 

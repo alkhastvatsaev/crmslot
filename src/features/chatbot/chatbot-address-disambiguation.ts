@@ -1,4 +1,4 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
 import type { ChatbotPwaResolvedIntervention } from "@/features/chatbot/chatbot-pwa-intent";
 import {
@@ -47,7 +47,7 @@ export function isAddressDisambiguationPrompt(text: string): boolean {
   const t = text.toLowerCase();
   return (
     /pour laquelle|laquelle de ces|quelles? adresse|choisir|sélectionnez|selectionnez|indiquez le numéro|répondez par le numéro/i.test(
-      t,
+      t
     ) && extractNumberedAddressLines(text).length >= 2
   );
 }
@@ -68,7 +68,7 @@ function addressMatchScore(addressLine: string, interventionAddress: string): nu
 
 export function listInterventionsForClientQuery(
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  clientQuery: string,
+  clientQuery: string
 ): ChatbotPwaResolvedIntervention[] {
   if (!snapshot?.interventions?.length || !clientQuery.trim()) return [];
 
@@ -79,16 +79,14 @@ export function listInterventionsForClientQuery(
   });
 
   return [...rows]
-    .sort((a, b) =>
-      String(a.address ?? "").localeCompare(String(b.address ?? ""), "fr"),
-    )
+    .sort((a, b) => String(a.address ?? "").localeCompare(String(b.address ?? ""), "fr"))
     .map((iv) => ({ interventionId: iv.id, clientName: iv.clientName }));
 }
 
 export function mapNumberedAddressesToInterventionIds(
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
   addressLines: string[],
-  clientQuery?: string | null,
+  clientQuery?: string | null
 ): string[] {
   if (!snapshot?.interventions?.length || addressLines.length === 0) return [];
 
@@ -128,16 +126,16 @@ export function mapNumberedAddressesToInterventionIds(
   return ids;
 }
 
-export function findClientQueryFromConversation(
-  messages: ChatbotUiMessageLike[],
-): string | null {
+export function findClientQueryFromConversation(messages: ChatbotUiMessageLike[]): string | null {
   for (let i = messages.length - 1; i >= 0; i -= 1) {
     const m = messages[i];
     if (m.role !== "user") continue;
     const q = extractChatbotClientQuery(m.content);
     if (q) return q;
     if (/facture|devis/i.test(m.content)) {
-      const q2 = extractChatbotClientQuery(m.content) ?? m.content.match(/\b([A-ZÀ-Ÿ][a-zà-ÿ\-']{2,})\b/)?.[1];
+      const q2 =
+        extractChatbotClientQuery(m.content) ??
+        m.content.match(/\b([A-ZÀ-Ÿ][a-zà-ÿ\-']{2,})\b/)?.[1];
       if (q2) return q2;
     }
   }
@@ -148,7 +146,7 @@ export function resolveNumericInterventionChoice(
   text: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
   messages: ChatbotUiMessageLike[],
-  pendingInterventionIds?: string[] | null,
+  pendingInterventionIds?: string[] | null
 ): { interventionId: string; documentType: ChatbotDocumentKind } | null {
   const index = parseNumericChoiceIndex(text);
   if (index == null) return null;
@@ -191,7 +189,7 @@ export function extractInterventionIdFromInvoiceReply(
   assistantText: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
   messages: ChatbotUiMessageLike[],
-  pendingInterventionIds?: string[] | null,
+  pendingInterventionIds?: string[] | null
 ): string | null {
   if (!snapshot?.interventions?.length) return null;
 
@@ -202,7 +200,7 @@ export function extractInterventionIdFromInvoiceReply(
       String(numericIndex),
       snapshot,
       messages.slice(0, -1),
-      pendingInterventionIds,
+      pendingInterventionIds
     );
     if (choice) return choice.interventionId;
   }
@@ -210,7 +208,7 @@ export function extractInterventionIdFromInvoiceReply(
   const clientQuery = findClientQueryFromConversation(messages);
   const pool = clientQuery
     ? listInterventionsForClientQuery(snapshot, clientQuery).map((r) =>
-        snapshot.interventions.find((iv) => iv.id === r.interventionId),
+        snapshot.interventions.find((iv) => iv.id === r.interventionId)
       )
     : snapshot.interventions;
 
@@ -221,7 +219,9 @@ export function extractInterventionIdFromInvoiceReply(
   for (const iv of candidates) {
     const addr = normalizeMatch(String(iv.address ?? ""));
     if (!addr) continue;
-    const score = hay.includes(addr) ? 100 : addressMatchScore(assistantText, String(iv.address ?? ""));
+    const score = hay.includes(addr)
+      ? 100
+      : addressMatchScore(assistantText, String(iv.address ?? ""));
     if (score > 0 && (!best || score > best.score)) {
       best = { id: iv.id, score };
     }
@@ -249,7 +249,7 @@ export function shouldAutoPreviewInvoiceInPanel(assistantText: string): boolean 
 export function buildPendingInterventionIdsFromAssistant(
   assistantText: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  messages: ChatbotUiMessageLike[],
+  messages: ChatbotUiMessageLike[]
 ): string[] | null {
   if (!isAddressDisambiguationPrompt(assistantText)) return null;
   const lines = extractNumberedAddressLines(assistantText);

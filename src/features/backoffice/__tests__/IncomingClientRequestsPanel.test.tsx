@@ -3,7 +3,7 @@ import { render, screen } from "@/test-utils/render";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import IncomingClientRequestsPanel from "@/features/backoffice/components/IncomingClientRequestsPanel";
 
 const TEST_TECH_UID = "tech-uid-1";

@@ -6,7 +6,7 @@ import { DateProvider } from "@/context/DateContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import BackOfficeInboxPanel from "@/features/backoffice/components/BackOfficeInboxPanel";
 
 const TEST_TECH_UID = "tech-uid-1";

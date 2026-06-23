@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import CompanyStockItemList from "@/features/featureHub/components/CompanyStockItemList";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const item: StockItem = {
   id: "tile-1",

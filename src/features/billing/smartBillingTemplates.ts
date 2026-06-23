@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export interface BillingLineSuggestion {
   description: string;
@@ -23,7 +23,7 @@ function normalizeDesc(desc: string): string {
  */
 export function computeBillingLineSuggestions(
   pastInterventions: Intervention[],
-  maxSuggestions = 5,
+  maxSuggestions = 5
 ): BillingLineSuggestion[] {
   const freq = new Map<string, { line: LineKey; count: number; totalQty: number }>();
 

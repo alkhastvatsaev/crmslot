@@ -3,7 +3,7 @@
 import { useTechnicians } from "@/features/technicians/hooks";
 import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function useInterventionDetailScrollBody(selectedItem: Intervention) {
   const { technicians } = useTechnicians();

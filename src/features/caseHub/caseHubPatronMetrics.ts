@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 import type { CaseHubBucket, CaseHubStatusFilter } from "@/features/caseHub/caseHubTypes";
 

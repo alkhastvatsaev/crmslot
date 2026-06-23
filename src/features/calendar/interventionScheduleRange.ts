@@ -1,6 +1,5 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { CALENDAR_DEFAULT_EVENT_DURATION_MS } from "@/features/calendar/calendarConstants";
-
 
 export function getInterventionScheduledRange(iv: Intervention): { start: Date; end: Date } | null {
   const d = (iv.scheduledDate ?? "").trim();
@@ -12,7 +11,6 @@ export function getInterventionScheduledRange(iv: Intervention): { start: Date; 
   const end = new Date(start.getTime() + CALENDAR_DEFAULT_EVENT_DURATION_MS);
   return { start, end };
 }
-
 
 export function interventionScheduledLocalDayKey(iv: Intervention): string | null {
   const r = getInterventionScheduledRange(iv);

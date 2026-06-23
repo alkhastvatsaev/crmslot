@@ -3,7 +3,7 @@
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { HUB_TYPE } from "@/core/ui/hub";
 import { formatAddress } from "@/utils/stringUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   selectedItem: Intervention;

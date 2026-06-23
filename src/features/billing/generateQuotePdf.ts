@@ -3,7 +3,7 @@ import type { BillingPdfBranding } from "@/features/billing/billingPdfBranding";
 import { fetchBillingPdfBrandingForCompany } from "@/features/billing/billingPdfBranding";
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
 import { buildInterventionReportPdf } from "@/features/interventions/buildInterventionReportPdf";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function defaultBillingPdfBranding(companyName = "Société"): BillingPdfBranding {
   return {
@@ -16,32 +16,32 @@ export function defaultBillingPdfBranding(companyName = "Société"): BillingPdf
 
 export function generateInterventionQuotePdf(
   iv: Intervention,
-  branding?: BillingPdfBranding,
+  branding?: BillingPdfBranding
 ): Uint8Array {
   return buildPremiumBillingPdf(
     iv,
     "quote",
     "Total TTC indicatif",
-    branding ?? defaultBillingPdfBranding(),
+    branding ?? defaultBillingPdfBranding()
   );
 }
 
 export function generateInterventionInvoicePdf(
   iv: Intervention,
-  branding?: BillingPdfBranding,
+  branding?: BillingPdfBranding
 ): Uint8Array {
   return buildPremiumBillingPdf(
     iv,
     "invoice",
     "Total TTC",
-    branding ?? defaultBillingPdfBranding(),
+    branding ?? defaultBillingPdfBranding()
   );
 }
 
 export function generateInterventionDocumentPdf(
   iv: Intervention,
   kind: ChatbotDocumentKind,
-  branding?: BillingPdfBranding,
+  branding?: BillingPdfBranding
 ): Uint8Array {
   if (kind === "report") return buildInterventionReportPdf(iv);
   if (kind === "invoice") return generateInterventionInvoicePdf(iv, branding);
@@ -50,7 +50,7 @@ export function generateInterventionDocumentPdf(
 
 export async function resolveBillingPdfBranding(
   companyId: string,
-  companyData?: Record<string, unknown>,
+  companyData?: Record<string, unknown>
 ): Promise<BillingPdfBranding> {
   return fetchBillingPdfBrandingForCompany(companyData, companyId);
 }

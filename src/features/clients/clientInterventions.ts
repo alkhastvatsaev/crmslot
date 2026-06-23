@@ -7,7 +7,7 @@ import {
   where,
   type Firestore,
 } from "firebase/firestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const CLIENT_INTERVENTIONS_LIMIT = 20;
 
@@ -20,7 +20,7 @@ export function subscribeClientInterventions(
   companyId: string,
   clientId: string,
   onRows: (rows: Intervention[]) => void,
-  onError?: (err: Error) => void,
+  onError?: (err: Error) => void
 ): () => void {
   const cid = companyId.trim();
   const clid = clientId.trim();
@@ -34,7 +34,7 @@ export function subscribeClientInterventions(
     where("companyId", "==", cid),
     where("clientId", "==", clid),
     orderBy("createdAt", "desc"),
-    limit(CLIENT_INTERVENTIONS_LIMIT),
+    limit(CLIENT_INTERVENTIONS_LIMIT)
   );
 
   return onSnapshot(
@@ -42,6 +42,6 @@ export function subscribeClientInterventions(
     (snap) => {
       onRows(snap.docs.map((d) => mapInterventionDoc(d.id, d.data() as Record<string, unknown>)));
     },
-    (err) => onError?.(err),
+    (err) => onError?.(err)
   );
 }

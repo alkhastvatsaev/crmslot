@@ -3,8 +3,8 @@
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Intervention } from "@/features/interventions/types";
-import type { AssignScheduleOverride } from "@/features/interventions/assignInterventionToTechnician";
+import type { Intervention } from "@/features/interventions";
+import type { AssignScheduleOverride } from "@/features/interventions";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
 import { useTechnicianAssignPicker } from "@/features/dispatch/hooks/useTechnicianAssignPicker";

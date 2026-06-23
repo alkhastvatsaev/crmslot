@@ -1,11 +1,11 @@
 import { getDefaultAssignedTechnicianUid } from "@/features/interventions/defaultAssignedTechnicianUid";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 export function haversineDistanceKm(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number,
+  lon2: number
 ): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -30,7 +30,7 @@ export type RankedTechnician = {
 export function rankTechniciansForIntervention(
   technicians: Technician[],
   interventionLat: number,
-  interventionLng: number,
+  interventionLng: number
 ): RankedTechnician[] {
   const available = technicians.filter((t) => t.status === "available");
   const pool = available.length > 0 ? available : [...technicians];
@@ -42,10 +42,14 @@ export function rankTechniciansForIntervention(
       let distanceKm = Number.MAX_VALUE;
 
       if (
-        typeof interventionLat === "number" && !Number.isNaN(interventionLat) &&
-        typeof interventionLng === "number" && !Number.isNaN(interventionLng) &&
-        typeof tLat === "number" && !Number.isNaN(tLat) &&
-        typeof tLng === "number" && !Number.isNaN(tLng)
+        typeof interventionLat === "number" &&
+        !Number.isNaN(interventionLat) &&
+        typeof interventionLng === "number" &&
+        !Number.isNaN(interventionLng) &&
+        typeof tLat === "number" &&
+        !Number.isNaN(tLat) &&
+        typeof tLng === "number" &&
+        !Number.isNaN(tLng)
       ) {
         distanceKm = haversineDistanceKm(interventionLat, interventionLng, tLat, tLng);
       }

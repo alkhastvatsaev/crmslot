@@ -1,4 +1,4 @@
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 import {
   buildSupplierOrderPreviewFromToolResult,
   type LecotOrderToolResult,

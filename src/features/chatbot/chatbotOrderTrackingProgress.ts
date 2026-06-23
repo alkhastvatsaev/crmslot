@@ -2,8 +2,8 @@ import {
   resolveDemoSupplierOrderProgress,
   type SupplierOrderProgressInput,
 } from "@/features/chatbot/supplierOrderDemoProgress";
-import type { MaterialOrder } from "@/features/materials/types";
-import type { SupplierOrderStatus } from "@/features/suppliers/types";
+import type { MaterialOrder } from "@/features/materials";
+import type { SupplierOrderStatus } from "@/features/suppliers";
 
 export type OrderTrackingProgress = {
   percent: number;

@@ -1,5 +1,5 @@
 import { doc, updateDoc, type Firestore } from "firebase/firestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { ClientRecord, SiteRecord } from "./types";
 import { buildClientDisplayName } from "./clientDisplayName";
 
@@ -15,7 +15,7 @@ export type LinkInterventionToClientParams = {
 
 /** Patch Firestore intervention avec FK CRM + champs client dénormalisés (rétrocompat). */
 export function buildInterventionClientPatch(
-  params: LinkInterventionToClientParams,
+  params: LinkInterventionToClientParams
 ): Partial<Intervention> {
   const display = buildClientDisplayName(params.client);
   const patch: Partial<Intervention> = {
@@ -40,9 +40,12 @@ export function buildInterventionClientPatch(
 export async function linkInterventionToClient(
   db: Firestore,
   interventionId: string,
-  params: LinkInterventionToClientParams,
+  params: LinkInterventionToClientParams
 ): Promise<void> {
   const id = interventionId.trim();
   if (!id) throw new Error("interventionId required");
-  await updateDoc(doc(db, "interventions", id), buildInterventionClientPatch(params) as Record<string, unknown>);
+  await updateDoc(
+    doc(db, "interventions", id),
+    buildInterventionClientPatch(params) as Record<string, unknown>
+  );
 }

@@ -10,7 +10,7 @@ import {
 } from "@/features/backoffice/backOfficeDashboardFormat";
 import { backofficeBucketLabel } from "@/features/backoffice/backofficeBuckets";
 import type { BackofficeViewFilters } from "@/features/backoffice/backofficeFilters";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 type Membership = { companyId: string; companyName: string };
 

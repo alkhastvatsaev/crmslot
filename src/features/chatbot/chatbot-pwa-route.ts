@@ -1,13 +1,19 @@
-import { executeChatbotTool, type ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import {
+  executeChatbotTool,
+  type ChatbotToolContext,
+} from "@/features/chatbot/chatbot-tool-executor";
 import {
   resolveChatbotPwaIntent,
   type ChatbotPwaIntent,
 } from "@/features/chatbot/chatbot-pwa-intent";
 import type { ChatbotBillingResolveContext } from "@/features/chatbot/chatbot-billing-resolve";
 import { streamDocumentToolOutcome } from "@/features/chatbot/chatbot-sse";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
-function pwaIntentToTool(intent: ChatbotPwaIntent): { name: string; input: Record<string, unknown> } {
+function pwaIntentToTool(intent: ChatbotPwaIntent): {
+  name: string;
+  input: Record<string, unknown>;
+} {
   const interventionId = intent.intervention.interventionId;
   switch (intent.kind) {
     case "document_preview":
@@ -51,7 +57,7 @@ export async function handleChatbotPwaIntentRoute(params: {
   const intent = resolveChatbotPwaIntent(
     params.lastUserText,
     params.workspaceSnapshot,
-    params.billingCtx,
+    params.billingCtx
   );
   if (!intent) return null;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { CommissionValueType } from "@/features/commissions/types";
+import type { CommissionValueType } from "@/features/commissions";
 import type { CommissionsHubSelection } from "@/features/commissionsHub/commissionsHubTypes";
 import type { PatronTechnicianRow } from "@/features/commissionsHub/commissionsHubPatronMetrics";
 import CommissionsHubTechRatesList from "@/features/commissionsHub/components/CommissionsHubTechRatesList";

@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import { getInterventionScheduledRange } from "@/features/calendar/interventionScheduleRange";
 

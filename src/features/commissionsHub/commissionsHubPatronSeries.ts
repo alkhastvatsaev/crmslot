@@ -1,5 +1,5 @@
-import type { ManualCommissionEntry } from "@/features/commissions/commissionFirestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { ManualCommissionEntry } from "@/features/commissions";
+import type { Intervention } from "@/features/interventions";
 import {
   interventionCommissionMonth,
   interventionRevenueMonth,

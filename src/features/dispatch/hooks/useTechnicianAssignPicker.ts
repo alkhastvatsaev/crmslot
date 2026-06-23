@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { pickRecommendedSlot } from "@/features/scheduling/pickRecommendedSlot";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { interventionLocationOrDefault } from "@/features/interventions/interventionLocation";
 import {
   buildAssignInterventionToTechnicianUpdate,

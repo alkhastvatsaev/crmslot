@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAssignPicker";
-import type { ScheduleConflict } from "@/features/scheduling/scheduleConflicts";
-import type { ProposedSlot } from "@/features/scheduling/proposeAvailableSlots";
+import type { ScheduleConflict } from "@/features/scheduling";
+import type { ProposedSlot } from "@/features/scheduling";
 
 type Props = {
   selectedItem: Intervention;

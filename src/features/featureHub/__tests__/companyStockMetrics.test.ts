@@ -4,7 +4,7 @@ import {
   sortStockByPatronPriority,
   stockHealth,
 } from "@/features/featureHub/companyStockMetrics";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const base: StockItem = {
   id: "s1",
@@ -66,7 +66,7 @@ describe("companyStockMetrics", () => {
           updatedAt: "",
         },
       ],
-      2,
+      2
     );
     expect(metrics.outCount).toBe(1);
     expect(metrics.lowCount).toBe(1);

@@ -1,5 +1,5 @@
 import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const base: Omit<Intervention, "id" | "status"> = {
   title: "T",
@@ -20,7 +20,7 @@ describe("buildInterventionReminders", () => {
           createdAt: "2026-05-01T10:00:00Z",
         } as Intervention,
       ],
-      now,
+      now
     );
     expect(rows.some((r) => r.kind === "done_not_invoiced")).toBe(true);
   });

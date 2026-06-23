@@ -1,5 +1,5 @@
-import type { Intervention } from "@/features/interventions/types";
-import type { AssignScheduleOverride } from "@/features/interventions/assignInterventionToTechnician";
+import type { Intervention } from "@/features/interventions";
+import type { AssignScheduleOverride } from "@/features/interventions";
 import {
   localCalendarYmd,
   scheduledFieldsWhenReleasingToTechnician,

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
 import {
   bucketForIntervention,

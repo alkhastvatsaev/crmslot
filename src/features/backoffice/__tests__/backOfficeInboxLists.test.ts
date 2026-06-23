@@ -4,7 +4,7 @@ import {
   computePendingRequests,
   computeValidationReports,
 } from "@/features/backoffice/backOfficeInboxLists";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(
   partial: Partial<Intervention> & { id: string; status: Intervention["status"] }

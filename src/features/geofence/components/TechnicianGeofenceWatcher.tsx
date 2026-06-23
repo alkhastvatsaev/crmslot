@@ -6,7 +6,7 @@ import { useGeofenceMonitor } from "../useGeofenceMonitor";
 import { geofenceArrivalNextStatus } from "../geofenceArrival";
 import { showGeofenceArrivalToast } from "./GeofenceArrivalToast";
 import { transitionInterventionFromTechnician } from "@/features/interventions/workflow/transitionInterventionFromTechnician";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   missions: Intervention[];

@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   selectedItem: Intervention;

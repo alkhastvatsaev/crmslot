@@ -5,7 +5,7 @@ import {
   getE2eSeedTechnicianUid,
   isE2eSeedAllowed,
 } from "@/features/interventions/server/e2eSeedConfig";
-import type { QuoteLine } from "@/features/quotes/types";
+import type { QuoteLine } from "@/features/quotes";
 
 export const E2E_PORTAL_QUOTE_INTERVENTION_ID = "e2e-portal-quote";
 export const E2E_PORTAL_QUOTE_DOC_ID = "e2e-quote-portal-1";

@@ -5,7 +5,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
 
 export type BackOfficeInterventionsCompanyScope = string | readonly string[] | null;

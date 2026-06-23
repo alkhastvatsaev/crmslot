@@ -1,5 +1,5 @@
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { CrmActivityEvent, CrmEventType } from "./crmActivityTypes";
 
 export type CrmActivityEventDetail = {
