@@ -4,10 +4,12 @@ CRM contacts : fiches client, sites, import CSV, contrats.
 
 ## Points d'entrée
 
-| Fichier               | Rôle                     |
-| --------------------- | ------------------------ |
-| `ClientsCrmPanel.tsx` | Point d'entrée principal |
-| _(voir dossier)_      | Modules colocalisés      |
+| Fichier                                 | Rôle                              |
+| --------------------------------------- | --------------------------------- |
+| `components/ClientsCrmPanel.tsx`        | Orchestrateur UI (Espace société) |
+| `hooks/useClientsCrmPanelController.ts` | État + handlers CRM               |
+| `components/ClientsCrmClientsList.tsx`  | Liste clients filtrée             |
+| `components/ClientsCrmClientDetail.tsx` | Fiche client, sites, équipement   |
 
 ## Données
 
