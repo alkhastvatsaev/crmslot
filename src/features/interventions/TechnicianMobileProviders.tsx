@@ -13,6 +13,7 @@ import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { DashboardPagerProvider } from "@/features/dashboard";
 import { DashboardPageSelectorProvider } from "@/features/dashboard";
+import { MobileDockOnboardingProvider } from "@/features/dashboard/MobileDockOnboardingContext";
 import DeferredTechnicianBootstraps from "@/features/interventions/components/DeferredTechnicianBootstraps";
 
 const TECHNICIAN_MOBILE_PAGE_COUNT = 1;
@@ -31,16 +32,18 @@ export default function TechnicianMobileProviders({ children }: Props) {
           <FeatureFlagsProvider>
             <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
               <DashboardPageSelectorProvider>
-                <TechnicianQueryProvider>
-                  <OfflineSyncProvider>
-                    <TechnicianCaseIntentProvider>
-                      <TechnicianFinishJobProvider>
-                        <DeferredTechnicianBootstraps />
-                        <TechnicianLoginGate>{children}</TechnicianLoginGate>
-                      </TechnicianFinishJobProvider>
-                    </TechnicianCaseIntentProvider>
-                  </OfflineSyncProvider>
-                </TechnicianQueryProvider>
+                <MobileDockOnboardingProvider>
+                  <TechnicianQueryProvider>
+                    <OfflineSyncProvider>
+                      <TechnicianCaseIntentProvider>
+                        <TechnicianFinishJobProvider>
+                          <DeferredTechnicianBootstraps />
+                          <TechnicianLoginGate>{children}</TechnicianLoginGate>
+                        </TechnicianFinishJobProvider>
+                      </TechnicianCaseIntentProvider>
+                    </OfflineSyncProvider>
+                  </TechnicianQueryProvider>
+                </MobileDockOnboardingProvider>
               </DashboardPageSelectorProvider>
             </DashboardPagerProvider>
           </FeatureFlagsProvider>

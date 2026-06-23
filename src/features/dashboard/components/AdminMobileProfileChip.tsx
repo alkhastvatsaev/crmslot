@@ -1,6 +1,7 @@
 "use client";
 
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils";
 export default function AdminMobileProfileChip() {
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
+  const dockOnboarding = useMobileDockOnboardingOptional();
   const { fields, ready } = useCrmStaffAccountPanel();
   const accountOpen = pageSelector.view === "account";
 
@@ -35,7 +37,10 @@ export default function AdminMobileProfileChip() {
       aria-label={String(t("staff_account.title"))}
       aria-expanded={accountOpen}
       disabled={!ready}
-      onClick={() => pageSelector.toggleAccount()}
+      onClick={() => {
+        dockOnboarding?.dismissFooterHint();
+        pageSelector.toggleAccount();
+      }}
     >
       <div className="flex min-w-0 max-w-full items-center justify-center gap-2">
         <span

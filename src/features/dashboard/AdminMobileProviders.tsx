@@ -11,6 +11,7 @@ import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposer
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { MobileDockOnboardingProvider } from "@/features/dashboard/MobileDockOnboardingContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";
 
@@ -33,10 +34,12 @@ export default function AdminMobileProviders({ children }: Props) {
                 <MobileGalaxyComposerOpenProvider>
                   <DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}>
                     <DashboardPageSelectorProvider>
-                      <BackofficeInboxIntentProvider>
-                        <DeferredAdminBootstraps />
-                        {children}
-                      </BackofficeInboxIntentProvider>
+                      <MobileDockOnboardingProvider>
+                        <BackofficeInboxIntentProvider>
+                          <DeferredAdminBootstraps />
+                          {children}
+                        </BackofficeInboxIntentProvider>
+                      </MobileDockOnboardingProvider>
                     </DashboardPageSelectorProvider>
                   </DashboardPagerProvider>
                 </MobileGalaxyComposerOpenProvider>

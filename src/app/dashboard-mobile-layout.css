@@ -89,28 +89,120 @@
 }
 
 /**
- * Indice onboarding : halo bleu très discret derrière le dock calendrier (header).
- * S'éteint quand le sélecteur de pages est ouvert ou si reduced-motion.
+ * Onboarding docks mobile — halo bleu discret (étape 1 : header, étape 2 : footer profil).
+ * Persistance localStorage via `MobileDockOnboardingContext`.
  */
-@keyframes mobile-header-dock-hint-glow {
+@keyframes mobile-dock-hint-glow {
   0%,
   76%,
   100% {
     opacity: 0;
     box-shadow:
-      0 12px 36px -14px rgb(37 99 235 / 0),
+      0 14px 40px -12px rgb(37 99 235 / 0),
       0 0 0 0 rgb(59 130 246 / 0);
   }
 
   38% {
     opacity: 1;
     box-shadow:
-      0 14px 42px -12px rgb(37 99 235 / 0.2),
-      0 0 32px -8px rgb(59 130 246 / 0.16);
+      0 18px 52px -10px rgb(37 99 235 / 0.36),
+      0 0 44px -6px rgb(59 130 246 / 0.28);
   }
 }
 
-[data-mobile-shell] header .mobile-profile-bar-chrome::before {
+@keyframes mobile-dock-hint-spill-down {
+  0%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.82);
+  }
+
+  38% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes mobile-dock-hint-spill-up {
+  0%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.82);
+  }
+
+  38% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-header,
+[data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-footer {
+  overflow: visible;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-body {
+  position: relative;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-body::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--mobile-shell-pad-x) + 4%);
+  right: calc(var(--mobile-shell-pad-x) + 4%);
+  top: 0;
+  height: 2.25rem;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 0%,
+    rgb(59 130 246 / 0.24) 0%,
+    rgb(59 130 246 / 0.08) 52%,
+    transparent 76%
+  );
+  filter: blur(12px);
+  animation: mobile-dock-hint-spill-down 5.8s ease-in-out infinite;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-body {
+  position: relative;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-body::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--mobile-shell-pad-x) + 4%);
+  right: calc(var(--mobile-shell-pad-x) + 4%);
+  bottom: 0;
+  height: 2.25rem;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 100%,
+    rgb(59 130 246 / 0.24) 0%,
+    rgb(59 130 246 / 0.08) 52%,
+    transparent 76%
+  );
+  filter: blur(12px);
+  animation: mobile-dock-hint-spill-up 5.8s ease-in-out infinite;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-body > *,
+[data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"]
+  header
+  .mobile-profile-bar-chrome::before,
+[data-mobile-shell][data-mobile-dock-hint-footer="active"]
+  footer
+  .mobile-galaxy-dock-chrome::before {
   content: "";
   position: absolute;
   inset: -4px -6px;
@@ -120,26 +212,83 @@
   opacity: 0;
   background: radial-gradient(
     ellipse 105% 95% at 50% 52%,
-    rgb(59 130 246 / 0.14) 0%,
-    rgb(59 130 246 / 0.05) 42%,
+    rgb(59 130 246 / 0.26) 0%,
+    rgb(59 130 246 / 0.11) 42%,
     transparent 72%
   );
-  animation: mobile-header-dock-hint-glow 5.8s ease-in-out infinite;
+  animation: mobile-dock-hint-glow 5.8s ease-in-out infinite;
   will-change: opacity, box-shadow;
 }
 
-[data-mobile-shell] header .mobile-profile-bar-chrome > * {
+[data-mobile-shell][data-mobile-dock-hint-header="active"]
+  header
+  .mobile-profile-bar-chrome::after {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: calc(100% - 0.25rem);
+  height: 3rem;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 0%,
+    rgb(59 130 246 / 0.34) 0%,
+    rgb(59 130 246 / 0.14) 48%,
+    transparent 74%
+  );
+  filter: blur(11px);
+  animation: mobile-dock-hint-spill-down 5.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-footer="active"]
+  footer
+  .mobile-galaxy-dock-chrome::after {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: calc(100% - 0.25rem);
+  height: 3rem;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 100%,
+    rgb(59 130 246 / 0.34) 0%,
+    rgb(59 130 246 / 0.14) 48%,
+    transparent 74%
+  );
+  filter: blur(11px);
+  animation: mobile-dock-hint-spill-up 5.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+[data-mobile-shell][data-mobile-dock-hint-header="active"] header .mobile-profile-bar-chrome > *,
+[data-mobile-shell][data-mobile-dock-hint-footer="active"] footer .mobile-galaxy-dock-chrome > * {
   position: relative;
   z-index: 1;
 }
 
-[data-mobile-shell][data-page-selector-open="true"] header .mobile-profile-bar-chrome::before {
-  animation: none;
-  opacity: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  [data-mobile-shell] header .mobile-profile-bar-chrome::before {
+  [data-mobile-shell][data-mobile-dock-hint-header="active"]
+    header
+    .mobile-profile-bar-chrome::before,
+  [data-mobile-shell][data-mobile-dock-hint-header="active"]
+    header
+    .mobile-profile-bar-chrome::after,
+  [data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-body::before,
+  [data-mobile-shell][data-mobile-dock-hint-footer="active"]
+    footer
+    .mobile-galaxy-dock-chrome::before,
+  [data-mobile-shell][data-mobile-dock-hint-footer="active"]
+    footer
+    .mobile-galaxy-dock-chrome::after,
+  [data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-body::after {
     animation: none;
     opacity: 0;
   }
