@@ -4,11 +4,15 @@ Auth staff + portail client, détection rôle, guards session.
 
 ## Points d'entrée
 
-| Fichier                                | Rôle                                  |
-| -------------------------------------- | ------------------------------------- |
-| `components/LoginOverlay.tsx`          | Gate admin                            |
-| `components/ClientPortalAuthPanel.tsx` | Auth portail client                   |
-| `useAccountRole.ts`                    | Admin / technicien / client satellite |
+| Fichier                                   | Rôle                                   |
+| ----------------------------------------- | -------------------------------------- |
+| `components/LoginOverlay.tsx`             | Gate admin                             |
+| `components/CrmEmailLoginPanel.tsx`       | Orchestrateur login staff (~65 lignes) |
+| `components/CrmEmailLoginPanelHeader.tsx` | Logo + titre login staff               |
+| `components/CrmEmailLoginForm.tsx`        | Champs email / mot de passe staff      |
+| `hooks/useCrmEmailLoginForm.ts`           | État + submit / reset staff            |
+| `components/ClientPortalAuthPanel.tsx`    | Auth portail client                    |
+| `useAccountRole.ts`                       | Admin / technicien / client satellite  |
 
 ## Données
 
