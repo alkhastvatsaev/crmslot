@@ -1,24 +1,6 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
-import AdminMobileApp from "@/features/dashboard/components/AdminMobileApp";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "CRMSLOT Admin",
-  description: "Inbox et missions du jour",
-};
-
-export default function AdminMobileRoutePage() {
-  return (
-    <Suspense
-      fallback={
-        <div
-          data-testid="admin-mobile-route-loading"
-          className="flex min-h-dvh items-center justify-center bg-slate-50"
-          aria-busy="true"
-        />
-      }
-    >
-      <AdminMobileApp />
-    </Suspense>
-  );
+/** Ancienne route satellite — une seule app CRM : `/`. */
+export default function AdminMobileLegacyRoute() {
+  redirect("/");
 }

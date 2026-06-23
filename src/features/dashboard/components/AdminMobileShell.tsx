@@ -27,8 +27,6 @@ type Props = {
   children: ReactNode;
   /** Dock bas : profil par défaut, Galaxy si actif (`MobileShellFooterDock`). */
   dock?: ReactNode;
-  /** Sous le dock (ex. lien CRM complet). */
-  footerExtra?: ReactNode;
 };
 
 const accountOverlayClass = cn(
@@ -41,7 +39,7 @@ const accountOverlayClass = cn(
  * Chrome mobile admin — même grammaire que `MobileShell` / `TechnicianMobileShell` :
  * calendrier en haut · panneaux centraux (children) · profil ou Galaxy en bas.
  */
-export default function AdminMobileShell({ children, dock, footerExtra }: Props) {
+export default function AdminMobileShell({ children, dock }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
   const accountOpen = view === "account";
 
@@ -116,11 +114,6 @@ export default function AdminMobileShell({ children, dock, footerExtra }: Props)
           </MobileShellSlotGrid>
         ) : null}
         <MobileHubDotsBar />
-        {footerExtra ? (
-          <div className="grid w-full grid-cols-[var(--mobile-shell-pad-x)_minmax(0,1fr)_var(--mobile-shell-pad-x)]">
-            <div className="col-start-2 min-w-0">{footerExtra}</div>
-          </div>
-        ) : null}
       </footer>
     </div>
   );
