@@ -1,20 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { GMAIL_HUB_SLOT_INDEX, GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
+import { GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";
 import { useGmailHubLinkIntervention } from "@/features/gmail/useGmailHubLinkIntervention";
 import { useGmailCreateIntervention } from "@/features/gmail/hooks/useGmailCreateIntervention";
 import { useGmailHubPdfPreview } from "@/features/gmail/hooks/useGmailHubPdfPreview";
-import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { useGmailHubOAuthReturn } from "@/features/gmail/hooks/useGmailHubOAuthReturn";
+import { useGmailHubCompose } from "@/features/gmail/hooks/useGmailHubCompose";
+import { useGmailHubReaderActions } from "@/features/gmail/hooks/useGmailHubReaderActions";
+import { useGmailHubAccountActions } from "@/features/gmail/hooks/useGmailHubAccountActions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import { parseSenderEmail } from "@/features/gmail/gmailHubUi";
 import type { GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
 
 export function useGmailHubPageController(slotIndex: number) {
@@ -24,7 +26,6 @@ export function useGmailHubPageController(slotIndex: number) {
   const workspace = useCompanyWorkspaceOptional();
   const { logEmail } = useActivityLog();
   const companyId = (workspace?.activeCompanyId ?? "").trim() || null;
-  /** Sans pager (tests) : chargement immédiat ; avec pager : uniquement quand la page est visible. */
   const pageActive = pager == null || pager.pageIndex === slotIndex;
   const [linkPanelOpen, setLinkPanelOpen] = useState(false);
   const { interventions } = useBackOfficeInterventions(linkPanelOpen ? companyId : null);
@@ -39,16 +40,11 @@ export function useGmailHubPageController(slotIndex: number) {
   } = useGmailHubLinkIntervention(companyId);
   const { creating: creatingIntervention, createFromMessage } =
     useGmailCreateIntervention(companyId);
-  const oauthReturnHandled = useRef(false);
+
   const [activeLabelId, setActiveLabelId] = useState("INBOX");
   const [searchQuery, setSearchQuery] = useState("");
   const hub = useGmailHub({ labelId: activeLabelId, enabled: pageActive });
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [composing, setComposing] = useState(false);
-  const [composeTo, setComposeTo] = useState("");
-  const [composeSubject, setComposeSubject] = useState("");
-  const [composeBody, setComposeBody] = useState("");
-  const [sending, setSending] = useState(false);
 
   const {
     pdfPreviewUrl,
@@ -64,48 +60,12 @@ export function useGmailHubPageController(slotIndex: number) {
     attachmentErrorLabel: String(t("gmail.hub.attachment_error")),
   });
 
+  useGmailHubOAuthReturn(hub);
+
   useEffect(() => {
     setLinkPanelOpen(false);
     resetGmailLink();
   }, [selectedId, resetGmailLink]);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || oauthReturnHandled.current) return;
-    const params = new URLSearchParams(window.location.search);
-    const connected = params.get("gmail_connected");
-    const oauthError = params.get("gmail_error");
-    if (!connected && !oauthError) return;
-
-    oauthReturnHandled.current = true;
-    pager?.setPageIndex(GMAIL_HUB_SLOT_INDEX);
-
-    const cleanOAuthQuery = () => {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("gmail_connected");
-      url.searchParams.delete("gmail_error");
-      const next = url.pathname + (url.search || "");
-      window.history.replaceState({}, "", next);
-    };
-
-    if (connected === "1") {
-      void (async () => {
-        await hub.refreshStatus({ silent: true });
-        await hub.refreshLabels();
-        toast.success(String(t("gmail.hub.connected_ok")));
-        cleanOAuthQuery();
-      })();
-      return;
-    }
-
-    const errKey =
-      oauthError === "access_denied"
-        ? "gmail.hub.oauth_denied"
-        : oauthError === "no_refresh_token"
-          ? "gmail.hub.oauth_no_refresh"
-          : "gmail.hub.oauth_failed";
-    toast.error(String(t(errKey)));
-    cleanOAuthQuery();
-  }, [hub, pager, t]);
 
   const userLabels = useMemo(
     () => hub.labels.filter((l) => l.type === "user").slice(0, 12),
@@ -124,39 +84,55 @@ export function useGmailHubPageController(slotIndex: number) {
     void hub.loadMessages({ labelId: activeLabelId, q: searchQuery });
   }, [hub, activeLabelId, searchQuery]);
 
+  const compose = useGmailHubCompose({
+    hub,
+    reloadInbox,
+    t,
+    setLinkPanelOpen,
+    setSelectedId,
+  });
+
   const selectLabel = useCallback(
     (id: string) => {
       setActiveLabelId(id);
       setSelectedId(null);
       setSearchQuery("");
-      setComposing(false);
+      compose.setComposing(false);
       hub.clearThread();
     },
-    [hub]
+    [hub, compose]
   );
-
-  const startCompose = useCallback(() => {
-    setComposing(true);
-    setSelectedId(null);
-    hub.setSelectedMessage(null);
-    setComposeTo("");
-    setComposeSubject("");
-    setComposeBody("");
-  }, [hub]);
 
   const handleSelectMessage = useCallback(
     (msg: GmailHubMessageSummary) => {
       setSelectedId(msg.id);
-      setComposing(false);
+      compose.setComposing(false);
       void hub.loadThread(msg.threadId, msg.id);
       logEmail(msg.subject ?? "(sans objet)");
     },
-    [hub.loadThread, logEmail]
+    [hub.loadThread, logEmail, compose]
   );
 
-  /** Ouvre le mail le plus récent (1er de la liste Gmail) quand rien n'est sélectionné. */
+  const reader = useGmailHubReaderActions({
+    hub,
+    selectedId,
+    setSelectedId,
+    reloadInbox,
+    t,
+    logEmail,
+    handleSelectMessage,
+  });
+
+  const account = useGmailHubAccountActions({
+    hub,
+    t,
+    closePdfPreview,
+    setSelectedId,
+    setComposing: compose.setComposing,
+  });
+
   useEffect(() => {
-    if (hub.status?.oauthConfigured !== true || composing || hub.loadingList) return;
+    if (hub.status?.oauthConfigured !== true || compose.composing || hub.loadingList) return;
     const { messages } = hub;
     if (messages.length === 0) return;
     if (selectedId && messages.some((m) => m.id === selectedId)) return;
@@ -165,99 +141,12 @@ export function useGmailHubPageController(slotIndex: number) {
     void hub.loadThread(latest.threadId, latest.id);
   }, [
     hub.status?.oauthConfigured,
-    composing,
+    compose.composing,
     hub.loadingList,
     hub.messages,
     selectedId,
     hub.loadThread,
   ]);
-
-  const handleListToggleRead = useCallback(
-    async (msg: GmailHubMessageSummary, markAsUnread: boolean) => {
-      try {
-        await hub.toggleReadState(msg.id, markAsUnread);
-        toast.success(
-          String(markAsUnread ? t("gmail.hub.marked_unread") : t("gmail.hub.marked_read"))
-        );
-        logEmail(`${markAsUnread ? "Non-lu" : "Lu"} : ${msg.subject ?? "(sans objet)"}`);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : String(t("common.error")));
-      }
-    },
-    [hub, t, logEmail]
-  );
-
-  const handleReaderToggleRead = useCallback(() => {
-    const m = hub.selectedMessage;
-    if (!m) return;
-    void handleListToggleRead(m, !m.isUnread);
-  }, [hub.selectedMessage, handleListToggleRead]);
-
-  const handleToggleLabel = useCallback(
-    (labelId: string) => {
-      const m = hub.selectedMessage;
-      if (!m) return;
-      void (async () => {
-        try {
-          await hub.toggleUserLabel(m.id, labelId, m.labelIds.includes(labelId));
-          toast.success(String(t("gmail.hub.label_updated")));
-        } catch (e) {
-          toast.error(e instanceof Error ? e.message : String(t("common.error")));
-        }
-      })();
-    },
-    [hub, t]
-  );
-
-  const goAdjacentMessage = useCallback(
-    (delta: number) => {
-      if (!selectedId || hub.messages.length === 0) return;
-      const idx = hub.messages.findIndex((m) => m.id === selectedId);
-      if (idx < 0) return;
-      const next = hub.messages[idx + delta];
-      if (next) handleSelectMessage(next);
-    },
-    [selectedId, hub.messages, handleSelectMessage]
-  );
-
-  const handleConnect = async () => {
-    try {
-      const res = await fetchWithAuth("/api/integrations/gmail/auth-url");
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        throw new Error(data.error ?? "Impossible de démarrer OAuth Gmail.");
-      }
-      window.location.href = data.url;
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(t("common.error")));
-    }
-  };
-
-  const handleDisconnect = () => {
-    if (!window.confirm(String(t("gmail.hub.disconnect_confirm")))) return;
-    void (async () => {
-      try {
-        closePdfPreview();
-        setSelectedId(null);
-        setComposing(false);
-        hub.setSelectedMessage(null);
-        await hub.disconnectGmail();
-        toast.success(String(t("gmail.hub.disconnected_ok")));
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : String(t("common.error")));
-      }
-    })();
-  };
-
-  const handleReply = () => {
-    const m = hub.selectedMessage;
-    if (!m) return;
-    setLinkPanelOpen(false);
-    setComposeTo(parseSenderEmail(m.from));
-    setComposeSubject(m.subject.startsWith("Re:") ? m.subject : `Re: ${m.subject}`);
-    setComposeBody(`\n\n—\n${m.bodyText}`);
-    setComposing(true);
-  };
 
   const handleCreateInterventionFromEmail = useCallback(async () => {
     const m = hub.selectedMessage;
@@ -295,103 +184,6 @@ export function useGmailHubPageController(slotIndex: number) {
     [hub.selectedMessage, linkToIntervention, resetGmailLink, t]
   );
 
-  const handleSend = async () => {
-    const m = hub.selectedMessage;
-    setSending(true);
-    try {
-      await hub.sendMessage({
-        to: composeTo.trim(),
-        subject: composeSubject.trim(),
-        bodyText: composeBody.trim(),
-        threadId: composing && m ? m.threadId : undefined,
-        inReplyTo: composing && m?.messageIdHeader ? m.messageIdHeader : undefined,
-        references:
-          composing && m
-            ? [m.referencesHeader, m.messageIdHeader].filter(Boolean).join(" ").trim() || undefined
-            : undefined,
-      });
-      toast.success(String(t("gmail.hub.sent_ok")));
-      setComposing(false);
-      setComposeTo("");
-      setComposeSubject("");
-      setComposeBody("");
-      reloadInbox();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(t("common.error")));
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleStar = async () => {
-    const m = hub.selectedMessage;
-    if (!m) return;
-    const starred = m.labelIds.includes("STARRED");
-    // optimistic
-    const add = starred ? [] : ["STARRED"];
-    const remove = starred ? ["STARRED"] : [];
-    hub.setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id !== m.id
-          ? msg
-          : {
-              ...msg,
-              labelIds: [...msg.labelIds.filter((l) => !remove.includes(l)), ...add],
-            }
-      )
-    );
-    try {
-      await hub.modifyMessage(m.id, add, remove);
-      toast.success(String(t("gmail.hub.star_updated")));
-      void hub.loadThread(m.threadId, m.id);
-    } catch (e) {
-      reloadInbox(); // revert
-      toast.error(e instanceof Error ? e.message : String(t("common.error")));
-    }
-  };
-
-  const handleArchive = async () => {
-    const m = hub.selectedMessage;
-    if (!m) return;
-    // optimistic
-    hub.setMessages((prev) => prev.filter((msg) => msg.id !== m.id));
-    hub.setSelectedMessage(null);
-    setSelectedId(null);
-    try {
-      await hub.modifyMessage(m.id, [], ["INBOX"]);
-      toast.success(String(t("gmail.hub.archived")));
-    } catch (e) {
-      reloadInbox(); // revert
-      toast.error(e instanceof Error ? e.message : String(t("common.error")));
-    }
-  };
-
-  const handleTrash = async () => {
-    const m = hub.selectedMessage;
-    if (!m) return;
-    if (!window.confirm(String(t("gmail.hub.trash_confirm")))) return;
-    // optimistic
-    hub.setMessages((prev) => prev.filter((msg) => msg.id !== m.id));
-    hub.setSelectedMessage(null);
-    setSelectedId(null);
-    try {
-      await hub.trashMessage(m.id);
-      toast.success(String(t("gmail.hub.trashed")));
-    } catch (e) {
-      reloadInbox(); // revert
-      toast.error(e instanceof Error ? e.message : String(t("common.error")));
-    }
-  };
-
-  const handleComposeChange = useCallback(
-    (patch: { to?: string; subject?: string; body?: string }) => {
-      if (patch.to !== undefined) setComposeTo(patch.to);
-      if (patch.subject !== undefined) setComposeSubject(patch.subject);
-      if (patch.body !== undefined) setComposeBody(patch.body);
-    },
-    []
-  );
-
   const handleFocusThreadMessage = useCallback(
     (id: string) => {
       setSelectedId(id);
@@ -412,12 +204,12 @@ export function useGmailHubPageController(slotIndex: number) {
   const connected = !invalidGrant && hub.status?.oauthConfigured === true;
 
   useGmailHubKeyboard({
-    enabled: connected && !composing,
-    onReply: handleReply,
-    onArchive: () => void handleArchive(),
-    onTrash: () => void handleTrash(),
-    onNext: () => goAdjacentMessage(1),
-    onPrev: () => goAdjacentMessage(-1),
+    enabled: connected && !compose.composing,
+    onReply: compose.handleReply,
+    onArchive: () => void reader.handleArchive(),
+    onTrash: () => void reader.handleTrash(),
+    onNext: () => reader.goAdjacentMessage(1),
+    onPrev: () => reader.goAdjacentMessage(-1),
   });
 
   return {
@@ -428,13 +220,13 @@ export function useGmailHubPageController(slotIndex: number) {
     searchQuery,
     setSearchQuery,
     selectedId,
-    composing,
-    setComposing,
-    composeTo,
-    composeSubject,
-    composeBody,
-    handleComposeChange,
-    sending,
+    composing: compose.composing,
+    setComposing: compose.setComposing,
+    composeTo: compose.composeTo,
+    composeSubject: compose.composeSubject,
+    composeBody: compose.composeBody,
+    handleComposeChange: compose.handleComposeChange,
+    sending: compose.sending,
     userLabels,
     activeLabelTitle,
     devLocal,
@@ -460,20 +252,20 @@ export function useGmailHubPageController(slotIndex: number) {
     handleOpenPdf,
     reloadInbox,
     selectLabel,
-    startCompose,
+    startCompose: compose.startCompose,
     handleSelectMessage,
-    handleListToggleRead,
-    handleReaderToggleRead,
-    handleToggleLabel,
-    handleConnect,
-    handleDisconnect,
-    handleReply,
+    handleListToggleRead: reader.handleListToggleRead,
+    handleReaderToggleRead: reader.handleReaderToggleRead,
+    handleToggleLabel: reader.handleToggleLabel,
+    handleConnect: account.handleConnect,
+    handleDisconnect: account.handleDisconnect,
+    handleReply: compose.handleReply,
     handleCreateInterventionFromEmail,
     handleLinkToIntervention,
-    handleSend,
-    handleStar,
-    handleArchive,
-    handleTrash,
+    handleSend: compose.handleSend,
+    handleStar: reader.handleStar,
+    handleArchive: reader.handleArchive,
+    handleTrash: reader.handleTrash,
     handleFocusThreadMessage,
   };
 }
