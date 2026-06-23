@@ -21,7 +21,11 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `smartFormSubmit.ts`                               | Soumission Firestore + upload audio                         |
 | `hooks/useSmartFormDraftEffects.ts`                | Autosave, prefill, slots pris                               |
 | `components/TechnicianFinishJobPanel.tsx`          | Wizard clôture terrain (~155 lignes)                        |
-| `hooks/useFinishJobWizard.ts`                      | État photos / signature / facture                           |
+| `hooks/useFinishJobWizard.ts`                      | Orchestrateur wizard clôture (~120 lignes)                  |
+| `hooks/useFinishJobWizardCamera.ts`                | Caméra + capture photos wizard clôture                      |
+| `hooks/useFinishJobWizardEffects.ts`               | Hydratation rapport + prefetch facture brouillon            |
+| `hooks/useFinishJobWizardSubmit.ts`                | Soumission rapport terrain + navigation post-clôture        |
+| `hooks/finishJobWizardDraftBilling.ts`             | Prefetch API prepare-draft-billing                          |
 | `hooks/useRequesterInterventionForm.ts`            | Portail demandeur (~195 lignes)                             |
 | `components/RequesterInterventionPanel.tsx`        | Orchestrateur portail demandeur (~25 lignes)                |
 | `hooks/useRequesterInterventionPanelController.ts` | État + voice + submit portail                               |
