@@ -4,24 +4,31 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 
 ## Points d'entrée
 
-| Fichier                                   | Rôle                                                        |
-| ----------------------------------------- | ----------------------------------------------------------- |
-| `types.ts`                                | Type `Intervention` — **import public #1** pour toute l'app |
-| `technicianSchedule.ts`                   | Barrel schedule technicien (filtres/tri missions)           |
-| `technicianScheduleParse.ts`              | Ancrage dates, coercion Firestore                           |
-| `technicianScheduleVisibility.ts`         | Filtres onglets / file back-office                          |
-| `technicianScheduleLabels.ts`             | Libellés horaires et client                                 |
-| `hooks/useSmartForm.ts`                   | Orchestrateur wizard demande client (~220 lignes)           |
-| `smartFormDraftStorage.ts`                | Brouillon localStorage + step initial                       |
-| `smartFormSubmit.ts`                      | Soumission Firestore + upload audio                         |
-| `hooks/useSmartFormDraftEffects.ts`       | Autosave, prefill, slots pris                               |
-| `components/TechnicianFinishJobPanel.tsx` | Wizard clôture terrain (~155 lignes)                        |
-| `hooks/useFinishJobWizard.ts`             | État photos / signature / facture                           |
-| `hooks/useRequesterInterventionForm.ts`   | Portail demandeur (~195 lignes)                             |
-| `requesterInterventionFormSubmit.ts`      | Soumission Firestore portail client                         |
-| `requesterInterventionFormHelpers.ts`     | Auth anonyme + timeout géoloc                               |
-| `workflow/interventionWorkflow.ts`        | Transitions statut                                          |
-| `assignInterventionToTechnician.ts`       | Assignation (seuil coverage P0 100 %)                       |
+| Fichier                                            | Rôle                                                        |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| `types.ts`                                         | Type `Intervention` — **import public #1** pour toute l'app |
+| `technicianSchedule.ts`                            | Barrel schedule technicien (filtres/tri missions)           |
+| `technicianScheduleParse.ts`                       | Ancrage dates, coercion Firestore                           |
+| `technicianScheduleVisibility.ts`                  | Filtres onglets / file back-office                          |
+| `technicianScheduleLabels.ts`                      | Libellés horaires et client                                 |
+| `hooks/useSmartForm.ts`                            | Orchestrateur wizard demande client (~220 lignes)           |
+| `smartFormDraftStorage.ts`                         | Brouillon localStorage + step initial                       |
+| `smartFormSubmit.ts`                               | Soumission Firestore + upload audio                         |
+| `hooks/useSmartFormDraftEffects.ts`                | Autosave, prefill, slots pris                               |
+| `components/TechnicianFinishJobPanel.tsx`          | Wizard clôture terrain (~155 lignes)                        |
+| `hooks/useFinishJobWizard.ts`                      | État photos / signature / facture                           |
+| `hooks/useRequesterInterventionForm.ts`            | Portail demandeur (~195 lignes)                             |
+| `components/RequesterInterventionPanel.tsx`        | Orchestrateur portail demandeur (~25 lignes)                |
+| `hooks/useRequesterInterventionPanelController.ts` | État + voice + submit portail                               |
+| `components/RequesterInterventionSteps.tsx`        | Steps animés AnimatePresence                                |
+| `components/RequesterStepPhotos.tsx`               | Étape photos portail                                        |
+| `components/RequesterStepTimeSlot.tsx`             | Étape créneau portail                                       |
+| `components/RequesterStepAddressSubmit.tsx`        | Étape adresse + envoi                                       |
+| `requesterInterventionStepMotion.ts`               | Variants Framer Motion steps                                |
+| `requesterInterventionFormSubmit.ts`               | Soumission Firestore portail client                         |
+| `requesterInterventionFormHelpers.ts`              | Auth anonyme + timeout géoloc                               |
+| `workflow/interventionWorkflow.ts`                 | Transitions statut                                          |
+| `assignInterventionToTechnician.ts`                | Assignation (seuil coverage P0 100 %)                       |
 
 ## Données
 
