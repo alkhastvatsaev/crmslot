@@ -2,13 +2,13 @@
 
 import type { ReactNode } from "react";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
-import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import ClientMobileProfileChip from "@/features/company/components/ClientMobileProfileChip";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
   MOBILE_GALAXY_DOCK_CLASS,
+  MOBILE_HEADER_RAIL_HOST_CLASS,
   MOBILE_PROFILE_BAR_CHROME_CLASS,
   MOBILE_PROFILE_BAR_CLASS,
   MOBILE_SHELL_BODY_CLASS,
@@ -16,6 +16,7 @@ import {
   MOBILE_SHELL_FOOTER_CLASS,
   MOBILE_SHELL_HEADER_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
+import { cn } from "@/lib/utils";
 
 type Props = {
   children: ReactNode;
@@ -41,20 +42,19 @@ export default function ClientMobileShell({ children }: Props) {
           chromeClassName={MOBILE_PROFILE_BAR_CHROME_CLASS}
           data-testid="client-mobile-top-bar"
         >
-          <MobileHeaderRailLayout
-            rootTestId="client-mobile-header-rail"
-            leftTestId="client-mobile-header-calendar"
-            centerTestId="client-mobile-header-title"
-            swipeDisabled
-            left={<ClockCalendar compact interactive />}
-            center={
-              <div className="mobile-header-chip flex h-full w-full items-center justify-center px-4">
-                <span className="text-sm font-semibold uppercase tracking-wider text-slate-800">
-                  Demande
-                </span>
-              </div>
-            }
-          />
+          <div
+            className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, "mobile-header-rail-host h-full w-full")}
+            data-testid="client-mobile-header-rail"
+          >
+            <div
+              data-testid="client-mobile-header-calendar"
+              data-mobile-header-rail="left"
+              data-mobile-header-rail-active="true"
+              className="mobile-header-rail-layer flex h-full w-full min-h-0 items-stretch"
+            >
+              <ClockCalendar compact interactive />
+            </div>
+          </div>
         </MobileShellSlotGrid>
       </header>
 

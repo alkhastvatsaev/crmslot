@@ -66,8 +66,8 @@ export const MOBILE_SHELL_CONTRACT = {
       "data-mobile-hub-rail-active",
     ],
     "src/features/dashboard/components/MobileTopBar.tsx": [
-      "MobileHeaderRailLayout",
       "ClockCalendar compact",
+      "mobile-header-calendar",
     ],
     "src/app/page.tsx": ["AdminDashboardProviders", "MobileShell", "DashboardDesktopShell"],
     "src/features/dashboard/AdminDashboardProviders.tsx": [
