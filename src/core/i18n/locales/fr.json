@@ -1770,7 +1770,17 @@
     "company": "Société",
     "role": "Rôle",
     "role_admin": "Administrateur",
-    "role_staff": "Collaborateur"
+    "role_staff": "Collaborateur",
+    "phone": "Téléphone",
+    "edit": "Modifier",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete_account": "Supprimer le compte",
+    "delete_account_confirm": "Supprimer définitivement votre compte CRM ? Cette action est irréversible.",
+    "delete_account_success": "Compte supprimé.",
+    "delete_account_failed": "Impossible de supprimer le compte. Reconnectez-vous puis réessayez.",
+    "save_success": "Profil enregistré.",
+    "save_failed": "Enregistrement impossible. Vérifiez vos informations."
   },
   "map": {
     "boot_error_token": "Carte indisponible — jeton Mapbox manquant",
