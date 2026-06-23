@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { TRANSCRIPT_POLL_MS } from "@/features/map/mapTranscriptionReveal";
 import type { MapTranscriptionAudiosResponse } from "@/features/map/mapTranscriptionOverlayTypes";
@@ -116,14 +116,18 @@ export function useMapTranscriptionOverlayPoll({
     };
   }, [armed, scopedClipPublicUrl, onTranscriptReset, onDecisionRefused]);
 
+  const clearClosedSession = useCallback(() => {
+    closedForSessionRef.current = null;
+  }, []);
+
+  const closeSession = useCallback(() => {
+    closedForSessionRef.current = currentSessionKeyRef.current || null;
+  }, []);
+
   return {
     fullText,
     transcriptSourceUrl,
-    clearClosedSession: () => {
-      closedForSessionRef.current = null;
-    },
-    closeSession: () => {
-      closedForSessionRef.current = currentSessionKeyRef.current || null;
-    },
+    clearClosedSession,
+    closeSession,
   };
 }
