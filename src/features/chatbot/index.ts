@@ -35,3 +35,23 @@ export {
   GalaxyComposerSendButton,
   galaxyComposerFieldMouseDown,
 } from "@/features/chatbot/components/GalaxyComposerControls";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/chatbot/chatbot-gmail";
+export * from "@/features/chatbot/chatbot-route-handler";
+export * from "@/features/chatbot/chatbot-stored-messages";
+export * from "@/features/chatbot/chatbot-message-markdown";
+export * from "@/features/chatbot/chatbot-message-trim";
+export * from "@/features/chatbot/chatbot-conversation-context";
+export {
+  resolveDocumentActionTool,
+  handleChatbotDocumentActionPost,
+  type ChatbotDocumentActionBody,
+} from "@/features/chatbot/chatbot-document-action-handler";
+export * from "@/features/chatbot/chatbot-email-intent";
+export * from "@/features/chatbot/chatbot-intervention-source";
+export * from "@/features/chatbot/chatbot-lecot-instant-order-intent";
+export * from "@/features/chatbot/chatbot-order-side-effect";
+export * from "@/features/chatbot/chatbot-pwa-route";
+export * from "@/features/chatbot/chatbot-tools";
+export * from "@/features/chatbot/flushPendingLecotEmails";

@@ -8,3 +8,7 @@ export { invoicePreviewFromIntervention } from "@/features/billing/invoicePrevie
 export { downloadAccountingCsv } from "@/features/billing/exportAccountingCsv";
 export type { BillingPdfBranding } from "@/features/billing/billingPdfBranding";
 export { isValidInvoiceNumber, formatInvoiceNumber } from "@/features/billing/invoiceNumbering";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/billing/stripeMockMode";
+export * from "@/features/billing/loadBillingPdfBrandingForIntervention";

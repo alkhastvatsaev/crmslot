@@ -11,3 +11,6 @@ export {
 } from "@/features/stock/stockFirestore";
 export { buildVehicleStockAgentSystemPrompt } from "@/features/stock/vehicleStockAgentSystemPrompt";
 export { useVehicleStockAgent } from "@/features/stock/hooks/useVehicleStockAgent";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/stock/vehicleStockAgentRouteHandler";

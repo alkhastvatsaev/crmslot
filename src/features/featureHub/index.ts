@@ -72,3 +72,6 @@ export {
 } from "@/features/featureHub/companyStockMetrics";
 export type { StockImageMap } from "@/features/featureHub/hooks/useCompanyStockImages";
 export { useCompanyStockImages } from "@/features/featureHub/hooks/useCompanyStockImages";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/featureHub/materialAgentRouteHandler";
