@@ -1,4 +1,4 @@
-import { computeOrderTotal } from "@/features/suppliers/types";
+import { computeOrderTotal } from "@/features/suppliers";
 import {
   executeDemoLecotOrder,
   isLecotDemoMode,

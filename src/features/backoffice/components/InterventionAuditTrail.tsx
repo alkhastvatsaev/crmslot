@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
-import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { InterventionStatusEvent } from "@/features/interventions";
 import { Clock, ArrowRight, User, MessageSquare } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";

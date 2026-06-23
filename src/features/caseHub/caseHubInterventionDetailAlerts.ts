@@ -3,7 +3,7 @@ import { hasPendingTechnicianReportAmendment } from "@/features/interventions/te
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
-import type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
+import type { UnifiedDrawerTab } from "@/features/interventions";
 import type { CaseHubAlert } from "@/features/caseHub/caseHubInterventionDetailTypes";
 
 export function canCaseHubAssignTechnician(iv: Intervention): boolean {

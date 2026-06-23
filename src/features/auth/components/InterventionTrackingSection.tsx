@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, MapPin, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { Intervention } from "@/features/interventions/types";
+import { Intervention } from "@/features/interventions";
 import { cn } from "@/lib/utils";
 
 const STATUS_LABELS: Record<string, string> = {

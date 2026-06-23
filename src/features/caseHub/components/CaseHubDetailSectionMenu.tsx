@@ -6,7 +6,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { HubSegmentedControl } from "@/core/ui/hub";
 import { useInterventionEmails } from "@/features/emails/useInterventionEmails";
-import type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
+import type { UnifiedDrawerTab } from "@/features/interventions";
 
 const SECTIONS: Array<{
   id: UnifiedDrawerTab;

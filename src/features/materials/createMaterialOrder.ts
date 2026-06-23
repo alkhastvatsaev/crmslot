@@ -4,7 +4,7 @@ import type { Intervention } from "@/features/interventions";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
 import { createMaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
-import type { TransitionActor } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { TransitionActor } from "@/features/interventions";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
 
 export type CreateMaterialOrderParams = {

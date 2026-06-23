@@ -21,3 +21,7 @@ export { CHATBOT_TOOL_LABELS } from "@/features/chatbot/chatbot-tool-labels";
 export { isChatbotZeroTokenUiTool } from "@/features/chatbot/chatbot-document-side-effect";
 export type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-client-document";
 export { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
+export type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+export type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
+export type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
+export type { ChatbotStreamEmit } from "@/features/chatbot/chatbot-types";

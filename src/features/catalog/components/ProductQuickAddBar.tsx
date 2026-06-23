@@ -14,7 +14,7 @@ import {
 import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
 import { mergeCatalogProducts } from "@/features/catalog/searchCatalogProducts";
 import { useLecotProductSearch } from "@/features/catalog/useLecotProductSearch";
-import type { BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
+import type { BillingLine } from "@/features/interventions";
 
 type Props = {
   intervention: Pick<Intervention, "category" | "problem">;

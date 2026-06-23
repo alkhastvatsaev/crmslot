@@ -1,6 +1,6 @@
 import { emitChatbotOrderRegisteredEvents } from "@/features/chatbot/chatbot-order-side-effect";
 import { extractDocumentPreviewFromResult } from "@/features/chatbot/chatbot-document-side-effect";
-import type { ChatbotStreamEmit } from "@/features/chatbot/chatbot-types";
+import type { ChatbotStreamEmit } from "@/features/chatbot";
 import type { CompanyStockFilter } from "@/features/featureHub";
 import type { BillingPaymentFilter } from "@/features/billingHub";
 

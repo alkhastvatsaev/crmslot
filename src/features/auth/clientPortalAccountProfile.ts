@@ -3,7 +3,7 @@ import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { clientPortalFirestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/features/interventions";
 
 export type ClientPortalAccountFields = {
   firstName: string;

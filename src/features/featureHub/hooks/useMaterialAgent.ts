@@ -9,7 +9,7 @@ import type {
   CompanyStockAgentContext,
   CompanyStockAgentMessage,
 } from "@/features/featureHub/companyStockAgentTypes";
-import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
+import type { ChatbotQuickAction } from "@/features/chatbot";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import {

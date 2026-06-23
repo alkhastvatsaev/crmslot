@@ -1,4 +1,4 @@
-import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
+import type { ChatbotQuickAction } from "@/features/chatbot";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
 import type { MaterialOrderDoc } from "@/features/materials";
 import type { StockItem } from "@/features/materials";

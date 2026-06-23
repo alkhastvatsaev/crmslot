@@ -10,7 +10,7 @@ import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import ChatbotGalaxyOrb from "@/features/chatbot/components/ChatbotGalaxyOrb";
 import { renderChatbotMarkdownLite } from "@/features/chatbot/chatbot-message-markdown";
 import ChatbotQuickActions from "@/features/chatbot/components/ChatbotQuickActions";
-import type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
+import type { ChatbotQuickAction } from "@/features/chatbot";
 import { useCompanyStockAgentBridge } from "@/context/CompanyStockAgentBridgeContext";
 import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
 import type { CompanyStockAgentContext } from "@/features/featureHub/companyStockAgentTypes";

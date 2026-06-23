@@ -2,7 +2,7 @@
 
 import { ExternalLink, FileText, Sparkles } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
+import type { DraftBillingLine } from "@/features/interventions";
 import {
   formatInvoiceTotalEur,
   invoiceTotalCents,

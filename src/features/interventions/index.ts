@@ -27,7 +27,19 @@ export {
   canTransitionInterventionStatus,
   buildStatusTransitionPatch,
 } from "@/features/interventions/workflow/interventionWorkflow";
-export { default as TechnicianMobileApp } from "@/features/interventions/components/TechnicianMobileApp";
+export type {
+  WorkflowOwnerRole,
+  InterventionStatusEvent,
+  TransitionActor,
+} from "@/features/interventions/workflow/interventionWorkflowTypes";
+export type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
+export type { BillingLine } from "@/features/interventions/components/TechnicianBillingLinesForm";
+export type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
+export type {
+  RequesterProfile,
+  RequesterType,
+  InterventionRequestData,
+} from "@/features/interventions/context/RequesterHubContext";
 export type {
   PortalAccessSession,
   PortalAccessSessionCase,

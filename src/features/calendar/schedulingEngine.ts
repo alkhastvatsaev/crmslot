@@ -1,4 +1,4 @@
-import { Intervention } from '@/features/interventions/types';
+import { Intervention } from "@/features/interventions";
 
 export interface TimeSlot {
   date: string; // YYYY-MM-DD
@@ -34,13 +34,13 @@ export function checkSchedulingConflict(
     // Ignorer les interventions non assignées au technicien cible
     if (iv.assignedTechnicianUid !== targetTechnicianUid) continue;
     // Ignorer les interventions annulées ou terminées
-    if (iv.status === 'done' || iv.status === 'invoiced' || iv.status === 'cancelled') continue;
+    if (iv.status === "done" || iv.status === "invoiced" || iv.status === "cancelled") continue;
     // Ignorer les interventions non planifiées
     if (!iv.scheduledDate || !iv.scheduledTime) continue;
 
     const ivDateStr = `${iv.scheduledDate}T${iv.scheduledTime}:00`;
     const ivStart = new Date(ivDateStr).getTime();
-    
+
     if (isNaN(ivStart)) continue;
 
     const ivEnd = ivStart + assumedDurationMinutes * 60 * 1000;
@@ -53,7 +53,7 @@ export function checkSchedulingConflict(
       return {
         hasConflict: true,
         conflictingInterventionId: iv.id,
-        reason: `Conflit détecté avec l'intervention ${iv.id} prévue à ${iv.scheduledTime}.`
+        reason: `Conflit détecté avec l'intervention ${iv.id} prévue à ${iv.scheduledTime}.`,
       };
     }
   }

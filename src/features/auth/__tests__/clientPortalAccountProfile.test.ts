@@ -8,7 +8,7 @@ import {
   saveClientPortalAccountFields,
   validateClientPortalAccountFields,
 } from "@/features/auth/clientPortalAccountProfile";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/features/interventions";
 
 jest.mock("@/core/config/firebase", () => ({
   isConfigured: true,
