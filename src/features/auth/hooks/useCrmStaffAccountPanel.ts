@@ -162,8 +162,10 @@ export function useCrmStaffAccountPanel() {
       });
       setEditing(false);
       toast.success(String(t("staff_account.save_success")));
-    } catch {
-      toast.error(String(t("staff_account.save_failed")));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message.trim() : String(t("staff_account.save_failed"));
+      toast.error(message || String(t("staff_account.save_failed")));
     } finally {
       setSaving(false);
     }
