@@ -13,6 +13,10 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `technicianScheduleLabels.ts`                       | Libellés horaires et client                                 |
 | `hooks/useSmartForm.ts`                             | Orchestrateur wizard demande client (~220 lignes)           |
 | `components/SmartFormStep5Recap.tsx`                | Orchestrateur étape 5 récap (~95 lignes)                    |
+| `components/SmartFormAddressAutocomplete.tsx`       | Orchestrateur autocomplete adresse (~105 lignes)            |
+| `hooks/useSmartFormAddressAutocomplete.ts`          | Prédictions Google Places + clavier                         |
+| `hooks/smartFormAddressAutocompleteTypes.ts`        | Types Places API + constantes debounce                      |
+| `components/SmartFormAddressSuggestionsList.tsx`    | Liste suggestions portail fixed                             |
 | `components/SmartFormRecapTiles.tsx`                | Tuiles contact / lieu / détail / vocal / créneau            |
 | `components/SmartFormRecapPhotosSheet.tsx`          | Bandeau photos + modal aperçu                               |
 | `components/SmartFormRecapActionBar.tsx`            | Urgence + envoi                                             |
