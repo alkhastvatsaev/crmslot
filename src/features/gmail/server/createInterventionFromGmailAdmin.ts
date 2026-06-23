@@ -8,7 +8,7 @@ import {
 import { extractInterventionFieldsFromEmail } from "@/features/gmail/extractInterventionFieldsFromEmail";
 import { geocodeAddressAdmin } from "@/features/gmail/server/geocodeAddressAdmin";
 import { parseSenderEmail, parseSenderName } from "@/features/gmail/gmailSenderParse";
-import { generatePortalAccessToken } from "@/features/interventions/portalToken";
+import { generatePortalAccessToken } from "@/features/interventions";
 import type { Intervention } from "@/features/interventions";
 
 export type CreateInterventionFromGmailResult = {

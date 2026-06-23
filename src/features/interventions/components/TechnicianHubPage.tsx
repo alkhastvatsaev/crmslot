@@ -30,7 +30,7 @@ import TechnicianGeofenceWatcher from "@/features/geofence/components/Technician
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
-import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useDashboardPageSelectorOptional } from "@/features/dashboard";
 import TechnicianMonthCalendar from "@/features/interventions/components/TechnicianMonthCalendar";
 import { resolveTechnicianHubMissionSelection } from "@/features/interventions/technicianHubMissionSelection";
 

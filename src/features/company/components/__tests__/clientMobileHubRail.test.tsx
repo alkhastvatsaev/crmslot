@@ -4,7 +4,7 @@ import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import CompanyHubPage from "@/features/company/components/CompanyHubPage";
 import { RequesterHubProvider } from "@/context/RequesterHubContext";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { DashboardPagerProvider } from "@/features/dashboard";
 
 /** Régression : `/m/demande` utilise MobileHubLayout → exige MobileHubRailProvider. */
 describe("client mobile hub rail", () => {

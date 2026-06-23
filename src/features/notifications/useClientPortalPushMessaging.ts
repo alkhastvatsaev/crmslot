@@ -6,8 +6,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 import { toast } from "sonner";
 import { auth, app, firestore, isConfigured } from "@/core/config/firebase";
-import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import {
   navigateCompanyHub,

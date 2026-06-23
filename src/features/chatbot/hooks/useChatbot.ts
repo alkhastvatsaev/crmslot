@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { useWorkspaceCopilotSnapshot } from "@/features/copilot/hooks/useWorkspaceCopilotSnapshot";
+import { useWorkspaceCopilotSnapshot } from "@/features/copilot";
 import type { ChatbotPendingTool } from "@/features/chatbot/chatbot-types";
 import { isChatbotZeroTokenUiTool } from "@/features/chatbot/chatbot-document-side-effect";
 import { useChatbotDocumentPreview } from "@/features/chatbot/hooks/useChatbotDocumentPreview";
 import { useChatbotSupplierOrdersPanel } from "@/features/chatbot/hooks/useChatbotSupplierOrdersPanel";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";

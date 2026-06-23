@@ -5,7 +5,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
 import type { Intervention } from "@/features/interventions";
 import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/index.server";
-import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/server/notifyTechnicianAssignmentAdmin";
+import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

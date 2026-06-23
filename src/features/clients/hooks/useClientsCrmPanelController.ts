@@ -18,7 +18,7 @@ import {
   deleteClientWithSites,
   updateClient,
 } from "@/features/clients/clientFirestore";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 
 export function useClientsCrmPanelController() {
   const { t } = useTranslation();

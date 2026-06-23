@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Database, Loader2, Package, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import CompanyStockPulseBar from "@/features/featureHub/components/CompanyStockPulseBar";
 import { seedCompanyStockCatalog } from "@/features/featureHub/seedCompanyStockCatalog";
 import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockChatbot";

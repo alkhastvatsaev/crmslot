@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { blockIfProduction } from "@/core/api/routeAuth";
-import { isE2eSeedAllowed } from "@/features/interventions/server/e2eSeedConfig";
-import { e2eSeedAssignedInterventionAdmin } from "@/features/interventions/server/e2eSeedAssignedIntervention";
+import { isE2eSeedAllowed } from "@/features/interventions/index.server";
+import { e2eSeedAssignedInterventionAdmin } from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

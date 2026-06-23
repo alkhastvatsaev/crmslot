@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import TechnicianMobileProfileChip from "@/features/interventions/components/TechnicianMobileProfileChip";
-import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { DashboardPageSelectorProvider } from "@/features/dashboard";
 
 jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
   useCrmStaffAccountPanel: () => ({

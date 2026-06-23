@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { markInterventionPaidAdmin } from "@/features/billing/server/markInterventionPaidAdmin";
+import { markInterventionPaidAdmin } from "@/features/billing/index.server";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
 
 export const runtime = "nodejs";

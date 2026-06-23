@@ -6,7 +6,7 @@ import BackOfficeHubPanelShell from "@/features/backoffice/components/BackOffice
 import PwaCopilotChatPanel from "@/features/copilot/components/PwaCopilotChatPanel";
 import PwaCopilotContextSummary from "@/features/copilot/components/PwaCopilotContextSummary";
 import PwaCopilotSuggestions from "@/features/copilot/components/PwaCopilotSuggestions";
-import { useWorkspaceCopilotSnapshot } from "@/features/copilot/hooks/useWorkspaceCopilotSnapshot";
+import { useWorkspaceCopilotSnapshot } from "@/features/copilot";
 import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -33,13 +33,19 @@ export default function TechnicianOfflineHubPage({ slotIndex }: Props) {
       rightAriaLabel={`${t("copilot.aria.page")} ${humanPage} — ${t("copilot.panel_suggestions")}`}
       left={
         <section className={railShell} data-testid="pwa-copilot-rail-left">
-          <BackOfficeHubPanelShell title={t("copilot.panel_context")} testId="pwa-copilot-panel-context">
+          <BackOfficeHubPanelShell
+            title={t("copilot.panel_context")}
+            testId="pwa-copilot-panel-context"
+          >
             <PwaCopilotContextSummary snapshot={snapshot} loading={loading} />
           </BackOfficeHubPanelShell>
         </section>
       }
       center={
-        <section className="relative flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="pwa-copilot-rail-center">
+        <section
+          className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+          data-testid="pwa-copilot-rail-center"
+        >
           <PwaCopilotChatPanel
             snapshot={snapshot}
             loadingSnapshot={loading}
@@ -50,7 +56,10 @@ export default function TechnicianOfflineHubPage({ slotIndex }: Props) {
       }
       right={
         <section className={railShell} data-testid="pwa-copilot-rail-right">
-          <BackOfficeHubPanelShell title={t("copilot.panel_suggestions")} testId="pwa-copilot-panel-suggestions">
+          <BackOfficeHubPanelShell
+            title={t("copilot.panel_suggestions")}
+            testId="pwa-copilot-panel-suggestions"
+          >
             <PwaCopilotSuggestions
               disabled={!snapshot || loading}
               onPick={(prompt) => setExternalPrompt(prompt)}

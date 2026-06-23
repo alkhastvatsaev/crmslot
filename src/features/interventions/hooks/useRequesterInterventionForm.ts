@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { compressImageToDataUrl } from "@/features/interventions/compressImageToDataUrl";

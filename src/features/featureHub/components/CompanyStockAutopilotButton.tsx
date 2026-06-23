@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import { runStockAutopilotPlan } from "@/features/featureHub/companyStockAutopilotRun";
 import type { StockAutopilotPlan } from "@/features/featureHub/companyStockAutopilot";

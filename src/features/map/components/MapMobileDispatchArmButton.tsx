@@ -3,7 +3,7 @@
 import { Mic } from "lucide-react";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useMobileGalaxyComposerOpenApi } from "@/context/MobileGalaxyComposerOpenContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeContext";

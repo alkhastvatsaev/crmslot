@@ -5,7 +5,7 @@ import { getESignProvider } from "@/features/esign";
 import {
   findInterventionByPortalToken,
   isValidPortalAccessToken,
-} from "@/features/interventions/server/portalLookupAdmin";
+} from "@/features/interventions/index.server";
 
 export const runtime = "nodejs";
 

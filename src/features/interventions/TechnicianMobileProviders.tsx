@@ -11,8 +11,8 @@ import { TechnicianFinishJobProvider } from "@/context/TechnicianFinishJobContex
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
-import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+import { DashboardPagerProvider } from "@/features/dashboard";
+import { DashboardPageSelectorProvider } from "@/features/dashboard";
 import DeferredTechnicianBootstraps from "@/features/interventions/components/DeferredTechnicianBootstraps";
 
 const TECHNICIAN_MOBILE_PAGE_COUNT = 1;

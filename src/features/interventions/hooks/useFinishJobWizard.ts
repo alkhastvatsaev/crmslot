@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { FINISH_JOB_MIN_PHOTOS } from "@/features/interventions/finishJobConstants";
 import type { FinishJobStep } from "@/features/interventions/components/FinishJobStepIndicator";
 import type { TechnicianSignaturePadHandle } from "@/features/interventions/components/TechnicianSignaturePad";

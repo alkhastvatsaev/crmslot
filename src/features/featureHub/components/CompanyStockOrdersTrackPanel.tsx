@@ -13,7 +13,7 @@ import {
 } from "@/features/materials/materialOrderFirestore";
 import { displayMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
 import type { MaterialOrder } from "@/features/materials";
-import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrder } from "@/features/suppliers/types";
+import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrder } from "@/features/suppliers";
 
 type Props = {
   orders: MaterialOrderDoc[];

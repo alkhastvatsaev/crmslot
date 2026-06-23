@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_CLIENT_PORTAL,

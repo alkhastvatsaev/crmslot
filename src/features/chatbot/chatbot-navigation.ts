@@ -1,4 +1,4 @@
-import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
+import { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice";
 import type { DashboardPagerApi } from "@/features/dashboard";
 
 /** Ouvre un dossier dans le hub back-office (page 4 carrousel). */

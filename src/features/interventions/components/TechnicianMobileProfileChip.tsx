@@ -1,6 +1,6 @@
 "use client";
 
-import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useDashboardPageSelector } from "@/features/dashboard";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {

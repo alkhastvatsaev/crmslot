@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { featureFlagsFromEnv } from "@/core/featureFlags";
-import { sendInterventionEInvoiceAdmin } from "@/features/billing/server/sendInterventionEInvoiceAdmin";
+import { sendInterventionEInvoiceAdmin } from "@/features/billing/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

@@ -8,7 +8,7 @@ import {
 } from "@/features/company/companyHubNavigation";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { openBackofficeIntervention } from "@/features/backoffice/openBackofficeIntervention";
 import { useClientInterventions } from "@/features/clients/useClientInterventions";

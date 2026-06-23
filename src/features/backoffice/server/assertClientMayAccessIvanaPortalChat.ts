@@ -1,5 +1,5 @@
 import type * as admin from "firebase-admin";
-import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
+import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 type Gate = { allowed: true } | { allowed: false; status: number; error: string };
 

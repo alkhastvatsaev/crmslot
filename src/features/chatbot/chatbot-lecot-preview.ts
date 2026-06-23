@@ -1,8 +1,4 @@
-import type {
-  SupplierOrder,
-  SupplierOrderLine,
-  SupplierOrderStatus,
-} from "@/features/suppliers/types";
+import type { SupplierOrder, SupplierOrderLine, SupplierOrderStatus } from "@/features/suppliers";
 
 export type LecotOrderToolResult = {
   supplierOrderId: string;

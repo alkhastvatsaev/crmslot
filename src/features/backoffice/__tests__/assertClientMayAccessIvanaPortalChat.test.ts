@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { assertClientMayAccessIvanaPortalChat } from "@/features/backoffice/server/assertClientMayAccessIvanaPortalChat";
-import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
+import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 function makeDb(membershipExists: boolean, portalCompanyId?: string) {
   const membershipGet = jest.fn().mockResolvedValue({

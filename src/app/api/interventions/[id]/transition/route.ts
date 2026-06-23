@@ -5,8 +5,8 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import type { Intervention } from "@/features/interventions";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { actorMayTransition } from "@/features/interventions/workflow/interventionWorkflow";
-import { coerceAdminExtraPatch } from "@/features/interventions/workflow/coerceAdminExtraPatch";
-import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
+import { coerceAdminExtraPatch } from "@/features/interventions/index.server";
+import { transitionInterventionStatusAdmin } from "@/features/interventions/index.server";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { logger } from "@/core/logger";
 

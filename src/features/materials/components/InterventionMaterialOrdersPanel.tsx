@@ -14,7 +14,7 @@ import { suggestMaterialPartsFromIntervention } from "@/features/materials/sugge
 import { useMaterialOrders } from "@/features/materials/useMaterialOrders";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
 import type { Intervention } from "@/features/interventions";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useCompanyStockItems } from "@/features/featureHub/hooks/useCompanyStockItems";
 import {
   dispatcherTransitionActor,

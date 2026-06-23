@@ -3,7 +3,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
-import { createInterventionPaymentIntentAdmin } from "@/features/billing/server/createInterventionPaymentIntentAdmin";
+import { createInterventionPaymentIntentAdmin } from "@/features/billing/index.server";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import type { Intervention } from "@/features/interventions";

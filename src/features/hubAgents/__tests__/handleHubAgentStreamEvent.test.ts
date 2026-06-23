@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { useHubAgentStreamHandler } from "@/features/hubAgents/handleHubAgentStreamEvent";
-import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
-import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub";
 import type { ChatbotStreamEvent } from "@/features/chatbot";
 
 const mockSetPageIndex = jest.fn();

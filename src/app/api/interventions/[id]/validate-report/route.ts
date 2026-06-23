@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { validateInterventionReportServer } from "@/features/interventions/server/validateInterventionReportServer";
+import { validateInterventionReportServer } from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { verifyPortalAccessAdmin } from "@/features/interventions/server/portalAccessVerifyAdmin";
+import { verifyPortalAccessAdmin } from "@/features/interventions/index.server";
 import { portalAccessDeniedResponse, rateLimitByIp } from "@/core/api/rateLimit";
 
 export const runtime = "nodejs";
