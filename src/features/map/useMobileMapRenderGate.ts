@@ -8,8 +8,8 @@ function isMapRenderAllowed(container: HTMLElement): boolean {
   const pageHost = container.closest('[data-testid="mobile-page-0"]');
   if (pageHost?.getAttribute("aria-hidden") === "true") return false;
 
-  const centerRail = container.closest('[data-mobile-hub-rail="center"]');
-  if (centerRail?.getAttribute("data-mobile-hub-rail-active") === "false") return false;
+  const mapRail = container.closest('[data-mobile-hub-rail="left"]');
+  if (mapRail?.getAttribute("data-mobile-hub-rail-active") === "false") return false;
 
   return true;
 }

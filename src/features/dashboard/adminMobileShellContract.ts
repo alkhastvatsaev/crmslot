@@ -29,7 +29,7 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
       "DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}",
     ],
     "src/features/dashboard/components/AdminMobileApp.tsx": [
-      "MobileMapHubLite",
+      "MapboxView",
       "AdminMobileOfflineBar",
       "MobileShellFooterDock",
       "MobileHubRailProvider",

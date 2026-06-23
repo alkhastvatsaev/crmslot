@@ -1,12 +1,10 @@
 import { isMapWebGLActive } from "@/features/map/mapboxPowerProfile";
 
-/** WebGL Mapbox sur téléphone — actif si flag `mobileMapWebGL` et carte visible. */
+/** WebGL Mapbox sur mobile quand la page carte et le rail « carte » sont visibles. */
 export function resolveMapWebGLActive(
   isMobile: boolean | null,
   dashboardPageIndex: number,
-  mapRenderActive: boolean,
-  mobileMapWebGLEnabled: boolean
+  mapRenderActive: boolean
 ): boolean {
-  if (isMobile === true && !mobileMapWebGLEnabled) return false;
   return isMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
 }

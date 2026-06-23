@@ -9,7 +9,7 @@ import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 
-const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileMapHubLite"), {
+const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
   loading: () => (
     <div
@@ -32,7 +32,7 @@ export default function AdminMobileApp() {
             <AdminMobileOfflineBar />
             <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
               <ErrorBoundary name="admin-mobile-inbox">
-                <MobileMapHubLite />
+                <MapboxView />
               </ErrorBoundary>
             </div>
           </AdminMobileShell>

@@ -124,8 +124,8 @@ export function markerGlowBlurClass(isMobile: boolean): string {
 }
 
 /**
- * WebGL actif : page carte visible. Sur mobile, pause dès que le rail centre est masqué
- * (missions / inbox) ou l’onglet est en arrière-plan.
+ * WebGL actif : page carte visible. Sur mobile, pause dès que le rail gauche (carte)
+ * est masqué (missions / inbox) ou l’onglet est en arrière-plan.
  */
 export function isMapWebGLActive(
   isMobile: boolean | null,

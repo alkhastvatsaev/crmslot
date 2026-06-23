@@ -10,7 +10,6 @@ import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxInten
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useMapHubMissions } from "@/features/map/hooks/useMapHubMissions";
@@ -34,16 +33,10 @@ export default function MapboxView() {
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
-  const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
   const dashboardPageIndex = pager?.pageIndex ?? 0;
-  const mapWebGLActive = resolveMapWebGLActive(
-    isMobile,
-    dashboardPageIndex,
-    mapRenderActive,
-    mobileMapWebGL
-  );
+  const mapWebGLActive = resolveMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const { t } = useTranslation();
   const requestMobileHubRail = useRequestMobileHubRail();
   const [routeLine, setRouteLine] = useState<Array<[number, number]>>([]);
