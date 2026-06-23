@@ -55,13 +55,6 @@ export type {
   NotificationPayload,
   DispatchNotificationsParams,
 } from "@/features/notifications/dispatchStatusNotifications";
-export { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
-export type {
-  SendNativePushParams,
-  SendNativePushResult,
-} from "@/features/notifications/sendNativePushAdmin";
-export { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
-export type { NotifyAdminsResult } from "@/features/notifications/notifyCompanyAdminsPush";
 export {
   parseClientNotificationSearchParams,
   clientNotificationCaseUrl,

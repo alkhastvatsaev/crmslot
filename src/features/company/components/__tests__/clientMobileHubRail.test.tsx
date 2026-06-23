@@ -3,7 +3,7 @@ import { render } from "@/test-utils/render";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import CompanyHubPage from "@/features/company/components/CompanyHubPage";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 
 /** Régression : `/m/demande` utilise MobileHubLayout → exige MobileHubRailProvider. */

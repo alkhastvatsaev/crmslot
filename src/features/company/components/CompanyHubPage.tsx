@@ -21,7 +21,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
 import { useClientPortalLinkedCompanyId } from "@/features/auth/hooks/useClientPortalLinkedCompanyId";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";

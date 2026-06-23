@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import type { PortalAccessSession } from "@/features/interventions/portalAccessSession";
 import RequesterSubmittedDossierBanner from "@/features/interventions/components/RequesterSubmittedDossierBanner";
 

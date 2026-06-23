@@ -83,7 +83,7 @@ export default function ChatbotGalaxyOrb({ className, size = "sm", onPress }: Pr
 
   return (
     <div
-      ref={surfaceRef}
+      ref={surfaceRef as React.RefObject<HTMLDivElement>}
       className={cn("chatbot-galaxy-orb shrink-0", isHero && "chatbot-galaxy-orb--hero", className)}
       data-testid="chatbot-galaxy-orb"
       data-size={size}

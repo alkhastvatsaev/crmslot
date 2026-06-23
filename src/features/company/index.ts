@@ -30,7 +30,4 @@ export {
 export type { ResolveClientPortalInterventionCompanyIdInput } from "@/features/company/clientPortalCompanyId";
 export { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
 export { isPortalInvoiceAvailable } from "@/features/company/portalInvoiceAvailability";
-export { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 export { default as ClientMobileApp } from "@/features/company/components/ClientMobileApp";
-export { default as CompanyHubPage } from "@/features/company/components/CompanyHubPage";
-export { default as CompanySpacePanel } from "@/features/company/components/CompanySpacePanel";

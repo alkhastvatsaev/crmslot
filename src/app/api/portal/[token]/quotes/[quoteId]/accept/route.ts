@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { isValidPortalAccessToken } from "@/features/interventions/server/portalLookupAdmin";
-import { respondQuoteViaPortalAdmin } from "@/features/quotes";
+import { respondQuoteViaPortalAdmin } from "@/features/quotes/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

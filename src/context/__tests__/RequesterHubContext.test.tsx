@@ -1,9 +1,6 @@
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
-import {
-  RequesterHubProvider,
-  useRequesterHub,
-} from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider, useRequesterHub } from "@/context/RequesterHubContext";
 
 const STORAGE_KEY = "map-belgique-requester-draft-v1";
 
@@ -41,14 +38,8 @@ function TestConsumer() {
         data-testid="set-problem"
         onClick={() => setRequestData((d) => ({ ...d, problemLabel: "Fuite" }))}
       />
-      <button
-        data-testid="set-step-3"
-        onClick={() => setCurrentStep(3)}
-      />
-      <button
-        data-testid="set-last-id"
-        onClick={() => setLastSubmittedInterventionId("abc123")}
-      />
+      <button data-testid="set-step-3" onClick={() => setCurrentStep(3)} />
+      <button data-testid="set-last-id" onClick={() => setLastSubmittedInterventionId("abc123")} />
       <button data-testid="trigger-validation" onClick={triggerValidation} />
       <button data-testid="reset-request" onClick={resetRequestOnly} />
       <button data-testid="reset-all" onClick={resetAll} />
@@ -60,7 +51,7 @@ function renderProvider() {
   return render(
     <RequesterHubProvider>
       <TestConsumer />
-    </RequesterHubProvider>,
+    </RequesterHubProvider>
   );
 }
 
@@ -167,7 +158,7 @@ describe("RequesterHubContext", () => {
           photoDataUrls: [],
           interventionAddress: "",
         },
-      }),
+      })
     );
 
     renderProvider();
@@ -190,7 +181,7 @@ describe("RequesterHubContext", () => {
           companyName: "ACME",
           accessCode: "",
         },
-      }),
+      })
     );
 
     renderProvider();

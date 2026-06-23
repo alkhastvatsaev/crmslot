@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider } from "@/context/RequesterHubContext";
 
 const openDocumentPreview = jest.fn();
 const closeDocumentPreview = jest.fn();

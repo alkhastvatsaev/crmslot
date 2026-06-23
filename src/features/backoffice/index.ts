@@ -10,7 +10,6 @@ export type {
 } from "@/features/backoffice/assignInterventionFromBackoffice";
 export { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
 export { canApplyBackofficeTechnicianAssignment } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
-export { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/applyBackofficeTechnicianAssignmentAdmin";
 export { BACKOFFICE_HUB_SLOT_INDEX } from "@/features/backoffice/backofficeHubConstants";
 export { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
 export { openBackofficeIntervention } from "@/features/backoffice/openBackofficeIntervention";

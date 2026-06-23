@@ -3,7 +3,7 @@ import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
-import { createInterventionFromGmailAdmin } from "@/features/gmail";
+import { createInterventionFromGmailAdmin } from "@/features/gmail/index.server";
 import { verifyGmailRouteCompanyAccess } from "@/features/gmail/gmailRouteCompany";
 
 export const runtime = "nodejs";

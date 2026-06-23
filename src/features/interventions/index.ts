@@ -39,7 +39,7 @@ export type {
   RequesterProfile,
   RequesterType,
   InterventionRequestData,
-} from "@/features/interventions/context/RequesterHubContext";
+} from "@/context/RequesterHubContext";
 export type {
   PortalAccessSession,
   PortalAccessSessionCase,
@@ -50,3 +50,34 @@ export {
 } from "@/features/interventions/portalAccessSession";
 export type { PortalInterventionSummary } from "@/features/interventions/portalToken";
 export { generatePortalAccessToken, toPortalSummary } from "@/features/interventions/portalToken";
+export { TERMINAL_INTERVENTION_STATUSES } from "@/features/interventions/workflow/interventionWorkflowTypes";
+export {
+  TERRAIN_TEMPLATES,
+  BILLING_TEMPLATES,
+  type TerrainTemplate,
+  type TerrainTemplateLine,
+  type BillingTemplate,
+  type BillingTemplateLine,
+} from "@/features/interventions/config/terrainTemplates";
+export {
+  transitionInterventionFromTechnician,
+  serializeTechnicianExtraPatchForApi,
+  type TransitionInterventionFromTechnicianParams,
+} from "@/features/interventions/workflow/transitionInterventionFromTechnician";
+export {
+  technicianTransitionActor,
+  dispatcherTransitionActor,
+  requireAuthTransitionActor,
+} from "@/features/interventions/workflow/workflowActor";
+export {
+  default as FinishJobStepIndicator,
+  type FinishJobStep,
+} from "@/features/interventions/components/FinishJobStepIndicator";
+export {
+  useSmartForm,
+  SMART_FORM_MAX_PHOTOS,
+  emptyDraft,
+  loadStorageDraft,
+  type DraftPayload,
+  type WizardStep,
+} from "@/features/interventions/hooks/useSmartForm";

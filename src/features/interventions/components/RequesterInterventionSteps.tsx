@@ -131,9 +131,9 @@ export default function RequesterInterventionSteps({ c }: Props) {
             showSubmitSuccess={c.showSubmitSuccess}
             dossierNumber={c.lastSubmittedPortalAccessCode}
             interventionAddress={c.interventionAddress}
-            interventionLatLng={c.interventionLatLng}
+            interventionLatLng={c.interventionLatLng ?? null}
             locatingAddress={c.locatingAddress}
-            canSubmit={c.canSubmit}
+            canSubmit={Boolean(c.canSubmit)}
             isSubmitting={c.isSubmitting}
             onAddressChange={(val) =>
               c.setRequestData((prev) => ({ ...prev, interventionAddress: val }))

@@ -3,7 +3,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
-import { acceptQuoteAdmin } from "@/features/quotes";
+import { acceptQuoteAdmin } from "@/features/quotes/index.server";
 
 export const runtime = "nodejs";
 

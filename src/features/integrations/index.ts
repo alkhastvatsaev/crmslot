@@ -11,4 +11,3 @@ export {
   deliverWebhook,
   endpointSubscribed,
 } from "@/features/integrations/dispatchOutboundWebhook";
-export { dispatchCompanyWebhooksAdmin } from "@/features/integrations/server/dispatchCompanyWebhooksAdmin";

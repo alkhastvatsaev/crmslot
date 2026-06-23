@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { capitalizeName } from "@/utils/stringUtils";

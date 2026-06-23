@@ -12,7 +12,7 @@ jest.mock("sonner", () => ({
 
 const setPortalAccessSession = jest.fn();
 
-jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
+jest.mock("@/context/RequesterHubContext", () => ({
   useRequesterHub: () => ({
     setPortalAccessSession,
   }),

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
+import type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
   buildInterventionClientLabelMap,
   buildSupplierOrderClientNameByOrderId,
@@ -79,7 +80,11 @@ export function useChatbotSupplierOrdersPanelView(placement: ChatbotSupplierOrde
   const isLeftRail = placement === "leftRail";
   const isRightRail = placement === "rightRail";
   const isSideRail = isLeftRail || isRightRail;
-  const pdfOverlayTarget = isLeftRail ? "left" : isRightRail ? "materialRight" : "right";
+  const pdfOverlayTarget: DocumentPreviewOverlayTarget = isLeftRail
+    ? "left"
+    : isRightRail
+      ? "materialRight"
+      : "right";
   const highlightId = supplierOrdersPanel.highlightOrderId;
   const highlightMaterialId = supplierOrdersPanel.highlightMaterialOrderId;
   const totalCount = supplierOrders.length + materialOrders.length;

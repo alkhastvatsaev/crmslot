@@ -31,7 +31,7 @@ export default function TechnicianDashboardDetailDoneAmendable({
   technicianUid: string;
   queryClient: QueryClient;
   clientDisplayName: string;
-  descriptionText: string;
+  descriptionText: string | null;
   addressMapsHref: string | null;
   primaryContactActions: MissionContactAction[];
   onStartFinishJob: () => void;
