@@ -23,6 +23,12 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `hooks/useChatbotStreamDocumentAction.ts`          | POST `/api/ai/chatbot/document-action`             |
 | `chatbotStreamSessionTypes.ts`                     | Types partagés hooks stream                        |
 | `chatbot-route-handler.ts`                         | Handler API (importé par route Next)               |
+| `chatbot-conversation-context.ts`                  | Barrel contexte conversation (scope outils / fils) |
+| `chatbot-conversation-context-types.ts`            | Types ChatbotFlowId + contexte tour                |
+| `chatbot-conversation-context-messages.ts`         | Normalisation messages + texte récent              |
+| `chatbot-conversation-context-flows.ts`            | Détection fils Lecot/email/planning…               |
+| `chatbot-conversation-context-scope.ts`            | Scope outils + requête Lecot par tour              |
+| `chatbot-conversation-context-resolve.ts`          | `resolveChatbotConversationContext`                |
 | `chatbot-openai.ts`                                | Pipeline OpenAI orchestrateur (~145 lignes)        |
 | `chatbot-openai-stream.ts`                         | Stream completion + accumulation tool calls        |
 | `chatbot-openai-execute-tools.ts`                  | Exécution outils + side effects SSE                |
