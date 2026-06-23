@@ -1,4 +1,4 @@
-import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIvanaChatFirebaseSession";
+import { resolvePortalChatFirebaseSession } from "@/features/backoffice/resolvePortalChatFirebaseSession";
 
 jest.mock("@/core/config/firebase", () => ({
   auth: { currentUser: { uid: "crm-uid" } },
@@ -7,15 +7,15 @@ jest.mock("@/core/config/firebase", () => ({
   clientPortalFirestore: { app: "portal" },
 }));
 
-describe("resolveIvanaChatFirebaseSession", () => {
+describe("resolvePortalChatFirebaseSession", () => {
   it("utilise auth CRM pour l'inbox staff", () => {
-    const session = resolveIvanaChatFirebaseSession(false);
+    const session = resolvePortalChatFirebaseSession(false);
     expect(session.chatAuth).toEqual({ currentUser: { uid: "crm-uid" } });
     expect(session.chatDb).toEqual({ app: "crm" });
   });
 
   it("utilise clientPortalAuth pour le portail demandeur (invité ou connecté)", () => {
-    const session = resolveIvanaChatFirebaseSession(true);
+    const session = resolvePortalChatFirebaseSession(true);
     expect(session.chatAuth).toEqual({ currentUser: null });
     expect(session.chatDb).toEqual({ app: "portal" });
   });

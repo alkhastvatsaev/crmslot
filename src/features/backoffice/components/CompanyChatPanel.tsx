@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useIvanaClientChatPanel } from "@/features/backoffice/hooks/useIvanaClientChatPanel";
-import IvanaChatMessageList from "@/features/backoffice/components/IvanaChatMessageList";
-import IvanaChatComposer from "@/features/backoffice/components/IvanaChatComposer";
-import type { IvanaChatMessage } from "@/features/backoffice/ivanaChatTypes";
+import { useCompanyChatPanel } from "@/features/backoffice/hooks/useCompanyChatPanel";
+import CompanyChatMessageList from "@/features/backoffice/components/CompanyChatMessageList";
+import CompanyChatComposer from "@/features/backoffice/components/CompanyChatComposer";
+import type { CompanyChatMessage } from "@/features/backoffice/companyChatTypes";
 
-export type { IvanaChatMessage };
+export type { CompanyChatMessage };
 
 type PanelProps = {
   className?: string;
@@ -18,7 +18,7 @@ type PanelProps = {
   onRemoteClientMessage?: () => void;
 };
 
-export default function IvanaClientChatPanel({
+export default function CompanyChatPanel({
   className,
   publishAsPortal = false,
   acceptPortalMessages = false,
@@ -28,7 +28,7 @@ export default function IvanaClientChatPanel({
 }: PanelProps) {
   const {
     messages,
-    ivanaTyping,
+    assistantTyping,
     draft,
     setDraft,
     pendingImages,
@@ -41,7 +41,7 @@ export default function IvanaClientChatPanel({
     attachImagesBlocked,
     companyIdTrimmed,
     portalAuthReady,
-  } = useIvanaClientChatPanel({
+  } = useCompanyChatPanel({
     publishAsPortal,
     acceptPortalMessages,
     chatCompanyId,
@@ -51,18 +51,18 @@ export default function IvanaClientChatPanel({
 
   return (
     <div
-      data-testid="ivana-client-chat-panel"
+      data-testid="company-chat-panel"
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
-      <IvanaChatMessageList
+      <CompanyChatMessageList
         messages={messages}
-        ivanaTyping={ivanaTyping}
+        assistantTyping={assistantTyping}
         listRef={listRef}
         publishAsPortal={publishAsPortal}
         companyIdTrimmed={companyIdTrimmed}
         portalAuthReady={portalAuthReady}
       />
-      <IvanaChatComposer
+      <CompanyChatComposer
         draft={draft}
         setDraft={setDraft}
         pendingImages={pendingImages}
@@ -72,7 +72,7 @@ export default function IvanaClientChatPanel({
         handlePickImages={handlePickImages}
         send={send}
         attachImagesBlocked={attachImagesBlocked}
-        ivanaTyping={ivanaTyping}
+        assistantTyping={assistantTyping}
       />
     </div>
   );

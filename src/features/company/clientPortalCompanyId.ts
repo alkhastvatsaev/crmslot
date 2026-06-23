@@ -28,7 +28,7 @@ export function resolveClientPortalInterventionCompanyId(
   return null;
 }
 
-/** Sociétés à écouter dans l'inbox IVANA (carte / dispatch). */
+/** Sociétés à écouter dans l'inbox chat portail (carte / dispatch). */
 export function resolveBackofficeInboxCompanyIds(
   workspace:
     | Pick<CompanyWorkspaceApi, "isTenantUser" | "activeCompanyId" | "memberships">

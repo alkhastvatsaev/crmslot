@@ -5,7 +5,7 @@ import {
   normalizeNotificationPreferences,
 } from "@/features/notifications/notificationPreferences";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
-import { IVANA_PORTAL_CHAT_COLLECTION } from "@/features/backoffice/ivanaChatFirestore";
+import { PORTAL_CHAT_COLLECTION } from "@/features/backoffice/portalChatFirestore";
 import { logger } from "@/core/logger";
 
 async function clientPushEnabled(db: admin.firestore.Firestore, uid: string): Promise<boolean> {
@@ -41,7 +41,7 @@ async function resolveClientChatRecipientUids(
     }
 
     const threadSnap = await db
-      .collection(IVANA_PORTAL_CHAT_COLLECTION)
+      .collection(PORTAL_CHAT_COLLECTION)
       .where("interventionId", "==", ivId)
       .where("role", "==", "client")
       .limit(25)

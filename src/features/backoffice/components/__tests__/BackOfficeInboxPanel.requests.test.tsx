@@ -97,7 +97,7 @@ jest.mock("@/features/chatbot/components/ChatbotDocumentsRightPanel", () => ({
   default: () => null,
 }));
 
-jest.mock("@/features/backoffice/components/IvanaClientChatPanel", () => ({
+jest.mock("@/features/backoffice/components/CompanyChatPanel", () => ({
   __esModule: true,
   default: () => null,
 }));

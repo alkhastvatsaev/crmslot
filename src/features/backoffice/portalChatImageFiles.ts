@@ -1,7 +1,7 @@
 const MAX_FILES = 6;
 const MAX_TOTAL = 6;
 
-export async function readIvanaChatImageDataUrls(
+export async function readPortalChatImageDataUrls(
   files: FileList | null,
   currentCount: number
 ): Promise<string[]> {

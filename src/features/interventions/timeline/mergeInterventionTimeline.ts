@@ -4,7 +4,7 @@ import type { InterventionTimelineDoc } from "@/features/interventions/timeline/
 import type { InterventionEmailDoc } from "@/features/emails";
 import type { MaterialOrderDoc } from "@/features/materials";
 import type { CommissionAuditRow } from "@/features/commissions";
-import type { IvanaPortalChatDoc } from "@/features/backoffice";
+import type { PortalChatDoc } from "@/features/backoffice";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 function toIsoString(value: unknown): string {
@@ -76,7 +76,7 @@ export function materialOrderToInterventionEvent(order: MaterialOrderDoc): Inter
   };
 }
 
-export function portalChatToInterventionEvent(msg: IvanaPortalChatDoc): InterventionEvent {
+export function portalChatToInterventionEvent(msg: PortalChatDoc): InterventionEvent {
   const fromClient = msg.role === "client";
   const label = msg.senderName?.trim() || (fromClient ? "Client" : "Équipe");
   const imageNote =
@@ -116,7 +116,7 @@ export function mergeInterventionTimelineEvents(
     emails?: InterventionEmailDoc[];
     materialOrders?: MaterialOrderDoc[];
     commissionAudit?: CommissionAuditRow[];
-    portalChat?: IvanaPortalChatDoc[];
+    portalChat?: PortalChatDoc[];
   }
 ): InterventionEvent[] {
   const clientOnly = options?.clientVisibleOnly === true;

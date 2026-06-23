@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { assertClientMayAccessIvanaPortalChat } from "@/features/backoffice/server/assertClientMayAccessIvanaPortalChat";
+import { assertClientMayAccessPortalChat } from "@/features/backoffice/server/assertClientMayAccessPortalChat";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 function makeDb(membershipExists: boolean, portalCompanyId?: string) {
@@ -28,19 +28,19 @@ function makeDb(membershipExists: boolean, portalCompanyId?: string) {
   } as unknown as FirebaseFirestore.Firestore;
 }
 
-describe("assertClientMayAccessIvanaPortalChat", () => {
+describe("assertClientMayAccessPortalChat", () => {
   it("allows active company membership", async () => {
-    const gate = await assertClientMayAccessIvanaPortalChat(makeDb(true), "uid-1", "co-1");
+    const gate = await assertClientMayAccessPortalChat(makeDb(true), "uid-1", "co-1");
     expect(gate).toEqual({ allowed: true });
   });
 
   it("allows linked client portal profile", async () => {
-    const gate = await assertClientMayAccessIvanaPortalChat(makeDb(false, "co-1"), "uid-1", "co-1");
+    const gate = await assertClientMayAccessPortalChat(makeDb(false, "co-1"), "uid-1", "co-1");
     expect(gate).toEqual({ allowed: true });
   });
 
   it("denies when no membership nor portal link", async () => {
-    const gate = await assertClientMayAccessIvanaPortalChat(makeDb(false), "uid-1", "co-1");
+    const gate = await assertClientMayAccessPortalChat(makeDb(false), "uid-1", "co-1");
     expect(gate.allowed).toBe(false);
     if (!gate.allowed) expect(gate.status).toBe(403);
   });

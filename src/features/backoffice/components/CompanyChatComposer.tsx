@@ -5,7 +5,7 @@ import { ArrowRight, ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
-type IvanaChatComposerProps = {
+type CompanyChatComposerProps = {
   draft: string;
   setDraft: (value: string) => void;
   pendingImages: string[];
@@ -15,10 +15,10 @@ type IvanaChatComposerProps = {
   handlePickImages: (files: FileList | null) => Promise<void>;
   send: () => Promise<void>;
   attachImagesBlocked: boolean;
-  ivanaTyping: boolean;
+  assistantTyping: boolean;
 };
 
-export default function IvanaChatComposer({
+export default function CompanyChatComposer({
   draft,
   setDraft,
   pendingImages,
@@ -28,14 +28,14 @@ export default function IvanaChatComposer({
   handlePickImages,
   send,
   attachImagesBlocked,
-  ivanaTyping,
-}: IvanaChatComposerProps) {
+  assistantTyping,
+}: CompanyChatComposerProps) {
   const { t } = useTranslation();
 
   return (
     <div className="shrink-0 border-t border-slate-200/80 bg-white/80 p-3 backdrop-blur-md">
       {pendingImages.length > 0 ? (
-        <div className="mb-2 flex flex-wrap gap-2" data-testid="ivana-chat-pending-images">
+        <div className="mb-2 flex flex-wrap gap-2" data-testid="company-chat-pending-images">
           {pendingImages.map((url, idx) => (
             <div
               key={`pending-${idx}`}
@@ -67,7 +67,7 @@ export default function IvanaChatComposer({
         />
         <button
           type="button"
-          data-testid="ivana-chat-attach"
+          data-testid="company-chat-attach"
           onClick={() => fileInputRef.current?.click()}
           disabled={attachImagesBlocked}
           title={attachImagesBlocked ? t("chat.attach_blocked_title") : undefined}
@@ -84,13 +84,13 @@ export default function IvanaChatComposer({
         >
           <ImagePlus className="h-5 w-5" />
         </button>
-        <label htmlFor="ivana-chat-input" className="sr-only">
+        <label htmlFor="company-chat-input" className="sr-only">
           {t("chat.input_label")}
         </label>
         <div className="flex min-w-0 flex-1 items-center rounded-[18px] border border-slate-200 bg-white shadow-sm focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/20">
           <textarea
-            id="ivana-chat-input"
-            data-testid="ivana-chat-input"
+            id="company-chat-input"
+            data-testid="company-chat-input"
             rows={1}
             ref={inputRef}
             value={draft}
@@ -107,14 +107,14 @@ export default function IvanaChatComposer({
         </div>
         <button
           type="button"
-          data-testid="ivana-chat-send"
+          data-testid="company-chat-send"
           onClick={() => void send()}
-          disabled={(!draft.trim() && pendingImages.length === 0) || ivanaTyping}
+          disabled={(!draft.trim() && pendingImages.length === 0) || assistantTyping}
           className={cn(
             "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
             "active:scale-[0.98]",
-            (!draft.trim() && pendingImages.length === 0) || ivanaTyping
+            (!draft.trim() && pendingImages.length === 0) || assistantTyping
               ? "cursor-not-allowed text-slate-400 opacity-40"
               : "text-blue-600 hover:bg-blue-500/10 hover:text-blue-700"
           )}

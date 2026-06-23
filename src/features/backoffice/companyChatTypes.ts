@@ -1,6 +1,6 @@
-export type IvanaChatMessage = {
+export type CompanyChatMessage = {
   id: string;
-  role: "user" | "ivana" | "client" | "staff";
+  role: "user" | "assistant" | "client" | "staff";
   text: string;
   images?: string[];
   createdAt: number;
@@ -10,10 +10,10 @@ export type IvanaChatMessage = {
   failed?: boolean;
 };
 
-export const IVANA_CHAT_STORAGE_PREFIX = "map-belgique-ivana-chat-v1";
-export const IVANA_CHAT_PERSISTENCE_ENABLED = false;
+export const COMPANY_CHAT_STORAGE_PREFIX = "map-belgique-company-chat-v1";
+export const COMPANY_CHAT_PERSISTENCE_ENABLED = false;
 
-export function pickIvanaReply(userText: string, t: (key: string) => string): string {
+export function pickLocalChatReply(userText: string, t: (key: string) => string): string {
   const lower = userText.toLowerCase();
   if (/\burgent|urgence|immédiat|rapide\b/.test(lower)) return t("chat.reply_urgent");
   if (/\bfacture|facturation|paiement|devis\b/.test(lower)) return t("chat.reply_billing");
@@ -22,27 +22,30 @@ export function pickIvanaReply(userText: string, t: (key: string) => string): st
   return t("chat.reply_default");
 }
 
-export function ivanaWelcomeMessage(t: (key: string) => string): IvanaChatMessage {
+export function companyChatWelcomeMessage(t: (key: string) => string): CompanyChatMessage {
   return {
     id: "welcome",
-    role: "ivana",
+    role: "assistant",
     text: t("chat.welcome"),
     createdAt: Date.now(),
   };
 }
 
-export function ivanaBubbleTestId(m: IvanaChatMessage): string {
-  if (m.role === "user") return "ivana-chat-bubble-user";
-  if (m.role === "client") return "ivana-chat-bubble-client";
-  if (m.role === "staff") return "ivana-chat-bubble-staff";
-  return "ivana-chat-bubble-ivana";
+export function companyChatBubbleTestId(m: CompanyChatMessage): string {
+  if (m.role === "user") return "company-chat-bubble-user";
+  if (m.role === "client") return "company-chat-bubble-client";
+  if (m.role === "staff") return "company-chat-bubble-staff";
+  return "company-chat-bubble-assistant";
 }
 
-export function ivanaBubbleAlign(m: IvanaChatMessage): string {
+export function companyChatBubbleAlign(m: CompanyChatMessage): string {
   return m.role === "user" || m.role === "client" ? "justify-end" : "justify-start";
 }
 
-export function ivanaSenderHeader(m: IvanaChatMessage, t: (key: string) => string): string | null {
+export function companyChatSenderHeader(
+  m: CompanyChatMessage,
+  t: (key: string) => string
+): string | null {
   if (m.role === "client") return m.senderName?.trim() || t("chat.role_client");
   if (m.role === "staff") return m.senderName?.trim() || t("chat.role_staff");
   return null;

@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
 import type { InterventionEvent } from "@/features/interventions/types";
-import { subscribeInterventionEmails, type InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
+import {
+  subscribeInterventionEmails,
+  type InterventionEmailDoc,
+} from "@/features/emails/interventionEmailFirestore";
 import { addInterventionTimelineComment } from "@/features/interventions/timeline/addInterventionTimelineComment";
 import { mergeInterventionTimelineEvents } from "@/features/interventions/timeline/mergeInterventionTimeline";
 import type { InterventionTimelineDoc } from "@/features/interventions/timeline/interventionTimelineTypes";
@@ -19,8 +22,8 @@ import {
 } from "@/features/commissions/commissionFirestore";
 import {
   subscribePortalChatForIntervention,
-  type IvanaPortalChatDoc,
-} from "@/features/backoffice/ivanaChatFirestore";
+  type PortalChatDoc,
+} from "@/features/backoffice/portalChatFirestore";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 function mapStatusEventDoc(id: string, data: Record<string, unknown>): InterventionStatusEvent {
@@ -51,7 +54,7 @@ function mapTimelineDoc(id: string, data: Record<string, unknown>): Intervention
 
 export function useInterventionTimeline(
   interventionId: string | null,
-  options?: { clientVisibleOnly?: boolean; companyId?: string | null },
+  options?: { clientVisibleOnly?: boolean; companyId?: string | null }
 ) {
   const activeId = interventionId?.trim() || null;
   const [events, setEvents] = useState<InterventionEvent[]>([]);
@@ -66,7 +69,7 @@ export function useInterventionTimeline(
     let emailRows: InterventionEmailDoc[] = [];
     let materialRows: MaterialOrderDoc[] = [];
     let commissionRows: CommissionAuditRow[] = [];
-    let portalChatRows: IvanaPortalChatDoc[] = [];
+    let portalChatRows: PortalChatDoc[] = [];
 
     const publish = () => {
       setEvents(
@@ -76,7 +79,7 @@ export function useInterventionTimeline(
           materialOrders: materialRows,
           commissionAudit: commissionRows,
           portalChat: portalChatRows,
-        }),
+        })
       );
       setLoading(false);
     };
@@ -92,7 +95,7 @@ export function useInterventionTimeline(
       () => {
         emailRows = [];
         publish();
-      },
+      }
     );
 
     let unsubTimeline: (() => void) | undefined;
@@ -100,22 +103,24 @@ export function useInterventionTimeline(
       unsubStatus = onSnapshot(
         query(
           collection(firestore!, "interventions", activeId, "status_events"),
-          orderBy("at", "asc"),
+          orderBy("at", "asc")
         ),
         (snap) => {
-          statusRows = snap.docs.map((d) => mapStatusEventDoc(d.id, d.data() as Record<string, unknown>));
+          statusRows = snap.docs.map((d) =>
+            mapStatusEventDoc(d.id, d.data() as Record<string, unknown>)
+          );
           publish();
         },
         () => {
           statusRows = [];
           publish();
-        },
+        }
       );
 
       unsubTimeline = onSnapshot(
         query(
           collection(firestore!, "interventions", activeId, "timeline_events"),
-          orderBy("createdAt", "asc"),
+          orderBy("createdAt", "asc")
         ),
         (snap) => {
           timelineRows = snap.docs.map((d) => ({
@@ -127,7 +132,7 @@ export function useInterventionTimeline(
         () => {
           timelineRows = [];
           publish();
-        },
+        }
       );
     }, 10);
 
@@ -151,7 +156,7 @@ export function useInterventionTimeline(
       () => {
         portalChatRows = [];
         publish();
-      },
+      }
     );
 
     return () => {

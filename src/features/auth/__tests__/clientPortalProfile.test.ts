@@ -20,11 +20,11 @@ jest.mock("firebase/firestore", () => ({
 const mockSetDoc = setDoc as jest.MockedFunction<typeof setDoc>;
 
 describe("companyIdFromAllowedUsersDoc", () => {
-  it("prefers portalCompanyId then ivanaChatCompanyId then companyId", () => {
+  it("prefers portalCompanyId then portalChatCompanyId then companyId", () => {
     expect(companyIdFromAllowedUsersDoc({ portalCompanyId: "co-a", companyId: "co-b" })).toBe(
       "co-a"
     );
-    expect(companyIdFromAllowedUsersDoc({ ivanaChatCompanyId: "co-c" })).toBe("co-c");
+    expect(companyIdFromAllowedUsersDoc({ portalChatCompanyId: "co-c" })).toBe("co-c");
     expect(companyIdFromAllowedUsersDoc({ companyId: "co-d" })).toBe("co-d");
     expect(companyIdFromAllowedUsersDoc({})).toBeNull();
   });

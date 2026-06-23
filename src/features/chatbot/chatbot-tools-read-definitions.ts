@@ -154,7 +154,7 @@ export const CHATBOT_READ_TOOL_DEFINITIONS: ChatbotToolDefinition[] = [
   },
   {
     name: "list_portal_chat",
-    description: "Messages chat portail client (Ivana) — société ou dossier précis.",
+    description: "Messages chat portail client (entreprise) — société ou dossier précis.",
     input_schema: {
       type: "object",
       properties: {

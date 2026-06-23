@@ -6,15 +6,18 @@ import type { Auth, User } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import { isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { publishClientPortalMessage } from "@/features/backoffice/ivanaChatPortalBridge";
-import { sendIvanaPortalMessage } from "@/features/backoffice/ivanaChatFirestore";
-import { ensureIvanaChatPortalProfile } from "@/features/backoffice/ensureIvanaChatPortalProfile";
-import { uploadIvanaChatImagesFromDataUrls } from "@/features/backoffice/ivanaChatStorage";
-import { readIvanaChatImageDataUrls } from "@/features/backoffice/ivanaChatImageFiles";
+import { publishClientPortalMessage } from "@/features/backoffice/portalChatBridge";
+import { sendPortalChatMessage } from "@/features/backoffice/portalChatFirestore";
+import { ensurePortalChatProfile } from "@/features/backoffice/ensurePortalChatProfile";
+import { uploadPortalChatImagesFromDataUrls } from "@/features/backoffice/portalChatStorage";
+import { readPortalChatImageDataUrls } from "@/features/backoffice/portalChatImageFiles";
 import { requestStaffPortalChatNotification } from "@/features/backoffice/requestStaffPortalChatNotification";
 import { requestClientPortalChatNotification } from "@/features/backoffice/requestClientPortalChatNotification";
-import { resolveIvanaChatSenderName } from "@/features/backoffice/resolveIvanaChatSenderName";
-import { pickIvanaReply, type IvanaChatMessage } from "@/features/backoffice/ivanaChatTypes";
+import { resolvePortalChatSenderName } from "@/features/backoffice/resolvePortalChatSenderName";
+import {
+  pickLocalChatReply,
+  type CompanyChatMessage,
+} from "@/features/backoffice/companyChatTypes";
 import type { useCrmStaffAccountPanel } from "@/features/auth";
 import type { useRequesterHub } from "@/context/RequesterHubContext";
 
@@ -22,13 +25,13 @@ type StaffFields = ReturnType<typeof useCrmStaffAccountPanel>["fields"];
 type RequesterProfile = ReturnType<typeof useRequesterHub>["profile"];
 type ClientAccountFields = ReturnType<typeof useRequesterHub>["clientAccountFields"];
 
-export function useIvanaClientChatSend({
+export function useCompanyChatSend({
   draft,
   setDraft,
   pendingImages,
   setPendingImages,
-  ivanaTyping,
-  setIvanaTyping,
+  assistantTyping,
+  setAssistantTyping,
   setMessages,
   fileInputRef,
   pendingDocIdRef,
@@ -47,9 +50,9 @@ export function useIvanaClientChatSend({
   setDraft: (v: string) => void;
   pendingImages: string[];
   setPendingImages: Dispatch<SetStateAction<string[]>>;
-  ivanaTyping: boolean;
-  setIvanaTyping: (v: boolean) => void;
-  setMessages: Dispatch<SetStateAction<IvanaChatMessage[]>>;
+  assistantTyping: boolean;
+  setAssistantTyping: (v: boolean) => void;
+  setMessages: Dispatch<SetStateAction<CompanyChatMessage[]>>;
   fileInputRef: MutableRefObject<HTMLInputElement | null>;
   pendingDocIdRef: MutableRefObject<Map<string, string>>;
   publishAsPortal: boolean;
@@ -65,7 +68,7 @@ export function useIvanaClientChatSend({
 }) {
   const handlePickImages = useCallback(
     async (files: FileList | null) => {
-      const newUrls = await readIvanaChatImageDataUrls(files, pendingImages.length);
+      const newUrls = await readPortalChatImageDataUrls(files, pendingImages.length);
       if (newUrls.length > 0) setPendingImages((prev) => [...prev, ...newUrls]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     },
@@ -74,7 +77,7 @@ export function useIvanaClientChatSend({
 
   const send = useCallback(async () => {
     const text = draft.trim();
-    if ((!text && pendingImages.length === 0) || ivanaTyping) return;
+    if ((!text && pendingImages.length === 0) || assistantTyping) return;
 
     const wantsFirestore = Boolean(companyIdTrimmed && isConfigured && chatDb);
 
@@ -104,7 +107,7 @@ export function useIvanaClientChatSend({
 
       const role = publishAsPortal ? "client" : "staff";
       const currentUser = chatAuth.currentUser as User;
-      const senderName = resolveIvanaChatSenderName({
+      const senderName = resolvePortalChatSenderName({
         publishAsPortal,
         user: currentUser,
         staffFields,
@@ -114,7 +117,7 @@ export function useIvanaClientChatSend({
       });
       const tempId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
       const optimisticImages = pendingImages.length > 0 ? [...pendingImages] : undefined;
-      const optimisticMsg: IvanaChatMessage = {
+      const optimisticMsg: CompanyChatMessage = {
         id: `pending-${tempId}`,
         role,
         text,
@@ -131,17 +134,17 @@ export function useIvanaClientChatSend({
 
       try {
         if (publishAsPortal) {
-          await ensureIvanaChatPortalProfile(db, currentUser, companyIdTrimmed);
+          await ensurePortalChatProfile(db, currentUser, companyIdTrimmed);
         }
         let imageUrls: string[] | undefined;
         if (optimisticImages && optimisticImages.length > 0 && storage) {
-          imageUrls = await uploadIvanaChatImagesFromDataUrls(storage, {
+          imageUrls = await uploadPortalChatImagesFromDataUrls(storage, {
             companyId: companyIdTrimmed,
             uid: currentUser.uid,
             dataUrls: optimisticImages,
           });
         }
-        const docId = await sendIvanaPortalMessage(db, {
+        const docId = await sendPortalChatMessage(db, {
           companyId: companyIdTrimmed,
           body: text,
           role,
@@ -173,7 +176,7 @@ export function useIvanaClientChatSend({
           });
         }
       } catch (e) {
-        logger.error("IvanaClientChatPanel send", {
+        logger.error("CompanyChatPanel send", {
           error: e instanceof Error ? e.message : String(e),
         });
         toast.error("Chat", {
@@ -186,7 +189,7 @@ export function useIvanaClientChatSend({
       return;
     }
 
-    const userMsg: IvanaChatMessage = {
+    const userMsg: CompanyChatMessage = {
       id: `u-${Date.now()}`,
       role: "user",
       text,
@@ -209,22 +212,22 @@ export function useIvanaClientChatSend({
         preview: userMsg.text || (userMsg.images?.length ? "Photo jointe" : ""),
       });
     }
-    setIvanaTyping(true);
+    setAssistantTyping(true);
 
     const delay = 700 + Math.floor(Math.random() * 600);
     window.setTimeout(() => {
-      const reply: IvanaChatMessage = {
+      const reply: CompanyChatMessage = {
         id: `i-${Date.now()}`,
-        role: "ivana",
-        text: pickIvanaReply(text, t),
+        role: "assistant",
+        text: pickLocalChatReply(text, t),
         createdAt: Date.now(),
       };
       setMessages((prev) => [...prev, reply]);
-      setIvanaTyping(false);
+      setAssistantTyping(false);
     }, delay);
   }, [
     draft,
-    ivanaTyping,
+    assistantTyping,
     pendingImages,
     publishAsPortal,
     companyIdTrimmed,
@@ -239,7 +242,7 @@ export function useIvanaClientChatSend({
     setDraft,
     setPendingImages,
     setMessages,
-    setIvanaTyping,
+    setAssistantTyping,
     pendingDocIdRef,
   ]);
 

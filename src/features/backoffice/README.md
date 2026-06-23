@@ -1,6 +1,6 @@
 # backoffice
 
-Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terrain, assignation techniciens.
+Inbox patron / dispatch : demandes entrantes, chat portail entreprise, rapports terrain, assignation techniciens.
 
 ## Points d'entrée
 
@@ -43,7 +43,7 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 | `incomingRequestClientDisplayName.ts`               | Libellé client formaté                                                  |
 | `hooks/useBackOfficeInboxState.ts`                  | Orchestrateur inbox (~270 lignes)                                       |
 | `hooks/useBackOfficeInboxSelection.ts`              | Tabs, sélection, intent pager                                           |
-| `hooks/useBackOfficeInboxPortalChat.ts`             | Abonnement chat portail Ivana                                           |
+| `hooks/useBackOfficeInboxPortalChat.ts`             | Abonnement chat portail entreprise                                      |
 | `hooks/useBackOfficeInboxActions.ts`                | Compose handlers inbox (~20 lignes)                                     |
 | `hooks/useBackOfficeInboxAssignActions.ts`          | Assignation + planning drag board                                       |
 | `hooks/useBackOfficeInboxReportActions.ts`          | Verify / archive / reject rapports                                      |
@@ -53,17 +53,17 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 | `backOfficeInboxLists.ts`                           | Pure functions — listes inbox                                           |
 | `useBackOfficeInterventions.ts`                     | Hook Firestore interventions société                                    |
 | `assignInterventionFromBackoffice.ts`               | Assignation depuis inbox                                                |
-| `components/IvanaClientChatPanel.tsx`               | Chat portail client (~80 lignes)                                        |
-| `hooks/useIvanaClientChatPanel.ts`                  | Orchestrateur chat portail (~215 lignes)                                |
-| `hooks/useIvanaClientChatFirestoreSync.ts`          | Abonnement Firestore + merge optimiste                                  |
-| `hooks/useIvanaClientChatSend.ts`                   | Envoi messages + images                                                 |
-| `ivanaChatMessageMerge.ts`                          | Mapping Firestore → messages UI                                         |
-| `ivanaChatImageFiles.ts`                            | Lecture fichiers image (data URLs)                                      |
-| `ivanaChatFirestore.ts`                             | Messages portail Firestore                                              |
+| `components/CompanyChatPanel.tsx`                   | Chat portail client (~80 lignes)                                        |
+| `hooks/useCompanyChatPanel.ts`                      | Orchestrateur chat portail (~215 lignes)                                |
+| `hooks/useCompanyChatFirestoreSync.ts`              | Abonnement Firestore + merge optimiste                                  |
+| `hooks/useCompanyChatSend.ts`                       | Envoi messages + images                                                 |
+| `companyChatMessageMerge.ts`                        | Mapping Firestore → messages UI                                         |
+| `portalChatImageFiles.ts`                           | Lecture fichiers image (data URLs)                                      |
+| `portalChatFirestore.ts`                            | Messages portail Firestore                                              |
 
 ## Données
 
-- Firestore : `interventions`, messages portail (via `ivanaChatFirestore`)
+- Firestore : `interventions`, messages portail (via `portalChatFirestore`)
 - Pas de collection `backoffice` dédiée
 
 ## Dépendances autorisées

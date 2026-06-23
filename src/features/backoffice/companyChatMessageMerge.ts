@@ -1,12 +1,15 @@
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
-import { type IvanaChatMessage, ivanaWelcomeMessage } from "@/features/backoffice/ivanaChatTypes";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
+import {
+  type CompanyChatMessage,
+  companyChatWelcomeMessage,
+} from "@/features/backoffice/companyChatTypes";
 
-export function mapIvanaPortalRowsToMessages(rows: IvanaPortalChatDoc[]): IvanaChatMessage[] {
+export function mapPortalChatRowsToMessages(rows: PortalChatDoc[]): CompanyChatMessage[] {
   return rows
     .map((r) => {
       const ts = coerceFirestoreLikeDate(r.createdAt)?.getTime() ?? Date.now();
-      let role: IvanaChatMessage["role"] = "user";
+      let role: CompanyChatMessage["role"] = "user";
       if (r.role === "client") role = "client";
       else if (r.role === "staff") role = "staff";
       return {
@@ -22,13 +25,13 @@ export function mapIvanaPortalRowsToMessages(rows: IvanaPortalChatDoc[]): IvanaC
     .sort((a, b) => a.createdAt - b.createdAt);
 }
 
-export function mergeIvanaChatWithOptimistic(params: {
-  mapped: IvanaChatMessage[];
-  filteredRows: IvanaPortalChatDoc[];
-  prev: IvanaChatMessage[];
+export function mergeCompanyChatWithOptimistic(params: {
+  mapped: CompanyChatMessage[];
+  filteredRows: PortalChatDoc[];
+  prev: CompanyChatMessage[];
   pendingDocIdRef: Map<string, string>;
-  welcome: IvanaChatMessage;
-}): IvanaChatMessage[] {
+  welcome: CompanyChatMessage;
+}): CompanyChatMessage[] {
   const { mapped, filteredRows, prev, pendingDocIdRef, welcome } = params;
   const confirmedIds = new Set(filteredRows.map((r) => r.id));
   const contentKeys = new Set(filteredRows.map((r) => `${(r.senderUid ?? "").trim()}::${r.body}`));
@@ -51,6 +54,6 @@ export function mergeIvanaChatWithOptimistic(params: {
   return [...base, ...optimistic].sort((a, b) => a.createdAt - b.createdAt);
 }
 
-export function ivanaChatWelcome(t: (key: string) => string): IvanaChatMessage {
-  return ivanaWelcomeMessage(t);
+export function companyChatWelcome(t: (key: string) => string): CompanyChatMessage {
+  return companyChatWelcomeMessage(t);
 }

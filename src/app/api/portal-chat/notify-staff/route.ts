@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { assertClientMayAccessIvanaPortalChat } from "@/features/backoffice/server/assertClientMayAccessIvanaPortalChat";
+import { assertClientMayAccessPortalChat } from "@/features/backoffice/server/assertClientMayAccessPortalChat";
 import { notifyStaffPortalChatAdmin } from "@/features/backoffice/server/notifyStaffPortalChatAdmin";
 import { logger } from "@/core/logger";
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "companyId manquant." }, { status: 400 });
   }
 
-  const gate = await assertClientMayAccessIvanaPortalChat(admin.firestore(), auth.uid, companyId);
+  const gate = await assertClientMayAccessPortalChat(admin.firestore(), auth.uid, companyId);
   if (!gate.allowed) {
     return NextResponse.json({ ok: false, error: gate.error }, { status: gate.status });
   }

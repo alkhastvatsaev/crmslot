@@ -1,4 +1,4 @@
-import { ensureIvanaChatPortalProfile } from "@/features/backoffice/ensureIvanaChatPortalProfile";
+import { ensurePortalChatProfile } from "@/features/backoffice/ensurePortalChatProfile";
 
 jest.mock("firebase/firestore", () => ({
   doc: jest.fn((_db: unknown, collection: string, uid: string) => ({
@@ -17,7 +17,7 @@ const { doc, setDoc } = jest.requireMock("firebase/firestore") as {
   setDoc: jest.Mock;
 };
 
-describe("ensureIvanaChatPortalProfile", () => {
+describe("ensurePortalChatProfile", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -26,7 +26,7 @@ describe("ensureIvanaChatPortalProfile", () => {
     const db = {} as import("firebase/firestore").Firestore;
     const user = { uid: "u1", email: "a@b.c", displayName: "A B" } as import("firebase/auth").User;
 
-    await ensureIvanaChatPortalProfile(db, user, "co-abc");
+    await ensurePortalChatProfile(db, user, "co-abc");
 
     expect(doc).toHaveBeenCalledWith(db, "client_portal_profiles", "u1");
     expect(setDoc).toHaveBeenCalledWith(
@@ -39,7 +39,7 @@ describe("ensureIvanaChatPortalProfile", () => {
   it("ignore companyId vide", async () => {
     const db = {} as import("firebase/firestore").Firestore;
     const user = { uid: "u1" } as import("firebase/auth").User;
-    await ensureIvanaChatPortalProfile(db, user, "  ");
+    await ensurePortalChatProfile(db, user, "  ");
     expect(setDoc).not.toHaveBeenCalled();
   });
 });

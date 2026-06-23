@@ -1,4 +1,4 @@
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import {
   countClientPortalThreadsNeedingReply,
   filterNewClientPortalMessages,
@@ -6,9 +6,7 @@ import {
   portalChatThreadKey,
 } from "@/features/backoffice/portalChatInboxLogic";
 
-function msg(
-  partial: Partial<IvanaPortalChatDoc> & Pick<IvanaPortalChatDoc, "id" | "role">
-): IvanaPortalChatDoc {
+function msg(partial: Partial<PortalChatDoc> & Pick<PortalChatDoc, "id" | "role">): PortalChatDoc {
   return {
     companyId: "co-1",
     body: "hello",

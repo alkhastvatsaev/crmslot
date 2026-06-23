@@ -15,14 +15,11 @@ export { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNaviga
 export { openBackofficeIntervention } from "@/features/backoffice/openBackofficeIntervention";
 export { unknownTimestampToMs } from "@/features/backoffice/timeHelpers";
 export {
-  IVANA_PORTAL_CHAT_COLLECTION,
-  subscribeIvanaPortalMessages,
+  PORTAL_CHAT_COLLECTION,
+  subscribePortalChatMessages,
   subscribePortalChatForIntervention,
-} from "@/features/backoffice/ivanaChatFirestore";
-export type {
-  IvanaPortalChatDoc,
-  IvanaPortalChatRole,
-} from "@/features/backoffice/ivanaChatFirestore";
+} from "@/features/backoffice/portalChatFirestore";
+export type { PortalChatDoc, PortalChatRole } from "@/features/backoffice/portalChatFirestore";
 
 // Modules consommés cross-feature (audit:barrels:public).
 export * from "@/features/backoffice/useResolvedInterventionAudio";

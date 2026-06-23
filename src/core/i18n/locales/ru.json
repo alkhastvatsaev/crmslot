@@ -673,7 +673,7 @@
       "intervention_payment_updated": "Оплата обновлена",
       "intervention_terrain_report_received": "Получен отчёт с объекта",
       "bridged_report_dismissed": "Отчёт скрыт",
-      "ivana_chat_message": "Сообщение Ivana",
+      "ivana_chat_message": "Сообщение клиентского чата",
       "material_order_status_changed": "Статус заказа материалов",
       "supplier_order_lecot": "Заказ Lecot (chatbot)",
       "chatbot_intervention_status": "Статус дела (chatbot)",
@@ -750,7 +750,7 @@
         "intervention_payment_updated": "Статус оплаты или регистрация поступления денег по делу изменены.",
         "intervention_terrain_report_received": "Отчёт о завершении выезда (текст, фото, подпись) отправлен техником.",
         "bridged_report_dismissed": "Автоматически импортированный отчёт с объекта был проигнорирован или скрыт диспетчером.",
-        "ivana_chat_message": "Сообщение в чате Ivana, связанное с клиентским порталом или отслеживанием дела.",
+        "ivana_chat_message": "Сообщение в корпоративном чате, связанном с клиентским порталом или отслеживанием дела.",
         "material_order_status_changed": "Статус внутреннего заказа материалов изменился (черновик, отправлен, получен и т. д.).",
         "supplier_order_lecot": "Заказ поставщику Lecot создан или обновлён через chatbot или хаб материалов.",
         "chatbot_intervention_status": "Chatbot изменил статус дела после подтверждения пользователем.",
@@ -784,6 +784,9 @@
         "summary_week": "Подытожь активность на этой неделе"
       },
       "info": "Агент QM анализирует ваши KPI в реальном времени и выявляет точки внимания по качеству."
+    },
+    "types": {
+      "ivana_chat_message": "Сообщение клиентского чата"
     }
   },
   "companyStock": {
@@ -1485,7 +1488,7 @@
     "aria": {
       "left": "Кто заявляет? — хаб заявителя",
       "center": "Что нужно починить? — хаб заявителя",
-      "right": "Отслеживание дела и чат IVANA — хаб заявителя"
+      "right": "Отслеживание дела и корпоративный чат — хаб заявителя"
     },
     "right_tabs": {
       "aria": "Категории портала заявителя",
@@ -1540,7 +1543,7 @@
         "mission_done_badge": "Завершён",
         "invoice_backoffice_pending": "Отправьте счёт клиенту ниже.",
         "edit_report": "Изменить отчёт",
-        "report_rejected_title": "Отчёт требует исправления (IVANA)",
+        "report_rejected_title": "Отчёт требует исправления",
         "report_rejected_hint": "Повторите закрытие: фото, подпись, затем счёт.",
         "finish_job": "Завершить выезд",
         "updating": "Обновление...",
@@ -1555,7 +1558,7 @@
         "accept_assignment": "Принять",
         "decline_assignment": "Отклонить",
         "assignment_accepted": "Выезд принят",
-        "assignment_declined": "Выезд отклонён — возвращён в заявки IVANA",
+        "assignment_declined": "Выезд отклонён — возвращён во входящие заявки",
         "assignment_action_failed": "Действие невозможно",
         "update_failed": "Не удалось обновить",
         "assignment_respond_in_list": "Примите или отклоните этот выезд в списке слева.",
@@ -1741,6 +1744,12 @@
       "rail_left": "Выезды",
       "rail_center": "Детали",
       "rail_right": "Фото"
+    },
+    "validation": {
+      "report_rejected_title": "Отчёт требует исправления"
+    },
+    "assignment": {
+      "assignment_declined": "Выезд отклонён — возвращён во входящие заявки"
     }
   },
   "common": {

@@ -4,25 +4,25 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { isConfigured, storage } from "@/core/config/firebase";
 import {
-  IVANA_PORTAL_MESSAGE_EVENT,
+  PORTAL_CHAT_MESSAGE_EVENT,
   type ClientPortalChatPayload,
-} from "@/features/backoffice/ivanaChatPortalBridge";
+} from "@/features/backoffice/portalChatBridge";
 import { ensureClientPortalChatAuth } from "@/features/backoffice/ensureClientPortalChatAuth";
-import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIvanaChatFirebaseSession";
+import { resolvePortalChatFirebaseSession } from "@/features/backoffice/resolvePortalChatFirebaseSession";
 import { isClientPortalChatUser } from "@/features/auth/hooks/useClientPortalAccount";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
-  type IvanaChatMessage,
-  IVANA_CHAT_STORAGE_PREFIX,
-  IVANA_CHAT_PERSISTENCE_ENABLED,
-  ivanaWelcomeMessage,
-} from "@/features/backoffice/ivanaChatTypes";
-import { useIvanaClientChatFirestoreSync } from "@/features/backoffice/hooks/useIvanaClientChatFirestoreSync";
-import { useIvanaClientChatSend } from "@/features/backoffice/hooks/useIvanaClientChatSend";
+  type CompanyChatMessage,
+  COMPANY_CHAT_STORAGE_PREFIX,
+  COMPANY_CHAT_PERSISTENCE_ENABLED,
+  companyChatWelcomeMessage,
+} from "@/features/backoffice/companyChatTypes";
+import { useCompanyChatFirestoreSync } from "@/features/backoffice/hooks/useCompanyChatFirestoreSync";
+import { useCompanyChatSend } from "@/features/backoffice/hooks/useCompanyChatSend";
 
-export type UseIvanaClientChatPanelArgs = {
+export type UseCompanyChatPanelArgs = {
   publishAsPortal?: boolean;
   acceptPortalMessages?: boolean;
   chatCompanyId?: string | null;
@@ -30,20 +30,22 @@ export type UseIvanaClientChatPanelArgs = {
   onRemoteClientMessage?: () => void;
 };
 
-export function useIvanaClientChatPanel({
+export function useCompanyChatPanel({
   publishAsPortal = false,
   acceptPortalMessages = false,
   chatCompanyId = null,
   chatInterventionId = null,
   onRemoteClientMessage,
-}: UseIvanaClientChatPanelArgs) {
+}: UseCompanyChatPanelArgs) {
   const { t } = useTranslation();
   const { fields: staffFields } = useCrmStaffAccountPanel();
   const { profile: requesterProfile, clientAccountFields } = useRequesterHub();
   const [user, setUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<IvanaChatMessage[]>(() => [ivanaWelcomeMessage(t)]);
+  const [messages, setMessages] = useState<CompanyChatMessage[]>(() => [
+    companyChatWelcomeMessage(t),
+  ]);
   const [draft, setDraft] = useState("");
-  const [ivanaTyping, setIvanaTyping] = useState(false);
+  const [assistantTyping, setAssistantTyping] = useState(false);
   const [pendingImages, setPendingImages] = useState<string[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -53,7 +55,7 @@ export function useIvanaClientChatPanel({
   const pendingDocIdRef = useRef<Map<string, string>>(new Map());
 
   const { chatAuth, chatDb } = useMemo(
-    () => resolveIvanaChatFirebaseSession(publishAsPortal),
+    () => resolvePortalChatFirebaseSession(publishAsPortal),
     [publishAsPortal]
   );
 
@@ -65,7 +67,7 @@ export function useIvanaClientChatPanel({
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
   const storageKey = useMemo(
-    () => `${IVANA_CHAT_STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`,
+    () => `${COMPANY_CHAT_STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`,
     [user?.uid]
   );
 
@@ -93,10 +95,10 @@ export function useIvanaClientChatPanel({
     let cancelled = false;
     hydratedRef.current = false;
 
-    if (!IVANA_CHAT_PERSISTENCE_ENABLED) {
+    if (!COMPANY_CHAT_PERSISTENCE_ENABLED) {
       if (!cancelled) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMessages([ivanaWelcomeMessage(t)]);
+        setMessages([companyChatWelcomeMessage(t)]);
         hydratedRef.current = true;
       }
       return () => {
@@ -107,7 +109,7 @@ export function useIvanaClientChatPanel({
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
-        const parsed = JSON.parse(raw) as IvanaChatMessage[];
+        const parsed = JSON.parse(raw) as CompanyChatMessage[];
         if (Array.isArray(parsed) && parsed.length > 0) {
           if (!cancelled) {
             setMessages(parsed);
@@ -120,7 +122,7 @@ export function useIvanaClientChatPanel({
       /* ignore */
     }
     if (!cancelled) {
-      setMessages([ivanaWelcomeMessage(t)]);
+      setMessages([companyChatWelcomeMessage(t)]);
       hydratedRef.current = true;
     }
     return () => {
@@ -130,7 +132,7 @@ export function useIvanaClientChatPanel({
 
   useEffect(() => {
     if (!hydratedRef.current || typeof window === "undefined" || firestoreSyncEnabled) return;
-    if (!IVANA_CHAT_PERSISTENCE_ENABLED) return;
+    if (!COMPANY_CHAT_PERSISTENCE_ENABLED) return;
     try {
       localStorage.setItem(storageKey, JSON.stringify(messages));
     } catch {
@@ -138,7 +140,7 @@ export function useIvanaClientChatPanel({
     }
   }, [messages, storageKey, firestoreSyncEnabled]);
 
-  useIvanaClientChatFirestoreSync(
+  useCompanyChatFirestoreSync(
     firestoreSyncEnabled,
     chatDb,
     companyIdTrimmed,
@@ -154,7 +156,7 @@ export function useIvanaClientChatPanel({
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [messages, ivanaTyping]);
+  }, [messages, assistantTyping]);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -184,17 +186,17 @@ export function useIvanaClientChatPanel({
         },
       ]);
     };
-    window.addEventListener(IVANA_PORTAL_MESSAGE_EVENT, handler as EventListener);
-    return () => window.removeEventListener(IVANA_PORTAL_MESSAGE_EVENT, handler as EventListener);
+    window.addEventListener(PORTAL_CHAT_MESSAGE_EVENT, handler as EventListener);
+    return () => window.removeEventListener(PORTAL_CHAT_MESSAGE_EVENT, handler as EventListener);
   }, [acceptPortalMessages, firestoreSyncEnabled]);
 
-  const { handlePickImages, send } = useIvanaClientChatSend({
+  const { handlePickImages, send } = useCompanyChatSend({
     draft,
     setDraft,
     pendingImages,
     setPendingImages,
-    ivanaTyping,
-    setIvanaTyping,
+    assistantTyping,
+    setAssistantTyping,
     setMessages,
     fileInputRef,
     pendingDocIdRef,
@@ -212,7 +214,7 @@ export function useIvanaClientChatPanel({
 
   return {
     messages,
-    ivanaTyping,
+    assistantTyping,
     draft,
     setDraft,
     pendingImages,

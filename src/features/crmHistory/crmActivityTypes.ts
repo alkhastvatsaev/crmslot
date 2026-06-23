@@ -72,7 +72,7 @@ export interface CrmActivityEvent {
   actorUid?: string;
   actorRole?: string;
   note?: string;
-  /** Chat Ivana / matériel */
+  /** Chat portail client / matériel */
   chatRole?: "client" | "staff";
   materialOrderStatus?: string;
 }

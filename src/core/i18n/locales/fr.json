@@ -673,7 +673,7 @@
       "intervention_payment_updated": "Paiement mis à jour",
       "intervention_terrain_report_received": "Rapport terrain reçu",
       "bridged_report_dismissed": "Rapport masqué",
-      "ivana_chat_message": "Message Ivana",
+      "ivana_chat_message": "Message chat client",
       "material_order_status_changed": "Statut commande matériel",
       "supplier_order_lecot": "Commande Lecot (chatbot)",
       "chatbot_intervention_status": "Statut dossier (chatbot)",
@@ -750,7 +750,7 @@
         "intervention_payment_updated": "Le statut de paiement ou l'enregistrement d'un encaissement a été modifié sur ce dossier.",
         "intervention_terrain_report_received": "Un rapport de fin de mission (texte, photos, signature) a été déposé par le technicien.",
         "bridged_report_dismissed": "Un rapport terrain importé automatiquement a été ignoré ou masqué par le dispatcher.",
-        "ivana_chat_message": "Échange dans le chat Ivana lié au portail client ou au suivi du dossier.",
+        "ivana_chat_message": "Échange dans le chat entreprise lié au portail client ou au suivi du dossier.",
         "material_order_status_changed": "Le statut d'une commande de matériel interne a évolué (brouillon, envoyée, reçue, etc.).",
         "supplier_order_lecot": "Une commande fournisseur Lecot a été créée ou mise à jour via le chatbot ou le hub matériel.",
         "chatbot_intervention_status": "Le chatbot a modifié le statut du dossier après confirmation utilisateur.",
@@ -784,6 +784,9 @@
         "summary_week": "Résume l'activité de cette semaine"
       },
       "info": "L'Agent QM analyse vos KPIs en temps réel et identifie les points d'attention qualité."
+    },
+    "types": {
+      "ivana_chat_message": "Message chat client"
     }
   },
   "companyStock": {
@@ -1485,7 +1488,7 @@
     "aria": {
       "left": "Qui demande ? — hub demandeur",
       "center": "Que faut-il réparer ? — hub demandeur",
-      "right": "Suivi dossier et chat IVANA — hub demandeur"
+      "right": "Suivi dossier et chat entreprise — hub demandeur"
     },
     "right_tabs": {
       "aria": "Catégories portail demandeur",
@@ -1540,7 +1543,7 @@
         "mission_done_badge": "Terminée",
         "invoice_backoffice_pending": "Envoyez la facture au client ci-dessous.",
         "edit_report": "Modifier le rapport",
-        "report_rejected_title": "Rapport à corriger (IVANA)",
+        "report_rejected_title": "Rapport à corriger",
         "report_rejected_hint": "Refaites la clôture : photos, signature, puis facture.",
         "finish_job": "Terminer l'intervention",
         "updating": "Mise à jour...",
@@ -1555,7 +1558,7 @@
         "accept_assignment": "Accepter",
         "decline_assignment": "Refuser",
         "assignment_accepted": "Mission acceptée",
-        "assignment_declined": "Mission refusée — renvoyée aux demandes IVANA",
+        "assignment_declined": "Mission refusée — renvoyée aux demandes entrantes",
         "assignment_action_failed": "Action impossible",
         "update_failed": "Mise à jour impossible",
         "assignment_respond_in_list": "Acceptez ou refusez cette mission dans la liste à gauche.",
@@ -1741,6 +1744,12 @@
       "rail_left": "Missions",
       "rail_center": "Détail",
       "rail_right": "Photos"
+    },
+    "validation": {
+      "report_rejected_title": "Rapport à corriger"
+    },
+    "assignment": {
+      "assignment_declined": "Mission refusée — renvoyée aux demandes entrantes"
     }
   },
   "common": {

@@ -1,10 +1,10 @@
-import { resolveIvanaChatSenderName } from "@/features/backoffice/resolveIvanaChatSenderName";
+import { resolvePortalChatSenderName } from "@/features/backoffice/resolvePortalChatSenderName";
 
 const t = (key: string) => key;
 
-describe("resolveIvanaChatSenderName", () => {
+describe("resolvePortalChatSenderName", () => {
   it("client — prénom compte portail", () => {
-    const name = resolveIvanaChatSenderName({
+    const name = resolvePortalChatSenderName({
       publishAsPortal: true,
       user: { displayName: null, email: "x@y.com" } as never,
       clientAccountFields: {
@@ -20,7 +20,7 @@ describe("resolveIvanaChatSenderName", () => {
   });
 
   it("staff — nom CRM", () => {
-    const name = resolveIvanaChatSenderName({
+    const name = resolvePortalChatSenderName({
       publishAsPortal: false,
       user: { displayName: null, email: "staff@co.com" } as never,
       staffFields: {

@@ -51,15 +51,13 @@ jest.mock("../useCompanyCrmActivityLog", () => ({
   }),
 }));
 
-jest.mock("../useCompanyIvanaChatFeed", () => ({
-  useCompanyIvanaChatFeed: () => ({ messages: [], loading: false }),
+jest.mock("../useCompanyPortalChatFeed", () => ({
+  useCompanyPortalChatFeed: () => ({ messages: [], loading: false }),
 }));
 
 describe("useCrmActivityFeed", () => {
   it("hides feedError when interventions still produce events", async () => {
-    const { result } = renderHook(() =>
-      useCrmActivityFeed("demo-local-company", "all", "all", ""),
-    );
+    const { result } = renderHook(() => useCrmActivityFeed("demo-local-company", "all", "all", ""));
 
     await waitFor(() => {
       expect(result.current.events.length).toBeGreaterThan(0);

@@ -673,7 +673,7 @@
       "intervention_payment_updated": "Betaling bijgewerkt",
       "intervention_terrain_report_received": "Veldrapport ontvangen",
       "bridged_report_dismissed": "Rapport verborgen",
-      "ivana_chat_message": "Ivana-bericht",
+      "ivana_chat_message": "Klantchatbericht",
       "material_order_status_changed": "Materiaalbestelling status",
       "supplier_order_lecot": "Lecot-leveranciersbestelling (chatbot)",
       "chatbot_intervention_status": "Dossierstatus (chatbot)",
@@ -750,7 +750,7 @@
         "intervention_payment_updated": "De betalingsstatus of een geregistreerde betaling werd bijgewerkt op dit dossier.",
         "intervention_terrain_report_received": "Een eindrapport (tekst, foto's, handtekening) werd ingediend door de technicus.",
         "bridged_report_dismissed": "Een automatisch geïmporteerd veldrapport werd genegeerd of verborgen door de dispatcher.",
-        "ivana_chat_message": "Uitwisseling in de Ivana-chat gekoppeld aan het klantportaal of dossieropvolging.",
+        "ivana_chat_message": "Uitwisseling in de bedrijfschat gekoppeld aan het klantportaal of dossieropvolging.",
         "material_order_status_changed": "De status van een interne materiaalbestelling is gewijzigd (concept, verzonden, ontvangen, enz.).",
         "supplier_order_lecot": "Een Lecot-leveranciersbestelling werd aangemaakt of bijgewerkt via de chatbot of materiaalhub.",
         "chatbot_intervention_status": "De chatbot heeft de dossierstatus gewijzigd na bevestiging door de gebruiker.",
@@ -784,6 +784,9 @@
         "summary_week": "Vat de activiteit van deze week samen"
       },
       "info": "De QM-agent analyseert uw KPI's in realtime en identificeert kwaliteitsproblemen."
+    },
+    "types": {
+      "ivana_chat_message": "Klantchatbericht"
     }
   },
   "companyStock": {
@@ -1485,7 +1488,7 @@
     "aria": {
       "left": "Wie vraagt? — aanvragerhub",
       "center": "Wat moet er hersteld worden? — aanvragerhub",
-      "right": "Dossiertracking en IVANA-chat — aanvragerhub"
+      "right": "Dossiertracking en bedrijfschat — aanvragerhub"
     },
     "right_tabs": {
       "aria": "Categorieën aanvragersportaal",
@@ -1540,7 +1543,7 @@
         "mission_done_badge": "Voltooid",
         "invoice_backoffice_pending": "Stuur de factuur hieronder naar de klant.",
         "edit_report": "Rapport wijzigen",
-        "report_rejected_title": "Rapport te corrigeren (dispatcher)",
+        "report_rejected_title": "Rapport moet worden gecorrigeerd",
         "report_rejected_hint": "Sluit opnieuw af: foto's, handtekening, dan factuur.",
         "finish_job": "Klus afronden",
         "updating": "Bijwerken...",
@@ -1555,7 +1558,7 @@
         "accept_assignment": "Accepteren",
         "decline_assignment": "Weigeren",
         "assignment_accepted": "Opdracht geaccepteerd",
-        "assignment_declined": "Opdracht geweigerd — teruggestuurd naar IVANA-aanvragen",
+        "assignment_declined": "Opdracht geweigerd — teruggestuurd naar binnenkomende aanvragen",
         "assignment_action_failed": "Actie mislukt",
         "update_failed": "Bijwerken mislukt",
         "assignment_respond_in_list": "Accepteer of weiger deze opdracht via de lijst links.",
@@ -1741,6 +1744,12 @@
       "rail_left": "Klussen",
       "rail_center": "Detail",
       "rail_right": "Foto's"
+    },
+    "validation": {
+      "report_rejected_title": "Rapport moet worden gecorrigeerd"
+    },
+    "assignment": {
+      "assignment_declined": "Opdracht geweigerd — teruggestuurd naar binnenkomende aanvragen"
     }
   },
   "common": {

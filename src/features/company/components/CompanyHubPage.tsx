@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
-import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
+import CompanyChatPanel from "@/features/backoffice/components/CompanyChatPanel";
 import RequesterProfilePanel from "@/features/interventions/components/RequesterProfilePanel";
 import RequesterInterventionPanel from "@/features/interventions/components/RequesterInterventionPanel";
 import RequesterTrackingPanel from "@/features/interventions/components/RequesterTrackingPanel";
@@ -63,7 +63,7 @@ export default function CompanyHubPage() {
 
   const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
 
-  const ivanaChatCompanyId = useMemo(
+  const portalChatCompanyId = useMemo(
     () =>
       resolveClientPortalInterventionCompanyId({
         tenantActiveCompanyId:
@@ -128,10 +128,10 @@ export default function CompanyHubPage() {
         {rightCategory === "tracking" ? (
           <RequesterTrackingPanel />
         ) : rightCategory === "chat" ? (
-          <IvanaClientChatPanel
+          <CompanyChatPanel
             className="min-h-0 flex-1"
             publishAsPortal
-            chatCompanyId={ivanaChatCompanyId}
+            chatCompanyId={portalChatCompanyId}
             chatInterventionId={portalCaseId}
           />
         ) : (

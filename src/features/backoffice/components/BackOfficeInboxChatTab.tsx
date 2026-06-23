@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { capitalizeName } from "@/utils/stringUtils";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
+import CompanyChatPanel from "@/features/backoffice/components/CompanyChatPanel";
 import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClientsPicker";
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
@@ -15,7 +15,7 @@ export default function BackOfficeInboxChatTab({
   active,
   selectedChatInterventionId,
   setSelectedChatInterventionId,
-  ivanaChatCompanyId,
+  portalChatCompanyId,
   chatDayRows,
   interventions,
   setActiveTab,
@@ -23,7 +23,7 @@ export default function BackOfficeInboxChatTab({
   active: boolean;
   selectedChatInterventionId: string | null;
   setSelectedChatInterventionId: (id: string | null) => void;
-  ivanaChatCompanyId: string | null;
+  portalChatCompanyId: string | null;
   chatDayRows: ChatDayMissionRow[];
   interventions: Intervention[];
   setActiveTab: (tab: "chat" | "requests" | "reports" | "documents") => void;
@@ -71,14 +71,14 @@ export default function BackOfficeInboxChatTab({
               ) : null}
             </div>
           </div>
-          <IvanaClientChatPanel
+          <CompanyChatPanel
             className="min-h-0 flex-1 px-0"
             acceptPortalMessages
-            chatCompanyId={ivanaChatCompanyId}
+            chatCompanyId={portalChatCompanyId}
             chatInterventionId={
               selectedChatInterventionId === "global" ? null : selectedChatInterventionId
             }
-            onRemoteClientMessage={ivanaChatCompanyId ? () => setActiveTab("chat") : undefined}
+            onRemoteClientMessage={portalChatCompanyId ? () => setActiveTab("chat") : undefined}
           />
         </div>
       ) : (
