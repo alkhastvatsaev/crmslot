@@ -2,15 +2,15 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { generateInterventionDocumentPdf } from "@/features/billing/generateQuotePdf";
-import { generateMaterialOrdersPdf } from "@/features/materials/generateMaterialOrderPdf";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import { generateInterventionDocumentPdf } from "@/features/billing";
+import { generateMaterialOrdersPdf } from "@/features/materials";
+import type { MaterialOrderDoc } from "@/features/materials";
 import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
 import {
   CHATBOT_DOCUMENT_LABELS,
   isChatbotDocumentKind,
 } from "@/features/chatbot/chatbot-document";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 
@@ -48,14 +48,11 @@ export async function GET(request: Request, context: RouteContext) {
       .where("interventionId", "==", interventionId)
       .limit(30)
       .get();
-    const orders = ordersSnap.docs.map(
-      (d) => ({ id: d.id, ...d.data() }) as MaterialOrderDoc,
-    );
+    const orders = ordersSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as MaterialOrderDoc);
     const clientFromOrder = orders
       .map((o) => (typeof o.clientName === "string" ? o.clientName.trim() : ""))
       .find(Boolean);
-    const clientLabel =
-      clientFromOrder || String(iv.clientName ?? "").trim() || undefined;
+    const clientLabel = clientFromOrder || String(iv.clientName ?? "").trim() || undefined;
     pdf = generateMaterialOrdersPdf(interventionId, orders, clientLabel);
   } else {
     const branding =

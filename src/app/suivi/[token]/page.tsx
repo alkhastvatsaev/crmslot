@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { PortalInterventionSummary } from "@/features/interventions/portalToken";
+import type { PortalInterventionSummary } from "@/features/interventions";
 import PortalQuoteSection from "@/features/interventions/components/PortalQuoteSection";
 import PortalSignSection from "@/features/interventions/components/PortalSignSection";
 

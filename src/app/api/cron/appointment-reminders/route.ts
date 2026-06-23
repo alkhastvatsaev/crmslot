@@ -8,8 +8,8 @@ import {
 } from "@/features/notifications/appointmentReminders";
 import { notifyClient } from "@/core/services/email/clientNotifications/notifyClient";
 import { buildClientAppointmentReminderEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
-import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import { sendNativePushToUser } from "@/features/notifications";
+import type { Intervention } from "@/features/interventions";
 
 function pushTitleFor(reminderType: "24h" | "2h" | "30min", role: "client" | "tech"): string {
   if (reminderType === "24h") return role === "tech" ? "RDV demain" : "Rappel RDV demain";

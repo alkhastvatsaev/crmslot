@@ -4,7 +4,7 @@ import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { generateInterventionQuotePdf } from "@/features/billing/generateQuotePdf";
 import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

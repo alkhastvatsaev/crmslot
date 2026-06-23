@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
-import { acceptQuoteAdmin } from "@/features/quotes/server/acceptQuoteAdmin";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
+import { acceptQuoteAdmin } from "@/features/quotes";
 
 export const runtime = "nodejs";
 

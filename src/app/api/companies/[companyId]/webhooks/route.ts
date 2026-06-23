@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
-import type { WebhookEndpoint, WebhookEventType } from "@/features/integrations/types";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
+import type { WebhookEndpoint, WebhookEventType } from "@/features/integrations";
 
 export const runtime = "nodejs";
 

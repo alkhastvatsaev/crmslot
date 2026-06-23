@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { submitLecotSupplierOrder } from "@/features/catalog/lecotSupplierOrder";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import { submitLecotSupplierOrder } from "@/features/catalog";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 export const runtime = "nodejs";
 
@@ -34,7 +34,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: result.error }, { status: 502 });
     }
     if (result.source === "manual") {
-      return NextResponse.json({ ok: true, source: "manual", message: result.message, lines: result.lines });
+      return NextResponse.json({
+        ok: true,
+        source: "manual",
+        message: result.message,
+        lines: result.lines,
+      });
     }
     return NextResponse.json({ ok: true, source: result.source, orderId: result.orderId });
   }

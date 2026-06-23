@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { clientNotificationCaseUrl } from "@/features/notifications/clientNotificationUrls";
+import { clientNotificationCaseUrl } from "@/features/notifications";
 
 async function listFcmTokens(uid: string): Promise<string[]> {
   const snap = await getAdminDb().collection("users").doc(uid).collection("fcm_tokens").get();
@@ -12,7 +12,7 @@ async function listFcmTokens(uid: string): Promise<string[]> {
 /** Notifie le demandeur portail client après paiement Stripe (best-effort). */
 export async function notifyClientPaymentReceived(
   interventionId: string,
-  createdByUid: string | null | undefined,
+  createdByUid: string | null | undefined
 ): Promise<void> {
   const uid = typeof createdByUid === "string" ? createdByUid.trim() : "";
   if (!uid || !admin.apps.length) return;

@@ -2,9 +2,9 @@ import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
-import { dispatchCompanyWebhooksAdmin } from "@/features/integrations/server/dispatchCompanyWebhooksAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
+import { dispatchCompanyWebhooksAdmin } from "@/features/integrations";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

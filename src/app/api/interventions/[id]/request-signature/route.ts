@@ -2,10 +2,10 @@ import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
 import { featureFlagsFromEnv } from "@/core/featureFlags";
-import { getESignProvider } from "@/features/esign/ESignProvider";
-import type { Intervention } from "@/features/interventions/types";
+import { getESignProvider } from "@/features/esign";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

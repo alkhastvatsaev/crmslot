@@ -2,18 +2,18 @@ import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
 import { requireCronSecret } from "@/core/api/routeAuth";
-import { buildInterventionReminders } from "@/features/reminders/interventionReminders";
-import { computeContractChurnRisks } from "@/features/clients/contractChurnRisk";
+import { buildInterventionReminders } from "@/features/reminders";
+import { computeContractChurnRisks } from "@/features/clients";
 import { loadTechniciansAdmin } from "@/features/dispatch/server/loadTechniciansAdmin";
-import { haversineDistanceKm } from "@/features/dispatch/rankTechniciansForIntervention";
-import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions/assignInterventionToTechnician";
+import { haversineDistanceKm } from "@/features/dispatch";
+import { buildAssignInterventionToTechnicianUpdate } from "@/features/interventions";
 import {
   canResolveTechnicianAssignUid,
   resolveTechnicianAssignUid,
 } from "@/features/dispatch/technicianAssignUid";
 import { sendInterventionEmail } from "@/core/services/email/sendInterventionEmail";
-import type { Intervention } from "@/features/interventions/types";
-import type { MaintenanceContract } from "@/features/maintenance/types";
+import type { Intervention } from "@/features/interventions";
+import type { MaintenanceContract } from "@/features/maintenance";
 
 export const runtime = "nodejs";
 

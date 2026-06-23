@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
-import { autoAssignBestTechnicianAdmin } from "@/features/dispatch/server/autoAssignBestTechnicianAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
+import { autoAssignBestTechnicianAdmin } from "@/features/dispatch";
+import type { Intervention } from "@/features/interventions";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

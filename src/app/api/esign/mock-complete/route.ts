@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { blockIfProduction } from "@/core/api/routeAuth";
-import { parseMockSignRequestId } from "@/features/esign/parseMockSignRequestId";
+import { parseMockSignRequestId } from "@/features/esign";
 
 export const runtime = "nodejs";
 

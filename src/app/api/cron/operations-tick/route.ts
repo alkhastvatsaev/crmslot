@@ -7,9 +7,9 @@ import {
   findUnpaidInvoices,
   type UnpaidReminderKey,
 } from "@/features/notifications/operationsTick";
-import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
-import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
-import type { Intervention } from "@/features/interventions/types";
+import { sendNativePushToUser } from "@/features/notifications";
+import { notifyCompanyAdminsPush } from "@/features/notifications";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

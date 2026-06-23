@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUserOrLocalDev } from "@/core/api/routeAuth";
 import { createGmailApiClient } from "@/core/services/email/gmailApiClient";
 import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
-import { mapGmailMessageDetail } from "@/features/gmail/gmailHubMappers";
+import { mapGmailMessageDetail } from "@/features/gmail";
 
 export const runtime = "nodejs";
 

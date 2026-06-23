@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildMobileRuntimeConfig } from "@/features/mobile/server/mobileRuntimeConfig";
+import { buildMobileRuntimeConfig } from "@/features/mobile";
 
 export const runtime = "nodejs";
 

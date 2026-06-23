@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
-import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
+import { listCompanyStaff } from "@/features/company";
 
 /** Liste les UIDs des admins actifs d'une société (broadcast push dispatcher). */
 export async function listAdminUidsForCompany(companyId: string): Promise<string[]> {

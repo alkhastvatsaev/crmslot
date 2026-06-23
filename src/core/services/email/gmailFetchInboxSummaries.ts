@@ -1,6 +1,6 @@
 import type { gmail_v1 } from "@googleapis/gmail";
-import { mapGmailMessageSummary } from "@/features/gmail/gmailHubMappers";
-import type { GmailHubMessageSummary } from "@/features/gmail/gmailHubTypes";
+import { mapGmailMessageSummary } from "@/features/gmail";
+import type { GmailHubMessageSummary } from "@/features/gmail";
 
 const METADATA_HEADERS = ["From", "To", "Subject", "Date"];
 
