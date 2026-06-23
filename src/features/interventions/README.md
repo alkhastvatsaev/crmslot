@@ -22,7 +22,14 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `components/SmartFormRecapActionBar.tsx`            | Urgence + envoi                                             |
 | `smartFormRecapStyles.ts`                           | Classes Tailwind partagées tuiles récap                     |
 | `smartFormDraftStorage.ts`                          | Brouillon localStorage + step initial                       |
-| `smartFormSubmit.ts`                                | Soumission Firestore + upload audio                         |
+| `smartFormSubmit.ts`                                | Orchestrateur soumission wizard smart form (~130 lignes)    |
+| `smartFormSubmitTypes.ts`                           | Types input + enregistreur audio                            |
+| `smartFormSubmitValidation.ts`                      | Validation pré-soumission smart form                        |
+| `smartFormSubmitQueries.ts`                         | Déduplication + géocodage smart form                        |
+| `smartFormSubmitAudio.ts`                           | Upload audio démo / Storage / fallback data URL             |
+| `smartFormSubmitWrite.ts`                           | Payload Firestore + log CRM création                        |
+| `smartFormSubmitBackground.ts`                      | Transcription async, alerte doublon, purge brouillon        |
+| `smartFormSubmitHelpers.ts`                         | Auth utilisateur + blob WAV silencieux démo                 |
 | `hooks/useSmartFormDraftEffects.ts`                 | Orchestrateur effets brouillon wizard                       |
 | `hooks/smartFormDraftEffectsTypes.ts`               | Types args effets brouillon                                 |
 | `hooks/useSmartFormDraftPregenerateId.ts`           | Pré-génération id Firestore intervention                    |
