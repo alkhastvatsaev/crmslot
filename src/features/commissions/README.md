@@ -6,11 +6,14 @@ Moteur commissions techniciens : calcul, Firestore, dashboard règles.
 
 ## Points d'entrée
 
-| Fichier                              | Rôle                                 |
-| ------------------------------------ | ------------------------------------ |
-| `commissionFirestore.ts`             | CRUD règles et lignes commission     |
-| `components/CommissionDashboard.tsx` | Dashboard règles (legacy / embarqué) |
-| `formatCommissionAuditAt.ts`         | Format dates audit                   |
+| Fichier                                       | Rôle                                     |
+| --------------------------------------------- | ---------------------------------------- |
+| `commissionFirestore.ts`                      | CRUD règles et lignes commission         |
+| `components/CommissionDashboard.tsx`          | Orchestrateur dashboard (~50 lignes)     |
+| `hooks/useCommissionDashboardController.ts`   | État + handlers règles / saisie manuelle |
+| `components/CommissionDashboardRulesTab.tsx`  | Onglet règles auto                       |
+| `components/CommissionDashboardManualTab.tsx` | Onglet saisie manuelle                   |
+| `formatCommissionAuditAt.ts`                  | Format dates audit                       |
 
 ## Données
 
