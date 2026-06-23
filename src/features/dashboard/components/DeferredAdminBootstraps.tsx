@@ -45,7 +45,7 @@ function DeferredAdminBootstrapsInner() {
       {idleReady ? (
         <>
           <BackofficePushBootstrap />
-          <AndroidAppInstallPromoBootstrap surface="admin" presentation="dialog" />
+          <AndroidAppInstallPromoBootstrap surface="admin" />
           <AuthActivityLogger />
           <ActivityLogPageObserver />
         </>

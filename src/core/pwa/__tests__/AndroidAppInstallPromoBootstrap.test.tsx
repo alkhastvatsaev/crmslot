@@ -1,6 +1,5 @@
 import React from "react";
-import { act, render, screen } from "@testing-library/react";
-import { I18nProvider } from "@/core/i18n/I18nContext";
+import { act, render } from "@testing-library/react";
 import AndroidAppInstallPromoBootstrap from "@/core/pwa/AndroidAppInstallPromoBootstrap";
 
 const mockUseAndroidAppInstallPromo = jest.fn();
@@ -9,28 +8,12 @@ jest.mock("@/core/pwa/useAndroidAppInstallPromo", () => ({
   useAndroidAppInstallPromo: (...args: unknown[]) => mockUseAndroidAppInstallPromo(...args),
 }));
 
-jest.mock("sonner", () => ({
-  toast: {
-    message: jest.fn(),
-    success: jest.fn(),
-  },
-}));
-
-const { toast } = jest.requireMock("sonner") as {
-  toast: { message: jest.Mock; success: jest.Mock };
-};
-
-function renderPromo(ui: React.ReactElement) {
-  return render(<I18nProvider>{ui}</I18nProvider>);
-}
-
 describe("AndroidAppInstallPromoBootstrap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockUseAndroidAppInstallPromo.mockReturnValue({
-      eligible: true,
-      hasNativePrompt: true,
+      hasNativePrompt: false,
       install: jest.fn(async () => "accepted"),
       dismiss: jest.fn(),
     });
@@ -40,23 +23,59 @@ describe("AndroidAppInstallPromoBootstrap", () => {
     jest.useRealTimers();
   });
 
-  it("shows a toast on demande after delay", () => {
-    renderPromo(<AndroidAppInstallPromoBootstrap surface="demande" presentation="toast" />);
-    expect(toast.message).not.toHaveBeenCalled();
-    act(() => {
-      jest.advanceTimersByTime(1_500);
-    });
-    expect(toast.message).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ id: "android-install-promo-demande" })
-    );
+  it("renders nothing (no in-app install UI)", () => {
+    const { container } = render(<AndroidAppInstallPromoBootstrap surface="admin" />);
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it("opens admin dialog after delay", () => {
-    renderPromo(<AndroidAppInstallPromoBootstrap surface="admin" presentation="dialog" />);
-    act(() => {
-      jest.advanceTimersByTime(1_500);
+  it("does not call install without Chrome beforeinstallprompt", () => {
+    const install = jest.fn(async () => "accepted");
+    mockUseAndroidAppInstallPromo.mockReturnValue({
+      hasNativePrompt: false,
+      install,
+      dismiss: jest.fn(),
     });
-    expect(screen.getByTestId("android-install-promo-dialog-admin")).toBeInTheDocument();
+
+    render(<AndroidAppInstallPromoBootstrap surface="admin" />);
+    act(() => {
+      jest.advanceTimersByTime(5_000);
+    });
+    expect(install).not.toHaveBeenCalled();
+  });
+
+  it("triggers native Chrome install prompt after delay when available", async () => {
+    const install = jest.fn(async () => "accepted");
+    mockUseAndroidAppInstallPromo.mockReturnValue({
+      hasNativePrompt: true,
+      install,
+      dismiss: jest.fn(),
+    });
+
+    render(<AndroidAppInstallPromoBootstrap surface="admin" />);
+    act(() => {
+      jest.advanceTimersByTime(1_999);
+    });
+    expect(install).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(install).toHaveBeenCalledTimes(1);
+  });
+
+  it("persists dismiss when user declines native prompt", async () => {
+    const dismiss = jest.fn();
+    const install = jest.fn(async () => "dismissed");
+    mockUseAndroidAppInstallPromo.mockReturnValue({
+      hasNativePrompt: true,
+      install,
+      dismiss,
+    });
+
+    render(<AndroidAppInstallPromoBootstrap surface="demande" />);
+    await act(async () => {
+      jest.advanceTimersByTime(2_000);
+    });
+    expect(dismiss).toHaveBeenCalledTimes(1);
   });
 });
