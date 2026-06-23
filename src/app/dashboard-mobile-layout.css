@@ -487,6 +487,19 @@
   gap: 0.875rem;
 }
 
+.account-panel-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+  padding-bottom: 0.125rem;
+}
+
+.mobile-account-panel .account-panel-footer {
+  padding-bottom: 0.25rem;
+}
+
 /* ── Nav drawer (bottom sheet) ───────────────────────────── */
 
 .mobile-nav-drawer-backdrop {

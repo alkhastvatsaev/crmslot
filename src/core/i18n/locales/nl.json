@@ -1770,7 +1770,17 @@
     "company": "Bedrijf",
     "role": "Rol",
     "role_admin": "Beheerder",
-    "role_staff": "Medewerker"
+    "role_staff": "Medewerker",
+    "phone": "Telefoon",
+    "edit": "Bewerken",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete_account": "Account verwijderen",
+    "delete_account_confirm": "Uw CRM-account definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "delete_account_success": "Account verwijderd.",
+    "delete_account_failed": "Account kon niet worden verwijderd. Meld u opnieuw aan en probeer het opnieuw.",
+    "save_success": "Profiel opgeslagen.",
+    "save_failed": "Profiel kon niet worden opgeslagen. Controleer uw gegevens."
   },
   "map": {
     "boot_error_token": "Kaart niet beschikbaar — Mapbox-token ontbreekt",
