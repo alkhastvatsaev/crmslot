@@ -2,7 +2,10 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { collection, getDocs, query, where, type Firestore } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import type { InterventionRequestData, RequesterProfile } from "@/context/RequesterHubContext";
-import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
+import {
+  findPotentialDuplicates,
+  type DuplicateMatch,
+} from "@/features/interventions/detectDuplicates";
 import type { Intervention } from "@/features/interventions/types";
 
 export async function findRequesterDuplicateInterventions(params: {
@@ -12,7 +15,7 @@ export async function findRequesterDuplicateInterventions(params: {
   interventionCompanyId: string;
   profile: RequesterProfile;
   requestData: InterventionRequestData;
-}): Promise<Intervention[]> {
+}): Promise<DuplicateMatch[]> {
   const { db, user, tenantCompanyId, interventionCompanyId, profile, requestData } = params;
   const problemForDedupe = requestData.description.trim() || requestData.problemLabel.trim();
 

@@ -2,7 +2,10 @@ import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 import type { User } from "firebase/auth";
-import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
+import {
+  findPotentialDuplicates,
+  type DuplicateMatch,
+} from "@/features/interventions/detectDuplicates";
 import type { Intervention } from "@/features/interventions/types";
 
 export async function findSmartFormDuplicateInterventions(params: {
@@ -15,7 +18,7 @@ export async function findSmartFormDuplicateInterventions(params: {
   firstName: string;
   lastName: string;
   phone: string;
-}): Promise<Intervention[]> {
+}): Promise<DuplicateMatch[]> {
   const {
     db,
     user,

@@ -38,5 +38,3 @@ export {
 } from "@/features/gmail/gmailHubMappers";
 export { parseSenderName, parseSenderEmail } from "@/features/gmail/gmailSenderParse";
 export type { GmailLinkCandidate } from "@/features/gmail/useGmailHubLinkIntervention";
-export type { CreateInterventionFromGmailResult } from "@/features/gmail/server/createInterventionFromGmailAdmin";
-export { createInterventionFromGmailAdmin } from "@/features/gmail/server/createInterventionFromGmailAdmin";

@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
-import { autoAssignBestTechnicianAdmin } from "@/features/dispatch";
+import { autoAssignBestTechnicianAdmin } from "@/features/dispatch/index.server";
 import type { Intervention } from "@/features/interventions";
 import { logger } from "@/core/logger";
 

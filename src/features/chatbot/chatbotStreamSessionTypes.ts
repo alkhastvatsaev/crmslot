@@ -7,7 +7,9 @@ import type {
 } from "@/features/chatbot/chatbot-types";
 import type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-client-document";
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+import type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
+import type { SupplierOrder } from "@/features/suppliers/types";
 
 export type ChatbotStreamCtx = {
   accText: { v: string };
@@ -35,16 +37,22 @@ export type UseChatbotStreamSessionArgs = {
   openDocumentPreview: (
     interventionId: string,
     documentType: ChatbotDocumentKind,
-    force?: boolean
+    force?: boolean,
+    overlayTarget?: DocumentPreviewOverlayTarget
   ) => void;
   openSupplierOrdersPanel: (
-    highlightOrderId?: string | null,
+    highlightOrderId: string,
     materialOrderId?: string | null,
-    previewOrder?: boolean
+    previewOrder?: SupplierOrder | null
   ) => void;
   ensureRightPanelOpen: () => void;
   refreshRegistry: () => void;
-  openSupplierOrderPdf: (companyId: string, orderId: string, force?: boolean) => Promise<void>;
+  openSupplierOrderPdf: (
+    companyId: string,
+    orderId: string,
+    force?: boolean,
+    overlayTarget?: DocumentPreviewOverlayTarget
+  ) => Promise<void>;
   setPageIndex: ((index: number) => void) | undefined;
   setStreaming: Dispatch<SetStateAction<boolean>>;
   setStreamingText: Dispatch<SetStateAction<string>>;

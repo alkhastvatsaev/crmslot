@@ -8,7 +8,7 @@ import {
 } from "@/features/notifications/appointmentReminders";
 import { notifyClient } from "@/core/services/email/clientNotifications/notifyClient";
 import { buildClientAppointmentReminderEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
-import { sendNativePushToUser } from "@/features/notifications";
+import { sendNativePushToUser } from "@/features/notifications/index.server";
 import type { Intervention } from "@/features/interventions";
 
 function pushTitleFor(reminderType: "24h" | "2h" | "30min", role: "client" | "tech"): string {

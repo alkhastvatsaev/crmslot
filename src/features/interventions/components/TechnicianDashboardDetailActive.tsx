@@ -38,7 +38,7 @@ export default function TechnicianDashboardDetailActive({
   caseId: string;
   technicianUid: string;
   clientDisplayName: string;
-  descriptionText: string;
+  descriptionText: string | null;
   addressMapsHref: string | null;
   hasAudioBlock: boolean;
   awaitingAssignment: boolean;

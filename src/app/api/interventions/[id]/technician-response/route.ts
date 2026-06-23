@@ -11,7 +11,7 @@ import {
 import { assertTechnicianMayRespondToAssignment } from "@/features/interventions/technicianAssignmentServerAuth";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
-import { notifyCompanyAdminsPush } from "@/features/notifications";
+import { notifyCompanyAdminsPush } from "@/features/notifications/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

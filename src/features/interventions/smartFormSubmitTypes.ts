@@ -1,7 +1,7 @@
 export type SmartFormAudioRecorderApi = {
   audioBlob: Blob | null;
   transcription: string;
-  transcriptionPromise: (() => Promise<string | null>) | null;
+  transcriptionPromise: () => Promise<string> | null;
   isTranscribing: boolean;
   resetRecording: () => void;
 };

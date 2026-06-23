@@ -4,7 +4,7 @@ import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
 import type { Intervention } from "@/features/interventions";
-import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice";
+import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/index.server";
 import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/server/notifyTechnicianAssignmentAdmin";
 import { logger } from "@/core/logger";
 

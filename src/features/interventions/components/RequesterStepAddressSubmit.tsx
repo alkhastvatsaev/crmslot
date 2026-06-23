@@ -78,7 +78,7 @@ export default function RequesterStepAddressSubmit({
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
           <SmartFormAddressMiniMap
             address={interventionAddress}
-            placeLatLng={interventionLatLng}
+            placeLatLng={interventionLatLng ?? undefined}
             className="h-full min-h-[140px] w-full !border-none"
           />
           <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />

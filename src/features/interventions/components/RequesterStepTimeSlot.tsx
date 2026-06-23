@@ -5,8 +5,8 @@ import { SmartTimeSlotPicker } from "@/features/interventions/components/SmartTi
 
 type Props = {
   tenantCompanyId: string | null;
-  interventionDate: string;
-  interventionTime: string;
+  interventionDate?: string;
+  interventionTime?: string;
   onDateSelect: (date: string) => void;
   onTimeSelect: (time: string) => void;
 };

@@ -19,5 +19,3 @@ export {
   findDueContracts,
   buildInterventionDraft,
 } from "@/features/maintenance/generateDueInterventions";
-export type { GenerateDueAdminResult } from "@/features/maintenance/server/generateDueInterventionsAdmin";
-export { generateDueInterventionsAdmin } from "@/features/maintenance/server/generateDueInterventionsAdmin";
