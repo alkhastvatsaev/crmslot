@@ -45,11 +45,14 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+import Script from "next/script";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
 import DeferredRootBootstraps from "@/core/native/DeferredRootBootstraps";
 import PwaStaleBundleGuard from "@/core/pwa/PwaStaleBundleGuard";
+import PwaBootRecovery from "@/core/pwa/PwaBootRecovery";
+import { buildPwaBootRecoveryInlineScript } from "@/core/pwa/pwaBootRecovery";
 import MobileServiceWorkerDisabler from "@/core/pwa/MobileServiceWorkerDisabler";
 import LivePerfProbeRoot from "@/core/perf/LivePerfProbeRoot";
 
@@ -68,8 +71,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="notranslate" suppressHydrationWarning>
+        {appGitSha ? (
+          <Script id="pwa-boot-recovery" strategy="beforeInteractive">
+            {buildPwaBootRecoveryInlineScript(appGitSha)}
+          </Script>
+        ) : null}
         <NativeShellBootstrap />
         <MobileServiceWorkerDisabler />
+        <PwaBootRecovery />
         <PwaStaleBundleGuard />
         <LivePerfProbeRoot />
         <DeferredRootBootstraps />
