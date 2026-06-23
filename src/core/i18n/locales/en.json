@@ -1789,6 +1789,7 @@
     "mission_overlay": {
       "phone": "Phone",
       "address": "Address",
+      "view_on_map": "View this job on the map?",
       "problem_description": "Problem description"
     },
     "mission": {

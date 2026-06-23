@@ -13,7 +13,6 @@ import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeCo
 import { useMapArchivedMissions } from "@/features/map/useMapArchivedMissions";
 import { missionStableKey } from "@/features/map/missionStableKey";
 import type { Mission } from "@/features/map/missionTypes";
-import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { useFirestoreLiveEnabled } from "@/core/perf/useFirestoreLiveEnabled";
 import { doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "@/core/config/firebase";
@@ -31,7 +30,6 @@ export function useMapHubMissions({ mapHubDataActive = true }: Options = {}) {
   const { t } = useTranslation();
   const { archivedKeys, archiveKey } = useMapArchivedMissions();
   const { selectedDate } = useDateContext();
-  const requestMobileHubRail = useRequestMobileHubRail();
   const missionsLive = useFirestoreLiveEnabled(mapHubDataActive);
 
   const { interventions: boInterventions } = useBackOfficeInterventions(
@@ -128,12 +126,11 @@ export function useMapHubMissions({ mapHubDataActive = true }: Options = {}) {
   const handleMissionClick = useCallback(
     (mission: Mission) => {
       setSelectedMission(mission);
-      requestMobileHubRail("center");
       if (inboxIntent) {
         inboxIntent.setPendingChatInterventionId(missionStableKey(mission));
       }
     },
-    [inboxIntent, requestMobileHubRail]
+    [inboxIntent]
   );
 
   return {

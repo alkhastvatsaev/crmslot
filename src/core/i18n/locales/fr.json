@@ -1789,6 +1789,7 @@
     "mission_overlay": {
       "phone": "Téléphone",
       "address": "Adresse",
+      "view_on_map": "Voir l'intervention sur la carte ?",
       "problem_description": "Description du problème"
     },
     "mission": {

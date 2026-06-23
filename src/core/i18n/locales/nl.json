@@ -1789,6 +1789,7 @@
     "mission_overlay": {
       "phone": "Telefoon",
       "address": "Adres",
+      "view_on_map": "Deze klus op de kaart bekijken?",
       "problem_description": "Probleembeschrijving"
     },
     "mission": {

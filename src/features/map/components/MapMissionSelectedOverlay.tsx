@@ -10,6 +10,7 @@ type Props = {
   onClose: () => void;
   onArchive: (mission: Mission) => void;
   onDelete: (mission: Mission) => void;
+  onViewOnMap?: (mission: Mission) => void;
   variant: "compact" | "desktop";
 };
 
@@ -18,6 +19,7 @@ export default function MapMissionSelectedOverlay({
   onClose,
   onArchive,
   onDelete,
+  onViewOnMap,
   variant,
 }: Props) {
   const { t } = useTranslation();
@@ -58,6 +60,9 @@ export default function MapMissionSelectedOverlay({
             ) : null}
             {mission.address ? (
               <p className="mt-2 text-base text-white/80">{mission.address}</p>
+            ) : null}
+            {onViewOnMap ? (
+              <ViewOnMapButton mission={mission} onViewOnMap={onViewOnMap} className="mt-5" />
             ) : null}
             <OverlayActions
               mission={mission}
@@ -153,6 +158,14 @@ export default function MapMissionSelectedOverlay({
               </div>
             ) : null}
           </div>
+          {onViewOnMap ? (
+            <ViewOnMapButton
+              mission={mission}
+              onViewOnMap={onViewOnMap}
+              className="mt-6 sm:mt-8"
+              large
+            />
+          ) : null}
           <OverlayActions
             mission={mission}
             onArchive={onArchive}
@@ -164,6 +177,29 @@ export default function MapMissionSelectedOverlay({
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+function ViewOnMapButton({
+  mission,
+  onViewOnMap,
+  className,
+  large,
+}: {
+  mission: Mission;
+  onViewOnMap: (mission: Mission) => void;
+  className: string;
+  large?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      onClick={() => onViewOnMap(mission)}
+      className={`mx-auto flex min-h-[2.75rem] w-full max-w-sm items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/15 px-4 text-center font-semibold text-blue-200 transition-colors hover:bg-blue-500/25 active:bg-blue-500/30 ${large ? "text-base sm:text-lg" : "text-[15px]"}`}
+    >
+      {String(t("map.mission_overlay.view_on_map"))}
+    </button>
   );
 }
 

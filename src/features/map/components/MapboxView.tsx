@@ -1,12 +1,8 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
-import DailyMissions from "@/features/dashboard/components/DailyMissions";
-import BackOfficeInboxPanel from "@/features/backoffice/components/BackOfficeInboxPanel";
-import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
-import MapMissionSelectedOverlay from "@/features/map/components/MapMissionSelectedOverlay";
+import MapHubMobileTripleLayout from "@/features/map/components/MapHubMobileTripleLayout";
 import MapboxMapControls from "@/features/map/components/MapboxMapControls";
 import MapboxViewDesktopLayout from "@/features/map/components/MapboxViewDesktopLayout";
 import { useDashboardPagerOptional } from "@/features/dashboard";
@@ -18,6 +14,7 @@ import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 import { useMapHubMissions } from "@/features/map/hooks/useMapHubMissions";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { useMapboxInstance } from "@/features/map/hooks/useMapboxInstance";
 import { useMapMissionMarkers } from "@/features/map/hooks/useMapMissionMarkers";
 import { useMapRouteLineLayer } from "@/features/map/hooks/useMapRouteLineLayer";
@@ -48,6 +45,7 @@ export default function MapboxView() {
     mobileMapWebGL
   );
   const { t } = useTranslation();
+  const requestMobileHubRail = useRequestMobileHubRail();
   const [routeLine, setRouteLine] = useState<Array<[number, number]>>([]);
 
   const {
@@ -98,9 +96,17 @@ export default function MapboxView() {
   const handleMissionClick = useCallback(
     (mission: Mission) => {
       hubMissionClick(mission);
-      if (mission.coordinates) flyToMission(mission.coordinates as [number, number]);
     },
-    [flyToMission, hubMissionClick]
+    [hubMissionClick]
+  );
+
+  const handleViewMissionOnMap = useCallback(
+    (mission: Mission) => {
+      requestMobileHubRail("left");
+      if (mission.coordinates) flyToMission(mission.coordinates as [number, number]);
+      setSelectedMission(null);
+    },
+    [flyToMission, requestMobileHubRail, setSelectedMission]
   );
 
   const handleRecenter = useCallback(() => {
@@ -116,7 +122,7 @@ export default function MapboxView() {
 
   const handleMobileMapResize = useCallback(
     (rail: MobileHubRail) => {
-      if (rail !== "center") return;
+      if (rail !== "left") return;
       const map = mapRef.current;
       if (!map) return;
       scheduleMapboxResizeBurst(map);
@@ -154,48 +160,26 @@ export default function MapboxView() {
         visibleInterventions={visibleInterventions}
         onRouteOptimized={handleRouteOptimized}
       />
-      <AnimatePresence>
-        {selectedMission ? (
-          <MapMissionSelectedOverlay
-            mission={selectedMission}
-            onClose={() => setSelectedMission(null)}
-            onArchive={handleArchiveMission}
-            onDelete={handleDeleteMission}
-            variant="compact"
-          />
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 
   if (mobileHubLayout) {
     return (
-      <MobileHubLayout
-        rootTestId="mobile-map-triple"
-        leftLabel={String(t("map.mobile.rail_missions"))}
-        centerLabel={String(t("map.mobile.rail_map"))}
-        rightLabel={String(t("map.mobile.rail_inbox"))}
-        panelPadding={false}
-        sideScroll={false}
-        onRailChange={handleMobileMapResize}
-        left={
-          <DailyMissions
-            missions={visibleMissions}
-            onMissionClick={handleMissionClick}
-            isEmbedded
-          />
-        }
-        center={
+      <MapHubMobileTripleLayout
+        mapRail={
           <div id="map-container" className="flex h-full min-h-0 flex-col">
             {mapPanelInner}
           </div>
         }
-        right={
-          <BackOfficeInboxPanel
-            dayMissions={visibleMissions}
-            inboxDataActive={powerGate.inboxDataActive}
-          />
-        }
+        visibleMissions={visibleMissions}
+        selectedMission={selectedMission}
+        inboxDataActive={powerGate.inboxDataActive}
+        onMissionClick={handleMissionClick}
+        onCloseMission={() => setSelectedMission(null)}
+        onArchiveMission={handleArchiveMission}
+        onDeleteMission={handleDeleteMission}
+        onViewOnMap={handleViewMissionOnMap}
+        onRailChange={handleMobileMapResize}
       />
     );
   }

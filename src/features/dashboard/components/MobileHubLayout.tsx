@@ -12,12 +12,13 @@ import {
   stepMobileHubRail,
 } from "@/features/dashboard/mobileHubRailMotion";
 import { cn } from "@/lib/utils";
+import GlassPanel from "@/core/ui/GlassPanel";
 import {
   MOBILE_HUB_LAYOUT_CLASS,
-  MOBILE_HUB_PANEL_CLASS,
   MOBILE_HUB_PANEL_INNER_CLASS,
   MOBILE_HUB_PANEL_INNER_PADDED_CLASS,
   MOBILE_HUB_PANEL_INNER_SCROLL_CLASS,
+  mobileHubPanelGlassShellClass,
 } from "@/core/ui/dashboardMobileLayout";
 
 type Props = {
@@ -152,13 +153,15 @@ export default function MobileHubLayout({
 
   return (
     <div ref={rootRef} className={MOBILE_HUB_LAYOUT_CLASS} data-testid={rootTestId}>
-      <section
-        className={cn(
-          MOBILE_HUB_PANEL_CLASS,
+      <GlassPanel
+        as="section"
+        aria-label={labels[rail]}
+        shellClassName={cn(
+          mobileHubPanelGlassShellClass,
           availableRails.length > 1 && MOBILE_HUB_PANEL_ANIMATED_CLASS
         )}
+        innerClassName="relative min-h-0 flex-1 flex-col overflow-hidden"
         style={{ position: "relative" }}
-        aria-label={labels[rail]}
       >
         {availableRails.map((railKey) => {
           const active = rail === railKey;
@@ -180,7 +183,7 @@ export default function MobileHubLayout({
             </div>
           );
         })}
-      </section>
+      </GlassPanel>
     </div>
   );
 }

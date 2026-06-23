@@ -82,8 +82,9 @@ export default function DesktopOnlyGate({ children }: { children: React.ReactNod
     >
       <p className="text-lg font-semibold text-slate-800">Version desktop uniquement</p>
       <p className="max-w-md text-sm leading-relaxed text-slate-600">
-        Cette version est optimisée pour ordinateur et tablette. Pour tester sur téléphone en
-        staging, définissez <code className="text-xs">NEXT_PUBLIC_ALLOW_MOBILE=true</code>.
+        Cette version est optimisée pour ordinateur et tablette. Sur téléphone, installez la PWA
+        depuis Chrome ou utilisez l&apos;app native CRMSLOT. En dev, activez{" "}
+        <code className="text-xs">NEXT_PUBLIC_ALLOW_MOBILE=true</code>.
       </p>
     </div>
   );

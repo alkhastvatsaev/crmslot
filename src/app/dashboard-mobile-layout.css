@@ -8,7 +8,7 @@
   --mobile-header-height: 2.75rem;
   --mobile-tab-bar-height: 3.25rem;
   --mobile-galaxy-height: 3.5rem;
-  --mobile-panel-radius: 1.125rem;
+  --mobile-panel-radius: 1.5rem;
   --mobile-panel-gap: 0.75rem;
   /** Espacement vertical uniforme : profil · panneau · dots · galaxy */
   --mobile-stack-gap: var(--mobile-panel-gap);
@@ -651,7 +651,15 @@
   box-shadow: var(--mobile-elevation-sm);
 }
 
-.mobile-hub-panel {
+.mobile-hub-panel-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/** Legacy flat panel — conservé pour snapshots / styles admin ciblés */
+.mobile-hub-panel:not([data-glass-panel]) {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -663,7 +671,12 @@
   box-shadow: var(--mobile-elevation-sm);
 }
 
-.mobile-hub-panel--animated {
+[data-mobile-shell] [data-glass-panel].mobile-hub-panel-shell {
+  border-radius: var(--mobile-panel-radius);
+}
+
+.mobile-hub-panel--animated,
+[data-mobile-shell] [data-glass-panel].mobile-hub-panel--animated {
   overflow: hidden;
 }
 

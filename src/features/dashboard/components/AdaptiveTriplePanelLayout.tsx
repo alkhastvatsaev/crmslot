@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import DashboardTriplePanelLayout from "@/features/dashboard/components/DashboardTriplePanelLayout";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
+import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 
 type Props = ComponentProps<typeof DashboardTriplePanelLayout> & {
   /** Libellés courts pour le segment mobile (≠ aria desktop). */
@@ -14,6 +15,10 @@ type Props = ComponentProps<typeof DashboardTriplePanelLayout> & {
   mobileSwipeDisabled?: boolean;
   /** Rail mobile au chargement (défaut : centre). */
   mobileInitialRail?: "left" | "center" | "right";
+  /** Scroll latéral mobile (défaut : true). */
+  mobileSideScroll?: boolean;
+  /** Callback rail actif (ex. resize Mapbox quand la carte est visible). */
+  onRailChange?: (rail: MobileHubRail) => void;
 };
 
 /**
@@ -28,6 +33,8 @@ export default function AdaptiveTriplePanelLayout({
   mobileRightLabel,
   mobileSwipeDisabled = false,
   mobileInitialRail = "center",
+  mobileSideScroll = true,
+  onRailChange,
   centerPadding = true,
   rightPadding = true,
   ...props
@@ -49,8 +56,10 @@ export default function AdaptiveTriplePanelLayout({
         centerLabel={mobileCenterLabel}
         rightLabel={mobileRightLabel}
         panelPadding={panelPadding}
+        sideScroll={mobileSideScroll}
         swipeDisabled={mobileSwipeDisabled}
         mobileInitialRail={mobileInitialRail}
+        onRailChange={onRailChange}
       />
     );
   }
