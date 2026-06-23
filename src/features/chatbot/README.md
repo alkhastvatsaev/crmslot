@@ -22,7 +22,13 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `chatbot-lecot-order-helpers.ts`                | Firestore, CRM, email, sync facturation            |
 | `chatbot-lecot-order-demo.ts` / `-prod.ts`      | Branches démo / API Lecot réelle                   |
 | `chatbot-tools.ts`                              | Schémas JSON outils — **754 lignes**               |
-| `chatbot-tool-executor.ts`                      | Exécution serveur outils                           |
+| `chatbot-executor-queries.ts`                   | Barrel requêtes exécuteur (~35 lignes)             |
+| `chatbot-executor-db.ts`                        | `db()`, accès intervention, labels                 |
+| `chatbot-executor-workspace-queries.ts`         | Interventions, workspace, stats, facturation       |
+| `chatbot-executor-crm-queries.ts`               | Clients, devis, techniciens                        |
+| `chatbot-executor-stock-queries.ts`             | Stock entrepôt + véhicule                          |
+| `chatbot-executor-order-queries.ts`             | Bons matériel / fournisseur                        |
+| `chatbot-executor-comms-queries.ts`             | Inbox, emails, chat portail                        |
 
 ## Données
 
@@ -43,7 +49,6 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 ## Pièges
 
 - Ajouter un outil = 4 fichiers : `chatbot-tools.ts`, `chatbot-tool-executor.ts`, `CHATBOT_WRITE_TOOLS`, `TOOL_LABELS`
-- `chatbot-executor-queries.ts` (643 lignes) — requêtes Firestore exécuteur
 - Zero-token tools : `isChatbotZeroTokenUiTool`
 
 ## Tests
