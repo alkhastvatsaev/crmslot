@@ -21,6 +21,7 @@ import {
 } from "@/features/backoffice/companyChatTypes";
 import { useCompanyChatFirestoreSync } from "@/features/backoffice/hooks/useCompanyChatFirestoreSync";
 import { useCompanyChatSend } from "@/features/backoffice/hooks/useCompanyChatSend";
+import { usePortalChatProfileBootstrap } from "@/features/backoffice/hooks/usePortalChatProfileBootstrap";
 
 export type UseCompanyChatPanelArgs = {
   publishAsPortal?: boolean;
@@ -61,8 +62,17 @@ export function useCompanyChatPanel({
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
   const portalAuthReady = !publishAsPortal || isClientPortalChatUser(user);
+  const { ready: portalProfileReady, errorKey: portalProfileErrorKey } =
+    usePortalChatProfileBootstrap(
+      publishAsPortal,
+      chatDb,
+      chatAuth,
+      companyIdTrimmed,
+      user,
+      portalAuthReady
+    );
   const firestoreSyncEnabled = Boolean(
-    companyIdTrimmed && isConfigured && chatDb && portalAuthReady
+    companyIdTrimmed && isConfigured && chatDb && portalAuthReady && portalProfileReady
   );
   const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
 
@@ -228,5 +238,7 @@ export function useCompanyChatPanel({
     publishAsPortal,
     companyIdTrimmed,
     portalAuthReady,
+    portalProfileErrorKey,
+    portalProfileReady,
   };
 }

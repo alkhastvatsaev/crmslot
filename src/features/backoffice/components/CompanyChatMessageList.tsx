@@ -18,6 +18,8 @@ type CompanyChatMessageListProps = {
   publishAsPortal: boolean;
   companyIdTrimmed: string;
   portalAuthReady: boolean;
+  portalProfileErrorKey?: string | null;
+  portalProfileReady?: boolean;
 };
 
 function bubbleShellClass(m: CompanyChatMessage) {
@@ -40,6 +42,8 @@ export default function CompanyChatMessageList({
   publishAsPortal,
   companyIdTrimmed,
   portalAuthReady,
+  portalProfileErrorKey,
+  portalProfileReady = true,
 }: CompanyChatMessageListProps) {
   const { t } = useTranslation();
 
@@ -51,9 +55,29 @@ export default function CompanyChatMessageList({
         "flex min-h-0 flex-1 flex-col gap-3 px-3 py-4"
       )}
     >
-      {publishAsPortal && companyIdTrimmed && !portalAuthReady ? (
+      {publishAsPortal && portalProfileErrorKey ? (
+        <div
+          data-testid="company-chat-profile-error"
+          className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs font-medium text-red-900"
+        >
+          {t(portalProfileErrorKey)}
+        </div>
+      ) : null}
+      {publishAsPortal && companyIdTrimmed && !portalAuthReady && !portalProfileErrorKey ? (
         <div
           data-testid="company-chat-login-hint"
+          className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-900"
+        >
+          {t("chat.connecting")}
+        </div>
+      ) : null}
+      {publishAsPortal &&
+      companyIdTrimmed &&
+      portalAuthReady &&
+      !portalProfileReady &&
+      !portalProfileErrorKey ? (
+        <div
+          data-testid="company-chat-profile-loading"
           className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-900"
         >
           {t("chat.connecting")}

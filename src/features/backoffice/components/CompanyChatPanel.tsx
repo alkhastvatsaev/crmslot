@@ -41,6 +41,8 @@ export default function CompanyChatPanel({
     attachImagesBlocked,
     companyIdTrimmed,
     portalAuthReady,
+    portalProfileErrorKey,
+    portalProfileReady,
   } = useCompanyChatPanel({
     publishAsPortal,
     acceptPortalMessages,
@@ -61,6 +63,8 @@ export default function CompanyChatPanel({
         publishAsPortal={publishAsPortal}
         companyIdTrimmed={companyIdTrimmed}
         portalAuthReady={portalAuthReady}
+        portalProfileErrorKey={portalProfileErrorKey}
+        portalProfileReady={portalProfileReady}
       />
       <CompanyChatComposer
         draft={draft}

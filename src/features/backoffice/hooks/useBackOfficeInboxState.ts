@@ -76,7 +76,11 @@ export function useBackOfficeInboxState(
 
   const { selectedDate } = useDateContext();
   const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
-  const portalChatCompanyId = (cid ?? envDefaultCompanyId) || null;
+  const portalChatCompanyId =
+    cid ??
+    (envDefaultCompanyId && inboxCompanyIds.includes(envDefaultCompanyId)
+      ? envDefaultCompanyId
+      : null);
   const isTenant = !!workspace?.isTenantUser;
   const workspaceReady = workspace?.workspaceReady !== false;
 

@@ -2506,7 +2506,9 @@
     "reply_thanks": "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
     "reply_default": "Merci pour votre message. Le dispatcher a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin.",
     "connecting": "Connexion au chat…",
-    "company_unconfigured": "Chat indisponible : société portail non configurée."
+    "company_unconfigured": "Chat indisponible : société portail non configurée.",
+    "profile_sync_failed": "Impossible d'ouvrir le chat. Réessayez dans un instant.",
+    "profile_permission_denied": "Chat indisponible : droits Firestore manquants. L'administrateur doit activer acceptsPublicInterventions sur la société et déployer les règles à jour."
   },
   "copilot": {
     "aria": {
