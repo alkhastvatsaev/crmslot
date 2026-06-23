@@ -19,7 +19,14 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `smartFormRecapStyles.ts`                          | Classes Tailwind partagées tuiles récap                     |
 | `smartFormDraftStorage.ts`                         | Brouillon localStorage + step initial                       |
 | `smartFormSubmit.ts`                               | Soumission Firestore + upload audio                         |
-| `hooks/useSmartFormDraftEffects.ts`                | Autosave, prefill, slots pris                               |
+| `hooks/useSmartFormDraftEffects.ts`                | Orchestrateur effets brouillon wizard                       |
+| `hooks/smartFormDraftEffectsTypes.ts`              | Types args effets brouillon                                 |
+| `hooks/useSmartFormDraftPregenerateId.ts`          | Pré-génération id Firestore intervention                    |
+| `hooks/useSmartFormDraftPrefill.ts`                | Prefill sessionStorage client / SAV                         |
+| `hooks/useSmartFormDraftAudioEffects.ts`           | Sync enregistreur vocal + sauvegarde démo                   |
+| `hooks/useSmartFormDraftRecapEffects.ts`           | Modal photos récap (Escape, reset step)                     |
+| `hooks/useSmartFormDraftSyncEffects.ts`            | Chargement remote + autosave local/Firestore + garde step   |
+| `hooks/useSmartFormDraftTakenSlots.ts`             | Créneaux déjà pris (étape 5)                                |
 | `components/TechnicianFinishJobPanel.tsx`          | Wizard clôture terrain (~155 lignes)                        |
 | `hooks/useFinishJobWizard.ts`                      | Orchestrateur wizard clôture (~120 lignes)                  |
 | `hooks/useFinishJobWizardCamera.ts`                | Caméra + capture photos wizard clôture                      |
