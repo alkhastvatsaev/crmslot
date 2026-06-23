@@ -3,6 +3,12 @@
  * Ordre slots = `DASHBOARD_CAROUSEL_PAGES` (doit matcher `src/app/page.tsx`).
  */
 export { default as AdminDashboardProviders } from "@/features/dashboard/AdminDashboardProviders";
+export { default as AdminMobileProviders } from "@/features/dashboard/AdminMobileProviders";
+export {
+  ADMIN_MOBILE_APP_ROUTE,
+  ADMIN_MOBILE_APP_SLOT_INDEX,
+  isAdminMobileAppPath,
+} from "@/features/dashboard/adminMobileAppConstants";
 export {
   DashboardPagerProvider,
   useDashboardPager,
