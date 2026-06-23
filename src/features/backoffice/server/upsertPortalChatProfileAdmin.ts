@@ -1,4 +1,4 @@
-import type * as admin from "firebase-admin";
+import * as admin from "firebase-admin";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 export async function upsertPortalChatProfileAdmin(
