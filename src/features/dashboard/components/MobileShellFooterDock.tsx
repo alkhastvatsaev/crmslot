@@ -38,7 +38,7 @@ export default function MobileShellFooterDock() {
   const showDispatchDock =
     dispatchVoice && pageIndex === MAP_PAGE_INDEX && showGalaxyFooter && !showHubComposer;
   const showProfileOverlay = !showGalaxyFooter;
-  const audioBackgroundTasksEnabled = dispatchVoice && (isMobile !== true || transcriptionArmed);
+  const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
 
   return (
     <div className="relative h-full w-full min-h-0">

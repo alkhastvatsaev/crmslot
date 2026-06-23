@@ -25,6 +25,7 @@ export type GalaxyCreatedMission = {
 type GalaxyLayerBridgeCtx = {
   transcriptionArmed: boolean;
   armTranscription: () => void;
+  disarmTranscription: () => void;
   emitInterventionCreated: (mission: GalaxyCreatedMission) => void;
   registerInterventionConsumer: (fn: ((m: GalaxyCreatedMission) => void) | null) => void;
 };
@@ -36,12 +37,13 @@ export function GalaxyLayerBridgeProvider({ children }: { children: ReactNode })
   const consumerRef = useRef<((m: GalaxyCreatedMission) => void) | null>(null);
 
   const armTranscription = useCallback(() => setTranscriptionArmed(true), []);
+  const disarmTranscription = useCallback(() => setTranscriptionArmed(false), []);
 
   const registerInterventionConsumer = useCallback(
     (fn: ((m: GalaxyCreatedMission) => void) | null) => {
       consumerRef.current = fn;
     },
-    [],
+    []
   );
 
   const emitInterventionCreated = useCallback((mission: GalaxyCreatedMission) => {
@@ -52,10 +54,17 @@ export function GalaxyLayerBridgeProvider({ children }: { children: ReactNode })
     () => ({
       transcriptionArmed,
       armTranscription,
+      disarmTranscription,
       emitInterventionCreated,
       registerInterventionConsumer,
     }),
-    [transcriptionArmed, armTranscription, emitInterventionCreated, registerInterventionConsumer],
+    [
+      transcriptionArmed,
+      armTranscription,
+      disarmTranscription,
+      emitInterventionCreated,
+      registerInterventionConsumer,
+    ]
   );
 
   return (

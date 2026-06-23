@@ -29,4 +29,6 @@ export type MapTranscriptionOverlayProps = {
   scopedClipPublicUrl?: string | null;
   /** Force l'affichage du calque (assombrissement et croix) même sans texte ou signal de lecture. */
   forceVisible?: boolean;
+  /** Décision refusée côté API — replie le dock Galaxy mobile. */
+  onVoiceReviewComplete?: () => void;
 };

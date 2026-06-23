@@ -8,6 +8,9 @@ import AiAssistant, {
 } from "@/features/dispatch/components/AiAssistant";
 import MapTranscriptionOverlay from "@/features/map/components/MapTranscriptionOverlay";
 import MapTranscriptionActionsPanel from "@/features/map/components/MapTranscriptionActionsPanel";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useDashboardPagerOptional } from "@/features/dashboard";
+import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeContext";
 import { DASHBOARD_DESKTOP_GALAXY_RAIL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 
@@ -44,6 +47,10 @@ export default function MapGalaxyTranscriptionLayer({
   backgroundTasksEnabled = true,
   mobilePowerSave,
 }: Props) {
+  const isMobile = useIsMobile();
+  const pager = useDashboardPagerOptional();
+  const pageIndex = pager?.pageIndex ?? 0;
+  const bridge = useGalaxyLayerBridgeOptional();
   const [playbackSync, setPlaybackSync] = useState<AiPlaybackSync>(null);
   const [openEditSignal, setOpenEditSignal] = useState(0);
   const [transcriptOverlayOpen, setTranscriptOverlayOpen] = useState(false);
@@ -91,6 +98,21 @@ export default function MapGalaxyTranscriptionLayer({
     }
   }, []);
 
+  const openVoiceReview = useCallback(() => {
+    onUserPressPlay();
+    setTranscriptTextEnabled(true);
+    setOpenEditSignal((v) => v + 1);
+  }, [onUserPressPlay]);
+
+  const onNewFirestoreClip = useCallback(() => {
+    if (isMobile !== true || pageIndex !== 0) return;
+    openVoiceReview();
+  }, [isMobile, pageIndex, openVoiceReview]);
+
+  const onVoiceReviewComplete = useCallback(() => {
+    bridge?.disarmTranscription();
+  }, [bridge]);
+
   const overlays = (
     <>
       <MapTranscriptionOverlay
@@ -101,12 +123,14 @@ export default function MapGalaxyTranscriptionLayer({
         onVisibleChange={onTranscriptVisible}
         scopedClipPublicUrl={activeClipPublicUrl}
         forceVisible={historyModeOpen}
+        onVoiceReviewComplete={onVoiceReviewComplete}
       />
       <MapTranscriptionActionsPanel
         armed={transcriptionArmed}
         onInterventionCreated={onInterventionCreated}
         openEditSignal={openEditSignal}
         scopedClipPublicUrl={activeClipPublicUrl}
+        onVoiceReviewComplete={onVoiceReviewComplete}
       />
       {historyModeOpen ? (
         <HistoryPanel queue={queue} onClose={() => setHistoryModeOpen(false)} />
@@ -122,14 +146,11 @@ export default function MapGalaxyTranscriptionLayer({
         dockLayout={!hideDockStrip}
         transcriptOverlayVisible={transcriptOverlayOpen}
         onActiveClipUrlChange={onActiveClipFromAssistant}
-        onUserPressPlay={() => {
-          onUserPressPlay();
-          setTranscriptTextEnabled(true);
-          setOpenEditSignal((v) => v + 1);
-        }}
+        onUserPressPlay={openVoiceReview}
         onPlaybackSync={setPlaybackSync}
         onUserLongPress={() => setHistoryModeOpen(true)}
         onQueueChange={setQueue}
+        onNewFirestoreClip={onNewFirestoreClip}
         backgroundTasksEnabled={backgroundTasksEnabled}
         mobilePowerSave={mobilePowerSave}
       />
