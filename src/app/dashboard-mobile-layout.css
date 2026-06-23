@@ -420,7 +420,7 @@
   width: 100%;
 }
 
-.admin-mobile-app [data-testid="admin-mobile-header-calendar"] {
+.admin-mobile-app [data-testid="admin-mobile-footer-calendar"] {
   border-radius: var(--mobile-panel-radius);
   background: rgb(248 250 252);
   overflow: hidden;

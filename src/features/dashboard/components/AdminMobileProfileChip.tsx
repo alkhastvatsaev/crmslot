@@ -10,7 +10,7 @@ import {
 } from "@/features/interventions/technicianMobileProfileLabel";
 import { cn } from "@/lib/utils";
 
-/** Profil staff connecté — dock bas admin (même pattern que technicien). */
+/** Profil staff connecté — dock haut admin (même pattern que technicien). */
 export default function AdminMobileProfileChip() {
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
@@ -38,7 +38,7 @@ export default function AdminMobileProfileChip() {
       aria-expanded={accountOpen}
       disabled={!ready}
       onClick={() => {
-        dockOnboarding?.dismissFooterHint();
+        dockOnboarding?.dismissHeaderHint();
         pageSelector.toggleAccount();
       }}
     >

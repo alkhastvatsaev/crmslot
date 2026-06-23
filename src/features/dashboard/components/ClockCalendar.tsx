@@ -51,8 +51,8 @@ export default function ClockCalendar({
   const pageSelector = useDashboardPageSelectorOptional();
   const dockOnboarding = useMobileDockOnboardingOptional();
 
-  const dismissHeaderDockHint = () => {
-    dockOnboarding?.dismissHeaderHint();
+  const dismissFooterDockHint = () => {
+    dockOnboarding?.dismissFooterHint();
   };
 
   const changeDay = (e: React.MouseEvent, delta: number) => {
@@ -87,7 +87,7 @@ export default function ClockCalendar({
         className={cn(
           "mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-between gap-2 px-4"
         )}
-        onClick={dismissHeaderDockHint}
+        onClick={dismissFooterDockHint}
       >
         <button
           data-testid="prev-day-btn"

@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import MapGalaxyTranscriptionLayer from "@/features/map/components/MapGalaxyTranscriptionLayer";
-import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
 import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { useMobileGalaxyComposerOpen } from "@/context/MobileGalaxyComposerOpenContext";
 import { useGalaxyLayerBridge } from "@/features/map/GalaxyLayerBridgeContext";
@@ -18,7 +17,7 @@ import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstant
 
 const MAP_PAGE_INDEX = 0;
 
-/** Footer mobile admin — profil par défaut, Galaxy (saisie / dispatch) seulement si actif. */
+/** Footer mobile admin — Galaxy (saisie / dispatch) seulement si actif. */
 export default function MobileShellFooterDock() {
   const showGalaxyFooter = useMobileFooterGalaxyVisible();
   const composerOpen = useMobileGalaxyComposerOpen();
@@ -37,7 +36,6 @@ export default function MobileShellFooterDock() {
     hubComposer != null && (isMobile !== true || composerOpen) && showGalaxyFooter;
   const showDispatchDock =
     dispatchVoice && pageIndex === MAP_PAGE_INDEX && showGalaxyFooter && !showHubComposer;
-  const showProfileOverlay = !showGalaxyFooter;
   const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
 
   return (
@@ -53,7 +51,6 @@ export default function MobileShellFooterDock() {
         />
       ) : null}
       {showHubComposer ? hubComposer : null}
-      {showProfileOverlay ? <AdminMobileProfileChip /> : null}
     </div>
   );
 }
