@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
 import {
   REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT,

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { renderHook } from "@testing-library/react";
 import { saveClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
 import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAccount";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import { I18nProvider } from "@/core/i18n/I18nContext";
 
 jest.mock("@/features/auth/clientPortalAccountProfile", () => {

@@ -13,7 +13,7 @@ import {
   saveClientPortalAccountFields,
   type ClientPortalAccountFields,
 } from "@/features/auth/clientPortalAccountProfile";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 
 export function isVerifiedClientPortalUser(user: User | null): user is User {
   return Boolean(user && !user.isAnonymous && user.emailVerified);

@@ -22,7 +22,7 @@ const mockSetPendingTrackingInterventionId = jest.fn();
 
 const mockSetPortalRightTab = jest.fn();
 
-jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
+jest.mock("@/context/RequesterHubContext", () => ({
   useRequesterHub: () => ({
     setLastSubmittedInterventionId: mockSetLastSubmittedInterventionId,
     setPendingTrackingInterventionId: mockSetPendingTrackingInterventionId,

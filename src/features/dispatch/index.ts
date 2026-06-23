@@ -13,8 +13,6 @@ export {
   resolveTechnicianAssignUid,
   canResolveTechnicianAssignUid,
 } from "@/features/dispatch/technicianAssignUid";
-export { autoAssignBestTechnicianAdmin } from "@/features/dispatch/server/autoAssignBestTechnicianAdmin";
-export type { AutoAssignResult } from "@/features/dispatch/server/autoAssignBestTechnicianAdmin";
 export { useAiAudioPlayback } from "@/features/dispatch/hooks/useAiAudioPlayback";
 export type {
   UseAiAudioPlaybackOptions,

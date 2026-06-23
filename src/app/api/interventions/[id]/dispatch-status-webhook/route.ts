@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
-import { dispatchCompanyWebhooksAdmin } from "@/features/integrations";
+import { dispatchCompanyWebhooksAdmin } from "@/features/integrations/index.server";
 import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";

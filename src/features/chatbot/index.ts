@@ -25,3 +25,9 @@ export type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
 export type { ChatbotQuickAction } from "@/features/chatbot/chatbot-quick-actions";
 export type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 export type { ChatbotStreamEmit } from "@/features/chatbot/chatbot-types";
+export {
+  GalaxyComposerNewButton,
+  GalaxyComposerMicButton,
+  GalaxyComposerSendButton,
+  galaxyComposerFieldMouseDown,
+} from "@/features/chatbot/components/GalaxyComposerControls";

@@ -7,8 +7,8 @@ import {
   buildInterventionDraft,
   computeNextDueDate,
 } from "@/features/maintenance/generateDueInterventions";
-import { generateDueInterventionsAdmin } from "@/features/maintenance";
-import type { MaintenanceContract } from "@/features/maintenance";
+import { generateDueInterventionsAdmin } from "@/features/maintenance/index.server";
+import type { MaintenanceContract } from "@/features/maintenance/types";
 
 export const runtime = "nodejs";
 

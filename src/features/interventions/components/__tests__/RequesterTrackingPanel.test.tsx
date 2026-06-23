@@ -1,9 +1,9 @@
 import { render, screen, waitFor, act } from "@/test-utils/render";
 import { onAuthStateChanged } from "firebase/auth";
 import RequesterTrackingPanel from "@/features/interventions/components/RequesterTrackingPanel";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 
-jest.mock("@/features/interventions/context/RequesterHubContext", () => ({
+jest.mock("@/context/RequesterHubContext", () => ({
   useRequesterHub: jest.fn(),
 }));
 

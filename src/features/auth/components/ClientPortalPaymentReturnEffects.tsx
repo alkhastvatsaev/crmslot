@@ -9,7 +9,7 @@ import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_CLIENT_PORTAL,
 } from "@/features/company/companyHubNavigation";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 
 /** Retour Stripe après paiement — toast + hub société (onglet suivi). */
 export default function ClientPortalPaymentReturnEffects() {

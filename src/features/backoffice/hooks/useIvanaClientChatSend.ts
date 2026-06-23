@@ -16,7 +16,7 @@ import { requestClientPortalChatNotification } from "@/features/backoffice/reque
 import { resolveIvanaChatSenderName } from "@/features/backoffice/resolveIvanaChatSenderName";
 import { pickIvanaReply, type IvanaChatMessage } from "@/features/backoffice/ivanaChatTypes";
 import type { useCrmStaffAccountPanel } from "@/features/auth";
-import type { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import type { useRequesterHub } from "@/context/RequesterHubContext";
 
 type StaffFields = ReturnType<typeof useCrmStaffAccountPanel>["fields"];
 type RequesterProfile = ReturnType<typeof useRequesterHub>["profile"];
@@ -79,6 +79,9 @@ export function useIvanaClientChatSend({
     const wantsFirestore = Boolean(companyIdTrimmed && isConfigured && chatDb);
 
     if (wantsFirestore) {
+      const db = chatDb;
+      if (!db) return;
+
       if (publishAsPortal && !portalAuthReady) {
         toast.error(t("chat.toast_login_required"), {
           description: t("chat.toast_login_description"),
@@ -128,7 +131,7 @@ export function useIvanaClientChatSend({
 
       try {
         if (publishAsPortal) {
-          await ensureIvanaChatPortalProfile(chatDb, currentUser, companyIdTrimmed);
+          await ensureIvanaChatPortalProfile(db, currentUser, companyIdTrimmed);
         }
         let imageUrls: string[] | undefined;
         if (optimisticImages && optimisticImages.length > 0 && storage) {
@@ -138,7 +141,7 @@ export function useIvanaClientChatSend({
             dataUrls: optimisticImages,
           });
         }
-        const docId = await sendIvanaPortalMessage(chatDb, {
+        const docId = await sendIvanaPortalMessage(db, {
           companyId: companyIdTrimmed,
           body: text,
           role,

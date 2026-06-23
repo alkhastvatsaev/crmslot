@@ -3,7 +3,7 @@ import { deleteDoc, doc, setDoc, type DocumentReference, type Firestore } from "
 import { getDownloadURL, ref, uploadBytes, type FirebaseStorage } from "firebase/storage";
 import type { User } from "firebase/auth";
 import { logger } from "@/core/logger";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/context/RequesterHubContext";
 import { recordDuplicateAlertIfNeeded } from "@/features/interventions/recordDuplicateAlertIfNeeded";
 import type { RequesterClientFields } from "@/features/interventions/requesterInterventionSubmitPayload";
 

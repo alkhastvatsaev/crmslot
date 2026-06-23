@@ -39,16 +39,3 @@ export { useQuoteEditorPanelController } from "@/features/quotes/hooks/useQuoteE
 export { default as QuoteListPanel } from "@/features/quotes/components/QuoteListPanel";
 export { default as QuoteEditorPanel } from "@/features/quotes/components/QuoteEditorPanel";
 export { default as PortalQuotePanel } from "@/features/quotes/components/PortalQuotePanel";
-export { acceptQuoteAdmin } from "@/features/quotes/server/acceptQuoteAdmin";
-export type { AcceptQuoteAdminResult } from "@/features/quotes/server/acceptQuoteAdmin";
-export { declineQuoteAdmin } from "@/features/quotes/server/declineQuoteAdmin";
-export { loadPortalQuotesAdmin } from "@/features/quotes/server/loadPortalQuotesAdmin";
-export {
-  sendQuoteEmailAdmin,
-  buildQuoteEmailBody,
-} from "@/features/quotes/server/sendQuoteEmailAdmin";
-export { respondQuoteViaPortalAdmin } from "@/features/quotes/server/respondQuoteViaPortalAdmin";
-export type {
-  PortalQuoteRespondAction,
-  PortalQuoteRespondResult,
-} from "@/features/quotes/server/respondQuoteViaPortalAdmin";

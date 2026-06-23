@@ -10,9 +10,4 @@ export {
   updateStockItem,
 } from "@/features/stock/stockFirestore";
 export { buildVehicleStockAgentSystemPrompt } from "@/features/stock/vehicleStockAgentSystemPrompt";
-export { handleVehicleStockAgentPost } from "@/features/stock/vehicleStockAgentRouteHandler";
-export type {
-  VehicleStockAgentPostBody,
-  VehicleStockAgentRouteAuth,
-} from "@/features/stock/vehicleStockAgentRouteHandler";
 export { useVehicleStockAgent } from "@/features/stock/hooks/useVehicleStockAgent";

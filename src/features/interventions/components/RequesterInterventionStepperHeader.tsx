@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

@@ -4,10 +4,7 @@ import {
   validateClientPortalAccountFields,
 } from "@/features/auth/clientPortalAccountProfile";
 import { clientPortalAuth } from "@/core/config/firebase";
-import type {
-  InterventionRequestData,
-  RequesterProfile,
-} from "@/features/interventions/context/RequesterHubContext";
+import type { InterventionRequestData, RequesterProfile } from "@/context/RequesterHubContext";
 import { isValidPortalEmail } from "@/features/interventions/portalEmail";
 import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
 
