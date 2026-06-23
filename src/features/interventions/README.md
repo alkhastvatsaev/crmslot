@@ -7,7 +7,10 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | Fichier                                   | Rôle                                                        |
 | ----------------------------------------- | ----------------------------------------------------------- |
 | `types.ts`                                | Type `Intervention` — **import public #1** pour toute l'app |
-| `technicianSchedule.ts`                   | Filtres/tri missions (utilisé par map, backoffice, hubs)    |
+| `technicianSchedule.ts`                   | Barrel schedule technicien (filtres/tri missions)           |
+| `technicianScheduleParse.ts`              | Ancrage dates, coercion Firestore                           |
+| `technicianScheduleVisibility.ts`         | Filtres onglets / file back-office                          |
+| `technicianScheduleLabels.ts`             | Libellés horaires et client                                 |
 | `hooks/useSmartForm.ts`                   | Orchestrateur wizard demande client (~220 lignes)           |
 | `smartFormDraftStorage.ts`                | Brouillon localStorage + step initial                       |
 | `smartFormSubmit.ts`                      | Soumission Firestore + upload audio                         |
