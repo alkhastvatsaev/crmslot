@@ -160,6 +160,91 @@
   display: none;
 }
 
+/* ── Admin mobile · polish DailyMissions + BackOfficeInboxPanel ── */
+
+/**
+ * Empty state grid : overlay centré quand la grille missions est vide.
+ * Les slots placeholders restent en fond (skeleton léger).
+ */
+.admin-mobile-app [data-testid="daily-missions-empty-grid"] {
+  position: relative;
+}
+
+.admin-mobile-app [data-testid="daily-missions-empty-grid"]::after {
+  content: "Aucune mission aujourd'hui";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgb(71 85 105);
+  text-align: center;
+  padding: 1rem;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+/* Cards missions : tighter padding mobile + tap target preservé. */
+.admin-mobile-app [data-testid^="daily-mission-"] {
+  min-height: 5rem;
+}
+
+/* Backoffice inbox : surface admin neutre (contraste accru sur slate-50). */
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] {
+  background: rgb(255 255 255);
+  border-radius: var(--mobile-panel-radius);
+}
+
+/* Segmented control inbox : touch targets 44px + lisibilité mobile. */
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] [role="tablist"] button,
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] [data-testid^="backoffice-inbox-tab-"] {
+  min-height: 2.75rem;
+  font-size: 0.8125rem;
+  letter-spacing: -0.005em;
+}
+
+/* Loading skeleton inbox : tonalité harmonisée admin. */
+.admin-mobile-app [data-testid="backoffice-inbox-loading"] > div {
+  background: rgb(241 245 249);
+}
+
+/* États vides inbox (chat, requests, reports) : message centré + typo soignée. */
+.admin-mobile-app
+  [data-testid="backoffice-inbox-panel"]
+  :where([data-testid$="-empty"], [data-empty="true"]) {
+  text-align: center;
+  color: rgb(71 85 105);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 1.5rem 1rem;
+  line-height: 1.5;
+}
+
+/* Hiérarchie typo headings panneaux mobile admin. */
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] h1,
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] h2 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: rgb(15 23 42);
+}
+
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] h3 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgb(30 41 59);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-mobile-app [data-testid^="daily-mission-"] {
+    animation: none !important;
+  }
+}
+
 .mobile-top-bar {
   display: flex;
   width: 100%;
