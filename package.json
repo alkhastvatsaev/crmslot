@@ -50,6 +50,7 @@
     "test:e2e:api-matrix": "playwright test tests/e2e/api-routes-auth-matrix.spec.ts",
     "generate:api-routes": "node scripts/ci/generate-protected-api-routes.mjs",
     "map": "node scripts/ci/generate-codemap.mjs",
+    "audit:barrels": "node scripts/ci/audit-barrels.mjs",
     "ci": "npm run lint:ci && npm run test:ci && npm run build",
     "clean:dev": "bash scripts/dev/clean-dev-artifacts.sh",
     "ci:all": "npm run ci && npm run test:e2e",
