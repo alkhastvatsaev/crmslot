@@ -111,13 +111,31 @@ export default function MobileHubLayout({
 
   const navigateLeft = useCallback(() => {
     if (availableRails.length <= 1) return;
-    pickRail(stepMobileHubRail(availableRails, rail, "next"));
-  }, [availableRails, rail, pickRail]);
+    const next = stepMobileHubRail(availableRails, rail, "next");
+    if (
+      dockOnboarding?.swipeRightHintActive &&
+      rail === "center" &&
+      next === "right" &&
+      next !== rail
+    ) {
+      dockOnboarding.dismissSwipeRightHint();
+    }
+    pickRail(next);
+  }, [availableRails, rail, pickRail, dockOnboarding]);
 
   const navigateRight = useCallback(() => {
     if (availableRails.length <= 1) return;
-    pickRail(stepMobileHubRail(availableRails, rail, "prev"));
-  }, [availableRails, rail, pickRail]);
+    const next = stepMobileHubRail(availableRails, rail, "prev");
+    if (
+      dockOnboarding?.swipeLeftHintActive &&
+      rail === "right" &&
+      next !== "right" &&
+      next !== rail
+    ) {
+      dockOnboarding.dismissSwipeLeftHint();
+    }
+    pickRail(next);
+  }, [availableRails, rail, pickRail, dockOnboarding]);
 
   useEffect(() => {
     if (activeRail && activeRail !== rail) pickRail(activeRail);
@@ -153,25 +171,20 @@ export default function MobileHubLayout({
     return () => setRegistration(registrationId, null);
   }, [availableRails, panelVisible, pickRail, rail, registrationId, setRegistration]);
 
-  const swipeHintSide =
-    rail === "center" && availableRails.length > 1
-      ? dockOnboarding?.swipeRightHintActive
-        ? "right"
-        : dockOnboarding?.swipeLeftHintActive
-          ? "left"
-          : undefined
-      : undefined;
-
-  const handleSwipeHintClick = useCallback(() => {
-    if (!dockOnboarding) return;
-    if (dockOnboarding.swipeRightHintActive) {
-      dockOnboarding.dismissSwipeRightHint();
-      return;
+  const swipeHintSide = (() => {
+    if (availableRails.length <= 1) return undefined;
+    if (
+      dockOnboarding?.swipeRightHintActive &&
+      rail === "center" &&
+      availableRails.includes("right")
+    ) {
+      return "right";
     }
-    if (dockOnboarding.swipeLeftHintActive) {
-      dockOnboarding.dismissSwipeLeftHint();
+    if (dockOnboarding?.swipeLeftHintActive && rail === "right") {
+      return "left";
     }
-  }, [dockOnboarding]);
+    return undefined;
+  })();
 
   return (
     <div
@@ -179,39 +192,48 @@ export default function MobileHubLayout({
       className={MOBILE_HUB_LAYOUT_CLASS}
       data-testid={rootTestId}
       data-mobile-hub-swipe-hint={swipeHintSide}
-      onClick={swipeHintSide ? handleSwipeHintClick : undefined}
     >
-      <GlassPanel
-        as="section"
-        aria-label={labels[rail]}
-        shellClassName={cn(
-          mobileHubPanelGlassShellClass,
-          availableRails.length > 1 && MOBILE_HUB_PANEL_ANIMATED_CLASS
-        )}
-        innerClassName="relative min-h-0 flex-1 flex-col overflow-hidden"
-        style={{ position: "relative" }}
-      >
-        {availableRails.map((railKey) => {
-          const active = rail === railKey;
-          return (
-            <div
-              key={railKey}
-              aria-label={labels[railKey]}
-              aria-hidden={!active}
-              data-testid={testIds[railKey]}
-              data-mobile-hub-rail={railKey}
-              data-mobile-hub-rail-active={active ? "true" : "false"}
-              className={cn(
-                innerClassFor(railKey),
-                MOBILE_HUB_RAIL_LAYER_CLASS,
-                mobileHubRailLayerSideClass(railKey, rail, availableRails)
-              )}
-            >
-              {panels[RAIL_PANEL[railKey]]}
-            </div>
-          );
-        })}
-      </GlassPanel>
+      <div className="mobile-hub-panel-stack relative flex min-h-0 min-w-0 flex-1 flex-col">
+        {swipeHintSide ? (
+          <div
+            className={cn("mobile-hub-swipe-hint", `mobile-hub-swipe-hint--${swipeHintSide}`)}
+            data-testid={`mobile-hub-swipe-hint-${swipeHintSide}`}
+            aria-hidden
+          />
+        ) : null}
+        <GlassPanel
+          as="section"
+          aria-label={labels[rail]}
+          className="relative z-[1] flex min-h-0 min-w-0 flex-1 flex-col"
+          shellClassName={cn(
+            mobileHubPanelGlassShellClass,
+            availableRails.length > 1 && MOBILE_HUB_PANEL_ANIMATED_CLASS
+          )}
+          innerClassName="relative min-h-0 flex-1 flex-col overflow-hidden"
+          style={{ position: "relative" }}
+        >
+          {availableRails.map((railKey) => {
+            const active = rail === railKey;
+            return (
+              <div
+                key={railKey}
+                aria-label={labels[railKey]}
+                aria-hidden={!active}
+                data-testid={testIds[railKey]}
+                data-mobile-hub-rail={railKey}
+                data-mobile-hub-rail-active={active ? "true" : "false"}
+                className={cn(
+                  innerClassFor(railKey),
+                  MOBILE_HUB_RAIL_LAYER_CLASS,
+                  mobileHubRailLayerSideClass(railKey, rail, availableRails)
+                )}
+              >
+                {panels[RAIL_PANEL[railKey]]}
+              </div>
+            );
+          })}
+        </GlassPanel>
+      </div>
     </div>
   );
 }
