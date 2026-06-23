@@ -138,6 +138,34 @@
   }
 }
 
+@keyframes mobile-dock-hint-spill-left {
+  0%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.82);
+  }
+
+  38% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes mobile-dock-hint-spill-right {
+  0%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.82);
+  }
+
+  38% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
 [data-mobile-shell][data-mobile-dock-hint-header="active"] .mobile-shell-header,
 [data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-footer {
   overflow: visible;
@@ -289,6 +317,69 @@
     footer
     .mobile-galaxy-dock-chrome::after,
   [data-mobile-shell][data-mobile-dock-hint-footer="active"] .mobile-shell-body::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/**
+ * Étape 3 onboarding : swipe du panneau central (droite puis gauche).
+ */
+.mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel],
+.mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel] {
+  position: relative;
+  overflow: visible;
+}
+
+.mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel]::before {
+  content: "";
+  position: absolute;
+  top: 7%;
+  right: -0.5rem;
+  bottom: 7%;
+  width: 3.5rem;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 100% 72% at 100% 50%,
+    rgb(59 130 246 / 0.42) 0%,
+    rgb(59 130 246 / 0.16) 46%,
+    transparent 74%
+  );
+  filter: blur(11px);
+  box-shadow: 10px 0 40px -10px rgb(37 99 235 / 0.34);
+  animation: mobile-dock-hint-spill-right 5.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel]::after {
+  content: "";
+  position: absolute;
+  top: 7%;
+  left: -0.5rem;
+  bottom: 7%;
+  width: 3.5rem;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 100% 72% at 0% 50%,
+    rgb(59 130 246 / 0.42) 0%,
+    rgb(59 130 246 / 0.16) 46%,
+    transparent 74%
+  );
+  filter: blur(11px);
+  box-shadow: -10px 0 40px -10px rgb(37 99 235 / 0.34);
+  animation: mobile-dock-hint-spill-left 5.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-hub-layout[data-mobile-hub-swipe-hint="right"] [data-glass-panel]::before,
+  .mobile-hub-layout[data-mobile-hub-swipe-hint="left"] [data-glass-panel]::after {
     animation: none;
     opacity: 0;
   }
