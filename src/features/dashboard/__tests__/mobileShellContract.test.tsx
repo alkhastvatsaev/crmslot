@@ -10,6 +10,7 @@ import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPag
 import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
+import * as mobileFooterGalaxyVisible from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import {
   MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS,
   MOBILE_PROFILE_BAR_CHROME_CLASS,
@@ -19,6 +20,10 @@ import {
 jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
   default: () => null,
+}));
+
+jest.mock("@/features/dashboard/hooks/useMobileFooterGalaxyVisible", () => ({
+  useMobileFooterGalaxyVisible: jest.fn(() => false),
 }));
 
 jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
@@ -69,6 +74,7 @@ describe("mobileShellContract — source guards", () => {
 
 describe("mobileShellContract — layout", () => {
   it("aligne profil et galaxy sur la même grille slot", () => {
+    jest.mocked(mobileFooterGalaxyVisible.useMobileFooterGalaxyVisible).mockReturnValue(true);
     renderMobileShell([<div key="0">Map</div>]);
 
     expect(screen.getByTestId(MOBILE_SHELL_CONTRACT.testIds.topBar)).toHaveClass(

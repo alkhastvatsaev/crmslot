@@ -6,14 +6,11 @@ import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalen
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
-import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
+import MobileShellGalaxyDockSlot from "@/features/dashboard/components/MobileShellGalaxyDockSlot";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
-import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
-  MOBILE_GALAXY_DOCK_CHROME_CLASS,
-  MOBILE_GALAXY_DOCK_CLASS,
   MOBILE_SHELL_BODY_CLASS,
   MOBILE_SHELL_CLASS,
   MOBILE_SHELL_FOOTER_CLASS,
@@ -51,13 +48,9 @@ export default function MobileShell({ pages }: Props) {
 
         <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="mobile-shell-footer">
           <MobileCalendarFooterBar />
-          <MobileShellSlotGrid
-            rootClassName={MOBILE_GALAXY_DOCK_CLASS}
-            chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
-            data-testid={MOBILE_SHELL_CONTRACT.testIds.galaxyDock}
-          >
+          <MobileShellGalaxyDockSlot>
             <MobileShellFooterDock />
-          </MobileShellSlotGrid>
+          </MobileShellGalaxyDockSlot>
           <MobileHubDotsBar />
         </footer>
       </div>

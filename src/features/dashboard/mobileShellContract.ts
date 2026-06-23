@@ -54,7 +54,7 @@ export const MOBILE_SHELL_CONTRACT = {
       "data-page-selector-open",
       "MobileScreenHost",
       "MobileTopBar",
-      "MobileShellFooterDock",
+      "MobileShellGalaxyDockSlot",
     ],
     "src/features/dashboard/components/DashboardPageSelector.tsx": [
       "MobileCentralPanelFrame",

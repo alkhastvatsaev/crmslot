@@ -5,14 +5,12 @@ import DashboardAccountPanel from "@/features/dashboard/components/DashboardAcco
 import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTopBar";
+import MobileShellGalaxyDockSlot from "@/features/dashboard/components/MobileShellGalaxyDockSlot";
 import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
-import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { useDashboardPageSelector } from "@/features/dashboard";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
-  MOBILE_GALAXY_DOCK_CHROME_CLASS,
-  MOBILE_GALAXY_DOCK_CLASS,
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_CLASS,
   MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
@@ -100,13 +98,9 @@ export default function AdminMobileShell({ children, dock }: Props) {
           calendarTestId="admin-mobile-footer-calendar"
         />
         {dock ? (
-          <MobileShellSlotGrid
-            rootClassName={MOBILE_GALAXY_DOCK_CLASS}
-            chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
-            data-testid="admin-mobile-shell-dock"
-          >
+          <MobileShellGalaxyDockSlot testId="admin-mobile-shell-dock">
             {dock}
-          </MobileShellSlotGrid>
+          </MobileShellGalaxyDockSlot>
         ) : null}
         <MobileHubDotsBar />
       </footer>
