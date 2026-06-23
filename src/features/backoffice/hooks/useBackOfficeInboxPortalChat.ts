@@ -81,7 +81,8 @@ export function useBackOfficeInboxPortalChat({
 
   useEffect(() => {
     const companyIds = inboxCompanyIds.map((id) => id.trim()).filter(Boolean);
-    if (!inboxLive || !isConfigured || !firestore || companyIds.length === 0 || !isTenant) return;
+    const chatDb = firestore;
+    if (!inboxLive || !isConfigured || !chatDb || companyIds.length === 0 || !isTenant) return;
 
     portalChatHydratedRef.current = false;
     const seen = new Set<string>();
@@ -111,7 +112,7 @@ export function useBackOfficeInboxPortalChat({
 
     const unsubs = companyIds.map((companyId) =>
       subscribePortalChatMessages(
-        firestore,
+        chatDb,
         companyId,
         (rows) => {
           rowsByCompany.set(companyId, rows);
