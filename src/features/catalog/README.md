@@ -28,7 +28,10 @@ Deux moitiés à distinguer : **catalogue interne société** et **stack Lecot**
 | `lecotImageCrawlerUtils.ts`      | Pool, cache page, fetch backoff              |
 | `lecotImageCrawlerResolve.ts`    | Chaîne résolution vignette (API→Playwright)  |
 | `lecotImageCrawlerIndex.ts`      | Merge index + overlays label/SKU             |
-| `lecotPlaywrightScraper.ts`      | Scraper Playwright (307 L)                   |
+| `lecotPlaywrightScraper.ts`      | Point d'entrée scraper Playwright Lecot      |
+| `lecotPlaywrightScraperTypes.ts` | Types guest / résultat commande Playwright   |
+| `lecotPlaywrightSearch.ts`       | Recherche catalogue via Playwright           |
+| `lecotPlaywrightOrder.ts`        | Passage commande checkout Playwright         |
 | `lecotPlaywrightBrowser.ts`      | Wrapper navigateur Playwright                |
 | `lecotProductImage*.ts`          | Stack résolution / cache images produits     |
 | `parseLecotSearchHtmlImage.ts`   | Parse HTML résultats Lecot                   |
