@@ -11,6 +11,7 @@ import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
 import { toast } from "sonner";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
+import { logger } from "@/core/logger";
 import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
 import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
 import {
