@@ -78,10 +78,7 @@ export function MobileHubRailProvider({ children }: { children: ReactNode }) {
 
 export function useMobileHubRailRegistration() {
   const ctx = useContext(MobileHubRailContext);
-  if (!ctx) {
-    throw new Error("MobileHubRailProvider manquant.");
-  }
-  return ctx.setRegistration;
+  return ctx?.setRegistration ?? (() => {});
 }
 
 export function useMobileHubRailSnapshot() {
