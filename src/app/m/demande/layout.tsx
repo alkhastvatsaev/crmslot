@@ -3,6 +3,8 @@ import {
   PWA_DEMANDE_SHORT_NAME,
   PWA_DEMANDE_TITLE,
   PWA_MANIFEST_DEMANDE,
+  PWA_METADATA_ICONS,
+  PWA_THEME_COLOR,
 } from "@/core/pwa/pwaSatelliteManifests";
 
 export const metadata: Metadata = {
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
   description: "Formulaire et suivi client",
   applicationName: PWA_DEMANDE_SHORT_NAME,
   manifest: PWA_MANIFEST_DEMANDE,
+  icons: PWA_METADATA_ICONS,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -18,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f8fafc",
+  themeColor: PWA_THEME_COLOR,
 };
 
 export default function ClientMobilePwaLayout({ children }: { children: React.ReactNode }) {
