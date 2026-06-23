@@ -1,79 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, RotateCcw, Send, X, Archive } from "lucide-react";
+import { X } from "lucide-react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { HubActionBar, HubButton, HubCard, HubDetailHeader, HUB_TYPE } from "@/core/ui/hub";
-import { useTranslation } from "@/core/i18n/I18nContext";
-import { capitalizeName, formatAddress } from "@/utils/stringUtils";
-import { auth } from "@/core/config/firebase";
-import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import { PRESENTATION_PRIVACY_MODE } from "@/core/config/presentationMode";
-import type { Intervention } from "@/features/interventions/types";
-import type {
-  BridgedTechnicianReport,
-  TechnicianBackofficeReportBridgeApi,
-} from "@/context/TechnicianBackofficeReportBridgeContext";
-import RequestDetailAudioPlayer from "@/features/backoffice/components/RequestDetailAudioPlayer";
+import { HubDetailHeader } from "@/core/ui/hub";
+import TerrainReportClientCard from "@/features/backoffice/components/TerrainReportClientCard";
+import TerrainReportAudioSection from "@/features/backoffice/components/TerrainReportAudioSection";
+import TerrainReportPhotosGrid from "@/features/backoffice/components/TerrainReportPhotosGrid";
+import TerrainReportSignatureSection from "@/features/backoffice/components/TerrainReportSignatureSection";
+import TerrainReportRejectForm from "@/features/backoffice/components/TerrainReportRejectForm";
+import TerrainReportActionBar from "@/features/backoffice/components/TerrainReportActionBar";
 import InterventionInvoicePreviewCard from "@/features/billing/components/InterventionInvoicePreviewCard";
 import { invoicePreviewFromIntervention } from "@/features/billing/invoicePreviewFromIntervention";
-import { canArchiveBackofficeReportInInbox } from "@/features/backoffice/backofficeReportsInboxArchive";
+import { useTerrainReportDetailPanelController } from "@/features/backoffice/hooks/useTerrainReportDetailPanelController";
+import type { TerrainReportDetailPanelProps } from "@/features/backoffice/terrainReportDetailPanelTypes";
 
-function readTranscription(inv: unknown): string | null {
-  if (!inv || typeof inv !== "object") return null;
-  const anyInv = inv as Record<string, unknown>;
-  const candidates = [anyInv.transcription, anyInv.audioTranscription, anyInv.audio_transcription];
-  const hit = candidates.find((v) => typeof v === "string" && v.trim().length > 0);
-  return typeof hit === "string" ? hit : null;
-}
-
-type Props = {
-  report: BridgedTechnicianReport;
-  iv: Intervention | null;
-  terrainBridge: TechnicianBackofficeReportBridgeApi | null;
-  terrainResolvedAudioUrl: string | null;
-  terrainAudioLoading: boolean;
-  terrainAudioFailed: boolean;
-  onClose: () => void;
-  onVerify: (id: string) => void;
-  onArchiveReport: (id: string) => void;
-  onReject: (id: string, reason?: string) => void;
-};
-
-export default function TerrainReportDetailPanel({
-  report: r,
-  iv,
-  terrainBridge,
-  terrainResolvedAudioUrl,
-  terrainAudioLoading,
-  terrainAudioFailed,
-  onClose,
-  onVerify,
-  onArchiveReport,
-  onReject,
-}: Props) {
-  const { t } = useTranslation();
-  const [rejectOpen, setRejectOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
-
-  const first = iv?.clientFirstName ?? "";
-  const last = iv?.clientLastName ?? "";
-  const fallbackName = iv?.clientName ?? "";
-  const nameRaw = `${first} ${last}`.trim() || fallbackName;
-  const displayName = nameRaw ? capitalizeName(nameRaw) : `Client · …${r.interventionId.slice(-8)}`;
-  const phone = iv?.clientPhone ?? "";
-  const email = iv?.clientEmail ?? "";
-  const address = iv?.address ? formatAddress(iv.address) : "";
-  const description = iv?.problem || iv?.title || "";
-  const isAlreadyValidated = iv?.status === "invoiced";
-  const canArchiveReport = Boolean(iv && canArchiveBackofficeReportInInbox(iv));
-
-  const handleRejectConfirm = () => {
-    onReject(r.interventionId, rejectReason.trim() || undefined);
-    setRejectOpen(false);
-    setRejectReason("");
-  };
+export default function TerrainReportDetailPanel(props: TerrainReportDetailPanelProps) {
+  const c = useTerrainReportDetailPanelController(props);
 
   return (
     <motion.div
@@ -84,28 +26,15 @@ export default function TerrainReportDetailPanel({
       className="absolute inset-0 z-30 flex flex-col bg-white rounded-[inherit] shadow-2xl"
     >
       <HubDetailHeader
-        title={String(t("backoffice.inbox.terrain_report"))}
-        onBack={onClose}
-        backLabel={String(t("common.back"))}
+        title={String(c.t("backoffice.inbox.terrain_report"))}
+        onBack={props.onClose}
+        backLabel={String(c.t("common.back"))}
         rightAction={
           <button
             type="button"
-            onClick={() => {
-              const actorUid = auth?.currentUser?.uid?.trim() || "system";
-              if (iv) {
-                void logCrmInterventionAction({
-                  kind: "bridged_report_dismissed",
-                  iv,
-                  actorUid,
-                  actorRole: "dispatcher",
-                  note: "Rapport terrain masqué (non supprimé)",
-                });
-              }
-              terrainBridge?.dismissReport(r.localId);
-              onClose();
-            }}
+            onClick={c.handleDismiss}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200"
-            aria-label={t("backoffice.inbox.hide_report")}
+            aria-label={c.t("backoffice.inbox.hide_report")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -113,206 +42,71 @@ export default function TerrainReportDetailPanel({
       />
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <HubCard tone="muted" padding="md" className="space-y-2">
-          <p className="text-[14px] !font-extrabold text-slate-900">{displayName}</p>
-          {phone ? <p className="text-[12px] !font-bold text-slate-700">{phone}</p> : null}
-          {email ? (
-            <p className="text-[12px] !font-bold text-slate-700 break-all">
-              <a href={`mailto:${email}`} className="hover:underline">
-                {email}
-              </a>
-            </p>
-          ) : null}
-          {address ? <p className="text-[12px] !font-bold text-slate-700">{address}</p> : null}
-          {description ? (
-            <p className="text-[13px] !font-bold text-slate-800 leading-relaxed">
-              {t("backoffice.inbox.problem_prefix")} · {description}
-            </p>
-          ) : null}
-        </HubCard>
+        <TerrainReportClientCard
+          displayName={c.displayName}
+          phone={c.phone}
+          email={c.email}
+          address={c.address}
+          description={c.description}
+          problemPrefix={String(c.t("backoffice.inbox.problem_prefix"))}
+        />
 
-        <div className="space-y-3">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-            {t("backoffice.inbox.voice_message")}
-          </p>
-          {terrainResolvedAudioUrl ? (
-            <RequestDetailAudioPlayer
-              key={`terrain-${r.interventionId}-${terrainResolvedAudioUrl}`}
-              url={terrainResolvedAudioUrl}
-            />
-          ) : terrainAudioLoading ? (
-            <div
-              data-testid="backoffice-terrain-report-audio-loading"
-              className="flex w-full items-center gap-3 rounded-[16px] border border-dashed border-slate-200 bg-slate-50/70 px-4 py-4"
-              aria-busy="true"
-              aria-label={t("backoffice.inbox.voice_loading")}
-            >
-              <div
-                className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200"
-                aria-hidden
-              />
-              <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-                <div className="h-2 w-full animate-pulse rounded-full bg-slate-200" />
-                <div className="flex justify-between gap-2">
-                  <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                  <div className="h-2 w-10 animate-pulse rounded bg-slate-200" />
-                </div>
-              </div>
-              <div
-                className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-slate-200/80"
-                aria-hidden
-              />
-            </div>
-          ) : terrainAudioFailed ? (
-            <div
-              data-testid="backoffice-terrain-report-audio-storage-error"
-              className="w-full rounded-[16px] border border-amber-200/90 bg-amber-50/80 px-4 py-4 text-center text-[13px] font-semibold leading-snug text-amber-950"
-            >
-              {t("backoffice.inbox.voice_storage_error")}
-            </div>
-          ) : (
-            <div
-              data-testid="backoffice-terrain-report-audio-empty"
-              className="w-full rounded-[16px] border border-dashed border-slate-200 bg-slate-50/60 px-4 py-4 text-center text-[13px] font-semibold text-slate-500"
-            >
-              {t("backoffice.inbox.voice_empty")}
-            </div>
-          )}
-          {iv && readTranscription(iv) ? (
-            <div className="rounded-[16px] border border-blue-100 bg-blue-50/50 p-4 text-sm italic text-blue-900">
-              &quot;{readTranscription(iv)}&quot;
-            </div>
-          ) : null}
-        </div>
+        <TerrainReportAudioSection
+          interventionId={c.r.interventionId}
+          audioUrl={props.terrainResolvedAudioUrl}
+          loading={props.terrainAudioLoading}
+          failed={props.terrainAudioFailed}
+          voiceMessageLabel={String(c.t("backoffice.inbox.voice_message"))}
+          voiceLoadingLabel={String(c.t("backoffice.inbox.voice_loading"))}
+          voiceStorageErrorLabel={String(c.t("backoffice.inbox.voice_storage_error"))}
+          voiceEmptyLabel={String(c.t("backoffice.inbox.voice_empty"))}
+          transcription={c.transcription}
+        />
 
-        <div className="space-y-3">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-            {t("backoffice.inbox.photos")}
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {r.photoDataUrls.map((url, i) => (
-              <div
-                key={`${r.localId}-detail-ph-${i}`}
-                className="aspect-square relative rounded-[16px] overflow-hidden border border-slate-100 bg-slate-50 shadow-sm"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt=""
-                  className={cn(
-                    "w-full h-full object-cover",
-                    PRESENTATION_PRIVACY_MODE ? "blur-lg" : null
-                  )}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <TerrainReportPhotosGrid
+          localId={c.r.localId}
+          photoDataUrls={c.r.photoDataUrls}
+          photosLabel={String(c.t("backoffice.inbox.photos"))}
+        />
 
-        <div className="space-y-3">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-            {t("backoffice.inbox.signature_client")}
-          </p>
-          <div className="rounded-[16px] bg-slate-50 p-4 border border-slate-100 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={r.signaturePngDataUrl}
-              alt={t("backoffice.inbox.signature_alt")}
-              className="max-h-32 object-contain"
-            />
-          </div>
-        </div>
+        <TerrainReportSignatureSection
+          signaturePngDataUrl={c.r.signaturePngDataUrl}
+          signatureLabel={String(c.t("backoffice.inbox.signature_client"))}
+          signatureAlt={String(c.t("backoffice.inbox.signature_alt"))}
+        />
 
-        {iv ? <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(iv)} /> : null}
+        {c.iv ? <InterventionInvoicePreviewCard {...invoicePreviewFromIntervention(c.iv)} /> : null}
 
-        {/* Reject inline form */}
-        {rejectOpen ? (
-          <div
-            data-testid="backoffice-reject-form"
-            className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3"
-          >
-            <p className="text-[13px] font-bold text-amber-900">
-              {t("backoffice.inbox.reject_reason_label")}
-            </p>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder={t("backoffice.inbox.reject_reason_placeholder")}
-              rows={3}
-              className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-slate-800 outline-none focus:border-amber-400 placeholder:text-slate-400 resize-none"
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <HubButton
-                type="button"
-                variant="dangerOutline"
-                data-testid="backoffice-reject-confirm"
-                onClick={handleRejectConfirm}
-                className="flex-1"
-              >
-                <Send className="h-4 w-4" />
-                {t("backoffice.inbox.reject_send")}
-              </HubButton>
-              <HubButton
-                type="button"
-                onClick={() => {
-                  setRejectOpen(false);
-                  setRejectReason("");
-                }}
-                className="shrink-0"
-              >
-                {t("common.cancel")}
-              </HubButton>
-            </div>
-          </div>
+        {c.rejectOpen ? (
+          <TerrainReportRejectForm
+            rejectReason={c.rejectReason}
+            rejectReasonLabel={String(c.t("backoffice.inbox.reject_reason_label"))}
+            rejectReasonPlaceholder={String(c.t("backoffice.inbox.reject_reason_placeholder"))}
+            rejectSendLabel={String(c.t("backoffice.inbox.reject_send"))}
+            cancelLabel={String(c.t("common.cancel"))}
+            onRejectReasonChange={c.setRejectReason}
+            onConfirm={c.handleRejectConfirm}
+            onCancel={c.cancelReject}
+          />
         ) : null}
       </div>
 
-      <HubActionBar>
-        {!rejectOpen && !isAlreadyValidated && iv ? (
-          <HubButton
-            type="button"
-            data-testid="backoffice-reject-report-btn"
-            onClick={() => setRejectOpen(true)}
-          >
-            <RotateCcw className="h-4 w-4" />
-            {t("backoffice.inbox.reject_report")}
-          </HubButton>
-        ) : null}
-
-        <HubButton
-          type="button"
-          variant="success"
-          emphasis
-          data-testid={`backoffice-bridged-report-validate-${r.localId}`}
-          disabled={!iv || isAlreadyValidated}
-          onClick={() => void onVerify(r.interventionId)}
-          className={cn(
-            isAlreadyValidated &&
-              "cursor-not-allowed bg-emerald-100 text-emerald-700 opacity-70 shadow-none hover:bg-emerald-100",
-            !iv && "cursor-not-allowed bg-slate-100 text-slate-400 shadow-none hover:bg-slate-100"
-          )}
-          aria-label={t("backoffice.inbox.verify_terrain_report_aria")}
-        >
-          <CheckCircle2 className="h-4 w-4" />
-          {isAlreadyValidated
-            ? t("backoffice.inbox.already_verified")
-            : t("backoffice.inbox.verify_report")}
-        </HubButton>
-
-        {canArchiveReport && !rejectOpen ? (
-          <HubButton
-            type="button"
-            variant="secondary"
-            data-testid={`backoffice-bridged-report-archive-${r.localId}`}
-            onClick={() => void onArchiveReport(r.interventionId)}
-            aria-label={t("backoffice.inbox.archive_report_aria")}
-          >
-            <Archive className="h-4 w-4" />
-            {t("backoffice.inbox.archive_report")}
-          </HubButton>
-        ) : null}
-      </HubActionBar>
+      <TerrainReportActionBar
+        report={c.r}
+        iv={c.iv}
+        rejectOpen={c.rejectOpen}
+        isAlreadyValidated={c.isAlreadyValidated}
+        canArchiveReport={c.canArchiveReport}
+        rejectReportLabel={String(c.t("backoffice.inbox.reject_report"))}
+        verifyReportLabel={String(c.t("backoffice.inbox.verify_report"))}
+        alreadyVerifiedLabel={String(c.t("backoffice.inbox.already_verified"))}
+        verifyReportAria={String(c.t("backoffice.inbox.verify_terrain_report_aria"))}
+        archiveReportLabel={String(c.t("backoffice.inbox.archive_report"))}
+        archiveReportAria={String(c.t("backoffice.inbox.archive_report_aria"))}
+        onOpenReject={c.openRejectForm}
+        onVerify={props.onVerify}
+        onArchiveReport={props.onArchiveReport}
+      />
     </motion.div>
   );
 }
