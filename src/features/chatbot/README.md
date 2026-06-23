@@ -4,17 +4,21 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 
 ## Points d'entrée
 
-| Fichier                                         | Rôle                                          |
-| ----------------------------------------------- | --------------------------------------------- |
-| `components/ChatbotChat.tsx` / `SerrAIChat.tsx` | UI chat                                       |
-| `hooks/useChatbot.ts`                           | Hook client SSE — orchestrateur (~330 lignes) |
-| `hooks/useChatbotStreamSession.ts`              | Stream SSE + side effects UI                  |
-| `chatbot-route-handler.ts`                      | Handler API (importé par route Next)          |
-| `chatbot-openai.ts`                             | Pipeline OpenAI (orchestrateur)               |
-| `chatbot-tool-labels.ts`                        | Labels outils stream                          |
-| `index.ts`                                      | **Barrel public** cross-feature               |
-| `chatbot-tools.ts`                              | Schémas JSON outils — **754 lignes**          |
-| `chatbot-tool-executor.ts`                      | Exécution serveur outils                      |
+| Fichier                                         | Rôle                                               |
+| ----------------------------------------------- | -------------------------------------------------- |
+| `components/ChatbotChat.tsx` / `SerrAIChat.tsx` | UI chat                                            |
+| `components/ChatbotSupplierOrdersPanel.tsx`     | Liste commandes fournisseur/matériel (~120 lignes) |
+| `hooks/useChatbotSupplierOrdersPanelView.ts`    | Labels clients, highlight, images rail             |
+| `components/ChatbotSupplierOrderRow.tsx`        | Ligne commande fournisseur (embedded)              |
+| `components/ChatbotMaterialOrderRow.tsx`        | Ligne commande matériel (embedded)                 |
+| `hooks/useChatbot.ts`                           | Hook client SSE — orchestrateur (~330 lignes)      |
+| `hooks/useChatbotStreamSession.ts`              | Stream SSE + side effects UI                       |
+| `chatbot-route-handler.ts`                      | Handler API (importé par route Next)               |
+| `chatbot-openai.ts`                             | Pipeline OpenAI (orchestrateur)                    |
+| `chatbot-tool-labels.ts`                        | Labels outils stream                               |
+| `index.ts`                                      | **Barrel public** cross-feature                    |
+| `chatbot-tools.ts`                              | Schémas JSON outils — **754 lignes**               |
+| `chatbot-tool-executor.ts`                      | Exécution serveur outils                           |
 
 ## Données
 
