@@ -383,5 +383,9 @@
     "method": "POST",
     "path": "/api/suppliers/order",
     "body": {}
+  },
+  {
+    "path": "/api/account/staff-profile",
+    "methods": ["PATCH"]
   }
 ]
