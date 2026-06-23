@@ -7,6 +7,11 @@ import { logger } from "@/core/logger";
 import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions";
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
+import {
+  readAdminInboxInterventionsCache,
+  splitInterventionsByCompanyIds,
+  writeAdminInboxInterventionsCache,
+} from "@/features/offline/adminInboxInterventionsCache";
 
 export type BackOfficeInterventionsCompanyScope = string | readonly string[] | null;
 
@@ -53,12 +58,25 @@ export function useBackOfficeInterventions(
   const [rowsByCompany, setRowsByCompany] = useState<Record<string, Intervention[]>>({});
   const [loadedCompanyKeys, setLoadedCompanyKeys] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+
+  useEffect(() => {
+    if (cidList.length === 0 || !cidKey) return;
+    const cached = readAdminInboxInterventionsCache(cidKey);
+    if (cached.length === 0) return;
+    const byCompany = splitInterventionsByCompanyIds(cidList, cached);
+    setRowsByCompany(byCompany);
+    setFromCache(true);
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setLoadedCompanyKeys(cidKey);
+      setError(null);
+    }
+  }, [cidKey, cidList]);
 
   useEffect(() => {
     if (noFirestore || cidList.length === 0 || !enabled) return () => {};
+    if (typeof navigator !== "undefined" && !navigator.onLine) return () => {};
 
-    setRowsByCompany({});
-    setLoadedCompanyKeys("");
     setError(null);
 
     const loaded = new Set<string>();
@@ -72,14 +90,19 @@ export function useBackOfficeInterventions(
             const raw = stripKnownSyntheticInterventions(
               snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention)
             );
-            setRowsByCompany((prev) => ({
-              ...prev,
-              [cid]: filterInterventionsByCompany(cid, raw),
-            }));
-            loaded.add(cid);
-            if (loaded.size === cidList.length) {
-              setLoadedCompanyKeys(cidKey);
-            }
+            setRowsByCompany((prev) => {
+              const next = {
+                ...prev,
+                [cid]: filterInterventionsByCompany(cid, raw),
+              };
+              loaded.add(cid);
+              if (loaded.size === cidList.length) {
+                setLoadedCompanyKeys(cidKey);
+                setFromCache(false);
+                writeAdminInboxInterventionsCache(cidKey, mergeInterventionRows(next));
+              }
+              return next;
+            });
             setError(null);
           },
           (e) => {
@@ -88,6 +111,11 @@ export function useBackOfficeInterventions(
               error: e instanceof Error ? e.message : String(e),
             });
             setError(e.message || "Erreur Firestore");
+            const cached = readAdminInboxInterventionsCache(cidKey);
+            if (cached.length > 0) {
+              setRowsByCompany(splitInterventionsByCompanyIds(cidList, cached));
+              setFromCache(true);
+            }
             loaded.add(cid);
             if (loaded.size === cidList.length) {
               setLoadedCompanyKeys(cidKey);
@@ -113,8 +141,8 @@ export function useBackOfficeInterventions(
   const loading = cidList.length > 0 && loadedCompanyKeys !== cidKey;
 
   if (cidList.length === 0 || noFirestore) {
-    return { interventions, loading: false, error: null, firebaseUid };
+    return { interventions, loading: false, error: null, firebaseUid, fromCache };
   }
 
-  return { interventions, loading, error, firebaseUid };
+  return { interventions, loading, error, firebaseUid, fromCache };
 }
