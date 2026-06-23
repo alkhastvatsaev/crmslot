@@ -64,6 +64,8 @@ L'app principale (`/`) est un carrousel horizontal piloté par `DashboardPagerPr
 | 6 | `BILLING_HUB_SLOT_INDEX` | Facturation |
 
 > Convention `<domaine>/` vs `<domaine>Hub/` (8 hubs) : **`docs/agents/HUB_PATTERN.md`**. Source de vérité du slot = le `*Constants.ts` du hub, pas ce tableau.
+>
+> Frontières entre features proches : **`docs/agents/MESSAGING_PATTERN.md`** (gmail/inbox/emails/communications/notifications), **`docs/agents/MATERIEL_PATTERN.md`** (catalog/materials/stock/suppliers/equipment), **`docs/agents/PLANNING_PATTERN.md`** (dispatch/scheduling/planningHub/calendar).
 
 **Navigation inter-pages** : `pager.setPageIndex(N)` via `useDashboardPagerOptional()`. Pour pré-remplir le Chatbot depuis une autre page, dispatch les événements DOM `chatbot-draft-prompt` (pre-fill composer) ou `chatbot-quick-prompt` (envoi direct) — écoutés dans `ChatbotGalaxyComposer`. Pattern centralisé dans `src/features/featureHub/companyStockChatbot.ts`.
 
