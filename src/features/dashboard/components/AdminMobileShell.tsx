@@ -3,8 +3,8 @@
 import type { ReactNode } from "react";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
+import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
-import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
 import { useDashboardPageSelector } from "@/features/dashboard";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
@@ -25,8 +25,10 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   children: ReactNode;
-  /** Slot dock (composer, dispatch, etc) — branché par Cursor en semaine 2. */
-  footer?: ReactNode;
+  /** Dock bas : profil par défaut, Galaxy si actif (`MobileShellFooterDock`). */
+  dock?: ReactNode;
+  /** Sous le dock (ex. lien CRM complet). */
+  footerExtra?: ReactNode;
 };
 
 const accountOverlayClass = cn(
@@ -36,10 +38,10 @@ const accountOverlayClass = cn(
 );
 
 /**
- * Chrome mobile admin : header (calendrier + profil) + body children + footer dock.
- * Calqué sur TechnicianMobileShell — pas de logique métier, slot CSS scopés `.admin-mobile-app`.
+ * Chrome mobile admin — même grammaire que `MobileShell` / `TechnicianMobileShell` :
+ * calendrier en haut · panneaux centraux (children) · profil ou Galaxy en bas.
  */
-export default function AdminMobileShell({ children, footer }: Props) {
+export default function AdminMobileShell({ children, dock, footerExtra }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
   const accountOpen = view === "account";
 
@@ -63,25 +65,16 @@ export default function AdminMobileShell({ children, footer }: Props) {
           data-testid={MOBILE_SHELL_CONTRACT.testIds.topBar}
         >
           <div
-            className={cn(
-              MOBILE_HEADER_RAIL_HOST_CLASS,
-              "mobile-header-rail-host admin-mobile-header-rail flex h-full w-full items-stretch gap-2"
-            )}
+            className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, "mobile-header-rail-host h-full w-full")}
             data-testid="admin-mobile-header-rail"
-            data-mobile-header-rail="left"
-            data-mobile-header-rail-active="true"
           >
             <div
               data-testid="admin-mobile-header-calendar"
-              className="mobile-header-rail-layer flex h-full min-w-0 min-h-0 flex-1 items-stretch"
+              data-mobile-header-rail="left"
+              data-mobile-header-rail-active="true"
+              className="mobile-header-rail-layer flex h-full w-full min-h-0 items-stretch"
             >
               <ClockCalendar compact interactive toggleTarget="calendar" />
-            </div>
-            <div
-              data-testid="admin-mobile-header-profile"
-              className="mobile-header-rail-layer flex h-full flex-shrink-0 items-stretch"
-            >
-              <AdminMobileProfileChip />
             </div>
           </div>
         </MobileShellSlotGrid>
@@ -113,14 +106,20 @@ export default function AdminMobileShell({ children, footer }: Props) {
         data-testid="admin-mobile-shell-footer"
         data-admin-shell-dock="true"
       >
-        {footer ? (
+        {dock ? (
           <MobileShellSlotGrid
             rootClassName={MOBILE_GALAXY_DOCK_CLASS}
             chromeClassName={MOBILE_GALAXY_DOCK_CHROME_CLASS}
             data-testid="admin-mobile-shell-dock"
           >
-            {footer}
+            {dock}
           </MobileShellSlotGrid>
+        ) : null}
+        <MobileHubDotsBar />
+        {footerExtra ? (
+          <div className="grid w-full grid-cols-[var(--mobile-shell-pad-x)_minmax(0,1fr)_var(--mobile-shell-pad-x)]">
+            <div className="col-start-2 min-w-0">{footerExtra}</div>
+          </div>
         ) : null}
       </footer>
     </div>

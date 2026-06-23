@@ -6,12 +6,12 @@ import { ArrowUpRight } from "lucide-react";
 import AdminMobileShell from "@/features/dashboard/components/AdminMobileShell";
 import AdminMobileProviders from "@/features/dashboard/AdminMobileProviders";
 import AdminMobileOfflineBar from "@/features/dashboard/components/AdminMobileOfflineBar";
-import AdminMobileFooterDock from "@/features/dashboard/components/AdminMobileFooterDock";
+import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
+import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import MapMobileDispatchArmButton from "@/features/map/components/MapMobileDispatchArmButton";
 import { buildFullCrmMobileHref } from "@/features/dashboard/adminMobileFullCrm";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
-import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileMapHubLite"), {
@@ -31,20 +31,15 @@ const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileM
  */
 export default function AdminMobileApp() {
   const { t } = useTranslation();
-  const dispatchVoice = useFeatureFlag("dispatchVoice");
   const fullCrmLabel = String(t("admin_mobile.full_crm_link"));
 
   return (
     <AdminMobileProviders>
       <LayoutShellProvider mode="mobile">
-        <AdminMobileShell
-          footer={
-            <div className="flex w-full flex-col gap-2">
-              {dispatchVoice ? (
-                <div className="relative min-h-[var(--mobile-galaxy-height,3.5rem)] w-full flex-1">
-                  <AdminMobileFooterDock />
-                </div>
-              ) : null}
+        <MobileHubRailProvider>
+          <AdminMobileShell
+            dock={<MobileShellFooterDock />}
+            footerExtra={
               <Link
                 href={buildFullCrmMobileHref()}
                 aria-label={fullCrmLabel}
@@ -57,17 +52,17 @@ export default function AdminMobileApp() {
                   aria-hidden
                 />
               </Link>
+            }
+          >
+            <AdminMobileOfflineBar />
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+              <ErrorBoundary name="admin-mobile-inbox">
+                <MobileMapHubLite />
+              </ErrorBoundary>
+              <MapMobileDispatchArmButton />
             </div>
-          }
-        >
-          <AdminMobileOfflineBar />
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-            <ErrorBoundary name="admin-mobile-inbox">
-              <MobileMapHubLite />
-            </ErrorBoundary>
-            <MapMobileDispatchArmButton />
-          </div>
-        </AdminMobileShell>
+          </AdminMobileShell>
+        </MobileHubRailProvider>
       </LayoutShellProvider>
     </AdminMobileProviders>
   );
