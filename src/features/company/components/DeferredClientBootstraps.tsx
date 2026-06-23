@@ -20,7 +20,7 @@ function DeferredClientBootstrapsInner() {
   return (
     <>
       <ClientPortalNotificationBootstrap />
-      <AndroidAppInstallPromoBootstrap surface="demande" presentation="toast" />
+      <AndroidAppInstallPromoBootstrap surface="demande" />
     </>
   );
 }

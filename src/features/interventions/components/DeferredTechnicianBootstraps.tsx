@@ -31,9 +31,7 @@ function DeferredTechnicianBootstrapsInner() {
   return (
     <>
       {pushIntent || idleReady ? <TechnicianNotificationBootstrap /> : null}
-      {idleReady ? (
-        <AndroidAppInstallPromoBootstrap surface="technician" presentation="toast" />
-      ) : null}
+      {idleReady ? <AndroidAppInstallPromoBootstrap surface="technician" /> : null}
     </>
   );
 }

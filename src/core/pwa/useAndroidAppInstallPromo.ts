@@ -17,21 +17,19 @@ export type BeforeInstallPromptEvent = Event & {
 
 export function useAndroidAppInstallPromo(surface: AndroidInstallPromoSurface) {
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
-  const [eligible, setEligible] = useState(false);
   const [hasNativePrompt, setHasNativePrompt] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const eligibleNow =
+    const mayPrompt =
       shouldSuggestAndroidAppInstall({
         userAgent: navigator.userAgent,
         isCapacitorNative: isCapacitorNative(),
         isPwaStandalone: isPwaStandalone(),
       }) && !isAndroidInstallPromoDismissed(surface);
 
-    setEligible(eligibleNow);
-    if (!eligibleNow) return;
+    if (!mayPrompt) return;
 
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -45,21 +43,21 @@ export function useAndroidAppInstallPromo(surface: AndroidInstallPromoSurface) {
 
   const dismiss = useCallback(() => {
     dismissAndroidInstallPromo(surface);
-    setEligible(false);
+    setHasNativePrompt(false);
+    deferredPromptRef.current = null;
   }, [surface]);
 
-  const install = useCallback(async (): Promise<"accepted" | "dismissed" | "manual"> => {
+  const install = useCallback(async (): Promise<"accepted" | "dismissed" | null> => {
     const deferred = deferredPromptRef.current;
-    if (!deferred) return "manual";
+    if (!deferred) return null;
 
     await deferred.prompt();
     const choice = await deferred.userChoice;
     deferredPromptRef.current = null;
     setHasNativePrompt(false);
     dismissAndroidInstallPromo(surface);
-    setEligible(false);
     return choice.outcome;
   }, [surface]);
 
-  return { eligible, hasNativePrompt, install, dismiss };
+  return { hasNativePrompt, install, dismiss };
 }
