@@ -9,6 +9,8 @@ Avant toute modification :
 
 1. Lire `src/features/<zone>/README.md` si présent.
 2. Imports **cross-feature** : passer par le barrel `@/features/<zone>` (`index.ts`) — pas d'import profond sauf dans la zone elle-même.
+   - **Hubs** (`src/app/`, `src/context/`, `src/core/`, `src/app/api/`) : toujours via barrel.
+   - **Entre features** (`src/features/A` → `src/features/B`) : import profond OK si le barrel créerait un cycle.
 3. `Grep` / `SemanticSearch` **scopés** à `src/features/<zone>/` — pas de search globale sauf i18n (`src/core/i18n/locales/`).
 4. Ne pas ouvrir plus de **5 fichiers source** en parallèle sans raison.
 5. Fichier **>400 lignes** : proposer découpage **avant** d'ajouter des lignes.

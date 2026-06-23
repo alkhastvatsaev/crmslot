@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
-import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
+import { listCompanyStaff } from "@/features/company";
 
 export const runtime = "nodejs";
 

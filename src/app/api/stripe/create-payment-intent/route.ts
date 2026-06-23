@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
 import { createInterventionPaymentIntentAdmin } from "@/features/billing/server/createInterventionPaymentIntentAdmin";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

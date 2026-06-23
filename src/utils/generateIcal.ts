@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function icsDate(dateStr: string): string {
   const d = new Date(dateStr);

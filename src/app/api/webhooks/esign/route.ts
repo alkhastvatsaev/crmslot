@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import "@/core/config/firebase-admin";
 import { isProductionNodeEnv } from "@/core/api/routeAuth";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
+import { notifyCompanyAdminsPush } from "@/features/notifications";
 
 export const runtime = "nodejs";
 

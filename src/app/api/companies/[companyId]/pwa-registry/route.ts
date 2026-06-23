@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { isFirebaseAdminReady } from "@/core/config/firebase-admin";
-import { loadCompanyPwaRegistryAdmin } from "@/features/mobile/server/companyPwaRegistryAdmin";
+import { loadCompanyPwaRegistryAdmin } from "@/features/mobile";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 

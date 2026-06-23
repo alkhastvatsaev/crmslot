@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/core/logger";
-import { sendNativePushToUser } from "@/features/notifications/sendNativePushAdmin";
+import { sendNativePushToUser } from "@/features/notifications";
 import {
   buildEmailHtml,
   interpolateTemplate,

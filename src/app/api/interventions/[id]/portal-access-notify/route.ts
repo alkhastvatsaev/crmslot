@@ -3,7 +3,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { notifyPortalAccessAdmin } from "@/features/interventions/server/portalAccessNotifyAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

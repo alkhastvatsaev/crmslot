@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { generateSupplierOrderPdf } from "@/features/suppliers/generateSupplierOrderPdf";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import { generateSupplierOrderPdf } from "@/features/suppliers";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export const runtime = "nodejs";
 

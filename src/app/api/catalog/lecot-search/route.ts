@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
-import { loadCompanyCatalogProducts } from "@/features/catalog/loadCompanyCatalog";
-import {
-  lecotApiBaseUrl,
-  searchLecotViaApi,
-} from "@/features/catalog/lecotApiSearch";
-import { mergeCatalogProducts, searchCatalogProducts } from "@/features/catalog/searchCatalogProducts";
-import {
-  filterCatalogForIntervention,
-  STUB_CATALOG,
-} from "@/features/catalog/productQuickAdd";
+import { LECOT_CATALOG } from "@/features/catalog";
+import { loadCompanyCatalogProducts } from "@/features/catalog";
+import { lecotApiBaseUrl, searchLecotViaApi } from "@/features/catalog/lecotApiSearch";
+import { mergeCatalogProducts, searchCatalogProducts } from "@/features/catalog";
+import { filterCatalogForIntervention, STUB_CATALOG } from "@/features/catalog/productQuickAdd";
 
 export const runtime = "nodejs";
 

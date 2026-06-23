@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { featureFlagsFromEnv } from "@/core/featureFlags";
-import { getESignProvider } from "@/features/esign/ESignProvider";
+import { getESignProvider } from "@/features/esign";
 import {
   findInterventionByPortalToken,
   isValidPortalAccessToken,

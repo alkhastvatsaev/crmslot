@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { sendInterventionInvoiceEmailToClient } from "@/features/interventions/server/interventionInvoiceEmail";
 
 export const runtime = "nodejs";

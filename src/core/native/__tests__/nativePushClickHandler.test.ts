@@ -1,6 +1,6 @@
 import { registerNativePushClickHandler } from "@/core/native/nativePushClickHandler";
-import { TECHNICIAN_NOTIFICATION_INTENT_EVENT } from "@/features/notifications/technicianNotificationIntent";
-import { BM_TECH_CASE_PARAM } from "@/features/notifications/notificationConstants";
+import { TECHNICIAN_NOTIFICATION_INTENT_EVENT } from "@/features/notifications";
+import { BM_TECH_CASE_PARAM } from "@/features/notifications";
 
 jest.mock("@/core/native/capacitorRuntime", () => ({
   isCapacitorNative: jest.fn(() => true),

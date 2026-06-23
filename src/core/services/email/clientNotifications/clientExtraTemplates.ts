@@ -1,5 +1,5 @@
 import { buildPortalSuiviUrl } from "@/core/config/publicAppUrl";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { NotifyClientInput } from "@/core/services/email/clientNotifications/notifyClient";
 
 type ExtraTemplatePayload = Omit<

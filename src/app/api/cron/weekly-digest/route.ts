@@ -2,8 +2,8 @@ import "@/core/config/firebase-admin";
 import { NextResponse } from "next/server";
 import { getAdminDb, isFirebaseAdminReady } from "@/core/config/firebase-admin";
 import { requireCronSecret } from "@/core/api/routeAuth";
-import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import { computeBillingHubMetrics } from "@/features/billingHub";
+import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";
 

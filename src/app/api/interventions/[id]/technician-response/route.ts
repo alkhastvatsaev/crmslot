@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   acceptTechnicianAssignmentInProgressPatch,
   acceptTechnicianAssignmentPatch,
@@ -11,7 +11,7 @@ import {
 import { assertTechnicianMayRespondToAssignment } from "@/features/interventions/technicianAssignmentServerAuth";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
-import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
+import { notifyCompanyAdminsPush } from "@/features/notifications";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

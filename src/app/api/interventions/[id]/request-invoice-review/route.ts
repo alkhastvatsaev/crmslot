@@ -3,8 +3,8 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
-import { assertCanAssignInterventionServer } from "@/features/backoffice/assignInterventionServerAuth";
-import type { Intervention } from "@/features/interventions/types";
+import { assertCanAssignInterventionServer } from "@/features/backoffice";
+import type { Intervention } from "@/features/interventions";
 import { requestInterventionInvoiceReviewAdmin } from "@/features/interventions/server/requestInterventionInvoiceReviewAdmin";
 import { logger } from "@/core/logger";
 

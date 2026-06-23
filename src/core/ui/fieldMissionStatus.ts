@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 /** Pastille statut — scan rapide sans lire de label. */
 export function fieldMissionStatusDotClass(status?: Intervention["status"] | string): string {

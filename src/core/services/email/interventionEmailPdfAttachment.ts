@@ -1,8 +1,8 @@
 import * as admin from "firebase-admin";
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
-import { generateInterventionDocumentPdf } from "@/features/billing/generateQuotePdf";
+import { generateInterventionDocumentPdf } from "@/features/billing";
 import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type InterventionEmailPdfKind = Extract<ChatbotDocumentKind, "quote" | "invoice">;
 
@@ -19,7 +19,7 @@ export type EmailPdfAttachment = {
 /** Génère le PDF facture/devis côté PWA (jsPDF) pour pièce jointe email. */
 export async function buildInterventionEmailPdfAttachment(
   interventionId: string,
-  kind: InterventionEmailPdfKind,
+  kind: InterventionEmailPdfKind
 ): Promise<EmailPdfAttachment> {
   if (!admin.apps.length) {
     throw new Error("Firebase Admin non initialisé");
