@@ -949,18 +949,6 @@
   max-height: var(--mobile-galaxy-height);
   display: flex;
   align-items: stretch;
-  overflow: hidden;
-}
-
-/* Profil / Galaxy : le chip remplit la coque glass sans double bordure. */
-.mobile-galaxy-dock-chrome.panel-glass .mobile-profile-chip {
-  border: none;
-  background: transparent;
-  border-radius: inherit;
-}
-
-.mobile-galaxy-dock-chrome.panel-glass .mobile-profile-chip:active {
-  background: rgba(0, 0, 0, 0.04);
 }
 
 .mobile-header-chip {
@@ -985,6 +973,22 @@
 
 .mobile-header-chip--interactive:active {
   background: rgb(241 245 249);
+}
+
+/* Dock profil/Galaxy : une seule coque `.panel-glass` — pas de cadre chip en double. */
+.mobile-galaxy-dock-chrome.panel-glass {
+  overflow: visible;
+}
+
+.mobile-galaxy-dock-chrome.panel-glass .mobile-header-chip.mobile-profile-chip {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: inherit;
+}
+
+.mobile-galaxy-dock-chrome.panel-glass .mobile-header-chip.mobile-profile-chip:active {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .mobile-map-recenter-btn {
