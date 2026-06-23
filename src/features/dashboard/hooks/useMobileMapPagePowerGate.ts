@@ -12,7 +12,7 @@ export type MobileMapPagePowerGate = {
   mapPageVisible: boolean;
   /** Firestore missions / marqueurs : rails gauche ou centre. */
   mapHubDataActive: boolean;
-  /** WebGL carte : rail centre uniquement. */
+  /** WebGL carte : rail gauche (panneau Mapbox). */
   mapRenderDataActive: boolean;
   /** Inbox back-office : rail droit. */
   inboxDataActive: boolean;
@@ -46,7 +46,7 @@ export function useMobileMapPagePowerGate(
     return {
       mapPageVisible,
       mapHubDataActive: mapPageVisible && (activeRail === "left" || activeRail === "center"),
-      mapRenderDataActive: mapPageVisible && activeRail === "center",
+      mapRenderDataActive: mapPageVisible && activeRail === "left",
       inboxDataActive: mapPageVisible && activeRail === "right",
       documentsTabActive,
     };

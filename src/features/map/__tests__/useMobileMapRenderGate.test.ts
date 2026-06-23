@@ -21,9 +21,9 @@ describe("useMobileMapRenderGate", () => {
     host.remove();
   });
 
-  it("retourne false quand le rail centre hub est inactif", () => {
+  it("retourne false quand le rail carte hub est inactif", () => {
     const rail = document.createElement("div");
-    rail.dataset.mobileHubRail = "center";
+    rail.dataset.mobileHubRail = "left";
     rail.dataset.mobileHubRailActive = "false";
     const map = document.createElement("div");
     rail.appendChild(map);

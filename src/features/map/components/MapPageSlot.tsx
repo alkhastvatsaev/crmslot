@@ -1,9 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
-import { useFeatureFlag } from "@/core/useFeatureFlags";
-import { resolveAdminMapPageMode } from "@/features/map/resolveAdminMapPageMode";
 
 const mapLoading = () => (
   <div
@@ -18,16 +15,7 @@ const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"),
   loading: mapLoading,
 });
 
-const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileMapHubLite"), {
-  ssr: false,
-  loading: mapLoading,
-});
-
-/** Page carte admin — lite mobile par défaut ; Mapbox si `mobileMapWebGL`. */
+/** Page carte admin — Mapbox mobile (rail gauche) + desktop. */
 export default function MapPageSlot() {
-  const isMobile = useIsMobile();
-  const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
-  const mode = resolveAdminMapPageMode(isMobile, mobileMapWebGL);
-
-  return <>{mode === "lite" ? <MobileMapHubLite /> : <MapboxView />}</>;
+  return <MapboxView />;
 }
