@@ -2,23 +2,37 @@
 
 import dynamic from "next/dynamic";
 import MapMobileDispatchArmButton from "@/features/map/components/MapMobileDispatchArmButton";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { resolveAdminMapPageMode } from "@/features/map/resolveAdminMapPageMode";
+
+const mapLoading = () => (
+  <div
+    className="flex h-full min-h-[240px] items-center justify-center bg-slate-50 text-sm text-slate-500"
+    data-testid="map-page-loading"
+    aria-busy="true"
+  />
+);
 
 const MapboxView = dynamic(() => import("@/features/map/components/MapboxView"), {
   ssr: false,
-  loading: () => (
-    <div
-      className="flex h-full min-h-[240px] items-center justify-center bg-slate-50 text-sm text-slate-500"
-      data-testid="map-page-loading"
-      aria-busy="true"
-    />
-  ),
+  loading: mapLoading,
 });
 
-/** Page carte admin — Mapbox WebGL (mobile + desktop). */
+const MobileMapHubLite = dynamic(() => import("@/features/map/components/MobileMapHubLite"), {
+  ssr: false,
+  loading: mapLoading,
+});
+
+/** Page carte admin — lite mobile par défaut ; Mapbox si `mobileMapWebGL`. */
 export default function MapPageSlot() {
+  const isMobile = useIsMobile();
+  const mobileMapWebGL = useFeatureFlag("mobileMapWebGL");
+  const mode = resolveAdminMapPageMode(isMobile, mobileMapWebGL);
+
   return (
     <>
-      <MapboxView />
+      {mode === "lite" ? <MobileMapHubLite /> : <MapboxView />}
       <MapMobileDispatchArmButton />
     </>
   );

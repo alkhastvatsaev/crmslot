@@ -1,67 +1,65 @@
 "use client";
 
-import { useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useState } from "react";
 import { isPwaStandalone } from "@/core/pwa/isPwaStandalone";
+import {
+  hasPwaAutoReloadAttempted,
+  markPwaAutoReloadAttempted,
+  markPwaGitShaStored,
+  purgePwaServiceWorkersAndCaches,
+  readDeployedGitSha,
+  readStoredPwaGitSha,
+} from "@/core/pwa/pwaBundleUpdate";
 
-const STORAGE_KEY = "crmslot:pwa-git-sha";
-
-function readDeployedGitSha(): string | null {
-  const fromMeta = document
-    .querySelector('meta[name="application-git-sha"]')
-    ?.getAttribute("content")
-    ?.trim();
-  if (fromMeta) return fromMeta;
-  return process.env.NEXT_PUBLIC_APP_GIT_SHA?.trim() || null;
-}
+const PwaUpdateBanner = dynamic(() => import("@/core/pwa/PwaUpdateBanner"), { ssr: false });
 
 /**
- * iOS PWA garde souvent l'ancien bundle Workbox après deploy — Safari charge le réseau.
- * Si le SHA build change : purge caches SW + reload une fois.
+ * iOS PWA garde souvent l'ancien bundle Workbox après deploy.
+ * Bannière utilisateur puis purge caches + reload (secours auto si bannière absente).
  */
 export default function PwaStaleBundleGuard() {
+  const [updateVisible, setUpdateVisible] = useState(false);
+  const [deployedSha, setDeployedSha] = useState<string | null>(null);
+
+  const applyUpdate = useCallback(async () => {
+    if (!deployedSha) return;
+    markPwaAutoReloadAttempted(deployedSha);
+    try {
+      await purgePwaServiceWorkersAndCaches();
+    } catch {
+      /* best-effort */
+    } finally {
+      markPwaGitShaStored(deployedSha);
+      window.location.reload();
+    }
+  }, [deployedSha]);
+
   useEffect(() => {
     if (!isPwaStandalone()) return;
 
-    const deployedSha = readDeployedGitSha();
-    if (!deployedSha) return;
+    const sha = readDeployedGitSha();
+    if (!sha) return;
 
-    let storedSha: string | null = null;
-    try {
-      storedSha = window.localStorage.getItem(STORAGE_KEY);
-    } catch {
+    const storedSha = readStoredPwaGitSha();
+    if (storedSha === sha) return;
+
+    if (hasPwaAutoReloadAttempted(sha)) {
+      markPwaGitShaStored(sha);
       return;
     }
 
-    if (storedSha === deployedSha) return;
-
-    const reloadOnceKey = `${STORAGE_KEY}:reload:${deployedSha}`;
-    try {
-      if (window.sessionStorage.getItem(reloadOnceKey) === "1") {
-        window.localStorage.setItem(STORAGE_KEY, deployedSha);
-        return;
-      }
-      window.sessionStorage.setItem(reloadOnceKey, "1");
-    } catch {
-      /* private mode */
-    }
-
-    void (async () => {
-      try {
-        if ("serviceWorker" in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(regs.map((reg) => reg.unregister()));
-        }
-        if ("caches" in window) {
-          const keys = await caches.keys();
-          await Promise.all(keys.map((key) => caches.delete(key)));
-        }
-      } catch {
-        /* best-effort */
-      } finally {
-        window.location.reload();
-      }
-    })();
+    setDeployedSha(sha);
+    setUpdateVisible(true);
   }, []);
 
-  return null;
+  if (!updateVisible || !deployedSha) return null;
+
+  return (
+    <PwaUpdateBanner
+      visible
+      onReload={() => void applyUpdate()}
+      onDismiss={() => setUpdateVisible(false)}
+    />
+  );
 }
