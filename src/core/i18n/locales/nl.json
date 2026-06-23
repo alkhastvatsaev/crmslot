@@ -28,7 +28,17 @@
         "title": "Technicus-app installeren",
         "description": "Missies en afsluiting werken het best als geïnstalleerde app."
       }
+    },
+    "update_banner": {
+      "title": "Er is een nieuwe versie beschikbaar.",
+      "later": "Later",
+      "update": "Bijwerken"
     }
+  },
+  "admin_mobile": {
+    "full_crm_link": "Volledige CRM",
+    "offline_banner": "Offline — gegevens in cache",
+    "empty_missions": "Geen missies vandaag"
   },
   "tracking": {
     "waiting_material_banner": "Wachten op materiaal. We nemen contact op zodra het binnen is.",

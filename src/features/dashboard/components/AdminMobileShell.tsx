@@ -5,7 +5,7 @@ import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
-import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useDashboardPageSelector } from "@/features/dashboard";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -65,19 +65,21 @@ export default function AdminMobileShell({ children, footer }: Props) {
           <div
             className={cn(
               MOBILE_HEADER_RAIL_HOST_CLASS,
-              "admin-mobile-header-rail flex h-full w-full items-stretch gap-2"
+              "mobile-header-rail-host admin-mobile-header-rail flex h-full w-full items-stretch gap-2"
             )}
             data-testid="admin-mobile-header-rail"
+            data-mobile-header-rail="left"
+            data-mobile-header-rail-active="true"
           >
             <div
               data-testid="admin-mobile-header-calendar"
-              className="flex h-full min-w-0 flex-1 items-stretch"
+              className="mobile-header-rail-layer flex h-full min-w-0 min-h-0 flex-1 items-stretch"
             >
               <ClockCalendar compact interactive toggleTarget="calendar" />
             </div>
             <div
               data-testid="admin-mobile-header-profile"
-              className="flex h-full flex-shrink-0 items-stretch"
+              className="mobile-header-rail-layer flex h-full flex-shrink-0 items-stretch"
             >
               <AdminMobileProfileChip />
             </div>
@@ -106,7 +108,11 @@ export default function AdminMobileShell({ children, footer }: Props) {
         </div>
       </div>
 
-      <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="admin-mobile-shell-footer">
+      <footer
+        className={MOBILE_SHELL_FOOTER_CLASS}
+        data-testid="admin-mobile-shell-footer"
+        data-admin-shell-dock="true"
+      >
         {footer ? (
           <MobileShellSlotGrid
             rootClassName={MOBILE_GALAXY_DOCK_CLASS}

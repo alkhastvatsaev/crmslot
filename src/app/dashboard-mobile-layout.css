@@ -245,6 +245,75 @@
   }
 }
 
+/* ── Admin mobile · polish layout iteration 2 ──────────────── */
+
+/**
+ * Rail segment (missions / carte / inbox) : touch 44px sur iPhone.
+ * Override .mobile-rail-segment-btn sans toucher la logique du segment.
+ */
+.admin-mobile-app .mobile-rail-segment-btn {
+  min-height: 2.5rem;
+  padding-block: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: -0.005em;
+}
+
+.admin-mobile-app .mobile-rail-segment-btn--active {
+  box-shadow: var(--mobile-elevation-md);
+}
+
+/**
+ * Mission grid : densité ajustée + slots placeholders plus discrets.
+ */
+.admin-mobile-app [data-testid="daily-missions-grid"],
+.admin-mobile-app [data-testid="daily-missions-empty-grid"] {
+  gap: 0.625rem;
+  padding-block: 0.875rem 1.25rem;
+}
+
+.admin-mobile-app [data-testid^="daily-missions-empty-slot-"] {
+  background: rgb(255 255 255 / 0.35);
+  border-color: rgb(15 23 42 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.55);
+}
+
+/**
+ * Tab strip inbox : sticky en haut quand contenu scroll.
+ * Améliore le contexte mobile (tabs toujours visibles).
+ */
+.admin-mobile-app [data-testid="backoffice-inbox-panel"] [role="tablist"] {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: rgb(255 255 255 / 0.96);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+}
+
+/**
+ * Inbox detail panels (intervention/terrain) : safe-area + overflow soigné.
+ */
+.admin-mobile-app
+  [data-testid="backoffice-inbox-panel"]
+  :where([data-testid$="-detail"], [data-testid$="-detail-panel"]) {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+/**
+ * Rail missions (gauche) : padding intérieur pour respiration.
+ */
+.admin-mobile-app [data-mobile-hub-rail="left"] {
+  padding-inline: 0.25rem;
+}
+
+/**
+ * Rail inbox (droite) : harmonise scroll iOS + radius interne.
+ */
+.admin-mobile-app [data-mobile-hub-rail="right"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
 .mobile-top-bar {
   display: flex;
   width: 100%;

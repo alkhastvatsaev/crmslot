@@ -28,7 +28,17 @@
         "title": "Installer l'app Technicien",
         "description": "Missions et clôture terrain optimisées en application installée."
       }
+    },
+    "update_banner": {
+      "title": "Une nouvelle version est disponible.",
+      "later": "Plus tard",
+      "update": "Mettre à jour"
     }
+  },
+  "admin_mobile": {
+    "full_crm_link": "CRM complet",
+    "offline_banner": "Hors ligne — données en cache",
+    "empty_missions": "Aucune mission aujourd'hui"
   },
   "tracking": {
     "waiting_material_banner": "Intervention en attente de matériel. Nous vous recontactons dès réception.",
