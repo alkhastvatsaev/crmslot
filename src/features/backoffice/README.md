@@ -18,7 +18,11 @@ Inbox patron / dispatch : demandes entrantes, chat portail Ivana, rapports terra
 | `hooks/useBackOfficeInboxState.ts`             | Orchestrateur inbox (~270 lignes)                 |
 | `hooks/useBackOfficeInboxSelection.ts`         | Tabs, sélection, intent pager                     |
 | `hooks/useBackOfficeInboxPortalChat.ts`        | Abonnement chat portail Ivana                     |
-| `hooks/useBackOfficeInboxActions.ts`           | Handlers assign / verify / delete                 |
+| `hooks/useBackOfficeInboxActions.ts`           | Compose handlers inbox (~20 lignes)               |
+| `hooks/useBackOfficeInboxAssignActions.ts`     | Assignation + planning drag board                 |
+| `hooks/useBackOfficeInboxReportActions.ts`     | Verify / archive / reject rapports                |
+| `hooks/useBackOfficeInboxMiscActions.ts`       | Delete + PDF devis                                |
+| `backOfficeInboxActionsTypes.ts`               | Types args handlers inbox                         |
 | `hooks/useBackOfficeInboxTerrainBridge.ts`     | Rapports terrain bridgés offline                  |
 | `backOfficeInboxLists.ts`                      | Pure functions — listes inbox                     |
 | `useBackOfficeInterventions.ts`                | Hook Firestore interventions société              |
