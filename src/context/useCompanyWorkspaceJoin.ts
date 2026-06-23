@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { auth } from "@/core/config/firebase";
-import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
+import { requestDefaultCompanyMembership } from "@/features/auth";
 
 export function useCompanyWorkspaceJoin({
   authLoading,

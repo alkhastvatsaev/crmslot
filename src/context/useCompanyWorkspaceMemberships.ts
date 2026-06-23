@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
-import type { CompanyMembershipRow } from "@/features/company/types";
+import type { CompanyMembershipRow } from "@/features/company";
 import { ACTIVE_COMPANY_STORAGE_KEY } from "@/context/companyWorkspaceContextTypes";
 
 export function useCompanyWorkspaceMemberships(

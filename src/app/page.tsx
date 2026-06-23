@@ -2,31 +2,33 @@
 import React, { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import MacroDroidIndicator from "@/features/dashboard/components/MacroDroidIndicator";
-import AutoProcessUploads from "@/features/dashboard/components/AutoProcessUploads";
-import DashboardPager from "@/features/dashboard/components/DashboardPager";
-import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
-import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
-import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
-import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
-import { PLANNING_HUB_SLOT_INDEX } from "@/features/planningHub/planningHubConstants";
-import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
-import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
-import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
-import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
-import DashboardDesktopShell from "@/features/dashboard/components/DashboardDesktopShell";
-import MobileShell from "@/features/dashboard/components/MobileShell";
-import AdminDashboardProviders from "@/features/dashboard/AdminDashboardProviders";
+import {
+  MacroDroidIndicator,
+  AutoProcessUploads,
+  DashboardPager,
+  DashboardDesktopShell,
+  MobileShell,
+  AdminDashboardProviders,
+  useIsMobile,
+} from "@/features/dashboard";
+import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail";
+import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub";
+import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub";
+import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub";
+import { PLANNING_HUB_SLOT_INDEX } from "@/features/planningHub";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub";
+import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub";
+import { DashboardGalaxyLayer } from "@/features/map";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
-import { useAccountRole } from "@/features/auth/useAccountRole";
-import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company/clientMobileAppConstants";
-import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+import { useAccountRole } from "@/features/auth";
+import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
+import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions";
 
-const MapPageSlot = dynamic(() => import("@/features/map/components/MapPageSlot"), {
+const MapPageSlot = dynamic(() => import("@/features/map").then((m) => m.MapPageSlot), {
   ssr: false,
   loading: () => (
     <main

@@ -4,10 +4,11 @@ Commandes fournisseur supplierOrders.
 
 ## Points d'entrée
 
-| Fichier                | Rôle                     |
-| ---------------------- | ------------------------ |
-| `supplierFirestore.ts` | Point d'entrée principal |
-| _(voir dossier)_       | Modules colocalisés      |
+| Fichier                | Rôle                                                                   |
+| ---------------------- | ---------------------------------------------------------------------- |
+| \`index.ts\`           | **Barrel public** — imports cross-feature via \`@/features/suppliers\` |
+| `supplierFirestore.ts` | Point d'entrée principal                                               |
+| _(voir dossier)_       | Modules colocalisés                                                    |
 
 ## Données
 

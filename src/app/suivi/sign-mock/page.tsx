@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import PortalSignMockClient from "@/features/esign/components/PortalSignMockClient";
+import { PortalSignMockClient } from "@/features/esign";
 
 export const metadata: Metadata = {
   title: "Signature — CRMSLOT",

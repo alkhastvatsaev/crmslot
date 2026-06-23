@@ -1,8 +1,7 @@
 "use client";
 
-import BiReportsPanel from "@/features/analytics/components/BiReportsPanel";
-import CarouselUsagePanel from "@/features/analytics/components/CarouselUsagePanel";
-import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
+import { BiReportsPanel, CarouselUsagePanel } from "@/features/analytics";
+import { useCompanyBillingInterventions } from "@/features/billingHub";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";

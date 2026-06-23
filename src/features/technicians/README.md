@@ -4,24 +4,25 @@ Profils techniciens (`technicians` Firestore), compétences, cockpit terrain (la
 
 ## Points d'entrée
 
-| Fichier                                         | Rôle                                               |
-| ----------------------------------------------- | -------------------------------------------------- |
-| `hooks.ts`                                      | `useTechnicians` — abonnement société              |
-| `types.ts`                                      | Types `Technician`, `TechnicianSkill` (20 imports) |
-| `skillConstants.ts`                             | Catalogue compétences                              |
-| `components/TechnicianCockpit.tsx`              | Cockpit terrain (~275 lignes)                      |
-| `components/TechnicianLabCarouselPage.tsx`      | Page lab (hors slots admin)                        |
-| `components/TechnicianLabView.tsx`              | Vue lab (3 panneaux)                               |
-| `components/{Left,Center,Right}Panel.tsx`       | Layout lab                                         |
-| `components/TechnicianPerformanceDashboard.tsx` | Dashboard KPI technicien (~290 L)                  |
-| `components/MissionFinishModal.tsx`             | Modal fin mission (signature, photos)              |
-| `components/TapToPayModal.tsx`                  | Modal paiement Tap-to-Pay                          |
-| `components/SkillsTagEditor.tsx`                | Édition compétences                                |
-| `components/TourOptimizeButton.tsx`             | Optimisation tournée (consommé par `map/`)         |
-| `components/ARScanner.tsx`                      | Scanner AR (caméra)                                |
-| `technicianLabConstants.ts`                     | Constantes lab                                     |
-| `withTechnicianAuthUid.ts`                      | Guard auth pour routes techniciens                 |
-| `demoTechnicianCatalog.ts`                      | Données démo                                       |
+| Fichier                                         | Rôle                                                                     |
+| ----------------------------------------------- | ------------------------------------------------------------------------ |
+| \`index.ts\`                                    | **Barrel public** — imports cross-feature via \`@/features/technicians\` |
+| `hooks.ts`                                      | `useTechnicians` — abonnement société                                    |
+| `types.ts`                                      | Types `Technician`, `TechnicianSkill` (20 imports)                       |
+| `skillConstants.ts`                             | Catalogue compétences                                                    |
+| `components/TechnicianCockpit.tsx`              | Cockpit terrain (~275 lignes)                                            |
+| `components/TechnicianLabCarouselPage.tsx`      | Page lab (hors slots admin)                                              |
+| `components/TechnicianLabView.tsx`              | Vue lab (3 panneaux)                                                     |
+| `components/{Left,Center,Right}Panel.tsx`       | Layout lab                                                               |
+| `components/TechnicianPerformanceDashboard.tsx` | Dashboard KPI technicien (~290 L)                                        |
+| `components/MissionFinishModal.tsx`             | Modal fin mission (signature, photos)                                    |
+| `components/TapToPayModal.tsx`                  | Modal paiement Tap-to-Pay                                                |
+| `components/SkillsTagEditor.tsx`                | Édition compétences                                                      |
+| `components/TourOptimizeButton.tsx`             | Optimisation tournée (consommé par `map/`)                               |
+| `components/ARScanner.tsx`                      | Scanner AR (caméra)                                                      |
+| `technicianLabConstants.ts`                     | Constantes lab                                                           |
+| `withTechnicianAuthUid.ts`                      | Guard auth pour routes techniciens                                       |
+| `demoTechnicianCatalog.ts`                      | Données démo                                                             |
 
 ## Données
 

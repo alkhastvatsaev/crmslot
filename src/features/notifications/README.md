@@ -4,10 +4,11 @@ Push FCM, prefs, rappels RDV.
 
 ## Points d'entrée
 
-| Fichier                       | Rôle                     |
-| ----------------------------- | ------------------------ |
-| `BackofficePushBootstrap.tsx` | Point d'entrée principal |
-| _(voir dossier)_              | Modules colocalisés      |
+| Fichier                       | Rôle                                                                       |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| \`index.ts\`                  | **Barrel public** — imports cross-feature via \`@/features/notifications\` |
+| `BackofficePushBootstrap.tsx` | Point d'entrée principal                                                   |
+| _(voir dossier)_              | Modules colocalisés                                                        |
 
 ## Données
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { auth } from "@/core/config/firebase";
-import type { CompanyMembershipRow } from "@/features/company/types";
+import type { CompanyMembershipRow } from "@/features/company";
 
 export function useCompanyWorkspaceClaims({
   firebaseUid,

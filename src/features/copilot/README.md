@@ -4,10 +4,11 @@ Snapshot workspace + chat SSE léger.
 
 ## Points d'entrée
 
-| Fichier                          | Rôle                     |
-| -------------------------------- | ------------------------ |
-| `useWorkspaceCopilotSnapshot.ts` | Point d'entrée principal |
-| _(voir dossier)_                 | Modules colocalisés      |
+| Fichier                          | Rôle                                                                 |
+| -------------------------------- | -------------------------------------------------------------------- |
+| \`index.ts\`                     | **Barrel public** — imports cross-feature via \`@/features/copilot\` |
+| `useWorkspaceCopilotSnapshot.ts` | Point d'entrée principal                                             |
+| _(voir dossier)_                 | Modules colocalisés                                                  |
 
 ## Données
 

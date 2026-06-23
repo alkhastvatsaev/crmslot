@@ -9,11 +9,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import {
   MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT,
   peekPendingMaterialAgentQuickPrompt,
-} from "@/features/featureHub/companyStockChatbot";
+} from "@/features/featureHub";
 
 type MobileGalaxyComposerOpenApi = {
   open: boolean;

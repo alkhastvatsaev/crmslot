@@ -50,3 +50,5 @@ export { default as MobileShell } from "@/features/dashboard/components/MobileSh
 export { default as AdaptiveTriplePanelLayout } from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 export { default as MobileHubLayout } from "@/features/dashboard/components/MobileHubLayout";
 export { default as DailyMissions } from "@/features/dashboard/components/DailyMissions";
+export { default as MacroDroidIndicator } from "@/features/dashboard/components/MacroDroidIndicator";
+export { default as AutoProcessUploads } from "@/features/dashboard/components/AutoProcessUploads";

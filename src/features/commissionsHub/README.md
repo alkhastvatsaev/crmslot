@@ -6,18 +6,19 @@ UI hub commissions patron : métriques revenus, distribution, taux techniciens (
 
 ## Points d'entrée
 
-| Fichier                                 | Rôle                                 |
-| --------------------------------------- | ------------------------------------ |
-| `components/CommissionsHubPage.tsx`     | Page slot                            |
-| `commissionsHubPatronMetrics.ts`        | Barrel agrégats (import path stable) |
-| `commissionsHubPatronMetricsTypes.ts`   | Types KPI / séries / techniciens     |
-| `commissionsHubPatronMonthKeys.ts`      | Clés mois + CA intervention          |
-| `commissionsHubPatronRules.ts`          | Résolution taux + previews           |
-| `commissionsHubPatronKpis.ts`           | KPIs mois courant                    |
-| `commissionsHubPatronSeries.ts`         | Séries mensuelles + tendance         |
-| `commissionsHubPatronTechnicianRows.ts` | Lignes technicien mois               |
-| `hooks/useCommissionsHubData.ts`        | Chargement Firestore                 |
-| `commissionsHubConstants.ts`            | Index pager                          |
+| Fichier                                 | Rôle                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| \`index.ts\`                            | **Barrel public** — imports cross-feature via \`@/features/commissionsHub\` |
+| `components/CommissionsHubPage.tsx`     | Page slot                                                                   |
+| `commissionsHubPatronMetrics.ts`        | Barrel agrégats (import path stable)                                        |
+| `commissionsHubPatronMetricsTypes.ts`   | Types KPI / séries / techniciens                                            |
+| `commissionsHubPatronMonthKeys.ts`      | Clés mois + CA intervention                                                 |
+| `commissionsHubPatronRules.ts`          | Résolution taux + previews                                                  |
+| `commissionsHubPatronKpis.ts`           | KPIs mois courant                                                           |
+| `commissionsHubPatronSeries.ts`         | Séries mensuelles + tendance                                                |
+| `commissionsHubPatronTechnicianRows.ts` | Lignes technicien mois                                                      |
+| `hooks/useCommissionsHubData.ts`        | Chargement Firestore                                                        |
+| `commissionsHubConstants.ts`            | Index pager                                                                 |
 
 ## Dépendances autorisées
 

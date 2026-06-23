@@ -4,10 +4,11 @@ Infra agents IA par hub (panel, scopes outils).
 
 ## Points d'entrée
 
-| Fichier             | Rôle                     |
-| ------------------- | ------------------------ |
-| `HubAgentPanel.tsx` | Point d'entrée principal |
-| _(voir dossier)_    | Modules colocalisés      |
+| Fichier             | Rôle                                                                   |
+| ------------------- | ---------------------------------------------------------------------- |
+| \`index.ts\`        | **Barrel public** — imports cross-feature via \`@/features/hubAgents\` |
+| `HubAgentPanel.tsx` | Point d'entrée principal                                               |
+| _(voir dossier)_    | Modules colocalisés                                                    |
 
 ## Données
 

@@ -4,10 +4,11 @@ Sync terrain PWA : queue IndexedDB clôtures.
 
 ## Points d'entrée
 
-| Fichier                | Rôle                     |
-| ---------------------- | ------------------------ |
-| `completionQueueDb.ts` | Point d'entrée principal |
-| _(voir dossier)_       | Modules colocalisés      |
+| Fichier                | Rôle                                                                 |
+| ---------------------- | -------------------------------------------------------------------- |
+| \`index.ts\`           | **Barrel public** — imports cross-feature via \`@/features/offline\` |
+| `completionQueueDb.ts` | Point d'entrée principal                                             |
+| _(voir dossier)_       | Modules colocalisés                                                  |
 
 ## Données
 

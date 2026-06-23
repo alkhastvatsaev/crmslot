@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import type { BillingPaymentFilter } from "@/features/billingHub/billingHubMetrics";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import type { BillingPaymentFilter } from "@/features/billingHub";
 
 type BillingHubIntentApi = {
   filter: BillingPaymentFilter;
@@ -41,7 +34,7 @@ export function BillingHubIntentProvider({ children }: { children: ReactNode }) 
       selectedInterventionId,
       setSelectedInterventionId,
     }),
-    [filter, setFilter, search, setSearch, selectedInterventionId, setSelectedInterventionId],
+    [filter, setFilter, search, setSearch, selectedInterventionId, setSelectedInterventionId]
   );
 
   return (

@@ -4,27 +4,28 @@ Auth staff + portail client, détection rôle, guards session.
 
 ## Points d'entrée
 
-| Fichier                                      | Rôle                                    |
-| -------------------------------------------- | --------------------------------------- |
-| `components/LoginOverlay.tsx`                | Gate admin                              |
-| `components/CrmEmailLoginPanel.tsx`          | Orchestrateur login staff (~65 lignes)  |
-| `components/CrmEmailLoginPanelHeader.tsx`    | Logo + titre login staff                |
-| `components/CrmEmailLoginForm.tsx`           | Champs email / mot de passe staff       |
-| `hooks/useCrmEmailLoginForm.ts`              | État + submit / reset staff             |
-| `components/ClientPortalAuthPanel.tsx`       | Orchestrateur auth portail (~95 lignes) |
-| `hooks/useClientPortalAuthPanel.ts`          | État pager + hooks auth / suivi         |
-| `components/ClientPortalAuthForm.tsx`        | Email, mot de passe, Google             |
-| `components/ClientPortalMfaPanel.tsx`        | Double authentification SMS / TOTP      |
-| `components/ClientPortalAuthedView.tsx`      | Session connectée (dashboard, logout)   |
-| `components/ClientPortalAuthCard.tsx`        | Carte login / register (hub complet)    |
-| `components/ClientPortalAuthRailContent.tsx` | Formulaire rail hub demandeur           |
-| `components/ClientPortalAuthOffline.tsx`     | Firebase non configuré                  |
-| `hooks/useClientPortalAuth.ts`               | Orchestrateur auth portail (~70 lignes) |
-| `hooks/useClientPortalAuthSignIn.ts`         | Google, email/mdp, lien magique         |
-| `hooks/useClientPortalAuthMfa.ts`            | SMS / TOTP + reCAPTCHA invisible        |
-| `hooks/useClientPortalAuthTypes.ts`          | Types `ClientPortalAuthTab`             |
-| `clientPortalMagicLinkFeedback.ts`           | Messages erreur lien magique Firebase   |
-| `useAccountRole.ts`                          | Admin / technicien / client satellite   |
+| Fichier                                      | Rôle                                                              |
+| -------------------------------------------- | ----------------------------------------------------------------- |
+| \`index.ts\`                                 | **Barrel public** — imports cross-feature via \`@/features/auth\` |
+| `components/LoginOverlay.tsx`                | Gate admin                                                        |
+| `components/CrmEmailLoginPanel.tsx`          | Orchestrateur login staff (~65 lignes)                            |
+| `components/CrmEmailLoginPanelHeader.tsx`    | Logo + titre login staff                                          |
+| `components/CrmEmailLoginForm.tsx`           | Champs email / mot de passe staff                                 |
+| `hooks/useCrmEmailLoginForm.ts`              | État + submit / reset staff                                       |
+| `components/ClientPortalAuthPanel.tsx`       | Orchestrateur auth portail (~95 lignes)                           |
+| `hooks/useClientPortalAuthPanel.ts`          | État pager + hooks auth / suivi                                   |
+| `components/ClientPortalAuthForm.tsx`        | Email, mot de passe, Google                                       |
+| `components/ClientPortalMfaPanel.tsx`        | Double authentification SMS / TOTP                                |
+| `components/ClientPortalAuthedView.tsx`      | Session connectée (dashboard, logout)                             |
+| `components/ClientPortalAuthCard.tsx`        | Carte login / register (hub complet)                              |
+| `components/ClientPortalAuthRailContent.tsx` | Formulaire rail hub demandeur                                     |
+| `components/ClientPortalAuthOffline.tsx`     | Firebase non configuré                                            |
+| `hooks/useClientPortalAuth.ts`               | Orchestrateur auth portail (~70 lignes)                           |
+| `hooks/useClientPortalAuthSignIn.ts`         | Google, email/mdp, lien magique                                   |
+| `hooks/useClientPortalAuthMfa.ts`            | SMS / TOTP + reCAPTCHA invisible                                  |
+| `hooks/useClientPortalAuthTypes.ts`          | Types `ClientPortalAuthTab`                                       |
+| `clientPortalMagicLinkFeedback.ts`           | Messages erreur lien magique Firebase                             |
+| `useAccountRole.ts`                          | Admin / technicien / client satellite                             |
 
 ## Données
 

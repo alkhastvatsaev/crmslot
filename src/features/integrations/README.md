@@ -4,10 +4,11 @@ Webhooks sortants société HMAC.
 
 ## Points d'entrée
 
-| Fichier                      | Rôle                     |
-| ---------------------------- | ------------------------ |
-| `dispatchOutboundWebhook.ts` | Point d'entrée principal |
-| _(voir dossier)_             | Modules colocalisés      |
+| Fichier                      | Rôle                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| \`index.ts\`                 | **Barrel public** — imports cross-feature via \`@/features/integrations\` |
+| `dispatchOutboundWebhook.ts` | Point d'entrée principal                                                  |
+| _(voir dossier)_             | Modules colocalisés                                                       |
 
 ## Données
 

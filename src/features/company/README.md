@@ -4,12 +4,13 @@ Portail demandeur `/m/demande`, workspace multi-société, helpers hubs.
 
 ## Points d'entrée
 
-| Fichier                            | Rôle                      |
-| ---------------------------------- | ------------------------- |
-| `components/ClientMobileApp.tsx`   | Shell `/m/demande`        |
-| `components/CompanyHubPage.tsx`    | UI portail client         |
-| `resolveHubCompanyId.ts`           | Société active hubs admin |
-| `components/CompanySpacePanel.tsx` | Paramètres admin société  |
+| Fichier                            | Rôle                                                                 |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| \`index.ts\`                       | **Barrel public** — imports cross-feature via \`@/features/company\` |
+| `components/ClientMobileApp.tsx`   | Shell `/m/demande`                                                   |
+| `components/CompanyHubPage.tsx`    | UI portail client                                                    |
+| `resolveHubCompanyId.ts`           | Société active hubs admin                                            |
+| `components/CompanySpacePanel.tsx` | Paramètres admin société                                             |
 
 ## Données
 

@@ -4,9 +4,10 @@ Stub cleanup service worker en dev.
 
 ## Points d'entrée
 
-| Fichier     | Rôle                                  |
-| ----------- | ------------------------------------- |
-| _(dossier)_ | Voir fichiers racine et `components/` |
+| Fichier      | Rôle                                                             |
+| ------------ | ---------------------------------------------------------------- |
+| \`index.ts\` | **Barrel public** — imports cross-feature via \`@/features/dev\` |
+| _(dossier)_  | Voir fichiers racine et `components/`                            |
 
 ## Données
 

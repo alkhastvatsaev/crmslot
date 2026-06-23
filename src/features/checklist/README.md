@@ -4,9 +4,10 @@ Checklist Firestore par intervention (flag pwaV2Bundle).
 
 ## Points d'entrée
 
-| Fichier     | Rôle                                  |
-| ----------- | ------------------------------------- |
-| _(dossier)_ | Voir fichiers racine et `components/` |
+| Fichier      | Rôle                                                                   |
+| ------------ | ---------------------------------------------------------------------- |
+| \`index.ts\` | **Barrel public** — imports cross-feature via \`@/features/checklist\` |
+| _(dossier)_  | Voir fichiers racine et `components/`                                  |
 
 ## Données
 

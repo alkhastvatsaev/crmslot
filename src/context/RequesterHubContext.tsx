@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import type { ClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
+import type { ClientPortalAccountFields } from "@/features/auth";
 import {
   readPortalAccessSession,
   writePortalAccessSession,
   type PortalAccessSession,
-} from "@/features/interventions/portalAccessSession";
+} from "@/features/interventions";
 
 export type RequesterType = "particulier" | "login" | "register";
 

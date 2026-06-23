@@ -4,9 +4,10 @@ Analytics carrousel PostHog/GA4 + panels /reports.
 
 ## Points d'entrée
 
-| Fichier     | Rôle                                  |
-| ----------- | ------------------------------------- |
-| _(dossier)_ | Voir fichiers racine et `components/` |
+| Fichier      | Rôle                                                                   |
+| ------------ | ---------------------------------------------------------------------- |
+| \`index.ts\` | **Barrel public** — imports cross-feature via \`@/features/analytics\` |
+| _(dossier)_  | Voir fichiers racine et `components/`                                  |
 
 ## Données
 

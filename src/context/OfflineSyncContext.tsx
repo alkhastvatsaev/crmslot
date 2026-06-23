@@ -15,8 +15,8 @@ import {
   getCompletionQueueLength,
   subscribeCompletionQueueChanged,
   type FlushCompletionReport,
-} from "@/features/offline/completionSync";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+} from "@/features/offline";
+import { useIsMobile } from "@/features/dashboard";
 
 export type OfflineSyncContextValue = {
   navigatorOnline: boolean;
