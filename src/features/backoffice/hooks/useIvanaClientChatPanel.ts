@@ -10,7 +10,7 @@ import {
 import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIvanaChatFirebaseSession";
 import { isVerifiedClientPortalUser } from "@/features/auth/hooks/useClientPortalAccount";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   type IvanaChatMessage,

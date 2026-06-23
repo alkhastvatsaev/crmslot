@@ -12,7 +12,7 @@ import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smart
 import { SMART_FORM_MAX_PHOTOS } from "@/features/interventions/hooks/useSmartForm";
 import { resolveInterventionAddressFromCoords } from "@/features/interventions/smartFormReverseGeocode";
 import { uploadInterventionAudioToFirebase } from "@/features/interventions/clientAudioUpload";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import { REQUESTER_GEOLOC_OPTIONS } from "@/features/interventions/requesterInterventionFormHelpers";
 import { submitRequesterIntervention } from "@/features/interventions/requesterInterventionFormSubmit";
 import { logger } from "@/core/logger";

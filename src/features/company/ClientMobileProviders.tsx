@@ -8,7 +8,7 @@ import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import { ClientPortalPushProvider } from "@/features/notifications/ClientPortalPushContext";
 import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuthEffects";
 import ClientPortalPaymentReturnEffects from "@/features/auth/components/ClientPortalPaymentReturnEffects";

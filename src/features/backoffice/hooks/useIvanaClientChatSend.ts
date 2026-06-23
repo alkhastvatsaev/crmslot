@@ -16,7 +16,7 @@ import { requestClientPortalChatNotification } from "@/features/backoffice/reque
 import { resolveIvanaChatSenderName } from "@/features/backoffice/resolveIvanaChatSenderName";
 import { pickIvanaReply, type IvanaChatMessage } from "@/features/backoffice/ivanaChatTypes";
 import type { useCrmStaffAccountPanel } from "@/features/auth";
-import type { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import type { useRequesterHub } from "@/context/RequesterHubContext";
 
 type StaffFields = ReturnType<typeof useCrmStaffAccountPanel>["fields"];
 type RequesterProfile = ReturnType<typeof useRequesterHub>["profile"];

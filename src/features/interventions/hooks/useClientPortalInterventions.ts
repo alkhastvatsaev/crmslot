@@ -5,7 +5,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { clientPortalAuth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/context/RequesterHubContext";
 import type { PortalAccessSessionCase } from "@/features/interventions/portalAccessSession";
 import {
   canResolveClientPortalIdentity,

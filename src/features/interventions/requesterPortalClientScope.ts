@@ -1,5 +1,5 @@
 import type { User } from "firebase/auth";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/context/RequesterHubContext";
 
 export type ClientPortalIdentity = {
   uid: string | null;

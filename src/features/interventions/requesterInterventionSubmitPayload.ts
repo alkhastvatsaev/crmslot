@@ -6,10 +6,7 @@ import {
   isPersistableClientAudioUrl,
   uploadInterventionAudioToFirebase,
 } from "@/features/interventions/clientAudioUpload";
-import type {
-  InterventionRequestData,
-  RequesterProfile,
-} from "@/features/interventions/context/RequesterHubContext";
+import type { InterventionRequestData, RequesterProfile } from "@/context/RequesterHubContext";
 import { capitalizeName } from "@/utils/stringUtils";
 import { normalizePortalEmail } from "@/features/interventions/portalEmail";
 import { SMART_FORM_MAX_PHOTOS } from "@/features/interventions/hooks/useSmartForm";

@@ -39,7 +39,7 @@ export type {
   RequesterProfile,
   RequesterType,
   InterventionRequestData,
-} from "@/features/interventions/context/RequesterHubContext";
+} from "@/context/RequesterHubContext";
 export type {
   PortalAccessSession,
   PortalAccessSessionCase,

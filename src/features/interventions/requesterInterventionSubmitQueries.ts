@@ -1,10 +1,7 @@
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { collection, getDocs, query, where, type Firestore } from "firebase/firestore";
 import type { User } from "firebase/auth";
-import type {
-  InterventionRequestData,
-  RequesterProfile,
-} from "@/features/interventions/context/RequesterHubContext";
+import type { InterventionRequestData, RequesterProfile } from "@/context/RequesterHubContext";
 import { findPotentialDuplicates } from "@/features/interventions/detectDuplicates";
 import type { Intervention } from "@/features/interventions/types";
 

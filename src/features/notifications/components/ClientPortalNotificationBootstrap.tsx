@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_CLIENT_PORTAL,

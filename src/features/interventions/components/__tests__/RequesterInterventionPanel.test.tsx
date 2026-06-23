@@ -6,7 +6,7 @@ import {
   RequesterHubProvider,
   useRequesterHub,
   type InterventionRequestData,
-} from "@/features/interventions/context/RequesterHubContext";
+} from "@/context/RequesterHubContext";
 import { mockState } from "@/test-utils/mockState";
 
 // ── External deps ────────────────────────────────────────────────────────────

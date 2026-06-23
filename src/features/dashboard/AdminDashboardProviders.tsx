@@ -19,7 +19,7 @@ import { BillingHubAgentBridgeProvider } from "@/context/BillingHubAgentBridgeCo
 import { BillingHubIntentProvider } from "@/context/BillingHubIntentContext";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
-import { RequesterHubProvider } from "@/features/interventions/context/RequesterHubContext";
+import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";

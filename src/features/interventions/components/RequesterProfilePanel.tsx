@@ -6,7 +6,7 @@ import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPa
 import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAccount";
 import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
 import RequesterClientAccountPanel from "@/features/interventions/components/RequesterClientAccountPanel";
-import { useRequesterHub, RequesterType } from "../context/RequesterHubContext";
+import { useRequesterHub, RequesterType } from "@/context/RequesterHubContext";
 import { HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 import { motion, useAnimation } from "framer-motion";

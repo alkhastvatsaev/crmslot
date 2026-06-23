@@ -7,7 +7,7 @@ import { useChatbotContextOptional } from "@/features/chatbot/ChatbotContext";
 import ChatbotPdfPreviewPanel from "@/features/chatbot/components/ChatbotPdfPreviewPanel";
 import { isPortalInvoiceAvailable } from "@/features/company/portalInvoiceAvailability";
 import { useRequesterPortalInterventions } from "@/features/company/hooks/useRequesterPortalInterventions";
-import { useRequesterHub } from "@/features/interventions/context/RequesterHubContext";
+import { useRequesterHub } from "@/context/RequesterHubContext";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 import { cn } from "@/lib/utils";
 
