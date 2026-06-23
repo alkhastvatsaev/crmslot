@@ -1,6 +1,6 @@
 import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   coerceFirestoreLikeDate,
   formatScheduledTimeOnly,

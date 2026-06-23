@@ -1,4 +1,4 @@
-import type { CommissionRule } from "@/features/commissions/types";
+import type { CommissionRule } from "@/features/commissions";
 
 export type PatronCommissionKpis = {
   monthTotalCents: number;

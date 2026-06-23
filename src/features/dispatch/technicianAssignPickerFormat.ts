@@ -1,4 +1,4 @@
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 export function formatAssignPickerDistanceKm(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;

@@ -5,7 +5,7 @@ import QuoteListPanel from "@/features/quotes/components/QuoteListPanel";
 import EInvoiceButton from "@/features/billing/components/EInvoiceButton";
 import PortalLinkButton from "@/features/interventions/components/PortalLinkButton";
 import InterventionPdfButton from "@/features/interventions/components/InterventionPdfButton";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Intervention;

@@ -1,5 +1,5 @@
 import { computeMetrics } from "@/features/technicians/components/TechnicianPerformanceDashboard";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function makeIv(partial: Partial<Intervention> = {}): Intervention {
   return {
@@ -38,10 +38,7 @@ describe("computeMetrics", () => {
   });
 
   it("counts waiting_material", () => {
-    const ivs = [
-      makeIv({ status: "waiting_material" }),
-      makeIv({ status: "done" }),
-    ];
+    const ivs = [makeIv({ status: "waiting_material" }), makeIv({ status: "done" })];
     const m = computeMetrics(ivs, "tech-1");
     expect(m.waitingMaterial).toBe(1);
   });

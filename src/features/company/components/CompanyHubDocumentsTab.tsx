@@ -9,7 +9,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useChatbotContextOptional } from "@/features/chatbot/ChatbotContext";
 import ChatbotPdfPreviewPanel from "@/features/chatbot/components/ChatbotPdfPreviewPanel";
 import { ArrowLeft, Package } from "lucide-react";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 type Props = {
   interventionId: string | null;

@@ -1,4 +1,4 @@
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
 import {
   CLIENT_MOBILE_APP_ROUTE,

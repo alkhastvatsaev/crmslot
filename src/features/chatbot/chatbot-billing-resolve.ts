@@ -1,13 +1,16 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 import type { ChatbotPwaResolvedIntervention } from "@/features/chatbot/chatbot-pwa-intent";
-import { extractChatbotClientQuery, matchInterventionInSnapshot } from "@/features/chatbot/chatbot-pwa-intent";
+import {
+  extractChatbotClientQuery,
+  matchInterventionInSnapshot,
+} from "@/features/chatbot/chatbot-pwa-intent";
 
 export type ChatbotBillingResolveContext = {
   focusInterventionId?: string | null;
 };
 
 export function pickDefaultBillingIntervention(
-  snapshot: WorkspaceCopilotSnapshot | null | undefined,
+  snapshot: WorkspaceCopilotSnapshot | null | undefined
 ): ChatbotPwaResolvedIntervention | null {
   if (!snapshot?.interventions?.length) return null;
 
@@ -18,7 +21,7 @@ export function pickDefaultBillingIntervention(
         iv.status === "done" ||
         iv.status === "invoiced" ||
         iv.paymentStatus === "unpaid" ||
-        iv.hasInvoicePdf),
+        iv.hasInvoicePdf)
   );
 
   if (candidates.length === 1) {
@@ -41,7 +44,7 @@ export function pickDefaultBillingIntervention(
 export function resolveInterventionForBilling(
   text: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  ctx?: ChatbotBillingResolveContext,
+  ctx?: ChatbotBillingResolveContext
 ): ChatbotPwaResolvedIntervention | null {
   const clientQuery = extractChatbotClientQuery(text);
   if (clientQuery) {
@@ -65,7 +68,7 @@ export function resolveInterventionForBilling(
 export function resolveInterventionForClientEmail(
   text: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  ctx?: ChatbotBillingResolveContext,
+  ctx?: ChatbotBillingResolveContext
 ): ChatbotPwaResolvedIntervention | null {
   const fromText = resolveInterventionForBilling(text, snapshot, ctx);
   if (fromText) return fromText;

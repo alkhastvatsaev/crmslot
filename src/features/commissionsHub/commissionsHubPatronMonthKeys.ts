@@ -1,6 +1,6 @@
-import type { ManualCommissionEntry } from "@/features/commissions/commissionFirestore";
+import type { ManualCommissionEntry } from "@/features/commissions";
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 const TECHNICIAN_REVENUE_STATUSES: Intervention["status"][] = ["done", "invoiced"];

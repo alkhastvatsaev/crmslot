@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { getScheduleAnchor } from "@/features/interventions/technicianSchedule";
 import { BACKOFFICE_REVENUE_ESTIMATE_TTC_EUR } from "@/features/backoffice/backofficeConstants";
 import { interventionBackofficeBucket } from "@/features/backoffice/backofficeBuckets";
@@ -43,10 +43,9 @@ function createdDayKey(iv: Intervention): string | null {
   return null;
 }
 
-
 export function computeTodayActivitySummary(
   interventions: Intervention[],
-  now = new Date(),
+  now = new Date()
 ): TodayActivitySummary {
   const today = todayKeyBrussels(now);
   let completedCount = 0;

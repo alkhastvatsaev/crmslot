@@ -7,7 +7,7 @@ import type {
 } from "@/features/chatbot/chatbot-types";
 import type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-client-document";
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 export type ChatbotStreamCtx = {
   accText: { v: string };

@@ -3,7 +3,7 @@ import {
   buildPlanningSlotsForTechnician,
 } from "@/features/planningHub/planningHubPatronMetrics";
 import { localCalendarYmd } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const NOW = new Date("2026-06-18T12:00:00.000Z");
 const today = localCalendarYmd(NOW);

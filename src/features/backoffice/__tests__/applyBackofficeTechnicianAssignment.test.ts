@@ -1,6 +1,6 @@
 import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/applyBackofficeTechnicianAssignmentAdmin";
 import { canApplyBackofficeTechnicianAssignment } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const mockTransitionAdmin = jest.fn(async () => ({ id: "evt-1" }));
 const mockUpdate = jest.fn(async () => undefined);

@@ -1,4 +1,4 @@
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 export const BACK_OFFICE_DASHBOARD_SELECT_CLASS =
   "flex h-10 w-full cursor-pointer appearance-none rounded-[14px] border border-black/[0.06] bg-white/95 py-2 pl-3 pr-3 text-sm font-medium text-slate-800 outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15";

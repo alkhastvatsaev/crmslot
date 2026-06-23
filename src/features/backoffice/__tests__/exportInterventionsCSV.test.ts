@@ -1,5 +1,5 @@
 import { interventionsToCSV } from "@/features/backoffice/exportInterventionsCSV";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function makeIv(partial: Partial<Intervention> = {}): Intervention {
   return {
@@ -25,9 +25,7 @@ describe("exportInterventionsCSV", () => {
   });
 
   it("escapes commas and quotes in values", () => {
-    const csv = interventionsToCSV([
-      makeIv({ address: 'Rue "Grande", 5' }),
-    ]);
+    const csv = interventionsToCSV([makeIv({ address: 'Rue "Grande", 5' })]);
     expect(csv).toContain('"Rue ""Grande"", 5"');
   });
 
@@ -43,10 +41,9 @@ describe("exportInterventionsCSV", () => {
   });
 
   it("resolves technician names from lookup", () => {
-    const csv = interventionsToCSV(
-      [makeIv({ assignedTechnicianUid: "tech-1" })],
-      { "tech-1": "Mansour" },
-    );
+    const csv = interventionsToCSV([makeIv({ assignedTechnicianUid: "tech-1" })], {
+      "tech-1": "Mansour",
+    });
     expect(csv).toContain("Mansour");
   });
 });

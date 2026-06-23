@@ -13,7 +13,7 @@ import { buildLecotProductQuickActions } from "@/features/chatbot/chatbot-quick-
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import { buildLecotSearchUrl } from "@/features/chatbot/chatbot-lecot-url";
 import { STUB_CATALOG } from "@/features/catalog/productQuickAdd";
-import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
+import type { CatalogProduct } from "@/features/catalog";
 import {
   mergeCatalogProducts,
   searchCatalogProductsScored,

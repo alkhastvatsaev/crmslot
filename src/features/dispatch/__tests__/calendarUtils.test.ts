@@ -1,5 +1,5 @@
 import { getWeekDays, buildWeekCalendar, toIsoDate } from "../calendarUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const iv = (id: string, scheduledDate: string): Intervention =>
   ({ id, companyId: "c", status: "pending", scheduledDate }) as unknown as Intervention;

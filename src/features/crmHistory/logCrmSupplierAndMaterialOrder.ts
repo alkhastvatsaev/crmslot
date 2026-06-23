@@ -1,8 +1,8 @@
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
-import type { CompanyRole } from "@/features/company/types";
-import type { Intervention } from "@/features/interventions/types";
+import type { ChatbotToolContext } from "@/features/chatbot";
+import type { CompanyRole } from "@/features/company";
+import type { Intervention } from "@/features/interventions";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import { SUPPLIER_ORDER_STATUS_LABELS, type SupplierOrderLine } from "@/features/suppliers/types";
 import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";

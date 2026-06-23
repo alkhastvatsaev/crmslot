@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { logger } from "@/core/logger";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { logCrmTimeEntryRecorded } from "@/features/timetracking/logCrmTimeEntryRecorded";
 import {
   startTimeEntry,

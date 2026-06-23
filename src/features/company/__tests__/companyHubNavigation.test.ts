@@ -3,7 +3,7 @@ import {
   resolveCompanyHubPageIndex,
   COMPANY_HUB_ANCHOR_SMART_FORM,
 } from "@/features/company/companyHubNavigation";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import {
   CLIENT_MOBILE_APP_ROUTE,
   CLIENT_MOBILE_APP_SLOT_INDEX,

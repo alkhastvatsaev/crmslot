@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   buildClientIntakeFields,
   buildTechnicianReportFields,

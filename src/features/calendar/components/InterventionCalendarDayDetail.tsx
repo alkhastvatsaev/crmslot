@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDays } from "lucide-react";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import CalendarInterventionSlotRow from "@/features/calendar/components/CalendarInterventionSlotRow";
 
 export default function InterventionCalendarDayDetail({

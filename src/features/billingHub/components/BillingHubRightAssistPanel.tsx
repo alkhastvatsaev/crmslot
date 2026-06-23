@@ -7,7 +7,7 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import { useBillingHubIntent } from "@/context/BillingHubIntentContext";
 import { navigateToBillingAgentWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   interventions: Intervention[];

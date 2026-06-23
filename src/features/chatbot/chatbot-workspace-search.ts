@@ -1,6 +1,6 @@
 import type * as admin from "firebase-admin";
 import { buildClientDisplayName } from "@/features/clients/clientDisplayName";
-import type { ClientRecord } from "@/features/clients/types";
+import type { ClientRecord } from "@/features/clients";
 import { fetchInterventionsForCompany } from "@/features/chatbot/chatbot-intervention-source";
 
 export function matchesWorkspaceQuery(haystack: string, query: string): boolean {
@@ -51,7 +51,7 @@ export function interventionSearchHaystack(row: Record<string, unknown>): string
 export async function fetchAllClientsForCompany(
   firestore: admin.firestore.Firestore,
   companyId: string,
-  maxDocs = 500,
+  maxDocs = 500
 ): Promise<Record<string, unknown>[]> {
   const snap = await firestore
     .collection("clients")
@@ -59,8 +59,10 @@ export async function fetchAllClientsForCompany(
     .limit(maxDocs)
     .get();
 
-  const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Record<string, unknown>));
-  return rows.sort((a, b) => String(a.displayName || "").localeCompare(String(b.displayName || "")));
+  const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Record<string, unknown>);
+  return rows.sort((a, b) =>
+    String(a.displayName || "").localeCompare(String(b.displayName || ""))
+  );
 }
 
 export function formatClientRow(r: Record<string, unknown>) {
@@ -103,7 +105,7 @@ export async function searchWorkspace(
   firestore: admin.firestore.Firestore,
   companyId: string,
   query: string,
-  limit = 25,
+  limit = 25
 ): Promise<{
   query: string;
   clients: ReturnType<typeof formatClientRow>[];
@@ -139,12 +141,9 @@ export async function searchWorkspace(
     .map(formatInterventionSearchHit);
 
   const quotes = quotesSnap.docs
-    .map((d) => ({ id: d.id, ...d.data() } as Record<string, unknown>))
+    .map((d) => ({ id: d.id, ...d.data() }) as Record<string, unknown>)
     .filter((r) =>
-      matchesWorkspaceQuery(
-        [r.clientName, r.title, r.interventionId].filter(Boolean).join(" "),
-        q,
-      ),
+      matchesWorkspaceQuery([r.clientName, r.title, r.interventionId].filter(Boolean).join(" "), q)
     )
     .slice(0, cap)
     .map((r) => ({

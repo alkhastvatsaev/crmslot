@@ -1,5 +1,5 @@
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import {
   BM_TECH_CASE_PARAM,
   BM_TECH_REMINDER_PARAM,

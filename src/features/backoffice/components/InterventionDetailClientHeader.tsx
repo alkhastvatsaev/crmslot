@@ -7,7 +7,7 @@ import {
   isInterventionPendingBackOfficeIntake,
 } from "@/features/interventions/technicianSchedule";
 import { capitalizeName } from "@/utils/stringUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   selectedItem: Intervention;

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
 import { useClientPortalInterventions } from "@/features/interventions/hooks/useClientPortalInterventions";
 

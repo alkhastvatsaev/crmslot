@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type CompanyKpiSnapshot = {
   pending: number;
@@ -9,7 +9,12 @@ export type CompanyKpiSnapshot = {
   avgCloseDays: number | null;
 };
 
-const IN_PROGRESS: Intervention["status"][] = ["assigned", "en_route", "in_progress", "waiting_material"];
+const IN_PROGRESS: Intervention["status"][] = [
+  "assigned",
+  "en_route",
+  "in_progress",
+  "waiting_material",
+];
 
 export function computeCompanyKpi(interventions: Intervention[]): CompanyKpiSnapshot {
   let pending = 0;
@@ -38,7 +43,9 @@ export function computeCompanyKpi(interventions: Intervention[]): CompanyKpiSnap
   }
 
   const avgCloseDays =
-    closeDays.length > 0 ? Math.round((closeDays.reduce((a, b) => a + b, 0) / closeDays.length) * 10) / 10 : null;
+    closeDays.length > 0
+      ? Math.round((closeDays.reduce((a, b) => a + b, 0) / closeDays.length) * 10) / 10
+      : null;
 
   void now;
 

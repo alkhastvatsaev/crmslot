@@ -1,4 +1,4 @@
-import type { ClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
+import type { ClientPortalAccountFields } from "@/features/auth";
 import {
   resolveAccountFieldsForSubmit,
   validateClientPortalAccountFields,

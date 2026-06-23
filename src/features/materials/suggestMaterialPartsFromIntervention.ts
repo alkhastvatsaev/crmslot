@@ -3,7 +3,7 @@ import { lookupClientLecotProductImageOverlay } from "@/features/catalog/lecotPr
 import { hasExactOverlayImage } from "@/features/catalog/lecotProductImageResolve";
 import { normalizeLecotImageLookupKey } from "@/features/catalog/lecotProductImageCache";
 import { locksmithStockCatalogRows } from "@/features/catalog/locksmithStockSeedCatalog";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { CatalogMatchedPart } from "@/features/materials/matchStockCatalogItem";
 import type { StockItem } from "@/features/materials/stockFirestore";
 

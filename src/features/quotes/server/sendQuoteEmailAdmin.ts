@@ -14,7 +14,7 @@ import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBi
 import { buildQuotePdfFromQuote, quotePdfFileName } from "@/features/quotes/buildQuotePdfFromQuote";
 import type { Quote } from "@/features/quotes/types";
 import { ensurePortalAccessTokenAdmin } from "@/features/interventions/server/ensurePortalAccessTokenAdmin";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function buildQuoteEmailBody(params: {
   clientLabel: string;

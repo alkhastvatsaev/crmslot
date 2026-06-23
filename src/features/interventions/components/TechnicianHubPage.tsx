@@ -7,7 +7,7 @@ import TechnicianDashboardDetailPanel from "@/features/interventions/components/
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
 import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
 import DailyMissions from "@/features/dashboard/components/DailyMissions";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Mission } from "@/features/map";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { useTechnicianFinishJob } from "@/context/TechnicianFinishJobContext";
 import { useTranslation } from "@/core/i18n/I18nContext";

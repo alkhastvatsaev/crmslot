@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { buildWeekCalendar, WEEKDAY_LABELS_FR, toIsoDate } from "../calendarUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 interface Props {
   interventions: Intervention[];
@@ -78,7 +78,10 @@ export default function DispatchWeekCalendar({ interventions, onSelectInterventi
 
       <div className="grid grid-cols-7 gap-1">
         {WEEKDAY_LABELS_FR.map((label, i) => (
-          <div key={label} className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-1">
+          <div
+            key={label}
+            className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-1"
+          >
             {label}
             <div
               className={`text-xs font-bold mt-0.5 ${
@@ -94,9 +97,7 @@ export default function DispatchWeekCalendar({ interventions, onSelectInterventi
           <div
             key={day.date}
             className={`min-h-[80px] rounded-lg border p-1 space-y-0.5 ${
-              day.date === today
-                ? "border-blue-200 bg-blue-50"
-                : "border-slate-100 bg-white"
+              day.date === today ? "border-blue-200 bg-blue-50" : "border-slate-100 bg-white"
             } ${i >= 5 ? "bg-slate-50" : ""}`}
           >
             {day.interventions.map((iv) => (
@@ -122,7 +123,8 @@ export default function DispatchWeekCalendar({ interventions, onSelectInterventi
 
       {interventions.filter((iv) => !iv.scheduledDate).length > 0 && (
         <p className="text-xs text-slate-400">
-          {interventions.filter((iv) => !iv.scheduledDate).length} intervention(s) sans date planifiée
+          {interventions.filter((iv) => !iv.scheduledDate).length} intervention(s) sans date
+          planifiée
         </p>
       )}
     </section>

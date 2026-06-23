@@ -1,5 +1,5 @@
 import { parseBrusselsDateTime } from "@/core/time/parseBrusselsDateTime";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 /** Tech « en retard » : assigné/en_route, scheduledTime + LATE_THRESHOLD_MIN dépassé. */
 export const LATE_THRESHOLD_MIN = 15;

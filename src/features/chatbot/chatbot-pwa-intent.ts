@@ -1,4 +1,4 @@
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 import type { ParsedBillingLineDraft } from "@/features/chatbot/chatbot-billing-parse";
 import {
   isBillingLinesAddRequest,
@@ -56,9 +56,7 @@ export function parseChatbotEuroAmount(text: string): number | null {
     const n = Number(m[1].replace(",", "."));
     return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null;
   }
-  const m2 = text.match(
-    /(?:à|a|pour|prix|montant|total)\s*(\d{1,7}(?:[.,]\d{1,2})?)/i,
-  );
+  const m2 = text.match(/(?:à|a|pour|prix|montant|total)\s*(\d{1,7}(?:[.,]\d{1,2})?)/i);
   if (m2) {
     const n = Number(m2[1].replace(",", "."));
     return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null;
@@ -74,7 +72,7 @@ export function isCreateInvoiceRequest(text: string): boolean {
   if (/\bdevis\b/i.test(t) && !/\bfacture\b/i.test(t)) return false;
   return (
     /(?:fait|faire|cr[eé][eé]r|g[eé]n[eé]rer|pr[eé]parer|[eé]tablir)\s+(?:une?\s+)?facture\b/i.test(
-      t,
+      t
     ) || /\bfacture\s+(?:pour|de)\s+(?:monsieur|madame|m\.|mme|mr|mrs)\b/i.test(t)
   );
 }
@@ -100,7 +98,7 @@ export function extractChatbotClientQuery(text: string): string | null {
 
 export function matchInterventionInSnapshot(
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  clientQuery: string,
+  clientQuery: string
 ): ChatbotPwaResolvedIntervention | null {
   if (!snapshot?.interventions?.length || !clientQuery.trim()) return null;
 
@@ -135,10 +133,7 @@ export function matchInterventionInSnapshot(
   };
 }
 
-function wantsDocumentPreview(
-  text: string,
-  ctx?: ChatbotBillingResolveContext,
-): boolean {
+function wantsDocumentPreview(text: string, ctx?: ChatbotBillingResolveContext): boolean {
   const t = text.toLowerCase();
   if (!/(?:affiche|montre|voir|ouvr|afficher|pdf)/i.test(t)) return false;
   if (parseChatbotEuroAmount(text) != null || parseBillingLineDrafts(text).length > 0) {
@@ -172,7 +167,7 @@ function previewDocumentTypeFromText(text: string): "quote" | "invoice" {
 export function resolveChatbotPwaIntent(
   text: string,
   snapshot: WorkspaceCopilotSnapshot | null | undefined,
-  ctx?: ChatbotBillingResolveContext,
+  ctx?: ChatbotBillingResolveContext
 ): ChatbotPwaIntent | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
@@ -236,9 +231,7 @@ export function isChatbotPwaPendingToolId(toolUseId: string): boolean {
 export function buildChatbotPwaDoneMessage(intent: ChatbotPwaIntent): string {
   if (intent.kind === "billing_add_lines") {
     const total = intent.lines.reduce((s, l) => s + l.unitPriceEur * l.quantity, 0);
-    const list = intent.lines
-      .map((l) => `**${l.description}** ${l.unitPriceEur} €`)
-      .join(", ");
+    const list = intent.lines.map((l) => `**${l.description}** ${l.unitPriceEur} €`).join(", ");
     const name = intent.intervention.clientName;
     return `Lignes ajoutées (${list}) — total ajouté ${Math.round(total * 100) / 100} €${name ? ` pour **${name}**` : ""}. PDF à droite.`;
   }

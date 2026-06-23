@@ -1,7 +1,7 @@
 import { logger } from "@/core/logger";
 import { isGmailOAuthConfigured } from "@/core/services/email/gmailOAuthConfig";
 import { sendViaGmailApi } from "@/core/services/email/sendViaGmailApi";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 export const LECOT_EMAIL = "info@lecot.be";
 

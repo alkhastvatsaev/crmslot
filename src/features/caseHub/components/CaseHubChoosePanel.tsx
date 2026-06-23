@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import CaseHubListPanel from "@/features/caseHub/components/CaseHubListPanel";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { CaseHubBucket } from "@/features/caseHub/caseHubTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

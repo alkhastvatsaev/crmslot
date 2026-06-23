@@ -1,4 +1,4 @@
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export function isOpenSupplierOrder(order: SupplierOrder): boolean {
   return order.status === "draft" || order.status === "sent" || order.status === "confirmed";

@@ -1,5 +1,5 @@
-import type { Intervention } from "@/features/interventions/types";
-import type { MaintenanceContract } from "@/features/maintenance/types";
+import type { Intervention } from "@/features/interventions";
+import type { MaintenanceContract } from "@/features/maintenance";
 import { computeSlaStatus } from "@/features/sla/computeSla";
 
 export type ChurnRiskLevel = "safe" | "watch" | "at_risk";

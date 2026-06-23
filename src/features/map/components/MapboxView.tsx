@@ -24,8 +24,8 @@ import { useMapRouteLineLayer } from "@/features/map/hooks/useMapRouteLineLayer"
 import { useMapUserPuckAndCamera } from "@/features/map/hooks/useMapUserPuckAndCamera";
 import { resolveMapCameraDuration } from "@/features/map/mapboxPowerProfile";
 import { scheduleMapboxResizeBurst } from "@/features/map/mapboxMapLifecycle";
-import type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
-import type { Intervention } from "@/features/interventions/types";
+import type { MobileHubRail } from "@/features/dashboard";
+import type { Intervention } from "@/features/interventions";
 import type { Mission } from "@/features/map/missionTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { billingLinesTotalCents, formatEur } from "@/features/billing/invoiceBillingPanelUtils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   billingLines: NonNullable<Intervention["billingLines"]>;

@@ -4,7 +4,7 @@ import { screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import CompanyStockCenterPanel from "@/features/featureHub/components/CompanyStockCenterPanel";
 import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: jest.fn(async () => ({

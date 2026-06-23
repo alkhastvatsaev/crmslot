@@ -5,7 +5,7 @@ import { I18nProvider } from "@/core/i18n/I18nContext";
 import { DateProvider } from "@/context/DateContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import BackOfficeInboxPanel from "@/features/backoffice/components/BackOfficeInboxPanel";
 
 jest.mock("@/context/CompanyWorkspaceContext", () => ({

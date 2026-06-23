@@ -1,5 +1,8 @@
-import type { Intervention } from "@/features/interventions/types";
-import { getScheduleAnchor, interventionMatchesTab } from "@/features/interventions/technicianSchedule";
+import type { Intervention } from "@/features/interventions";
+import {
+  getScheduleAnchor,
+  interventionMatchesTab,
+} from "@/features/interventions/technicianSchedule";
 import { unknownTimestampToMs } from "@/features/backoffice/timeHelpers";
 import {
   type BackofficeBucket,
@@ -10,7 +13,7 @@ export type ActivityWindow = "all" | "today" | "week" | "custom";
 
 export type BackofficeViewFilters = {
   activityWindow: ActivityWindow;
-  
+
   dateFrom: string;
   dateTo: string;
   technicianUid: string;
@@ -24,7 +27,6 @@ export const defaultBackofficeViewFilters = (): BackofficeViewFilters => ({
   technicianUid: "",
   statusBucket: "",
 });
-
 
 export function ivPlanningDayKeyBrussels(iv: Intervention): string | null {
   const a = getScheduleAnchor(iv);
@@ -40,7 +42,7 @@ export function ivPlanningDayKeyBrussels(iv: Intervention): string | null {
 export function applyBackofficeFilters(
   list: Intervention[],
   filters: BackofficeViewFilters,
-  now = new Date(),
+  now = new Date()
 ): Intervention[] {
   return list.filter((iv) => {
     if (filters.statusBucket) {
@@ -77,7 +79,6 @@ export function applyBackofficeFilters(
   });
 }
 
-
 export function uniqueAssignedTechnicianUids(list: Intervention[]): string[] {
   const s = new Set<string>();
   for (const iv of list) {
@@ -86,7 +87,6 @@ export function uniqueAssignedTechnicianUids(list: Intervention[]): string[] {
   }
   return [...s].sort((a, b) => a.localeCompare(b));
 }
-
 
 export function sortBackofficeRowsDesc(list: Intervention[]): Intervention[] {
   return [...list].sort((a, b) => {

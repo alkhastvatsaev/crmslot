@@ -10,7 +10,7 @@ import {
   bucketForIntervention,
   timeGroupForIntervention,
 } from "@/features/caseHub/caseHubPatronMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   interventions: Intervention[];

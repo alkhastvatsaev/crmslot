@@ -9,7 +9,7 @@ import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import SlaBadge from "@/features/interventions/components/SlaBadge";
 import SlaStatusBadge from "@/features/sla/components/SlaStatusBadge";
 

@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Intervention, InterventionEvent } from "@/features/interventions/types";
+import type { Intervention, InterventionEvent } from "@/features/interventions";
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

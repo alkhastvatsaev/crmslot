@@ -1,7 +1,10 @@
-import { inferStockCategory, type StockCategoryId } from "@/features/featureHub/companyStockCategories";
+import {
+  inferStockCategory,
+  type StockCategoryId,
+} from "@/features/featureHub/companyStockCategories";
 import { sortStockByPatronPriority } from "@/features/featureHub/companyStockMetrics";
-import type { StockItem } from "@/features/materials/stockFirestore";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { StockItem } from "@/features/materials";
+import type { MaterialOrderDoc } from "@/features/materials";
 
 export type CompanyStockFilter = "all" | "low" | "out" | "orders" | "lecot";
 
@@ -22,7 +25,7 @@ export function filterStockItemsBySearch(items: StockItem[], query: string): Sto
 export function filterStockByChip(
   items: StockItem[],
   filter: CompanyStockFilter,
-  openOrderRefs: Set<string>,
+  openOrderRefs: Set<string>
 ): StockItem[] {
   switch (filter) {
     case "low":
@@ -31,7 +34,7 @@ export function filterStockByChip(
       return items.filter((i) => i.quantity <= 0);
     case "orders":
       return items.filter(
-        (i) => openOrderRefs.has(i.reference.toLowerCase()) || openOrderRefs.has(i.id),
+        (i) => openOrderRefs.has(i.reference.toLowerCase()) || openOrderRefs.has(i.id)
       );
     case "lecot":
       return items.filter((i) => /lecot|lec-/i.test(i.reference) || /lecot/i.test(i.description));
@@ -42,7 +45,7 @@ export function filterStockByChip(
 
 export function filterStockByCategory(
   items: StockItem[],
-  category: StockCategoryId | "all",
+  category: StockCategoryId | "all"
 ): StockItem[] {
   if (category === "all") return items;
   return items.filter((i) => inferStockCategory(i) === category);
@@ -55,7 +58,7 @@ export function applyStockListFilters(
     category: StockCategoryId | "all";
     search: string;
     openOrderRefs: Set<string>;
-  },
+  }
 ): StockItem[] {
   let rows = filterStockByChip(items, opts.filter, opts.openOrderRefs);
   rows = filterStockByCategory(rows, opts.category);
@@ -65,7 +68,7 @@ export function applyStockListFilters(
 
 export function materialOrdersMatchingStock(
   orders: MaterialOrderDoc[],
-  item: StockItem,
+  item: StockItem
 ): MaterialOrderDoc[] {
   const ref = item.reference.trim().toLowerCase();
   const desc = item.description.trim().toLowerCase();
@@ -74,7 +77,7 @@ export function materialOrdersMatchingStock(
       const pr = (p.reference ?? "").trim().toLowerCase();
       const pl = (p.description ?? "").trim().toLowerCase();
       return (ref && pr === ref) || (desc && pl.includes(desc)) || (desc && desc.includes(pl));
-    }),
+    })
   );
 }
 

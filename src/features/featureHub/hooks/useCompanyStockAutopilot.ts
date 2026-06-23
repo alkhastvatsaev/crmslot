@@ -9,9 +9,9 @@ import {
 } from "@/features/featureHub/companyStockAutopilot";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
 import { buildOpenOrderReferenceSet } from "@/features/featureHub/filterCompanyStock";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { StockItem } from "@/features/materials/stockFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { StockItem } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 
 type Input = {
   companyId: string;
@@ -39,7 +39,7 @@ export function useCompanyStockAutopilot({
 
   const selected = useMemo(
     () => items.find((i) => i.id === selectedStockItemId) ?? null,
-    [items, selectedStockItemId],
+    [items, selectedStockItemId]
   );
 
   const plan = useMemo(
@@ -51,7 +51,7 @@ export function useCompanyStockAutopilot({
         metrics,
         selected,
       }),
-    [items, orders, supplierOrders, metrics, selected],
+    [items, orders, supplierOrders, metrics, selected]
   );
 
   useEffect(() => {

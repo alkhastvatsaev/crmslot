@@ -1,4 +1,4 @@
-import type { CommissionLevel } from "@/features/commissions/types";
+import type { CommissionLevel } from "@/features/commissions";
 
 export type CommissionsHubMode = "team" | "rules" | "manual" | "history";
 

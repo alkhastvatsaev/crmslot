@@ -1,5 +1,5 @@
 import { filterInterventionsByCompany } from "@/features/backoffice/filterInterventionsByCompany";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function row(id: string, companyId?: string): Intervention {
   return {

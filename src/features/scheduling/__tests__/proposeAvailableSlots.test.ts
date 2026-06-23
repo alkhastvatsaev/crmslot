@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
 
 function iv(partial: Partial<Intervention> & Pick<Intervention, "id">): Intervention {

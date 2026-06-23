@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
 import { storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function readAudioUrl(inv: unknown): string | null {
   if (!inv || typeof inv !== "object") return null;

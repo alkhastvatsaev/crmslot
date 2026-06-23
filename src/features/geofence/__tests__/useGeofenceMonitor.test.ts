@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useGeofenceMonitor } from "@/features/geofence/useGeofenceMonitor";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type WatchArgs = [PositionCallback, PositionErrorCallback | undefined, PositionOptions | undefined];
 const mockWatchPosition = jest.fn<number, WatchArgs>(() => 42);

@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type {
   WorkspaceCopilotClientRow,
   WorkspaceCopilotInterventionRow,
@@ -40,7 +40,7 @@ export type BuildWorkspaceCopilotSnapshotInput = {
 };
 
 export function buildWorkspaceCopilotSnapshot(
-  input: BuildWorkspaceCopilotSnapshotInput,
+  input: BuildWorkspaceCopilotSnapshotInput
 ): WorkspaceCopilotSnapshot {
   const { interventions } = input;
   const byStatus: Record<string, number> = {};
@@ -56,7 +56,12 @@ export function buildWorkspaceCopilotSnapshot(
     byStatus[st] = (byStatus[st] ?? 0) + 1;
     if (iv.urgency && st !== "done" && st !== "invoiced" && st !== "cancelled") urgentOpen += 1;
     if (st === "pending" || st === "pending_needs_address") awaitingAssignment += 1;
-    if (st === "assigned" || st === "en_route" || st === "in_progress" || st === "waiting_material") {
+    if (
+      st === "assigned" ||
+      st === "en_route" ||
+      st === "in_progress" ||
+      st === "waiting_material"
+    ) {
       inProgress += 1;
     }
     if (st === "done" || st === "invoiced") doneOrInvoiced += 1;
@@ -91,9 +96,7 @@ export function buildWorkspaceCopilotSnapshot(
       scheduled: formatScheduled(iv),
       paymentStatus: iv.paymentStatus ?? null,
       invoiceAmountEur:
-        typeof iv.invoiceAmountCents === "number"
-          ? Math.round(iv.invoiceAmountCents) / 100
-          : null,
+        typeof iv.invoiceAmountCents === "number" ? Math.round(iv.invoiceAmountCents) / 100 : null,
       urgency: Boolean(iv.urgency),
       hasAudio: Boolean(iv.audioUrl || iv.audioStoragePath || iv.transcription),
       hasInvoicePdf: Boolean(iv.invoicePdfUrl || iv.invoicePdfStoragePath),

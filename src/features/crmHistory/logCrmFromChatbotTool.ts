@@ -1,8 +1,8 @@
 import * as admin from "firebase-admin";
 import { logger } from "@/core/logger";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import type { ChatbotToolContext } from "@/features/chatbot";
 import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
 import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";

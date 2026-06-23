@@ -20,7 +20,7 @@ import {
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Mission } from "@/features/map/missionTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   mapContainerRef: React.RefObject<HTMLDivElement | null>;

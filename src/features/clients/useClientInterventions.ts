@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { subscribeClientInterventions } from "@/features/clients/clientInterventions";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function useClientInterventions(
   companyId: string,
-  clientId: string | null,
+  clientId: string | null
 ): { interventions: Intervention[]; loading: boolean } {
   const crmEnabled = useFeatureFlag("crmContacts");
   const [interventions, setInterventions] = useState<Intervention[]>([]);
@@ -32,7 +32,7 @@ export function useClientInterventions(
         setInterventions(rows);
         setLoading(false);
       },
-      () => setLoading(false),
+      () => setLoading(false)
     );
   }, [crmEnabled, companyId, clientId]);
 

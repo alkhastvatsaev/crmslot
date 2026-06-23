@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { BackofficeInboxIntentApi } from "@/context/BackofficeInboxIntentContext";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type SelectionArgs = {
   interventions: Intervention[];

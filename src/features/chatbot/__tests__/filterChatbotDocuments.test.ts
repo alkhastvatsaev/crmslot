@@ -7,7 +7,7 @@ import {
   tokenizeDocumentSearchQuery,
 } from "@/features/chatbot/filterChatbotDocuments";
 import type { ChatbotInvoiceRow } from "@/features/chatbot/chatbotInvoiceRows";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 const invoice: ChatbotInvoiceRow = {
   interventionId: "iv-dupont-42",

@@ -1,5 +1,5 @@
 import { inferStockCategory } from "@/features/featureHub/companyStockCategories";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 function item(description: string, reference = ""): StockItem {
   return {

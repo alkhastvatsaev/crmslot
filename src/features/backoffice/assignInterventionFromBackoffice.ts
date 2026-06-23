@@ -1,6 +1,6 @@
 import { auth } from "@/core/config/firebase";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type AssignInterventionSchedule = {
   scheduledDate: string;

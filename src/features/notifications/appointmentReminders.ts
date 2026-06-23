@@ -1,5 +1,5 @@
 import { parseBrusselsDateTime } from "@/core/time/parseBrusselsDateTime";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type AppointmentReminderType = "24h" | "2h" | "30min";
 

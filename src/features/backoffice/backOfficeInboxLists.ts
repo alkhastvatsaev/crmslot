@@ -7,7 +7,7 @@ import {
   coerceFirestoreLikeDate,
   isInterventionInBackofficeRequestsQueue,
 } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 
 export function computePendingRequests(interventions: Intervention[]): Intervention[] {

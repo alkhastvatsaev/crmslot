@@ -13,7 +13,7 @@ import {
   Banknote,
   Hourglass,
 } from "lucide-react";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 function DonutChart({ slices }: { slices: { value: number; color: string; label: string }[] }) {

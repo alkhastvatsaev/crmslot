@@ -8,7 +8,7 @@ import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { toast } from "sonner";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useTechnicians } from "@/features/technicians/hooks";
 import {

@@ -3,7 +3,7 @@ import {
   resolveTechnicianHubPageIndex,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import {
   TECHNICIAN_MOBILE_APP_ROUTE,
   TECHNICIAN_MOBILE_APP_SLOT_INDEX,

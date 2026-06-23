@@ -1,5 +1,5 @@
 import type * as admin from "firebase-admin";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 
 /** Charge les techniciens terrain (collection racine `technicians`). */

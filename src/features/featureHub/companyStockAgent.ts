@@ -9,7 +9,7 @@ import type {
   CompanyStockAgentContext,
   CompanyStockAgentTurnResult,
 } from "@/features/featureHub/companyStockAgentTypes";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const MAX_LINES = 8;
 

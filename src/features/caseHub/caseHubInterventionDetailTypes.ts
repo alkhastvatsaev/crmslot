@@ -1,5 +1,5 @@
 import type { UnifiedDrawerTab } from "@/features/interventions/components/UnifiedInterventionDrawer";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type CaseHubAlertTone = "rose" | "amber" | "sky" | "violet" | "emerald";
 

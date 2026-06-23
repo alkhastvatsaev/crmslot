@@ -10,7 +10,7 @@ import {
 import { buildLecotOrderLineRows } from "@/features/chatbot/chatbot-lecot-order-lines";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import { lecotShopBaseUrl } from "@/features/catalog/lecotShopConfig";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 export async function executeProductionLecotOrder(params: {
   ctx: ChatbotToolContext;

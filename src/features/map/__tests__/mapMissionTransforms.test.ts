@@ -5,7 +5,7 @@ import {
   isValidMissionCoordinates,
   missionTimeSortScore,
 } from "@/features/map/mapMissionTransforms";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { Mission } from "@/features/map/missionTypes";
 
 function baseIntervention(overrides: Partial<Intervention> = {}): Intervention {

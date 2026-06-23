@@ -1,5 +1,5 @@
 import { interventionsToAccountingRows, accountingRowsToCsv } from "../exportAccountingCsv";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const makeIntervention = (overrides: Partial<Intervention> = {}): Intervention =>
   ({
@@ -52,7 +52,10 @@ describe("accountingRowsToCsv", () => {
   });
 
   it("produces correct line count (header + data)", () => {
-    const rows = interventionsToAccountingRows([makeIntervention(), makeIntervention({ id: "iv2" })]);
+    const rows = interventionsToAccountingRows([
+      makeIntervention(),
+      makeIntervention({ id: "iv2" }),
+    ]);
     const lines = accountingRowsToCsv(rows).split("\n");
     expect(lines).toHaveLength(3); // header + 2 rows
   });

@@ -1,5 +1,5 @@
 import { computeSlaStatus } from "../computeSla";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const base: Intervention = {
   id: "i-1",

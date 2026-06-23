@@ -7,7 +7,7 @@ import {
   type UblInvoiceInput,
   type UblParty,
 } from "@/features/billing/ubl/buildUblInvoiceXml";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { DecodedIdToken } from "firebase-admin/auth";
 
 export type SendEInvoiceResult = {

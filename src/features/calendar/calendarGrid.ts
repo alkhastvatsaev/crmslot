@@ -1,12 +1,13 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { interventionScheduledLocalDayKey } from "@/features/calendar/interventionScheduleRange";
-
 
 export function filterScheduledInterventions(list: Intervention[]): Intervention[] {
   return list.filter((iv) => interventionScheduledLocalDayKey(iv) !== null);
 }
 
-export function groupScheduledInterventionsByLocalDay(list: Intervention[]): Map<string, Intervention[]> {
+export function groupScheduledInterventionsByLocalDay(
+  list: Intervention[]
+): Map<string, Intervention[]> {
   const map = new Map<string, Intervention[]>();
   for (const iv of list) {
     const key = interventionScheduledLocalDayKey(iv);
@@ -20,7 +21,6 @@ export function groupScheduledInterventionsByLocalDay(list: Intervention[]): Map
   }
   return map;
 }
-
 
 export function buildMonthGrid(year: number, monthIndex: number): (number | null)[] {
   const first = new Date(year, monthIndex, 1);

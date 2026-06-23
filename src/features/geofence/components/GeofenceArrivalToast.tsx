@@ -2,12 +2,9 @@
 
 import { toast } from "sonner";
 import { MapPin } from "lucide-react";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
-export function showGeofenceArrivalToast(
-  intervention: Intervention,
-  onConfirm: () => void,
-) {
+export function showGeofenceArrivalToast(intervention: Intervention, onConfirm: () => void) {
   toast(
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2 font-semibold text-slate-900">
@@ -15,8 +12,7 @@ export function showGeofenceArrivalToast(
         Arrivée détectée
       </div>
       <p className="text-sm text-slate-600">
-        Vous êtes à proximité de{" "}
-        <span className="font-semibold">{intervention.address}</span>.
+        Vous êtes à proximité de <span className="font-semibold">{intervention.address}</span>.
       </p>
       <button
         type="button"
@@ -32,6 +28,6 @@ export function showGeofenceArrivalToast(
     {
       duration: 30_000,
       position: "top-center",
-    },
+    }
   );
 }

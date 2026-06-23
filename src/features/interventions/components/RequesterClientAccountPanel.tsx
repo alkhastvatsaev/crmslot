@@ -5,7 +5,7 @@ import { motion, type useAnimation } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { HUB_RADIUS, HUB_SURFACE } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
-import type { ClientPortalAccountFields } from "@/features/auth/clientPortalAccountProfile";
+import type { ClientPortalAccountFields } from "@/features/auth";
 
 export type RequesterClientAccountPanelProps = {
   fields: ClientPortalAccountFields;

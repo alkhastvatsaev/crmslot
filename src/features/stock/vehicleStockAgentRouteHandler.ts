@@ -1,7 +1,7 @@
 import { runChatbotOpenAI } from "@/features/chatbot/chatbot-openai";
 import { createChatbotSseResponse } from "@/features/chatbot/chatbot-sse";
 import { buildVehicleStockAgentSystemPrompt } from "@/features/stock/vehicleStockAgentSystemPrompt";
-import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import type { ChatbotToolContext } from "@/features/chatbot";
 import { VEHICLE_STOCK_AGENT_TOOL_SCOPE } from "@/features/hubAgents/hubAgentToolScopes";
 
 export type VehicleStockAgentPostBody = {

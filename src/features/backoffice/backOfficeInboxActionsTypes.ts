@@ -1,5 +1,5 @@
 import type { TechnicianBackofficeReportBridgeApi } from "@/context/TechnicianBackofficeReportBridgeContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type BackOfficeInboxActionsArgs = {
   interventions: Intervention[];

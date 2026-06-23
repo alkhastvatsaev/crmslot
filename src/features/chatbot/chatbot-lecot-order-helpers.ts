@@ -9,7 +9,7 @@ import {
 } from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
 import { resolveInterventionClientNameFromRecord } from "@/features/interventions/resolveInterventionClientName";
 import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 export async function assertInterventionAccess(companyId: string, interventionId: string) {
   const ref = admin.firestore().collection("interventions").doc(interventionId);

@@ -5,7 +5,7 @@ import {
 } from "@/features/backoffice/useResolvedInterventionAudio";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
 import { coerceDisplayString } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   buildCaseHubAlerts,
   buildCaseHubDrawerTabBadges,

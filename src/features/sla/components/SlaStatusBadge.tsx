@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { computeSlaStatus } from "../computeSla";
 import { PRIORITY_LABELS } from "../slaConfig";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const URGENCY_STYLES = {
   ok: "bg-emerald-100 text-emerald-700",
@@ -42,7 +42,7 @@ export default function SlaStatusBadge({ intervention, className }: Props) {
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold",
         URGENCY_STYLES[sla.urgency],
-        className,
+        className
       )}
     >
       <Icon className="h-3 w-3" />

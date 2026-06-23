@@ -14,7 +14,7 @@ import {
   STOCK_HEALTH_TILE_SHADOW,
   STOCK_HEALTH_TILE_SHADOW_ACTIVE,
 } from "@/features/featureHub/companyStockVisualTheme";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 type Props = {
   items: StockItem[];

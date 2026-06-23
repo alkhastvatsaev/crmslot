@@ -14,8 +14,8 @@ import { useChatbotContext } from "@/features/chatbot/ChatbotContext";
 import { useChatbotOrderImages } from "@/features/chatbot/hooks/useChatbotOrderImages";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import type { SupplierOrder } from "@/features/suppliers/types";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { SupplierOrder } from "@/features/suppliers";
+import type { MaterialOrderDoc } from "@/features/materials";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 export type ChatbotSupplierOrdersPlacement = "leftRail" | "rightRail" | "embedded";

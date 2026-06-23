@@ -3,7 +3,7 @@ import {
   invoiceClientOnlyLabel,
   isChatbotInvoiceCandidate,
 } from "@/features/chatbot/chatbotInvoiceRows";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 describe("chatbotInvoiceRows", () => {
   it("detects invoiced interventions", () => {

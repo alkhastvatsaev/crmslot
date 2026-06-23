@@ -9,7 +9,7 @@ import { extractInterventionFieldsFromEmail } from "@/features/gmail/extractInte
 import { geocodeAddressAdmin } from "@/features/gmail/server/geocodeAddressAdmin";
 import { parseSenderEmail, parseSenderName } from "@/features/gmail/gmailSenderParse";
 import { generatePortalAccessToken } from "@/features/interventions/portalToken";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type CreateInterventionFromGmailResult = {
   interventionId: string;

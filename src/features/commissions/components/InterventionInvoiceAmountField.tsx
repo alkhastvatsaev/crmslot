@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { auth, firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { computeAndPersistInterventionCommission } from "@/features/commissions/computeInterventionCommission";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Pick<

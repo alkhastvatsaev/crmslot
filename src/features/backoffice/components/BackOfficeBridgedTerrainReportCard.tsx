@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { capitalizeName } from "@/utils/stringUtils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { BridgedTechnicianReport } from "@/context/TechnicianBackofficeReportBridgeContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export default function BackOfficeBridgedTerrainReportCard({
   r,

@@ -1,12 +1,9 @@
 import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
 import { loadCompanyCatalogProducts } from "@/features/catalog/loadCompanyCatalog";
-import type { CatalogProduct } from "@/features/catalog/productQuickAdd";
+import type { CatalogProduct } from "@/features/catalog";
 import { STUB_CATALOG } from "@/features/catalog/productQuickAdd";
 import { mergeCatalogProducts } from "@/features/catalog/searchCatalogProducts";
-import {
-  LECOT_FLOW_CONTEXT_RE,
-  priorUserTexts,
-} from "@/features/chatbot/chatbot-lecot-follow-up";
+import { LECOT_FLOW_CONTEXT_RE, priorUserTexts } from "@/features/chatbot/chatbot-lecot-follow-up";
 import {
   parseLecotInstantOrderIntent,
   type LecotInstantOrderIntent,
@@ -17,8 +14,7 @@ export { parseLecotInstantOrderIntent, type LecotInstantOrderIntent };
 
 const LOCAL_CATALOG = mergeCatalogProducts(LECOT_CATALOG, STUB_CATALOG);
 
-const CATALOG_LINE_RE =
-  /^(\d+)\.\s+\[([^\]]+)\]\([^)]+\)[^\n]*\(SKU\s+([A-Z0-9][A-Z0-9-]*)\)/gim;
+const CATALOG_LINE_RE = /^(\d+)\.\s+\[([^\]]+)\]\([^)]+\)[^\n]*\(SKU\s+([A-Z0-9][A-Z0-9-]*)\)/gim;
 
 export type LecotInstantOrderLine = {
   sku: string;
@@ -28,7 +24,7 @@ export type LecotInstantOrderLine = {
 };
 
 export function extractCatalogLinesFromAssistantText(
-  text: string,
+  text: string
 ): Array<{ rank: number; sku: string; label: string }> {
   const rows: Array<{ rank: number; sku: string; label: string }> = [];
   const re = new RegExp(CATALOG_LINE_RE.source, CATALOG_LINE_RE.flags);
@@ -91,7 +87,7 @@ export async function buildInstantLecotOrderPayload(
   companyId: string,
   lastUserText: string,
   messages: unknown[],
-  opts?: { focusInterventionId?: string | null },
+  opts?: { focusInterventionId?: string | null }
 ): Promise<{ lines: LecotInstantOrderLine[]; interventionId?: string } | null> {
   const intent = parseLecotInstantOrderIntent(lastUserText);
   if (!intent) return null;
@@ -118,7 +114,7 @@ export async function buildInstantLecotOrderPayload(
       catalog.find(
         (p) =>
           p.sku.trim().toUpperCase() === intent.sku ||
-          p.label.trim().toLowerCase() === intent.label.trim().toLowerCase(),
+          p.label.trim().toLowerCase() === intent.label.trim().toLowerCase()
       ) ??
       null;
     if (!product) {

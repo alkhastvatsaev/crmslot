@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { lookupClientLecotProductImageOverlay } from "@/features/catalog/lecotProductImageClientOverlay";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 export type StockImageMap = Record<string, string | null>;
 

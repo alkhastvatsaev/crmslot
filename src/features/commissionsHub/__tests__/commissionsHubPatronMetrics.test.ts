@@ -7,7 +7,7 @@ import {
   findCompanyGroupRule,
   formatRuleShort,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
-import type { CommissionRule } from "@/features/commissions/types";
+import type { CommissionRule } from "@/features/commissions";
 
 const NOW = new Date("2026-06-15T12:00:00.000Z");
 

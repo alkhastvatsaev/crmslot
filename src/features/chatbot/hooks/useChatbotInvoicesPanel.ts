@@ -7,7 +7,7 @@ import {
   buildChatbotInvoiceRows,
   type ChatbotInvoiceRow,
 } from "@/features/chatbot/chatbotInvoiceRows";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function useChatbotInvoicesPanel(companyId: string | null, enabled: boolean) {
   const [invoices, setInvoices] = useState<ChatbotInvoiceRow[]>([]);

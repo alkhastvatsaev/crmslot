@@ -8,7 +8,7 @@ import { useInterventionCommission } from "@/features/commissions/useInterventio
 import { saveCommissionOverride } from "@/features/commissions/commissionFirestore";
 import { computeAndPersistInterventionCommission } from "@/features/commissions/computeInterventionCommission";
 import InterventionCommissionAuditList from "@/features/commissions/components/InterventionCommissionAuditList";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Pick<
@@ -31,9 +31,7 @@ export default function InterventionCommissionPanel({ intervention }: Props) {
   const [busy, setBusy] = useState(false);
 
   const canShow =
-    intervention.status === "done" ||
-    intervention.status === "invoiced" ||
-    Boolean(commission);
+    intervention.status === "done" || intervention.status === "invoiced" || Boolean(commission);
 
   const handleRecalculate = useCallback(async () => {
     if (!firestore) return;
@@ -86,7 +84,7 @@ export default function InterventionCommissionPanel({ intervention }: Props) {
           updatedAt: new Date().toISOString(),
         },
         uid,
-        reason.trim(),
+        reason.trim()
       );
       setOverrideOpen(false);
       toast.success(String(t("commissions.override_saved")));
@@ -115,7 +113,10 @@ export default function InterventionCommissionPanel({ intervention }: Props) {
       {loading && !commission ? (
         <p className="text-[12px] text-slate-400">{t("common.loading")}</p>
       ) : (
-        <p className="text-[15px] font-semibold text-slate-800" data-testid="commission-amount-display">
+        <p
+          className="text-[15px] font-semibold text-slate-800"
+          data-testid="commission-amount-display"
+        >
           {displayCents != null
             ? `${(displayCents / 100).toFixed(2)} €`
             : String(t("commissions.not_calculated"))}

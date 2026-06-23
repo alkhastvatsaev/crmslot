@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import InterventionClientLinkPanel from "@/features/clients/components/InterventionClientLinkPanel";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { linkInterventionToClient } from "@/features/clients/linkInterventionToClient";
 
 jest.mock("@/core/useFeatureFlags", () => ({
@@ -28,7 +28,9 @@ jest.mock("@/features/clients/useClients", () => ({
 
 jest.mock("@/features/clients/useClientSites", () => ({
   useClientSites: () => ({
-    sites: [{ id: "st-1", companyId: "co-1", clientId: "cl-1", label: "Bureau", address: "Bruxelles" }],
+    sites: [
+      { id: "st-1", companyId: "co-1", clientId: "cl-1", label: "Bureau", address: "Bruxelles" },
+    ],
     loading: false,
   }),
 }));
@@ -60,7 +62,7 @@ describe("InterventionClientLinkPanel", () => {
       expect(linkInterventionToClient).toHaveBeenCalledWith(
         expect.anything(),
         "iv-1",
-        expect.objectContaining({ clientId: "cl-1" }),
+        expect.objectContaining({ clientId: "cl-1" })
       );
     });
   });

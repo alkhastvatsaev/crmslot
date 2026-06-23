@@ -1,7 +1,9 @@
 import { computeBillingLineSuggestions } from "../smartBillingTemplates";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
-const iv = (lines: { description: string; quantity: number; unitPriceCents: number }[]): Intervention =>
+const iv = (
+  lines: { description: string; quantity: number; unitPriceCents: number }[]
+): Intervention =>
   ({
     id: "iv",
     companyId: "c",
@@ -38,7 +40,7 @@ describe("computeBillingLineSuggestions", () => {
 
   it("limits results to maxSuggestions", () => {
     const interventions = Array.from({ length: 10 }, (_, i) =>
-      iv([{ description: `Item ${i}`, quantity: 1, unitPriceCents: 1000 * (i + 1) }]),
+      iv([{ description: `Item ${i}`, quantity: 1, unitPriceCents: 1000 * (i + 1) }])
     );
     expect(computeBillingLineSuggestions(interventions, 3)).toHaveLength(3);
   });

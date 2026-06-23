@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useCompanyStockImages } from "@/features/featureHub/hooks/useCompanyStockImages";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: jest.fn(),

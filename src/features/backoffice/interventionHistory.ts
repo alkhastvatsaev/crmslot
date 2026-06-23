@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { unknownTimestampToMs } from "@/features/backoffice/timeHelpers";
 
 export type InterventionHistoryEntry = {
@@ -18,7 +18,6 @@ function formatWhen(ms: number): string {
     minute: "2-digit",
   });
 }
-
 
 export function buildInterventionHistory(iv: Intervention): InterventionHistoryEntry[] {
   const rows: InterventionHistoryEntry[] = [];

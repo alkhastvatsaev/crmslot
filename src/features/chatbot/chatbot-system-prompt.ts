@@ -1,7 +1,7 @@
-import type { CompanyRole } from "@/features/company/types";
+import type { CompanyRole } from "@/features/company";
 import type { ChatbotTurnDirective } from "@/features/chatbot/chatbot-email-intent";
 import { formatWorkspaceSnapshotForPrompt } from "@/features/chatbot/chatbot-snapshot-prompt";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 /** Prompt court — règles métier (facture, Lecot, confirmations) = code PWA + route API. */
 export function buildChatbotSystemPrompt(params: {

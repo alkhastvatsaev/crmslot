@@ -1,7 +1,7 @@
 import type { Firestore } from "firebase-admin/firestore";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { MaterialOrderDoc } from "@/features/materials";
 import { readStoredOrderClientName } from "@/features/materials/materialOrderClientName";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export type PwaRegistryPayload = {
   supplierOrders: SupplierOrder[];

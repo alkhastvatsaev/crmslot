@@ -1,7 +1,7 @@
 "use client";
 
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
+import type { ChatbotStreamEvent } from "@/features/chatbot";
 
 jest.mock("@/core/api/fetchWithAuth", () => ({
   fetchWithAuth: jest.fn(),
@@ -40,7 +40,7 @@ import CompanyStockGalaxyComposer from "@/features/featureHub/components/Company
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
 import { CompanyStockIntentProvider } from "@/context/CompanyStockIntentContext";
 import { computeCompanyStockMetrics } from "@/features/featureHub/companyStockMetrics";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const items: StockItem[] = [
   {
@@ -68,7 +68,7 @@ function renderAgentUi(pageActive = true) {
           <CompanyStockGalaxyComposer />
         </>
       </CompanyStockIntentProvider>
-    </CompanyStockAgentBridgeProvider>,
+    </CompanyStockAgentBridgeProvider>
   );
 }
 
@@ -79,7 +79,7 @@ describe("CompanyStockAgentPanel", () => {
       streamResponse([
         { type: "text", delta: "1 article en rupture." },
         { type: "done", apiMessages: [{ role: "assistant", content: "1 article en rupture." }] },
-      ]),
+      ])
     );
   });
 
@@ -108,7 +108,7 @@ describe("CompanyStockAgentPanel", () => {
     });
     expect(mockFetchWithAuth).toHaveBeenCalledWith(
       "/api/ai/material-agent",
-      expect.objectContaining({ method: "POST" }),
+      expect.objectContaining({ method: "POST" })
     );
   });
 

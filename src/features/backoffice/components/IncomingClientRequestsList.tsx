@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { formatIncomingRequestClientName } from "@/features/backoffice/incomingRequestClientDisplayName";
 import type { useIncomingClientRequestsController } from "@/features/backoffice/hooks/useIncomingClientRequestsController";
 import SlaStatusBadge from "@/features/sla/components/SlaStatusBadge";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type View = ReturnType<typeof useIncomingClientRequestsController>;
 

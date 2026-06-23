@@ -8,7 +8,7 @@ import {
   generateInterventionInvoicePdf,
   generateInterventionQuotePdf,
 } from "@/features/billing/generateQuotePdf";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 describe("generateInterventionQuotePdf", () => {
   it("returns non-empty pdf bytes", () => {

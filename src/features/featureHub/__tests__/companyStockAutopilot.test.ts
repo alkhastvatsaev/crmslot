@@ -5,7 +5,7 @@ import {
   resolveSmartFilter,
 } from "@/features/featureHub/companyStockAutopilot";
 import type { CompanyStockDashboardMetrics } from "@/features/featureHub/companyStockMetrics";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const baseMetrics = (): CompanyStockDashboardMetrics => ({
   totalSkus: 2,
@@ -50,7 +50,7 @@ describe("companyStockAutopilot", () => {
     const id = pickFocusStockItemId(
       [item({ id: "ok", quantity: 10 }), item({ id: "out", quantity: 0 })],
       "out",
-      new Set(),
+      new Set()
     );
     expect(id).toBe("out");
   });

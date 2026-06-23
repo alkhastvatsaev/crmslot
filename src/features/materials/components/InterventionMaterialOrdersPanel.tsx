@@ -13,7 +13,7 @@ import { orderInterventionPartViaMaterialAgent } from "@/features/materials/orde
 import { suggestMaterialPartsFromIntervention } from "@/features/materials/suggestMaterialPartsFromIntervention";
 import { useMaterialOrders } from "@/features/materials/useMaterialOrders";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useCompanyStockItems } from "@/features/featureHub/hooks/useCompanyStockItems";
 import {

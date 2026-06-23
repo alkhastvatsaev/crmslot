@@ -1,7 +1,7 @@
 import { CRMSLOT_FOCUS_STOCK_HUB_EVENT } from "@/context/CompanyStockIntentContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 
 /** Signal : une commande matériel attend que le bridge agent soit prêt (après changement de page). */
 export const MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT = "material-agent-pending-quick-prompt";

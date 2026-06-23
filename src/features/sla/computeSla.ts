@@ -1,5 +1,5 @@
 import { SLA_RULES, type SlaPriority } from "./slaConfig";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type SlaUrgency = "ok" | "warning" | "breach";
 
@@ -32,7 +32,7 @@ function worstUrgency(a: SlaUrgency, b: SlaUrgency): SlaUrgency {
 
 export function computeSlaStatus(
   intervention: Intervention,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): SlaStatus | null {
   const priority = (intervention.priority ?? null) as SlaPriority | null;
   if (!priority || !intervention.createdAt) return null;
@@ -45,9 +45,7 @@ export function computeSlaStatus(
   const responseHoursRemaining = isResponded
     ? rule.responseHours - elapsed // already responded — show remaining at time of response
     : rule.responseHours - elapsed;
-  const responseUrgency = isResponded
-    ? "ok"
-    : urgencyFromRemaining(responseHoursRemaining);
+  const responseUrgency = isResponded ? "ok" : urgencyFromRemaining(responseHoursRemaining);
 
   // Completion SLA
   const isCompleted = intervention.status === "done" || intervention.status === "invoiced";

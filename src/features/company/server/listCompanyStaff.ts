@@ -1,5 +1,5 @@
 import type * as admin from "firebase-admin";
-import type { CompanyStaffMember } from "@/features/teamHub/types";
+import type { CompanyStaffMember } from "@/features/teamHub";
 import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 import { buildTechnicianDisplayName } from "@/features/company/server/provisionTechnicianStaff";
 import {

@@ -1,5 +1,5 @@
-import type { MaterialOrderPart } from "@/features/materials/types";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { MaterialOrderPart } from "@/features/materials";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 type LineLike = { label: string; quantity?: number };
 

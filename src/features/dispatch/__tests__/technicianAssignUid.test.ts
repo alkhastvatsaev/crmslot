@@ -2,7 +2,7 @@ import {
   canResolveTechnicianAssignUid,
   resolveTechnicianAssignUid,
 } from "@/features/dispatch/technicianAssignUid";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 
 const techWithAuth: Technician = {
   id: "1",

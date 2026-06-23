@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { SCHEDULING_WORK_SLOTS } from "@/features/scheduling/schedulingConstants";
 import { getInterventionOccupiedRange } from "@/features/scheduling/interventionOccupiedRange";
 import { useTechnicians } from "@/features/technicians/hooks";

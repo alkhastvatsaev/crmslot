@@ -1,5 +1,5 @@
 import type { Firestore } from "firebase/firestore";
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import { navigateToChatbotWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import type { StockAutopilotPlan } from "@/features/featureHub/companyStockAutopilot";
 import { updateMaterialOrderStatus } from "@/features/materials/materialOrderFirestore";

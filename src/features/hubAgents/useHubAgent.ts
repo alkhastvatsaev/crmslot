@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
+import type { ChatbotStreamEvent } from "@/features/chatbot";
 import { trimChatbotMessagesForApi } from "@/features/chatbot/chatbot-message-trim";
 import { normalizeStoredMessages } from "@/features/chatbot/chatbot-stored-messages";
 import type { HubAgentMessage } from "@/features/hubAgents/hubAgentTypes";

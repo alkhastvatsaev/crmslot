@@ -1,11 +1,11 @@
-import type { ManualCommissionEntry } from "@/features/commissions/commissionFirestore";
-import type { CommissionRule } from "@/features/commissions/types";
+import type { ManualCommissionEntry } from "@/features/commissions";
+import type { CommissionRule } from "@/features/commissions";
 import {
   canResolveTechnicianAssignUid,
   resolveTechnicianAssignUid,
 } from "@/features/dispatch/technicianAssignUid";
-import type { Intervention } from "@/features/interventions/types";
-import type { Technician } from "@/features/technicians/types";
+import type { Intervention } from "@/features/interventions";
+import type { Technician } from "@/features/technicians";
 import {
   interventionCommissionMonth,
   interventionRevenueMonth,

@@ -11,7 +11,7 @@ import {
   shouldDismissBridgedTerrainReport,
 } from "@/features/backoffice/mergeReportCompletionMedia";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type TerrainBridgeArgs = {
   interventions: Intervention[];

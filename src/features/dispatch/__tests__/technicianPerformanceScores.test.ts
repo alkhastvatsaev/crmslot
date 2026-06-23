@@ -3,7 +3,7 @@ import {
   computeTechnicianPerformanceScores,
   formatCompositeScore,
 } from "@/features/dispatch/technicianPerformanceScores";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const NOW = new Date("2026-06-11T12:00:00Z");
 const RECENT = "2026-06-01T10:00:00Z"; // within 30d

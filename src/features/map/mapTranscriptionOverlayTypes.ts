@@ -1,4 +1,4 @@
-import type { AiPlaybackSync } from "@/features/dispatch/components/AiAssistant";
+import type { AiPlaybackSync } from "@/features/dispatch";
 
 export type MapTranscriptionAudiosResponse = {
   audio: null | {

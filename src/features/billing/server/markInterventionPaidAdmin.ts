@@ -5,7 +5,7 @@ import { notifyClient } from "@/core/services/email/clientNotifications/notifyCl
 import { buildClientPaymentReceivedEmail } from "@/core/services/email/clientNotifications/clientExtraTemplates";
 import { logCrmInterventionActionAdmin } from "@/features/crmHistory/logCrmInterventionActionAdmin";
 import { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function formatAmount(amount: unknown, currency: unknown): string {
   if (typeof amount !== "number" || !Number.isFinite(amount)) return "";

@@ -1,5 +1,5 @@
 import { documentCreatedAtMs } from "@/features/chatbot/filterChatbotDocuments";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export function formatEur(cents: number): string {
   return `${(cents / 100).toLocaleString("fr-BE", { maximumFractionDigits: 0 })} €`;

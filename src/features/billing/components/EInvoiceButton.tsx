@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = { intervention: Intervention };
 

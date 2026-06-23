@@ -5,9 +5,9 @@ import {
   isLowStockItem,
   type CompanyStockFilter,
 } from "@/features/featureHub/filterCompanyStock";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { StockItem } from "@/features/materials/stockFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { StockItem } from "@/features/materials";
+import type { SupplierOrder } from "@/features/suppliers";
 
 /** Filtre initial : le problème le plus urgent en premier. */
 export function resolveSmartFilter(metrics: CompanyStockDashboardMetrics): CompanyStockFilter {
@@ -20,7 +20,7 @@ export function resolveSmartFilter(metrics: CompanyStockDashboardMetrics): Compa
 export function pickFocusStockItemId(
   items: StockItem[],
   filter: CompanyStockFilter,
-  openOrderRefs: Set<string>,
+  openOrderRefs: Set<string>
 ): string | null {
   const rows = applyStockListFilters(items, {
     filter,
@@ -63,17 +63,24 @@ export function buildAutopilotChatbotPrompt(input: {
   if (out.length > 0) {
     lines.push("", "Ruptures :");
     for (const i of out.slice(0, 12)) {
-      lines.push(`- ${i.description} (réf. ${i.reference || "—"}, qté ${i.quantity}, seuil ${i.alertThreshold})`);
+      lines.push(
+        `- ${i.description} (réf. ${i.reference || "—"}, qté ${i.quantity}, seuil ${i.alertThreshold})`
+      );
     }
   }
   if (low.length > 0) {
     lines.push("", "Stock bas :");
     for (const i of low.slice(0, 12)) {
-      lines.push(`- ${i.description} (réf. ${i.reference || "—"}, qté ${i.quantity}/${i.alertThreshold})`);
+      lines.push(
+        `- ${i.description} (réf. ${i.reference || "—"}, qté ${i.quantity}/${i.alertThreshold})`
+      );
     }
   }
   if (pending.length > 0) {
-    lines.push("", "Demandes techniciens (déjà validées côté patron si tu vois ce message après coup) :");
+    lines.push(
+      "",
+      "Demandes techniciens (déjà validées côté patron si tu vois ce message après coup) :"
+    );
     for (const o of pending.slice(0, 8)) {
       const parts = (o.partsRequested ?? [])
         .map((p) => p.description || p.reference)
@@ -85,13 +92,13 @@ export function buildAutopilotChatbotPrompt(input: {
   if (selected) {
     lines.push(
       "",
-      `Focus actuel : ${selected.description} (réf. ${selected.reference || "—"}, qté ${selected.quantity}).`,
+      `Focus actuel : ${selected.description} (réf. ${selected.reference || "—"}, qté ${selected.quantity}).`
     );
   }
 
   lines.push(
     "",
-    "À faire maintenant : 1) prioriser les achats Lecot pour les ruptures, 2) regrouper une commande fournisseur si pertinent, 3) indiquer les seuils à ajuster. Réponds en français, listes courtes, actions numérotées.",
+    "À faire maintenant : 1) prioriser les achats Lecot pour les ruptures, 2) regrouper une commande fournisseur si pertinent, 3) indiquer les seuils à ajuster. Réponds en français, listes courtes, actions numérotées."
   );
 
   return lines.join("\n");
@@ -106,7 +113,8 @@ export function resolveAutopilotPlan(input: {
 }): StockAutopilotPlan {
   const pending = input.orders.filter((o) => o.status === "pending");
   const orderIdsToApprove = pending.map((o) => o.id);
-  const stockIssues = input.metrics.outCount + input.metrics.lowCount + input.metrics.waitingMaterialJobs;
+  const stockIssues =
+    input.metrics.outCount + input.metrics.lowCount + input.metrics.waitingMaterialJobs;
   const issueCount = orderIdsToApprove.length + stockIssues;
   const needsChatbot = stockIssues > 0 || input.metrics.openSupplierOrders > 0;
   const chatbotPrompt = needsChatbot ? buildAutopilotChatbotPrompt(input) : null;

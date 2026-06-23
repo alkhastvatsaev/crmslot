@@ -2,11 +2,11 @@ import {
   invoiceClientOnlyLabel,
   type ChatbotInvoiceRow,
 } from "@/features/chatbot/chatbotInvoiceRows";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
+import type { MaterialOrderDoc } from "@/features/materials";
 import { MATERIAL_ORDER_CLIENT_FALLBACK } from "@/features/materials/materialOrderClientName";
-import type { Intervention } from "@/features/interventions/types";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { Intervention } from "@/features/interventions";
+import type { SupplierOrder } from "@/features/suppliers";
 
 /** Index interventionId → libellé client (dossiers société + factures + snapshot). */
 export function buildInterventionClientLabelMap(

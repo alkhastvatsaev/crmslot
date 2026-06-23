@@ -6,7 +6,7 @@ import {
   buildChatbotPwaDoneMessage,
   isChatbotPwaPendingToolId,
 } from "@/features/chatbot/chatbot-pwa-intent";
-import type { WorkspaceCopilotSnapshot } from "@/features/copilot/types";
+import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
 
 const snapshot: WorkspaceCopilotSnapshot = {
   generatedAt: "2026-05-18T10:00:00Z",
@@ -72,7 +72,7 @@ describe("chatbot-pwa-intent", () => {
     const intent = resolveChatbotPwaIntent(
       "ajoute une serrure a 300€ et main d'oeuvre 50€",
       snapshot,
-      { focusInterventionId: "int-vatsaev" },
+      { focusInterventionId: "int-vatsaev" }
     );
     expect(intent?.kind).toBe("billing_add_lines");
     if (intent?.kind === "billing_add_lines") {
@@ -86,7 +86,7 @@ describe("chatbot-pwa-intent", () => {
     });
     expect(intent?.kind).toBe("document_preview");
     expect(intent && intent.kind === "document_preview" ? intent.documentType : null).toBe(
-      "invoice",
+      "invoice"
     );
   });
 
@@ -133,7 +133,9 @@ describe("chatbot-pwa-intent", () => {
     });
 
     it("resolveChatbotPwaIntent handles line index", () => {
-      const intent = resolveChatbotPwaIntent("met la ligne 2 a 500€", snapshot, { focusInterventionId: "int-vatsaev" });
+      const intent = resolveChatbotPwaIntent("met la ligne 2 a 500€", snapshot, {
+        focusInterventionId: "int-vatsaev",
+      });
       expect(intent?.kind).toBe("billing_patch");
       if (intent?.kind === "billing_patch") {
         expect(intent.lineIndex).toBe(1); // zero-indexed
@@ -148,11 +150,13 @@ describe("chatbot-pwa-intent", () => {
     it("buildChatbotPwaDoneMessage formats messages correctly", () => {
       const intentPatch = resolveChatbotPwaIntent("facture Vatsaev 500€", snapshot)!;
       expect(buildChatbotPwaDoneMessage(intentPatch)).toContain("500 €");
-      
+
       const intentPreview = resolveChatbotPwaIntent("affiche devis Vatsaev", snapshot)!;
       expect(buildChatbotPwaDoneMessage(intentPreview)).toContain("Devis");
 
-      const intentAdd = resolveChatbotPwaIntent("ajoute serrure a 100€", snapshot, { focusInterventionId: "int-vatsaev" })!;
+      const intentAdd = resolveChatbotPwaIntent("ajoute serrure a 100€", snapshot, {
+        focusInterventionId: "int-vatsaev",
+      })!;
       expect(buildChatbotPwaDoneMessage(intentAdd)).toContain("Lignes ajoutées");
     });
   });

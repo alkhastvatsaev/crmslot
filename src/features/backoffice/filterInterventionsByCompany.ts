@@ -1,9 +1,9 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 /** Garde-fou client si Firestore renvoie des docs hors société active (rules permissives en dev). */
 export function filterInterventionsByCompany(
   companyId: string,
-  rows: Intervention[],
+  rows: Intervention[]
 ): Intervention[] {
   const cid = companyId.trim();
   if (!cid) return [];

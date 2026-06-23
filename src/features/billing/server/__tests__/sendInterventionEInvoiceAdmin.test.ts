@@ -1,6 +1,6 @@
 /** @jest-environment node */
 
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   companyToUblSupplier,
   interventionToUblInput,

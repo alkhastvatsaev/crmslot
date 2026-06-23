@@ -8,7 +8,7 @@ import type {
   ChatbotDocumentListItem,
   ParsedDocumentsSearchQuery,
 } from "@/features/chatbot/filterChatbotDocumentsTypes";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 const MONTH_LABELS = [
   "janvier",

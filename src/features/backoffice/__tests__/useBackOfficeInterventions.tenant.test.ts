@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
 
 jest.mock("firebase/firestore", () => ({

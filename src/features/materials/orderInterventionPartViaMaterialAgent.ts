@@ -1,7 +1,7 @@
-import type { DashboardPagerApi } from "@/features/dashboard/dashboardPagerContext";
+import type { DashboardPagerApi } from "@/features/dashboard";
 import { navigateMaterialAgentWithQuickPrompt } from "@/features/featureHub/companyStockChatbot";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { buildInterventionMaterialOrderPrompt } from "@/features/materials/interventionMaterialOrderPrompt";
 import type { CatalogMatchedPart } from "@/features/materials/matchStockCatalogItem";
 

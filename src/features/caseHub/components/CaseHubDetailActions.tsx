@@ -10,7 +10,7 @@ import TechnicianAssignPicker from "@/features/dispatch/components/TechnicianAss
 import CaseHubDetailStep from "@/features/caseHub/components/CaseHubDetailStep";
 import { CASE_HUB_DETAIL } from "@/features/caseHub/caseHubDetailTheme";
 import type { CaseHubDetailSnapshot } from "@/features/caseHub/caseHubInterventionDetail";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   intervention: Intervention;

@@ -13,8 +13,8 @@ import {
   applyStockListFilters,
   buildOpenOrderReferenceSet,
 } from "@/features/featureHub/filterCompanyStock";
-import type { StockItem } from "@/features/materials/stockFirestore";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { StockItem } from "@/features/materials";
+import type { MaterialOrderDoc } from "@/features/materials";
 import {
   dispatchMaterialAgentQuickPrompt,
   buildStockCenterMaterialOrderPrompt,

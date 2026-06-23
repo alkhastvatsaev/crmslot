@@ -1,7 +1,7 @@
 import { isChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
 import { streamDocumentToolOutcome } from "@/features/chatbot/chatbot-sse";
 import { executeChatbotTool } from "@/features/chatbot/chatbot-tool-executor";
-import type { CompanyRole } from "@/features/company/types";
+import type { CompanyRole } from "@/features/company";
 
 export type ChatbotDocumentActionBody = {
   companyId?: string;
@@ -30,7 +30,7 @@ export type ChatbotRouteAuth = {
 };
 
 export function resolveDocumentActionTool(
-  body: ChatbotDocumentActionBody | null,
+  body: ChatbotDocumentActionBody | null
 ):
   | { ok: true; toolName: string; toolInput: Record<string, unknown> }
   | { ok: false; status: number; error: string } {
@@ -120,7 +120,7 @@ export function resolveDocumentActionTool(
 
 export async function handleChatbotDocumentActionPost(
   body: ChatbotDocumentActionBody | null,
-  auth: ChatbotRouteAuth,
+  auth: ChatbotRouteAuth
 ): Promise<Response> {
   const resolved = resolveDocumentActionTool(body);
   if (!resolved.ok) {
@@ -137,7 +137,7 @@ export async function handleChatbotDocumentActionPost(
   const result = await executeChatbotTool(resolved.toolName, resolved.toolInput, toolCtx).catch(
     (err: unknown) => ({
       error: err instanceof Error ? err.message : "Erreur",
-    }),
+    })
   );
 
   return streamDocumentToolOutcome({

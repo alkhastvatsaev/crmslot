@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export interface CalendarDay {
   date: string; // "YYYY-MM-DD"
@@ -25,7 +25,7 @@ export function toIsoDate(date: Date): string {
 /** Groups interventions by their scheduledDate into a week view. */
 export function buildWeekCalendar(
   interventions: Intervention[],
-  weekContaining: Date,
+  weekContaining: Date
 ): CalendarDay[] {
   const days = getWeekDays(weekContaining);
   return days.map((d) => {

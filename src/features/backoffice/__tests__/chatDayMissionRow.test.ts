@@ -1,5 +1,5 @@
 import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 const anchor = new Date("2026-06-19T12:00:00");
 

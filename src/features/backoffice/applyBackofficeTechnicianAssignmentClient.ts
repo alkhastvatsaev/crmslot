@@ -5,7 +5,7 @@ import {
   buildBackofficeAssignPatch,
   canApplyBackofficeTechnicianAssignment,
 } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
@@ -24,7 +24,7 @@ export async function applyBackofficeTechnicianAssignmentClient(
   iv: Intervention,
   technicianUid: string,
   actorUid: string,
-  schedule?: AssignInterventionSchedule,
+  schedule?: AssignInterventionSchedule
 ): Promise<void> {
   if (!firestore) throw new Error("Firestore indisponible");
   if (!canApplyBackofficeTechnicianAssignment(iv)) {
@@ -58,8 +58,6 @@ export async function applyBackofficeTechnicianAssignmentClient(
     actorUid,
     actorRole: "dispatcher",
     statusAfter: "assigned",
-    note: schedule
-      ? `Créneau ${schedule.scheduledDate} ${schedule.scheduledTime}`
-      : undefined,
+    note: schedule ? `Créneau ${schedule.scheduledDate} ${schedule.scheduledTime}` : undefined,
   });
 }

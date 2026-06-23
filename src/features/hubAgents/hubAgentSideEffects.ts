@@ -1,8 +1,8 @@
 import { emitChatbotOrderRegisteredEvents } from "@/features/chatbot/chatbot-order-side-effect";
 import { extractDocumentPreviewFromResult } from "@/features/chatbot/chatbot-document-side-effect";
 import type { ChatbotStreamEmit } from "@/features/chatbot/chatbot-types";
-import type { CompanyStockFilter } from "@/features/featureHub/filterCompanyStock";
-import type { BillingPaymentFilter } from "@/features/billingHub/billingHubMetrics";
+import type { CompanyStockFilter } from "@/features/featureHub";
+import type { BillingPaymentFilter } from "@/features/billingHub";
 
 function okResult(result: unknown): result is Record<string, unknown> {
   return Boolean(result && typeof result === "object" && (result as { ok?: boolean }).ok);

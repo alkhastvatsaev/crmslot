@@ -1,7 +1,7 @@
 import type * as admin from "firebase-admin";
 import Stripe from "stripe";
 import { stripeMockPaymentsEnabled } from "@/features/billing/stripeMockMode";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export type CreateInterventionPaymentIntentResult = {
   clientSecret: string | null;

@@ -11,7 +11,7 @@ import {
   formatBillingMoney,
 } from "@/features/billing/billingPdfTheme";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type BillingLine = NonNullable<Intervention["billingLines"]>[number];
 
@@ -30,7 +30,7 @@ function drawHeader(
   doc: jsPDF,
   branding: BillingPdfBranding,
   docKind: "invoice" | "quote",
-  interventionId: string,
+  interventionId: string
 ) {
   const isInvoice = docKind === "invoice";
   const docLabel = isInvoice ? "FACTURE" : "DEVIS";
@@ -151,12 +151,7 @@ function drawLinesTable(doc: jsPDF, lines: BillingLine[], startY: number): numbe
   return (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? startY;
 }
 
-function drawTotals(
-  doc: jsPDF,
-  lines: BillingLine[],
-  footerLabel: string,
-  startY: number,
-): number {
+function drawTotals(doc: jsPDF, lines: BillingLine[], footerLabel: string, startY: number): number {
   const ht = subtotalCents(lines);
   const tva = Math.round(ht * 0.06);
   const ttc = ht + tva;
@@ -202,7 +197,7 @@ export function buildPremiumBillingPdf(
   iv: Intervention,
   docKind: "invoice" | "quote",
   footerLabel: string,
-  branding: BillingPdfBranding,
+  branding: BillingPdfBranding
 ): Uint8Array {
   const doc = new jsPDF();
 

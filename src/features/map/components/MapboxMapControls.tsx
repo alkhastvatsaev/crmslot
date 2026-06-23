@@ -5,7 +5,7 @@ import {
   DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS,
   DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   onRecenter: () => void;

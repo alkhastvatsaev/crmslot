@@ -26,7 +26,7 @@ import {
 } from "@/features/interventions/technicianHubNavigation";
 import type { FinishWizardPhoto } from "@/features/interventions/technicianCompletionReport";
 import type { Intervention } from "@/features/interventions/types";
-import type { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import type { useDashboardPagerOptional } from "@/features/dashboard";
 import { useQueryClient } from "@tanstack/react-query";
 
 type Pager = ReturnType<typeof useDashboardPagerOptional>;

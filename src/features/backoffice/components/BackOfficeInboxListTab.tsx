@@ -6,7 +6,7 @@ import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import BackOfficeBridgedTerrainReportCard from "@/features/backoffice/components/BackOfficeBridgedTerrainReportCard";
 import { BackOfficeInboxInterventionRow } from "@/features/backoffice/components/BackOfficeInboxInterventionRow";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { BridgedTechnicianReport } from "@/context/TechnicianBackofficeReportBridgeContext";
 
 export default function BackOfficeInboxListTab({

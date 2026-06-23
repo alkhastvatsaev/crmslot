@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { downloadAccountingCsv } from "../exportAccountingCsv";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 interface Props {
   interventions: Intervention[];
@@ -24,9 +24,7 @@ export default function AccountingExportButton({ interventions, periodLabel }: P
     }
     setLoading(true);
     try {
-      const filename = periodLabel
-        ? `export-comptable-${periodLabel}.csv`
-        : "export-comptable.csv";
+      const filename = periodLabel ? `export-comptable-${periodLabel}.csv` : "export-comptable.csv";
       downloadAccountingCsv(billed, filename);
       toast.success(`${billed.length} intervention(s) exportée(s)`);
     } finally {

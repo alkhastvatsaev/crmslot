@@ -8,7 +8,7 @@ import {
   isInterventionVisibleOnTechnicianMap,
 } from "@/features/interventions/technicianSchedule";
 import type { Mission } from "@/features/map/missionTypes";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function interventionHasMapCoordinates(iv: Intervention): boolean {
   const loc = iv.location;

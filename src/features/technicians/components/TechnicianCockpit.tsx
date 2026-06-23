@@ -7,7 +7,7 @@ import ARScanner from "./ARScanner";
 import MissionFinishModal from "./MissionFinishModal";
 import { MaterialOrderForm } from "@/features/materials/components/MaterialOrderForm";
 import { BILLING_TEMPLATES } from "@/features/interventions/config/terrainTemplates";
-import type { MaterialOrderPart } from "@/features/materials/types";
+import type { MaterialOrderPart } from "@/features/materials";
 
 type TechnicianStatus = "available" | "on-mission" | "break";
 

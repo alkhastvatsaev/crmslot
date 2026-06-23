@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { useClients } from "@/features/clients/useClients";
 import { useClientSites } from "@/features/clients/useClientSites";
 import { buildClientDisplayName } from "@/features/clients/clientDisplayName";
@@ -157,7 +157,9 @@ export default function InterventionClientLinkPanel({ intervention }: Props) {
                     data-testid={`intervention-crm-site-${s.id}`}
                     onClick={() => setPickSiteId(s.id)}
                     className={`flex w-full items-start gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
-                      pickSiteId === s.id ? "bg-emerald-600 text-white" : "bg-slate-50 hover:bg-slate-100"
+                      pickSiteId === s.id
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-50 hover:bg-slate-100"
                     }`}
                   >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" />

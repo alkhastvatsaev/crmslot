@@ -6,8 +6,8 @@ import { firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { fetchChatbotPwaRegistry } from "@/features/chatbot/fetchChatbotPwaRegistry";
 import { subscribeSupplierOrders } from "@/features/suppliers/supplierFirestore";
-import type { SupplierOrder } from "@/features/suppliers/types";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
+import type { SupplierOrder } from "@/features/suppliers";
+import type { MaterialOrderDoc } from "@/features/materials";
 
 export type ChatbotSupplierOrdersPanelState = {
   open: boolean;

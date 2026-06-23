@@ -5,14 +5,14 @@ import { CheckCircle2, ExternalLink, Trash2, X } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import {
   formatScheduledLabel,
   interventionClientLabel,
   statusLabelKey,
 } from "@/features/interventions/technicianSchedule";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { Technician } from "@/features/technicians/types";
+import type { Technician } from "@/features/technicians";
 import { useInterventionLive } from "@/features/interventions/useInterventionLive";
 import { interventionBackofficeBucket } from "@/features/backoffice/backofficeBuckets";
 import { buildInterventionHistory } from "@/features/backoffice/interventionHistory";

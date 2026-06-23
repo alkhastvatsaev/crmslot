@@ -1,5 +1,5 @@
 import { computeTodayActivitySummary } from "@/features/backoffice/todayActivity";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(partial: Partial<Intervention> & Pick<Intervention, "id" | "status">): Intervention {
   return {
@@ -30,7 +30,7 @@ describe("computeTodayActivitySummary", () => {
           invoiceAmountCents: 15_000,
         }),
       ],
-      now,
+      now
     );
     expect(summary.invoicedCount).toBe(2);
     expect(summary.revenueEstimateEuros).toBe(350);

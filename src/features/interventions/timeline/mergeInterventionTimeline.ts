@@ -1,10 +1,10 @@
 import type { InterventionEvent } from "@/features/interventions/types";
 import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
 import type { InterventionTimelineDoc } from "@/features/interventions/timeline/interventionTimelineTypes";
-import type { InterventionEmailDoc } from "@/features/emails/interventionEmailFirestore";
-import type { MaterialOrderDoc } from "@/features/materials/materialOrderFirestore";
-import type { CommissionAuditRow } from "@/features/commissions/commissionFirestore";
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import type { InterventionEmailDoc } from "@/features/emails";
+import type { MaterialOrderDoc } from "@/features/materials";
+import type { CommissionAuditRow } from "@/features/commissions";
+import type { IvanaPortalChatDoc } from "@/features/backoffice";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 function toIsoString(value: unknown): string {

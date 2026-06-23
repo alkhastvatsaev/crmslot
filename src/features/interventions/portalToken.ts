@@ -1,4 +1,4 @@
-import type { PortalQuoteSummary } from "@/features/quotes/portalQuoteSummary";
+import type { PortalQuoteSummary } from "@/features/quotes";
 import type { Intervention } from "@/features/interventions/types";
 
 export function generatePortalAccessToken(): string {

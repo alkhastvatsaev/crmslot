@@ -8,7 +8,7 @@ import { interventionClientLabel } from "@/features/interventions/technicianSche
 import type { GmailLinkCandidate } from "@/features/gmail/useGmailHubLinkIntervention";
 import { gmailDivider, gmailEyebrow, gmailFieldClass } from "@/features/gmail/gmailHubUi";
 import { HubButton } from "@/core/ui/hub";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 type Props = {
   open: boolean;

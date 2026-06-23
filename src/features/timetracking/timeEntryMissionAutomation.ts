@@ -1,5 +1,5 @@
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import type { TimeEntryType } from "@/features/timetracking/types";
 import { TIME_ENTRY_LABELS, formatDuration } from "@/features/timetracking/types";
 

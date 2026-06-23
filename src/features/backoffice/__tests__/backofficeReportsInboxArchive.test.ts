@@ -4,7 +4,7 @@ import {
   isBackofficeReportInInboxActiveQueue,
   isBackofficeReportInInboxArchive,
 } from "@/features/backoffice/backofficeReportsInboxArchive";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 function iv(
   partial: Pick<Intervention, "status"> &

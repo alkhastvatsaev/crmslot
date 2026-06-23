@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { localCalendarYmd } from "@/features/interventions/technicianSchedule";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
 import type {

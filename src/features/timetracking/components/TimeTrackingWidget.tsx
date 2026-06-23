@@ -5,7 +5,7 @@ import { Timer, Play, Square } from "lucide-react";
 import { toast } from "sonner";
 import { firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { logCrmTimeEntryRecorded } from "@/features/timetracking/logCrmTimeEntryRecorded";
 import {
   autoStartTimeEntryType,

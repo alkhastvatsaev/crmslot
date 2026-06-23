@@ -7,7 +7,7 @@ import {
 } from "@/features/catalog/searchCatalogProducts";
 import { syntheticLecotSku } from "@/features/chatbot/chatbot-lecot-catalog";
 import { buildLecotSearchUrl } from "@/features/chatbot/chatbot-lecot-url";
-import type { SupplierOrderLine } from "@/features/suppliers/types";
+import type { SupplierOrderLine } from "@/features/suppliers";
 
 const LOCAL_CATALOG = mergeCatalogProducts(LECOT_CATALOG, STUB_CATALOG);
 

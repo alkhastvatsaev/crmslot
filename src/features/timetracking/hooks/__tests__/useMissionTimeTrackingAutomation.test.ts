@@ -6,7 +6,7 @@ import {
   stopTimeEntry,
   subscribeTimeEntriesByIntervention,
 } from "@/features/timetracking/timetrackingFirestore";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: () => ({

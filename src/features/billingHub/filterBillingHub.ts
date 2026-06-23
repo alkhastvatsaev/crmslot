@@ -1,17 +1,16 @@
 import type { BillingPaymentFilter } from "@/features/billingHub/billingHubMetrics";
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 
 export function filterBillingByPayment(
   rows: Intervention[],
-  filter: BillingPaymentFilter,
+  filter: BillingPaymentFilter
 ): Intervention[] {
   switch (filter) {
     case "unpaid":
       return rows.filter(
         (iv) =>
-          (iv.billingLines?.length ?? 0) > 0 &&
-          (iv.paymentStatus === "unpaid" || !iv.paymentStatus),
+          (iv.billingLines?.length ?? 0) > 0 && (iv.paymentStatus === "unpaid" || !iv.paymentStatus)
       );
     case "pending":
       return rows.filter((iv) => iv.paymentStatus === "pending");
@@ -44,7 +43,7 @@ export function sortBillingRows(rows: Intervention[]): Intervention[] {
 
 export function applyBillingListFilters(
   rows: Intervention[],
-  opts: { filter: BillingPaymentFilter; search: string },
+  opts: { filter: BillingPaymentFilter; search: string }
 ): Intervention[] {
   let list = filterBillingByPayment(rows, opts.filter);
   list = filterBillingBySearch(list, opts.search);

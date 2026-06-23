@@ -1,5 +1,5 @@
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type {
   CaseHubInsight,

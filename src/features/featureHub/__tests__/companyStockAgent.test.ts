@@ -1,6 +1,6 @@
 import { computeCompanyStockMetrics } from "@/features/featureHub/companyStockMetrics";
 import { runCompanyStockAgentTurn } from "@/features/featureHub/companyStockAgent";
-import type { StockItem } from "@/features/materials/stockFirestore";
+import type { StockItem } from "@/features/materials";
 
 const items: StockItem[] = [
   {

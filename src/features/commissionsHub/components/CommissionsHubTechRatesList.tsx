@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { CommissionValueType } from "@/features/commissions/types";
+import type { CommissionValueType } from "@/features/commissions";
 import type { PatronTechnicianRow } from "@/features/commissionsHub/commissionsHubPatronMetrics";
 import { formatCommissionValue } from "@/features/commissionsHub/commissionsHubFormat";
 import { logger } from "@/core/logger";

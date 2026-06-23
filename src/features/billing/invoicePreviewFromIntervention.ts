@@ -1,4 +1,4 @@
-import type { Intervention } from "@/features/interventions/types";
+import type { Intervention } from "@/features/interventions";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
 
 const INVOICE_DATE_FMT: Intl.DateTimeFormatOptions = {

@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import type { Mission } from "@/features/map/missionTypes";
+import type { Mission } from "@/features/map";
 import { dailyMissionCardToneFromStatus } from "@/features/interventions/technicianSchedule";
 import {
   DASHBOARD_PANEL_CHROME_BLUR,
