@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { auth } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { isCompanyDispatchViewer } from "@/features/company/isCompanyDispatchViewer";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import {
+  readAdminInterventionDetailCache,
+  writeAdminInterventionDetailCache,
+} from "@/features/offline/adminInterventionDetailCache";
 import type { Intervention } from "@/features/interventions";
 
 export function useBackOfficeHubSelectedIntervention(): {
@@ -29,7 +33,16 @@ export function useBackOfficeHubSelectedIntervention(): {
     [interventionId, interventions]
   );
 
-  const intervention = liveIntervention;
+  const cachedIntervention = useMemo(
+    () => (interventionId ? readAdminInterventionDetailCache(interventionId) : null),
+    [interventionId]
+  );
+
+  useEffect(() => {
+    if (liveIntervention) writeAdminInterventionDetailCache(liveIntervention);
+  }, [liveIntervention]);
+
+  const intervention: Intervention | null = liveIntervention ?? cachedIntervention;
   const technicianUid =
     intervention?.assignedTechnicianUid?.trim() || auth?.currentUser?.uid?.trim() || "";
 
