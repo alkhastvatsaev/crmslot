@@ -49,6 +49,11 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `chatbot-executor-stock-queries.ts`                | Stock entrepôt + véhicule                          |
 | `chatbot-executor-order-queries.ts`                | Bons matériel / fournisseur                        |
 | `chatbot-executor-comms-queries.ts`                | Inbox, emails, chat portail                        |
+| `filterChatbotDocuments.ts`                        | Barrel recherche documents (factures + commandes)  |
+| `filterChatbotDocumentsTypes.ts`                   | Types filtre / item liste documents                |
+| `filterChatbotDocumentsParse.ts`                   | Normalisation + tokenisation requête               |
+| `filterChatbotDocumentsHaystack.ts`                | Haystack facture / bon fournisseur                 |
+| `filterChatbotDocumentsScore.ts`                   | Score fuzzy, filtre, tri, merge par date           |
 
 ## Données
 
