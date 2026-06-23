@@ -28,6 +28,11 @@ Cœur métier CRM : création demande client, workflow statuts, app technicien t
 | `components/RequesterInterventionSteps.tsx`        | Steps animés AnimatePresence                                |
 | `components/RequesterStepPhotos.tsx`               | Étape photos portail                                        |
 | `components/RequesterStepTimeSlot.tsx`             | Étape créneau portail                                       |
+| `components/SmartTimeSlotPicker.tsx`               | Orchestrateur créneaux portail (~55 lignes)                 |
+| `components/SmartTimeSlotNextAvailabilities.tsx`   | Liste prochaines dispos                                     |
+| `components/SmartTimeSlotSpecificDatePicker.tsx`   | Calendrier + grille horaires jour                           |
+| `components/SmartTimeSlotPremiumCalendar.tsx`      | Calendrier mensuel premium                                  |
+| `smartTimeSlotConstants.ts`                        | Heures ouvrées + types slots                                |
 | `components/RequesterStepAddressSubmit.tsx`        | Étape adresse + envoi                                       |
 | `requesterInterventionStepMotion.ts`               | Variants Framer Motion steps                                |
 | `requesterInterventionFormSubmit.ts`               | Orchestrateur soumission portail (~205 lignes)              |
