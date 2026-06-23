@@ -9,6 +9,7 @@ type Props = {
   title: ReactNode;
   onBack: () => void;
   backLabel?: string;
+  backTestId?: string;
   rightAction?: ReactNode;
   className?: string;
 };
@@ -17,6 +18,7 @@ export default function HubDetailHeader({
   title,
   onBack,
   backLabel,
+  backTestId,
   rightAction,
   className,
 }: Props) {
@@ -31,6 +33,7 @@ export default function HubDetailHeader({
         type="button"
         onClick={onBack}
         aria-label={backLabel}
+        data-testid={backTestId}
         className={cn(
           "flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200",
           HUB_FOCUS_RING

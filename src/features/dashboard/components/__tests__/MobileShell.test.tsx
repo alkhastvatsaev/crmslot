@@ -52,7 +52,8 @@ describe("MobileShell", () => {
     expect(screen.getByTestId("admin-mobile-profile-chip")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-screen-host")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-shell-footer")).toBeInTheDocument();
-    expect(screen.queryByTestId("mobile-hub-dots-bar")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mobile-hub-dots-bar")).toBeInTheDocument();
+    expect(document.querySelectorAll(".mobile-hub-dot")).toHaveLength(0);
     expect(screen.getByText("Hub A")).toBeInTheDocument();
   });
 

@@ -11,7 +11,7 @@ import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeConte
 import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
-  MOBILE_GALAXY_DOCK_CHROME_CLASS,
+  MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS,
   MOBILE_PROFILE_BAR_CHROME_CLASS,
   MOBILE_SHELL_SLOT_GRID_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
@@ -85,7 +85,7 @@ describe("mobileShellContract — layout", () => {
     expect(
       screen
         .getByTestId(MOBILE_SHELL_CONTRACT.testIds.galaxyDock)
-        .querySelector(`.${MOBILE_GALAXY_DOCK_CHROME_CLASS}`)
+        .querySelector(`.${MOBILE_GALAXY_DOCK_CHROME_BASE_CLASS}`)
     ).toBeTruthy();
   });
 

@@ -33,14 +33,15 @@ function RegisterDots({
 }
 
 describe("MobileHubDotsBar", () => {
-  it("n'affiche rien sans enregistrement visible", () => {
+  it("réserve la hauteur sans points quand aucun hub multi-rails n'est actif", () => {
     render(
       <MobileHubRailProvider>
         <MobileHubDotsBar />
       </MobileHubRailProvider>
     );
 
-    expect(screen.queryByTestId("mobile-hub-dots-bar")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mobile-hub-dots-bar")).toBeInTheDocument();
+    expect(document.querySelectorAll(".mobile-hub-dot")).toHaveLength(0);
   });
 
   it("affiche les dots sous le shell quand un hub multi-rails est actif", () => {

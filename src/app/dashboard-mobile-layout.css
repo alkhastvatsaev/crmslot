@@ -379,6 +379,32 @@
   min-height: 0;
 }
 
+/* Sélecteur langue — 4 options en largeur égale, sans déborder du glass. */
+.dashboard-page-selector-language--mobile {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 0.875rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0;
+}
+
+.dashboard-page-selector-language--mobile .dashboard-page-selector-language-control {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  gap: 0.125rem;
+  padding: 0.1875rem;
+}
+
+.dashboard-page-selector-language--mobile .dashboard-page-selector-language-option {
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.375rem 0.25rem;
+  font-size: 0.75rem;
+}
+
 .mobile-page-selector-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -445,6 +471,21 @@
 
 .mobile-page-selector-item--active .mobile-page-selector-label {
   color: rgb(37 99 235);
+}
+
+/* ── Account panel (profil staff) ───────────────────────── */
+
+.mobile-account-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.mobile-account-panel-inner {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.875rem;
 }
 
 /* ── Nav drawer (bottom sheet) ───────────────────────────── */
@@ -777,6 +818,8 @@
   justify-content: center;
   align-items: center;
   pointer-events: none;
+  /* Hauteur réservée même sans points — évite le saut des panneaux au changement de page. */
+  min-height: 0.625rem;
 }
 
 .mobile-hub-dots {
@@ -907,6 +950,17 @@
   display: flex;
   align-items: stretch;
   overflow: hidden;
+}
+
+/* Profil / Galaxy : le chip remplit la coque glass sans double bordure. */
+.mobile-galaxy-dock-chrome.panel-glass .mobile-profile-chip {
+  border: none;
+  background: transparent;
+  border-radius: inherit;
+}
+
+.mobile-galaxy-dock-chrome.panel-glass .mobile-profile-chip:active {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .mobile-header-chip {
