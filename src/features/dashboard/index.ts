@@ -47,6 +47,7 @@ export type { MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 export { default as DashboardPager } from "@/features/dashboard/components/DashboardPager";
 export { default as DashboardDesktopShell } from "@/features/dashboard/components/DashboardDesktopShell";
 export { default as MobileShell } from "@/features/dashboard/components/MobileShell";
+export { default as AdminMobileShell } from "@/features/dashboard/components/AdminMobileShell";
 export { default as AdaptiveTriplePanelLayout } from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 export { default as MobileHubLayout } from "@/features/dashboard/components/MobileHubLayout";
 export { default as DailyMissions } from "@/features/dashboard/components/DailyMissions";
