@@ -20,7 +20,9 @@ Carte Mapbox (slot 0 du DashboardPager) : missions dispatch/terrain, markers, ro
 | `hooks/useMapTranscriptionActionsRailRect.ts`   | Alignement panneau édition sur rail gauche                            |
 | `hooks/useMapTranscriptionActionsCreate.ts`     | Refus + création intervention (API / fallback Firestore)              |
 | `components/MapTranscriptionOverlay.tsx`        | Orchestrateur calque transcription (~35 lignes)                       |
-| `hooks/useMapTranscriptionOverlayController.ts` | Polling API + révélation texte/audio                                  |
+| `hooks/useMapTranscriptionOverlayController.ts` | Orchestrateur overlay transcription (~75 lignes)                      |
+| `hooks/useMapTranscriptionOverlayPoll.ts`       | Polling API + sessions transcript                                     |
+| `hooks/useMapTranscriptionOverlayReveal.ts`     | Révélation texte synchronisée audio / fallback                        |
 | `components/MapTranscriptionOverlayView.tsx`    | Scrim + texte + fermeture                                             |
 | `mapTranscriptionReveal.ts`                     | Pure functions révélation synchronisée audio                          |
 | `mapTranscriptionOverlayTypes.ts`               | Types props overlay transcription                                     |
