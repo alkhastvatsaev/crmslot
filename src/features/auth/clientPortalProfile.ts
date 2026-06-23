@@ -14,7 +14,7 @@ export function companyIdFromAllowedUsersDoc(
   data: Record<string, unknown> | undefined
 ): string | null {
   if (!data) return null;
-  const keys = ["portalCompanyId", "ivanaChatCompanyId", "companyId"] as const;
+  const keys = ["portalCompanyId", "portalChatCompanyId", "companyId"] as const;
   for (const k of keys) {
     const v = data[k];
     if (typeof v === "string" && v.trim()) return v.trim();

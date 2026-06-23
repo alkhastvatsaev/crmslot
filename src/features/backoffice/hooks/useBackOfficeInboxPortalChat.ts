@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import type { CompanyWorkspaceApi } from "@/context/CompanyWorkspaceContext";
-import { IVANA_PORTAL_MESSAGE_EVENT } from "@/features/backoffice/ivanaChatPortalBridge";
-import { subscribeIvanaPortalMessages } from "@/features/backoffice/ivanaChatFirestore";
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import { PORTAL_CHAT_MESSAGE_EVENT } from "@/features/backoffice/portalChatBridge";
+import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import {
   countClientPortalThreadsNeedingReply,
   filterNewClientPortalMessages,
@@ -32,8 +32,8 @@ type PortalChatArgs = {
   chatTabLabel: string;
 };
 
-function mergePortalChatRows(rowsByCompany: Iterable<IvanaPortalChatDoc[]>): IvanaPortalChatDoc[] {
-  const byId = new Map<string, IvanaPortalChatDoc>();
+function mergePortalChatRows(rowsByCompany: Iterable<PortalChatDoc[]>): PortalChatDoc[] {
+  const byId = new Map<string, PortalChatDoc>();
   for (const rows of rowsByCompany) {
     for (const row of rows) byId.set(row.id, row);
   }
@@ -53,7 +53,7 @@ export function useBackOfficeInboxPortalChat({
   chatTabLabel,
 }: PortalChatArgs) {
   const portalChatHydratedRef = useRef(false);
-  const [portalChatMessages, setPortalChatMessages] = useState<IvanaPortalChatDoc[]>([]);
+  const [portalChatMessages, setPortalChatMessages] = useState<PortalChatDoc[]>([]);
 
   const chatDayRows = useMemo(
     () =>
@@ -75,8 +75,8 @@ export function useBackOfficeInboxPortalChat({
   useEffect(() => {
     if (!isTenant) return;
     const openChat = () => setActiveTab("chat");
-    window.addEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
-    return () => window.removeEventListener(IVANA_PORTAL_MESSAGE_EVENT, openChat);
+    window.addEventListener(PORTAL_CHAT_MESSAGE_EVENT, openChat);
+    return () => window.removeEventListener(PORTAL_CHAT_MESSAGE_EVENT, openChat);
   }, [isTenant, setActiveTab]);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export function useBackOfficeInboxPortalChat({
 
     portalChatHydratedRef.current = false;
     const seen = new Set<string>();
-    const rowsByCompany = new Map<string, IvanaPortalChatDoc[]>();
+    const rowsByCompany = new Map<string, PortalChatDoc[]>();
 
     const publishMerged = () => {
       const rows = mergePortalChatRows(rowsByCompany.values());
@@ -110,7 +110,7 @@ export function useBackOfficeInboxPortalChat({
     };
 
     const unsubs = companyIds.map((companyId) =>
-      subscribeIvanaPortalMessages(
+      subscribePortalChatMessages(
         firestore,
         companyId,
         (rows) => {

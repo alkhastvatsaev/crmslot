@@ -13,7 +13,7 @@ type Params = {
 };
 
 /** Nom affiché dans les bulles — figé à l'envoi. */
-export function resolveIvanaChatSenderName({
+export function resolvePortalChatSenderName({
   publishAsPortal,
   user,
   staffFields,

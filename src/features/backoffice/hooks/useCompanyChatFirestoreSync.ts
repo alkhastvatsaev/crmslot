@@ -11,16 +11,16 @@ import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
 import { toast } from "sonner";
 import { logger } from "@/core/logger";
-import { subscribeIvanaPortalMessages } from "@/features/backoffice/ivanaChatFirestore";
+import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
 import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
 import {
-  ivanaChatWelcome,
-  mapIvanaPortalRowsToMessages,
-  mergeIvanaChatWithOptimistic,
-} from "@/features/backoffice/ivanaChatMessageMerge";
-import type { IvanaChatMessage } from "@/features/backoffice/ivanaChatTypes";
+  companyChatWelcome,
+  mapPortalChatRowsToMessages,
+  mergeCompanyChatWithOptimistic,
+} from "@/features/backoffice/companyChatMessageMerge";
+import type { CompanyChatMessage } from "@/features/backoffice/companyChatTypes";
 
-export function useIvanaClientChatFirestoreSync(
+export function useCompanyChatFirestoreSync(
   firestoreSyncEnabled: boolean,
   chatDb: Firestore | null,
   companyIdTrimmed: string,
@@ -28,7 +28,7 @@ export function useIvanaClientChatFirestoreSync(
   chatInterventionId: string | null,
   onRemoteClientMessage: (() => void) | undefined,
   t: (key: string) => string,
-  setMessages: Dispatch<SetStateAction<IvanaChatMessage[]>>,
+  setMessages: Dispatch<SetStateAction<CompanyChatMessage[]>>,
   pendingDocIdRef: MutableRefObject<Map<string, string>>
 ) {
   const fsHydratedRef = useRef(false);
@@ -42,12 +42,12 @@ export function useIvanaClientChatFirestoreSync(
   useEffect(() => {
     if (!firestoreSyncEnabled || !chatDb || !companyIdTrimmed) return;
 
-    const unsub = subscribeIvanaPortalMessages(
+    const unsub = subscribePortalChatMessages(
       chatDb,
       companyIdTrimmed,
       (rows) => {
         const filteredRows = filterPortalChatMessagesForThread(rows, chatInterventionId);
-        const mapped = mapIvanaPortalRowsToMessages(filteredRows);
+        const mapped = mapPortalChatRowsToMessages(filteredRows);
 
         if (!fsHydratedRef.current) {
           fsHydratedRef.current = true;
@@ -66,17 +66,17 @@ export function useIvanaClientChatFirestoreSync(
         }
 
         setMessages((prev) =>
-          mergeIvanaChatWithOptimistic({
+          mergeCompanyChatWithOptimistic({
             mapped,
             filteredRows,
             prev,
             pendingDocIdRef: pendingDocIdRef.current,
-            welcome: ivanaChatWelcome(t),
+            welcome: companyChatWelcome(t),
           })
         );
       },
       (err) => {
-        logger.error("[IvanaClientChatPanel] Firestore chat", {
+        logger.error("[CompanyChatPanel] Firestore chat", {
           error: err instanceof Error ? err.message : String(err),
         });
         toast.error("Chat", { description: err.message });

@@ -2,7 +2,7 @@ import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import { auth, clientPortalAuth, clientPortalFirestore, firestore } from "@/core/config/firebase";
 
-export type IvanaChatFirebaseSession = {
+export type PortalChatFirebaseSession = {
   chatAuth: Auth | null;
   chatDb: Firestore | null;
 };
@@ -11,9 +11,9 @@ export type IvanaChatFirebaseSession = {
  * Portail demandeur : `clientPortalAuth` + Firestore lié (anonyme ou compte vérifié).
  * Inbox admin / staff : auth CRM principal.
  */
-export function resolveIvanaChatFirebaseSession(
+export function resolvePortalChatFirebaseSession(
   publishAsPortal: boolean
-): IvanaChatFirebaseSession {
+): PortalChatFirebaseSession {
   if (!publishAsPortal) {
     return { chatAuth: auth, chatDb: firestore };
   }

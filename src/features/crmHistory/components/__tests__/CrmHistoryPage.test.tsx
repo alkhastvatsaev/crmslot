@@ -45,8 +45,8 @@ jest.mock("@/features/crmHistory/hooks/useCompanyCrmActivityLog", () => ({
   useCompanyCrmActivityLog: () => ({ rows: [], loading: false }),
 }));
 
-jest.mock("@/features/crmHistory/hooks/useCompanyIvanaChatFeed", () => ({
-  useCompanyIvanaChatFeed: () => ({ messages: [], loading: false }),
+jest.mock("@/features/crmHistory/hooks/useCompanyPortalChatFeed", () => ({
+  useCompanyPortalChatFeed: () => ({ messages: [], loading: false }),
 }));
 
 jest.mock("@/context/CrmHistoryAgentBridgeContext", () => ({

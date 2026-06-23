@@ -5,7 +5,7 @@ import { HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Mission } from "@/features/map";
-import IvanaClientChatPanel from "@/features/backoffice/components/IvanaClientChatPanel";
+import CompanyChatPanel from "@/features/backoffice/components/CompanyChatPanel";
 import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
 import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";
 import { useBackOfficeInboxState } from "@/features/backoffice/hooks/useBackOfficeInboxState";
@@ -59,10 +59,10 @@ export default function BackOfficeInboxPanel({
           HUB_SURFACE.muted
         )}
       >
-        <IvanaClientChatPanel
+        <CompanyChatPanel
           className="min-h-0"
           acceptPortalMessages
-          chatCompanyId={s.ivanaChatCompanyId}
+          chatCompanyId={s.portalChatCompanyId}
         />
       </div>
     );
@@ -133,7 +133,7 @@ export default function BackOfficeInboxPanel({
         active={s.activeTab === "chat"}
         selectedChatInterventionId={s.selectedChatInterventionId}
         setSelectedChatInterventionId={s.setSelectedChatInterventionId}
-        ivanaChatCompanyId={s.ivanaChatCompanyId}
+        portalChatCompanyId={s.portalChatCompanyId}
         chatDayRows={s.chatDayRows}
         interventions={s.interventions}
         setActiveTab={s.setActiveTab}

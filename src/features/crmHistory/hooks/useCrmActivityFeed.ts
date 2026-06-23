@@ -23,8 +23,8 @@ import type { CrmPeriodFilter, CrmTypeFilter } from "../crmActivityTypes";
 import type { Intervention } from "@/features/interventions";
 import { useCompanyStatusEventsFeed } from "./useCompanyStatusEventsFeed";
 import { useCompanyCrmActivityLog } from "./useCompanyCrmActivityLog";
-import { useCompanyIvanaChatFeed } from "./useCompanyIvanaChatFeed";
-import { synthesizeIvanaChatEvents } from "../synthesizeIvanaChatEvents";
+import { useCompanyPortalChatFeed } from "./useCompanyPortalChatFeed";
+import { synthesizePortalChatEvents } from "../synthesizePortalChatEvents";
 
 export function useCrmActivityFeed(
   companyId: string | null,
@@ -60,7 +60,8 @@ export function useCrmActivityFeed(
     loading: crmLogLoading,
     error: crmLogError,
   } = useCompanyCrmActivityLog(feedCompanyId);
-  const { messages: ivanaMessages, loading: ivanaLoading } = useCompanyIvanaChatFeed(feedCompanyId);
+  const { messages: ivanaMessages, loading: ivanaLoading } =
+    useCompanyPortalChatFeed(feedCompanyId);
 
   const anySourceLoading =
     ivLoading ||
@@ -85,7 +86,7 @@ export function useCrmActivityFeed(
           synthesizeInterventionLifecycleEvents(interventions),
           synthesizeStatusEvents(statusEvents, interventionMap),
           synthesizeCompanyCrmLogEvents(crmLogRows),
-          synthesizeIvanaChatEvents(ivanaMessages, interventionMap),
+          synthesizePortalChatEvents(ivanaMessages, interventionMap),
           synthesizeMaterialOrderEvents(materialOrders),
           synthesizeSupplierOrderEvents(supplierOrders),
           synthesizeEmailEvents(emails, interventionMap),

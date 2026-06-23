@@ -1,5 +1,4 @@
-
-export const IVANA_PORTAL_MESSAGE_EVENT = "map-belgique-ivana-portal-message" as const;
+export const PORTAL_CHAT_MESSAGE_EVENT = "map-belgique-ivana-portal-message" as const;
 
 export type ClientPortalChatPayload = {
   id: string;
@@ -11,6 +10,6 @@ export type ClientPortalChatPayload = {
 export function publishClientPortalMessage(payload: ClientPortalChatPayload): void {
   if (typeof window === "undefined") return;
   window.dispatchEvent(
-    new CustomEvent<ClientPortalChatPayload>(IVANA_PORTAL_MESSAGE_EVENT, { detail: payload }),
+    new CustomEvent<ClientPortalChatPayload>(PORTAL_CHAT_MESSAGE_EVENT, { detail: payload })
   );
 }

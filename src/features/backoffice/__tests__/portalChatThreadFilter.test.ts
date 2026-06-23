@@ -1,9 +1,9 @@
 import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 
 function msg(
-  partial: Partial<IvanaPortalChatDoc> & Pick<IvanaPortalChatDoc, "id" | "role" | "body">
-): IvanaPortalChatDoc {
+  partial: Partial<PortalChatDoc> & Pick<PortalChatDoc, "id" | "role" | "body">
+): PortalChatDoc {
   return {
     companyId: "co1",
     senderUid: "u1",
@@ -13,7 +13,7 @@ function msg(
 }
 
 describe("filterPortalChatMessagesForThread", () => {
-  const rows: IvanaPortalChatDoc[] = [
+  const rows: PortalChatDoc[] = [
     msg({ id: "1", role: "client", body: "dossier", interventionId: "iv-1" }),
     msg({ id: "2", role: "staff", body: "réponse dossier", interventionId: "iv-1" }),
     msg({ id: "3", role: "staff", body: "réponse globale", interventionId: null }),

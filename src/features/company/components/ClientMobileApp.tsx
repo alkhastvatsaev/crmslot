@@ -9,7 +9,7 @@ import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
 import { CLIENT_MOBILE_APP_SLOT_INDEX } from "@/features/company/clientMobileAppConstants";
 
 /**
- * Portail client — formulaire, suivi, chat IVANA.
+ * Portail client — formulaire, suivi, chat entreprise.
  * Route : `/m/demande`.
  */
 export default function ClientMobileApp() {

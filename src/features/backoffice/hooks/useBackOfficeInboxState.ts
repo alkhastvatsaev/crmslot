@@ -76,7 +76,7 @@ export function useBackOfficeInboxState(
 
   const { selectedDate } = useDateContext();
   const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
-  const ivanaChatCompanyId = (cid ?? envDefaultCompanyId) || null;
+  const portalChatCompanyId = (cid ?? envDefaultCompanyId) || null;
   const isTenant = !!workspace?.isTenantUser;
   const workspaceReady = workspace?.workspaceReady !== false;
 
@@ -203,7 +203,7 @@ export function useBackOfficeInboxState(
     cid,
     isTenant,
     workspaceReady,
-    ivanaChatCompanyId,
+    portalChatCompanyId,
     pwaV2,
     workspace,
     interventions,

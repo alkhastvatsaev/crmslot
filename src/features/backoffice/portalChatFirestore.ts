@@ -10,15 +10,16 @@ import {
   type Firestore,
 } from "firebase/firestore";
 
-export const IVANA_PORTAL_CHAT_COLLECTION = "portal_ivana_chat_messages";
+/** Collection Firestore — nom historique conservé (`portal_ivana_chat_messages`). */
+export const PORTAL_CHAT_COLLECTION = "portal_ivana_chat_messages";
 
-export type IvanaPortalChatRole = "client" | "staff";
+export type PortalChatRole = "client" | "staff";
 
-export type IvanaPortalChatDoc = {
+export type PortalChatDoc = {
   id: string;
   companyId: string;
   body: string;
-  role: IvanaPortalChatRole;
+  role: PortalChatRole;
   senderUid: string;
   /** Affichage UI — displayName/email/n° de dossier figé au moment de l'envoi. */
   senderName?: string;
@@ -28,10 +29,10 @@ export type IvanaPortalChatDoc = {
   imageUrls?: string[];
 };
 
-export function subscribeIvanaPortalMessages(
+export function subscribePortalChatMessages(
   db: Firestore,
   companyId: string,
-  onRows: (rows: IvanaPortalChatDoc[]) => void,
+  onRows: (rows: PortalChatDoc[]) => void,
   onError?: (e: Error) => void
 ): () => void {
   const trimmed = companyId.trim();
@@ -40,7 +41,7 @@ export function subscribeIvanaPortalMessages(
     return () => {};
   }
   const q = query(
-    collection(db, IVANA_PORTAL_CHAT_COLLECTION),
+    collection(db, PORTAL_CHAT_COLLECTION),
     where("companyId", "==", trimmed),
     orderBy("createdAt", "asc"),
     limit(200)
@@ -51,8 +52,8 @@ export function subscribeIvanaPortalMessages(
       q,
       (snap) => {
         const rows = snap.docs.map((d) => {
-          const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
-          return { id: d.id, ...data } as IvanaPortalChatDoc;
+          const data = d.data() as Omit<PortalChatDoc, "id">;
+          return { id: d.id, ...data } as PortalChatDoc;
         });
         onRows(rows);
       },
@@ -70,7 +71,7 @@ export function subscribeIvanaPortalMessages(
 export function subscribePortalChatForIntervention(
   db: Firestore,
   interventionId: string,
-  onRows: (rows: IvanaPortalChatDoc[]) => void,
+  onRows: (rows: PortalChatDoc[]) => void,
   onError?: (e: Error) => void
 ): () => void {
   const ivId = interventionId.trim();
@@ -79,7 +80,7 @@ export function subscribePortalChatForIntervention(
     return () => {};
   }
   const q = query(
-    collection(db, IVANA_PORTAL_CHAT_COLLECTION),
+    collection(db, PORTAL_CHAT_COLLECTION),
     where("interventionId", "==", ivId),
     orderBy("createdAt", "asc"),
     limit(200)
@@ -91,7 +92,7 @@ export function subscribePortalChatForIntervention(
       (snap) => {
         onRows(
           snap.docs.map((d) => {
-            const data = d.data() as Omit<IvanaPortalChatDoc, "id">;
+            const data = d.data() as Omit<PortalChatDoc, "id">;
             return { id: d.id, ...data };
           })
         );
@@ -105,12 +106,12 @@ export function subscribePortalChatForIntervention(
   };
 }
 
-export async function sendIvanaPortalMessage(
+export async function sendPortalChatMessage(
   db: Firestore,
   params: {
     companyId: string;
     body: string;
-    role: IvanaPortalChatRole;
+    role: PortalChatRole;
     senderUid: string;
     senderName?: string | null;
     interventionId?: string | null;
@@ -119,7 +120,7 @@ export async function sendIvanaPortalMessage(
 ): Promise<string> {
   const ivId = params.interventionId?.trim();
   const senderName = params.senderName?.trim();
-  const ref = await addDoc(collection(db, IVANA_PORTAL_CHAT_COLLECTION), {
+  const ref = await addDoc(collection(db, PORTAL_CHAT_COLLECTION), {
     companyId: params.companyId.trim(),
     body: params.body,
     role: params.role,

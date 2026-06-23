@@ -1,4 +1,4 @@
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 
 /**
  * Filtre les messages visibles dans un fil de chat portail.
@@ -7,9 +7,9 @@ import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestor
  * - Client dossier : messages du dossier + réponses staff sans tag (legacy / global).
  */
 export function filterPortalChatMessagesForThread(
-  rows: IvanaPortalChatDoc[],
+  rows: PortalChatDoc[],
   threadInterventionId?: string | null
-): IvanaPortalChatDoc[] {
+): PortalChatDoc[] {
   const threadIvId = (threadInterventionId ?? "").trim();
   if (!threadIvId) return rows;
 

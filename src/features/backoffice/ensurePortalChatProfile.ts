@@ -4,7 +4,7 @@ import type { Firestore } from "firebase/firestore";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 
 /** Profil minimal pour `clientPortalLinkedToCompany` (règles Firestore chat). */
-export async function ensureIvanaChatPortalProfile(
+export async function ensurePortalChatProfile(
   db: Firestore,
   user: User,
   companyId: string

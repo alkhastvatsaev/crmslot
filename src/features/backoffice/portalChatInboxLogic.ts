@@ -1,4 +1,4 @@
-import type { IvanaPortalChatDoc } from "@/features/backoffice/ivanaChatFirestore";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
 import type { Intervention } from "@/features/interventions";
 import {
@@ -13,12 +13,12 @@ export function portalChatThreadKey(interventionId?: string | null): string {
   return ivId || "__global__";
 }
 
-export function portalChatMessageTimeMs(msg: Pick<IvanaPortalChatDoc, "createdAt">): number {
+export function portalChatMessageTimeMs(msg: Pick<PortalChatDoc, "createdAt">): number {
   return coerceFirestoreLikeDate(msg.createdAt)?.getTime() ?? 0;
 }
 
 /** Dossiers ayant au moins un message client (toutes dates). */
-export function interventionIdsWithClientPortalChat(messages: IvanaPortalChatDoc[]): string[] {
+export function interventionIdsWithClientPortalChat(messages: PortalChatDoc[]): string[] {
   const ids = new Set<string>();
   for (const m of messages) {
     if (m.role !== "client") continue;
@@ -32,8 +32,8 @@ export function interventionIdsWithClientPortalChat(messages: IvanaPortalChatDoc
  * Fils dont le dernier message est du client → à traiter par le back-office.
  * Inclut le chat global et les dossiers hors « journée ».
  */
-export function countClientPortalThreadsNeedingReply(messages: IvanaPortalChatDoc[]): number {
-  const byThread = new Map<string, IvanaPortalChatDoc[]>();
+export function countClientPortalThreadsNeedingReply(messages: PortalChatDoc[]): number {
+  const byThread = new Map<string, PortalChatDoc[]>();
   for (const m of messages) {
     const key = portalChatThreadKey(m.interventionId);
     const bucket = byThread.get(key) ?? [];
@@ -53,10 +53,10 @@ export function countClientPortalThreadsNeedingReply(messages: IvanaPortalChatDo
 }
 
 export function filterNewClientPortalMessages(
-  messages: IvanaPortalChatDoc[],
+  messages: PortalChatDoc[],
   seenIds: ReadonlySet<string>,
   staffUid: string | null | undefined
-): IvanaPortalChatDoc[] {
+): PortalChatDoc[] {
   const uid = (staffUid ?? "").trim();
   return messages.filter(
     (m) => m.role === "client" && !seenIds.has(m.id) && (!uid || m.senderUid !== uid)

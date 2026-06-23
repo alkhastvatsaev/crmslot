@@ -673,7 +673,7 @@
       "intervention_payment_updated": "Payment updated",
       "intervention_terrain_report_received": "Field report received",
       "bridged_report_dismissed": "Report hidden",
-      "ivana_chat_message": "Ivana message",
+      "ivana_chat_message": "Client chat message",
       "material_order_status_changed": "Material order status changed",
       "supplier_order_lecot": "Lecot supplier order (chatbot)",
       "chatbot_intervention_status": "Case status (chatbot)",
@@ -750,7 +750,7 @@
         "intervention_payment_updated": "Payment status or a recorded payment was updated on this case.",
         "intervention_terrain_report_received": "An end-of-job report (text, photos, signature) was submitted by the technician.",
         "bridged_report_dismissed": "An automatically imported field report was dismissed or hidden by dispatcher.",
-        "ivana_chat_message": "A message in the Ivana chat linked to the client portal or case tracking.",
+        "ivana_chat_message": "Message in the company chat linked to the client portal or case tracking.",
         "material_order_status_changed": "An internal material order status changed (draft, sent, received, etc.).",
         "supplier_order_lecot": "A Lecot supplier order was created or updated via the chatbot or materials hub.",
         "chatbot_intervention_status": "The chatbot changed the case status after user confirmation.",
@@ -784,6 +784,9 @@
         "summary_week": "Summarize this week's activity"
       },
       "info": "The QM Agent analyzes your KPIs in real time and identifies quality issues."
+    },
+    "types": {
+      "ivana_chat_message": "Client chat message"
     }
   },
   "companyStock": {
@@ -1485,7 +1488,7 @@
     "aria": {
       "left": "Who is requesting? — requester hub",
       "center": "What needs to be fixed? — requester hub",
-      "right": "Case tracking and IVANA chat — requester hub"
+      "right": "Case tracking and company chat — requester hub"
     },
     "right_tabs": {
       "aria": "Requester portal categories",
@@ -1540,7 +1543,7 @@
         "mission_done_badge": "Done",
         "invoice_backoffice_pending": "Send the invoice to the client below.",
         "edit_report": "Edit report",
-        "report_rejected_title": "Report needs fixes (dispatcher)",
+        "report_rejected_title": "Report needs correction",
         "report_rejected_hint": "Close the job again: photos, signature, then invoice.",
         "finish_job": "Finish Job",
         "updating": "Updating...",
@@ -1555,7 +1558,7 @@
         "accept_assignment": "Accept",
         "decline_assignment": "Decline",
         "assignment_accepted": "Job accepted",
-        "assignment_declined": "Job declined — sent back to IVANA requests",
+        "assignment_declined": "Job declined — sent back to incoming requests",
         "assignment_action_failed": "Action failed",
         "update_failed": "Update failed",
         "assignment_respond_in_list": "Accept or decline this job using the list on the left.",
@@ -1741,6 +1744,12 @@
       "rail_left": "Jobs",
       "rail_center": "Detail",
       "rail_right": "Photos"
+    },
+    "validation": {
+      "report_rejected_title": "Report needs correction"
+    },
+    "assignment": {
+      "assignment_declined": "Job declined — sent back to incoming requests"
     }
   },
   "common": {
