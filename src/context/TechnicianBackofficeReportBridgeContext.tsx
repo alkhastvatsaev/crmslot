@@ -14,7 +14,7 @@ import {
   bridgedReportsDeleteForIntervention,
   bridgedReportsGetAll,
   bridgedReportsPut,
-} from "@/features/offline/bridgedReportsDb";
+} from "@/features/offline";
 
 const MAX_BRIDGE_REPORTS = 20;
 
@@ -24,7 +24,12 @@ export type BridgedTechnicianReport = {
   photoDataUrls: string[];
   signaturePngDataUrl: string;
   receivedAt: number;
-  billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+  billingLines?: {
+    description: string;
+    quantity: number;
+    unitPriceCents: number;
+    reference?: string;
+  }[];
 };
 
 export type TechnicianBackofficeReportBridgeApi = {
@@ -33,14 +38,20 @@ export type TechnicianBackofficeReportBridgeApi = {
     interventionId: string;
     photoDataUrls: string[];
     signaturePngDataUrl: string;
-    billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[];
+    billingLines?: {
+      description: string;
+      quantity: number;
+      unitPriceCents: number;
+      reference?: string;
+    }[];
   }) => void;
   dismissReport: (localId: string) => void;
   /** Réouverture terrain : retire le rapport de l’onglet Rapports IVANA. */
   withdrawReportsForIntervention: (interventionId: string) => void;
 };
 
-const TechnicianBackofficeReportBridgeContext = createContext<TechnicianBackofficeReportBridgeApi | null>(null);
+const TechnicianBackofficeReportBridgeContext =
+  createContext<TechnicianBackofficeReportBridgeApi | null>(null);
 
 export function TechnicianBackofficeReportBridgeProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<BridgedTechnicianReport[]>([]);
@@ -79,14 +90,26 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
   }, []);
 
   const pushReport = useCallback(
-    (p: { interventionId: string; photoDataUrls: string[]; signaturePngDataUrl: string; billingLines?: { description: string; quantity: number; unitPriceCents: number; reference?: string }[] }) => {
+    (p: {
+      interventionId: string;
+      photoDataUrls: string[];
+      signaturePngDataUrl: string;
+      billingLines?: {
+        description: string;
+        quantity: number;
+        unitPriceCents: number;
+        reference?: string;
+      }[];
+    }) => {
       const localId =
         typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
           ? crypto.randomUUID()
           : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const record: BridgedTechnicianReport = { ...p, localId, receivedAt: Date.now() };
 
-      void bridgedReportsDeleteForIntervention(p.interventionId).then(() => bridgedReportsPut(record));
+      void bridgedReportsDeleteForIntervention(p.interventionId).then(() =>
+        bridgedReportsPut(record)
+      );
 
       setReports((prev) => {
         const withoutDup = prev.filter((r) => r.interventionId !== p.interventionId);
@@ -96,7 +119,7 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
         return next;
       });
     },
-    [],
+    []
   );
 
   const dismissReport = useCallback((localId: string) => {
@@ -106,7 +129,7 @@ export function TechnicianBackofficeReportBridgeProvider({ children }: { childre
 
   const value = useMemo(
     () => ({ reports, pushReport, dismissReport, withdrawReportsForIntervention }),
-    [reports, pushReport, dismissReport, withdrawReportsForIntervention],
+    [reports, pushReport, dismissReport, withdrawReportsForIntervention]
   );
 
   return (

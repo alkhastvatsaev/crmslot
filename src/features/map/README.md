@@ -6,6 +6,7 @@ Carte Mapbox (slot 0 du DashboardPager) : missions dispatch/terrain, markers, ro
 
 | Fichier                                         | Rôle                                                                  |
 | ----------------------------------------------- | --------------------------------------------------------------------- |
+| \`index.ts\`                                    | **Barrel public** — imports cross-feature via \`@/features/map\`      |
 | `components/MapPageSlot.tsx`                    | Slot lazy-loadé depuis `src/app/page.tsx`                             |
 | `components/MapboxView.tsx`                     | Orchestrateur carte (~230 lignes)                                     |
 | `hooks/useMapHubMissions.ts`                    | Missions + inbox partagé avec MobileMapHubLite                        |

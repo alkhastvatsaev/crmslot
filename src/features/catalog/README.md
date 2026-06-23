@@ -6,15 +6,16 @@ Deux moitiés à distinguer : **catalogue interne société** et **stack Lecot**
 
 ## Points d'entrée — catalogue société
 
-| Fichier                              | Rôle                                             |
-| ------------------------------------ | ------------------------------------------------ |
-| `components/CompanyCatalogPanel.tsx` | UI gestion catalogue (ajout, édition, recherche) |
-| `components/ProductQuickAddBar.tsx`  | Barre ajout rapide (consommée par `materials/`)  |
-| `catalogFirestore.ts`                | CRUD Firestore catalogue société                 |
-| `loadCompanyCatalog.ts`              | Loader (cache, fallback)                         |
-| `mapCompanyCatalogProduct.ts`        | Mapping Firestore → modèle UI                    |
-| `productQuickAdd.ts`                 | Logique ajout rapide (17 imports cross-feature)  |
-| `locksmithStockSeedCatalog.ts`       | Catalogue seed démo serrurier                    |
+| Fichier                              | Rôle                                                                 |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| \`index.ts\`                         | **Barrel public** — imports cross-feature via \`@/features/catalog\` |
+| `components/CompanyCatalogPanel.tsx` | UI gestion catalogue (ajout, édition, recherche)                     |
+| `components/ProductQuickAddBar.tsx`  | Barre ajout rapide (consommée par `materials/`)                      |
+| `catalogFirestore.ts`                | CRUD Firestore catalogue société                                     |
+| `loadCompanyCatalog.ts`              | Loader (cache, fallback)                                             |
+| `mapCompanyCatalogProduct.ts`        | Mapping Firestore → modèle UI                                        |
+| `productQuickAdd.ts`                 | Logique ajout rapide (17 imports cross-feature)                      |
+| `locksmithStockSeedCatalog.ts`       | Catalogue seed démo serrurier                                        |
 
 ## Points d'entrée — Lecot
 

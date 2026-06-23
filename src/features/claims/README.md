@@ -4,9 +4,10 @@ Réclamations SAV companies/{id}/claims.
 
 ## Points d'entrée
 
-| Fichier     | Rôle                                  |
-| ----------- | ------------------------------------- |
-| _(dossier)_ | Voir fichiers racine et `components/` |
+| Fichier      | Rôle                                                                |
+| ------------ | ------------------------------------------------------------------- |
+| \`index.ts\` | **Barrel public** — imports cross-feature via \`@/features/claims\` |
+| _(dossier)_  | Voir fichiers racine et `components/`                               |
 
 ## Données
 

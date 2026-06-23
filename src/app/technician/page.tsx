@@ -1,6 +1,6 @@
 "use client";
 
-import TechnicianLabView from "@/features/technicians/components/TechnicianLabView";
+import { TechnicianLabView } from "@/features/technicians";
 
 export default function TechnicianPage() {
   return <TechnicianLabView />;

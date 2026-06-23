@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import type { HubAgentBridgeHandlers } from "@/features/hubAgents/hubAgentTypes";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import type { HubAgentBridgeHandlers } from "@/features/hubAgents";
 
 type CrmHistoryAgentBridgeApi = {
   handlers: HubAgentBridgeHandlers | null;
@@ -39,7 +32,9 @@ export function CrmHistoryAgentBridgeProvider({ children }: { children: ReactNod
   const value = useMemo(() => ({ handlers, registerHandlers }), [handlers, registerHandlers]);
 
   return (
-    <CrmHistoryAgentBridgeContext.Provider value={value}>{children}</CrmHistoryAgentBridgeContext.Provider>
+    <CrmHistoryAgentBridgeContext.Provider value={value}>
+      {children}
+    </CrmHistoryAgentBridgeContext.Provider>
   );
 }
 

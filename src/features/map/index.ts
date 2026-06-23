@@ -60,3 +60,5 @@ export {
   resolveMapboxStyleUrl,
 } from "@/features/map/mapboxStyleUrl";
 export { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
+export { default as DashboardGalaxyLayer } from "@/features/map/components/DashboardGalaxyLayer";
+export { default as MapPageSlot } from "@/features/map/components/MapPageSlot";

@@ -4,11 +4,12 @@ Hub Équipe (slot 5) : annuaire staff société, édition profils.
 
 ## Points d'entrée
 
-| Fichier                      | Rôle                      |
-| ---------------------------- | ------------------------- |
-| `components/TeamHubPage.tsx` | Page carrousel            |
-| `hooks/useCompanyStaff.ts`   | Liste staff via API       |
-| `teamHubConstants.ts`        | `TEAM_HUB_SLOT_INDEX = 5` |
+| Fichier                      | Rôle                                                                 |
+| ---------------------------- | -------------------------------------------------------------------- |
+| \`index.ts\`                 | **Barrel public** — imports cross-feature via \`@/features/teamHub\` |
+| `components/TeamHubPage.tsx` | Page carrousel                                                       |
+| `hooks/useCompanyStaff.ts`   | Liste staff via API                                                  |
+| `teamHubConstants.ts`        | `TEAM_HUB_SLOT_INDEX = 5`                                            |
 
 ## Données
 

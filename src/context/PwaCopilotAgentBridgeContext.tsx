@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import type { HubAgentBridgeHandlers } from "@/features/hubAgents/hubAgentTypes";
+import type { HubAgentBridgeHandlers } from "@/features/hubAgents";
 
 type PwaCopilotAgentBridgeApi = {
   handlers: HubAgentBridgeHandlers | null;

@@ -4,10 +4,11 @@ Inventaire équipements par client.
 
 ## Points d'entrée
 
-| Fichier              | Rôle                     |
-| -------------------- | ------------------------ |
-| `EquipmentPanel.tsx` | Point d'entrée principal |
-| _(voir dossier)_     | Modules colocalisés      |
+| Fichier              | Rôle                                                                   |
+| -------------------- | ---------------------------------------------------------------------- |
+| \`index.ts\`         | **Barrel public** — imports cross-feature via \`@/features/equipment\` |
+| `EquipmentPanel.tsx` | Point d'entrée principal                                               |
+| _(voir dossier)_     | Modules colocalisés                                                    |
 
 ## Données
 

@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { addDoc, collection } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
+import { logCrmInterventionCreated } from "@/features/crmHistory";
 import { CheckCircle2 } from "lucide-react";
 
 export default function WidgetPage() {

@@ -6,13 +6,14 @@ UI hub facturation (slot 6 `BILLING_HUB_SLOT_INDEX`) : liste dossiers à facture
 
 ## Points d'entrée
 
-| Fichier                          | Rôle                       |
-| -------------------------------- | -------------------------- |
-| `components/BillingHubPage.tsx`  | Page slot lazy-loadée      |
-| `hooks/useBillingHubAgent.ts`    | Agent IA dédié facturation |
-| `billingHubAgentRouteHandler.ts` | Route API agent            |
-| `billingHubConstants.ts`         | Index pager, events DOM    |
-| `filterBillingHub.ts`            | Filtres liste dossiers     |
+| Fichier                          | Rôle                                                                    |
+| -------------------------------- | ----------------------------------------------------------------------- |
+| \`index.ts\`                     | **Barrel public** — imports cross-feature via \`@/features/billingHub\` |
+| `components/BillingHubPage.tsx`  | Page slot lazy-loadée                                                   |
+| `hooks/useBillingHubAgent.ts`    | Agent IA dédié facturation                                              |
+| `billingHubAgentRouteHandler.ts` | Route API agent                                                         |
+| `billingHubConstants.ts`         | Index pager, events DOM                                                 |
+| `filterBillingHub.ts`            | Filtres liste dossiers                                                  |
 
 ## Dépendances autorisées
 

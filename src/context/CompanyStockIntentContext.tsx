@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CompanyStockFilter } from "@/features/featureHub/filterCompanyStock";
+import type { CompanyStockFilter } from "@/features/featureHub";
 
 export type CompanyStockFocusDetail = {
   stockItemId?: string | null;

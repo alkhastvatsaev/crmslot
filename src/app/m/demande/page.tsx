@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import ClientMobileApp from "@/features/company/components/ClientMobileApp";
+import { ClientMobileApp } from "@/features/company";
 
 export const metadata: Metadata = {
   title: "CRMSLOT Demande",

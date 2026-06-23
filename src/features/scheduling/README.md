@@ -4,10 +4,11 @@ Créneaux proposés, conflits, drag-board inbox.
 
 ## Points d'entrée
 
-| Fichier                | Rôle                     |
-| ---------------------- | ------------------------ |
-| `scheduleConflicts.ts` | Point d'entrée principal |
-| _(voir dossier)_       | Modules colocalisés      |
+| Fichier                | Rôle                                                                    |
+| ---------------------- | ----------------------------------------------------------------------- |
+| \`index.ts\`           | **Barrel public** — imports cross-feature via \`@/features/scheduling\` |
+| `scheduleConflicts.ts` | Point d'entrée principal                                                |
+| _(voir dossier)_       | Modules colocalisés                                                     |
 
 ## Données
 

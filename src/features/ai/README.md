@@ -4,9 +4,10 @@ Constante historique slot chatbot déprécié — voir dispatch/ et chatbot/.
 
 ## Points d'entrée
 
-| Fichier     | Rôle                                  |
-| ----------- | ------------------------------------- |
-| _(dossier)_ | Voir fichiers racine et `components/` |
+| Fichier      | Rôle                                                            |
+| ------------ | --------------------------------------------------------------- |
+| \`index.ts\` | **Barrel public** — imports cross-feature via \`@/features/ai\` |
+| _(dossier)_  | Voir fichiers racine et `components/`                           |
 
 ## Données
 

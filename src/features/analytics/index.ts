@@ -17,3 +17,5 @@ export type {
   CarouselPageUsage,
   CarouselUsageSnapshot,
 } from "@/features/analytics/carouselUsageStore";
+export { default as BiReportsPanel } from "@/features/analytics/components/BiReportsPanel";
+export { default as CarouselUsagePanel } from "@/features/analytics/components/CarouselUsagePanel";
