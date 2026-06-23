@@ -21,7 +21,14 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `chatbot-lecot-order-lines.ts`                  | Parse lignes + enrichissement prix catalogue       |
 | `chatbot-lecot-order-helpers.ts`                | Firestore, CRM, email, sync facturation            |
 | `chatbot-lecot-order-demo.ts` / `-prod.ts`      | Branches démo / API Lecot réelle                   |
-| `chatbot-tools.ts`                              | Schémas JSON outils — **754 lignes**               |
+| `chatbot-tools.ts`                              | Barrel schémas outils (~23 lignes)                 |
+| `chatbot-tools-read-definitions.ts`             | Outils lecture workspace / CRM                     |
+| `chatbot-tools-billing-definitions.ts`          | Facturation + exports + focus hub                  |
+| `chatbot-tools-intervention-definitions.ts`     | Écriture dossier intervention                      |
+| `chatbot-tools-gmail-definitions.ts`            | Gmail inbox / liaison / réponses                   |
+| `chatbot-tools-lecot-definitions.ts`            | Catalogue Lecot + commandes                        |
+| `chatbot-tools-stock-definitions.ts`            | Stock véhicule + focus inventaire                  |
+| `chatbot-tools-ai-definitions.ts`               | Vision, clôture vocale, churn                      |
 | `chatbot-executor-queries.ts`                   | Barrel requêtes exécuteur (~35 lignes)             |
 | `chatbot-executor-db.ts`                        | `db()`, accès intervention, labels                 |
 | `chatbot-executor-workspace-queries.ts`         | Interventions, workspace, stats, facturation       |
