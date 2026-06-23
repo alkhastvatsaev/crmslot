@@ -39,3 +39,8 @@ export {
   writeTerrainMissionsCache,
 } from "@/features/offline/terrainMissionsCache";
 export type { TerrainMissionCacheRow } from "@/features/offline/terrainMissionsCache";
+export {
+  readAdminInboxInterventionsCache,
+  writeAdminInboxInterventionsCache,
+  splitInterventionsByCompanyIds,
+} from "@/features/offline/adminInboxInterventionsCache";

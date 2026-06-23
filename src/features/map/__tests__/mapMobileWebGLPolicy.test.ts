@@ -1,8 +1,8 @@
 import { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
 
 describe("resolveMapWebGLActive", () => {
-  it("active WebGL sur mobile quand la carte est rendue", () => {
-    expect(resolveMapWebGLActive(true, 0, true, false)).toBe(true);
+  it("respecte le flag mobileMapWebGL sur mobile", () => {
+    expect(resolveMapWebGLActive(true, 0, true, false)).toBe(false);
     expect(resolveMapWebGLActive(true, 0, true, true)).toBe(true);
   });
 

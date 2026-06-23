@@ -28,6 +28,7 @@ import { useAccountRole } from "@/features/auth";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions";
 import { ADMIN_MOBILE_APP_ROUTE } from "@/features/dashboard/adminMobileAppConstants";
+import { prefersFullCrmOnMobile } from "@/features/dashboard/adminMobileFullCrm";
 
 const MapPageSlot = dynamic(() => import("@/features/map").then((m) => m.MapPageSlot), {
   ssr: false,
@@ -96,7 +97,11 @@ export default function Dashboard() {
     !isAccountRoleLoading &&
     isMobile === true &&
     !isCapacitorNative() &&
-    (isTechnicianAccount || isClientPortalAccount || isCrmTenantAccount);
+    (isTechnicianAccount ||
+      isClientPortalAccount ||
+      (isCrmTenantAccount &&
+        typeof window !== "undefined" &&
+        !prefersFullCrmOnMobile(window.location.search)));
 
   useEffect(() => {
     if (!satelliteAppRedirectPending) return;
