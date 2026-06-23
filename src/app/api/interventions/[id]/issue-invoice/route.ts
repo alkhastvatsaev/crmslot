@@ -4,7 +4,7 @@ import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
-import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
+import type { DraftBillingLine } from "@/features/interventions";
 import { issueInterventionInvoiceAdmin } from "@/features/interventions/server/issueInterventionInvoiceAdmin";
 import type { Intervention } from "@/features/interventions";
 import { logger } from "@/core/logger";

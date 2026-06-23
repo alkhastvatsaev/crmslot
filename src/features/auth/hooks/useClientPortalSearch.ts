@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { auth, firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { Intervention } from "@/features/interventions/types";
+import { Intervention } from "@/features/interventions";
 
 export function useClientPortalSearch() {
   const [searchName, setSearchName] = useState("");

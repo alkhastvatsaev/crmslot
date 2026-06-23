@@ -5,7 +5,7 @@ import { isChatbotWriteTool } from "@/features/chatbot/chatbot-tools";
 import type { ChatbotToolContext } from "@/features/chatbot";
 import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
-import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { WorkflowOwnerRole } from "@/features/interventions";
 
 const BILLING_TOOLS = new Set([
   "patch_intervention_billing",

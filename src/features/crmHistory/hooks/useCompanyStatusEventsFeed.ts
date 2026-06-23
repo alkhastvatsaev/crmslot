@@ -5,7 +5,7 @@ import { logger } from "@/core/logger";
 import { collectionGroup, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
-import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { InterventionStatusEvent } from "@/features/interventions";
 
 const STATUS_EVENTS_LIMIT = 1000;
 

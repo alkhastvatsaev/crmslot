@@ -2,7 +2,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 import type { Intervention } from "@/features/interventions";
 import { logCrmInterventionAction } from "@/features/crmHistory/logCrmInterventionAction";
-import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { WorkflowOwnerRole } from "@/features/interventions";
 import {
   candidateRangeFromScheduleFields,
   findTechnicianScheduleConflicts,

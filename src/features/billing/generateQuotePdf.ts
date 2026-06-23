@@ -1,7 +1,7 @@
 import { buildPremiumBillingPdf } from "@/features/billing/buildBillingPdfDocument";
 import type { BillingPdfBranding } from "@/features/billing/billingPdfBranding";
 import { fetchBillingPdfBrandingForCompany } from "@/features/billing/billingPdfBranding";
-import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+import type { ChatbotDocumentKind } from "@/features/chatbot";
 import { buildInterventionReportPdf } from "@/features/interventions/buildInterventionReportPdf";
 import type { Intervention } from "@/features/interventions";
 

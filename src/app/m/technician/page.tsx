@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { TechnicianMobileApp } from "@/features/interventions";
+import TechnicianMobileApp from "@/features/interventions/components/TechnicianMobileApp";
 
 export const metadata: Metadata = {
   title: "CRMSLOT Terrain",

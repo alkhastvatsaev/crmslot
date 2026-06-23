@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
+import type { ChatbotDocumentKind } from "@/features/chatbot";
 import { generateInterventionDocumentPdf } from "@/features/billing";
 import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
 import type { Intervention } from "@/features/interventions";

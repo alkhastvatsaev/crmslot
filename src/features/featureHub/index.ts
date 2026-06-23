@@ -78,3 +78,4 @@ export {
   sortStockByPatronPriority,
   computeCompanyStockMetrics,
 } from "@/features/featureHub/companyStockMetrics";
+export type { StockImageMap } from "@/features/featureHub/hooks/useCompanyStockImages";

@@ -1,7 +1,7 @@
 import type { User } from "firebase/auth";
 import type { CrmStaffAccountFields } from "@/features/auth";
 import type { ClientPortalAccountFields } from "@/features/auth";
-import type { RequesterProfile } from "@/features/interventions/context/RequesterHubContext";
+import type { RequesterProfile } from "@/features/interventions";
 
 type Params = {
   publishAsPortal: boolean;
