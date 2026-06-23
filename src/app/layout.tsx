@@ -6,6 +6,8 @@ import {
   PWA_ADMIN_SHORT_NAME,
   PWA_ADMIN_TITLE,
   PWA_MANIFEST_ADMIN,
+  PWA_METADATA_ICONS,
+  PWA_THEME_COLOR,
 } from "@/core/pwa/pwaSatelliteManifests";
 
 const outfit = Outfit({
@@ -21,10 +23,7 @@ export const metadata: Metadata = {
   description: "Dispatcher et pilotage des interventions",
   applicationName: PWA_ADMIN_SHORT_NAME,
   manifest: PWA_MANIFEST_ADMIN,
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-  },
+  icons: PWA_METADATA_ICONS,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -37,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09090B",
+  themeColor: PWA_THEME_COLOR,
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

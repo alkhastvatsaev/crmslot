@@ -3,6 +3,7 @@ import {
   PWA_ADMIN_SHORT_NAME,
   PWA_ADMIN_TITLE,
   PWA_MANIFEST_ADMIN,
+  PWA_METADATA_ICONS,
 } from "@/core/pwa/pwaSatelliteManifests";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   description: "Dispatcher et pilotage des interventions",
   applicationName: PWA_ADMIN_SHORT_NAME,
   manifest: PWA_MANIFEST_ADMIN,
+  icons: PWA_METADATA_ICONS,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
