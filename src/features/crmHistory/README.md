@@ -4,12 +4,15 @@ Historique CRM unifié — slot Quality Management (`CRM_HISTORY_SLOT_INDEX`).
 
 ## Points d'entrée
 
-| Fichier                               | Rôle                        |
-| ------------------------------------- | --------------------------- |
-| `components/CrmHistoryPage.tsx`       | Page slot triple panel      |
-| `components/CrmHistoryCenterFeed.tsx` | Feed central (~120 lignes)  |
-| `hooks/useCrmActivityFeed.ts`         | Agrégation feeds            |
-| `logCrmInterventionAction.ts`         | Log actions (import public) |
+| Fichier                                     | Rôle                                    |
+| ------------------------------------------- | --------------------------------------- |
+| `components/CrmHistoryPage.tsx`             | Page slot triple panel                  |
+| `components/CrmHistoryCenterFeed.tsx`       | Feed central (~120 lignes)              |
+| `components/CrmHistoryEventDetailPanel.tsx` | Panneau détail événement (~95 lignes)   |
+| `components/CrmHistoryQmSnapshotPanel.tsx`  | Grille stats QM (état vide / sélection) |
+| `components/crmHistoryEventDetailFormat.ts` | Formatage date période + horodatage     |
+| `hooks/useCrmActivityFeed.ts`               | Agrégation feeds                        |
+| `logCrmInterventionAction.ts`               | Log actions (import public)             |
 
 ## Données
 
