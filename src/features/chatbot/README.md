@@ -15,7 +15,9 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `hooks/useChatbotSupplierOrdersPanelView.ts`       | Labels clients, highlight, images rail             |
 | `components/ChatbotSupplierOrderRow.tsx`           | Ligne commande fournisseur (embedded)              |
 | `components/ChatbotMaterialOrderRow.tsx`           | Ligne commande matériel (embedded)                 |
-| `hooks/useChatbot.ts`                              | Hook client SSE — orchestrateur (~330 lignes)      |
+| `hooks/useChatbot.ts`                              | Hook client SSE — orchestrateur (~130 lignes)      |
+| `hooks/useChatbotConversations.ts`                 | Persistance localStorage + fil actif               |
+| `hooks/useChatbotMessaging.ts`                     | Envoi message, confirmation / annulation outil     |
 | `hooks/useChatbotStreamSession.ts`                 | Composer stream SSE (~30 lignes)                   |
 | `hooks/useChatbotStreamRun.ts`                     | POST `/api/ai/chatbot` + persistance conversation  |
 | `hooks/useChatbotStreamEventHandler.ts`            | Dispatch événements SSE → side effects UI          |
