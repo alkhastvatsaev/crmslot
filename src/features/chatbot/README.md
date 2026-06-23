@@ -17,6 +17,10 @@ Assistant IA OpenAI (SerrAI) : SSE streaming, outils Firebase Admin, commandes L
 | `chatbot-openai.ts`                             | Pipeline OpenAI (orchestrateur)                    |
 | `chatbot-tool-labels.ts`                        | Labels outils stream                               |
 | `index.ts`                                      | **Barrel public** cross-feature                    |
+| `chatbot-lecot-order.ts`                        | Orchestrateur commande Lecot (~57 lignes)          |
+| `chatbot-lecot-order-lines.ts`                  | Parse lignes + enrichissement prix catalogue       |
+| `chatbot-lecot-order-helpers.ts`                | Firestore, CRM, email, sync facturation            |
+| `chatbot-lecot-order-demo.ts` / `-prod.ts`      | Branches démo / API Lecot réelle                   |
 | `chatbot-tools.ts`                              | Schémas JSON outils — **754 lignes**               |
 | `chatbot-tool-executor.ts`                      | Exécution serveur outils                           |
 
