@@ -8,9 +8,9 @@ import {
   stepDashboardCarouselNavIndex,
   stepDashboardLinearPageIndex,
 } from "@/features/dashboard/dashboardCarouselRegistry";
-import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
-import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
-import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub";
+import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail";
 
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";

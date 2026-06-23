@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
 import type { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useTranslation } from "@/core/i18n/I18nContext";

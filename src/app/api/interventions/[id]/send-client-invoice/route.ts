@@ -4,7 +4,7 @@ import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import type { Intervention } from "@/features/interventions";
-import { sendInterventionInvoiceEmailToClient } from "@/features/interventions/server/interventionInvoiceEmail";
+import { sendInterventionInvoiceEmailToClient } from "@/features/interventions/index.server";
 
 export const runtime = "nodejs";
 

@@ -1,7 +1,7 @@
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions";
-import type { WorkflowOwnerRole } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { WorkflowOwnerRole } from "@/features/interventions";
 import { buildCompanyCrmActivityPayload, type CompanyCrmActivityKind } from "./crmActivityLog";
 import { logCompanyCrmActivityAdmin } from "./logCompanyCrmActivityAdmin";
 

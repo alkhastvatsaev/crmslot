@@ -6,7 +6,7 @@ import {
   DashboardPageSelectorProvider,
   useDashboardPageSelector,
 } from "@/features/dashboard/DashboardPageSelectorContext";
-import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail/gmailHubConstants";
+import { GMAIL_HUB_SLOT_INDEX } from "@/features/gmail";
 
 describe("UserProfile", () => {
   it("shows one profile per carousel page (9 admin hubs)", () => {

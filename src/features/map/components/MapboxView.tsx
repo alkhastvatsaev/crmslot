@@ -9,7 +9,7 @@ import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import MapMissionSelectedOverlay from "@/features/map/components/MapMissionSelectedOverlay";
 import MapboxMapControls from "@/features/map/components/MapboxMapControls";
 import MapboxViewDesktopLayout from "@/features/map/components/MapboxViewDesktopLayout";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";

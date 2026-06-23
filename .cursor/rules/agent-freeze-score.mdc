@@ -1,0 +1,41 @@
+---
+description: Freeze refactor structure + score agent-readiness (70%/90%)
+alwaysApply: true
+---
+
+# Freeze refactor + score agent
+
+## Objectif
+
+**70 %** = atteint · **90 %** = cible · mesurer avec `npm run agent:score`.
+
+## Freeze (sauf demande explicite)
+
+- **Pas** de découpage / barrels / migration imports **sans ticket feature ou bug build**.
+- **Pas** de fichier < 250 L « pour la forme ».
+- **Pas** de migration des ~3k imports **valeur** deep (cycles Jest + bundle client).
+
+## Contrat barrels
+
+| Fichier | Rôle |
+|---------|------|
+| `index.ts` | Client / types / helpers stables — **jamais** firebase-admin |
+| `index.server.ts` | Routes API, cron, Admin SDK uniquement |
+
+## Imports cross-feature
+
+- `import type` → barrel `@/features/<zone>` si exporté.
+- Valeurs → barrel dans hubs (`app/`, `context/`, `core/`, `api/`).
+- Valeurs entre features → **deep** si cycle ou composant lourd.
+- **Constantes pager** (`*_SLOT_INDEX`) : deep `*Constants.ts` — pas le barrel hub (cycles).
+
+## Avant merge sensible
+
+```bash
+npm run agent:score
+npx jest <zone> --no-coverage
+```
+
+Cible CI optionnelle : `npm run agent:score -- --min=85`
+
+Voir `docs/agents/AGENT_SCORE.md`.

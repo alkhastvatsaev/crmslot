@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPager } from "@/features/dashboard";
 import { useActivityLog } from "../useActivityLog";
 
 /**

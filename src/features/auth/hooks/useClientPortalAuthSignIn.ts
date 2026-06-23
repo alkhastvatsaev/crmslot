@@ -5,7 +5,7 @@ import { sendSignInLinkToEmail, type User } from "firebase/auth";
 import { toast } from "sonner";
 import { clientPortalAuth } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import {
   CLIENT_PORTAL_AUTH_SLOT_INDEX,
   EMAIL_LINK_STORAGE_KEY,

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, CloudOff, Wallet } from "lucide-react";
-import { useWorkspaceCopilotSnapshot } from "@/features/copilot/hooks/useWorkspaceCopilotSnapshot";
+import { useWorkspaceCopilotSnapshot } from "@/features/copilot";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
 import { useTranslation } from "@/core/i18n/I18nContext";
 

@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import {
   applyTechnicianNotificationIntent,
   parseTechnicianNotificationSearchParams,

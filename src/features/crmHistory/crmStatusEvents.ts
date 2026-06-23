@@ -1,5 +1,5 @@
 import type { Intervention } from "@/features/interventions";
-import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { InterventionStatusEvent } from "@/features/interventions";
 import type { CrmActivityEvent, CrmEventType } from "./crmActivityTypes";
 import { parseTs } from "./crmActivityLog";
 

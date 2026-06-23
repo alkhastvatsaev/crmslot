@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import MapGalaxyTranscriptionLayer from "@/features/map/components/MapGalaxyTranscriptionLayer";
 import { useGalaxyLayerBridge } from "@/features/map/GalaxyLayerBridgeContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileGalaxyComposerOpen } from "@/context/MobileGalaxyComposerOpenContext";
 import { useFeatureFlag } from "@/core/useFeatureFlags";

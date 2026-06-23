@@ -45,10 +45,10 @@ jest.mock("@/features/billingHub/components/BillingHubGalaxyComposer", () => ({
 import { screen } from "@testing-library/react";
 import { render } from "@/test-utils/render";
 import DashboardGalaxyLayer from "@/features/map/components/DashboardGalaxyLayer";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
-import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { DashboardPagerProvider } from "@/features/dashboard";
+import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
-import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 
 describe("DashboardGalaxyLayer", () => {

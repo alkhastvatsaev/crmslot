@@ -16,7 +16,7 @@ import {
   navigateCompanyHub,
   COMPANY_HUB_ANCHOR_SMART_FORM,
 } from "@/features/company/companyHubNavigation";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { CommissionDashboard } from "@/features/commissions/components/CommissionDashboard";
 import ClientsCrmPanel from "@/features/clients/components/ClientsCrmPanel";
 import RecurringContractsPanel from "@/features/clients/components/RecurringContractsPanel";

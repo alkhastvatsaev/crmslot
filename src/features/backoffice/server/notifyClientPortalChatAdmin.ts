@@ -4,7 +4,7 @@ import {
   channelAllowed,
   normalizeNotificationPreferences,
 } from "@/features/notifications/notificationPreferences";
-import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth/clientPortalConstants";
+import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 import { IVANA_PORTAL_CHAT_COLLECTION } from "@/features/backoffice/ivanaChatFirestore";
 import { logger } from "@/core/logger";
 

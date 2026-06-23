@@ -1,6 +1,6 @@
 import { render, type RenderOptions } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { DashboardPagerProvider } from "@/features/dashboard";
 import { I18nProvider } from "@/core/i18n/I18nContext";
 
 type Options = Omit<RenderOptions, "wrapper"> & {

@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { requireCompanyMember } from "@/features/company/server/requireCompanyMember";
-import { upsertTechnicianCommissionRuleAdmin } from "@/features/commissions/server/commissionRulesAdmin";
+import { upsertTechnicianCommissionRuleAdmin } from "@/features/commissions/index.server";
 import type { CommissionValueType } from "@/features/commissions";
 
 export const runtime = "nodejs";

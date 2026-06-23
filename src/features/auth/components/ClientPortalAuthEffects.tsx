@@ -7,7 +7,7 @@ import { Mail, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import {
   CLIENT_PORTAL_AUTH_SLOT_INDEX,
   EMAIL_LINK_STORAGE_KEY,

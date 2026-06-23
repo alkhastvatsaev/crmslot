@@ -3,7 +3,7 @@ import { render, type RenderOptions } from "@testing-library/react";
 import { I18nProvider } from "@/core/i18n/I18nContext";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { DashboardPagerProvider } from "@/features/dashboard";
 import { TechnicianQueryProvider } from "@/features/offline/TechnicianQueryProvider";
 import { OfflineSyncProvider } from "@/context/OfflineSyncContext";
 import { TechnicianCaseIntentProvider } from "@/context/TechnicianCaseIntentContext";

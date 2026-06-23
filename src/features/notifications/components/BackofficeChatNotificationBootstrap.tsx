@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import {
   applyBackofficeChatNotificationIntent,

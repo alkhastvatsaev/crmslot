@@ -5,7 +5,7 @@ import { loadPortalQuotesAdmin } from "@/features/quotes/index.server";
 import {
   findInterventionByPortalToken,
   isValidPortalAccessToken,
-} from "@/features/interventions/server/portalLookupAdmin";
+} from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

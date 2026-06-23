@@ -9,7 +9,7 @@ import type { ChatbotClientDocumentAction } from "@/features/chatbot/chatbot-cli
 import type { ChatbotDocumentKind } from "@/features/chatbot/chatbot-document";
 import type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import type { WorkspaceCopilotSnapshot } from "@/features/copilot";
-import type { SupplierOrder } from "@/features/suppliers/types";
+import type { SupplierOrder } from "@/features/suppliers";
 
 export type ChatbotStreamCtx = {
   accText: { v: string };

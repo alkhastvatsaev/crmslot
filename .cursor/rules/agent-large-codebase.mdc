@@ -8,11 +8,12 @@ alwaysApply: true
 Avant toute modification :
 
 1. Lire `src/features/<zone>/README.md` si présent.
-2. Imports **cross-feature** : passer par le barrel `@/features/<zone>` (`index.ts`) — pas d'import profond sauf dans la zone elle-même.
-   - **Types** (`import type`) : toujours via barrel si exporté.
-   - **Valeurs / composants** : barrel dans hubs (`src/app/`, `src/context/`, `src/core/`, `src/app/api/`). Entre features → profond si le barrel créerait un cycle (composants, hooks lourds).
-3. `Grep` / `SemanticSearch` **scopés** à `src/features/<zone>/` — pas de search globale sauf i18n (`src/core/i18n/locales/`).
-4. Ne pas ouvrir plus de **5 fichiers source** en parallèle sans raison.
+2. Imports **cross-feature** :
+   - **Types** (`import type`) : barrel `@/features/<zone>` si exporté (pas de deep hors zone).
+   - **Valeurs** : barrel dans hubs (`src/app/`, `src/context/`, `src/core/`). API serveur → `index.server.ts`.
+   - **Valeurs entre features** : deep si cycle ou composant lourd — **ne pas mass-migrer**.
+3. **Freeze** : pas de refactor structure sans ticket — voir `agent-freeze-score.mdc` · `npm run agent:score`.
+4. `Grep` / `SemanticSearch` **scopés** à `src/features/<zone>/` — pas de search globale sauf i18n (`src/core/i18n/locales/`).
 5. Fichier **>400 lignes** : proposer découpage **avant** d'ajouter des lignes.
 6. **Une tâche** = un dossier feature **OU** un fichier god — pas les deux.
 7. Hubs partagés (`src/app/page.tsx`, `src/context/*`) : **demander confirmation** avant modification.

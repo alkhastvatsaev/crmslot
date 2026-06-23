@@ -1,6 +1,6 @@
 "use client";
 
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { COMPANY_HUB_PAGE_INDEX } from "@/features/company/companyHubConstants";
 import { isClientMobileAppPath } from "@/features/company/clientMobileAppConstants";
 import { clientPortalAuth, isConfigured } from "@/core/config/firebase";

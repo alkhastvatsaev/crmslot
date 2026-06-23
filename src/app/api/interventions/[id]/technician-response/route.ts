@@ -9,7 +9,7 @@ import {
   declineTechnicianAssignmentPatch,
 } from "@/features/interventions/technicianAssignmentActions";
 import { assertTechnicianMayRespondToAssignment } from "@/features/interventions/technicianAssignmentServerAuth";
-import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
+import { transitionInterventionStatusAdmin } from "@/features/interventions/index.server";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { notifyCompanyAdminsPush } from "@/features/notifications/index.server";
 import { logger } from "@/core/logger";

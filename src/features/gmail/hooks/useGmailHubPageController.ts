@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { GMAIL_HUB_SYSTEM_LABELS } from "@/features/gmail/gmailHubConstants";
 import { useGmailHub } from "@/features/gmail/useGmailHub";
 import { useGmailHubKeyboard } from "@/features/gmail/useGmailHubKeyboard";

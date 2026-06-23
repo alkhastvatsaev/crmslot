@@ -69,15 +69,3 @@ export {
   dispatcherTransitionActor,
   requireAuthTransitionActor,
 } from "@/features/interventions/workflow/workflowActor";
-export {
-  default as FinishJobStepIndicator,
-  type FinishJobStep,
-} from "@/features/interventions/components/FinishJobStepIndicator";
-export {
-  useSmartForm,
-  SMART_FORM_MAX_PHOTOS,
-  emptyDraft,
-  loadStorageDraft,
-  type DraftPayload,
-  type WizardStep,
-} from "@/features/interventions/hooks/useSmartForm";

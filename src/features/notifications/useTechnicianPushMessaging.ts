@@ -14,7 +14,7 @@ import {
   resolvePushServiceWorkerRegistration,
   tokenDocId,
 } from "@/features/notifications/fcmWebPush";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
 import {

@@ -9,7 +9,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
 import {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { isValidPortalAccessToken } from "@/features/interventions/server/portalLookupAdmin";
+import { isValidPortalAccessToken } from "@/features/interventions/index.server";
 import { respondQuoteViaPortalAdmin } from "@/features/quotes/index.server";
 import { logger } from "@/core/logger";
 

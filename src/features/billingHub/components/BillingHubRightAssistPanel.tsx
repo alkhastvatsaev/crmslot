@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Bot, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBillingHubIntent } from "@/context/BillingHubIntentContext";
 import { navigateToBillingAgentWithPrompt } from "@/features/featureHub/companyStockChatbot";
 import InvoiceBillingPanel from "@/features/billing/components/InvoiceBillingPanel";

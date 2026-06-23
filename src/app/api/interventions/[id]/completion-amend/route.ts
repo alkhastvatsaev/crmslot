@@ -6,8 +6,8 @@ import type { Intervention } from "@/features/interventions";
 import { assertTechnicianMayUpdateAssignedIntervention } from "@/features/interventions/technicianAssignmentServerAuth";
 import { canTechnicianAmendCompletionReport } from "@/features/interventions/technicianCompletionReport";
 import { canTechnicianAmendInvoicedReport } from "@/features/interventions/technicianInvoicedReportAmend";
-import { technicianAmendInvoicedReportAdmin } from "@/features/interventions/server/technicianAmendInvoicedReportAdmin";
-import { coerceAdminExtraPatch } from "@/features/interventions/workflow/coerceAdminExtraPatch";
+import { technicianAmendInvoicedReportAdmin } from "@/features/interventions/index.server";
+import { coerceAdminExtraPatch } from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";

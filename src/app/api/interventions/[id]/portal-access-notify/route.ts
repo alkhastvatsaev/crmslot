@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
-import { notifyPortalAccessAdmin } from "@/features/interventions/server/portalAccessNotifyAdmin";
+import { notifyPortalAccessAdmin } from "@/features/interventions/index.server";
 import type { Intervention } from "@/features/interventions";
 
 export const runtime = "nodejs";

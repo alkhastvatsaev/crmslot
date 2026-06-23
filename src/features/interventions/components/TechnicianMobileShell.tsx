@@ -5,7 +5,7 @@ import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import TechnicianMobileProfileChip from "@/features/interventions/components/TechnicianMobileProfileChip";
-import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useDashboardPageSelector } from "@/features/dashboard";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,

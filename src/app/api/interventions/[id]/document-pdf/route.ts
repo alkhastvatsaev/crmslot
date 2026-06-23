@@ -5,7 +5,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { generateInterventionDocumentPdf } from "@/features/billing";
 import { generateMaterialOrdersPdf } from "@/features/materials";
 import type { MaterialOrderDoc } from "@/features/materials";
-import { loadBillingPdfBrandingForIntervention } from "@/features/billing/loadBillingPdfBrandingForIntervention";
+import { loadBillingPdfBrandingForIntervention } from "@/features/billing/index.server";
 import {
   CHATBOT_DOCUMENT_LABELS,
   isChatbotDocumentKind,

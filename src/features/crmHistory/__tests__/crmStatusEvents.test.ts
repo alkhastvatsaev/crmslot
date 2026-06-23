@@ -1,6 +1,6 @@
 import { dedupeCrmEvents, statusEventToCrmEvent } from "@/features/crmHistory/crmStatusEvents";
 import type { Intervention } from "@/features/interventions";
-import type { InterventionStatusEvent } from "@/features/interventions/workflow/interventionWorkflowTypes";
+import type { InterventionStatusEvent } from "@/features/interventions";
 
 const iv: Intervention = {
   id: "iv1",

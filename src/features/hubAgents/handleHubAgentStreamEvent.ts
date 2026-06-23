@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useChatbotContextOptional } from "@/features/chatbot/ChatbotContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
-import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import {
@@ -11,7 +11,7 @@ import {
   useCompanyStockIntentOptional,
 } from "@/context/CompanyStockIntentContext";
 import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNavigation";
-import type { ChatbotStreamEvent } from "@/features/chatbot";
+import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
 import type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { dispatchCrmOrdersChanged } from "@/features/crmHistory/crmOrdersChangedEvent";
