@@ -48,7 +48,7 @@ describe("MobileShell", () => {
     renderMobileShell([<div key="0">Hub A</div>, <div key="1">Hub B</div>]);
 
     expect(screen.getByTestId("mobile-shell")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-hub-title-chip")).toBeInTheDocument();
+    expect(screen.getByTestId("mobile-header-calendar")).toBeInTheDocument();
     expect(screen.getByTestId("admin-mobile-profile-chip")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-screen-host")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-shell-footer")).toBeInTheDocument();
