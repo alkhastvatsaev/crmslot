@@ -1,57 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { onAuthStateChanged } from "firebase/auth";
-import { onSnapshot } from "firebase/firestore";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
-import { logger } from "@/core/logger";
 import type { Intervention } from "@/features/interventions/types";
 import { TECHNICIAN_ASSIGNMENTS_QUERY_KEY } from "@/features/offline/technicianQueryKeys";
 import { buildTechnicianInterventionList } from "@/features/interventions/technicianAssignmentsFilter";
-import { getTechnicianAssignmentUid } from "@/features/interventions/technicianAssignmentActions";
+import { useTechnicianAssignmentsFirestoreListener } from "@/features/interventions/hooks/useTechnicianAssignmentsFirestoreListener";
 import {
-  fetchTechnicianAssignments,
-  resolveTechnicianAssignmentsPollMs,
-  technicianAssignmentsFirestoreQuery,
-} from "@/features/interventions/technicianAssignmentsQuery";
-import { writeTerrainMissionsCache } from "@/features/offline/terrainMissionsCache";
-import { TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT } from "@/features/interventions/technicianAssignmentSyncEvents";
-import {
-  interventionAssignmentPreview,
-  newAssignmentIdsFromSnapshotChanges,
-  showTechnicianNewAssignmentNotification,
-} from "@/features/interventions/technicianNewAssignmentAlerts";
-import { toast } from "sonner";
+  useTechnicianAssignmentsPolling,
+  useTechnicianAssignmentsResyncEffects,
+} from "@/features/interventions/hooks/useTechnicianAssignmentsResyncEffects";
+import { syncTechnicianAssignmentsFromServer } from "@/features/interventions/technicianAssignmentsSync";
+import type {
+  UseTechnicianAssignmentsOptions,
+  UseTechnicianAssignmentsResult,
+} from "@/features/interventions/useTechnicianAssignmentsTypes";
 
-export type UseTechnicianAssignmentsResult = {
-  interventions: Intervention[];
-  loading: boolean;
-  error: string | null;
-  firebaseUid: string | null;
-};
-
-type Options = {
-  /** Désactiver l’écoute Firestore (ex. carte dispatch qui utilise le back-office). */
-  enabled?: boolean;
-};
-
-function applyAssignmentsToCache(
-  queryClient: ReturnType<typeof useQueryClient>,
-  technicianUid: string,
-  data: Intervention[]
-) {
-  queryClient.setQueryData([TECHNICIAN_ASSIGNMENTS_QUERY_KEY, technicianUid], data);
-  writeTerrainMissionsCache(technicianUid, data);
-}
+export type { UseTechnicianAssignmentsResult } from "@/features/interventions/useTechnicianAssignmentsTypes";
 
 /**
  * Temps réel — interventions visibles par le technicien **après** le goulot IVANA.
  * Resync serveur périodique : le listener Firestore peut ne pas pousser les nouvelles
  * assignations IVANA tant que l’app mobile reste ouverte (WebView / PWA).
  */
-export function useTechnicianAssignments(options: Options = {}): UseTechnicianAssignmentsResult {
-  const [pollArmed, setPollArmed] = useState(false);
+export function useTechnicianAssignments(
+  options: UseTechnicianAssignmentsOptions = {}
+): UseTechnicianAssignmentsResult {
   const hookEnabled = options.enabled !== false;
   const queryClient = useQueryClient();
 
@@ -114,250 +89,47 @@ export function useTechnicianAssignments(options: Options = {}): UseTechnicianAs
   const listenerHydratedRef = useRef(false);
   const knownAssignmentIdsRef = useRef<Set<string>>(new Set());
 
-  const notifyNewAssignments = useCallback((rows: Intervention[]) => {
-    if (rows.length === 0) return;
-    const preview = interventionAssignmentPreview(rows[rows.length - 1]!);
-    toast.message("Nouvelle intervention", {
-      description: rows.length > 1 ? `${rows.length} nouvelles missions` : preview,
-    });
-    showTechnicianNewAssignmentNotification(
-      "Nouvelle intervention",
-      preview,
-      `assignment-${rows[rows.length - 1]!.id}`
-    );
-  }, []);
-
   const syncAssignmentsFromServer = useCallback(async () => {
     const uid = firebaseUid?.trim();
     const db = firestore;
-    if (!uid || !db || typeof document === "undefined") return;
-    if (document.visibilityState !== "visible") return;
+    if (!uid || !db) return;
 
-    try {
-      const data = await fetchTechnicianAssignments(db, uid, { fromServer: true });
-      const prev =
-        queryClient.getQueryData<Intervention[]>([
-          TECHNICIAN_ASSIGNMENTS_QUERY_KEY,
-          uid,
-        ] as const) ?? [];
-      const prevIds = new Set(prev.map((row) => row.id));
-      const added = data.filter((row) => !prevIds.has(row.id));
-      if (listenerHydratedRef.current && added.length > 0) {
-        notifyNewAssignments(added);
-      }
-      for (const row of data) {
-        knownAssignmentIdsRef.current.add(row.id);
-      }
-      applyAssignmentsToCache(queryClient, uid, data);
-      setSnapshotReady(true);
-      setError(null);
-    } catch (e) {
-      logger.warn("[useTechnicianAssignments] resync", {
-        error: e instanceof Error ? e.message : String(e),
-      });
-    }
-  }, [firebaseUid, queryClient, notifyNewAssignments]);
+    await syncTechnicianAssignmentsFromServer({
+      db,
+      uid,
+      queryClient,
+      listenerHydratedRef,
+      knownAssignmentIdsRef,
+      onSuccess: () => {
+        setSnapshotReady(true);
+        setError(null);
+      },
+    });
+  }, [firebaseUid, queryClient]);
 
   syncFromServerRef.current = syncAssignmentsFromServer;
 
-  useEffect(() => {
-    if (!hookEnabled || noFirebaseAuth) return () => {};
+  useTechnicianAssignmentsFirestoreListener({
+    hookEnabled,
+    noFirebaseAuth,
+    queryClient,
+    syncFromServerRef,
+    listenerHydratedRef,
+    knownAssignmentIdsRef,
+    setFirebaseUid,
+    setError,
+    setSnapshotReady,
+  });
 
-    let unsubSnap: (() => void) | undefined;
+  const resyncParams = {
+    hookEnabled,
+    firebaseUid,
+    noFirebaseAuth,
+    syncFromServerRef,
+  };
 
-    const clearSnap = () => {
-      const stop = unsubSnap;
-      unsubSnap = undefined;
-      if (!stop) return;
-      if (typeof queueMicrotask === "function") {
-        queueMicrotask(() => stop());
-      } else {
-        setTimeout(() => stop(), 0);
-      }
-    };
-
-    const unsubAuth = onAuthStateChanged(auth!, (user) => {
-      clearSnap();
-
-      const technicianUid = getTechnicianAssignmentUid(user?.uid ?? null);
-
-      queryClient.removeQueries({
-        predicate: (q) =>
-          Array.isArray(q.queryKey) &&
-          q.queryKey[0] === TECHNICIAN_ASSIGNMENTS_QUERY_KEY &&
-          q.queryKey[1] !== technicianUid,
-      });
-
-      if (!technicianUid) {
-        setFirebaseUid(null);
-        setError(null);
-        setSnapshotReady(true);
-        return;
-      }
-
-      setFirebaseUid(technicianUid);
-      setSnapshotReady(false);
-      setError(null);
-      listenerHydratedRef.current = false;
-      knownAssignmentIdsRef.current = new Set();
-
-      const db = firestore!;
-      const q = technicianAssignmentsFirestoreQuery(db, technicianUid);
-
-      unsubSnap = onSnapshot(
-        q,
-        { includeMetadataChanges: false },
-        (snapshot) => {
-          const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
-
-          if (!listenerHydratedRef.current) {
-            listenerHydratedRef.current = true;
-            knownAssignmentIdsRef.current = new Set(data.map((row) => row.id));
-            applyAssignmentsToCache(queryClient, technicianUid, data);
-            setSnapshotReady(true);
-            setError(null);
-            return;
-          }
-
-          const newIds = newAssignmentIdsFromSnapshotChanges(
-            snapshot.docChanges().map((c) => ({ type: c.type, docId: c.doc.id })),
-            knownAssignmentIdsRef.current
-          );
-          for (const id of data.map((row) => row.id)) {
-            knownAssignmentIdsRef.current.add(id);
-          }
-
-          if (newIds.length > 0) {
-            const addedRows = data.filter((row) => newIds.includes(row.id));
-            notifyNewAssignments(addedRows);
-            void syncFromServerRef.current?.();
-          }
-
-          applyAssignmentsToCache(queryClient, technicianUid, data);
-          setSnapshotReady(true);
-          setError(null);
-        },
-        (e) => {
-          logger.error("[useTechnicianAssignments]", {
-            error: e instanceof Error ? e.message : String(e),
-          });
-          setError(e.message || "Erreur Firestore");
-          setSnapshotReady(true);
-        }
-      );
-
-      void fetchTechnicianAssignments(db, technicianUid, { fromServer: true })
-        .then((data) => {
-          applyAssignmentsToCache(queryClient, technicianUid, data);
-          setSnapshotReady(true);
-          setError(null);
-        })
-        .catch((e) => {
-          logger.warn("[useTechnicianAssignments] initial server pull", {
-            error: e instanceof Error ? e.message : String(e),
-          });
-        });
-    });
-
-    return () => {
-      clearSnap();
-      unsubAuth();
-    };
-  }, [queryClient, hookEnabled, noFirebaseAuth, notifyNewAssignments]);
-
-  useEffect(() => {
-    if (!hookEnabled || !firebaseUid || noFirebaseAuth) return () => {};
-
-    const onResync = () => {
-      void syncFromServerRef.current?.();
-    };
-    window.addEventListener(TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT, onResync);
-    return () => window.removeEventListener(TECHNICIAN_ASSIGNMENTS_RESYNC_EVENT, onResync);
-  }, [hookEnabled, firebaseUid, noFirebaseAuth]);
-
-  /** Resync quand l’app revient au premier plan ou retrouve le réseau. */
-  useEffect(() => {
-    if (!hookEnabled || !firebaseUid || noFirebaseAuth) return () => {};
-
-    const onVisible = () => {
-      if (document.visibilityState === "visible") {
-        void syncFromServerRef.current?.();
-      }
-    };
-    const onOnline = () => {
-      void syncFromServerRef.current?.();
-    };
-
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("online", onOnline);
-
-    let unlistenCapacitor: (() => void) | null = null;
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        const { isCapacitorNative } = await import("@/core/native/capacitorRuntime");
-        if (!isCapacitorNative() || cancelled) return;
-        const { App } = await import("@capacitor/app");
-        if (cancelled) return;
-        const handle = await App.addListener("appStateChange", ({ isActive }) => {
-          if (isActive) void syncFromServerRef.current?.();
-        });
-        unlistenCapacitor = () => handle.remove();
-      } catch {
-        /* web pur */
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("online", onOnline);
-      unlistenCapacitor?.();
-    };
-  }, [hookEnabled, firebaseUid, noFirebaseAuth]);
-
-  /** Polling léger tant que l’écran terrain est visible (nouvelle assignation IVANA). */
-  useEffect(() => {
-    if (!hookEnabled || !firebaseUid || noFirebaseAuth || typeof window === "undefined") {
-      return () => {};
-    }
-
-    const pollMs = resolveTechnicianAssignmentsPollMs();
-    let intervalId: number | null = null;
-
-    const tick = () => {
-      if (document.visibilityState === "visible") {
-        void syncFromServerRef.current?.();
-      }
-    };
-
-    const start = () => {
-      if (intervalId || document.visibilityState !== "visible") return;
-      tick();
-      intervalId = window.setInterval(tick, pollMs);
-      setPollArmed(true);
-    };
-
-    const stop = () => {
-      if (!intervalId) return;
-      window.clearInterval(intervalId);
-      intervalId = null;
-      setPollArmed(false);
-    };
-
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") start();
-      else stop();
-    };
-
-    start();
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      stop();
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [hookEnabled, firebaseUid, noFirebaseAuth]);
+  useTechnicianAssignmentsResyncEffects(resyncParams);
+  useTechnicianAssignmentsPolling(resyncParams);
 
   return { interventions, loading, error, firebaseUid };
 }
