@@ -54,7 +54,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   maintenanceContracts: true,
   slaTracker: true,
   dispatchVoice: true,
-  mobileMapWebGL: true,
+  mobileMapWebGL: false,
   mobileEmergencyLite: false,
   geofenceAuto: false,
   vehicleStock: true,

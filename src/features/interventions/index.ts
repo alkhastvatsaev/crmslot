@@ -69,3 +69,26 @@ export {
   dispatcherTransitionActor,
   requireAuthTransitionActor,
 } from "@/features/interventions/workflow/workflowActor";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/interventions/resolveInterventionClientName";
+export * from "@/features/interventions/technicianAssignmentServerAuth";
+export * from "@/features/interventions/technicianInvoicedReportAmend";
+export * from "@/features/interventions/interventionLocation";
+export * from "@/features/interventions/optimizeTourOrder";
+export * from "@/features/interventions/technicianHubNavigation";
+export * from "@/features/interventions/buildInterventionReportPdf";
+export * from "@/features/interventions/completionPhotoUrls";
+export * from "@/features/interventions/completionUploadCore";
+export * from "@/features/interventions/defaultAssignedTechnicianUid";
+export * from "@/features/interventions/ensurePortalAccessToken";
+export * from "@/features/interventions/recordDuplicateAlertIfNeeded";
+export * from "@/features/interventions/requestAutoAssignIntervention";
+export * from "@/features/interventions/technicianAssignmentActions";
+export * from "@/features/interventions/technicianAssignmentSyncEvents";
+export * from "@/features/interventions/technicianCompletionReport";
+export * from "@/features/interventions/technicianInvoiceQuickAdjust";
+export * from "@/features/interventions/technicianMobileProfileLabel";
+export * from "@/features/interventions/useBrowserSpeechDictation";
+export * from "@/features/interventions/useInterventionLive";
+export * from "@/features/interventions/useTechnicianAssignments";

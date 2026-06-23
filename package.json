@@ -51,6 +51,8 @@
     "generate:api-routes": "node scripts/ci/generate-protected-api-routes.mjs",
     "map": "node scripts/ci/generate-codemap.mjs",
     "audit:barrels": "node scripts/ci/audit-barrels.mjs",
+    "audit:barrels:public": "node scripts/ci/detect-cross-feature-imports.mjs",
+    "audit:barrels:suggest": "node scripts/ci/detect-cross-feature-imports.mjs --suggest",
     "ci": "npm run lint:ci && npm run test:ci && npm run build",
     "clean:dev": "bash scripts/dev/clean-dev-artifacts.sh",
     "ci:all": "npm run ci && npm run test:e2e",
