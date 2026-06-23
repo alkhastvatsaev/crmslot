@@ -7,6 +7,8 @@ import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { BackofficeInboxIntentProvider } from "@/context/BackofficeInboxIntentContext";
+import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
+import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
@@ -27,14 +29,18 @@ export default function AdminMobileProviders({ children }: Props) {
           <DevServiceWorkerCleanup />
           <CompanyWorkspaceProvider>
             <FeatureFlagsProvider>
-              <DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}>
-                <DashboardPageSelectorProvider>
-                  <BackofficeInboxIntentProvider>
-                    <DeferredAdminBootstraps />
-                    {children}
-                  </BackofficeInboxIntentProvider>
-                </DashboardPageSelectorProvider>
-              </DashboardPagerProvider>
+              <GalaxyLayerBridgeProvider>
+                <MobileGalaxyComposerOpenProvider>
+                  <DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}>
+                    <DashboardPageSelectorProvider>
+                      <BackofficeInboxIntentProvider>
+                        <DeferredAdminBootstraps />
+                        {children}
+                      </BackofficeInboxIntentProvider>
+                    </DashboardPageSelectorProvider>
+                  </DashboardPagerProvider>
+                </MobileGalaxyComposerOpenProvider>
+              </GalaxyLayerBridgeProvider>
             </FeatureFlagsProvider>
           </CompanyWorkspaceProvider>
         </LoginOverlay>
