@@ -23,3 +23,6 @@ export type {
   OpenCrmDossierEvent,
   FocusStockFilter,
 } from "@/features/hubAgents/hubAgentSideEffects";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/hubAgents/HubAgentPanel";

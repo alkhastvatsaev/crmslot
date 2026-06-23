@@ -111,3 +111,7 @@ export {
   STATUS_NOTIFICATION_RULES,
 } from "@/features/notifications/statusNotificationRules";
 export type { StatusNotificationRule } from "@/features/notifications/statusNotificationRules";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/notifications/sendNativePushAdmin";
+export * from "@/features/notifications/notifyCompanyAdminsPush";

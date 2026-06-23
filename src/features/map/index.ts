@@ -62,3 +62,6 @@ export {
 export { resolveMapWebGLActive } from "@/features/map/mapMobileWebGLPolicy";
 export { default as DashboardGalaxyLayer } from "@/features/map/components/DashboardGalaxyLayer";
 export { default as MapPageSlot } from "@/features/map/components/MapPageSlot";
+
+// Modules consommés cross-feature (audit:barrels:public).
+export * from "@/features/map/mapboxPowerProfile";
