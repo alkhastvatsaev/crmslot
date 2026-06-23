@@ -2492,7 +2492,9 @@
     "reply_billing": "Voor facturatie of een offerte geeft u de naam op het dossier of de laatste cijfers van de interventie — ik stuur het door naar de bevoegde dienst.",
     "reply_schedule": "Om een tijdslot te wijzigen, geeft u de gewenste datum en gemeente; de dispatcher bevestigt de planning.",
     "reply_thanks": "Graag gedaan! Aarzel niet als u andere vragen heeft.",
-    "reply_default": "Bedankt voor uw bericht. De dispatcher is op de hoogte en neemt snel contact met u op. U kunt ook een verzoek indienen via de bedrijfsruimte."
+    "reply_default": "Bedankt voor uw bericht. De dispatcher is op de hoogte en neemt snel contact met u op. U kunt ook een verzoek indienen via de bedrijfsruimte.",
+    "connecting": "Verbinden met chat…",
+    "company_unconfigured": "Chat niet beschikbaar: portaalbedrijf is niet geconfigureerd."
   },
   "copilot": {
     "aria": {

@@ -2492,7 +2492,9 @@
     "reply_billing": "For billing or a quote, provide the name on the file or the last digits of the intervention reference — I will forward it to the relevant team.",
     "reply_schedule": "To change a time slot, indicate the desired date and city; the dispatcher will confirm your schedule.",
     "reply_thanks": "You're welcome! Don't hesitate if you have other questions.",
-    "reply_default": "Thank you for your message. The dispatcher has been notified and will get back to you shortly. You can also submit a request from the company space."
+    "reply_default": "Thank you for your message. The dispatcher has been notified and will get back to you shortly. You can also submit a request from the company space.",
+    "connecting": "Connecting to chat…",
+    "company_unconfigured": "Chat unavailable: portal company is not configured."
   },
   "copilot": {
     "aria": {

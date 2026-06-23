@@ -87,7 +87,7 @@ export function useBackOfficeInboxState(
     workspace,
     inboxLive,
     isTenant,
-    ivanaChatCompanyId,
+    inboxCompanyIds,
     setActiveTab: selection.setActiveTab,
     setSelectedChatInterventionId: selection.setSelectedChatInterventionId,
     chatTabLabel: String(t("backoffice.inbox.tabs.chat")),
