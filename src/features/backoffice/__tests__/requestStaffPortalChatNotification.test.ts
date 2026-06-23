@@ -22,16 +22,20 @@ describe("requestStaffPortalChatNotification", () => {
       clientLabel: "Alice",
     });
 
-    expect(fetchWithAuthMock).toHaveBeenCalledWith("/api/portal-chat/notify-staff", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        companyId: "co-1",
-        interventionId: "iv-9",
-        preview: "Bonjour",
-        clientLabel: "Alice",
-      }),
-    });
+    expect(fetchWithAuthMock).toHaveBeenCalledWith(
+      "/api/portal-chat/notify-staff",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: "co-1",
+          interventionId: "iv-9",
+          preview: "Bonjour",
+          clientLabel: "Alice",
+        }),
+      },
+      { user: undefined }
+    );
   });
 
   it("skips when companyId empty", async () => {

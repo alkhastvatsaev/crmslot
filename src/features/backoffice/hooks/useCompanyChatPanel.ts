@@ -63,14 +63,7 @@ export function useCompanyChatPanel({
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
   const portalAuthReady = !publishAsPortal || isClientPortalChatUser(user);
   const { ready: portalProfileReady, errorKey: portalProfileErrorKey } =
-    usePortalChatProfileBootstrap(
-      publishAsPortal,
-      chatDb,
-      chatAuth,
-      companyIdTrimmed,
-      user,
-      portalAuthReady
-    );
+    usePortalChatProfileBootstrap(publishAsPortal, companyIdTrimmed, user, portalAuthReady);
   const firestoreSyncEnabled = Boolean(
     companyIdTrimmed && isConfigured && chatDb && portalAuthReady && portalProfileReady
   );

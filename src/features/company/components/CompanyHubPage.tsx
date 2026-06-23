@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
-import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import CompanyChatPanel from "@/features/backoffice/components/CompanyChatPanel";
 import RequesterProfilePanel from "@/features/interventions/components/RequesterProfilePanel";
@@ -22,7 +21,7 @@ const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
 import { CompanyHubInvoiceTab } from "@/features/company/components/CompanyHubInvoiceTab";
 import { useRequesterHub } from "@/context/RequesterHubContext";
-import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
+import { resolvePortalChatCompanyId } from "@/features/company/clientPortalCompanyId";
 import { useClientPortalLinkedCompanyId } from "@/features/auth/hooks/useClientPortalLinkedCompanyId";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 
@@ -41,7 +40,6 @@ function normalizePortalRightTab(
 /** Interface Demandeur (Page 2) — Qui demande, Que faut-il réparer, Où en est ma demande. */
 export default function CompanyHubPage() {
   const [rightCategory, setRightCategory] = useState<CompanyHubRightCategory>("tracking");
-  const workspace = useCompanyWorkspaceOptional();
   const { t } = useTranslation();
   const { logNote } = useActivityLog();
   const {
@@ -64,13 +62,8 @@ export default function CompanyHubPage() {
   const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
 
   const portalChatCompanyId = useMemo(
-    () =>
-      resolveClientPortalInterventionCompanyId({
-        tenantActiveCompanyId:
-          workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null,
-        linkedPortalCompanyId,
-      }),
-    [workspace?.isTenantUser, workspace?.activeCompanyId, linkedPortalCompanyId]
+    () => resolvePortalChatCompanyId(linkedPortalCompanyId),
+    [linkedPortalCompanyId]
   );
 
   const leftPanel = (

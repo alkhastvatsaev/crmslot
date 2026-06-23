@@ -8,7 +8,7 @@ import { isConfigured, storage } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { publishClientPortalMessage } from "@/features/backoffice/portalChatBridge";
 import { sendPortalChatMessage } from "@/features/backoffice/portalChatFirestore";
-import { ensurePortalChatProfile } from "@/features/backoffice/ensurePortalChatProfile";
+import { requestPortalChatProfileEnsure } from "@/features/backoffice/requestPortalChatProfileEnsure";
 import { uploadPortalChatImagesFromDataUrls } from "@/features/backoffice/portalChatStorage";
 import { readPortalChatImageDataUrls } from "@/features/backoffice/portalChatImageFiles";
 import { requestStaffPortalChatNotification } from "@/features/backoffice/requestStaffPortalChatNotification";
@@ -134,7 +134,7 @@ export function useCompanyChatSend({
 
       try {
         if (publishAsPortal) {
-          await ensurePortalChatProfile(db, currentUser, companyIdTrimmed);
+          await requestPortalChatProfileEnsure(currentUser, companyIdTrimmed);
         }
         let imageUrls: string[] | undefined;
         if (optimisticImages && optimisticImages.length > 0 && storage) {
@@ -166,6 +166,7 @@ export function useCompanyChatSend({
             interventionId: chatInterventionId,
             preview,
             clientLabel: senderName,
+            user: currentUser,
           });
         } else {
           void requestClientPortalChatNotification({

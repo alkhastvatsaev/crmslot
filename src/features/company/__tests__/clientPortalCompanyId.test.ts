@@ -96,3 +96,23 @@ describe("resolveBackofficeInboxCompanyIds", () => {
     ).toEqual(["co-live"]);
   });
 });
+
+describe("resolvePortalChatCompanyId", () => {
+  const original = process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID;
+
+  afterEach(() => {
+    process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = original;
+  });
+
+  it("prefers linked portal company over env default", async () => {
+    process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = "env-co";
+    const { resolvePortalChatCompanyId } = await import("@/features/company/clientPortalCompanyId");
+    expect(resolvePortalChatCompanyId("linked-co")).toBe("linked-co");
+  });
+
+  it("falls back to env default", async () => {
+    process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = "env-co";
+    const { resolvePortalChatCompanyId } = await import("@/features/company/clientPortalCompanyId");
+    expect(resolvePortalChatCompanyId(null)).toBe("env-co");
+  });
+});

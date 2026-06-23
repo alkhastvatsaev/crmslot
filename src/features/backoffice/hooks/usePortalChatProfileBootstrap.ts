@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Auth, User } from "firebase/auth";
-import type { Firestore } from "firebase/firestore";
+import type { User } from "firebase/auth";
 import { logger } from "@/core/logger";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
-import { ensurePortalChatProfile } from "@/features/backoffice/ensurePortalChatProfile";
+import { requestPortalChatProfileEnsure } from "@/features/backoffice/requestPortalChatProfileEnsure";
 
 export type PortalChatProfileBootstrapState = {
   ready: boolean;
@@ -13,13 +12,11 @@ export type PortalChatProfileBootstrapState = {
 };
 
 /**
- * Crée le doc `client_portal_profiles/{uid}` avant l’écoute Firestore.
- * Les règles chat exigent `clientPortalLinkedToCompany` — sans profil → permission-denied.
+ * Initialise `client_portal_profiles/{uid}` via API Admin avant l’écoute Firestore.
+ * Contourne les refus d’écriture client (règles / App Check) pour les invités anonymes.
  */
 export function usePortalChatProfileBootstrap(
   publishAsPortal: boolean,
-  chatDb: Firestore | null,
-  chatAuth: Auth | null,
   companyIdTrimmed: string,
   user: User | null,
   portalAuthReady: boolean
@@ -40,7 +37,7 @@ export function usePortalChatProfileBootstrap(
       return;
     }
 
-    if (!portalAuthReady || !user || !chatDb || !chatAuth?.currentUser) {
+    if (!portalAuthReady || !user) {
       setState({ ready: false, errorKey: null });
       return;
     }
@@ -48,14 +45,14 @@ export function usePortalChatProfileBootstrap(
     let cancelled = false;
     setState({ ready: false, errorKey: null });
 
-    void ensurePortalChatProfile(chatDb, chatAuth.currentUser, companyIdTrimmed)
+    void requestPortalChatProfileEnsure(user, companyIdTrimmed)
       .then(() => {
         if (!cancelled) setState({ ready: true, errorKey: null });
       })
       .catch((err) => {
-        logger.error("[usePortalChatProfileBootstrap] ensurePortalChatProfile", {
+        logger.error("[usePortalChatProfileBootstrap] requestPortalChatProfileEnsure", {
           companyId: companyIdTrimmed,
-          uid: chatAuth.currentUser?.uid,
+          uid: user.uid,
           error: err instanceof Error ? err.message : String(err),
         });
         if (cancelled) return;
@@ -70,7 +67,7 @@ export function usePortalChatProfileBootstrap(
     return () => {
       cancelled = true;
     };
-  }, [publishAsPortal, companyIdTrimmed, portalAuthReady, user?.uid, chatDb, chatAuth]);
+  }, [publishAsPortal, companyIdTrimmed, portalAuthReady, user?.uid]);
 
   return state;
 }
