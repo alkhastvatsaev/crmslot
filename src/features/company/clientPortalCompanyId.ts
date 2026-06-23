@@ -28,6 +28,17 @@ export function resolveClientPortalInterventionCompanyId(
   return null;
 }
 
+/** Société du chat portail client — jamais la société tenant admin active. */
+export function resolvePortalChatCompanyId(linkedPortalCompanyId?: string | null): string | null {
+  const linked = (linkedPortalCompanyId ?? "").trim();
+  if (linked) return linked;
+
+  const envDefault = readClientPortalDefaultCompanyIdFromEnv();
+  if (envDefault) return envDefault;
+
+  return null;
+}
+
 /** Sociétés à écouter dans l'inbox chat portail (carte / dispatch). */
 export function resolveBackofficeInboxCompanyIds(
   workspace:

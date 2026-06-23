@@ -1,47 +1,38 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { usePortalChatProfileBootstrap } from "@/features/backoffice/hooks/usePortalChatProfileBootstrap";
 
-jest.mock("@/features/backoffice/ensurePortalChatProfile", () => ({
-  ensurePortalChatProfile: jest.fn(),
+const mockRequestPortalChatProfileEnsure = jest.fn();
+
+jest.mock("@/features/backoffice/requestPortalChatProfileEnsure", () => ({
+  requestPortalChatProfileEnsure: (...args: unknown[]) =>
+    mockRequestPortalChatProfileEnsure(...args),
 }));
 
-const { ensurePortalChatProfile } = jest.requireMock(
-  "@/features/backoffice/ensurePortalChatProfile"
-) as { ensurePortalChatProfile: jest.Mock };
-
 const user = { uid: "guest-1", isAnonymous: true } as import("firebase/auth").User;
-const chatAuth = { currentUser: user } as import("firebase/auth").Auth;
-const chatDb = {} as import("firebase/firestore").Firestore;
 
 describe("usePortalChatProfileBootstrap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    ensurePortalChatProfile.mockResolvedValue(undefined);
+    mockRequestPortalChatProfileEnsure.mockResolvedValue(undefined);
   });
 
   it("is ready immediately for staff chat", () => {
-    const { result } = renderHook(() =>
-      usePortalChatProfileBootstrap(false, chatDb, chatAuth, "co-1", user, true)
-    );
+    const { result } = renderHook(() => usePortalChatProfileBootstrap(false, "co-1", user, true));
     expect(result.current.ready).toBe(true);
-    expect(ensurePortalChatProfile).not.toHaveBeenCalled();
+    expect(mockRequestPortalChatProfileEnsure).not.toHaveBeenCalled();
   });
 
-  it("creates portal profile before enabling Firestore sync", async () => {
-    const { result } = renderHook(() =>
-      usePortalChatProfileBootstrap(true, chatDb, chatAuth, "co-1", user, true)
-    );
+  it("calls ensure-profile API before enabling Firestore sync", async () => {
+    const { result } = renderHook(() => usePortalChatProfileBootstrap(true, "co-1", user, true));
 
     expect(result.current.ready).toBe(false);
     await waitFor(() => expect(result.current.ready).toBe(true));
-    expect(ensurePortalChatProfile).toHaveBeenCalledWith(chatDb, user, "co-1");
+    expect(mockRequestPortalChatProfileEnsure).toHaveBeenCalledWith(user, "co-1");
   });
 
-  it("surfaces permission errors from profile bootstrap", async () => {
-    ensurePortalChatProfile.mockRejectedValue({ code: "permission-denied" });
-    const { result } = renderHook(() =>
-      usePortalChatProfileBootstrap(true, chatDb, chatAuth, "co-1", user, true)
-    );
+  it("surfaces permission errors from API bootstrap", async () => {
+    mockRequestPortalChatProfileEnsure.mockRejectedValue({ code: "permission-denied" });
+    const { result } = renderHook(() => usePortalChatProfileBootstrap(true, "co-1", user, true));
 
     await waitFor(() => expect(result.current.errorKey).toBe("chat.profile_permission_denied"));
     expect(result.current.ready).toBe(false);

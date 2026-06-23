@@ -7,21 +7,26 @@ export async function requestStaffPortalChatNotification(params: {
   interventionId?: string | null;
   preview: string;
   clientLabel?: string | null;
+  user?: import("firebase/auth").User | null;
 }): Promise<void> {
   const companyId = params.companyId.trim();
   if (!companyId) return;
 
   try {
-    const res = await fetchWithAuth("/api/portal-chat/notify-staff", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        companyId,
-        interventionId: params.interventionId ?? null,
-        preview: params.preview.slice(0, 500),
-        clientLabel: params.clientLabel ?? null,
-      }),
-    });
+    const res = await fetchWithAuth(
+      "/api/portal-chat/notify-staff",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId,
+          interventionId: params.interventionId ?? null,
+          preview: params.preview.slice(0, 500),
+          clientLabel: params.clientLabel ?? null,
+        }),
+      },
+      { user: params.user }
+    );
     if (!res.ok) {
       const payload = (await res.json().catch(() => ({}))) as { error?: string };
       logger.warn("[requestStaffPortalChatNotification] API error", {

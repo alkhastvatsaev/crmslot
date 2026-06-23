@@ -25,6 +25,7 @@ export {
 export {
   readClientPortalDefaultCompanyIdFromEnv,
   resolveClientPortalInterventionCompanyId,
+  resolvePortalChatCompanyId,
   resolveBackofficeInboxCompanyIds,
 } from "@/features/company/clientPortalCompanyId";
 export type { ResolveClientPortalInterventionCompanyIdInput } from "@/features/company/clientPortalCompanyId";
