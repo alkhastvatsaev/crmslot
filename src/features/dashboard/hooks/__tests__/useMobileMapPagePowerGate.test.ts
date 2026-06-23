@@ -42,12 +42,25 @@ describe("useMobileMapPagePowerGate", () => {
     });
   });
 
-  it("active map hub data sur rail centre", () => {
+  it("active les données hub sur rail centre sans WebGL carte", () => {
+    const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
+    expect(result.current.mapHubDataActive).toBe(true);
+    expect(result.current.mapRenderDataActive).toBe(false);
+    expect(result.current.inboxDataActive).toBe(false);
+    expect(result.current.documentsTabActive).toBe(false);
+  });
+
+  it("active WebGL carte sur rail gauche", () => {
+    mockUseMobileHubRailSnapshot.mockReturnValue({
+      rails: ["left", "center", "right"],
+      activeRail: "left",
+      visible: true,
+      requestRail: jest.fn(),
+    });
     const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
     expect(result.current.mapHubDataActive).toBe(true);
     expect(result.current.mapRenderDataActive).toBe(true);
     expect(result.current.inboxDataActive).toBe(false);
-    expect(result.current.documentsTabActive).toBe(false);
   });
 
   it("active inbox seulement sur rail droit", () => {
