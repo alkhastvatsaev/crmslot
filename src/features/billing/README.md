@@ -6,15 +6,24 @@ Domaine facturation : PDF devis/facture, numérotation, UBL/Peppol, Stripe, expo
 
 ## Points d'entrée
 
-| Fichier                             | Rôle                                        |
-| ----------------------------------- | ------------------------------------------- |
-| `generateQuotePdf.ts`               | `generateInterventionDocumentPdf` — PDF PWA |
-| `invoicePreviewFromIntervention.ts` | Aperçu facture depuis dossier               |
-| `exportAccountingCsv.ts`            | Export CSV comptable                        |
-| `invoiceNumbering.ts`               | Numéros FAC-YYYY-NNNN                       |
-| `ubl/buildUblInvoiceXml.ts`         | Facture électronique UBL                    |
-| `server/*`                          | Admin Firebase (paiement Stripe, Peppol)    |
-| `index.ts`                          | **Barrel public** — imports cross-feature   |
+| Fichier                                       | Rôle                                         |
+| --------------------------------------------- | -------------------------------------------- |
+| `components/InvoiceBillingPanel.tsx`          | Orchestrateur panel facturation (~55 lignes) |
+| `hooks/useInvoiceBillingPanelController.ts`   | État paiement, templates, Firestore          |
+| `components/InvoiceBillingPanelHeader.tsx`    | Toggle accordéon + badge statut              |
+| `components/InvoiceBillingLinesTable.tsx`     | Lignes HT / TVA / TTC                        |
+| `components/InvoiceBillingTemplateSelect.tsx` | Quick-fill modèle terrain                    |
+| `components/InvoiceBillingPaymentSection.tsx` | Dates + sélecteur statut paiement            |
+| `components/InvoiceBillingLinksSection.tsx`   | Peppol, portail, PDF, devis, Stripe          |
+| `invoiceBillingPanelTypes.ts`                 | Types statut paiement                        |
+| `invoiceBillingPanelUtils.ts`                 | Format EUR / dates                           |
+| `generateQuotePdf.ts`                         | `generateInterventionDocumentPdf` — PDF PWA  |
+| `invoicePreviewFromIntervention.ts`           | Aperçu facture depuis dossier                |
+| `exportAccountingCsv.ts`                      | Export CSV comptable                         |
+| `invoiceNumbering.ts`                         | Numéros FAC-YYYY-NNNN                        |
+| `ubl/buildUblInvoiceXml.ts`                   | Facture électronique UBL                     |
+| `server/*`                                    | Admin Firebase (paiement Stripe, Peppol)     |
+| `index.ts`                                    | **Barrel public** — imports cross-feature    |
 
 ## Données
 
