@@ -5,6 +5,7 @@ import { MOBILE_HUB_RAILS, type MobileHubRail } from "@/features/dashboard/dashb
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 import { useMobileHubPanelVisible } from "@/features/dashboard/hooks/useMobileHubPanelVisible";
 import { useMobileHubRailRegistration } from "@/features/dashboard/MobileHubRailContext";
+import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import {
   MOBILE_HUB_PANEL_ANIMATED_CLASS,
   MOBILE_HUB_RAIL_LAYER_CLASS,
@@ -80,6 +81,7 @@ export default function MobileHubLayout({
   const registrationId = useId();
   const setRegistration = useMobileHubRailRegistration();
   const panelVisible = useMobileHubPanelVisible(rootRef);
+  const dockOnboarding = useMobileDockOnboardingOptional();
   const [rail, setRail] = useState<MobileHubRail>(mobileInitialRail);
 
   const panels = { left, center, right };
@@ -151,8 +153,34 @@ export default function MobileHubLayout({
     return () => setRegistration(registrationId, null);
   }, [availableRails, panelVisible, pickRail, rail, registrationId, setRegistration]);
 
+  const swipeHintSide =
+    rail === "center" && availableRails.length > 1
+      ? dockOnboarding?.swipeRightHintActive
+        ? "right"
+        : dockOnboarding?.swipeLeftHintActive
+          ? "left"
+          : undefined
+      : undefined;
+
+  const handleSwipeHintClick = useCallback(() => {
+    if (!dockOnboarding) return;
+    if (dockOnboarding.swipeRightHintActive) {
+      dockOnboarding.dismissSwipeRightHint();
+      return;
+    }
+    if (dockOnboarding.swipeLeftHintActive) {
+      dockOnboarding.dismissSwipeLeftHint();
+    }
+  }, [dockOnboarding]);
+
   return (
-    <div ref={rootRef} className={MOBILE_HUB_LAYOUT_CLASS} data-testid={rootTestId}>
+    <div
+      ref={rootRef}
+      className={MOBILE_HUB_LAYOUT_CLASS}
+      data-testid={rootTestId}
+      data-mobile-hub-swipe-hint={swipeHintSide}
+      onClick={swipeHintSide ? handleSwipeHintClick : undefined}
+    >
       <GlassPanel
         as="section"
         aria-label={labels[rail]}
