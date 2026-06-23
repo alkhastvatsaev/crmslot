@@ -11,6 +11,7 @@ import {
   countClientPortalThreadsNeedingReply,
   filterNewClientPortalMessages,
   interventionIdsWithClientPortalChat,
+  portalChatMessageTimeMs,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
 import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
@@ -25,11 +26,19 @@ type PortalChatArgs = {
   workspace: CompanyWorkspaceApi | null;
   inboxLive: boolean;
   isTenant: boolean;
-  ivanaChatCompanyId: string | null;
+  inboxCompanyIds: string[];
   setActiveTab: (tab: BackOfficeInboxTab) => void;
   setSelectedChatInterventionId: (id: string | null) => void;
   chatTabLabel: string;
 };
+
+function mergePortalChatRows(rowsByCompany: Iterable<IvanaPortalChatDoc[]>): IvanaPortalChatDoc[] {
+  const byId = new Map<string, IvanaPortalChatDoc>();
+  for (const rows of rowsByCompany) {
+    for (const row of rows) byId.set(row.id, row);
+  }
+  return [...byId.values()].sort((a, b) => portalChatMessageTimeMs(a) - portalChatMessageTimeMs(b));
+}
 
 export function useBackOfficeInboxPortalChat({
   dayMissions,
@@ -38,7 +47,7 @@ export function useBackOfficeInboxPortalChat({
   workspace,
   inboxLive,
   isTenant,
-  ivanaChatCompanyId,
+  inboxCompanyIds,
   setActiveTab,
   setSelectedChatInterventionId,
   chatTabLabel,
@@ -71,43 +80,59 @@ export function useBackOfficeInboxPortalChat({
   }, [isTenant, setActiveTab]);
 
   useEffect(() => {
-    if (!inboxLive || !isConfigured || !firestore || !ivanaChatCompanyId || !isTenant) return;
+    const companyIds = inboxCompanyIds.map((id) => id.trim()).filter(Boolean);
+    if (!inboxLive || !isConfigured || !firestore || companyIds.length === 0 || !isTenant) return;
 
     portalChatHydratedRef.current = false;
     const seen = new Set<string>();
-    return subscribeIvanaPortalMessages(
-      firestore,
-      ivanaChatCompanyId,
-      (rows) => {
-        setPortalChatMessages(rows);
-        if (!portalChatHydratedRef.current) {
-          portalChatHydratedRef.current = true;
-          rows.forEach((r) => seen.add(r.id));
-          return;
-        }
+    const rowsByCompany = new Map<string, IvanaPortalChatDoc[]>();
 
-        const uid = auth?.currentUser?.uid;
-        const incoming = filterNewClientPortalMessages(rows, seen, uid);
-        incoming.forEach((r) => seen.add(r.id));
-        if (incoming.length === 0) return;
-
-        setActiveTab("chat");
-        const ivId = incoming[incoming.length - 1]?.interventionId?.trim();
-        setSelectedChatInterventionId(ivId || "global");
-
-        const preview = incoming[incoming.length - 1]?.body?.trim() || "Nouveau message client";
-        showPortalChatBrowserNotification(chatTabLabel, preview, `portal-chat-${ivId || "global"}`);
-      },
-      (err) => {
-        logger.error("[useBackOfficeInboxPortalChat] portal chat watch", {
-          error: err instanceof Error ? err.message : String(err),
-        });
+    const publishMerged = () => {
+      const rows = mergePortalChatRows(rowsByCompany.values());
+      setPortalChatMessages(rows);
+      if (!portalChatHydratedRef.current) {
+        portalChatHydratedRef.current = true;
+        rows.forEach((r) => seen.add(r.id));
+        return;
       }
+
+      const uid = auth?.currentUser?.uid;
+      const incoming = filterNewClientPortalMessages(rows, seen, uid);
+      incoming.forEach((r) => seen.add(r.id));
+      if (incoming.length === 0) return;
+
+      setActiveTab("chat");
+      const ivId = incoming[incoming.length - 1]?.interventionId?.trim();
+      setSelectedChatInterventionId(ivId || "global");
+
+      const preview = incoming[incoming.length - 1]?.body?.trim() || "Nouveau message client";
+      showPortalChatBrowserNotification(chatTabLabel, preview, `portal-chat-${ivId || "global"}`);
+    };
+
+    const unsubs = companyIds.map((companyId) =>
+      subscribeIvanaPortalMessages(
+        firestore,
+        companyId,
+        (rows) => {
+          rowsByCompany.set(companyId, rows);
+          publishMerged();
+        },
+        (err) => {
+          logger.error("[useBackOfficeInboxPortalChat] portal chat watch", {
+            companyId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      )
     );
+
+    return () => {
+      for (const unsub of unsubs) unsub();
+    };
   }, [
     chatTabLabel,
+    inboxCompanyIds,
     inboxLive,
-    ivanaChatCompanyId,
     isTenant,
     setActiveTab,
     setSelectedChatInterventionId,

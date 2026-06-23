@@ -367,6 +367,17 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/companies/$(companyId)).data.get('acceptsPublicInterventions', false) == true;
     }
 
+    /** Société liée au profil portail — whitelist téléphone ou demandes publiques ouvertes. */
+    function clientPortalProfileCompanyAllowed(companyId) {
+      return companyId is string
+        && companyId.size() > 0
+        && (
+          allowedUsersPhoneMatchesIvanaCompany(companyId)
+          || companyAcceptsPublicInterventions(companyId)
+        );
+    }
+
+
     function interventionCreateTenantAllowed(data) {
       return !data.keys().hasAny(['companyId'])
         || !(data.companyId is string)
@@ -637,7 +648,7 @@ service cloud.firestore {
           || request.resource.data.companyId == null
           || (
             request.resource.data.companyId is string
-            && allowedUsersPhoneMatchesIvanaCompany(request.resource.data.companyId)
+            && clientPortalProfileCompanyAllowed(request.resource.data.companyId)
           )
         );
       allow update: if isAuthed()
@@ -658,7 +669,7 @@ service cloud.firestore {
           || (
             request.resource.data.companyId is string
             && request.resource.data.companyId.size() > 0
-            && allowedUsersPhoneMatchesIvanaCompany(request.resource.data.companyId)
+            && clientPortalProfileCompanyAllowed(request.resource.data.companyId)
           )
         );
       allow delete: if false;

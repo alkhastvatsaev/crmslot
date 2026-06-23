@@ -56,7 +56,15 @@ export default function IvanaChatMessageList({
           data-testid="ivana-chat-login-hint"
           className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-900"
         >
-          {t("chat.toast_login_description")}
+          {t("chat.connecting")}
+        </div>
+      ) : null}
+      {publishAsPortal && !companyIdTrimmed ? (
+        <div
+          data-testid="ivana-chat-company-hint"
+          className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-900"
+        >
+          {t("chat.company_unconfigured")}
         </div>
       ) : null}
       {messages.map((m) => {

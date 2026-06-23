@@ -3,13 +3,8 @@ import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIv
 jest.mock("@/core/config/firebase", () => ({
   auth: { currentUser: { uid: "crm-uid" } },
   firestore: { app: "crm" },
-  clientPortalAuth: { currentUser: { uid: "portal-uid", emailVerified: true, isAnonymous: false } },
+  clientPortalAuth: { currentUser: null },
   clientPortalFirestore: { app: "portal" },
-}));
-
-jest.mock("@/features/auth/hooks/useClientPortalAccount", () => ({
-  isVerifiedClientPortalUser: (user: { emailVerified?: boolean; isAnonymous?: boolean } | null) =>
-    Boolean(user && !user.isAnonymous && user.emailVerified),
 }));
 
 describe("resolveIvanaChatFirebaseSession", () => {
@@ -19,11 +14,9 @@ describe("resolveIvanaChatFirebaseSession", () => {
     expect(session.chatDb).toEqual({ app: "crm" });
   });
 
-  it("utilise clientPortalAuth quand publishAsPortal et compte client vérifié", () => {
+  it("utilise clientPortalAuth pour le portail demandeur (invité ou connecté)", () => {
     const session = resolveIvanaChatFirebaseSession(true);
-    expect(session.chatAuth).toEqual({
-      currentUser: { uid: "portal-uid", emailVerified: true, isAnonymous: false },
-    });
+    expect(session.chatAuth).toEqual({ currentUser: null });
     expect(session.chatDb).toEqual({ app: "portal" });
   });
 });

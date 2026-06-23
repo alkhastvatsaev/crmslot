@@ -7,8 +7,9 @@ import {
   IVANA_PORTAL_MESSAGE_EVENT,
   type ClientPortalChatPayload,
 } from "@/features/backoffice/ivanaChatPortalBridge";
+import { ensureClientPortalChatAuth } from "@/features/backoffice/ensureClientPortalChatAuth";
 import { resolveIvanaChatFirebaseSession } from "@/features/backoffice/resolveIvanaChatFirebaseSession";
-import { isVerifiedClientPortalUser } from "@/features/auth/hooks/useClientPortalAccount";
+import { isClientPortalChatUser } from "@/features/auth/hooks/useClientPortalAccount";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -57,7 +58,7 @@ export function useIvanaClientChatPanel({
   );
 
   const companyIdTrimmed = (chatCompanyId ?? "").trim();
-  const portalAuthReady = !publishAsPortal || isVerifiedClientPortalUser(user);
+  const portalAuthReady = !publishAsPortal || isClientPortalChatUser(user);
   const firestoreSyncEnabled = Boolean(
     companyIdTrimmed && isConfigured && chatDb && portalAuthReady
   );
@@ -75,6 +76,17 @@ export function useIvanaClientChatPanel({
     }
     return onAuthStateChanged(chatAuth, setUser);
   }, [chatAuth]);
+
+  useEffect(() => {
+    if (!publishAsPortal || !chatAuth || !companyIdTrimmed) return;
+    let cancelled = false;
+    void ensureClientPortalChatAuth(chatAuth).then((nextUser) => {
+      if (!cancelled && nextUser) setUser(nextUser);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [publishAsPortal, chatAuth, companyIdTrimmed]);
 
   useEffect(() => {
     if (typeof window === "undefined" || firestoreSyncEnabled) return;

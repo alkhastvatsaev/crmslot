@@ -2492,7 +2492,9 @@
     "reply_billing": "Pour la facturation ou un devis, précisez le nom sur le dossier ou les derniers chiffres de l'intervention : je transmets au service concerné.",
     "reply_schedule": "Pour modifier un créneau, indiquez la date souhaitée et la commune ; le dispatcher vous confirmera la planification.",
     "reply_thanks": "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
-    "reply_default": "Merci pour votre message. Le dispatcher a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin."
+    "reply_default": "Merci pour votre message. Le dispatcher a bien été notifié et reprendra avec vous très vite. Vous pouvez aussi déposer une demande depuis l'espace société si besoin.",
+    "connecting": "Connexion au chat…",
+    "company_unconfigured": "Chat indisponible : société portail non configurée."
   },
   "copilot": {
     "aria": {

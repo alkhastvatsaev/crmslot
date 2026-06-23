@@ -1,7 +1,6 @@
 import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import { auth, clientPortalAuth, clientPortalFirestore, firestore } from "@/core/config/firebase";
-import { isVerifiedClientPortalUser } from "@/features/auth/hooks/useClientPortalAccount";
 
 export type IvanaChatFirebaseSession = {
   chatAuth: Auth | null;
@@ -9,7 +8,7 @@ export type IvanaChatFirebaseSession = {
 };
 
 /**
- * Portail demandeur : `clientPortalAuth` + Firestore lié (même jeton que la connexion client).
+ * Portail demandeur : `clientPortalAuth` + Firestore lié (anonyme ou compte vérifié).
  * Inbox admin / staff : auth CRM principal.
  */
 export function resolveIvanaChatFirebaseSession(
@@ -19,13 +18,12 @@ export function resolveIvanaChatFirebaseSession(
     return { chatAuth: auth, chatDb: firestore };
   }
 
-  const portalUser = clientPortalAuth?.currentUser ?? null;
-  if (isVerifiedClientPortalUser(portalUser)) {
-    return {
-      chatAuth: clientPortalAuth,
-      chatDb: clientPortalFirestore ?? firestore,
-    };
+  if (!clientPortalAuth) {
+    return { chatAuth: null, chatDb: null };
   }
 
-  return { chatAuth: null, chatDb: null };
+  return {
+    chatAuth: clientPortalAuth,
+    chatDb: clientPortalFirestore ?? firestore,
+  };
 }

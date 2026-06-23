@@ -24,6 +24,7 @@ export {
 export {
   useClientPortalAccount,
   isVerifiedClientPortalUser,
+  isClientPortalChatUser,
 } from "@/features/auth/hooks/useClientPortalAccount";
 export { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 export type { CrmStaffAccountFields } from "@/features/auth/hooks/useCrmStaffAccountPanel";
