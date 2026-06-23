@@ -6,6 +6,7 @@ import DashboardAccountPanel from "@/features/dashboard/components/DashboardAcco
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { useDashboardPageSelector } from "@/features/dashboard";
+import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -42,6 +43,7 @@ const accountOverlayClass = cn(
 export default function AdminMobileShell({ children, dock }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
   const accountOpen = view === "account";
+  const dockHintAttrs = useMobileShellDockHintAttrs();
 
   return (
     <div
@@ -49,6 +51,7 @@ export default function AdminMobileShell({ children, dock }: Props) {
       data-mobile-shell
       data-page-selector-open={overlayOpen ? "true" : undefined}
       data-testid="admin-mobile-app"
+      {...dockHintAttrs}
     >
       <div
         id="dashboard-overlay-root"

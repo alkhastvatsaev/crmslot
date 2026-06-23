@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import ClientMobileProfileChip from "@/features/company/components/ClientMobileProfileChip";
+import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -24,11 +25,14 @@ type Props = {
 
 /** Shell portail client — calendrier (header) + profil dock (footer), hub unique. */
 export default function ClientMobileShell({ children }: Props) {
+  const dockHintAttrs = useMobileShellDockHintAttrs();
+
   return (
     <div
       className={`${MOBILE_SHELL_CLASS} client-mobile-app`}
       data-mobile-shell
       data-testid="client-mobile-app"
+      {...dockHintAttrs}
     >
       <div
         id="dashboard-overlay-root"

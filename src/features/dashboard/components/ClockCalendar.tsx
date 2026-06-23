@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDateContext } from "@/context/DateContext";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,11 @@ export default function ClockCalendar({
   const dateString = selectedDate.toLocaleDateString(locale, dateOptions).replace(/\./g, "") || "";
 
   const pageSelector = useDashboardPageSelectorOptional();
+  const dockOnboarding = useMobileDockOnboardingOptional();
+
+  const dismissHeaderDockHint = () => {
+    dockOnboarding?.dismissHeaderHint();
+  };
 
   const changeDay = (e: React.MouseEvent, delta: number) => {
     e.stopPropagation();
@@ -81,6 +87,7 @@ export default function ClockCalendar({
         className={cn(
           "mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-between gap-2 px-4"
         )}
+        onClick={dismissHeaderDockHint}
       >
         <button
           data-testid="prev-day-btn"

@@ -8,6 +8,7 @@ import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
 import { DashboardPagerProvider } from "@/features/dashboard";
 import { DashboardPageSelectorProvider } from "@/features/dashboard";
+import { MobileDockOnboardingProvider } from "@/features/dashboard/MobileDockOnboardingContext";
 import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import { ClientPortalPushProvider } from "@/features/notifications/ClientPortalPushContext";
 import ClientPortalAuthEffects from "@/features/auth/components/ClientPortalAuthEffects";
@@ -31,16 +32,18 @@ export default function ClientMobileProviders({ children }: Props) {
           <FeatureFlagsProvider>
             <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
               <DashboardPageSelectorProvider>
-                <RequesterHubProvider>
-                  <ClientPortalPushProvider>
-                    <ClientPortalAuthEffects />
-                    <Suspense fallback={null}>
-                      <ClientPortalPaymentReturnEffects />
-                    </Suspense>
-                    <DeferredClientBootstraps />
-                    {children}
-                  </ClientPortalPushProvider>
-                </RequesterHubProvider>
+                <MobileDockOnboardingProvider>
+                  <RequesterHubProvider>
+                    <ClientPortalPushProvider>
+                      <ClientPortalAuthEffects />
+                      <Suspense fallback={null}>
+                        <ClientPortalPaymentReturnEffects />
+                      </Suspense>
+                      <DeferredClientBootstraps />
+                      {children}
+                    </ClientPortalPushProvider>
+                  </RequesterHubProvider>
+                </MobileDockOnboardingProvider>
               </DashboardPageSelectorProvider>
             </DashboardPagerProvider>
           </FeatureFlagsProvider>

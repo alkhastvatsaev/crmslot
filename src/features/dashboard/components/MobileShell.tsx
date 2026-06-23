@@ -8,6 +8,7 @@ import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFo
 import MobileShellSlotGrid from "@/features/dashboard/components/MobileShellSlotGrid";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
   MOBILE_GALAXY_DOCK_CHROME_CLASS,
@@ -22,6 +23,7 @@ type Props = { pages: ReactNode[] };
 
 export default function MobileShell({ pages }: Props) {
   const { open: pageSelectorOpen } = useDashboardPageSelector();
+  const dockHintAttrs = useMobileShellDockHintAttrs();
 
   return (
     <MobileHubRailProvider>
@@ -30,6 +32,7 @@ export default function MobileShell({ pages }: Props) {
         data-mobile-shell
         data-page-selector-open={pageSelectorOpen ? "true" : undefined}
         data-testid="mobile-shell"
+        {...dockHintAttrs}
       >
         <div
           id="dashboard-overlay-root"
