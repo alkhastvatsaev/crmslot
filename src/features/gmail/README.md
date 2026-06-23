@@ -19,7 +19,12 @@ Hub Gmail carrousel (`GMAIL_HUB_SLOT_INDEX`, accès Spotlight). OAuth, lecture/e
 | `hooks/useGmailHubReaderActions.ts`        | Star, archive, corbeille, labels          |
 | `hooks/useGmailHubOAuthReturn.ts`          | Callback OAuth au retour URL              |
 | `hooks/useGmailHubAccountActions.ts`       | Connexion / déconnexion Gmail             |
-| `useGmailHub.ts`                           | État API Gmail                            |
+| `useGmailHub.ts`                           | Orchestrateur état API Gmail (~95 lignes) |
+| `gmailHubApi.ts`                           | Appels API Gmail purs                     |
+| `gmailHubMessagePatches.ts`                | Patch liste (lu / non lu)                 |
+| `hooks/useGmailHubConnection.ts`           | Statut OAuth, libellés, déconnexion       |
+| `hooks/useGmailHubInbox.ts`                | Liste messages + pagination               |
+| `hooks/useGmailHubDetail.ts`               | Fil, détail, actions message              |
 | `hooks/useGmailHubPdfPreview.ts`           | Aperçu PDF inline                         |
 
 ## Données
