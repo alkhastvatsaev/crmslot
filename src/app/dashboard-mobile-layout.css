@@ -88,6 +88,63 @@
   position: relative;
 }
 
+/**
+ * Indice onboarding : halo bleu très discret derrière le dock calendrier (header).
+ * S'éteint quand le sélecteur de pages est ouvert ou si reduced-motion.
+ */
+@keyframes mobile-header-dock-hint-glow {
+  0%,
+  76%,
+  100% {
+    opacity: 0;
+    box-shadow:
+      0 12px 36px -14px rgb(37 99 235 / 0),
+      0 0 0 0 rgb(59 130 246 / 0);
+  }
+
+  38% {
+    opacity: 1;
+    box-shadow:
+      0 14px 42px -12px rgb(37 99 235 / 0.2),
+      0 0 32px -8px rgb(59 130 246 / 0.16);
+  }
+}
+
+[data-mobile-shell] header .mobile-profile-bar-chrome::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  z-index: 0;
+  border-radius: calc(var(--mobile-panel-radius) + 6px);
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 105% 95% at 50% 52%,
+    rgb(59 130 246 / 0.14) 0%,
+    rgb(59 130 246 / 0.05) 42%,
+    transparent 72%
+  );
+  animation: mobile-header-dock-hint-glow 5.8s ease-in-out infinite;
+  will-change: opacity, box-shadow;
+}
+
+[data-mobile-shell] header .mobile-profile-bar-chrome > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-mobile-shell][data-page-selector-open="true"] header .mobile-profile-bar-chrome::before {
+  animation: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-mobile-shell] header .mobile-profile-bar-chrome::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 .mobile-header-rail-host {
   position: relative;
   width: 100%;
