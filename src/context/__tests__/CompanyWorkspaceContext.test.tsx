@@ -54,6 +54,7 @@ describe("CompanyWorkspaceContext", () => {
     mockState.firestoreData["users/mock-user-123/company_memberships"] = [
       { id: "company-abc", role: "admin", companyName: "Société ABC" },
     ];
+    mockState.firestoreDocs["companies/company-abc"] = { name: "Société ABC" };
 
     render(
       <CompanyWorkspaceProvider>
