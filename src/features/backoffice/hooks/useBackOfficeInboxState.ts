@@ -28,6 +28,8 @@ import { useResolvedInterventionAudio } from "@/features/backoffice/useResolvedI
 import {
   readClientPortalDefaultCompanyIdFromEnv,
   resolveBackofficeInboxCompanyIds,
+  resolvePortalChatCompanyId,
+  resolvePortalChatInboxCompanyIds,
 } from "@/features/company/clientPortalCompanyId";
 import { useActivityLog } from "@/features/crmHistory/useActivityLog";
 import type { Mission } from "@/features/map";
@@ -76,11 +78,14 @@ export function useBackOfficeInboxState(
 
   const { selectedDate } = useDateContext();
   const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
-  const portalChatCompanyId =
-    cid ??
-    (envDefaultCompanyId && inboxCompanyIds.includes(envDefaultCompanyId)
-      ? envDefaultCompanyId
-      : null);
+  const portalChatInboxCompanyIds = useMemo(
+    () => resolvePortalChatInboxCompanyIds(workspace),
+    [workspace]
+  );
+  const portalChatCompanyId = useMemo(
+    () => resolvePortalChatCompanyId(envDefaultCompanyId || cid) ?? cid,
+    [envDefaultCompanyId, cid]
+  );
   const isTenant = !!workspace?.isTenantUser;
   const workspaceReady = workspace?.workspaceReady !== false;
 
@@ -91,7 +96,7 @@ export function useBackOfficeInboxState(
     workspace,
     inboxLive,
     isTenant,
-    inboxCompanyIds,
+    inboxCompanyIds: portalChatInboxCompanyIds,
     setActiveTab: selection.setActiveTab,
     setSelectedChatInterventionId: selection.setSelectedChatInterventionId,
     chatTabLabel: String(t("backoffice.inbox.tabs.chat")),
