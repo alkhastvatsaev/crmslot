@@ -1,4 +1,4 @@
-import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
+import type { PortalChatDoc, PortalChatRole } from "@/features/backoffice/portalChatFirestore";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
 import type { Intervention } from "@/features/interventions";
 import {
@@ -49,13 +49,51 @@ export function filterPortalChatMessagesForSenderUid(
   }
 
   const clientOnlyGlobal = clientIvIds.size === 0;
+  void clientOnlyGlobal;
 
   return rows.filter((r) => {
     const iv = r.interventionId?.trim();
     if (r.role === "client") return (r.senderUid ?? "").trim() === uid;
-    if (!iv) return clientOnlyGlobal;
+    if (!iv) return true;
     return clientIvIds.has(iv);
   });
+}
+
+/** Dernier dossier connu d’un client — pour tagger une réponse staff. */
+export function latestClientInterventionIdForSender(
+  rows: PortalChatDoc[],
+  senderUid: string
+): string | null {
+  const uid = senderUid.trim();
+  if (!uid) return null;
+  let latest: PortalChatDoc | null = null;
+  for (const r of rows) {
+    if (r.role !== "client") continue;
+    if ((r.senderUid ?? "").trim() !== uid) continue;
+    const iv = r.interventionId?.trim();
+    if (!iv) continue;
+    if (!latest || portalChatMessageTimeMs(r) >= portalChatMessageTimeMs(latest)) latest = r;
+  }
+  return latest?.interventionId?.trim() || null;
+}
+
+/** Jamais écrire `__sender__:` ou `global` dans Firestore `interventionId`. */
+export function resolvePortalChatWriteInterventionId(
+  threadId: string | null | undefined,
+  rows: PortalChatDoc[],
+  role: PortalChatRole
+): string | null {
+  const id = (threadId ?? "").trim();
+  if (!id || id === PORTAL_CHAT_GLOBAL_THREAD_ID) return null;
+  if (isPortalChatSenderThreadId(id)) {
+    if (role === "staff") {
+      const senderUid = portalChatSenderUidFromThreadId(id);
+      return senderUid ? latestClientInterventionIdForSender(rows, senderUid) : null;
+    }
+    return null;
+  }
+  if (id.startsWith("__")) return null;
+  return id;
 }
 
 export type EnrichChatDayRowsOptions = {

@@ -81,3 +81,34 @@ describe("enrichChatDayRowsFromPortalMessages", () => {
     expect(rows[0]?.clientName).toBe("Marie Dupont");
   });
 });
+
+describe("resolvePortalChatWriteInterventionId", () => {
+  it("n’écrit jamais __sender__ en Firestore", async () => {
+    const { resolvePortalChatWriteInterventionId } =
+      await import("@/features/backoffice/portalChatInboxLogic");
+    const rows = [
+      msg({ id: "c1", role: "client", body: "hi", senderUid: "uid-a", interventionId: "iv-1" }),
+    ];
+    expect(resolvePortalChatWriteInterventionId("__sender__:uid-a", rows, "staff")).toBe("iv-1");
+    expect(resolvePortalChatWriteInterventionId("__sender__:uid-a", rows, "client")).toBeNull();
+    expect(resolvePortalChatWriteInterventionId("global", rows, "staff")).toBeNull();
+  });
+});
+
+describe("filterPortalChatMessagesForViewer", () => {
+  it("client ne voit que ses messages sans dossier", async () => {
+    const { filterPortalChatMessagesForViewer } =
+      await import("@/features/backoffice/portalChatThreadFilter");
+    const rows = [
+      msg({ id: "1", role: "client", body: "mine", senderUid: "uid-a" }),
+      msg({ id: "2", role: "client", body: "other", senderUid: "uid-b" }),
+      msg({ id: "3", role: "staff", body: "reply", senderUid: "staff-1" }),
+    ];
+    const filtered = filterPortalChatMessagesForViewer(rows, {
+      threadId: null,
+      publishAsPortal: true,
+      viewerUid: "uid-a",
+    });
+    expect(filtered.map((r) => r.id)).toEqual(["1", "3"]);
+  });
+});

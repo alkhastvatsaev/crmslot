@@ -5,6 +5,8 @@ import { logger } from "@/core/logger";
 export async function requestStaffPortalChatNotification(params: {
   companyId: string;
   interventionId?: string | null;
+  /** Fil inbox (`__sender__:uid`) pour deep-link admin. */
+  chatThreadId?: string | null;
   preview: string;
   clientLabel?: string | null;
   user?: import("firebase/auth").User | null;
@@ -21,6 +23,7 @@ export async function requestStaffPortalChatNotification(params: {
         body: JSON.stringify({
           companyId,
           interventionId: params.interventionId ?? null,
+          chatThreadId: params.chatThreadId ?? params.interventionId ?? null,
           preview: params.preview.slice(0, 500),
           clientLabel: params.clientLabel ?? null,
         }),

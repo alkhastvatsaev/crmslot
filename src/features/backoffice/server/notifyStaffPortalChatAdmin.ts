@@ -21,6 +21,7 @@ export async function notifyStaffPortalChatAdmin(params: {
   senderUid: string;
   preview: string;
   interventionId?: string | null;
+  chatThreadId?: string | null;
   clientLabel?: string | null;
 }): Promise<{ notified: number }> {
   const companyId = params.companyId.trim();
@@ -57,7 +58,8 @@ export async function notifyStaffPortalChatAdmin(params: {
           type: "portal_chat",
           audience: "staff",
           companyId,
-          [BM_BACKOFFICE_CHAT_PARAM]: params.interventionId?.trim() || "global",
+          [BM_BACKOFFICE_CHAT_PARAM]:
+            params.chatThreadId?.trim() || params.interventionId?.trim() || "global",
           ...(params.interventionId?.trim()
             ? { interventionId: params.interventionId.trim() }
             : {}),

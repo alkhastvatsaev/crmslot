@@ -13,8 +13,10 @@ type PanelProps = {
   publishAsPortal?: boolean;
   acceptPortalMessages?: boolean;
   chatCompanyId?: string | null;
-  /** Dossier lié — messages tagués pour la timeline du dossier. */
+  /** Dossier client (portail) — tag Firestore `interventionId`. */
   chatInterventionId?: string | null;
+  /** Fil inbox admin (`__sender__:uid`, dossier, `global`) — affichage uniquement. */
+  chatThreadId?: string | null;
   onRemoteClientMessage?: () => void;
 };
 
@@ -24,6 +26,7 @@ export default function CompanyChatPanel({
   acceptPortalMessages = false,
   chatCompanyId = null,
   chatInterventionId = null,
+  chatThreadId = null,
   onRemoteClientMessage,
 }: PanelProps) {
   const {
@@ -48,6 +51,7 @@ export default function CompanyChatPanel({
     acceptPortalMessages,
     chatCompanyId,
     chatInterventionId,
+    chatThreadId,
     onRemoteClientMessage,
   });
 
