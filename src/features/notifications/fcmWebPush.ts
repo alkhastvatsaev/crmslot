@@ -16,10 +16,30 @@ export type FcmUiStatus =
 const SW_READY_MS = 14_000;
 
 import { isMobileServiceWorkerAllowed } from "@/core/pwa/mobileServiceWorkerPolicy";
+import { isPwaStandalone } from "@/core/pwa/isPwaStandalone";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 
-/** Service worker PWA enregistré (false en dev sans PWA, false sur iPhone). */
+/** Service worker PWA enregistré (false en dev sans PWA). */
 export function isPushServiceWorkerEnabled(): boolean {
   return isMobileServiceWorkerAllowed();
+}
+
+function isIosDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+
+/**
+ * Push web en arrière-plan : iOS exige la PWA sur l’écran d’accueil (pas un onglet Safari).
+ * Android / desktop : service worker + permission.
+ */
+export function isWebPushDeliveryCapable(): boolean {
+  if (typeof window === "undefined") return false;
+  if (isCapacitorNative()) return false;
+  if (!isPushServiceWorkerEnabled()) return false;
+  if (typeof Notification === "undefined") return false;
+  if (isIosDevice() && !isPwaStandalone()) return false;
+  return true;
 }
 
 /** Attendu en dev local sans PWA — pas de bruit console. */

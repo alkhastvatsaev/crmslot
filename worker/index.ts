@@ -6,12 +6,7 @@ import {
   firebasePublicConfig,
   isFirebasePublicConfigured,
 } from "../src/features/notifications/firebasePublicConfig";
-import {
-  BM_BACKOFFICE_CHAT_PARAM,
-  BM_CLIENT_CHAT_PARAM,
-  BM_TECH_CASE_PARAM,
-  BM_TECH_REMINDER_PARAM,
-} from "../src/features/notifications/notificationConstants";
+import { resolvePushNotificationOpenUrl } from "../src/features/notifications/resolvePushNotificationOpenUrl";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -22,37 +17,34 @@ function bootMessaging(): void {
   const messaging = getMessaging(app);
 
   onBackgroundMessage(messaging, (payload) => {
-    const title = payload.notification?.title ?? "CRMSLOT";
-    const body = payload.notification?.body ?? "";
-    const data = payload.data ?? {};
-
+    const data = (payload.data ?? {}) as Record<string, string | undefined>;
+    const title = payload.notification?.title ?? data.title ?? "CRMSLOT";
+    const body = payload.notification?.body ?? data.body ?? "";
     const origin = self.location.origin;
+    const openUrl = resolvePushNotificationOpenUrl(origin, data);
     const pushType = typeof data.type === "string" ? data.type : "";
     const interventionId = typeof data.interventionId === "string" ? data.interventionId : "";
-    let openUrl = `${origin}/`;
     let tag = "technician-reminder";
 
     if (pushType === "portal_chat") {
       const audience = typeof data.audience === "string" ? data.audience : "staff";
       if (audience === "client") {
         const chatIv = interventionId.length > 0 ? interventionId : "open";
-        openUrl = `${origin}/m/demande?${BM_CLIENT_CHAT_PARAM}=${encodeURIComponent(chatIv)}`;
         tag = `client-portal-chat-${chatIv}`;
       } else {
         const chatIv = interventionId.length > 0 ? interventionId : "global";
-        openUrl = `${origin}/?${BM_BACKOFFICE_CHAT_PARAM}=${encodeURIComponent(chatIv)}`;
         tag = `portal-chat-${chatIv}`;
       }
     } else if (interventionId.length > 0) {
-      openUrl = `${origin}/?${BM_TECH_CASE_PARAM}=${encodeURIComponent(interventionId)}`;
       tag = `case-${interventionId}`;
-    } else {
-      openUrl = `${origin}/?${BM_TECH_REMINDER_PARAM}=1`;
     }
+
     void self.registration.showNotification(title, {
       body,
       data: { ...data, url: openUrl },
       tag,
+      icon: `${origin}/icon-192.png`,
+      badge: `${origin}/icon-192.png`,
     });
   });
 }

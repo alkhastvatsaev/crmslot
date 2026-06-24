@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { logger } from "@/core/logger";
@@ -10,6 +10,7 @@ import {
   type NativeFcmRegistration,
 } from "@/core/native/nativeFcmToken";
 import { persistFcmToken } from "@/features/notifications/fcmWebPush";
+import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 
 type Audience = "client" | "technician" | "backoffice";
 
@@ -19,6 +20,25 @@ type Args = {
 };
 
 export function useNativePushRegistration({ audience, auth }: Args): void {
+  const currentUidRef = useRef<string | null>(null);
+
+  const resyncToken = useCallback(async () => {
+    if (!isCapacitorNative() || !auth) return;
+    const uid = currentUidRef.current;
+    if (!uid) return;
+    const reg = await fetchNativeFcmToken();
+    if (!reg) return;
+    try {
+      await persistFcmToken(uid, reg.token, audience, reg.platform);
+    } catch (err) {
+      logger.warn("[native-push] resync persist failed", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }, [audience, auth]);
+
+  usePushTokenResyncOnResume(resyncToken, Boolean(auth));
+
   useEffect(() => {
     if (!isCapacitorNative() || !auth) return;
 
@@ -42,6 +62,7 @@ export function useNativePushRegistration({ audience, auth }: Args): void {
       const uid = user?.uid ?? null;
       if (uid === currentUid) return;
       currentUid = uid;
+      currentUidRef.current = uid;
       if (!uid) return;
 
       (async () => {

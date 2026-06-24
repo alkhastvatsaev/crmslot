@@ -1,6 +1,5 @@
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { logger } from "@/core/logger";
-import { routePushNotificationClick } from "@/features/notifications/routePushNotificationClick";
 
 type PushReceivedEvent = {
   title?: string;
@@ -24,9 +23,7 @@ export async function registerNativePushForegroundHandler(): Promise<() => void>
       (event: PushReceivedEvent) => {
         const title = event.title?.trim() || "CRMSLOT";
         const body = event.body?.trim() || "";
-        const data = event.data ?? {};
         toast.message(title, { description: body || undefined });
-        routePushNotificationClick(data);
       }
     );
 

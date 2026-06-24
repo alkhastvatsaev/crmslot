@@ -10,10 +10,12 @@ import {
   type FcmUiStatus,
   handleFcmSyncError,
   isPushServiceWorkerEnabled,
+  isWebPushDeliveryCapable,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
   tokenDocId,
 } from "@/features/notifications/fcmWebPush";
+import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
@@ -142,6 +144,11 @@ export function useTechnicianPushMessaging(
             return;
           }
 
+          if (!isWebPushDeliveryCapable()) {
+            setStatus("unsupported");
+            return;
+          }
+
           if (!isPushServiceWorkerEnabled()) {
             setStatus("idle");
             return;
@@ -164,6 +171,14 @@ export function useTechnicianPushMessaging(
     };
   }, [enabled, vapidKey, syncTokenForUser]);
 
+  usePushTokenResyncOnResume(() => {
+    const uid = auth?.currentUser?.uid;
+    if (!uid || typeof Notification === "undefined" || Notification.permission !== "granted")
+      return;
+    if (!isWebPushDeliveryCapable()) return;
+    void syncTokenForUser(uid).catch(() => null);
+  }, enabled);
+
   const registerPush = useCallback(async () => {
     const uid = auth?.currentUser?.uid;
     if (!uid) {
@@ -176,6 +191,10 @@ export function useTechnicianPushMessaging(
       setStatus("registering");
       setLastError(null);
       if (typeof Notification === "undefined") {
+        setStatus("unsupported");
+        return;
+      }
+      if (!isWebPushDeliveryCapable()) {
         setStatus("unsupported");
         return;
       }

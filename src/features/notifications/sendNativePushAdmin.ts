@@ -2,7 +2,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { isFirebaseAdminReady, getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
-import { resolveAndroidPushChannelId } from "@/features/notifications/androidPushChannels";
+import { buildFcmSendPayload } from "@/features/notifications/buildFcmSendPayload";
 
 export type FcmTokenAudience = "technician" | "client" | "backoffice";
 
@@ -57,16 +57,14 @@ export async function sendNativePushToUser(
     }
 
     try {
-      const channelId = resolveAndroidPushChannelId(params.data);
+      const payload = buildFcmSendPayload({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      });
       await messaging.send({
         token,
-        notification: { title: params.title, body: params.body },
-        data: params.data,
-        android: {
-          priority: "high",
-          notification: { channelId, sound: "default" },
-        },
-        apns: { payload: { aps: { sound: "default" } } },
+        ...payload,
       });
       report.sent += 1;
     } catch (err) {
