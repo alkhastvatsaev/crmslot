@@ -10,6 +10,43 @@ import { resolvePushNotificationOpenUrl } from "../src/features/notifications/re
 
 declare let self: ServiceWorkerGlobalScope;
 
+type PushPayload = {
+  notification?: { title?: string; body?: string };
+  data?: Record<string, string | undefined>;
+};
+
+function showPushNotification(payload: PushPayload): void {
+  const data = (payload.data ?? {}) as Record<string, string | undefined>;
+  const title = data.title ?? payload.notification?.title ?? "CRMSLOT";
+  const body = data.body ?? payload.notification?.body ?? "";
+  const origin = self.location.origin;
+  const openUrl = resolvePushNotificationOpenUrl(origin, data);
+  const pushType = typeof data.type === "string" ? data.type : "";
+  const interventionId = typeof data.interventionId === "string" ? data.interventionId : "";
+  let tag = "technician-reminder";
+
+  if (pushType === "portal_chat") {
+    const audience = typeof data.audience === "string" ? data.audience : "staff";
+    if (audience === "client") {
+      const chatIv = interventionId.length > 0 ? interventionId : "open";
+      tag = `client-portal-chat-${chatIv}`;
+    } else {
+      const chatIv = interventionId.length > 0 ? interventionId : "global";
+      tag = `portal-chat-${chatIv}`;
+    }
+  } else if (interventionId.length > 0) {
+    tag = `case-${interventionId}`;
+  }
+
+  void self.registration.showNotification(title, {
+    body,
+    data: { ...data, url: openUrl },
+    tag,
+    icon: `${origin}/icon-192.png`,
+    badge: `${origin}/icon-192.png`,
+  });
+}
+
 function bootMessaging(): void {
   if (!isFirebasePublicConfigured()) return;
 
@@ -17,35 +54,7 @@ function bootMessaging(): void {
   const messaging = getMessaging(app);
 
   onBackgroundMessage(messaging, (payload) => {
-    const data = (payload.data ?? {}) as Record<string, string | undefined>;
-    const title = payload.notification?.title ?? data.title ?? "CRMSLOT";
-    const body = payload.notification?.body ?? data.body ?? "";
-    const origin = self.location.origin;
-    const openUrl = resolvePushNotificationOpenUrl(origin, data);
-    const pushType = typeof data.type === "string" ? data.type : "";
-    const interventionId = typeof data.interventionId === "string" ? data.interventionId : "";
-    let tag = "technician-reminder";
-
-    if (pushType === "portal_chat") {
-      const audience = typeof data.audience === "string" ? data.audience : "staff";
-      if (audience === "client") {
-        const chatIv = interventionId.length > 0 ? interventionId : "open";
-        tag = `client-portal-chat-${chatIv}`;
-      } else {
-        const chatIv = interventionId.length > 0 ? interventionId : "global";
-        tag = `portal-chat-${chatIv}`;
-      }
-    } else if (interventionId.length > 0) {
-      tag = `case-${interventionId}`;
-    }
-
-    void self.registration.showNotification(title, {
-      body,
-      data: { ...data, url: openUrl },
-      tag,
-      icon: `${origin}/icon-192.png`,
-      badge: `${origin}/icon-192.png`,
-    });
+    showPushNotification(payload);
   });
 }
 

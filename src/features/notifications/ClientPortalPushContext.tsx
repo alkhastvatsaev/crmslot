@@ -1,17 +1,17 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import {
   useClientPortalPushMessaging,
   type ClientPortalPushApi,
 } from "@/features/notifications/useClientPortalPushMessaging";
+import { isWebPushRegistrationAllowed } from "@/features/notifications/webPushRegistrationPolicy";
 
 const ClientPortalPushContext = createContext<ClientPortalPushApi | null>(null);
 
 export function ClientPortalPushProvider({ children }: { children: ReactNode }) {
   const api = useClientPortalPushMessaging(process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY, {
-    enabled: !isCapacitorNative(),
+    enabled: isWebPushRegistrationAllowed(),
   });
   return (
     <ClientPortalPushContext.Provider value={api}>{children}</ClientPortalPushContext.Provider>

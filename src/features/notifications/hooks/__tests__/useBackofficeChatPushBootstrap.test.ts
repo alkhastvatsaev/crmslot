@@ -11,6 +11,11 @@ jest.mock("@/features/notifications/useBackofficePushMessaging", () => ({
   }),
 }));
 
+jest.mock("@/features/notifications/webPushRegistrationPolicy", () => ({
+  isWebPushRegistrationAllowed: () => true,
+  shouldAutoPromptForPush: () => true,
+}));
+
 describe("useBackofficeChatPushBootstrap", () => {
   beforeEach(() => {
     registerPushMock.mockReset();

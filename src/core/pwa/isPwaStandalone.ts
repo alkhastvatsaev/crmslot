@@ -5,6 +5,7 @@ export function isPwaStandalone(): boolean {
   if (typeof window.matchMedia !== "function") return false;
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
-    window.matchMedia("(display-mode: fullscreen)").matches
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches
   );
 }
