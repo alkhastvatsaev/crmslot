@@ -91,6 +91,7 @@ export async function notifyClientPortalChatAdmin(params: {
         uid,
         title,
         body,
+        audiences: ["client"],
         data: {
           type: "portal_chat",
           audience: "client",

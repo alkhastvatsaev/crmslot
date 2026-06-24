@@ -1,5 +1,6 @@
 import { isCapacitorNative, getCapacitorPlatform } from "./capacitorRuntime";
 import { logger } from "@/core/logger";
+import { ensureAndroidPushChannels } from "./ensureAndroidPushChannels";
 
 export type NativeFcmRegistration = {
   token: string;
@@ -17,6 +18,8 @@ export async function fetchNativeFcmToken(): Promise<NativeFcmRegistration | nul
     const req = await PushNotifications.requestPermissions();
     if (req.receive !== "granted") return null;
   }
+
+  await ensureAndroidPushChannels();
   await PushNotifications.register();
 
   const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");

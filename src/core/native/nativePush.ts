@@ -1,4 +1,4 @@
-import { isCapacitorNative } from "./capacitorRuntime";
+import { isCapacitorNative, getCapacitorPlatform } from "./capacitorRuntime";
 import { logger } from "@/core/logger";
 
 export type NativePushToken = { token: string; platform: "ios" | "android" };
@@ -16,8 +16,10 @@ export async function registerNativePush(
       return;
     }
   }
+  const platform = getCapacitorPlatform();
+  const safePlatform: "ios" | "android" = platform === "android" ? "android" : "ios";
   await PushNotifications.addListener("registration", async (token) => {
-    await onToken({ token: token.value, platform: "ios" });
+    await onToken({ token: token.value, platform: safePlatform });
   });
   await PushNotifications.addListener("registrationError", (err) => {
     logger.warn("[push] registration error", { error: err.error });

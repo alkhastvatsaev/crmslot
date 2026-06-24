@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { clientNotificationCaseUrl } from "@/features/notifications/clientNotificationUrls";
+import { resolveAndroidPushChannelId } from "@/features/notifications/androidPushChannels";
 
 async function listFcmTokens(uid: string): Promise<string[]> {
   const snap = await getAdminDb().collection("users").doc(uid).collection("fcm_tokens").get();
@@ -37,6 +38,13 @@ export async function notifyClientPaymentReceived(
     data: {
       type: "payment_received",
       interventionId,
+    },
+    android: {
+      priority: "high",
+      notification: {
+        channelId: resolveAndroidPushChannelId({ type: "payment_received" }),
+        sound: "default",
+      },
     },
     webpush: {
       fcmOptions: {
