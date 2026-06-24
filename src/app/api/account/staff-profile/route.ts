@@ -38,5 +38,16 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
   }
 
-  return NextResponse.json({ ok: true });
+  const companyId = typeof body.companyId === "string" ? body.companyId.trim() : "";
+  let role = parseRole(body.role);
+  if (companyId) {
+    const membershipSnap = await db
+      .doc(`users/${authResult.uid}/company_memberships/${companyId}`)
+      .get();
+    if (membershipSnap.exists) {
+      role = (membershipSnap.data()?.role as CompanyRole) === "admin" ? "admin" : "collaborateur";
+    }
+  }
+
+  return NextResponse.json({ ok: true, companyId: companyId || undefined, role });
 }

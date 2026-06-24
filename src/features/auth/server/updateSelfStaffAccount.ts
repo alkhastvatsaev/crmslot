@@ -2,10 +2,11 @@ import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import type { CompanyRole } from "@/features/company";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
-import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
+import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
 import { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
 import type { UpdateCompanyStaffResult } from "@/features/company/server/updateCompanyStaffMember";
 import { isSelfServiceStaffRoleEditEnabled } from "@/features/auth/server/selfServiceStaffRoleEdit";
+import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
 
 export type SelfStaffAccountUpdateInput = {
   firstName?: string;
@@ -55,6 +56,7 @@ export async function updateSelfStaffAccount(
       updatedAt: FieldValue.serverTimestamp(),
     });
     await upsertCompanyStaffDirectoryEntry(db, companyId, uid, input.role);
+    await syncTenantClaims(auth, db, uid, companyId);
   }
 
   const staffResult = await updateCompanyStaffMember(db, auth, companyId, uid, {

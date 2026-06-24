@@ -5,6 +5,7 @@ import {
   type TechnicianStaffProfile,
 } from "@/features/company/server/provisionTechnicianStaff";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
+import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
 import { readDefaultStaffCompanyIdFromEnv } from "@/features/company/server/readDefaultStaffCompanyId";
 
 export type JoinDefaultCompanyOptions = {
@@ -15,27 +16,6 @@ export type JoinDefaultCompanyOptions = {
 export type JoinDefaultCompanyResult =
   | { ok: true; companyId: string; alreadyMember: boolean }
   | { ok: false; status: number; error: string };
-
-async function syncTenantClaims(
-  auth: typeof admin.auth,
-  db: admin.firestore.Firestore,
-  uid: string,
-  preferredActiveCompanyId: string
-): Promise<void> {
-  const snap = await db.collection(`users/${uid}/company_memberships`).get();
-  const tenants = snap.docs.map((d) => {
-    const role = (d.data().role as string) === "admin" ? "admin" : "collaborateur";
-    return `${d.id}:${role}`;
-  });
-  const fallbackActive = tenants.some((t) => t.startsWith(`${preferredActiveCompanyId}:`))
-    ? preferredActiveCompanyId
-    : (snap.docs[0]?.id ?? preferredActiveCompanyId);
-
-  await auth().setCustomUserClaims(uid, {
-    bmTenants: tenants,
-    bmActive: fallbackActive || null,
-  });
-}
 
 async function resolveTechnicianProfile(
   auth: typeof admin.auth,

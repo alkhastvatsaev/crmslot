@@ -17,24 +17,27 @@ export function useCompanyWorkspaceClaims({
   claimsInitialSyncDone: boolean;
   setClaimsInitialSyncDone: (done: boolean) => void;
 }) {
-  const refreshClaimsSilent = useCallback(async (): Promise<boolean> => {
-    const companyId = resolvedClaimsCompanyId;
-    if (!auth?.currentUser || memberships.length === 0 || !companyId) return false;
-    try {
-      const idToken = await auth.currentUser.getIdToken(false);
-      const res = await fetch("/api/company/sync-claims", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({ activeCompanyId: companyId }),
-      });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean };
-      if (!res.ok || !data.ok) return false;
-      await auth.currentUser.getIdToken(true);
-      return true;
-    } catch {
-      return false;
-    }
-  }, [memberships.length, resolvedClaimsCompanyId]);
+  const refreshClaimsSilent = useCallback(
+    async (activeCompanyIdOverride?: string): Promise<boolean> => {
+      const companyId = activeCompanyIdOverride?.trim() || resolvedClaimsCompanyId;
+      if (!auth?.currentUser || memberships.length === 0 || !companyId) return false;
+      try {
+        const idToken = await auth.currentUser.getIdToken(false);
+        const res = await fetch("/api/company/sync-claims", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ activeCompanyId: companyId }),
+        });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean };
+        if (!res.ok || !data.ok) return false;
+        await auth.currentUser.getIdToken(true);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [memberships.length, resolvedClaimsCompanyId]
+  );
 
   useEffect(() => {
     if (!firebaseUid || memberships.length === 0) return;

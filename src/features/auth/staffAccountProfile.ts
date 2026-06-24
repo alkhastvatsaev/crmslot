@@ -17,9 +17,9 @@ export async function saveStaffAccountProfile(
   options: {
     previousCompanyId: string;
     setActiveCompanyId: (id: string) => void;
-    refreshClaimsSilent: () => Promise<boolean>;
+    refreshClaimsSilent: (activeCompanyId?: string) => Promise<boolean>;
   }
-): Promise<void> {
+): Promise<StaffAccountDraft> {
   const res = await fetchWithAuth("/api/account/staff-profile", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -33,15 +33,29 @@ export async function saveStaffAccountProfile(
     }),
   });
 
-  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+    role?: CompanyRole;
+    companyId?: string;
+  };
   if (!res.ok || !data.ok) {
     throw new Error(data.error?.trim() || "Enregistrement impossible.");
   }
 
-  if (draft.companyId && draft.companyId !== options.previousCompanyId) {
-    options.setActiveCompanyId(draft.companyId);
+  const savedCompanyId = data.companyId?.trim() || draft.companyId.trim();
+  const savedRole = data.role === "admin" || data.role === "collaborateur" ? data.role : draft.role;
+
+  if (savedCompanyId) {
+    options.setActiveCompanyId(savedCompanyId);
+    await options.refreshClaimsSilent(savedCompanyId);
   }
-  await options.refreshClaimsSilent();
+
+  return {
+    ...draft,
+    companyId: savedCompanyId,
+    role: savedRole,
+  };
 }
 
 export async function deleteStaffAccount(user: User): Promise<void> {
