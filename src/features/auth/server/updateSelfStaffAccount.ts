@@ -7,6 +7,8 @@ import { updateCompanyStaffMember } from "@/features/company/server/updateCompan
 import type { UpdateCompanyStaffResult } from "@/features/company/server/updateCompanyStaffMember";
 import { isSelfServiceStaffRoleEditEnabled } from "@/features/auth/server/selfServiceStaffRoleEdit";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
+import { readDefaultStaffCompanyIdFromEnv } from "@/features/company/server/readDefaultStaffCompanyId";
+import { TEST_COMPANY_DISPLAY_NAME } from "@/features/company/resolveCompanyMembershipRows";
 
 export type SelfStaffAccountUpdateInput = {
   firstName?: string;
@@ -34,9 +36,22 @@ export async function updateSelfStaffAccount(
   }
 
   const membershipRef = db.doc(`users/${uid}/company_memberships/${companyId}`);
-  const membershipSnap = await membershipRef.get();
+  let membershipSnap = await membershipRef.get();
   if (!membershipSnap.exists) {
-    return { ok: false, status: 403, error: "Société non autorisée." };
+    const envDefaultId = readDefaultStaffCompanyIdFromEnv();
+    if (envDefaultId && companyId === envDefaultId && isSelfServiceStaffRoleEditEnabled()) {
+      const bootstrapRole = input.role === "admin" ? "admin" : "collaborateur";
+      await membershipRef.set({
+        companyId,
+        role: bootstrapRole,
+        companyName: TEST_COMPANY_DISPLAY_NAME,
+        joinedAt: FieldValue.serverTimestamp(),
+      });
+      await upsertCompanyStaffDirectoryEntry(db, companyId, uid, bootstrapRole);
+      membershipSnap = await membershipRef.get();
+    } else {
+      return { ok: false, status: 403, error: "Société non autorisée." };
+    }
   }
 
   const currentRole = resolveMembershipRole(membershipSnap.data());
