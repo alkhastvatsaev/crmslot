@@ -5,7 +5,7 @@ import {
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
+  Timestamp,
   where,
   type Firestore,
   type Query,
@@ -112,15 +112,7 @@ export function subscribePortalChatMessages(
   );
   const fallback = query(col, where("companyId", "==", trimmed), limit(CHAT_PAGE_SIZE));
 
-  let teardown: (() => void) | undefined;
-  const timeout = setTimeout(() => {
-    teardown = listenPortalChatQuery(indexed, fallback, onRows, onError);
-  }, 10);
-
-  return () => {
-    clearTimeout(timeout);
-    teardown?.();
-  };
+  return listenPortalChatQuery(indexed, fallback, onRows, onError);
 }
 
 export function subscribePortalChatForIntervention(
@@ -144,15 +136,7 @@ export function subscribePortalChatForIntervention(
   );
   const fallback = query(col, where("interventionId", "==", ivId), limit(CHAT_PAGE_SIZE));
 
-  let teardown: (() => void) | undefined;
-  const timeout = setTimeout(() => {
-    teardown = listenPortalChatQuery(indexed, fallback, onRows, onError);
-  }, 10);
-
-  return () => {
-    clearTimeout(timeout);
-    teardown?.();
-  };
+  return listenPortalChatQuery(indexed, fallback, onRows, onError);
 }
 
 export async function sendPortalChatMessage(
@@ -174,7 +158,7 @@ export async function sendPortalChatMessage(
     body: params.body,
     role: params.role,
     senderUid: params.senderUid,
-    createdAt: serverTimestamp(),
+    createdAt: Timestamp.now(),
     ...(senderName ? { senderName } : {}),
     ...(ivId ? { interventionId: ivId } : {}),
     ...(params.imageUrls && params.imageUrls.length > 0 ? { imageUrls: params.imageUrls } : {}),

@@ -22,6 +22,8 @@ export type ChatDayMissionRow = {
   statusLabel?: string;
   /** Créneau du jour sélectionné (affiché en tête de liste). */
   isToday?: boolean;
+  /** Dernier message du fil = client (en attente de réponse staff). */
+  needsReply?: boolean;
 };
 
 export function missionsToChatDayRows(missions: Mission[]): ChatDayMissionRow[] {

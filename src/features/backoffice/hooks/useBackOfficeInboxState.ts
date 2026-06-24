@@ -95,18 +95,19 @@ export function useBackOfficeInboxState(
   const isTenant = !!workspace?.isTenantUser;
   const workspaceReady = workspace?.workspaceReady !== false;
 
-  const { chatDayRows, chatThreadsNeedingReply } = useBackOfficeInboxPortalChat({
-    dayMissions,
-    interventions,
-    selectedDate,
-    workspace,
-    inboxLive,
-    isTenant,
-    inboxCompanyIds: portalChatInboxCompanyIds,
-    setActiveTab: selection.setActiveTab,
-    setSelectedChatInterventionId: selection.setSelectedChatInterventionId,
-    chatTabLabel: String(t("backoffice.inbox.tabs.chat")),
-  });
+  const { chatDayRows, chatThreadsNeedingReply, chatThreadsNeedingReplyIds } =
+    useBackOfficeInboxPortalChat({
+      dayMissions,
+      interventions,
+      selectedDate,
+      workspace,
+      inboxLive,
+      isTenant,
+      inboxCompanyIds: portalChatInboxCompanyIds,
+      setActiveTab: selection.setActiveTab,
+      setSelectedChatInterventionId: selection.setSelectedChatInterventionId,
+      chatTabLabel: String(t("backoffice.inbox.tabs.chat")),
+    });
 
   const pendingRequests = useMemo(() => computePendingRequests(interventions), [interventions]);
   const validationReports = useMemo(() => computeValidationReports(interventions), [interventions]);
@@ -238,6 +239,7 @@ export function useBackOfficeInboxState(
     setSelectedChatInterventionId: selection.setSelectedChatInterventionId,
     chatDayRows,
     chatThreadsNeedingReply,
+    chatThreadsNeedingReplyIds,
     isEditingDateTime: selection.isEditingDateTime,
     setIsEditingDateTime: selection.setIsEditingDateTime,
     editDate: selection.editDate,

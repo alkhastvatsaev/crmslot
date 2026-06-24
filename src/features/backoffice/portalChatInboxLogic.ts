@@ -246,28 +246,41 @@ export function interventionIdsWithClientPortalChat(messages: PortalChatDoc[]): 
   return [...ids];
 }
 
-/** Fils dont le dernier message est du client → badge inbox. */
-export function countClientPortalThreadsNeedingReply(messages: PortalChatDoc[]): number {
-  const threadIds = new Set<string>();
+/** Messages d’un fil inbox (picker ou conversation). */
+export function portalChatMessagesForThread(
+  messages: PortalChatDoc[],
+  threadId: string
+): PortalChatDoc[] {
+  const id = threadId.trim();
+  if (id === PORTAL_CHAT_GLOBAL_THREAD_ID) {
+    return messages.filter((m) => !normalizePortalChatInterventionId(m.interventionId));
+  }
+  const senderUid = portalChatSenderUidFromThreadId(id);
+  if (senderUid) return filterPortalChatMessagesForSenderUid(messages, senderUid);
+  return messages.filter((m) => normalizePortalChatInterventionId(m.interventionId) === id);
+}
+
+/** Fils dont le dernier message est du client — surbrillance liste inbox. */
+export function portalChatThreadIdsNeedingReply(messages: PortalChatDoc[]): Set<string> {
+  const candidates = new Set<string>();
   for (const m of messages) {
     if (m.role !== "client") continue;
-    threadIds.add(portalChatPickerThreadId(m));
+    candidates.add(portalChatPickerThreadId(m));
   }
 
-  let count = 0;
-  for (const threadId of threadIds) {
-    if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) continue;
-    const senderUid = portalChatSenderUidFromThreadId(threadId);
-    const threadMessages = senderUid
-      ? filterPortalChatMessagesForSenderUid(messages, senderUid)
-      : messages.filter((m) => !normalizePortalChatInterventionId(m.interventionId));
-    const sorted = [...threadMessages].sort(
+  const needing = new Set<string>();
+  for (const threadId of candidates) {
+    const sorted = [...portalChatMessagesForThread(messages, threadId)].sort(
       (a, b) => portalChatMessageTimeMs(a) - portalChatMessageTimeMs(b)
     );
-    const last = sorted[sorted.length - 1];
-    if (last?.role === "client") count += 1;
+    if (sorted[sorted.length - 1]?.role === "client") needing.add(threadId);
   }
-  return count;
+  return needing;
+}
+
+/** Fils dont le dernier message est du client → badge inbox. */
+export function countClientPortalThreadsNeedingReply(messages: PortalChatDoc[]): number {
+  return portalChatThreadIdsNeedingReply(messages).size;
 }
 
 export function filterNewClientPortalMessages(
@@ -291,6 +304,9 @@ export function sortChatDayRows(
     return Number(m[1]) * 60 + Number(m[2]);
   };
   return [...rows].sort((a, b) => {
+    const aReply = a.needsReply ? 0 : 1;
+    const bReply = b.needsReply ? 0 : 1;
+    if (aReply !== bReply) return aReply - bReply;
     const aToday = a.isToday ? 0 : 1;
     const bToday = b.isToday ? 0 : 1;
     if (aToday !== bToday) return aToday - bToday;
