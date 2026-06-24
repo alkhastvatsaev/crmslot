@@ -11,6 +11,7 @@ export const runtime = "nodejs";
 type Body = {
   companyId?: string;
   interventionId?: string | null;
+  chatThreadId?: string | null;
   preview?: string;
   clientLabel?: string | null;
 };
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       senderUid: auth.uid,
       preview: typeof body.preview === "string" ? body.preview : "",
       interventionId: body.interventionId ?? null,
+      chatThreadId: body.chatThreadId ?? body.interventionId ?? null,
       clientLabel: body.clientLabel ?? null,
     });
     return NextResponse.json({ ok: true, notified: result.notified });

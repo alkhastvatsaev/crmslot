@@ -30,6 +30,7 @@ describe("requestStaffPortalChatNotification", () => {
         body: JSON.stringify({
           companyId: "co-1",
           interventionId: "iv-9",
+          chatThreadId: "iv-9",
           preview: "Bonjour",
           clientLabel: "Alice",
         }),

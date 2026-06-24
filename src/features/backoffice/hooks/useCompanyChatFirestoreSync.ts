@@ -14,7 +14,8 @@ import { toast } from "sonner";
 import { isFirestorePermissionDenied } from "@/core/firestore/firestoreClientErrors";
 import { logger } from "@/core/logger";
 import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
-import { filterPortalChatMessagesForThread } from "@/features/backoffice/portalChatThreadFilter";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
+import { filterPortalChatMessagesForViewer } from "@/features/backoffice/portalChatThreadFilter";
 import {
   companyChatWelcome,
   mapPortalChatRowsToMessages,
@@ -27,7 +28,9 @@ export function useCompanyChatFirestoreSync(
   chatDb: Firestore | null,
   companyIdTrimmed: string,
   chatAuth: Auth | null,
-  chatInterventionId: string | null,
+  filterThreadId: string | null,
+  publishAsPortal: boolean,
+  portalChatRowsRef: MutableRefObject<PortalChatDoc[]>,
   onRemoteClientMessage: (() => void) | undefined,
   t: (key: string) => string,
   setMessages: Dispatch<SetStateAction<CompanyChatMessage[]>>,
@@ -39,7 +42,7 @@ export function useCompanyChatFirestoreSync(
   useEffect(() => {
     fsHydratedRef.current = false;
     seenFsIdsRef.current.clear();
-  }, [companyIdTrimmed, chatInterventionId]);
+  }, [companyIdTrimmed, filterThreadId]);
 
   useEffect(() => {
     if (!firestoreSyncEnabled || !chatDb || !companyIdTrimmed || !chatAuth) return;
@@ -54,6 +57,7 @@ export function useCompanyChatFirestoreSync(
 
       if (!user) {
         setMessages([companyChatWelcome(t)]);
+        portalChatRowsRef.current = [];
         return;
       }
 
@@ -61,7 +65,12 @@ export function useCompanyChatFirestoreSync(
         chatDb,
         companyIdTrimmed,
         (rows) => {
-          const filteredRows = filterPortalChatMessagesForThread(rows, chatInterventionId);
+          portalChatRowsRef.current = rows;
+          const filteredRows = filterPortalChatMessagesForViewer(rows, {
+            threadId: filterThreadId,
+            publishAsPortal,
+            viewerUid: user.uid,
+          });
           const mapped = mapPortalChatRowsToMessages(filteredRows);
 
           if (!fsHydratedRef.current) {
@@ -69,12 +78,11 @@ export function useCompanyChatFirestoreSync(
             rows.forEach((r) => seenFsIdsRef.current.add(r.id));
           }
 
-          const uid = user.uid;
           const newDocs = rows.filter((r) => !seenFsIdsRef.current.has(r.id));
           newDocs.forEach((r) => seenFsIdsRef.current.add(r.id));
           if (
             onRemoteClientMessage &&
-            newDocs.some((r) => r.role === "client" && r.senderUid !== uid)
+            newDocs.some((r) => r.role === "client" && r.senderUid !== user.uid)
           ) {
             onRemoteClientMessage();
           }
@@ -112,7 +120,9 @@ export function useCompanyChatFirestoreSync(
     companyIdTrimmed,
     chatDb,
     chatAuth,
-    chatInterventionId,
+    filterThreadId,
+    publishAsPortal,
+    portalChatRowsRef,
     onRemoteClientMessage,
     t,
     setMessages,

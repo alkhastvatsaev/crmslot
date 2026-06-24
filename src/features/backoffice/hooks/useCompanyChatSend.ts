@@ -18,6 +18,11 @@ import {
   pickLocalChatReply,
   type CompanyChatMessage,
 } from "@/features/backoffice/companyChatTypes";
+import {
+  resolvePortalChatWriteInterventionId,
+  portalChatPickerThreadId,
+} from "@/features/backoffice/portalChatInboxLogic";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import type { useCrmStaffAccountPanel } from "@/features/auth";
 import type { useRequesterHub } from "@/context/RequesterHubContext";
 
@@ -41,6 +46,9 @@ export function useCompanyChatSend({
   chatDb,
   chatAuth,
   chatInterventionId,
+  chatThreadId,
+  portalChatRowsRef,
+  portalProfileReady,
   staffFields,
   clientAccountFields,
   requesterProfile,
@@ -61,6 +69,9 @@ export function useCompanyChatSend({
   chatDb: Firestore | null;
   chatAuth: Auth | null;
   chatInterventionId: string | null;
+  chatThreadId: string | null;
+  portalChatRowsRef: MutableRefObject<PortalChatDoc[]>;
+  portalProfileReady: boolean;
   staffFields: StaffFields;
   clientAccountFields: ClientAccountFields;
   requesterProfile: RequesterProfile;
@@ -133,9 +144,12 @@ export function useCompanyChatSend({
       setPendingImages([]);
 
       try {
-        if (publishAsPortal) {
+        if (publishAsPortal && !portalProfileReady) {
           await requestPortalChatProfileEnsure(currentUser, companyIdTrimmed);
         }
+        const writeIvId = publishAsPortal
+          ? chatInterventionId?.trim() || null
+          : resolvePortalChatWriteInterventionId(chatThreadId, portalChatRowsRef.current, "staff");
         let imageUrls: string[] | undefined;
         if (optimisticImages && optimisticImages.length > 0 && storage) {
           imageUrls = await uploadPortalChatImagesFromDataUrls(storage, {
@@ -150,7 +164,7 @@ export function useCompanyChatSend({
           role,
           senderUid: currentUser.uid,
           senderName,
-          interventionId: chatInterventionId,
+          interventionId: writeIvId,
           ...(imageUrls && imageUrls.length > 0 ? { imageUrls } : {}),
         });
         pendingDocIdRef.current.set(tempId, docId);
@@ -163,7 +177,12 @@ export function useCompanyChatSend({
         if (publishAsPortal) {
           void requestStaffPortalChatNotification({
             companyId: companyIdTrimmed,
-            interventionId: chatInterventionId,
+            interventionId: writeIvId,
+            chatThreadId: portalChatPickerThreadId({
+              role: "client",
+              senderUid: currentUser.uid,
+              interventionId: writeIvId,
+            }),
             preview,
             clientLabel: senderName,
             user: currentUser,
@@ -171,7 +190,7 @@ export function useCompanyChatSend({
         } else {
           void requestClientPortalChatNotification({
             companyId: companyIdTrimmed,
-            interventionId: chatInterventionId,
+            interventionId: writeIvId,
             preview,
             staffLabel: senderName,
           });
@@ -235,6 +254,9 @@ export function useCompanyChatSend({
     chatDb,
     chatAuth,
     chatInterventionId,
+    chatThreadId,
+    portalChatRowsRef,
+    portalProfileReady,
     t,
     staffFields,
     clientAccountFields,

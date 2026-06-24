@@ -22,12 +22,14 @@ import {
 import { useCompanyChatFirestoreSync } from "@/features/backoffice/hooks/useCompanyChatFirestoreSync";
 import { useCompanyChatSend } from "@/features/backoffice/hooks/useCompanyChatSend";
 import { usePortalChatProfileBootstrap } from "@/features/backoffice/hooks/usePortalChatProfileBootstrap";
+import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 
 export type UseCompanyChatPanelArgs = {
   publishAsPortal?: boolean;
   acceptPortalMessages?: boolean;
   chatCompanyId?: string | null;
   chatInterventionId?: string | null;
+  chatThreadId?: string | null;
   onRemoteClientMessage?: () => void;
 };
 
@@ -36,6 +38,7 @@ export function useCompanyChatPanel({
   acceptPortalMessages = false,
   chatCompanyId = null,
   chatInterventionId = null,
+  chatThreadId = null,
   onRemoteClientMessage,
 }: UseCompanyChatPanelArgs) {
   const { t } = useTranslation();
@@ -54,6 +57,9 @@ export function useCompanyChatPanel({
   const hydratedRef = useRef(false);
   const seenPortalIdsRef = useRef<Set<string>>(new Set());
   const pendingDocIdRef = useRef<Map<string, string>>(new Map());
+  const portalChatRowsRef = useRef<PortalChatDoc[]>([]);
+
+  const filterThreadId = chatThreadId ?? chatInterventionId;
 
   const { chatAuth, chatDb } = useMemo(
     () => resolvePortalChatFirebaseSession(publishAsPortal),
@@ -148,7 +154,9 @@ export function useCompanyChatPanel({
     chatDb,
     companyIdTrimmed,
     chatAuth,
-    chatInterventionId,
+    filterThreadId,
+    publishAsPortal,
+    portalChatRowsRef,
     onRemoteClientMessage,
     t,
     setMessages,
@@ -209,6 +217,9 @@ export function useCompanyChatPanel({
     chatDb,
     chatAuth,
     chatInterventionId,
+    chatThreadId: filterThreadId,
+    portalChatRowsRef,
+    portalProfileReady,
     staffFields,
     clientAccountFields,
     requesterProfile,

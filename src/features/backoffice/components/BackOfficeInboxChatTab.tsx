@@ -85,11 +85,7 @@ export default function BackOfficeInboxChatTab({
             className="min-h-0 flex-1 px-0"
             acceptPortalMessages
             chatCompanyId={portalChatCompanyId}
-            chatInterventionId={
-              selectedChatInterventionId === PORTAL_CHAT_GLOBAL_THREAD_ID
-                ? null
-                : selectedChatInterventionId
-            }
+            chatThreadId={selectedChatInterventionId}
             onRemoteClientMessage={portalChatCompanyId ? () => setActiveTab("chat") : undefined}
           />
         </div>
