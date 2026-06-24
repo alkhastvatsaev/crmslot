@@ -32,6 +32,15 @@ export function portalChatSenderUidFromThreadId(threadId: string): string | null
   return uid || null;
 }
 
+/** Jamais persister `global`, `__sender__:` ou autres pseudo-fils dans Firestore. */
+export function normalizePortalChatInterventionId(interventionId?: string | null): string | null {
+  const id = (interventionId ?? "").trim();
+  if (!id || id === PORTAL_CHAT_GLOBAL_THREAD_ID) return null;
+  if (isPortalChatSenderThreadId(id)) return null;
+  if (id.startsWith("__")) return null;
+  return id;
+}
+
 /** Historique complet d’un client portail (messages + réponses staff sur ses dossiers). */
 export function filterPortalChatMessagesForSenderUid(
   rows: PortalChatDoc[],
@@ -44,17 +53,20 @@ export function filterPortalChatMessagesForSenderUid(
   for (const r of rows) {
     if (r.role !== "client") continue;
     if ((r.senderUid ?? "").trim() !== uid) continue;
-    const iv = r.interventionId?.trim();
+    const iv = normalizePortalChatInterventionId(r.interventionId);
     if (iv) clientIvIds.add(iv);
   }
 
   const clientOnlyGlobal = clientIvIds.size === 0;
-  void clientOnlyGlobal;
 
   return rows.filter((r) => {
-    const iv = r.interventionId?.trim();
     if (r.role === "client") return (r.senderUid ?? "").trim() === uid;
-    if (!iv) return true;
+    const rawIv = r.interventionId?.trim();
+    if (rawIv && isPortalChatSenderThreadId(rawIv)) {
+      return portalChatSenderUidFromThreadId(rawIv) === uid;
+    }
+    const iv = normalizePortalChatInterventionId(r.interventionId);
+    if (!iv) return clientOnlyGlobal;
     return clientIvIds.has(iv);
   });
 }
@@ -70,7 +82,7 @@ export function latestClientInterventionIdForSender(
   for (const r of rows) {
     if (r.role !== "client") continue;
     if ((r.senderUid ?? "").trim() !== uid) continue;
-    const iv = r.interventionId?.trim();
+    const iv = normalizePortalChatInterventionId(r.interventionId);
     if (!iv) continue;
     if (!latest || portalChatMessageTimeMs(r) >= portalChatMessageTimeMs(latest)) latest = r;
   }
@@ -123,7 +135,7 @@ export function enrichChatDayRowsFromPortalMessages(
   for (const [threadId, msg] of latestClientByThread) {
     if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) continue;
     const senderName = msg.senderName?.trim() ?? "";
-    const ivId = msg.interventionId?.trim();
+    const ivId = normalizePortalChatInterventionId(msg.interventionId);
     const iv = ivId ? interventions.find((x) => x.id === ivId) : undefined;
     const existing = byThread.get(threadId);
     if (existing) {
@@ -146,7 +158,72 @@ export function enrichChatDayRowsFromPortalMessages(
     });
   }
 
-  return sortChatDayRows([...byThread.values()], selectedDate);
+  return sortChatDayRows(
+    consolidateChatInboxPickerRows([...byThread.values()], messages),
+    selectedDate
+  );
+}
+
+function pickRicherChatDayRow(
+  a: ChatDayMissionRow,
+  b: ChatDayMissionRow,
+  aRemappedFromIv: boolean,
+  bRemappedFromIv: boolean
+): { row: ChatDayMissionRow; remappedFromIv: boolean } {
+  const score = (row: ChatDayMissionRow, remappedFromIv: boolean) =>
+    (isPortalChatSenderThreadId(row.threadId) && !remappedFromIv ? 8 : 0) +
+    (row.clientName.trim() ? 4 : 0) +
+    (row.isToday ? 2 : 0) +
+    (row.address?.trim() ? 1 : 0);
+  const aScore = score(a, aRemappedFromIv);
+  const bScore = score(b, bRemappedFromIv);
+  const winner =
+    bScore > aScore
+      ? { primary: b, secondary: a, remapped: bRemappedFromIv }
+      : { primary: a, secondary: b, remapped: aRemappedFromIv };
+  return {
+    remappedFromIv: winner.remapped,
+    row: {
+      ...winner.primary,
+      address: winner.primary.address?.trim() ? winner.primary.address : winner.secondary.address,
+      time: winner.primary.time?.trim() ? winner.primary.time : winner.secondary.time,
+      isToday: winner.primary.isToday || winner.secondary.isToday,
+      statusCode: winner.primary.statusCode ?? winner.secondary.statusCode,
+    },
+  };
+}
+
+/** Une ligne inbox par client — fusionne dossier + fil `__sender__:uid`. */
+export function consolidateChatInboxPickerRows(
+  rows: ChatDayMissionRow[],
+  messages: PortalChatDoc[]
+): ChatDayMissionRow[] {
+  const ivToSender = new Map<string, string>();
+  for (const m of messages) {
+    if (m.role !== "client") continue;
+    const uid = m.senderUid?.trim();
+    if (!uid) continue;
+    const iv = normalizePortalChatInterventionId(m.interventionId);
+    if (iv) ivToSender.set(iv, uid);
+  }
+
+  const merged = new Map<string, { row: ChatDayMissionRow; remappedFromIv: boolean }>();
+  for (const row of rows) {
+    const mappedSender = ivToSender.get(row.threadId);
+    const remappedFromIv = Boolean(mappedSender);
+    const threadId = mappedSender
+      ? `${PORTAL_CHAT_SENDER_THREAD_PREFIX}${mappedSender}`
+      : row.threadId;
+    const normalized = remappedFromIv ? { ...row, threadId } : row;
+    const existing = merged.get(threadId);
+    merged.set(
+      threadId,
+      existing
+        ? pickRicherChatDayRow(existing.row, normalized, existing.remappedFromIv, remappedFromIv)
+        : { row: normalized, remappedFromIv }
+    );
+  }
+  return [...merged.values()].map((entry) => entry.row);
 }
 
 export function portalChatThreadKey(interventionId?: string | null): string {
@@ -163,7 +240,7 @@ export function interventionIdsWithClientPortalChat(messages: PortalChatDoc[]): 
   const ids = new Set<string>();
   for (const m of messages) {
     if (m.role !== "client") continue;
-    const ivId = m.interventionId?.trim();
+    const ivId = normalizePortalChatInterventionId(m.interventionId);
     if (ivId) ids.add(ivId);
   }
   return [...ids];
@@ -183,7 +260,7 @@ export function countClientPortalThreadsNeedingReply(messages: PortalChatDoc[]):
     const senderUid = portalChatSenderUidFromThreadId(threadId);
     const threadMessages = senderUid
       ? filterPortalChatMessagesForSenderUid(messages, senderUid)
-      : messages.filter((m) => !m.interventionId?.trim());
+      : messages.filter((m) => !normalizePortalChatInterventionId(m.interventionId));
     const sorted = [...threadMessages].sort(
       (a, b) => portalChatMessageTimeMs(a) - portalChatMessageTimeMs(b)
     );

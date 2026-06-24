@@ -3,6 +3,7 @@ import {
   PORTAL_CHAT_GLOBAL_THREAD_ID,
   filterPortalChatMessagesForSenderUid,
   isPortalChatSenderThreadId,
+  normalizePortalChatInterventionId,
   portalChatSenderUidFromThreadId,
 } from "@/features/backoffice/portalChatInboxLogic";
 
@@ -28,13 +29,13 @@ export function filterPortalChatMessagesForThread(
   if (!threadId) return rows;
 
   if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) {
-    return rows.filter((r) => !r.interventionId?.trim());
+    return rows.filter((r) => !normalizePortalChatInterventionId(r.interventionId));
   }
 
   const senderUid = portalChatSenderUidFromThreadId(threadId);
   if (senderUid) return filterPortalChatMessagesForSenderUid(rows, senderUid);
 
-  return rows.filter((r) => (r.interventionId?.trim() ?? "") === threadId);
+  return rows.filter((r) => normalizePortalChatInterventionId(r.interventionId) === threadId);
 }
 
 /** Filtre lecture — sépare fil UI admin et vue client isolée. */
@@ -48,7 +49,7 @@ export function filterPortalChatMessagesForViewer(
   if (publishAsPortal && uid) {
     if (id && !isPortalChatSenderThreadId(id) && id !== PORTAL_CHAT_GLOBAL_THREAD_ID) {
       return rows.filter((r) => {
-        const msgIv = r.interventionId?.trim() ?? "";
+        const msgIv = normalizePortalChatInterventionId(r.interventionId) ?? "";
         if (!msgIv) return r.role === "staff";
         return msgIv === id;
       });

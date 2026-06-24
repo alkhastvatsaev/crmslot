@@ -19,6 +19,10 @@ export function parseBackofficeChatNotificationData(
   if (fromParam) return { kind: "chat", interventionId: fromParam };
 
   if (data.type?.trim() !== "portal_chat") return { kind: "none" };
+
+  const chatThreadId = data.chatThreadId?.trim();
+  if (chatThreadId) return { kind: "chat", interventionId: chatThreadId };
+
   const ivId = data.interventionId?.trim();
   return { kind: "chat", interventionId: ivId || "global" };
 }
