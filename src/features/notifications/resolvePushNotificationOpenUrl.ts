@@ -117,10 +117,10 @@ export function pickPushNotificationWindowClient(
     });
 
   if (targetPath.startsWith(TECHNICIAN_MOBILE_APP_ROUTE)) {
-    return matchPrefix(TECHNICIAN_MOBILE_APP_ROUTE) ?? clientList[0];
+    return matchPrefix(TECHNICIAN_MOBILE_APP_ROUTE);
   }
   if (targetPath.startsWith(CLIENT_MOBILE_APP_ROUTE)) {
-    return matchPrefix(CLIENT_MOBILE_APP_ROUTE) ?? clientList[0];
+    return matchPrefix(CLIENT_MOBILE_APP_ROUTE);
   }
   if (targetPath === "/" || targetPath === "") {
     return (
