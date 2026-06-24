@@ -174,10 +174,7 @@ export function useCompanyWorkspaceMemberships(
         : "";
 
     setActiveCompanyIdState((prev) => {
-      const next =
-        memberships.length === 0
-          ? stored || prev.trim()
-          : pickActiveCompanyId(memberships, prev, stored);
+      const next = memberships.length === 0 ? "" : pickActiveCompanyId(memberships, prev, stored);
       if (typeof window !== "undefined") {
         if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
         else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
@@ -192,12 +189,11 @@ export function useCompanyWorkspaceMemberships(
   }, [membershipsReady, activeCompanyId, memberships.length]);
 
   const resolvedClaimsCompanyId = useMemo(() => {
+    const membershipIds = new Set(memberships.map((m) => m.companyId));
     const fromState = activeCompanyId.trim();
-    if (fromState && memberships.some((m) => m.companyId === fromState)) return fromState;
-    const fromMembership = memberships[0]?.companyId?.trim() ?? "";
-    if (fromMembership) return fromMembership;
-    return storedActiveCompanyId;
-  }, [activeCompanyId, memberships, storedActiveCompanyId]);
+    if (fromState && membershipIds.has(fromState)) return fromState;
+    return memberships[0]?.companyId?.trim() ?? "";
+  }, [activeCompanyId, memberships]);
 
   return {
     memberships,

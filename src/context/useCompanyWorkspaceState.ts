@@ -43,19 +43,24 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
       return "";
     }
     if (!membershipsReady) {
-      return storedActiveCompanyId || activeCompanyId.trim();
+      const bootStored = storedActiveCompanyId.trim();
+      return bootStored || activeCompanyId.trim();
     }
-    const resolved = resolvedClaimsCompanyId || activeCompanyId;
-    return resolved;
+    if (memberships.length === 0) {
+      return "";
+    }
+    return resolvedClaimsCompanyId || activeCompanyId.trim();
   }, [
     authLoading,
     membershipsReady,
+    memberships.length,
     activeCompanyId,
     resolvedClaimsCompanyId,
     storedActiveCompanyId,
   ]);
 
-  const workspaceBootstrapReady = membershipsReady || Boolean(storedActiveCompanyId && firebaseUid);
+  const workspaceBootstrapReady =
+    membershipsReady || (!authLoading && Boolean(firebaseUid) && Boolean(storedActiveCompanyId));
 
   const activeRole = useMemo(() => {
     return memberships.find((m) => m.companyId === effectiveActiveCompanyId)?.role ?? null;

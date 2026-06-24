@@ -48,17 +48,21 @@ export function resolveBackofficeInboxCompanyIds(
 ): string[] {
   if (!workspace?.isTenantUser) return [];
 
-  const membershipIds = new Set(
-    workspace.memberships.map((m) => m.companyId.trim()).filter(Boolean)
-  );
+  const membershipIds = [
+    ...new Set(workspace.memberships.map((m) => m.companyId.trim()).filter(Boolean)),
+  ];
+  if (membershipIds.length === 0) return [];
+
   const active = workspace.activeCompanyId.trim();
   const envDefault = readClientPortalDefaultCompanyIdFromEnv();
 
   const ids = new Set<string>();
-  if (active && membershipIds.has(active)) ids.add(active);
-  if (envDefault && membershipIds.has(envDefault)) ids.add(envDefault);
+  if (active && membershipIds.includes(active)) ids.add(active);
+  if (envDefault && membershipIds.includes(envDefault)) ids.add(envDefault);
 
-  if (ids.size === 0 && active) ids.add(active);
+  if (ids.size === 0) {
+    for (const companyId of membershipIds) ids.add(companyId);
+  }
 
   return [...ids];
 }
