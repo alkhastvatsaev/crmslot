@@ -66,6 +66,10 @@
     {
       "path": "/api/cron/operations-tick",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/technician-unclosed-reminders",
+      "schedule": "0 8,18 * * *"
     }
   ]
 }

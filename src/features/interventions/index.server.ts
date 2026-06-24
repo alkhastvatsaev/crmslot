@@ -2,6 +2,7 @@
  * API serveur interventions — Admin SDK, portail, e2e seed (routes API / cron uniquement).
  */
 export { e2eSeedAssignedInterventionAdmin } from "@/features/interventions/server/e2eSeedAssignedIntervention";
+export { e2eSeedClosureBlockDemoAdmin } from "@/features/interventions/server/e2eSeedClosureBlockDemo";
 export { e2eSeedDoneInterventionAdmin } from "@/features/interventions/server/e2eSeedDoneIntervention";
 export { isE2eSeedAllowed } from "@/features/interventions/server/e2eSeedConfig";
 export {
@@ -28,3 +29,9 @@ export { validateInterventionReportServer } from "@/features/interventions/serve
 export { sendPortalStatusUpdateEmailAdmin } from "@/features/interventions/server/portalStatusUpdateEmailAdmin";
 export { coerceAdminExtraPatch } from "@/features/interventions/workflow/coerceAdminExtraPatch";
 export { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
+export {
+  assertTechnicianClosureBlockForAccept,
+  isTechnicianClosureBlockEnabledForCompany,
+  technicianClosureBlockHttpError,
+} from "@/features/interventions/server/technicianClosureBlockServer";
+export { runTechnicianUnclosedDossierRemindersAdmin } from "@/features/interventions/server/technicianUnclosedDossierRemindersAdmin";

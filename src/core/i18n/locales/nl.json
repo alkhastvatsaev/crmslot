@@ -1753,6 +1753,16 @@
     },
     "assignment": {
       "assignment_declined": "Opdracht geweigerd — teruggestuurd naar binnenkomende aanvragen"
+    },
+    "closure_block": {
+      "banner_title": "{{count}} opdracht(en) om af te sluiten",
+      "banner_hint": "Sluit lopende opdrachten af voordat u een nieuwe accepteert.",
+      "banner_cta": "Bekijk",
+      "accept_disabled_hint": "Sluit eerst uw open opdrachten af om deze te accepteren.",
+      "modal_title": "Openstaande opdrachten",
+      "modal_body": "U hebt nog open opdrachten. Sluit ze af voordat u een nieuwe accepteert.",
+      "modal_go": "Naar opdrachten om af te sluiten",
+      "modal_dismiss": "Sluiten"
     }
   },
   "common": {

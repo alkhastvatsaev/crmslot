@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
+import { useTechnicianNativePushBootstrap } from "@/features/interventions/hooks/useTechnicianNativePushBootstrap";
 import { parseTechnicianNotificationSearchParams } from "@/features/notifications/technicianNotificationUrls";
 
 const TechnicianNotificationBootstrap = dynamic(
@@ -25,6 +26,7 @@ function DeferredTechnicianBootstrapsInner() {
   });
 
   useTechnicianAssignmentPushBootstrap(idleReady);
+  useTechnicianNativePushBootstrap(idleReady);
 
   if (!pushIntent && !idleReady) return null;
 

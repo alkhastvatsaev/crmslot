@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
+import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTopBar";
 import TechnicianMobileProfileChip from "@/features/interventions/components/TechnicianMobileProfileChip";
 import { useDashboardPageSelector } from "@/features/dashboard";
@@ -89,6 +90,7 @@ export default function TechnicianMobileShell({ children }: Props) {
           railTestId="technician-mobile-footer-calendar-rail"
           calendarTestId="technician-mobile-footer-calendar"
         />
+        <MobileHubDotsBar />
       </footer>
     </div>
   );

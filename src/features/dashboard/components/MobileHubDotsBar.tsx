@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/core/i18n/I18nContext";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import {
   useMobileHubRailSnapshot,
   type MobileHubRailRegistration,
 } from "@/features/dashboard/MobileHubRailContext";
+import { MOBILE_HUB_RAIL_I18N } from "@/features/dashboard/dashboardMobileNav";
 import { MOBILE_HUB_DOTS_BAR_CLASS } from "@/core/ui/dashboardMobileLayout";
+import { cn } from "@/lib/utils";
 
 /** Délai avant de masquer les points quand aucun hub multi-rails n'est actif (hors transition). */
 const DOTS_HIDE_DELAY_MS = 250;
@@ -15,6 +18,7 @@ const DOTS_HIDE_DELAY_MS = 250;
 const DOTS_PAGE_TRANSITION_HOLD_MS = 500;
 
 export default function MobileHubDotsBar() {
+  const { t } = useTranslation();
   const visibleSnapshot = useMobileHubRailSnapshot();
   const pageSelectorOpen = useDashboardPageSelectorOptional()?.open ?? false;
   const pageIndex = useDashboardPagerOptional()?.pageIndex ?? 0;
@@ -48,13 +52,24 @@ export default function MobileHubDotsBar() {
   const activeIndex = showDots ? snapshot.rails.indexOf(snapshot.activeRail) : -1;
 
   return (
-    <div className={MOBILE_HUB_DOTS_BAR_CLASS} data-testid="mobile-hub-dots-bar" aria-hidden>
+    <div
+      className={cn(MOBILE_HUB_DOTS_BAR_CLASS, showDots && "mobile-hub-dots-bar--interactive")}
+      data-testid="mobile-hub-dots-bar"
+      role={showDots ? "tablist" : undefined}
+      aria-label={showDots ? String(t("mobile.rail_segment_label")) : undefined}
+    >
       {showDots ? (
         <div className="mobile-hub-dots">
           {snapshot.rails.map((rail, index) => (
-            <div
+            <button
               key={rail}
-              className={`mobile-hub-dot${index === activeIndex ? " mobile-hub-dot--active" : ""}`}
+              type="button"
+              role="tab"
+              aria-selected={index === activeIndex}
+              aria-label={String(t(MOBILE_HUB_RAIL_I18N[rail]))}
+              data-testid={`mobile-hub-dot-${rail}`}
+              className={cn("mobile-hub-dot", index === activeIndex && "mobile-hub-dot--active")}
+              onClick={() => snapshot.requestRail(rail)}
             />
           ))}
         </div>

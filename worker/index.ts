@@ -6,7 +6,10 @@ import {
   firebasePublicConfig,
   isFirebasePublicConfigured,
 } from "../src/features/notifications/firebasePublicConfig";
-import { resolvePushNotificationOpenUrl } from "../src/features/notifications/resolvePushNotificationOpenUrl";
+import {
+  pickPushNotificationWindowClient,
+  resolvePushNotificationOpenUrl,
+} from "../src/features/notifications/resolvePushNotificationOpenUrl";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -69,9 +72,11 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      const existing = clientList.find((c) => c.url.startsWith(self.location.origin)) as
-        | WindowClient
-        | undefined;
+      const existing = pickPushNotificationWindowClient(
+        clientList,
+        targetUrl,
+        self.location.origin
+      ) as WindowClient | undefined;
       if (existing?.navigate) {
         return existing.navigate(targetUrl).then(() => existing.focus());
       }

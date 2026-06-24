@@ -46,6 +46,19 @@ export function parseClientNotificationData(
 
 export function dispatchClientNotificationIntent(intent: ClientNotificationIntent): void {
   if (typeof window === "undefined" || intent.kind === "none") return;
+
+  if (!window.location.pathname.startsWith(CLIENT_MOBILE_APP_ROUTE)) {
+    const params = new URLSearchParams();
+    if (intent.kind === "chat") {
+      params.set(BM_CLIENT_CHAT_PARAM, intent.caseId ?? "open");
+    } else {
+      params.set(BM_CLIENT_CASE_PARAM, intent.caseId);
+    }
+    const qs = params.toString();
+    window.location.assign(`${CLIENT_MOBILE_APP_ROUTE}${qs ? `?${qs}` : ""}`);
+    return;
+  }
+
   window.dispatchEvent(
     new CustomEvent<ClientNotificationIntent>(CLIENT_NOTIFICATION_INTENT_EVENT, {
       detail: intent,
