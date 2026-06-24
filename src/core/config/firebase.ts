@@ -87,6 +87,8 @@ const clientPortalAuth = clientPortalApp ? getAuth(clientPortalApp) : null;
 /** Firestore lié à `clientPortalAuth` (même jeton que la connexion portail client). */
 const clientPortalFirestore = clientPortalApp ? getOrInitFirestore(clientPortalApp) : null;
 const storage = app ? getStorage(app) : null;
+/** Storage lié à `clientPortalAuth` (même jeton que le portail demandeur). */
+const clientPortalStorage = clientPortalApp ? getStorage(clientPortalApp) : null;
 
 /** Persistence IndexedDB — PWA premium (tous appareils). */
 if (typeof window !== "undefined" && firestore && process.env.NODE_ENV === "production") {
@@ -108,5 +110,6 @@ export {
   auth,
   clientPortalAuth,
   storage,
+  clientPortalStorage,
   isConfigured,
 };
