@@ -51,6 +51,7 @@ export default function MapHubMobileTripleLayout({
       centerPadding={false}
       rightPadding={false}
       mobileSideScroll={false}
+      mobileInitialRail="right"
       onRailChange={onRailChange}
       left={mapRail}
       center={
