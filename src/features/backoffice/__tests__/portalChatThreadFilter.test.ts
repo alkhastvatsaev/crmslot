@@ -25,9 +25,9 @@ describe("filterPortalChatMessagesForThread", () => {
     expect(filterPortalChatMessagesForThread(rows, "")).toHaveLength(4);
   });
 
-  it("dossier client — messages du dossier + staff sans tag", () => {
+  it("dossier client — messages taggés sur le même dossier", () => {
     const filtered = filterPortalChatMessagesForThread(rows, "iv-1");
-    expect(filtered.map((r) => r.id)).toEqual(["1", "2", "3"]);
+    expect(filtered.map((r) => r.id)).toEqual(["1", "2"]);
   });
 
   it("n'inclut pas les messages client d'un autre dossier", () => {

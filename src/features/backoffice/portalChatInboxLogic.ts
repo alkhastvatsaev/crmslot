@@ -1,20 +1,25 @@
 import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
 import type { Intervention } from "@/features/interventions";
+import {
+  coerceFirestoreLikeDate,
+  formatScheduledTimeOnly,
+  interventionClientLabel,
+  interventionMatchesTab,
+} from "@/features/interventions/technicianSchedule";
 
 /** Fil global legacy (tous les messages sans dossier). */
 export const PORTAL_CHAT_GLOBAL_THREAD_ID = "global";
 export const PORTAL_CHAT_SENDER_THREAD_PREFIX = "__sender__:";
 
-/** Clé de fil inbox admin — dossier, client anonyme global, ou chat global agrégé. */
+/** Inbox admin : un fil par client (`senderUid`), tous dossiers confondus. */
 export function portalChatPickerThreadId(
   msg: Pick<PortalChatDoc, "interventionId" | "senderUid" | "role">
 ): string {
-  const ivId = msg.interventionId?.trim();
-  if (ivId) return ivId;
   if (msg.role !== "client") return PORTAL_CHAT_GLOBAL_THREAD_ID;
   const uid = msg.senderUid?.trim();
-  return uid ? `${PORTAL_CHAT_SENDER_THREAD_PREFIX}${uid}` : PORTAL_CHAT_GLOBAL_THREAD_ID;
+  if (uid) return `${PORTAL_CHAT_SENDER_THREAD_PREFIX}${uid}`;
+  return PORTAL_CHAT_GLOBAL_THREAD_ID;
 }
 
 export function isPortalChatSenderThreadId(threadId: string): boolean {
@@ -27,11 +32,44 @@ export function portalChatSenderUidFromThreadId(threadId: string): string | null
   return uid || null;
 }
 
-/** Ajoute une ligne par client portail (même sans dossier intervention chargé). */
+/** Historique complet d’un client portail (messages + réponses staff sur ses dossiers). */
+export function filterPortalChatMessagesForSenderUid(
+  rows: PortalChatDoc[],
+  senderUid: string
+): PortalChatDoc[] {
+  const uid = senderUid.trim();
+  if (!uid) return [];
+
+  const clientIvIds = new Set<string>();
+  for (const r of rows) {
+    if (r.role !== "client") continue;
+    if ((r.senderUid ?? "").trim() !== uid) continue;
+    const iv = r.interventionId?.trim();
+    if (iv) clientIvIds.add(iv);
+  }
+
+  const clientOnlyGlobal = clientIvIds.size === 0;
+
+  return rows.filter((r) => {
+    const iv = r.interventionId?.trim();
+    if (r.role === "client") return (r.senderUid ?? "").trim() === uid;
+    if (!iv) return clientOnlyGlobal;
+    return clientIvIds.has(iv);
+  });
+}
+
+export type EnrichChatDayRowsOptions = {
+  interventions?: Intervention[];
+  selectedDate?: Date;
+};
+
+/** Une ligne par client portail — nom + adresse du dernier dossier connu. */
 export function enrichChatDayRowsFromPortalMessages(
   rows: ChatDayMissionRow[],
-  messages: PortalChatDoc[]
+  messages: PortalChatDoc[],
+  options: EnrichChatDayRowsOptions = {}
 ): ChatDayMissionRow[] {
+  const { interventions = [], selectedDate = new Date() } = options;
   const byThread = new Map(rows.map((r) => [r.threadId, r]));
   const latestClientByThread = new Map<string, PortalChatDoc>();
 
@@ -47,29 +85,31 @@ export function enrichChatDayRowsFromPortalMessages(
   for (const [threadId, msg] of latestClientByThread) {
     if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) continue;
     const senderName = msg.senderName?.trim() ?? "";
+    const ivId = msg.interventionId?.trim();
+    const iv = ivId ? interventions.find((x) => x.id === ivId) : undefined;
     const existing = byThread.get(threadId);
     if (existing) {
       if (!existing.clientName.trim() && senderName) {
-        byThread.set(threadId, { ...existing, clientName: senderName });
+        byThread.set(threadId, {
+          ...existing,
+          clientName: senderName,
+          ...(iv && !existing.address ? { address: iv.address } : {}),
+        });
       }
       continue;
     }
     byThread.set(threadId, {
       threadId,
       clientName: senderName,
-      time: "",
-      isToday: false,
+      time: iv ? formatScheduledTimeOnly(iv) : "",
+      address: iv?.address,
+      statusCode: iv?.status,
+      isToday: iv ? interventionMatchesTab(iv, "today", selectedDate) : false,
     });
   }
 
-  return sortChatDayRows([...byThread.values()]);
+  return sortChatDayRows([...byThread.values()], selectedDate);
 }
-import {
-  coerceFirestoreLikeDate,
-  formatScheduledTimeOnly,
-  interventionClientLabel,
-  interventionMatchesTab,
-} from "@/features/interventions/technicianSchedule";
 
 export function portalChatThreadKey(interventionId?: string | null): string {
   const ivId = interventionId?.trim();
@@ -91,22 +131,22 @@ export function interventionIdsWithClientPortalChat(messages: PortalChatDoc[]): 
   return [...ids];
 }
 
-/**
- * Fils dont le dernier message est du client → à traiter par le back-office.
- * Inclut le chat global et les dossiers hors « journée ».
- */
+/** Fils dont le dernier message est du client → badge inbox. */
 export function countClientPortalThreadsNeedingReply(messages: PortalChatDoc[]): number {
-  const byThread = new Map<string, PortalChatDoc[]>();
+  const threadIds = new Set<string>();
   for (const m of messages) {
-    const key = portalChatThreadKey(m.interventionId);
-    const bucket = byThread.get(key) ?? [];
-    bucket.push(m);
-    byThread.set(key, bucket);
+    if (m.role !== "client") continue;
+    threadIds.add(portalChatPickerThreadId(m));
   }
 
   let count = 0;
-  for (const thread of byThread.values()) {
-    const sorted = [...thread].sort(
+  for (const threadId of threadIds) {
+    if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) continue;
+    const senderUid = portalChatSenderUidFromThreadId(threadId);
+    const threadMessages = senderUid
+      ? filterPortalChatMessagesForSenderUid(messages, senderUid)
+      : messages.filter((m) => !m.interventionId?.trim());
+    const sorted = [...threadMessages].sort(
       (a, b) => portalChatMessageTimeMs(a) - portalChatMessageTimeMs(b)
     );
     const last = sorted[sorted.length - 1];

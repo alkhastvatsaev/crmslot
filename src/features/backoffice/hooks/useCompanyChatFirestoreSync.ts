@@ -7,6 +7,7 @@ import {
   type MutableRefObject,
   type SetStateAction,
 } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
 import { toast } from "sonner";
@@ -38,57 +39,74 @@ export function useCompanyChatFirestoreSync(
   useEffect(() => {
     fsHydratedRef.current = false;
     seenFsIdsRef.current.clear();
-  }, [companyIdTrimmed]);
+  }, [companyIdTrimmed, chatInterventionId]);
 
   useEffect(() => {
-    if (!firestoreSyncEnabled || !chatDb || !companyIdTrimmed) return;
+    if (!firestoreSyncEnabled || !chatDb || !companyIdTrimmed || !chatAuth) return;
 
-    const unsub = subscribePortalChatMessages(
-      chatDb,
-      companyIdTrimmed,
-      (rows) => {
-        const filteredRows = filterPortalChatMessagesForThread(rows, chatInterventionId);
-        const mapped = mapPortalChatRowsToMessages(filteredRows);
+    let unsubMessages: (() => void) | undefined;
 
-        if (!fsHydratedRef.current) {
-          fsHydratedRef.current = true;
-          rows.forEach((r) => seenFsIdsRef.current.add(r.id));
-        }
+    const unsubAuth = onAuthStateChanged(chatAuth, (user) => {
+      unsubMessages?.();
+      unsubMessages = undefined;
+      fsHydratedRef.current = false;
+      seenFsIdsRef.current.clear();
 
-        const uid = chatAuth?.currentUser?.uid;
-        const newDocs = rows.filter((r) => !seenFsIdsRef.current.has(r.id));
-        newDocs.forEach((r) => seenFsIdsRef.current.add(r.id));
-        if (
-          onRemoteClientMessage &&
-          uid &&
-          newDocs.some((r) => r.role === "client" && r.senderUid !== uid)
-        ) {
-          onRemoteClientMessage();
-        }
-
-        setMessages((prev) =>
-          mergeCompanyChatWithOptimistic({
-            mapped,
-            filteredRows,
-            prev,
-            pendingDocIdRef: pendingDocIdRef.current,
-            welcome: companyChatWelcome(t),
-          })
-        );
-      },
-      (err) => {
-        logger.error("[CompanyChatPanel] Firestore chat", {
-          error: err instanceof Error ? err.message : String(err),
-        });
-        const description = isFirestorePermissionDenied(err)
-          ? t("chat.profile_permission_denied")
-          : err instanceof Error
-            ? err.message
-            : t("chat.toast_send_failed");
-        toast.error("Chat", { description: String(description) });
+      if (!user) {
+        setMessages([companyChatWelcome(t)]);
+        return;
       }
-    );
-    return unsub;
+
+      unsubMessages = subscribePortalChatMessages(
+        chatDb,
+        companyIdTrimmed,
+        (rows) => {
+          const filteredRows = filterPortalChatMessagesForThread(rows, chatInterventionId);
+          const mapped = mapPortalChatRowsToMessages(filteredRows);
+
+          if (!fsHydratedRef.current) {
+            fsHydratedRef.current = true;
+            rows.forEach((r) => seenFsIdsRef.current.add(r.id));
+          }
+
+          const uid = user.uid;
+          const newDocs = rows.filter((r) => !seenFsIdsRef.current.has(r.id));
+          newDocs.forEach((r) => seenFsIdsRef.current.add(r.id));
+          if (
+            onRemoteClientMessage &&
+            newDocs.some((r) => r.role === "client" && r.senderUid !== uid)
+          ) {
+            onRemoteClientMessage();
+          }
+
+          setMessages((prev) =>
+            mergeCompanyChatWithOptimistic({
+              mapped,
+              filteredRows,
+              prev,
+              pendingDocIdRef: pendingDocIdRef.current,
+              welcome: companyChatWelcome(t),
+            })
+          );
+        },
+        (err) => {
+          logger.error("[CompanyChatPanel] Firestore chat", {
+            error: err instanceof Error ? err.message : String(err),
+          });
+          const description = isFirestorePermissionDenied(err)
+            ? t("chat.profile_permission_denied")
+            : err instanceof Error
+              ? err.message
+              : t("chat.toast_send_failed");
+          toast.error("Chat", { description: String(description) });
+        }
+      );
+    });
+
+    return () => {
+      unsubAuth();
+      unsubMessages?.();
+    };
   }, [
     firestoreSyncEnabled,
     companyIdTrimmed,
