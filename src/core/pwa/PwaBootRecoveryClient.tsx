@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { isRecoverableClientBootError, runPwaBootRecovery } from "@/core/pwa/pwaBootRecovery";
+import { isRecoverableClientBootError, runPwaBootRecovery } from "@/core/pwa/pwaBootRecoveryCore";
 import { readDeployedGitSha } from "@/core/pwa/pwaBundleUpdate";
 
 /** Écoute ChunkLoadError + mismatch SHA après hydratation (secours du script beforeInteractive). */
