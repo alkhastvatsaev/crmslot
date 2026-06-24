@@ -18,9 +18,11 @@ import {
   type FcmUiStatus,
   handleFcmSyncError,
   isPushServiceWorkerEnabled,
+  isWebPushDeliveryCapable,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
 } from "@/features/notifications/fcmWebPush";
+import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
 export type ClientPortalPushApi = {
@@ -165,6 +167,11 @@ export function useClientPortalPushMessaging(
             return;
           }
 
+          if (!isWebPushDeliveryCapable()) {
+            setStatus("unsupported");
+            return;
+          }
+
           if (!isPushServiceWorkerEnabled()) {
             setStatus("idle");
             return;
@@ -186,6 +193,14 @@ export function useClientPortalPushMessaging(
     };
   }, [enabled, vapidKey, syncTokenForUser]);
 
+  usePushTokenResyncOnResume(() => {
+    const uid = auth?.currentUser?.uid;
+    if (!uid || typeof Notification === "undefined" || Notification.permission !== "granted")
+      return;
+    if (!isWebPushDeliveryCapable()) return;
+    void syncTokenForUser(uid).catch(() => null);
+  }, enabled);
+
   const registerPush = useCallback(async () => {
     const uid = auth?.currentUser?.uid;
     if (!uid) {
@@ -206,6 +221,10 @@ export function useClientPortalPushMessaging(
       setStatus("registering");
       setLastError(null);
       if (typeof Notification === "undefined") {
+        setStatus("unsupported");
+        return;
+      }
+      if (!isWebPushDeliveryCapable()) {
         setStatus("unsupported");
         return;
       }

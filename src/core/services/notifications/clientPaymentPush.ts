@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { clientNotificationCaseUrl } from "@/features/notifications/clientNotificationUrls";
-import { resolveAndroidPushChannelId } from "@/features/notifications/androidPushChannels";
+import { buildFcmSendPayload } from "@/features/notifications/buildFcmSendPayload";
 
 async function listFcmTokens(uid: string): Promise<string[]> {
   const snap = await getAdminDb().collection("users").doc(uid).collection("fcm_tokens").get();
@@ -29,24 +29,21 @@ export async function notifyClientPaymentReceived(
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     "http://localhost:3000";
 
-  await admin.messaging().sendEachForMulticast({
-    tokens,
-    notification: {
-      title: "Paiement enregistré",
-      body: "Merci — votre paiement a bien été reçu.",
-    },
+  const payload = buildFcmSendPayload({
+    title: "Paiement enregistré",
+    body: "Merci — votre paiement a bien été reçu.",
     data: {
       type: "payment_received",
       interventionId,
     },
-    android: {
-      priority: "high",
-      notification: {
-        channelId: resolveAndroidPushChannelId({ type: "payment_received" }),
-        sound: "default",
-      },
-    },
+    origin,
+  });
+
+  await admin.messaging().sendEachForMulticast({
+    tokens,
+    ...payload,
     webpush: {
+      ...payload.webpush,
       fcmOptions: {
         link: `${clientNotificationCaseUrl(origin, interventionId)}&payment=success`,
       },
