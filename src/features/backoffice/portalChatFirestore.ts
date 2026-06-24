@@ -11,7 +11,10 @@ import {
   type Query,
   type QuerySnapshot,
 } from "firebase/firestore";
-import { portalChatMessageTimeMs } from "@/features/backoffice/portalChatInboxLogic";
+import {
+  normalizePortalChatInterventionId,
+  portalChatMessageTimeMs,
+} from "@/features/backoffice/portalChatInboxLogic";
 
 /** Collection Firestore — nom historique conservé (`portal_ivana_chat_messages`). */
 export const PORTAL_CHAT_COLLECTION = "portal_ivana_chat_messages";
@@ -37,7 +40,12 @@ const CHAT_PAGE_SIZE = 500;
 function mapPortalChatSnapshot(snap: QuerySnapshot): PortalChatDoc[] {
   return snap.docs.map((d) => {
     const data = d.data() as Omit<PortalChatDoc, "id">;
-    return { id: d.id, ...data } as PortalChatDoc;
+    const interventionId = normalizePortalChatInterventionId(data.interventionId);
+    return {
+      id: d.id,
+      ...data,
+      ...(interventionId ? { interventionId } : { interventionId: undefined }),
+    } as PortalChatDoc;
   });
 }
 
@@ -159,7 +167,7 @@ export async function sendPortalChatMessage(
     imageUrls?: string[];
   }
 ): Promise<string> {
-  const ivId = params.interventionId?.trim();
+  const ivId = normalizePortalChatInterventionId(params.interventionId);
   const senderName = params.senderName?.trim();
   const ref = await addDoc(collection(db, PORTAL_CHAT_COLLECTION), {
     companyId: params.companyId.trim(),

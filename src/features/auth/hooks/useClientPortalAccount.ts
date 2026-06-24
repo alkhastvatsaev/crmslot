@@ -19,9 +19,11 @@ export function isVerifiedClientPortalUser(user: User | null): user is User {
   return Boolean(user && !user.isAnonymous && user.emailVerified);
 }
 
-/** Chat portail : invité anonyme Firebase ou compte email vérifié. */
+/** Chat portail : invité anonyme ou compte email (vérification non bloquante). */
 export function isClientPortalChatUser(user: User | null): user is User {
-  return Boolean(user && (user.isAnonymous || isVerifiedClientPortalUser(user)));
+  if (!user) return false;
+  if (user.isAnonymous) return true;
+  return Boolean(user.email?.trim());
 }
 
 export function useClientPortalAccount() {

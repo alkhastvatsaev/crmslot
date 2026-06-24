@@ -60,6 +60,7 @@ export async function notifyStaffPortalChatAdmin(params: {
           companyId,
           [BM_BACKOFFICE_CHAT_PARAM]:
             params.chatThreadId?.trim() || params.interventionId?.trim() || "global",
+          ...(params.chatThreadId?.trim() ? { chatThreadId: params.chatThreadId.trim() } : {}),
           ...(params.interventionId?.trim()
             ? { interventionId: params.interventionId.trim() }
             : {}),
