@@ -13,6 +13,8 @@ import {
   resolvePushServiceWorkerRegistration,
 } from "@/features/notifications/fcmWebPush";
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
+import { parseBackofficeChatNotificationData } from "@/features/notifications/backofficeChatNotificationUrls";
+import { dispatchBackofficeChatNotificationIntent } from "@/features/notifications/backofficeChatNotificationIntent";
 
 export type BackofficePushApi = {
   status: FcmUiStatus;
@@ -41,6 +43,13 @@ export function useBackofficePushMessaging(
     unsubForegroundRef.current = onMessage(messaging, (payload) => {
       const title = payload.notification?.title ?? "CRMSLOT";
       const body = payload.notification?.body ?? "";
+      const data = (payload.data ?? {}) as Record<string, string | undefined>;
+      const chatIntent = parseBackofficeChatNotificationData(data);
+      if (chatIntent.kind !== "none") {
+        toast.message(title, { description: body });
+        dispatchBackofficeChatNotificationIntent(chatIntent);
+        return;
+      }
       toast.message(title, { description: body });
     });
   }, []);

@@ -4,6 +4,7 @@ import {
   channelAllowed,
   normalizeNotificationPreferences,
 } from "@/features/notifications/notificationPreferences";
+import { BM_BACKOFFICE_CHAT_PARAM } from "@/features/notifications/notificationConstants";
 import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 import { logger } from "@/core/logger";
 
@@ -50,6 +51,7 @@ export async function notifyStaffPortalChatAdmin(params: {
           type: "portal_chat",
           audience: "staff",
           companyId,
+          [BM_BACKOFFICE_CHAT_PARAM]: params.interventionId?.trim() || "global",
           ...(params.interventionId?.trim()
             ? { interventionId: params.interventionId.trim() }
             : {}),
