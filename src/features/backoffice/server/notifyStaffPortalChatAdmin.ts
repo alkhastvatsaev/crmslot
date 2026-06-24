@@ -30,6 +30,11 @@ export async function notifyStaffPortalChatAdmin(params: {
   const staff = await listCompanyStaff(params.db, params.auth, companyId);
   const recipients = staff.filter((m) => m.active && m.uid.trim() !== senderUid);
 
+  if (recipients.length === 0) {
+    logger.warn("[notifyStaffPortalChatAdmin] aucun destinataire staff actif", { companyId });
+    return { notified: 0 };
+  }
+
   const title = params.clientLabel?.trim()
     ? `Message client — ${params.clientLabel.trim()}`
     : "Nouveau message client";
@@ -47,6 +52,7 @@ export async function notifyStaffPortalChatAdmin(params: {
         uid,
         title,
         body,
+        audiences: ["backoffice", "technician"],
         data: {
           type: "portal_chat",
           audience: "staff",

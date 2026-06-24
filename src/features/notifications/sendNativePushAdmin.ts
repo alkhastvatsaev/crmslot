@@ -3,12 +3,16 @@ import "@/core/config/firebase-admin";
 import { isFirebaseAdminReady, getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
 
+export type FcmTokenAudience = "technician" | "client" | "backoffice";
+
 export type SendNativePushParams = {
   uid: string;
   title: string;
   body: string;
   /** Données passées dans le payload — disponibles dans le handler de clic Capacitor. */
   data?: Record<string, string>;
+  /** Limite l'envoi aux jetons de ces audiences (ex. staff admin, pas portail client). */
+  audiences?: readonly FcmTokenAudience[];
 };
 
 export type SendNativePushResult = {
@@ -37,10 +41,19 @@ export async function sendNativePushToUser(
 
   const messaging = admin.messaging();
 
+  const allowedAudiences = params.audiences?.length
+    ? new Set<FcmTokenAudience>(params.audiences)
+    : null;
+
   for (const docSnap of tokensSnap.docs) {
     const data = docSnap.data();
     const token = String(data?.token ?? "");
     if (!token) continue;
+
+    if (allowedAudiences) {
+      const rawAudience = typeof data?.audience === "string" ? data.audience.trim() : "";
+      if (rawAudience && !allowedAudiences.has(rawAudience as FcmTokenAudience)) continue;
+    }
 
     try {
       await messaging.send({

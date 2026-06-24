@@ -89,6 +89,32 @@ export async function requireAuthenticatedUser(
   return { uid: decoded.uid, decoded };
 }
 
+/**
+ * Routes `/api/portal-chat/*` — invités anonymes autorisés en production
+ * (chat portail demande). Le contrôle d'accès société reste côté handler.
+ */
+export async function requirePortalChatApiUser(
+  request: Request
+): Promise<AuthenticatedRequest | AuthGuardFailure> {
+  if (!admin.apps.length) {
+    return {
+      response: NextResponse.json(
+        { ok: false, error: "Firebase Admin non configuré (variables serveur manquantes)." },
+        { status: 503 }
+      ),
+    };
+  }
+
+  const decoded = await verifyBearerFromRequest(request);
+  if (!decoded) {
+    return {
+      response: NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 }),
+    };
+  }
+
+  return { uid: decoded.uid, decoded };
+}
+
 export function isAnonymousFirebaseUser(decoded: admin.auth.DecodedIdToken): boolean {
   const provider = decoded.firebase?.sign_in_provider;
   return provider === "anonymous";
