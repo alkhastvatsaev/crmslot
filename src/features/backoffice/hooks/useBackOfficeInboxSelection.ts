@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import type { BackofficeInboxIntentApi } from "@/context/BackofficeInboxIntentContext";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import type { Intervention } from "@/features/interventions";
@@ -16,7 +17,10 @@ export function useBackOfficeInboxSelection({
   inboxIntent,
   logIntervention,
 }: SelectionArgs) {
-  const [activeTab, setActiveTab] = useState<BackOfficeInboxTab>("chat");
+  const mobileHubLayout = useMobileHubLayout();
+  const [activeTab, setActiveTab] = useState<BackOfficeInboxTab>(() =>
+    mobileHubLayout ? "requests" : "chat"
+  );
   const [selectedItemId, setSelectedItemIdLocal] = useState<string | null>(null);
   const [selectedChatInterventionId, setSelectedChatInterventionId] = useState<string | null>(null);
   const [dragBoardTechUid, setDragBoardTechUid] = useState("");
