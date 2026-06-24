@@ -20,11 +20,17 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
     resolvedClaimsCompanyId,
   } = useCompanyWorkspaceMemberships(firebaseUid, initialActiveCompanyId);
 
+  const membershipCompanyIds = useMemo(
+    () => memberships.map((m) => m.companyId.trim()).filter(Boolean),
+    [memberships]
+  );
+
   const { membershipJoinPending, membershipJoinError, retryDefaultCompanyJoin } =
     useCompanyWorkspaceJoin({
       authLoading,
       membershipsReady,
       membershipsLength: memberships.length,
+      membershipCompanyIds,
       firebaseUid,
     });
 

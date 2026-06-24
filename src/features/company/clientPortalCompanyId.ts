@@ -28,15 +28,34 @@ export function resolveClientPortalInterventionCompanyId(
   return null;
 }
 
-/** Société du chat portail client — jamais la société tenant admin active. */
+/**
+ * Société du chat portail — source unique client + staff.
+ * En phase test (`NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID`), l’env prime sur un
+ * profil portail périmé (ex. ancienne société ABC supprimée).
+ */
 export function resolvePortalChatCompanyId(linkedPortalCompanyId?: string | null): string | null {
-  const linked = (linkedPortalCompanyId ?? "").trim();
-  if (linked) return linked;
-
   const envDefault = readClientPortalDefaultCompanyIdFromEnv();
   if (envDefault) return envDefault;
 
+  const linked = (linkedPortalCompanyId ?? "").trim();
+  if (linked) return linked;
+
   return null;
+}
+
+/** Sociétés Firestore à écouter pour le chat inbox staff (aligné sur `resolvePortalChatCompanyId`). */
+export function resolvePortalChatInboxCompanyIds(
+  workspace:
+    | Pick<CompanyWorkspaceApi, "isTenantUser" | "activeCompanyId" | "memberships">
+    | null
+    | undefined
+): string[] {
+  if (!workspace?.isTenantUser) return [];
+
+  const envDefault = readClientPortalDefaultCompanyIdFromEnv();
+  if (envDefault) return [envDefault];
+
+  return resolveBackofficeInboxCompanyIds(workspace);
 }
 
 /** Sociétés à écouter dans l'inbox chat portail (carte / dispatch). */

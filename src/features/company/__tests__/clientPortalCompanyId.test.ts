@@ -116,15 +116,42 @@ describe("resolvePortalChatCompanyId", () => {
     process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = original;
   });
 
-  it("prefers linked portal company over env default", async () => {
+  it("prefers env default over stale linked portal profile", async () => {
     process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = "env-co";
     const { resolvePortalChatCompanyId } = await import("@/features/company/clientPortalCompanyId");
-    expect(resolvePortalChatCompanyId("linked-co")).toBe("linked-co");
+    expect(resolvePortalChatCompanyId("linked-co")).toBe("env-co");
   });
 
   it("falls back to env default", async () => {
     process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = "env-co";
     const { resolvePortalChatCompanyId } = await import("@/features/company/clientPortalCompanyId");
     expect(resolvePortalChatCompanyId(null)).toBe("env-co");
+  });
+
+  it("uses linked portal company when env default is unset", async () => {
+    delete process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID;
+    const { resolvePortalChatCompanyId } = await import("@/features/company/clientPortalCompanyId");
+    expect(resolvePortalChatCompanyId("linked-co")).toBe("linked-co");
+  });
+});
+
+describe("resolvePortalChatInboxCompanyIds", () => {
+  const original = process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID;
+
+  afterEach(() => {
+    process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = original;
+  });
+
+  it("listens to env default for staff even with legacy membership only", async () => {
+    process.env.NEXT_PUBLIC_CLIENT_PORTAL_DEFAULT_COMPANY_ID = "env-co";
+    const { resolvePortalChatInboxCompanyIds } =
+      await import("@/features/company/clientPortalCompanyId");
+    expect(
+      resolvePortalChatInboxCompanyIds({
+        isTenantUser: true,
+        activeCompanyId: "legacy-co",
+        memberships: [{ companyId: "legacy-co", role: "admin" }],
+      } as never)
+    ).toEqual(["env-co"]);
   });
 });

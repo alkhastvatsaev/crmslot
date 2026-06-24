@@ -1,20 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { auth } from "@/core/config/firebase";
 import { requestDefaultCompanyMembership } from "@/features/auth";
+import { readClientPortalDefaultCompanyIdFromEnv } from "@/features/company/clientPortalCompanyId";
 
 export function useCompanyWorkspaceJoin({
   authLoading,
   membershipsReady,
   membershipsLength,
+  membershipCompanyIds,
   firebaseUid,
 }: {
   authLoading: boolean;
   membershipsReady: boolean;
   membershipsLength: number;
+  membershipCompanyIds: string[];
   firebaseUid: string | null;
 }) {
+  const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
+  const missingEnvMembership = Boolean(
+    envDefaultCompanyId &&
+    membershipsReady &&
+    membershipsLength > 0 &&
+    !membershipCompanyIds.includes(envDefaultCompanyId)
+  );
+  const missingAnyMembership = membershipsReady && membershipsLength === 0;
+  const shouldJoinDefault = missingAnyMembership || missingEnvMembership;
   const [membershipJoinPending, setMembershipJoinPending] = useState(false);
   const [membershipJoinError, setMembershipJoinError] = useState<string | null>(null);
 
@@ -36,7 +48,7 @@ export function useCompanyWorkspaceJoin({
   }, []);
 
   useEffect(() => {
-    if (!auth || authLoading || !membershipsReady || membershipsLength > 0) return;
+    if (!auth || authLoading || !membershipsReady || !shouldJoinDefault) return;
     const user = auth.currentUser;
     if (!user || user.isAnonymous) return;
 
@@ -75,7 +87,7 @@ export function useCompanyWorkspaceJoin({
       clearTimeout(joinTimeout);
       setMembershipJoinPending(false);
     };
-  }, [authLoading, membershipsReady, membershipsLength, firebaseUid]);
+  }, [authLoading, membershipsReady, shouldJoinDefault, firebaseUid]);
 
   useEffect(() => {
     if (membershipsLength > 0 && membershipJoinPending) {
