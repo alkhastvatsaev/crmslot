@@ -247,6 +247,7 @@
 
 .dashboard-page-selector-language--desktop {
   flex-shrink: 0;
+  margin-top: 5px;
 }
 
 .dashboard-page-selector-language-control {

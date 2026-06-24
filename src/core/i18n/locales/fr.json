@@ -2621,7 +2621,11 @@
     "rail_left": "Gauche",
     "rail_center": "Centre",
     "rail_right": "Droite",
-    "tab_ai": "IA"
+    "tab_ai": "IA",
+    "calendar_open_navigation": "Ouvrir la navigation",
+    "calendar_open_calendar": "Ouvrir le calendrier",
+    "calendar_prev_day": "Jour précédent",
+    "calendar_next_day": "Jour suivant"
   },
   "notifications": {
     "prefs_title": "Préférences de notifications",

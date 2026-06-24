@@ -1,8 +1,12 @@
 "use client";
 
 import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
-import { DASHBOARD_MOBILE_NAV_ICONS } from "@/features/dashboard/dashboardMobileNav";
+import {
+  DASHBOARD_MOBILE_NAV_ICONS,
+  MOBILE_TAB_I18N,
+} from "@/features/dashboard/dashboardMobileNav";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
+import { useTranslation } from "@/core/i18n/I18nContext";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
   MOBILE_HUB_PANEL_INNER_CLASS,
@@ -22,6 +26,7 @@ type Props = {
 
 export default function DashboardPageSelector({ onClose, variant = "mobile" }: Props) {
   const { pageIndex, setPageIndex } = useDashboardPager();
+  const { t } = useTranslation();
   const hubPages = getDashboardCarouselHubPages();
   const isDesktop = variant === "desktop";
 
@@ -69,7 +74,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
                 isDesktop ? "dashboard-page-selector-label" : "mobile-page-selector-label"
               )}
             >
-              {page.guideTitle}
+              {String(t(MOBILE_TAB_I18N[page.spotlightLabelKey]))}
             </span>
           </button>
         );
