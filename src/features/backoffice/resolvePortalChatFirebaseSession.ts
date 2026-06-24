@@ -1,10 +1,19 @@
 import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
-import { auth, clientPortalAuth, clientPortalFirestore, firestore } from "@/core/config/firebase";
+import type { FirebaseStorage } from "firebase/storage";
+import {
+  auth,
+  clientPortalAuth,
+  clientPortalFirestore,
+  clientPortalStorage,
+  firestore,
+  storage,
+} from "@/core/config/firebase";
 
 export type PortalChatFirebaseSession = {
   chatAuth: Auth | null;
   chatDb: Firestore | null;
+  chatStorage: FirebaseStorage | null;
 };
 
 /**
@@ -15,15 +24,16 @@ export function resolvePortalChatFirebaseSession(
   publishAsPortal: boolean
 ): PortalChatFirebaseSession {
   if (!publishAsPortal) {
-    return { chatAuth: auth, chatDb: firestore };
+    return { chatAuth: auth, chatDb: firestore, chatStorage: storage };
   }
 
   if (!clientPortalAuth) {
-    return { chatAuth: null, chatDb: null };
+    return { chatAuth: null, chatDb: null, chatStorage: null };
   }
 
   return {
     chatAuth: clientPortalAuth,
     chatDb: clientPortalFirestore ?? firestore,
+    chatStorage: clientPortalStorage ?? storage,
   };
 }

@@ -23,15 +23,16 @@ export async function uploadPortalChatImagesFromDataUrls(
   const trimmed = params.companyId.trim();
   if (!trimmed || params.dataUrls.length === 0) return [];
 
-  const urls: string[] = [];
-  for (let i = 0; i < params.dataUrls.length; i++) {
-    const blob = await dataUrlToBlob(params.dataUrls[i]);
-    const ext = extFromMime(blob.type);
-    const fileName = `${Date.now()}-${i}-${randomFileSuffix()}.${ext}`;
-    const r = ref(storage, `portal_ivana_chat/${trimmed}/${params.uid}/${fileName}`);
-    const contentType = blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg";
-    await uploadBytes(r, blob, { contentType });
-    urls.push(await getDownloadURL(r));
-  }
-  return urls;
+  const baseTs = Date.now();
+  return Promise.all(
+    params.dataUrls.map(async (dataUrl, i) => {
+      const blob = await dataUrlToBlob(dataUrl);
+      const ext = extFromMime(blob.type);
+      const fileName = `${baseTs}-${i}-${randomFileSuffix()}.${ext}`;
+      const r = ref(storage, `portal_ivana_chat/${trimmed}/${params.uid}/${fileName}`);
+      const contentType = blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg";
+      await uploadBytes(r, blob, { contentType });
+      return getDownloadURL(r);
+    })
+  );
 }

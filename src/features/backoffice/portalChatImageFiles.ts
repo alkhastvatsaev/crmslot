@@ -1,5 +1,10 @@
+import { compressImageToDataUrl } from "@/features/interventions/compressImageToDataUrl";
+
 const MAX_FILES = 6;
 const MAX_TOTAL = 6;
+/** Bord max + qualité JPEG — cible ~200–500 Ko par photo (upload chat). */
+const CHAT_IMAGE_MAX_EDGE = 1280;
+const CHAT_IMAGE_QUALITY = 0.78;
 
 export async function readPortalChatImageDataUrls(
   files: FileList | null,
@@ -13,16 +18,15 @@ export async function readPortalChatImageDataUrls(
   const remaining = Math.max(0, MAX_TOTAL - currentCount);
   const sliced = allowed.slice(0, Math.min(MAX_FILES, remaining));
 
-  const readOne = (file: File) =>
-    new Promise<string | null>((resolve) => {
-      const reader = new FileReader();
-      reader.onerror = () => resolve(null);
-      reader.onload = () => {
-        const v = reader.result;
-        resolve(typeof v === "string" ? v : null);
-      };
-      reader.readAsDataURL(file);
-    });
+  const compressed = await Promise.all(
+    sliced.map(async (file) => {
+      try {
+        return await compressImageToDataUrl(file, CHAT_IMAGE_MAX_EDGE, CHAT_IMAGE_QUALITY);
+      } catch {
+        return null;
+      }
+    })
+  );
 
-  return (await Promise.all(sliced.map(readOne))).filter(Boolean) as string[];
+  return compressed.filter(Boolean) as string[];
 }

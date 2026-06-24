@@ -4,7 +4,8 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import { toast } from "sonner";
 import type { Auth, User } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
-import { isConfigured, storage } from "@/core/config/firebase";
+import type { FirebaseStorage } from "firebase/storage";
+import { isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import { publishClientPortalMessage } from "@/features/backoffice/portalChatBridge";
 import { sendPortalChatMessage } from "@/features/backoffice/portalChatFirestore";
@@ -45,6 +46,7 @@ export function useCompanyChatSend({
   companyIdTrimmed,
   chatDb,
   chatAuth,
+  chatStorage,
   chatInterventionId,
   chatThreadId,
   portalChatRowsRef,
@@ -68,6 +70,7 @@ export function useCompanyChatSend({
   companyIdTrimmed: string;
   chatDb: Firestore | null;
   chatAuth: Auth | null;
+  chatStorage: FirebaseStorage | null;
   chatInterventionId: string | null;
   chatThreadId: string | null;
   portalChatRowsRef: MutableRefObject<PortalChatDoc[]>;
@@ -109,7 +112,7 @@ export function useCompanyChatSend({
         return;
       }
 
-      if (pendingImages.length > 0 && !storage) {
+      if (pendingImages.length > 0 && !chatStorage) {
         toast.error("Chat", {
           description: t("chat.toast_storage_unavailable"),
         });
@@ -151,8 +154,8 @@ export function useCompanyChatSend({
           ? chatInterventionId?.trim() || null
           : resolvePortalChatWriteInterventionId(chatThreadId, portalChatRowsRef.current, "staff");
         let imageUrls: string[] | undefined;
-        if (optimisticImages && optimisticImages.length > 0 && storage) {
-          imageUrls = await uploadPortalChatImagesFromDataUrls(storage, {
+        if (optimisticImages && optimisticImages.length > 0 && chatStorage) {
+          imageUrls = await uploadPortalChatImagesFromDataUrls(chatStorage, {
             companyId: companyIdTrimmed,
             uid: currentUser.uid,
             dataUrls: optimisticImages,
@@ -253,6 +256,7 @@ export function useCompanyChatSend({
     companyIdTrimmed,
     chatDb,
     chatAuth,
+    chatStorage,
     chatInterventionId,
     chatThreadId,
     portalChatRowsRef,

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { isConfigured, storage } from "@/core/config/firebase";
+import { isConfigured } from "@/core/config/firebase";
 import {
   PORTAL_CHAT_MESSAGE_EVENT,
   type ClientPortalChatPayload,
@@ -62,7 +62,7 @@ export function useCompanyChatPanel({
 
   const filterThreadId = chatThreadId ?? chatInterventionId;
 
-  const { chatAuth, chatDb } = useMemo(
+  const { chatAuth, chatDb, chatStorage } = useMemo(
     () => resolvePortalChatFirebaseSession(publishAsPortal),
     [publishAsPortal]
   );
@@ -74,7 +74,7 @@ export function useCompanyChatPanel({
   const firestoreSyncEnabled = Boolean(
     companyIdTrimmed && isConfigured && chatDb && portalAuthReady && portalProfileReady
   );
-  const attachImagesBlocked = Boolean(firestoreSyncEnabled && !storage);
+  const attachImagesBlocked = Boolean(firestoreSyncEnabled && !chatStorage);
 
   const storageKey = useMemo(
     () => `${COMPANY_CHAT_STORAGE_PREFIX}:${user?.uid ?? "anonymous"}`,
@@ -233,6 +233,7 @@ export function useCompanyChatPanel({
     companyIdTrimmed,
     chatDb,
     chatAuth,
+    chatStorage,
     chatInterventionId,
     chatThreadId: filterThreadId,
     portalChatRowsRef,
