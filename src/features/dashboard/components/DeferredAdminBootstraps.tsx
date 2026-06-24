@@ -39,12 +39,14 @@ function DeferredAdminBootstrapsInner() {
 
   if (!pushIntent && !idleReady) return null;
 
+  const pushBootstrapReady = isMobile === true || idleReady;
+
   return (
     <>
       {pushIntent || idleReady ? <BackofficeChatNotificationBootstrap /> : null}
+      {pushBootstrapReady ? <BackofficePushBootstrap /> : null}
       {idleReady ? (
         <>
-          <BackofficePushBootstrap />
           <AndroidAppInstallPromoBootstrap surface="admin" />
           <AuthActivityLogger />
           <ActivityLogPageObserver />

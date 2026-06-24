@@ -1,5 +1,6 @@
 import type * as admin from "firebase-admin";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
+import { companyAcceptsPublicInterventions } from "@/features/backoffice/server/companyAcceptsPublicInterventions";
 
 type Gate = { allowed: true } | { allowed: false; status: number; error: string };
 
@@ -26,6 +27,10 @@ export async function assertClientMayAccessPortalChat(
   const portalCompany =
     typeof portalSnap.data()?.companyId === "string" ? portalSnap.data()!.companyId.trim() : "";
   if (portalSnap.exists && portalCompany === trimmedCompany) {
+    return { allowed: true };
+  }
+
+  if (await companyAcceptsPublicInterventions(db, trimmedCompany)) {
     return { allowed: true };
   }
 

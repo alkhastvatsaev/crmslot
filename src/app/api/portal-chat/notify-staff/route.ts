@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
-import { requireAuthenticatedUser } from "@/core/api/routeAuth";
+import { requirePortalChatApiUser } from "@/core/api/routeAuth";
 import { assertClientMayAccessPortalChat } from "@/features/backoffice/server/assertClientMayAccessPortalChat";
 import { notifyStaffPortalChatAdmin } from "@/features/backoffice/server/notifyStaffPortalChatAdmin";
 import { logger } from "@/core/logger";
@@ -16,7 +16,7 @@ type Body = {
 };
 
 export async function POST(request: Request) {
-  const auth = await requireAuthenticatedUser(request);
+  const auth = await requirePortalChatApiUser(request);
   if ("response" in auth) return auth.response;
 
   let body: Body = {};

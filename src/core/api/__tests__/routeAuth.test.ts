@@ -7,6 +7,7 @@ import {
   blockIfProduction,
   requireAuthenticatedUser,
   requireAuthenticatedUserOrLocalDev,
+  requirePortalChatApiUser,
 } from "@/core/api/routeAuth";
 
 const verifyIdToken = jest.fn();
@@ -36,9 +37,25 @@ describe("requireAuthenticatedUser", () => {
     const result = await requireAuthenticatedUser(
       new Request("http://localhost/api/test", {
         headers: { authorization: "Bearer good-token" },
-      }),
+      })
     );
     expect("uid" in result && result.uid).toBe("user-1");
+  });
+});
+
+describe("requirePortalChatApiUser", () => {
+  it("allows anonymous Firebase users in production", async () => {
+    jest.replaceProperty(process, "env", { ...process.env, NODE_ENV: "production" });
+    verifyIdToken.mockResolvedValueOnce({
+      uid: "anon-1",
+      firebase: { sign_in_provider: "anonymous" },
+    });
+    const result = await requirePortalChatApiUser(
+      new Request("http://localhost/api/portal-chat/notify-staff", {
+        headers: { authorization: "Bearer anon-token" },
+      })
+    );
+    expect("uid" in result && result.uid).toBe("anon-1");
   });
 });
 
@@ -46,7 +63,7 @@ describe("requireAuthenticatedUserOrLocalDev", () => {
   it("allows local dev without Bearer when NODE_ENV is development", async () => {
     jest.replaceProperty(process, "env", { ...process.env, NODE_ENV: "development" });
     const result = await requireAuthenticatedUserOrLocalDev(
-      new Request("http://localhost/api/integrations/gmail/status"),
+      new Request("http://localhost/api/integrations/gmail/status")
     );
     expect("uid" in result && result.uid).toBe("local-dev-gmail");
   });
@@ -54,7 +71,7 @@ describe("requireAuthenticatedUserOrLocalDev", () => {
   it("returns 401 in production without Bearer", async () => {
     jest.replaceProperty(process, "env", { ...process.env, NODE_ENV: "production" });
     const result = await requireAuthenticatedUserOrLocalDev(
-      new Request("http://localhost/api/integrations/gmail/status"),
+      new Request("http://localhost/api/integrations/gmail/status")
     );
     expect("response" in result).toBe(true);
     if ("response" in result) expect(result.response.status).toBe(401);
@@ -83,7 +100,7 @@ describe("authorizeProcessUploads", () => {
   it("accepts matching upload secret", async () => {
     process.env.UPLOAD_AUTO_PROCESS_SECRET = "secret-1";
     const ok = await authorizeProcessUploads(
-      new Request("http://localhost", { headers: { "x-upload-auto-secret": "secret-1" } }),
+      new Request("http://localhost", { headers: { "x-upload-auto-secret": "secret-1" } })
     );
     expect(ok).toBe(true);
   });
@@ -112,8 +129,10 @@ describe("authorizeAudioDispatch", () => {
     expect(await authorizeAudioDispatch(new Request("http://localhost"))).toBe(false);
     expect(
       await authorizeAudioDispatch(
-        new Request("http://localhost", { headers: { "x-audio-dispatch-secret": "macrodroid-key" } }),
-      ),
+        new Request("http://localhost", {
+          headers: { "x-audio-dispatch-secret": "macrodroid-key" },
+        })
+      )
     ).toBe(true);
   });
 });
