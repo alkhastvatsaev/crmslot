@@ -3,6 +3,7 @@
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import { resolveStaffProfileRoleKey } from "@/features/auth/staffAccountRoleDisplay";
+import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   resolveTechnicianProfileFirstName,
