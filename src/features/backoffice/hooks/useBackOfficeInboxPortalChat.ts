@@ -9,9 +9,12 @@ import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFir
 import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import {
   countClientPortalThreadsNeedingReply,
+  enrichChatDayRowsFromPortalMessages,
   filterNewClientPortalMessages,
   interventionIdsWithClientPortalChat,
   portalChatMessageTimeMs,
+  portalChatPickerThreadId,
+  PORTAL_CHAT_GLOBAL_THREAD_ID,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
 import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
@@ -55,17 +58,16 @@ export function useBackOfficeInboxPortalChat({
   const portalChatHydratedRef = useRef(false);
   const [portalChatMessages, setPortalChatMessages] = useState<PortalChatDoc[]>([]);
 
-  const chatDayRows = useMemo(
-    () =>
-      buildChatDayRows({
-        interventions,
-        dayMissions,
-        selectedDate,
-        workspace,
-        includeInterventionIds: interventionIdsWithClientPortalChat(portalChatMessages),
-      }),
-    [dayMissions, interventions, selectedDate, workspace, portalChatMessages]
-  );
+  const chatDayRows = useMemo(() => {
+    const base = buildChatDayRows({
+      interventions,
+      dayMissions,
+      selectedDate,
+      workspace,
+      includeInterventionIds: interventionIdsWithClientPortalChat(portalChatMessages),
+    });
+    return enrichChatDayRowsFromPortalMessages(base, portalChatMessages);
+  }, [dayMissions, interventions, selectedDate, workspace, portalChatMessages]);
 
   const chatThreadsNeedingReply = useMemo(
     () => countClientPortalThreadsNeedingReply(portalChatMessages),
@@ -103,11 +105,13 @@ export function useBackOfficeInboxPortalChat({
       if (incoming.length === 0) return;
 
       setActiveTab("chat");
-      const ivId = incoming[incoming.length - 1]?.interventionId?.trim();
-      setSelectedChatInterventionId(ivId || "global");
-
-      const preview = incoming[incoming.length - 1]?.body?.trim() || "Nouveau message client";
-      showPortalChatBrowserNotification(chatTabLabel, preview, `portal-chat-${ivId || "global"}`);
+      const lastIncoming = incoming[incoming.length - 1];
+      const threadId = lastIncoming
+        ? portalChatPickerThreadId(lastIncoming)
+        : PORTAL_CHAT_GLOBAL_THREAD_ID;
+      setSelectedChatInterventionId(threadId);
+      const preview = lastIncoming?.body?.trim() || "Nouveau message client";
+      showPortalChatBrowserNotification(chatTabLabel, preview, `portal-chat-${threadId}`);
     };
 
     const unsubs = companyIds.map((companyId) =>
