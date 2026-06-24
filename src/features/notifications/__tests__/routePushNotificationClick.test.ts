@@ -2,9 +2,28 @@ import { routePushNotificationClick } from "@/features/notifications/routePushNo
 import { TECHNICIAN_NOTIFICATION_INTENT_EVENT } from "@/features/notifications/technicianNotificationIntent";
 import { CLIENT_NOTIFICATION_INTENT_EVENT } from "@/features/notifications/clientNotificationIntent";
 import { BACKOFFICE_CHAT_NOTIFICATION_INTENT_EVENT } from "@/features/notifications/backofficeChatNotificationIntent";
+import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company/clientMobileAppConstants";
+import * as pushNav from "@/features/notifications/pushNotificationNavigation";
+
+jest.mock("@/features/notifications/pushNotificationNavigation", () => ({
+  currentAppPathname: jest.fn(() => "/"),
+  isTechnicianAppPath: jest.fn((pathname = "") => pathname.startsWith("/m/technician")),
+  redirectToTechnicianApp: jest.fn(),
+  isClientAppPath: jest.fn((pathname = "") => pathname.startsWith("/m/demande")),
+  redirectToClientApp: jest.fn(),
+}));
+
+const pushNavMock = pushNav as jest.Mocked<typeof pushNav>;
 
 describe("routePushNotificationClick", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    pushNavMock.currentAppPathname.mockReturnValue("/");
+  });
+
   it("routes assignment to technician intent", () => {
+    pushNavMock.currentAppPathname.mockReturnValue(TECHNICIAN_MOBILE_APP_ROUTE);
     const handler = jest.fn();
     window.addEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, handler);
     routePushNotificationClick({ type: "assignment", interventionId: "iv-7" });
@@ -17,6 +36,7 @@ describe("routePushNotificationClick", () => {
   });
 
   it("routes portal chat client to client intent", () => {
+    pushNavMock.currentAppPathname.mockReturnValue(CLIENT_MOBILE_APP_ROUTE);
     const handler = jest.fn();
     window.addEventListener(CLIENT_NOTIFICATION_INTENT_EVENT, handler);
     routePushNotificationClick({

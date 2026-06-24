@@ -45,6 +45,45 @@ class ResizeObserverMock {
   disconnect(): void {}
 }
 
+class MockPointerEvent extends Event {
+  clientX: number;
+  clientY: number;
+  pointerId: number;
+  pointerType: string;
+  button: number;
+
+  constructor(
+    type: string,
+    init: {
+      bubbles?: boolean;
+      clientX?: number;
+      clientY?: number;
+      pointerId?: number;
+      pointerType?: string;
+      button?: number;
+    } = {}
+  ) {
+    super(type, { bubbles: init.bubbles ?? true });
+    this.clientX = init.clientX ?? 0;
+    this.clientY = init.clientY ?? 0;
+    this.pointerId = init.pointerId ?? 1;
+    this.pointerType = init.pointerType ?? "mouse";
+    this.button = init.button ?? 0;
+  }
+}
+
+if (typeof global.PointerEvent === "undefined") {
+  global.PointerEvent = MockPointerEvent as unknown as typeof PointerEvent;
+}
+if (typeof HTMLElement !== "undefined") {
+  if (!HTMLElement.prototype.setPointerCapture) {
+    HTMLElement.prototype.setPointerCapture = jest.fn();
+  }
+  if (!HTMLElement.prototype.releasePointerCapture) {
+    HTMLElement.prototype.releasePointerCapture = jest.fn();
+  }
+}
+
 global.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
 
 /** jsdom : blob URLs pour aperçus PDF / pièces jointes Gmail */

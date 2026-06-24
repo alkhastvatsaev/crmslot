@@ -6,8 +6,24 @@ import {
 } from "@/features/notifications/technicianNotificationIntent";
 import { BM_TECH_CASE_PARAM } from "@/features/notifications/notificationConstants";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+import * as pushNav from "@/features/notifications/pushNotificationNavigation";
+
+jest.mock("@/features/notifications/pushNotificationNavigation", () => ({
+  currentAppPathname: jest.fn(() => "/"),
+  isTechnicianAppPath: jest.fn((pathname = "") => pathname.startsWith("/m/technician")),
+  redirectToTechnicianApp: jest.fn(),
+  isClientAppPath: jest.fn(),
+  redirectToClientApp: jest.fn(),
+}));
+
+const pushNavMock = pushNav as jest.Mocked<typeof pushNav>;
 
 describe("technicianNotificationIntent", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    pushNavMock.currentAppPathname.mockReturnValue("/");
+  });
+
   it("parseTechnicianNotificationData reads bmTechCase", () => {
     expect(parseTechnicianNotificationData({ [BM_TECH_CASE_PARAM]: " iv-99 " })).toEqual({
       kind: "case",
@@ -27,12 +43,22 @@ describe("technicianNotificationIntent", () => {
     });
   });
 
-  it("dispatchTechnicianNotificationIntent emits custom event", () => {
+  it("dispatchTechnicianNotificationIntent emits custom event on terrain route", () => {
+    pushNavMock.currentAppPathname.mockReturnValue(TECHNICIAN_MOBILE_APP_ROUTE);
     const handler = jest.fn();
     window.addEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, handler);
     dispatchTechnicianNotificationIntent({ kind: "case", caseId: "abc" });
     window.removeEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, handler);
     expect(handler).toHaveBeenCalledTimes(1);
+    expect(pushNavMock.redirectToTechnicianApp).not.toHaveBeenCalled();
+  });
+
+  it("dispatchTechnicianNotificationIntent redirects outside terrain route", () => {
+    dispatchTechnicianNotificationIntent({ kind: "case", caseId: "abc" });
+    expect(pushNavMock.redirectToTechnicianApp).toHaveBeenCalledTimes(1);
+    expect(pushNavMock.redirectToTechnicianApp.mock.calls[0][0].get(BM_TECH_CASE_PARAM)).toBe(
+      "abc"
+    );
   });
 
   it("applyTechnicianNotificationIntent clears URL on terrain route", () => {

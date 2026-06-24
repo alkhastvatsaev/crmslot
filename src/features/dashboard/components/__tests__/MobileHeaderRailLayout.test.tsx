@@ -2,13 +2,13 @@ import { fireEvent, render, screen } from "@/test-utils/render";
 import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
 
 function swipeLeft(el: HTMLElement) {
-  fireEvent.touchStart(el, { touches: [{ clientX: 220, clientY: 40 }] });
-  fireEvent.touchMove(el, { touches: [{ clientX: 120, clientY: 40 }] });
+  fireEvent.pointerDown(el, { clientX: 220, clientY: 40, pointerId: 1, pointerType: "touch" });
+  fireEvent.pointerMove(el, { clientX: 120, clientY: 40, pointerId: 1, pointerType: "touch" });
 }
 
 function swipeRight(el: HTMLElement) {
-  fireEvent.touchStart(el, { touches: [{ clientX: 120, clientY: 40 }] });
-  fireEvent.touchMove(el, { touches: [{ clientX: 220, clientY: 40 }] });
+  fireEvent.pointerDown(el, { clientX: 120, clientY: 40, pointerId: 1, pointerType: "touch" });
+  fireEvent.pointerMove(el, { clientX: 220, clientY: 40, pointerId: 1, pointerType: "touch" });
 }
 
 describe("MobileHeaderRailLayout", () => {
