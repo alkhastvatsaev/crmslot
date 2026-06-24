@@ -15,6 +15,9 @@ export function parseBackofficeChatNotificationSearchParams(
 export function parseBackofficeChatNotificationData(
   data: Record<string, string | undefined>
 ): BackofficeChatNotificationIntent {
+  const fromParam = data[BM_BACKOFFICE_CHAT_PARAM]?.trim();
+  if (fromParam) return { kind: "chat", interventionId: fromParam };
+
   if (data.type?.trim() !== "portal_chat") return { kind: "none" };
   const ivId = data.interventionId?.trim();
   return { kind: "chat", interventionId: ivId || "global" };
