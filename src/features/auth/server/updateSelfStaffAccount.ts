@@ -1,9 +1,11 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import type { CompanyRole } from "@/features/company";
+import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
 import { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
 import type { UpdateCompanyStaffResult } from "@/features/company/server/updateCompanyStaffMember";
+import { isSelfServiceStaffRoleEditEnabled } from "@/features/auth/server/selfServiceStaffRoleEdit";
 
 export type SelfStaffAccountUpdateInput = {
   firstName?: string;
@@ -38,18 +40,21 @@ export async function updateSelfStaffAccount(
 
   const currentRole = resolveMembershipRole(membershipSnap.data());
   if (input.role && input.role !== currentRole) {
-    const adminCtx = await requireCompanyAdmin(db, uid, companyId);
-    if ("status" in adminCtx) {
-      return {
-        ok: false,
-        status: 403,
-        error: "Modification du rôle réservée aux administrateurs.",
-      };
+    if (!isSelfServiceStaffRoleEditEnabled()) {
+      const adminCtx = await requireCompanyAdmin(db, uid, companyId);
+      if ("status" in adminCtx) {
+        return {
+          ok: false,
+          status: 403,
+          error: "Modification du rôle réservée aux administrateurs.",
+        };
+      }
     }
     await membershipRef.update({
       role: input.role,
       updatedAt: FieldValue.serverTimestamp(),
     });
+    await upsertCompanyStaffDirectoryEntry(db, companyId, uid, input.role);
   }
 
   const staffResult = await updateCompanyStaffMember(db, auth, companyId, uid, {

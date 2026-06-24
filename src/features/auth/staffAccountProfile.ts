@@ -40,8 +40,8 @@ export async function saveStaffAccountProfile(
 
   if (draft.companyId && draft.companyId !== options.previousCompanyId) {
     options.setActiveCompanyId(draft.companyId);
-    await options.refreshClaimsSilent();
   }
+  await options.refreshClaimsSilent();
 }
 
 export async function deleteStaffAccount(user: User): Promise<void> {
