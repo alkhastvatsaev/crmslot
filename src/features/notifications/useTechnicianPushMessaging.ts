@@ -10,7 +10,7 @@ import {
   type FcmUiStatus,
   handleFcmSyncError,
   isPushServiceWorkerEnabled,
-  isWebPushDeliveryCapable,
+  isWebPushRegistrationAllowed,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
   tokenDocId,
@@ -144,7 +144,7 @@ export function useTechnicianPushMessaging(
             return;
           }
 
-          if (!isWebPushDeliveryCapable()) {
+          if (!isWebPushRegistrationAllowed()) {
             setStatus("unsupported");
             return;
           }
@@ -175,7 +175,7 @@ export function useTechnicianPushMessaging(
     const uid = auth?.currentUser?.uid;
     if (!uid || typeof Notification === "undefined" || Notification.permission !== "granted")
       return;
-    if (!isWebPushDeliveryCapable()) return;
+    if (!isWebPushRegistrationAllowed()) return;
     void syncTokenForUser(uid).catch(() => null);
   }, enabled);
 
@@ -194,7 +194,7 @@ export function useTechnicianPushMessaging(
         setStatus("unsupported");
         return;
       }
-      if (!isWebPushDeliveryCapable()) {
+      if (!isWebPushRegistrationAllowed()) {
         setStatus("unsupported");
         return;
       }

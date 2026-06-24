@@ -24,6 +24,7 @@ export async function fetchNativeFcmToken(): Promise<NativeFcmRegistration | nul
 
   const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
   try {
+    await FirebaseMessaging.requestPermissions();
     const { token } = await FirebaseMessaging.getToken();
     if (!token) return null;
     return { token, platform };

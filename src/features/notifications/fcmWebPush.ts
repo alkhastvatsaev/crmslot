@@ -16,8 +16,9 @@ export type FcmUiStatus =
 const SW_READY_MS = 14_000;
 
 import { isMobileServiceWorkerAllowed } from "@/core/pwa/mobileServiceWorkerPolicy";
-import { isPwaStandalone } from "@/core/pwa/isPwaStandalone";
-import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { isWebPushRegistrationAllowed } from "@/features/notifications/webPushRegistrationPolicy";
+
+export { isWebPushRegistrationAllowed };
 
 /** Service worker PWA enregistré (false en dev sans PWA). */
 export function isPushServiceWorkerEnabled(): boolean {
@@ -29,17 +30,14 @@ function isIosDevice(): boolean {
   return /iPad|iPhone|iPod/.test(navigator.userAgent);
 }
 
-/**
- * Push web en arrière-plan : iOS exige la PWA sur l’écran d’accueil (pas un onglet Safari).
- * Android / desktop : service worker + permission.
- */
+/** @deprecated Préférer `isWebPushRegistrationAllowed`. */
 export function isWebPushDeliveryCapable(): boolean {
-  if (typeof window === "undefined") return false;
-  if (isCapacitorNative()) return false;
-  if (!isPushServiceWorkerEnabled()) return false;
-  if (typeof Notification === "undefined") return false;
-  if (isIosDevice() && !isPwaStandalone()) return false;
-  return true;
+  return isWebPushRegistrationAllowed();
+}
+
+/** Indique si le device est iOS (pour messages UI). */
+export function isIosWebPushDevice(): boolean {
+  return isIosDevice();
 }
 
 /** Attendu en dev local sans PWA — pas de bruit console. */

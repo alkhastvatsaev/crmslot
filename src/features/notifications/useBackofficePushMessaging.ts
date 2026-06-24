@@ -9,7 +9,7 @@ import {
   type FcmUiStatus,
   handleFcmSyncError,
   isPushServiceWorkerEnabled,
-  isWebPushDeliveryCapable,
+  isWebPushRegistrationAllowed,
   persistFcmToken,
   resolvePushServiceWorkerRegistration,
 } from "@/features/notifications/fcmWebPush";
@@ -118,7 +118,7 @@ export function useBackofficePushMessaging(
             setStatus("idle");
             return;
           }
-          if (!isWebPushDeliveryCapable()) {
+          if (!isWebPushRegistrationAllowed()) {
             setStatus("unsupported");
             return;
           }
@@ -147,7 +147,7 @@ export function useBackofficePushMessaging(
     const uid = auth?.currentUser?.uid;
     if (!uid || typeof Notification === "undefined" || Notification.permission !== "granted")
       return;
-    if (!isWebPushDeliveryCapable()) return;
+    if (!isWebPushRegistrationAllowed()) return;
     void syncTokenForUser(uid).catch(() => null);
   }, enabled);
 
@@ -166,7 +166,7 @@ export function useBackofficePushMessaging(
         setStatus("unsupported");
         return;
       }
-      if (!isWebPushDeliveryCapable()) {
+      if (!isWebPushRegistrationAllowed()) {
         setStatus("unsupported");
         return;
       }

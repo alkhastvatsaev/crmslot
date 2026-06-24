@@ -2,7 +2,10 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { isFirebaseAdminReady, getAdminDb } from "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
-import { buildFcmSendPayload } from "@/features/notifications/buildFcmSendPayload";
+import {
+  buildFcmPayloadForPlatform,
+  normalizeFcmTokenPlatform,
+} from "@/features/notifications/buildFcmSendPayload";
 
 export type FcmTokenAudience = "technician" | "client" | "backoffice";
 
@@ -57,7 +60,8 @@ export async function sendNativePushToUser(
     }
 
     try {
-      const payload = buildFcmSendPayload({
+      const platform = normalizeFcmTokenPlatform(data?.platform);
+      const payload = buildFcmPayloadForPlatform(platform, {
         title: params.title,
         body: params.body,
         data: params.data,
