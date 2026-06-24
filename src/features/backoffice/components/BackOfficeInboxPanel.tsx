@@ -60,7 +60,7 @@ export default function BackOfficeInboxPanel({
         )}
       >
         <CompanyChatPanel
-          className="min-h-0"
+          className="min-h-0 flex-1"
           acceptPortalMessages
           chatCompanyId={s.portalChatCompanyId}
         />

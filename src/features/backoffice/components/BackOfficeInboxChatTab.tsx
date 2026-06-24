@@ -45,7 +45,7 @@ export default function BackOfficeInboxChatTab({
       aria-hidden={!active}
     >
       {selectedChatInterventionId ? (
-        <div className="flex flex-col min-h-0 flex-1">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 shrink-0 shadow-sm z-10">
             <button
               onClick={() => setSelectedChatInterventionId(null)}

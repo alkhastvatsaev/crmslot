@@ -61,6 +61,7 @@ export default function CompanyChatPanel({
       className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
     >
       <CompanyChatMessageList
+        className="min-h-0 flex-1"
         messages={messages}
         assistantTyping={assistantTyping}
         listRef={listRef}
