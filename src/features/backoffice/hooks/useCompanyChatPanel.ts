@@ -52,6 +52,7 @@ export function useCompanyChatPanel({
   const [assistantTyping, setAssistantTyping] = useState(false);
   const [pendingImages, setPendingImages] = useState<string[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hydratedRef = useRef(false);
@@ -164,8 +165,24 @@ export function useCompanyChatPanel({
   );
 
   useEffect(() => {
+    stickToBottomRef.current = true;
+  }, [filterThreadId, companyIdTrimmed]);
+
+  useEffect(() => {
     const el = listRef.current;
     if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottomRef.current = distance < 96;
+    };
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [filterThreadId, companyIdTrimmed]);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !stickToBottomRef.current) return;
     el.scrollTop = el.scrollHeight;
   }, [messages, assistantTyping]);
 

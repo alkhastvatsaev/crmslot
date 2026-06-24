@@ -590,6 +590,14 @@
   overscroll-behavior-y: contain;
 }
 
+/* Chat portail / inbox : scroll interne isolé du pager mobile snap. */
+.admin-mobile-app [data-testid="company-chat-messages"],
+[data-mobile-shell] [data-testid="company-chat-messages"] {
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .mobile-top-bar {
   display: flex;
   width: 100%;
