@@ -34,6 +34,7 @@ export async function notifyTechnicianAssignmentAdmin(params: {
       uid,
       title: "Nouvelle intervention",
       body,
+      audiences: ["technician"],
       data: {
         type: "assignment",
         interventionId,

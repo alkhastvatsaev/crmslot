@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth, clientPortalAuth } from "@/core/config/firebase";
 import { useNativePushRegistration } from "@/features/notifications/useNativePushRegistration";
 import { registerNativePushClickHandler } from "@/core/native/nativePushClickHandler";
+import { registerNativePushForegroundHandler } from "@/core/native/nativePushForeground";
+import { resolveNativePushAudience } from "@/features/notifications/resolveNativePushAudience";
 
 function wrap(
   rawAuth: typeof auth | typeof clientPortalAuth
@@ -16,20 +19,25 @@ function wrap(
 }
 
 export default function NativePushBootstrap() {
-  // L'app native cible le terrain (technicien) et le portail client. L'admin reste
-  // sur PWA web — son token FCM est enregistré par BackofficePushBootstrap.
-  // (Si une app native admin apparaît, exposer `audience: "backoffice"` ici via un
-  // mount conditionnel — sinon le token tech serait écrasé sur le même device.)
-  useNativePushRegistration({ audience: "technician", auth: wrap(auth) });
-  useNativePushRegistration({ audience: "client", auth: wrap(clientPortalAuth) });
+  const pathname = usePathname();
+  const audience = resolveNativePushAudience(pathname);
+  const portalAudience = audience === "client";
+  const authBinding = portalAudience ? wrap(clientPortalAuth) : wrap(auth);
+
+  useNativePushRegistration({ audience, auth: authBinding });
 
   useEffect(() => {
-    let unlisten: (() => void) | null = null;
+    let unlistenClick: (() => void) | null = null;
+    let unlistenForeground: (() => void) | null = null;
     void registerNativePushClickHandler().then((fn) => {
-      unlisten = fn;
+      unlistenClick = fn;
+    });
+    void registerNativePushForegroundHandler().then((fn) => {
+      unlistenForeground = fn;
     });
     return () => {
-      unlisten?.();
+      unlistenClick?.();
+      unlistenForeground?.();
     };
   }, []);
 

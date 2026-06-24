@@ -53,6 +53,7 @@ export async function notifyCompanyAdminsPush(params: {
         uid,
         title: params.title,
         body: params.body,
+        audiences: ["backoffice", "technician"],
         data: params.data,
       });
       result.sent += report.sent;
