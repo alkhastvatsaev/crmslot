@@ -98,6 +98,15 @@ export function useCrmStaffAccountPanel() {
   const [signingOut, setSigningOut] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [savedRoleHint, setSavedRoleHint] = useState<CompanyRole | null>(null);
+
+  useEffect(() => {
+    if (!savedRoleHint || !workspace) return;
+    const live =
+      workspace.memberships.find((m) => m.companyId === workspace.activeCompanyId)?.role ??
+      workspace.memberships[0]?.role;
+    if (live === savedRoleHint) setSavedRoleHint(null);
+  }, [savedRoleHint, workspace?.memberships, workspace?.activeCompanyId, workspace]);
 
   useEffect(() => {
     if (!auth) return () => {};
@@ -131,7 +140,8 @@ export function useCrmStaffAccountPanel() {
   }, [user?.uid]);
 
   const memberships = workspace?.memberships ?? [];
-  const fields = resolveStaffAccountFields(user, workspace, technicianProfile);
+  const baseFields = resolveStaffAccountFields(user, workspace, technicianProfile);
+  const fields = savedRoleHint != null ? { ...baseFields, roleLabel: savedRoleHint } : baseFields;
 
   const startEditing = useCallback(() => {
     setDraft(draftFromFields(fields, memberships));
@@ -162,11 +172,12 @@ export function useCrmStaffAccountPanel() {
     if (!user || saving) return;
     setSaving(true);
     try {
-      await saveStaffAccountProfile(user, draft, {
+      const saved = await saveStaffAccountProfile(user, draft, {
         previousCompanyId: fields.companyId,
         setActiveCompanyId: workspace?.setActiveCompanyId ?? (() => {}),
         refreshClaimsSilent: workspace?.refreshClaimsSilent ?? (async () => false),
       });
+      setSavedRoleHint(saved.role);
       setEditing(false);
       toast.success(String(t("staff_account.save_success")));
     } catch (error) {

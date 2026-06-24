@@ -63,7 +63,9 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
     membershipsReady || (!authLoading && Boolean(firebaseUid) && Boolean(storedActiveCompanyId));
 
   const activeRole = useMemo(() => {
-    return memberships.find((m) => m.companyId === effectiveActiveCompanyId)?.role ?? null;
+    const byActive = memberships.find((m) => m.companyId === effectiveActiveCompanyId);
+    if (byActive) return byActive.role;
+    return memberships[0]?.role ?? null;
   }, [memberships, effectiveActiveCompanyId]);
 
   return useMemo(

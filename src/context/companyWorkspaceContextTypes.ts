@@ -17,5 +17,5 @@ export type CompanyWorkspaceApi = {
   membershipJoinError: string | null;
   retryDefaultCompanyJoin: () => Promise<void>;
   /** Met à jour bmTenants / bmActive côté token (sans toast). */
-  refreshClaimsSilent: () => Promise<boolean>;
+  refreshClaimsSilent: (activeCompanyId?: string) => Promise<boolean>;
 };
