@@ -49,11 +49,11 @@ export function groupUnclosedInterventionsByTechnician(
 
 /** Mission la plus ancienne à traiter en priorité (rappel + deep link). */
 export function pickPrimaryUnclosedIntervention(rows: Intervention[]): Intervention {
-  return [...rows].sort((a, b) => {
-    const aKey = (a.statusUpdatedAt ?? a.id).toString();
-    const bKey = (b.statusUpdatedAt ?? b.id).toString();
-    return aKey.localeCompare(bKey);
-  })[0];
+  const sortKey = (iv: Intervention) => {
+    const assignedAt = (iv as Intervention & { assignedAt?: string | null }).assignedAt;
+    return (assignedAt ?? iv.statusUpdatedAt ?? iv.id).toString();
+  };
+  return [...rows].sort((a, b) => sortKey(a).localeCompare(sortKey(b)))[0];
 }
 
 export function shouldSendUnclosedDossierReminder(
