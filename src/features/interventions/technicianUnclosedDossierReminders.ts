@@ -50,8 +50,8 @@ export function groupUnclosedInterventionsByTechnician(
 /** Mission la plus ancienne à traiter en priorité (rappel + deep link). */
 export function pickPrimaryUnclosedIntervention(rows: Intervention[]): Intervention {
   return [...rows].sort((a, b) => {
-    const aKey = (a.assignedAt ?? a.statusUpdatedAt ?? a.id).toString();
-    const bKey = (b.assignedAt ?? b.statusUpdatedAt ?? b.id).toString();
+    const aKey = (a.statusUpdatedAt ?? a.id).toString();
+    const bKey = (b.statusUpdatedAt ?? b.id).toString();
     return aKey.localeCompare(bKey);
   })[0];
 }

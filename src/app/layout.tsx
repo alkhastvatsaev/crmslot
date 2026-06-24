@@ -50,8 +50,8 @@ import { cn } from "@/lib/utils";
 import NativeShellBootstrap from "@/core/native/NativeShellBootstrap";
 import DeferredRootBootstraps from "@/core/native/DeferredRootBootstraps";
 import PwaStaleBundleGuard from "@/core/pwa/PwaStaleBundleGuard";
-import PwaBootRecovery from "@/core/pwa/PwaBootRecovery";
-import { buildPwaBootRecoveryInlineScript } from "@/core/pwa/pwaBootRecovery";
+import PwaBootRecovery from "@/core/pwa/PwaBootRecoveryClient";
+import { buildPwaBootRecoveryInlineScript } from "@/core/pwa/pwaBootRecoveryCore";
 import MobileServiceWorkerDisabler from "@/core/pwa/MobileServiceWorkerDisabler";
 import LivePerfProbeRoot from "@/core/perf/LivePerfProbeRoot";
 

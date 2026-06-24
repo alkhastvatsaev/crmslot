@@ -2,7 +2,7 @@ import {
   buildPwaBootRecoveryInlineScript,
   isPwaBootRecoveryHost,
   isRecoverableClientBootError,
-} from "@/core/pwa/pwaBootRecovery";
+} from "@/core/pwa/pwaBootRecoveryCore";
 
 describe("pwaBootRecovery", () => {
   it("détecte les erreurs de chunk webpack", () => {
