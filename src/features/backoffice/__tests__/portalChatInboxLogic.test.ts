@@ -37,23 +37,27 @@ describe("portalChatInboxLogic", () => {
       msg({
         id: "g1",
         role: "client",
+        senderUid: "client-global",
         createdAt: new Date("2026-06-17T09:00:00.000Z"),
       }),
       msg({
         id: "iv1-c",
         role: "client",
+        senderUid: "client-1",
         interventionId: "iv-1",
         createdAt: new Date("2026-06-17T08:00:00.000Z"),
       }),
       msg({
         id: "iv2-c",
         role: "client",
+        senderUid: "client-2",
         interventionId: "iv-2",
         createdAt: new Date("2026-06-16T08:00:00.000Z"),
       }),
       msg({
         id: "iv2-c2",
         role: "client",
+        senderUid: "client-2",
         interventionId: "iv-2",
         createdAt: new Date("2026-06-16T09:00:00.000Z"),
       }),

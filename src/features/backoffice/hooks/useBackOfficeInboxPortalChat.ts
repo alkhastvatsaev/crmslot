@@ -11,13 +11,11 @@ import {
   countClientPortalThreadsNeedingReply,
   enrichChatDayRowsFromPortalMessages,
   filterNewClientPortalMessages,
-  interventionIdsWithClientPortalChat,
   portalChatMessageTimeMs,
   portalChatPickerThreadId,
   PORTAL_CHAT_GLOBAL_THREAD_ID,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
-import { buildChatDayRows } from "@/features/backoffice/chatDayMissionRow";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import type { Mission } from "@/features/map";
 import type { Intervention } from "@/features/interventions";
@@ -58,16 +56,14 @@ export function useBackOfficeInboxPortalChat({
   const portalChatHydratedRef = useRef(false);
   const [portalChatMessages, setPortalChatMessages] = useState<PortalChatDoc[]>([]);
 
-  const chatDayRows = useMemo(() => {
-    const base = buildChatDayRows({
-      interventions,
-      dayMissions,
-      selectedDate,
-      workspace,
-      includeInterventionIds: interventionIdsWithClientPortalChat(portalChatMessages),
-    });
-    return enrichChatDayRowsFromPortalMessages(base, portalChatMessages);
-  }, [dayMissions, interventions, selectedDate, workspace, portalChatMessages]);
+  const chatDayRows = useMemo(
+    () =>
+      enrichChatDayRowsFromPortalMessages([], portalChatMessages, {
+        interventions,
+        selectedDate,
+      }),
+    [interventions, selectedDate, portalChatMessages]
+  );
 
   const chatThreadsNeedingReply = useMemo(
     () => countClientPortalThreadsNeedingReply(portalChatMessages),

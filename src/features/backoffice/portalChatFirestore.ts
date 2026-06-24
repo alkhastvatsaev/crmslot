@@ -8,7 +8,10 @@ import {
   serverTimestamp,
   where,
   type Firestore,
+  type Query,
+  type QuerySnapshot,
 } from "firebase/firestore";
+import { portalChatMessageTimeMs } from "@/features/backoffice/portalChatInboxLogic";
 
 /** Collection Firestore — nom historique conservé (`portal_ivana_chat_messages`). */
 export const PORTAL_CHAT_COLLECTION = "portal_ivana_chat_messages";
@@ -29,6 +32,57 @@ export type PortalChatDoc = {
   imageUrls?: string[];
 };
 
+const CHAT_PAGE_SIZE = 500;
+
+function mapPortalChatSnapshot(snap: QuerySnapshot): PortalChatDoc[] {
+  return snap.docs.map((d) => {
+    const data = d.data() as Omit<PortalChatDoc, "id">;
+    return { id: d.id, ...data } as PortalChatDoc;
+  });
+}
+
+function sortPortalChatRows(rows: PortalChatDoc[]): PortalChatDoc[] {
+  return [...rows].sort((a, b) => portalChatMessageTimeMs(a) - portalChatMessageTimeMs(b));
+}
+
+function isMissingIndexError(error: unknown): boolean {
+  const code = (error as { code?: string })?.code;
+  return code === "failed-precondition" || code === "unimplemented";
+}
+
+function listenPortalChatQuery(
+  primary: Query,
+  fallback: Query,
+  onRows: (rows: PortalChatDoc[]) => void,
+  onError?: (e: Error) => void
+): () => void {
+  let activeUnsub: (() => void) | undefined;
+
+  const attach = (q: Query, allowFallback: boolean) => {
+    activeUnsub?.();
+    activeUnsub = onSnapshot(
+      q,
+      (snap) => {
+        onRows(sortPortalChatRows(mapPortalChatSnapshot(snap)));
+      },
+      (e) => {
+        const err = e instanceof Error ? e : new Error(String(e));
+        if (allowFallback && isMissingIndexError(e)) {
+          attach(fallback, false);
+          return;
+        }
+        onError?.(err);
+      }
+    );
+  };
+
+  attach(primary, true);
+
+  return () => {
+    activeUnsub?.();
+  };
+}
+
 export function subscribePortalChatMessages(
   db: Firestore,
   companyId: string,
@@ -40,31 +94,24 @@ export function subscribePortalChatMessages(
     onRows([]);
     return () => {};
   }
-  const q = query(
-    collection(db, PORTAL_CHAT_COLLECTION),
+
+  const col = collection(db, PORTAL_CHAT_COLLECTION);
+  const indexed = query(
+    col,
     where("companyId", "==", trimmed),
     orderBy("createdAt", "asc"),
-    limit(200)
+    limit(CHAT_PAGE_SIZE)
   );
-  let unsub: (() => void) | undefined;
+  const fallback = query(col, where("companyId", "==", trimmed), limit(CHAT_PAGE_SIZE));
+
+  let teardown: (() => void) | undefined;
   const timeout = setTimeout(() => {
-    unsub = onSnapshot(
-      q,
-      (snap) => {
-        const rows = snap.docs.map((d) => {
-          const data = d.data() as Omit<PortalChatDoc, "id">;
-          return { id: d.id, ...data } as PortalChatDoc;
-        });
-        onRows(rows);
-      },
-      (e) => {
-        onError?.(e instanceof Error ? e : new Error(String(e)));
-      }
-    );
+    teardown = listenPortalChatQuery(indexed, fallback, onRows, onError);
   }, 10);
+
   return () => {
     clearTimeout(timeout);
-    unsub?.();
+    teardown?.();
   };
 }
 
@@ -79,30 +126,24 @@ export function subscribePortalChatForIntervention(
     onRows([]);
     return () => {};
   }
-  const q = query(
-    collection(db, PORTAL_CHAT_COLLECTION),
+
+  const col = collection(db, PORTAL_CHAT_COLLECTION);
+  const indexed = query(
+    col,
     where("interventionId", "==", ivId),
     orderBy("createdAt", "asc"),
-    limit(200)
+    limit(CHAT_PAGE_SIZE)
   );
-  let unsub: (() => void) | undefined;
+  const fallback = query(col, where("interventionId", "==", ivId), limit(CHAT_PAGE_SIZE));
+
+  let teardown: (() => void) | undefined;
   const timeout = setTimeout(() => {
-    unsub = onSnapshot(
-      q,
-      (snap) => {
-        onRows(
-          snap.docs.map((d) => {
-            const data = d.data() as Omit<PortalChatDoc, "id">;
-            return { id: d.id, ...data };
-          })
-        );
-      },
-      (e) => onError?.(e instanceof Error ? e : new Error(String(e)))
-    );
+    teardown = listenPortalChatQuery(indexed, fallback, onRows, onError);
   }, 10);
+
   return () => {
     clearTimeout(timeout);
-    unsub?.();
+    teardown?.();
   };
 }
 
