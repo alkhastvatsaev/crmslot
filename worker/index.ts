@@ -7,12 +7,11 @@ import {
   isFirebasePublicConfigured,
 } from "../src/features/notifications/firebasePublicConfig";
 import {
-  BM_TECH_CASE_PARAM,
-  BM_TECH_REMINDER_PARAM,
   BM_BACKOFFICE_CHAT_PARAM,
   BM_CLIENT_CHAT_PARAM,
+  BM_TECH_CASE_PARAM,
+  BM_TECH_REMINDER_PARAM,
 } from "../src/features/notifications/notificationConstants";
-import { parseTechnicianNotificationSearchParams } from "../src/features/notifications/technicianNotificationUrls";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -62,23 +61,10 @@ bootMessaging();
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const rawUrl =
+  const targetUrl =
     typeof event.notification.data?.url === "string"
       ? event.notification.data.url
       : `${self.location.origin}/`;
-
-  let targetUrl = rawUrl;
-  try {
-    const u = new URL(rawUrl, self.location.origin);
-    const intent = parseTechnicianNotificationSearchParams(u.searchParams);
-    if (intent.kind === "case") {
-      targetUrl = `${self.location.origin}/?${BM_TECH_CASE_PARAM}=${encodeURIComponent(intent.caseId)}`;
-    } else if (intent.kind === "reminder") {
-      targetUrl = `${self.location.origin}/?${BM_TECH_REMINDER_PARAM}=1`;
-    }
-  } catch {
-    /* garde rawUrl */
-  }
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {

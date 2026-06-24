@@ -28,7 +28,20 @@ export function parseTechnicianNotificationData(
   const reminder = data[BM_TECH_REMINDER_PARAM]?.trim();
   if (caseId) params.set(BM_TECH_CASE_PARAM, caseId);
   if (reminder) params.set(BM_TECH_REMINDER_PARAM, reminder);
-  return parseTechnicianNotificationSearchParams(params);
+
+  const fromParams = parseTechnicianNotificationSearchParams(params);
+  if (fromParams.kind !== "none") return fromParams;
+
+  const pushType = data.type?.trim() ?? "";
+  const interventionId = data.interventionId?.trim();
+  if (interventionId && (pushType === "assignment" || pushType === "appointment_reminder")) {
+    return { kind: "case", caseId: interventionId };
+  }
+  if (pushType === "daily_reminder" || pushType === "appointment_reminder") {
+    return { kind: "reminder" };
+  }
+
+  return { kind: "none" };
 }
 
 export function dispatchTechnicianNotificationIntent(intent: TechnicianNotificationIntent): void {

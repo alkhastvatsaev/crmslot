@@ -2,7 +2,9 @@
 
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
+import { parseClientNotificationSearchParams } from "@/features/notifications/clientNotificationUrls";
 
 const AndroidAppInstallPromoBootstrap = dynamic(
   () => import("@/core/pwa/AndroidAppInstallPromoBootstrap"),
@@ -14,18 +16,24 @@ const ClientPortalNotificationBootstrap = dynamic(
 );
 
 function DeferredClientBootstrapsInner() {
-  const idleReady = useDeferredMount({ minDelayMs: 2_500, idleTimeoutMs: 6_000 });
-  if (!idleReady) return null;
+  const searchParams = useSearchParams();
+  const pushIntent = parseClientNotificationSearchParams(searchParams).kind !== "none";
+  const idleReady = useDeferredMount({
+    minDelayMs: pushIntent ? 0 : 2_500,
+    idleTimeoutMs: 6_000,
+  });
+
+  if (!pushIntent && !idleReady) return null;
 
   return (
     <>
-      <ClientPortalNotificationBootstrap />
-      <AndroidAppInstallPromoBootstrap surface="demande" />
+      {pushIntent || idleReady ? <ClientPortalNotificationBootstrap /> : null}
+      {idleReady ? <AndroidAppInstallPromoBootstrap surface="demande" /> : null}
     </>
   );
 }
 
-/** Notifications / PWA portail client — après premier idle. */
+/** Notifications / PWA portail client — après idle (sauf deep-link notif). */
 export default function DeferredClientBootstraps() {
   return (
     <Suspense fallback={null}>

@@ -1,9 +1,6 @@
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { logger } from "@/core/logger";
-import {
-  dispatchTechnicianNotificationIntent,
-  parseTechnicianNotificationData,
-} from "@/features/notifications/technicianNotificationIntent";
+import { routePushNotificationClick } from "@/features/notifications/routePushNotificationClick";
 
 type ActionPerformedEvent = {
   notification?: { data?: Record<string, string | undefined> };
@@ -19,8 +16,8 @@ export type PushNotificationsPlugin = {
 export type NativePushClickHandlerDeps = {
   isNative: () => boolean;
   loadPlugin: () => Promise<PushNotificationsPlugin>;
-  /** Pour test : override le dispatcher. */
-  dispatch?: typeof dispatchTechnicianNotificationIntent;
+  /** Pour test : override le routeur. */
+  routeClick?: typeof routePushNotificationClick;
 };
 
 const PROD_DEPS: NativePushClickHandlerDeps = {
@@ -42,13 +39,11 @@ export async function registerNativePushClickHandler(
 
   try {
     const plugin = await deps.loadPlugin();
-    const dispatch = deps.dispatch ?? dispatchTechnicianNotificationIntent;
+    const routeClick = deps.routeClick ?? routePushNotificationClick;
     const handle = await plugin.addListener(
       "pushNotificationActionPerformed",
       (event: ActionPerformedEvent) => {
-        const intent = parseTechnicianNotificationData(event.notification?.data ?? {});
-        if (intent.kind === "none") return;
-        dispatch(intent);
+        routeClick(event.notification?.data ?? {});
       }
     );
     return () => {
