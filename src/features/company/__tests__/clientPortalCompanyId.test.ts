@@ -85,6 +85,18 @@ describe("resolveBackofficeInboxCompanyIds", () => {
     ).toEqual(expect.arrayContaining(["co-active", "co-portal"]));
   });
 
+  it("ignore un activeCompanyId périmé et utilise les memberships valides", () => {
+    expect(
+      resolveBackofficeInboxCompanyIds({
+        isTenantUser: true,
+        activeCompanyId: "company-abc-deleted",
+        memberships: [
+          { companyId: "company-antwerp", role: "admin", companyName: "AntwerpenSlot" },
+        ],
+      } as never)
+    ).toEqual(["company-antwerp"]);
+  });
+
   it("returns only tenant company ids without demo fallback", () => {
     process.env.NEXT_PUBLIC_STAGING_PREVIEW = "true";
     expect(

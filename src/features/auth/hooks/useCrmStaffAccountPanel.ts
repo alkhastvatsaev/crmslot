@@ -45,15 +45,22 @@ function resolveStaffAccountFields(
   const fromAuth = splitDisplayName(user?.displayName ?? "");
   const firstName = (technicianProfile?.firstName || fromAuth.firstName).trim();
   const lastName = (technicianProfile?.lastName || fromAuth.lastName).trim();
-  const membership = workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId);
+  const membership =
+    workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId) ??
+    workspace?.memberships[0];
+  const activeCompanyId = workspace?.activeCompanyId?.trim() || membership?.companyId?.trim() || "";
   return {
     email: user?.email?.trim() ?? "",
     firstName,
     lastName,
     phone: technicianProfile?.phone?.trim() ?? "",
-    companyId: workspace?.activeCompanyId?.trim() ?? membership?.companyId ?? "",
+    companyId: activeCompanyId,
     companyName: membership?.companyName?.trim() || "—",
-    roleLabel: workspace?.activeRole ?? membership?.role ?? null,
+    roleLabel:
+      workspace?.activeRole ??
+      workspace?.memberships.find((m) => m.companyId === activeCompanyId)?.role ??
+      membership?.role ??
+      null,
   };
 }
 
