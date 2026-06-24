@@ -26,8 +26,8 @@ const defaultDevWebServer = {
   reuseExistingServer: !process.env.CI,
   timeout: 120_000,
   env: {
-    ...process.env,
     ...e2ePublicEnv,
+    ...process.env,
   },
 };
 
@@ -38,8 +38,8 @@ const desktopGateProdWebServer = {
   reuseExistingServer: !process.env.CI,
   timeout: 300_000,
   env: {
-    ...process.env,
     ...desktopGateProdEnv,
+    ...process.env,
     NEXT_E2E_GATE_DIST: "1",
   },
 };
@@ -66,7 +66,11 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: [/mobile-shell\.spec\.ts/, /desktop-only-gate-prod\.spec\.ts/],
+      testIgnore: [
+        /mobile-shell\.spec\.ts/,
+        /desktop-only-gate-prod\.spec\.ts/,
+        /portal-chat-client-ui\.spec\.ts/,
+      ],
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
@@ -89,6 +93,19 @@ export default defineConfig({
       testMatch: /technician-mobile-app\.spec\.ts/,
       use: {
         ...devices["Pixel 7"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "portal-chat-client",
+      testMatch: /portal-chat-client-ui\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
         launchOptions: {
           args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
         },

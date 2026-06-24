@@ -46,6 +46,7 @@
     "test:e2e:chatbot": "playwright test tests/e2e/chatbot-local-intent.spec.ts",
     "test:e2e:invoice": "playwright test tests/e2e/invoice-validation.spec.ts",
     "test:e2e:company": "playwright test tests/e2e/company-hub-request.spec.ts",
+    "test:e2e:portal-chat": "playwright test tests/e2e/portal-chat-smoke.spec.ts tests/e2e/portal-chat-client-ui.spec.ts --project=chromium --project=portal-chat-client",
     "test:e2e:technician": "playwright test tests/e2e/technician-finish-job.spec.ts",
     "test:e2e:offline": "playwright test tests/e2e/offline-sync.spec.ts",
     "test:e2e:api-matrix": "playwright test tests/e2e/api-routes-auth-matrix.spec.ts",
