@@ -12,13 +12,29 @@ describe("isClientPortalChatUser", () => {
 
   it("accepte un compte email vérifié", () => {
     expect(
-      isClientPortalChatUser({ uid: "b", isAnonymous: false, emailVerified: true } as never)
+      isClientPortalChatUser({
+        uid: "b",
+        isAnonymous: false,
+        email: "client@example.com",
+        emailVerified: true,
+      } as never)
     ).toBe(true);
   });
 
-  it("refuse un compte email non vérifié", () => {
+  it("accepte un compte email non vérifié pour le chat", () => {
     expect(
-      isClientPortalChatUser({ uid: "c", isAnonymous: false, emailVerified: false } as never)
+      isClientPortalChatUser({
+        uid: "c",
+        isAnonymous: false,
+        email: "client@example.com",
+        emailVerified: false,
+      } as never)
+    ).toBe(true);
+  });
+
+  it("refuse un compte sans email", () => {
+    expect(
+      isClientPortalChatUser({ uid: "e", isAnonymous: false, emailVerified: false } as never)
     ).toBe(false);
   });
 
