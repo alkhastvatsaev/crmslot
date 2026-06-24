@@ -54,12 +54,22 @@ export function useBackOfficeInboxState(
   const workspace = useCompanyWorkspaceOptional();
   const { logIntervention } = useActivityLog();
   const inboxCompanyIds = useMemo(() => resolveBackofficeInboxCompanyIds(workspace), [workspace]);
-  const cid = inboxCompanyIds[0] ?? null;
+  const portalChatInboxCompanyIds = useMemo(
+    () => resolvePortalChatInboxCompanyIds(workspace),
+    [workspace]
+  );
+  const interventionCompanyIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const id of inboxCompanyIds) ids.add(id);
+    for (const id of portalChatInboxCompanyIds) ids.add(id);
+    return [...ids];
+  }, [inboxCompanyIds, portalChatInboxCompanyIds]);
+  const cid = interventionCompanyIds[0] ?? inboxCompanyIds[0] ?? null;
   const inboxIntent = useBackofficeInboxIntentOptional();
-  const inboxFirestoreEnabled = inboxCompanyIds.length > 0;
+  const inboxFirestoreEnabled = interventionCompanyIds.length > 0;
   const inboxLive = useFirestoreLiveEnabled(options?.inboxDataActive ?? true);
   const { interventions, loading } = useBackOfficeInterventions(
-    inboxFirestoreEnabled ? inboxCompanyIds : null,
+    inboxFirestoreEnabled ? interventionCompanyIds : null,
     { enabled: inboxLive }
   );
   const terrainBridge = useTechnicianBackofficeReportBridgeOptional();
@@ -78,10 +88,6 @@ export function useBackOfficeInboxState(
 
   const { selectedDate } = useDateContext();
   const envDefaultCompanyId = useMemo(() => readClientPortalDefaultCompanyIdFromEnv(), []);
-  const portalChatInboxCompanyIds = useMemo(
-    () => resolvePortalChatInboxCompanyIds(workspace),
-    [workspace]
-  );
   const portalChatCompanyId = useMemo(
     () => resolvePortalChatCompanyId(envDefaultCompanyId || cid) ?? cid,
     [envDefaultCompanyId, cid]

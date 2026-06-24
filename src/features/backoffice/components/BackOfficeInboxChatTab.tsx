@@ -10,6 +10,10 @@ import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClient
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
+import {
+  PORTAL_CHAT_GLOBAL_THREAD_ID,
+  isPortalChatSenderThreadId,
+} from "@/features/backoffice/portalChatInboxLogic";
 
 export default function BackOfficeInboxChatTab({
   active,
@@ -52,15 +56,21 @@ export default function BackOfficeInboxChatTab({
             <div className="flex flex-col min-w-0 flex-1 items-center justify-center text-center pr-8">
               <span className="text-[14px] font-bold text-slate-800 truncate w-full text-center">
                 {(() => {
-                  if (selectedChatInterventionId === "global") return t("chat.global_chat_title");
+                  if (selectedChatInterventionId === PORTAL_CHAT_GLOBAL_THREAD_ID) {
+                    return t("chat.global_chat_title");
+                  }
                   const row = chatDayRows.find((r) => r.threadId === selectedChatInterventionId);
                   if (row?.clientName.trim()) return capitalizeName(row.clientName);
+                  if (isPortalChatSenderThreadId(selectedChatInterventionId)) {
+                    return t("chat.anonymous_client");
+                  }
                   const iv = interventions.find((x) => x.id === selectedChatInterventionId);
                   const label = iv ? interventionClientLabel(iv) : "";
                   return label ? capitalizeName(label) : t("chat.anonymous_client");
                 })()}
               </span>
-              {selectedChatInterventionId !== "global" ? (
+              {selectedChatInterventionId !== PORTAL_CHAT_GLOBAL_THREAD_ID &&
+              !isPortalChatSenderThreadId(selectedChatInterventionId) ? (
                 <span className="text-[11px] text-slate-500 truncate font-medium w-full text-center">
                   {chatDayRows
                     .find((r) => r.threadId === selectedChatInterventionId)
@@ -76,7 +86,9 @@ export default function BackOfficeInboxChatTab({
             acceptPortalMessages
             chatCompanyId={portalChatCompanyId}
             chatInterventionId={
-              selectedChatInterventionId === "global" ? null : selectedChatInterventionId
+              selectedChatInterventionId === PORTAL_CHAT_GLOBAL_THREAD_ID
+                ? null
+                : selectedChatInterventionId
             }
             onRemoteClientMessage={portalChatCompanyId ? () => setActiveTab("chat") : undefined}
           />
@@ -86,7 +98,7 @@ export default function BackOfficeInboxChatTab({
           className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "py-4 px-1")}
           rows={chatDayRows}
           selectedThreadId={selectedChatInterventionId}
-          onSelectGlobal={() => setSelectedChatInterventionId("global")}
+          onSelectGlobal={() => setSelectedChatInterventionId(PORTAL_CHAT_GLOBAL_THREAD_ID)}
           onSelectClient={(threadId) => setSelectedChatInterventionId(threadId)}
         />
       )}

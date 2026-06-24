@@ -1,6 +1,69 @@
 import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
 import type { Intervention } from "@/features/interventions";
+
+/** Fil global legacy (tous les messages sans dossier). */
+export const PORTAL_CHAT_GLOBAL_THREAD_ID = "global";
+export const PORTAL_CHAT_SENDER_THREAD_PREFIX = "__sender__:";
+
+/** Clé de fil inbox admin — dossier, client anonyme global, ou chat global agrégé. */
+export function portalChatPickerThreadId(
+  msg: Pick<PortalChatDoc, "interventionId" | "senderUid" | "role">
+): string {
+  const ivId = msg.interventionId?.trim();
+  if (ivId) return ivId;
+  if (msg.role !== "client") return PORTAL_CHAT_GLOBAL_THREAD_ID;
+  const uid = msg.senderUid?.trim();
+  return uid ? `${PORTAL_CHAT_SENDER_THREAD_PREFIX}${uid}` : PORTAL_CHAT_GLOBAL_THREAD_ID;
+}
+
+export function isPortalChatSenderThreadId(threadId: string): boolean {
+  return threadId.startsWith(PORTAL_CHAT_SENDER_THREAD_PREFIX);
+}
+
+export function portalChatSenderUidFromThreadId(threadId: string): string | null {
+  if (!isPortalChatSenderThreadId(threadId)) return null;
+  const uid = threadId.slice(PORTAL_CHAT_SENDER_THREAD_PREFIX.length).trim();
+  return uid || null;
+}
+
+/** Ajoute une ligne par client portail (même sans dossier intervention chargé). */
+export function enrichChatDayRowsFromPortalMessages(
+  rows: ChatDayMissionRow[],
+  messages: PortalChatDoc[]
+): ChatDayMissionRow[] {
+  const byThread = new Map(rows.map((r) => [r.threadId, r]));
+  const latestClientByThread = new Map<string, PortalChatDoc>();
+
+  for (const m of messages) {
+    if (m.role !== "client") continue;
+    const threadId = portalChatPickerThreadId(m);
+    const prev = latestClientByThread.get(threadId);
+    if (!prev || portalChatMessageTimeMs(m) >= portalChatMessageTimeMs(prev)) {
+      latestClientByThread.set(threadId, m);
+    }
+  }
+
+  for (const [threadId, msg] of latestClientByThread) {
+    if (threadId === PORTAL_CHAT_GLOBAL_THREAD_ID) continue;
+    const senderName = msg.senderName?.trim() ?? "";
+    const existing = byThread.get(threadId);
+    if (existing) {
+      if (!existing.clientName.trim() && senderName) {
+        byThread.set(threadId, { ...existing, clientName: senderName });
+      }
+      continue;
+    }
+    byThread.set(threadId, {
+      threadId,
+      clientName: senderName,
+      time: "",
+      isToday: false,
+    });
+  }
+
+  return sortChatDayRows([...byThread.values()]);
+}
 import {
   coerceFirestoreLikeDate,
   formatScheduledTimeOnly,
