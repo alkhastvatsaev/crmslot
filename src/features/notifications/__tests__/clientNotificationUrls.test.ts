@@ -14,7 +14,7 @@ describe("clientNotificationUrls", () => {
 
   it("builds client case deep link", () => {
     expect(clientNotificationCaseUrl("https://app.example.com", "iv-1")).toBe(
-      "https://app.example.com/?bmClientCase=iv-1",
+      "https://app.example.com/m/demande?bmClientCase=iv-1"
     );
   });
 });

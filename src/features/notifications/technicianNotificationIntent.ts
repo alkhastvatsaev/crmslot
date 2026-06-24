@@ -5,6 +5,11 @@ import {
   BM_TECH_REMINDER_PARAM,
 } from "@/features/notifications/notificationConstants";
 import {
+  currentAppPathname,
+  isTechnicianAppPath,
+  redirectToTechnicianApp,
+} from "@/features/notifications/pushNotificationNavigation";
+import {
   navigateTechnicianHub,
   TECHNICIAN_HUB_ANCHOR_MISSIONS,
 } from "@/features/interventions/technicianHubNavigation";
@@ -52,12 +57,11 @@ export function parseTechnicianNotificationData(
 export function dispatchTechnicianNotificationIntent(intent: TechnicianNotificationIntent): void {
   if (typeof window === "undefined" || intent.kind === "none") return;
 
-  if (!window.location.pathname.startsWith(TECHNICIAN_MOBILE_APP_ROUTE)) {
+  if (!isTechnicianAppPath(currentAppPathname())) {
     const params = new URLSearchParams();
     if (intent.kind === "case") params.set(BM_TECH_CASE_PARAM, intent.caseId);
     if (intent.kind === "reminder") params.set(BM_TECH_REMINDER_PARAM, "1");
-    const qs = params.toString();
-    window.location.assign(`${TECHNICIAN_MOBILE_APP_ROUTE}${qs ? `?${qs}` : ""}`);
+    redirectToTechnicianApp(params);
     return;
   }
 

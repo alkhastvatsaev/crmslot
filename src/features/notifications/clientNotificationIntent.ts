@@ -10,6 +10,11 @@ import {
   BM_CLIENT_CHAT_PARAM,
 } from "@/features/notifications/notificationConstants";
 import {
+  currentAppPathname,
+  isClientAppPath,
+  redirectToClientApp,
+} from "@/features/notifications/pushNotificationNavigation";
+import {
   parseClientNotificationSearchParams,
   type ClientNotificationIntent,
 } from "@/features/notifications/clientNotificationUrls";
@@ -47,15 +52,14 @@ export function parseClientNotificationData(
 export function dispatchClientNotificationIntent(intent: ClientNotificationIntent): void {
   if (typeof window === "undefined" || intent.kind === "none") return;
 
-  if (!window.location.pathname.startsWith(CLIENT_MOBILE_APP_ROUTE)) {
+  if (!isClientAppPath(currentAppPathname())) {
     const params = new URLSearchParams();
     if (intent.kind === "chat") {
       params.set(BM_CLIENT_CHAT_PARAM, intent.caseId ?? "open");
     } else {
       params.set(BM_CLIENT_CASE_PARAM, intent.caseId);
     }
-    const qs = params.toString();
-    window.location.assign(`${CLIENT_MOBILE_APP_ROUTE}${qs ? `?${qs}` : ""}`);
+    redirectToClientApp(params);
     return;
   }
 

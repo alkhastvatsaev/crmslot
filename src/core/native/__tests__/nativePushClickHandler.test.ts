@@ -1,3 +1,14 @@
+import * as pushNav from "@/features/notifications/pushNotificationNavigation";
+import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
+
+jest.mock("@/features/notifications/pushNotificationNavigation", () => ({
+  currentAppPathname: jest.fn(() => "/m/technician"),
+  isTechnicianAppPath: jest.fn((pathname = "") => pathname.startsWith("/m/technician")),
+  redirectToTechnicianApp: jest.fn(),
+  isClientAppPath: jest.fn(),
+  redirectToClientApp: jest.fn(),
+}));
+
 import { registerNativePushClickHandler } from "@/core/native/nativePushClickHandler";
 import { TECHNICIAN_NOTIFICATION_INTENT_EVENT } from "@/features/notifications";
 import { BM_TECH_CASE_PARAM } from "@/features/notifications";
