@@ -2621,7 +2621,11 @@
     "rail_left": "Слева",
     "rail_center": "Центр",
     "rail_right": "Справа",
-    "tab_ai": "ИИ"
+    "tab_ai": "ИИ",
+    "calendar_open_navigation": "Открыть навигацию",
+    "calendar_open_calendar": "Открыть календарь",
+    "calendar_prev_day": "Предыдущий день",
+    "calendar_next_day": "Следующий день"
   },
   "notifications": {
     "prefs_title": "Настройки уведомлений",

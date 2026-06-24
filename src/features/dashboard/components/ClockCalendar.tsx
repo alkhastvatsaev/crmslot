@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDateContext } from "@/context/DateContext";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
-import { useTranslation } from "@/core/i18n/I18nContext";
+import { useTranslation, type Language } from "@/core/i18n/I18nContext";
 import { cn } from "@/lib/utils";
 
 type ClockCalendarProps = {
@@ -14,6 +14,19 @@ type ClockCalendarProps = {
   toggleTarget?: "pages" | "calendar";
 };
 
+function resolveDateLocale(language: Language): string {
+  switch (language) {
+    case "en":
+      return "en-GB";
+    case "nl":
+      return "nl-NL";
+    case "ru":
+      return "ru-RU";
+    default:
+      return "fr-FR";
+  }
+}
+
 export default function ClockCalendar({
   compact = false,
   interactive = false,
@@ -21,9 +34,9 @@ export default function ClockCalendar({
 }: ClockCalendarProps) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
 
-  const locale = language === "nl" ? "nl-NL" : language === "en" ? "en-GB" : "fr-FR";
+  const locale = resolveDateLocale(language);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -94,6 +107,7 @@ export default function ClockCalendar({
           onClick={(e) => changeDay(e, -1)}
           className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
+          aria-label={String(t("mobile.calendar_prev_day"))}
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
@@ -103,7 +117,9 @@ export default function ClockCalendar({
             data-testid="clock-calendar-toggle"
             className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
             aria-label={
-              toggleTarget === "calendar" ? "Ouvrir le calendrier" : "Ouvrir la navigation"
+              toggleTarget === "calendar"
+                ? String(t("mobile.calendar_open_calendar"))
+                : String(t("mobile.calendar_open_navigation"))
             }
             aria-expanded={
               toggleTarget === "calendar"
@@ -126,6 +142,7 @@ export default function ClockCalendar({
           onClick={(e) => changeDay(e, 1)}
           className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700"
           type="button"
+          aria-label={String(t("mobile.calendar_next_day"))}
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -154,6 +171,8 @@ export default function ClockCalendar({
               data-testid="prev-day-btn"
               onClick={(e) => changeDay(e, -1)}
               className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer text-slate-400 hover:text-slate-700 flex-shrink-0"
+              type="button"
+              aria-label={String(t("mobile.calendar_prev_day"))}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -180,6 +199,8 @@ export default function ClockCalendar({
               data-testid="next-day-btn"
               onClick={(e) => changeDay(e, 1)}
               className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer text-slate-400 hover:text-slate-700 flex-shrink-0"
+              type="button"
+              aria-label={String(t("mobile.calendar_next_day"))}
             >
               <ChevronRight className="w-5 h-5" />
             </button>

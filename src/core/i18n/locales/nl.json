@@ -2621,7 +2621,11 @@
     "rail_left": "Links",
     "rail_center": "Midden",
     "rail_right": "Rechts",
-    "tab_ai": "IA"
+    "tab_ai": "IA",
+    "calendar_open_navigation": "Navigatie openen",
+    "calendar_open_calendar": "Kalender openen",
+    "calendar_prev_day": "Vorige dag",
+    "calendar_next_day": "Volgende dag"
   },
   "notifications": {
     "prefs_title": "Meldingsvoorkeuren",

@@ -2,7 +2,10 @@
 
 import { useEffect } from "react";
 import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
-import { DASHBOARD_MOBILE_NAV_ICONS } from "@/features/dashboard/dashboardMobileNav";
+import {
+  DASHBOARD_MOBILE_NAV_ICONS,
+  MOBILE_TAB_I18N,
+} from "@/features/dashboard/dashboardMobileNav";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -72,7 +75,9 @@ export default function MobileNavDrawer({ open, onClose, profileName, profileRol
                 <span className="mobile-nav-drawer-icon">
                   <Icon size={22} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
                 </span>
-                <span className="mobile-nav-drawer-label">{page.guideTitle}</span>
+                <span className="mobile-nav-drawer-label">
+                  {String(t(MOBILE_TAB_I18N[page.spotlightLabelKey]))}
+                </span>
               </button>
             );
           })}
