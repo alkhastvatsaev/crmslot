@@ -5,6 +5,7 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
 import type { CompanyMembershipRow, CompanyRole } from "@/features/company";
 import {
+  appendEnvDefaultMembershipFallback,
   mergeCompanyMembershipRows,
   pickActiveCompanyId,
   type CompanyLiveState,
@@ -63,10 +64,10 @@ export function useCompanyWorkspaceMemberships(
     [persistActiveId]
   );
 
-  const memberships = useMemo(
-    () => mergeCompanyMembershipRows(membershipDocs, companyById),
-    [membershipDocs, companyById]
-  );
+  const memberships = useMemo(() => {
+    const merged = mergeCompanyMembershipRows(membershipDocs, companyById);
+    return appendEnvDefaultMembershipFallback(merged);
+  }, [membershipDocs, companyById]);
 
   useEffect(() => {
     if (!firestore || !firebaseUid || !isConfigured) {
@@ -174,14 +175,15 @@ export function useCompanyWorkspaceMemberships(
         : "";
 
     setActiveCompanyIdState((prev) => {
-      const next = memberships.length === 0 ? "" : pickActiveCompanyId(memberships, prev, stored);
+      const next =
+        memberships.length === 0 ? "" : pickActiveCompanyId(memberships, prev, stored, companyById);
       if (typeof window !== "undefined") {
         if (next) window.localStorage.setItem(ACTIVE_COMPANY_STORAGE_KEY, next);
         else window.localStorage.removeItem(ACTIVE_COMPANY_STORAGE_KEY);
       }
       return next;
     });
-  }, [memberships, membershipsReady]);
+  }, [memberships, membershipsReady, companyById]);
 
   const storedActiveCompanyId = useMemo(() => {
     if (typeof window === "undefined") return "";

@@ -13,6 +13,7 @@ import {
   saveStaffAccountProfile,
   type StaffAccountDraft,
 } from "@/features/auth/staffAccountProfile";
+import { readClientPortalDefaultCompanyIdFromEnv } from "@/features/company/clientPortalCompanyId";
 
 type TechnicianFirestoreProfile = {
   firstName: string;
@@ -68,13 +69,14 @@ function draftFromFields(
   fields: CrmStaffAccountFields,
   memberships: CompanyMembershipRow[]
 ): StaffAccountDraft {
+  const envCompanyId = readClientPortalDefaultCompanyIdFromEnv();
   const membership = memberships.find((m) => m.companyId === fields.companyId) ?? memberships[0];
   return {
     firstName: fields.firstName,
     lastName: fields.lastName,
     email: fields.email,
     phone: fields.phone,
-    companyId: membership?.companyId ?? fields.companyId,
+    companyId: membership?.companyId ?? (fields.companyId.trim() || envCompanyId),
     role: membership?.role ?? fields.roleLabel ?? "collaborateur",
   };
 }
