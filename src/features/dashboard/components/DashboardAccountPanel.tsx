@@ -17,6 +17,11 @@ import {
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import type { CompanyRole } from "@/features/company";
+import {
+  resolveStaffProfileRoleKey,
+  STAFF_ACCOUNT_ROLE_OPTIONS,
+  staffAccountRoleOptionLabelKey,
+} from "@/features/auth/staffAccountRoleDisplay";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
   MOBILE_HUB_PANEL_INNER_CLASS,
@@ -59,20 +64,6 @@ const accountSelectClass = cn(
   "appearance-none pr-9",
   "bg-[length:1rem] bg-[right_0.65rem_center] bg-no-repeat"
 );
-
-const COMPANY_ROLES: CompanyRole[] = ["admin", "collaborateur"];
-
-function resolveStaffRoleKey(roleLabel: string | null): string {
-  if (roleLabel === "admin") return "admin";
-  if (roleLabel === "collaborateur") return "technician";
-  return roleLabel?.trim() || "back_office";
-}
-
-function roleOptionLabel(role: CompanyRole, t: (key: string) => string): string {
-  return role === "admin"
-    ? String(t("staff_account.role_admin"))
-    : String(t("staff_account.role_staff"));
-}
 
 function ReadOnlyField({
   icon,
@@ -248,7 +239,7 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
     handleSignOut,
   } = useCrmStaffAccountPanel();
   const isDesktop = variant === "desktop";
-  const displayRoleKey = resolveStaffRoleKey(editing ? draft.role : fields.roleLabel);
+  const displayRoleKey = resolveStaffProfileRoleKey(editing ? draft.role : fields.roleLabel);
   const roleLabel = String(t(`profiles.roles.${displayRoleKey}`));
 
   const body = (
@@ -347,9 +338,9 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
                     value={draft.role}
                     onChange={(value) => updateDraft({ role: value as CompanyRole })}
                   >
-                    {COMPANY_ROLES.map((role) => (
+                    {STAFF_ACCOUNT_ROLE_OPTIONS.map((role) => (
                       <option key={role} value={role}>
-                        {roleOptionLabel(role, t)}
+                        {String(t(staffAccountRoleOptionLabelKey(role)))}
                       </option>
                     ))}
                   </SelectField>
