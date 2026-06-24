@@ -61,6 +61,13 @@ export {
   clientNotificationChatUrl,
 } from "@/features/notifications/clientNotificationUrls";
 export type { ClientNotificationIntent } from "@/features/notifications/clientNotificationUrls";
+export {
+  parseClientNotificationData,
+  dispatchClientNotificationIntent,
+  applyClientNotificationIntent,
+  CLIENT_NOTIFICATION_INTENT_EVENT,
+} from "@/features/notifications/clientNotificationIntent";
+export { routePushNotificationClick } from "@/features/notifications/routePushNotificationClick";
 export { parseTechnicianNotificationSearchParams } from "@/features/notifications/technicianNotificationUrls";
 export type { TechnicianNotificationIntent } from "@/features/notifications/technicianNotificationUrls";
 export {

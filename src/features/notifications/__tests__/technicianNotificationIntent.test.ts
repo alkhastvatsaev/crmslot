@@ -15,6 +15,18 @@ describe("technicianNotificationIntent", () => {
     });
   });
 
+  it("parseTechnicianNotificationData reads assignment payload", () => {
+    expect(
+      parseTechnicianNotificationData({
+        type: "assignment",
+        interventionId: "iv-42",
+      })
+    ).toEqual({
+      kind: "case",
+      caseId: "iv-42",
+    });
+  });
+
   it("dispatchTechnicianNotificationIntent emits custom event", () => {
     const handler = jest.fn();
     window.addEventListener(TECHNICIAN_NOTIFICATION_INTENT_EVENT, handler);
