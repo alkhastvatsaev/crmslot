@@ -21,6 +21,7 @@ export default function BackOfficeInboxChatTab({
   setSelectedChatInterventionId,
   portalChatCompanyId,
   chatDayRows,
+  threadsNeedingReply,
   interventions,
   setActiveTab,
 }: {
@@ -29,6 +30,7 @@ export default function BackOfficeInboxChatTab({
   setSelectedChatInterventionId: (id: string | null) => void;
   portalChatCompanyId: string | null;
   chatDayRows: ChatDayMissionRow[];
+  threadsNeedingReply?: ReadonlySet<string>;
   interventions: Intervention[];
   setActiveTab: (tab: "chat" | "requests" | "reports" | "documents") => void;
 }) {
@@ -93,6 +95,7 @@ export default function BackOfficeInboxChatTab({
         <ChatDayClientsPicker
           className={cn(GLASS_PANEL_BODY_SCROLL_COMPACT, "py-4 px-1")}
           rows={chatDayRows}
+          threadsNeedingReply={threadsNeedingReply}
           selectedThreadId={selectedChatInterventionId}
           onSelectGlobal={() => setSelectedChatInterventionId(PORTAL_CHAT_GLOBAL_THREAD_ID)}
           onSelectClient={(threadId) => setSelectedChatInterventionId(threadId)}

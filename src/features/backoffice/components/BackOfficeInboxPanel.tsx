@@ -135,6 +135,7 @@ export default function BackOfficeInboxPanel({
         setSelectedChatInterventionId={s.setSelectedChatInterventionId}
         portalChatCompanyId={s.portalChatCompanyId}
         chatDayRows={s.chatDayRows}
+        threadsNeedingReply={s.chatThreadsNeedingReplyIds}
         interventions={s.interventions}
         setActiveTab={s.setActiveTab}
       />

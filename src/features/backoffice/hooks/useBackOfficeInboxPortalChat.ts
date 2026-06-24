@@ -8,12 +8,12 @@ import { PORTAL_CHAT_MESSAGE_EVENT } from "@/features/backoffice/portalChatBridg
 import { subscribePortalChatMessages } from "@/features/backoffice/portalChatFirestore";
 import type { PortalChatDoc } from "@/features/backoffice/portalChatFirestore";
 import {
-  countClientPortalThreadsNeedingReply,
   enrichChatDayRowsFromPortalMessages,
   filterNewClientPortalMessages,
   interventionIdsWithClientPortalChat,
   portalChatMessageTimeMs,
   portalChatPickerThreadId,
+  portalChatThreadIdsNeedingReply,
   PORTAL_CHAT_GLOBAL_THREAD_ID,
   showPortalChatBrowserNotification,
 } from "@/features/backoffice/portalChatInboxLogic";
@@ -58,7 +58,13 @@ export function useBackOfficeInboxPortalChat({
   const portalChatHydratedRef = useRef(false);
   const [portalChatMessages, setPortalChatMessages] = useState<PortalChatDoc[]>([]);
 
+  const chatThreadsNeedingReplyIds = useMemo(
+    () => portalChatThreadIdsNeedingReply(portalChatMessages),
+    [portalChatMessages]
+  );
+
   const chatDayRows = useMemo(() => {
+    const needingReply = chatThreadsNeedingReplyIds;
     const base = buildChatDayRows({
       interventions,
       dayMissions,
@@ -69,13 +75,20 @@ export function useBackOfficeInboxPortalChat({
     return enrichChatDayRowsFromPortalMessages(base, portalChatMessages, {
       interventions,
       selectedDate,
-    });
-  }, [dayMissions, interventions, selectedDate, workspace, portalChatMessages]);
+    }).map((row) => ({
+      ...row,
+      needsReply: needingReply.has(row.threadId),
+    }));
+  }, [
+    dayMissions,
+    interventions,
+    selectedDate,
+    workspace,
+    portalChatMessages,
+    chatThreadsNeedingReplyIds,
+  ]);
 
-  const chatThreadsNeedingReply = useMemo(
-    () => countClientPortalThreadsNeedingReply(portalChatMessages),
-    [portalChatMessages]
-  );
+  const chatThreadsNeedingReply = chatThreadsNeedingReplyIds.size;
 
   useEffect(() => {
     if (!isTenant) return;
@@ -146,5 +159,5 @@ export function useBackOfficeInboxPortalChat({
     setSelectedChatInterventionId,
   ]);
 
-  return { chatDayRows, chatThreadsNeedingReply };
+  return { chatDayRows, chatThreadsNeedingReply, chatThreadsNeedingReplyIds };
 }
