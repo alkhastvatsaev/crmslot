@@ -1136,6 +1136,12 @@
   min-height: 0.625rem;
 }
 
+.mobile-hub-dots-bar--interactive {
+  pointer-events: auto;
+  min-height: 1.75rem;
+  padding-top: 0.25rem;
+}
+
 .mobile-hub-dots {
   display: flex;
   flex-shrink: 0;
@@ -1150,9 +1156,23 @@
   height: 0.3125rem;
   border-radius: 9999px;
   background: rgb(203 213 225);
+  border: none;
+  padding: 0;
+  cursor: pointer;
   transition:
     width 0.22s ease,
     background 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mobile-hub-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .mobile-hub-dot:hover {
+    background: rgb(148 163 184);
+  }
 }
 
 .mobile-hub-dot--active {

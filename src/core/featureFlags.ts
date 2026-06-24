@@ -41,6 +41,8 @@ export type CrmslotFeatureFlags = {
   remoteESign: boolean;
   /** Rapports BI + analytics PostHog. */
   analyticsReports: boolean;
+  /** Blocage acceptation mission si dossiers terrain non clôturés. */
+  technicianClosureBlock: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
@@ -66,6 +68,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   outboundWebhooks: true,
   remoteESign: true,
   analyticsReports: true,
+  technicianClosureBlock: true,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -142,6 +145,10 @@ export function featureFlagsFromEnv(): CrmslotFeatureFlags {
     analyticsReports: readEnvBool(
       "NEXT_PUBLIC_FF_ANALYTICS",
       DEFAULT_FEATURE_FLAGS.analyticsReports
+    ),
+    technicianClosureBlock: readEnvBool(
+      "NEXT_PUBLIC_FF_TECHNICIAN_CLOSURE_BLOCK",
+      DEFAULT_FEATURE_FLAGS.technicianClosureBlock
     ),
   };
 }

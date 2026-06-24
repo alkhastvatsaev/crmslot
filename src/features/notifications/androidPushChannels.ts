@@ -51,6 +51,7 @@ export function resolveAndroidPushChannelId(data?: Record<string, string>): stri
   if (
     type === "assignment" ||
     type === "reminder" ||
+    type === "unclosed_dossier" ||
     type === "status" ||
     type === "late_technician" ||
     type === "unpaid_invoice"

@@ -9,7 +9,11 @@ import {
   declineTechnicianAssignmentPatch,
 } from "@/features/interventions/technicianAssignmentActions";
 import { assertTechnicianMayRespondToAssignment } from "@/features/interventions/technicianAssignmentServerAuth";
-import { transitionInterventionStatusAdmin } from "@/features/interventions/index.server";
+import {
+  assertTechnicianClosureBlockForAccept,
+  technicianClosureBlockHttpError,
+  transitionInterventionStatusAdmin,
+} from "@/features/interventions/index.server";
 import { technicianTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { notifyCompanyAdminsPush } from "@/features/notifications/index.server";
 import { logger } from "@/core/logger";
@@ -60,6 +64,18 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       { ok: false, error: "Mission non assignée à ce technicien." },
       { status: 403 }
     );
+  }
+
+  if (action === "accept") {
+    const closureBlock = await assertTechnicianClosureBlockForAccept({
+      db,
+      technicianUid: auth.uid,
+      companyId: iv.companyId,
+      acceptingInterventionId: interventionId,
+    });
+    if (closureBlock.blocked) {
+      return NextResponse.json(technicianClosureBlockHttpError(closureBlock), { status: 409 });
+    }
   }
 
   const actor = technicianTransitionActor(auth.uid);

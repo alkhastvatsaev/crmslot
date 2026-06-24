@@ -23,7 +23,7 @@ export function parseClientNotificationSearchParams(
 
 export function clientNotificationCaseUrl(origin: string, interventionId: string): string {
   const base = origin.replace(/\/$/, "");
-  return `${base}/?${BM_CLIENT_CASE_PARAM}=${encodeURIComponent(interventionId)}`;
+  return `${base}/m/demande?${BM_CLIENT_CASE_PARAM}=${encodeURIComponent(interventionId)}`;
 }
 
 export function clientNotificationChatUrl(origin: string, interventionId?: string | null): string {

@@ -1753,6 +1753,16 @@
     },
     "assignment": {
       "assignment_declined": "Mission refusée — renvoyée aux demandes entrantes"
+    },
+    "closure_block": {
+      "banner_title": "{{count}} mission(s) à clôturer",
+      "banner_hint": "Clôturez vos missions en cours avant d'en accepter une nouvelle.",
+      "banner_cta": "Voir",
+      "accept_disabled_hint": "Clôturez d'abord vos missions en cours pour accepter celle-ci.",
+      "modal_title": "Missions non clôturées",
+      "modal_body": "Vous avez encore des missions ouvertes. Clôturez-les avant d'en accepter une nouvelle.",
+      "modal_go": "Aller aux missions à clôturer",
+      "modal_dismiss": "Fermer"
     }
   },
   "common": {

@@ -34,7 +34,12 @@ export function parseTechnicianNotificationData(
 
   const pushType = data.type?.trim() ?? "";
   const interventionId = data.interventionId?.trim();
-  if (interventionId && (pushType === "assignment" || pushType === "appointment_reminder")) {
+  if (
+    interventionId &&
+    (pushType === "assignment" ||
+      pushType === "appointment_reminder" ||
+      pushType === "unclosed_dossier")
+  ) {
     return { kind: "case", caseId: interventionId };
   }
   if (pushType === "daily_reminder" || pushType === "appointment_reminder") {
@@ -46,6 +51,16 @@ export function parseTechnicianNotificationData(
 
 export function dispatchTechnicianNotificationIntent(intent: TechnicianNotificationIntent): void {
   if (typeof window === "undefined" || intent.kind === "none") return;
+
+  if (!window.location.pathname.startsWith(TECHNICIAN_MOBILE_APP_ROUTE)) {
+    const params = new URLSearchParams();
+    if (intent.kind === "case") params.set(BM_TECH_CASE_PARAM, intent.caseId);
+    if (intent.kind === "reminder") params.set(BM_TECH_REMINDER_PARAM, "1");
+    const qs = params.toString();
+    window.location.assign(`${TECHNICIAN_MOBILE_APP_ROUTE}${qs ? `?${qs}` : ""}`);
+    return;
+  }
+
   window.dispatchEvent(
     new CustomEvent<TechnicianNotificationIntent>(TECHNICIAN_NOTIFICATION_INTENT_EVENT, {
       detail: intent,

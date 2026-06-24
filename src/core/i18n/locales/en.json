@@ -1753,6 +1753,16 @@
     },
     "assignment": {
       "assignment_declined": "Job declined — sent back to incoming requests"
+    },
+    "closure_block": {
+      "banner_title": "{{count}} open job(s) to close",
+      "banner_hint": "Close your in-progress jobs before accepting a new one.",
+      "banner_cta": "View",
+      "accept_disabled_hint": "Close your open jobs before accepting this assignment.",
+      "modal_title": "Unclosed jobs",
+      "modal_body": "You still have open jobs. Close them before accepting a new assignment.",
+      "modal_go": "Go to jobs to close",
+      "modal_dismiss": "Close"
     }
   },
   "common": {
