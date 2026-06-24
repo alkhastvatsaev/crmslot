@@ -2,7 +2,7 @@
 
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
-import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
+import { resolveStaffProfileRoleKey } from "@/features/auth/staffAccountRoleDisplay";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   resolveTechnicianProfileFirstName,
@@ -24,7 +24,7 @@ export default function AdminMobileProfileChip() {
     String(t("technician_hub.dashboard.detail.not_provided"))
   );
   const firstNameClass = technicianFirstNameTextClass(firstName);
-  const roleKey = fields.roleLabel?.trim() || "back_office";
+  const roleKey = resolveStaffProfileRoleKey(fields.roleLabel);
 
   return (
     <button
