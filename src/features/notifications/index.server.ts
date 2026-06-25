@@ -8,3 +8,5 @@ export type {
 } from "@/features/notifications/sendNativePushAdmin";
 export { notifyCompanyAdminsPush } from "@/features/notifications/notifyCompanyAdminsPush";
 export type { NotifyAdminsResult } from "@/features/notifications/notifyCompanyAdminsPush";
+export { runGoogleReviewRequestsAdmin } from "@/features/notifications/server/runGoogleReviewRequestsAdmin";
+export type { GoogleReviewRequestsReport } from "@/features/notifications/server/runGoogleReviewRequestsAdmin";

@@ -70,6 +70,10 @@
     {
       "path": "/api/cron/technician-unclosed-reminders",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/google-review-requests",
+      "schedule": "0 9 * * *"
     }
   ]
 }
