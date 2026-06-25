@@ -983,6 +983,13 @@
       "surcharges": "Majorations"
     },
     "surcharge": {
+      "title": "Majorations auto",
+      "subtitle": "Selon le créneau planifié de l'intervention",
+      "weekend_row": "Week-end (sam.–dim.)",
+      "after_row": "Après",
+      "preview": "Ex. samedi 20h → +{{rate}} % ajouté sur la facture",
+      "preview_off": "Désactivé — aucune majoration sur les factures",
+      "advanced": "Réglages avancés",
       "hint": "Majoration automatique sur le brouillon de facture selon le créneau planifié.",
       "enabled": "Activer les majorations",
       "line_label": "Libellé ligne facture",
@@ -995,7 +1002,7 @@
       "apply_to": "Base de calcul",
       "apply_subtotal": "Sous-total complet",
       "apply_excl_travel": "Sous-total hors déplacement",
-      "save": "Enregistrer les majorations",
+      "save": "Enregistrer",
       "saved": "Majorations enregistrées"
     }
   },
