@@ -7,6 +7,7 @@ import {
   SmartFormRecapPhotosStrip,
 } from "@/features/interventions/components/SmartFormRecapPhotosSheet";
 import SmartFormRecapTiles from "@/features/interventions/components/SmartFormRecapTiles";
+import InterventionPriceEstimateCard from "@/features/interventions/components/InterventionPriceEstimateCard";
 
 type Props = {
   firstName: string;
@@ -74,6 +75,15 @@ export default function SmartFormStep5Recap(props: Props) {
           <SmartFormRecapPhotosStrip
             photoDataUrls={photoDataUrls}
             onOpen={() => setRecapPhotosOpen(true)}
+          />
+          <InterventionPriceEstimateCard
+            problem={description}
+            transcription={audioTranscription}
+            category="serrurerie"
+            address={address}
+            urgency={urgency}
+            scheduledDate={scheduledDate}
+            scheduledTime={scheduledTime}
           />
         </div>
       </div>

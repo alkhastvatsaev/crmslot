@@ -130,6 +130,12 @@ export default function RequesterInterventionSteps({ c }: Props) {
           <RequesterStepAddressSubmit
             showSubmitSuccess={c.showSubmitSuccess}
             dossierNumber={c.lastSubmittedPortalAccessCode}
+            problemTemplateId={c.problemTemplateId}
+            problemLabel={c.problemLabel}
+            description={c.description}
+            urgency={c.requestDataUrgency}
+            interventionDate={c.interventionDate}
+            interventionTime={c.interventionTime}
             interventionAddress={c.interventionAddress}
             interventionLatLng={c.interventionLatLng ?? null}
             locatingAddress={c.locatingAddress}

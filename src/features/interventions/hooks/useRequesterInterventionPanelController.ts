@@ -46,6 +46,7 @@ export function useRequesterInterventionPanelController() {
     interventionTime,
     audioBlob,
     photoDataUrls,
+    urgency: requestDataUrgency,
   } = requestData;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -162,6 +163,7 @@ export function useRequesterInterventionPanelController() {
     interventionTime,
     audioBlob,
     photoDataUrls,
+    requestDataUrgency,
     fileInputRef,
     descriptionVoiceListening,
     descriptionVoiceSupported,
