@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -10,6 +10,7 @@ import TeamHubStaffGrid from "@/features/teamHub/components/TeamHubStaffGrid";
 import TeamHubRightPanel from "@/features/teamHub/components/TeamHubRightPanel";
 import TeamHubAddMemberPanel from "@/features/teamHub/components/TeamHubAddMemberPanel";
 import { useCompanyStaff } from "@/features/teamHub/hooks/useCompanyStaff";
+import type { CreateCompanyStaffResponse } from "@/features/teamHub/hooks/useCreateCompanyStaff";
 import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
@@ -28,10 +29,25 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   const workspace = useCompanyWorkspaceOptional();
   const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { staff, loading, error, refresh } = useCompanyStaff(pageActive ? companyId : null);
+  const { staff, loading, error, refresh, upsertStaffMember } = useCompanyStaff(
+    pageActive ? companyId : null
+  );
   const isAdmin = workspace?.activeRole === "admin";
 
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
+
+  const handleMemberCreated = useCallback(
+    async (result: CreateCompanyStaffResponse) => {
+      if (result.mode === "member" && result.member) {
+        upsertStaffMember(result.member);
+      }
+      await refresh();
+      if (result.mode === "member") {
+        setSelectedUid(result.uid);
+      }
+    },
+    [refresh, upsertStaffMember]
+  );
 
   const gate =
     companyPhase === "loading" ? (
@@ -70,7 +86,11 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
         <section className={sideShell}>
           {gate}
           {companyId && !gate && isAdmin ? (
-            <TeamHubAddMemberPanel companyId={companyId} staff={staff} onRefresh={refresh} />
+            <TeamHubAddMemberPanel
+              companyId={companyId}
+              staff={staff}
+              onCreated={handleMemberCreated}
+            />
           ) : companyId && !gate ? (
             <div
               data-testid="team-hub-add-admin-only"

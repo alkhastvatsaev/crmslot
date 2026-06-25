@@ -47,6 +47,7 @@ export async function provisionTechnicianStaffRecord(
     status: existingData.status ?? "available",
     vehicle: existingData.vehicle ?? "Camionnette",
     location: existingData.location ?? DEFAULT_LOCATION,
+    active: existingData.active !== false,
     updatedAt: FieldValue.serverTimestamp(),
   };
 

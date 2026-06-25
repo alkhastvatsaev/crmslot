@@ -101,5 +101,11 @@ export async function POST(req: Request) {
     },
   });
 
+  if (result.mode === "member") {
+    const staff = await listCompanyStaff(db, admin.auth, adminCtx.companyId);
+    const member = staff.find((row) => row.uid === result.uid);
+    return NextResponse.json({ ...result, member });
+  }
+
   return NextResponse.json(result);
 }

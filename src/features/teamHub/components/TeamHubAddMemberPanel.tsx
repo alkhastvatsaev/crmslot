@@ -17,7 +17,7 @@ import {
 type Props = {
   companyId: string;
   staff: CompanyStaffMember[];
-  onRefresh: () => Promise<void>;
+  onCreated?: (result: CreateCompanyStaffResponse) => void | Promise<void>;
 };
 
 function suggestStaffKind(staff: CompanyStaffMember[]): CompanyStaffKind {
@@ -33,7 +33,7 @@ function resolveCopyPayload(result: CreateCompanyStaffResponse): string | null {
   return null;
 }
 
-export default function TeamHubAddMemberPanel({ companyId, staff, onRefresh }: Props) {
+export default function TeamHubAddMemberPanel({ companyId, staff, onCreated }: Props) {
   const { t } = useTranslation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -43,7 +43,7 @@ export default function TeamHubAddMemberPanel({ companyId, staff, onRefresh }: P
 
   const { busy, error, lastResult, createMember, clearFeedback } = useCreateCompanyStaff(
     companyId,
-    () => void onRefresh()
+    onCreated
   );
 
   const copyPayload = lastResult ? resolveCopyPayload(lastResult) : null;
