@@ -24,7 +24,13 @@ jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
 
 jest.mock("@/features/dashboard/hooks/useMobileFooterGalaxyVisible", () => ({
   useMobileFooterGalaxyVisible: jest.fn(() => false),
+  useMobileHubAgentRailActive: jest.fn(() => false),
 }));
+
+beforeEach(() => {
+  jest.mocked(mobileFooterGalaxyVisible.useMobileFooterGalaxyVisible).mockReturnValue(false);
+  jest.mocked(mobileFooterGalaxyVisible.useMobileHubAgentRailActive).mockReturnValue(false);
+});
 
 jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
   useCrmStaffAccountPanel: () => ({

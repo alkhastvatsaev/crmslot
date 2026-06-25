@@ -9,6 +9,7 @@ jest.mock("@/features/map/components/MapboxView", () => ({
 
 jest.mock("@/features/dashboard/hooks/useMobileFooterGalaxyVisible", () => ({
   useMobileFooterGalaxyVisible: jest.fn(() => false),
+  useMobileHubAgentRailActive: jest.fn(() => false),
 }));
 
 describe("AdminMobileApp", () => {
