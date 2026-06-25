@@ -791,6 +791,12 @@
   gap: 0.625rem;
 }
 
+.mobile-account-panel .dashboard-page-selector-language--mobile {
+  padding-inline: 0;
+  padding-top: 0;
+  padding-bottom: 0.5rem;
+}
+
 .account-panel-footer {
   display: flex;
   flex-direction: column;

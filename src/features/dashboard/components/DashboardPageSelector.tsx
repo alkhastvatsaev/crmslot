@@ -112,7 +112,6 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
       sectionDataVariant={variant}
       sectionProps={{ "aria-label": "Navigation" }}
     >
-      <DashboardLanguageSelector variant="mobile" />
       {grid}
     </MobileCentralPanelFrame>
   );

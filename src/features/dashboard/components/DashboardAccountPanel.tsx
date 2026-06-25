@@ -22,6 +22,7 @@ import {
   staffAccountRoleOptionLabelKey,
   type StaffAccountRoleOption,
 } from "@/features/auth/staffAccountRoleDisplay";
+import DashboardLanguageSelector from "@/features/dashboard/components/DashboardLanguageSelector";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
   MOBILE_HUB_PANEL_INNER_CLASS,
@@ -253,6 +254,8 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
         backTestId="dashboard-account-close"
         className="shrink-0 border-b-0 px-0 py-2"
       />
+
+      {!isDesktop ? <DashboardLanguageSelector variant="mobile" /> : null}
 
       {!ready ? (
         <div
