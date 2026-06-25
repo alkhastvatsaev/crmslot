@@ -983,6 +983,13 @@
       "surcharges": "Surcharges"
     },
     "surcharge": {
+      "title": "Auto surcharges",
+      "subtitle": "Based on the scheduled slot",
+      "weekend_row": "Weekend (Sat–Sun)",
+      "after_row": "After",
+      "preview": "E.g. Sat 8pm → +{{rate}}% added to the invoice",
+      "preview_off": "Off — no surcharge on invoices",
+      "advanced": "Advanced settings",
       "hint": "Automatic surcharge on draft invoices based on the scheduled slot.",
       "enabled": "Enable surcharges",
       "line_label": "Invoice line label",
@@ -995,7 +1002,7 @@
       "apply_to": "Calculation base",
       "apply_subtotal": "Full subtotal",
       "apply_excl_travel": "Subtotal excluding travel",
-      "save": "Save surcharges",
+      "save": "Save",
       "saved": "Surcharges saved"
     }
   },

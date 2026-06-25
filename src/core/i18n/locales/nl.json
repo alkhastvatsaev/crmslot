@@ -983,6 +983,13 @@
       "surcharges": "Toeslagen"
     },
     "surcharge": {
+      "title": "Auto-toeslagen",
+      "subtitle": "Volgens het geplande tijdslot",
+      "weekend_row": "Weekend (za.–zo.)",
+      "after_row": "Na",
+      "preview": "Bv. zaterdag 20u → +{{rate}}% op de factuur",
+      "preview_off": "Uit — geen toeslag op facturen",
+      "advanced": "Geavanceerde instellingen",
       "hint": "Automatische toeslag op factuurconcepten volgens het geplande tijdslot.",
       "enabled": "Toeslagen inschakelen",
       "line_label": "Label factuurregel",
@@ -995,7 +1002,7 @@
       "apply_to": "Berekeningsbasis",
       "apply_subtotal": "Volledig subtotaal",
       "apply_excl_travel": "Subtotaal zonder verplaatsing",
-      "save": "Toeslagen opslaan",
+      "save": "Opslaan",
       "saved": "Toeslagen opgeslagen"
     }
   },
