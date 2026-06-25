@@ -3,8 +3,12 @@
 import { useCallback, useMemo, useState } from "react";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
+import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
+import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
   buildInterventionClientLabelMap,
@@ -44,12 +48,21 @@ export function useChatbotDocumentsRightPanelController() {
 
   const workspace = useCompanyWorkspaceOptional();
   const isMobile = useIsMobile();
+  const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
+  const billingIntent = useBillingHubIntentOptional();
+  const railSnapshot = useMobileHubRailSnapshot();
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
+  const billingHubDocumentsRailActive =
+    pager?.pageIndex === BILLING_HUB_SLOT_INDEX &&
+    (billingIntent?.rightPanelTab ?? "documents") === "documents" &&
+    (isMobile !== true || railSnapshot?.activeRail === "right");
   const interventionsCompanyId =
     (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
   const interventionsFirestoreEnabled =
-    isMobile !== true || (powerGate.inboxDataActive && powerGate.documentsTabActive);
+    isMobile !== true ||
+    (powerGate.inboxDataActive && powerGate.documentsTabActive) ||
+    billingHubDocumentsRailActive;
   const { interventions } = useBackOfficeInterventions(
     interventionsFirestoreEnabled ? interventionsCompanyId : null
   );

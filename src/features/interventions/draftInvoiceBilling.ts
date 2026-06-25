@@ -7,6 +7,7 @@ import {
 } from "@/features/interventions/interventionBillingContext";
 import { suggestBillingLinesFromProblem } from "@/features/interventions/suggestBillingLines";
 import type { Intervention } from "@/features/interventions/types";
+import type { BillingSurchargeSettings } from "@/features/billing/billingSurchargeSettings";
 
 export type DraftBillingLine = {
   description: string;
@@ -41,10 +42,15 @@ function normalizeLines(lines: DraftBillingLine[]): DraftBillingLine[] {
 }
 
 /** Proposition locale à partir du formulaire client + catégorie. */
-export function buildTemplateDraftBilling(iv: InterventionBillingContext): DraftBillingLine[] {
+export function buildTemplateDraftBilling(
+  iv: InterventionBillingContext & { problemTemplateId?: string | null },
+  surchargeSettings?: BillingSurchargeSettings
+): DraftBillingLine[] {
   const problem = interventionProblemText(iv);
-  const seed = normalizeLines(suggestBillingLinesFromProblem(problem, iv.category ?? null));
-  return enrichDraftBillingLines(iv, seed);
+  const seed = normalizeLines(
+    suggestBillingLinesFromProblem(problem, iv.category ?? null, iv.problemTemplateId ?? null)
+  );
+  return enrichDraftBillingLines(iv, seed, surchargeSettings);
 }
 
 const OPENAI_BILLING_SYSTEM = `Tu es contrôleur facturation pour une entreprise de dépannage (serrurerie, vitrerie).
@@ -60,15 +66,16 @@ Chaque ligne : description (string), quantity (number), unitPriceCents (number),
 /** Enrichit / valide le brouillon via OpenAI (gpt-4o-mini par défaut). */
 export async function refineDraftBillingWithOpenAI(
   iv: InterventionBillingContext,
-  seedLines: DraftBillingLine[]
+  seedLines: DraftBillingLine[],
+  surchargeSettings?: BillingSurchargeSettings
 ): Promise<{ lines: DraftBillingLine[]; note?: string }> {
   if (!process.env.OPENAI_API_KEY?.trim()) {
-    return { lines: enrichDraftBillingLines(iv, seedLines) };
+    return { lines: enrichDraftBillingLines(iv, seedLines, surchargeSettings) };
   }
 
   const client = getClient();
   const model = process.env.OPENAI_DISPATCH_MODEL?.trim() || "gpt-4o-mini";
-  const context = buildInterventionBillingContextText(iv);
+  const context = buildInterventionBillingContextText(iv, surchargeSettings);
 
   const completion = await client.chat.completions.create({
     model,
@@ -89,13 +96,16 @@ export async function refineDraftBillingWithOpenAI(
     const rawLines = normalizeLines(Array.isArray(parsed.lines) ? parsed.lines : seedLines);
     const lines =
       rawLines.length > 0
-        ? enrichDraftBillingLines(iv, rawLines)
-        : enrichDraftBillingLines(iv, seedLines);
+        ? enrichDraftBillingLines(iv, rawLines, surchargeSettings)
+        : enrichDraftBillingLines(iv, seedLines, surchargeSettings);
     if (lines.length === 0)
-      return { lines: enrichDraftBillingLines(iv, seedLines), note: parsed.note };
+      return {
+        lines: enrichDraftBillingLines(iv, seedLines, surchargeSettings),
+        note: parsed.note,
+      };
     return { lines, note: typeof parsed.note === "string" ? parsed.note : undefined };
   } catch {
-    return { lines: enrichDraftBillingLines(iv, seedLines) };
+    return { lines: enrichDraftBillingLines(iv, seedLines, surchargeSettings) };
   }
 }
 
@@ -104,8 +114,8 @@ export async function refineDraftBillingWithOpenAI(
  * Réutilise les lignes existantes si déjà présentes et cohérentes.
  */
 export async function buildDraftBillingPackage(
-  iv: InterventionBillingContext & Pick<Intervention, "billingLines">,
-  opts?: { forceRegenerate?: boolean }
+  iv: InterventionBillingContext & Pick<Intervention, "billingLines" | "problemTemplateId">,
+  opts?: { forceRegenerate?: boolean; surchargeSettings?: BillingSurchargeSettings }
 ): Promise<DraftBillingPackage> {
   const existing = normalizeLines(
     (Array.isArray(iv.billingLines) ? iv.billingLines : []) as DraftBillingLine[]
@@ -118,11 +128,17 @@ export async function buildDraftBillingPackage(
     };
   }
 
-  const templateLines = buildTemplateDraftBilling(iv);
+  const templateLines = buildTemplateDraftBilling(iv, opts?.surchargeSettings);
   const seed = templateLines.length > 0 ? templateLines : existing;
-  const { lines, note } = await refineDraftBillingWithOpenAI(iv, seed);
+  const { lines, note } = await refineDraftBillingWithOpenAI(iv, seed, opts?.surchargeSettings);
   const finalLines =
-    lines.length > 0 ? lines : enrichDraftBillingLines(iv, seed.length > 0 ? seed : templateLines);
+    lines.length > 0
+      ? lines
+      : enrichDraftBillingLines(
+          iv,
+          seed.length > 0 ? seed : templateLines,
+          opts?.surchargeSettings
+        );
 
   return {
     lines: finalLines,
