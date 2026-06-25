@@ -3,7 +3,7 @@
   "short_name": "Terrain",
   "description": "Missions et clôture technicien CRMSLOT",
   "start_url": "/m/technician",
-  "scope": "/",
+  "scope": "/m/technician",
   "display": "standalone",
   "orientation": "portrait-primary",
   "lang": "fr",

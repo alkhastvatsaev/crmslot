@@ -3,7 +3,7 @@
   "short_name": "Inbox",
   "description": "Inbox et missions du jour CRMSLOT",
   "start_url": "/m/admin",
-  "scope": "/",
+  "scope": "/m/admin",
   "display": "standalone",
   "orientation": "portrait-primary",
   "lang": "fr",
