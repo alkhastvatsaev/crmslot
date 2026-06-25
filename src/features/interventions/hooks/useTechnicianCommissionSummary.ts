@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { firestore } from "@/core/config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import {
@@ -25,6 +26,10 @@ import {
   filterManualEntriesForTechnicianCommission,
 } from "@/features/interventions/technicianCommissionScope";
 import type { Technician } from "@/features/technicians";
+import {
+  findTechnicianByAssignUid,
+  resolveTechnicianProfileLabel,
+} from "@/features/technicians/resolveTechnicianIdentity";
 
 type Summary = {
   companyPhase: "loading" | "ready" | "missing";
@@ -36,18 +41,15 @@ type Summary = {
   monthlySeries: PatronMonthlyPoint[];
   rateLabel: string;
   hasPersonalRule: boolean;
+  displayName: string;
 };
 
 function findCurrentTechnician(
   technicians: Technician[],
-  technicianUid: string | null
+  technicianUid: string | null,
+  email?: string
 ): Technician | null {
-  const uid = (technicianUid ?? "").trim();
-  if (!uid) return null;
-  return (
-    technicians.find((tech) => (tech.authUid ?? "").trim() === uid || tech.id.trim() === uid) ??
-    null
-  );
+  return findTechnicianByAssignUid(technicians, technicianUid ?? "", { email }) ?? null;
 }
 
 export function useTechnicianCommissionSummary(params: {
@@ -64,6 +66,17 @@ export function useTechnicianCommissionSummary(params: {
   const { rules, loading: rulesLoading } = useCommissionRules(activeCompanyId);
   const [manualEntries, setManualEntries] = useState<ManualCommissionEntry[]>([]);
   const [manualLoading, setManualLoading] = useState(true);
+  const [authProfile, setAuthProfile] = useState({ displayName: "", email: "" });
+
+  useEffect(() => {
+    if (!auth) return () => {};
+    return onAuthStateChanged(auth, (user) => {
+      setAuthProfile({
+        displayName: user?.displayName?.trim() ?? "",
+        email: user?.email?.trim() ?? "",
+      });
+    });
+  }, []);
 
   useEffect(() => {
     if (!activeCompanyId || !firestore) {
@@ -83,9 +96,10 @@ export function useTechnicianCommissionSummary(params: {
       filterInterventionsForTechnicianCommission(
         params.interventions,
         params.technicianUid,
-        params.technicians
+        params.technicians,
+        authProfile.email
       ),
-    [params.interventions, params.technicianUid, params.technicians]
+    [authProfile.email, params.interventions, params.technicianUid, params.technicians]
   );
 
   const scopedManualEntries = useMemo(
@@ -93,14 +107,15 @@ export function useTechnicianCommissionSummary(params: {
       filterManualEntriesForTechnicianCommission(
         manualEntries,
         params.technicianUid,
-        params.technicians
+        params.technicians,
+        authProfile.email
       ),
-    [manualEntries, params.technicianUid, params.technicians]
+    [authProfile.email, manualEntries, params.technicianUid, params.technicians]
   );
 
   const currentTechnician = useMemo(
-    () => findCurrentTechnician(params.technicians, params.technicianUid),
-    [params.technicians, params.technicianUid]
+    () => findCurrentTechnician(params.technicians, params.technicianUid, authProfile.email),
+    [authProfile.email, params.technicians, params.technicianUid]
   );
 
   const row = useMemo(() => {
@@ -152,6 +167,11 @@ export function useTechnicianCommissionSummary(params: {
   const loading =
     companyPhase === "loading" || (Boolean(activeCompanyId) && (rulesLoading || manualLoading));
 
+  const displayName = useMemo(
+    () => resolveTechnicianProfileLabel(currentTechnician, authProfile),
+    [authProfile, currentTechnician]
+  );
+
   return {
     companyPhase,
     loading,
@@ -162,5 +182,6 @@ export function useTechnicianCommissionSummary(params: {
     monthlySeries,
     rateLabel,
     hasPersonalRule: row?.hasPersonalRule ?? false,
+    displayName,
   };
 }
