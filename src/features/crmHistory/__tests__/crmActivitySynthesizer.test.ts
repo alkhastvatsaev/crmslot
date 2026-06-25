@@ -249,7 +249,7 @@ describe("synthesizeBillingEvents", () => {
         status: "done",
         billingLines: [{ description: "Main d'œuvre", quantity: 1, unitPriceCents: 8500 }],
         invoiceAmountCents: 8500,
-        updatedAt: "2024-01-16T09:00:00Z",
+        statusUpdatedAt: "2024-01-16T09:00:00Z",
       },
     ]);
     expect(evts).toHaveLength(1);

@@ -23,9 +23,13 @@ function mergeMaterialOrders(...lists: MaterialOrderDoc[][]): MaterialOrderDoc[]
   return [...byId.values()].sort((a, b) => parseTs(b.createdAt) - parseTs(a.createdAt));
 }
 
+function interventionRecencyTs(iv: Intervention): number {
+  return parseTs(iv.statusUpdatedAt) || parseTs(iv.createdAt);
+}
+
 function pickInterventionIdsForOrderScan(interventions: Intervention[]): string[] {
   return [...interventions]
-    .sort((a, b) => parseTs(b.updatedAt) - parseTs(a.updatedAt))
+    .sort((a, b) => interventionRecencyTs(b) - interventionRecencyTs(a))
     .slice(0, INTERVENTION_SCAN_LIMIT)
     .map((iv) => iv.id);
 }
@@ -50,7 +54,8 @@ export function useCrmMaterialOrdersFeed(companyId: string | null, interventions
   const interventionIdsKey = interventionIds.join("|");
 
   useEffect(() => {
-    if (!firestore || interventionIds.length === 0) {
+    const db = firestore;
+    if (!db || interventionIds.length === 0) {
       setInterventionOrders([]);
       setInterventionLoading(false);
       return;
@@ -70,7 +75,7 @@ export function useCrmMaterialOrdersFeed(companyId: string | null, interventions
 
     const unsubs = chunks.map((chunk) => {
       const q = query(
-        collection(firestore, MATERIAL_ORDERS_COLLECTION),
+        collection(db, MATERIAL_ORDERS_COLLECTION),
         where("interventionId", "in", chunk),
         limit(PER_CHUNK_LIMIT * chunk.length)
       );
