@@ -58,7 +58,7 @@ export function synthesizeInterventionEvents(interventions: Intervention[]): Crm
     const invoicedTs =
       parseTs(iv.invoicedAt) ||
       (iv.status === "invoiced" || iv.invoicePdfUrl
-        ? parseTs(iv.statusUpdatedAt) || parseTs(iv.completedAt)
+        ? parseTs(iv.statusUpdatedAt) || parseTs(iv.updatedAt) || parseTs(iv.completedAt)
         : 0);
     if (invoicedTs) {
       events.push({
@@ -128,23 +128,85 @@ function resolveOrderEventTs(...candidates: unknown[]): number {
 }
 
 export function synthesizeMaterialOrderEvents(orders: MaterialOrderDoc[]): CrmActivityEvent[] {
-  return orders.map((o) => {
+  const events: CrmActivityEvent[] = [];
+  for (const o of orders) {
     const orderLabel =
       o.partsRequested?.map((p) => `${p.quantity}× ${p.description}`).join(", ") ?? "";
     const clientName =
       typeof o.clientName === "string" && o.clientName.trim() ? o.clientName.trim() : undefined;
-    return {
+    const baseTs = resolveOrderEventTs(o.updatedAt, o.createdAt);
+    events.push({
       id: `mo:${o.id}`,
       type: "material_ordered" as const,
-      ts: resolveOrderEventTs(o.updatedAt, o.createdAt),
+      ts: baseTs,
       interventionId: o.interventionId,
       orderId: o.id,
       orderLabel,
       clientName,
       materialOrderStatus: o.status,
       note: clientName ? `Client : ${clientName}` : undefined,
-    };
-  });
+    });
+    if (o.status && o.status !== "pending") {
+      const statusTs = parseTs(o.updatedAt) || parseTs(o.createdAt);
+      if (statusTs > 0 && statusTs !== baseTs) {
+        events.push({
+          id: `mo:${o.id}:status`,
+          type: "material_order_status_changed" as const,
+          ts: statusTs,
+          interventionId: o.interventionId,
+          orderId: o.id,
+          orderLabel,
+          clientName,
+          materialOrderStatus: o.status,
+          note: `Commande matériel · statut ${o.status}`,
+        });
+      }
+    }
+  }
+  return events;
+}
+
+/** Facturation dénormalisée sur le dossier (filet si le journal CRM n’a pas enregistré l’action). */
+export function synthesizeBillingEvents(interventions: Intervention[]): CrmActivityEvent[] {
+  const events: CrmActivityEvent[] = [];
+
+  for (const iv of interventions) {
+    const lines = Array.isArray(iv.billingLines) ? iv.billingLines : [];
+    if (lines.length === 0) continue;
+
+    const ts =
+      parseTs(iv.invoicedAt) ||
+      parseTs(iv.statusUpdatedAt) ||
+      parseTs(iv.updatedAt) ||
+      parseTs(iv.completedAt);
+    if (!ts) continue;
+
+    const totalCents =
+      typeof iv.invoiceAmountCents === "number" && iv.invoiceAmountCents > 0
+        ? iv.invoiceAmountCents
+        : lines.reduce(
+            (sum, line) =>
+              sum + Math.round(line.unitPriceCents ?? 0) * (line.quantity > 0 ? line.quantity : 1),
+            0
+          );
+
+    const hasInvoice =
+      iv.status === "invoiced" || Boolean(iv.invoicePdfUrl?.trim()) || Boolean(iv.invoicedAt);
+    const label = hasInvoice ? "Facture" : "Facturation";
+
+    events.push({
+      id: `${iv.id}:billing`,
+      type: "intervention_billing_updated",
+      ts,
+      interventionId: iv.id,
+      interventionTitle: iv.title,
+      clientName: interventionClientName(iv),
+      address: iv.address,
+      note: `${label} · ${lines.length} ligne(s) · ${(totalCents / 100).toFixed(2)} €`,
+    });
+  }
+
+  return events;
 }
 
 export function synthesizeSupplierOrderEvents(orders: SupplierOrder[]): CrmActivityEvent[] {

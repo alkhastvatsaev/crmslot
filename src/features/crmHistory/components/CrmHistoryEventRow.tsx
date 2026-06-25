@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
-import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { getCrmHistoryEventMeta } from "@/features/crmHistory/crmHistoryEventMeta";
 import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
@@ -20,7 +20,7 @@ type Props = {
 /** Variante liste horizontale — conservée pour réutilisation future. */
 export default function CrmHistoryEventRow({ event, onSelect, isNew, isSelected }: Props) {
   const { t } = useTranslation();
-  const meta = CRM_HISTORY_EVENT_META[event.type];
+  const meta = getCrmHistoryEventMeta(event.type);
   const { Icon, colorClass, dotClass } = meta;
   const isClickable = Boolean(onSelect);
 

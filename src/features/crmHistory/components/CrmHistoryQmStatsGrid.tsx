@@ -18,12 +18,14 @@ export default function CrmHistoryQmStatsGrid({ events }: { events: CrmActivityE
     for (const e of events) {
       if (e.type === "intervention_created") created++;
       else if (e.type === "intervention_completed") completed++;
-      else if (e.type === "intervention_invoiced") invoiced++;
+      else if (e.type === "intervention_invoiced" || e.type === "intervention_report_validated")
+        invoiced++;
       else if (e.type === "intervention_cancelled") cancelled++;
       else if (e.type === "intervention_technician_declined") declined++;
       else if (e.type === "intervention_returned_to_requests") returned++;
       else if (
         e.type === "material_ordered" ||
+        e.type === "material_order_status_changed" ||
         e.type === "supplier_ordered" ||
         e.type === "supplier_order_lecot"
       )

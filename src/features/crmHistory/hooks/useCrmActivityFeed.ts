@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { CRMSLOT_CRM_ORDERS_CHANGED_EVENT } from "../crmOrdersChangedEvent";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
-import { useCompanyMaterialOrdersRecent } from "@/features/featureHub/hooks/useCompanyMaterialOrdersRecent";
 import { useCompanySupplierOrdersRecent } from "@/features/featureHub/hooks/useCompanySupplierOrdersRecent";
+import { useCrmMaterialOrdersFeed } from "./useCrmMaterialOrdersFeed";
 import { useCompanyEmailsFeed } from "./useCompanyEmailsFeed";
 import { useCompanyCommissionsFeed } from "./useCompanyCommissionsFeed";
 import {
@@ -13,6 +13,7 @@ import {
   synthesizeEmailEvents,
   synthesizeInterventionEvents,
   synthesizeInterventionLifecycleEvents,
+  synthesizeBillingEvents,
   synthesizeMaterialOrderEvents,
   synthesizeSupplierOrderEvents,
 } from "../crmActivitySynthesizer";
@@ -44,8 +45,10 @@ export function useCrmActivityFeed(
   const feedCompanyId = companyId;
 
   const { interventions, loading: ivLoading } = useBackOfficeInterventions(feedCompanyId);
-  const { orders: materialOrders, loading: moLoading } =
-    useCompanyMaterialOrdersRecent(feedCompanyId);
+  const { orders: materialOrders, loading: moLoading } = useCrmMaterialOrdersFeed(
+    feedCompanyId,
+    interventions
+  );
   const {
     orders: supplierOrders,
     loading: soLoading,
@@ -84,6 +87,7 @@ export function useCrmActivityFeed(
         mergeAndSortCrmEvents(
           synthesizeInterventionEvents(interventions),
           synthesizeInterventionLifecycleEvents(interventions),
+          synthesizeBillingEvents(interventions),
           synthesizeStatusEvents(statusEvents, interventionMap),
           synthesizeCompanyCrmLogEvents(crmLogRows),
           synthesizePortalChatEvents(portalChatMessages, interventionMap),

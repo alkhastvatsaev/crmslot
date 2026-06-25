@@ -4,6 +4,7 @@ import {
   synthesizeEmailEvents,
   synthesizeInterventionEvents,
   synthesizeInterventionLifecycleEvents,
+  synthesizeBillingEvents,
   synthesizeMaterialOrderEvents,
   synthesizeSupplierOrderEvents,
 } from "../crmActivitySynthesizer";
@@ -237,5 +238,35 @@ describe("mergeAndSortCrmEvents", () => {
     const c = { id: "c", type: "supplier_ordered" as const, ts: 2000 };
     const result = mergeAndSortCrmEvents([a], [b], [c]);
     expect(result.map((e) => e.ts)).toEqual([3000, 2000, 1000]);
+  });
+});
+
+describe("synthesizeBillingEvents", () => {
+  it("emits billing event when dossier has billing lines", () => {
+    const evts = synthesizeBillingEvents([
+      {
+        ...baseIntervention,
+        status: "done",
+        billingLines: [{ description: "Main d'œuvre", quantity: 1, unitPriceCents: 8500 }],
+        invoiceAmountCents: 8500,
+        updatedAt: "2024-01-16T09:00:00Z",
+      },
+    ]);
+    expect(evts).toHaveLength(1);
+    expect(evts[0].type).toBe("intervention_billing_updated");
+    expect(evts[0].note).toContain("Facturation");
+  });
+
+  it("labels invoice when PDF is present", () => {
+    const evts = synthesizeBillingEvents([
+      {
+        ...baseIntervention,
+        status: "invoiced",
+        invoicePdfUrl: "https://example.com/invoice.pdf",
+        billingLines: [{ description: "Intervention", quantity: 1, unitPriceCents: 12000 }],
+        invoicedAt: "2024-01-17T10:00:00Z",
+      },
+    ]);
+    expect(evts[0]?.note).toContain("Facture");
   });
 });

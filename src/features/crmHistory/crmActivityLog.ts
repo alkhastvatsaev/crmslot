@@ -174,18 +174,25 @@ export function parseTs(raw: unknown): number {
 export function synthesizeCompanyCrmLogEvents(
   rows: Array<CompanyCrmActivityDoc & { id: string }>
 ): CrmActivityEvent[] {
-  return rows.map((row) => ({
-    id: `crm:${row.id}`,
-    type: KIND_TO_EVENT_TYPE[row.kind],
-    ts: parseTs(row.at),
-    interventionId: row.interventionId ?? undefined,
-    interventionTitle: row.interventionTitle ?? undefined,
-    clientName: row.clientName ?? undefined,
-    address: row.address ?? undefined,
-    statusBefore: row.statusBefore ?? undefined,
-    statusAfter: row.statusAfter ?? undefined,
-    actorUid: row.actorUid,
-    actorRole: row.actorRole,
-    note: row.note ?? undefined,
-  }));
+  return rows.flatMap((row) => {
+    const type = KIND_TO_EVENT_TYPE[row.kind];
+    const ts = parseTs(row.at);
+    if (!type || ts <= 0) return [];
+    return [
+      {
+        id: `crm:${row.id}`,
+        type,
+        ts,
+        interventionId: row.interventionId ?? undefined,
+        interventionTitle: row.interventionTitle ?? undefined,
+        clientName: row.clientName ?? undefined,
+        address: row.address ?? undefined,
+        statusBefore: row.statusBefore ?? undefined,
+        statusAfter: row.statusAfter ?? undefined,
+        actorUid: row.actorUid,
+        actorRole: row.actorRole,
+        note: row.note ?? undefined,
+      },
+    ];
+  });
 }

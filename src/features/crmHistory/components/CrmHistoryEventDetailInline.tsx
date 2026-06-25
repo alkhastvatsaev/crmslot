@@ -4,7 +4,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildCrmActivityEventDetail } from "@/features/crmHistory/crmActivityEventDetail";
-import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { getCrmHistoryEventMeta } from "@/features/crmHistory/crmHistoryEventMeta";
 import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedDateTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
@@ -17,7 +17,7 @@ type Props = {
 
 export default function CrmHistoryEventDetailInline({ event, onBack, onOpenIntervention }: Props) {
   const { t } = useTranslation();
-  const meta = CRM_HISTORY_EVENT_META[event.type];
+  const meta = getCrmHistoryEventMeta(event.type);
   const { Icon, colorClass } = meta;
   const detail = buildCrmActivityEventDetail(event, (key) =>
     String(t(key as "crmHistory.detail.empty_title"))
