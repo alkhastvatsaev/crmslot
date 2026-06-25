@@ -2,7 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { CompanyStaffKind, CreateCompanyStaffInput } from "@/features/teamHub/types";
+import type {
+  CompanyStaffKind,
+  CompanyStaffMember,
+  CreateCompanyStaffInput,
+} from "@/features/teamHub/types";
 
 export type CreateCompanyStaffResponse =
   | {
@@ -12,10 +16,14 @@ export type CreateCompanyStaffResponse =
       created: boolean;
       alreadyMember: boolean;
       passwordResetLink?: string;
+      member?: CompanyStaffMember;
     }
   | { ok: true; mode: "invite"; inviteId: string };
 
-export function useCreateCompanyStaff(companyId: string | null, onSuccess?: () => void) {
+export function useCreateCompanyStaff(
+  companyId: string | null,
+  onSuccess?: (result: CreateCompanyStaffResponse) => void | Promise<void>
+) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<CreateCompanyStaffResponse | null>(null);
@@ -42,7 +50,7 @@ export function useCreateCompanyStaff(companyId: string | null, onSuccess?: () =
           throw new Error(data.error?.trim() || "Ajout impossible.");
         }
         setLastResult(data);
-        onSuccess?.();
+        await Promise.resolve(onSuccess?.(data));
         return data;
       } catch (e) {
         setError(e instanceof Error ? e.message : "Ajout impossible.");
