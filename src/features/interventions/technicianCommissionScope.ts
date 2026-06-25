@@ -2,9 +2,9 @@ import type { ManualCommissionEntry } from "@/features/commissions";
 import type { Intervention } from "@/features/interventions/types";
 import type { Technician } from "@/features/technicians";
 import {
-  canResolveTechnicianAssignUid,
-  resolveTechnicianAssignUid,
-} from "@/features/dispatch/technicianAssignUid";
+  findTechnicianByAssignUid,
+  resolveTechnicianAuthUid,
+} from "@/features/technicians/resolveTechnicianIdentity";
 
 const CLOSED_TERRAIN_PHOTO_STATUSES: Intervention["status"][] = ["done", "invoiced", "cancelled"];
 
@@ -13,47 +13,46 @@ export function interventionOpenForTerrainPhotos(iv: Intervention): boolean {
   return !CLOSED_TERRAIN_PHOTO_STATUSES.includes(iv.status);
 }
 
-function technicianAssignAliases(technicians: Technician[], technicianUid: string): Set<string> {
+function technicianAssignAliases(
+  technicians: Technician[],
+  technicianUid: string,
+  email?: string
+): Set<string> {
   const aliases = new Set<string>();
   const uid = technicianUid.trim();
   if (!uid) return aliases;
   aliases.add(uid);
-  for (const tech of technicians) {
-    const docId = tech.id.trim();
-    const authUid = (tech.authUid ?? "").trim();
-    if (authUid === uid) {
-      aliases.add(docId);
-      if (canResolveTechnicianAssignUid(tech)) {
-        try {
-          aliases.add(resolveTechnicianAssignUid(tech));
-        } catch {
-          // ignore
-        }
-      }
-    }
-    if (docId === uid && authUid) aliases.add(authUid);
-  }
+
+  const tech = findTechnicianByAssignUid(technicians, uid, { email });
+  if (!tech) return aliases;
+
+  const docId = tech.id.trim();
+  const authUid = resolveTechnicianAuthUid(tech);
+  if (docId) aliases.add(docId);
+  if (authUid) aliases.add(authUid);
   return aliases;
 }
 
 export function filterInterventionsForTechnicianCommission(
   interventions: Intervention[],
   technicianUid: string | null,
-  technicians: Technician[]
+  technicians: Technician[],
+  email?: string
 ): Intervention[] {
   const uid = (technicianUid ?? "").trim();
   if (!uid) return [];
-  const aliases = technicianAssignAliases(technicians, uid);
+  const aliases = technicianAssignAliases(technicians, uid, email);
   return interventions.filter((iv) => aliases.has((iv.assignedTechnicianUid ?? "").trim()));
 }
 
 export function filterManualEntriesForTechnicianCommission(
   entries: ManualCommissionEntry[],
   technicianUid: string | null,
-  technicians: Technician[]
+  technicians: Technician[],
+  email?: string
 ): ManualCommissionEntry[] {
   const uid = (technicianUid ?? "").trim();
   if (!uid) return [];
-  const aliases = technicianAssignAliases(technicians, uid);
+  const aliases = technicianAssignAliases(technicians, uid, email);
   return entries.filter((entry) => aliases.has(entry.technicianUid.trim()));
 }

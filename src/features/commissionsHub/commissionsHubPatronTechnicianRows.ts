@@ -1,11 +1,16 @@
 import type { ManualCommissionEntry } from "@/features/commissions";
 import type { CommissionRule } from "@/features/commissions";
-import {
-  canResolveTechnicianAssignUid,
-  resolveTechnicianAssignUid,
-} from "@/features/dispatch/technicianAssignUid";
 import type { Intervention } from "@/features/interventions";
 import type { Technician } from "@/features/technicians";
+import {
+  buildTechnicianDocIdToAuthUidMap,
+  findTechnicianByAssignUid,
+  isTechnicianUidFallbackLabel,
+  resolveAssignedTechnicianUid,
+  resolveTechnicianAuthUid,
+  resolveTechnicianProfileLabel,
+  technicianProfileInitial,
+} from "@/features/technicians/resolveTechnicianIdentity";
 import {
   interventionCommissionMonth,
   interventionRevenueMonth,
@@ -61,33 +66,45 @@ export function buildPatronTechnicianRows(params: {
       });
       return byUid.get(uid)!;
     }
+    if (
+      isTechnicianUidFallbackLabel(existing.name, uid) &&
+      name.trim() &&
+      !isTechnicianUidFallbackLabel(name, uid)
+    ) {
+      existing.name = name;
+      existing.initial = initial;
+    }
     existing.alternateTargetIds = [
       ...new Set([...existing.alternateTargetIds, ...alternateTargetIds.filter(Boolean)]),
     ];
     return existing;
   };
 
+  const rowIdentityForUid = (uid: string) => {
+    const tech = findTechnicianByAssignUid(params.technicians, uid);
+    const name = resolveTechnicianProfileLabel(tech);
+    const initial = technicianProfileInitial(tech, name);
+    const alternates = tech
+      ? [tech.id.trim(), resolveTechnicianAuthUid(tech)].filter((id) => id && id !== uid)
+      : [];
+    return { name, initial, alternates };
+  };
+
   for (const tech of params.technicians) {
-    if (canResolveTechnicianAssignUid(tech)) {
-      const uid = resolveTechnicianAssignUid(tech);
-      ensure(uid, tech.name, tech.initial, [tech.id]);
-      continue;
-    }
-    const fallbackId = tech.id.trim();
-    if (fallbackId) ensure(fallbackId, tech.name, tech.initial, []);
+    const docId = tech.id.trim();
+    const authUid = resolveTechnicianAuthUid(tech);
+    const name = resolveTechnicianProfileLabel(tech);
+    const initial = technicianProfileInitial(tech, name);
+    const canonicalUid = authUid || docId;
+    if (!canonicalUid) continue;
+    const alternates = [docId, authUid].filter((id) => id && id !== canonicalUid);
+    ensure(canonicalUid, name, initial, alternates);
   }
 
-  const assignUidByDocId = new Map(
-    params.technicians
-      .filter((tech) => canResolveTechnicianAssignUid(tech))
-      .map((tech) => [tech.id.trim(), resolveTechnicianAssignUid(tech)] as const)
-      .filter(([docId]) => Boolean(docId))
-  );
+  const assignUidByDocId = buildTechnicianDocIdToAuthUidMap(params.technicians);
 
-  const resolveAssignedUid = (rawUid: string): string => {
-    const trimmed = rawUid.trim();
-    return assignUidByDocId.get(trimmed) ?? trimmed;
-  };
+  const resolveAssignedUid = (rawUid: string): string =>
+    resolveAssignedTechnicianUid(rawUid, assignUidByDocId);
 
   for (const iv of params.interventions) {
     if (interventionCommissionMonth(iv) !== monthKey) continue;
@@ -95,7 +112,8 @@ export function buildPatronTechnicianRows(params: {
     if (!uid) continue;
     const cents = iv.commissionAmountCents ?? 0;
     if (cents <= 0) continue;
-    const row = ensure(uid, uid.slice(-6), uid.slice(0, 1).toUpperCase());
+    const identity = rowIdentityForUid(uid);
+    const row = ensure(uid, identity.name, identity.initial, identity.alternates);
     row.missionCents += cents;
     row.missionCount += 1;
   }
@@ -106,7 +124,8 @@ export function buildPatronTechnicianRows(params: {
     if (!uid) continue;
     const revenueCents = interventionTechnicianRevenueCents(iv);
     if (revenueCents <= 0) continue;
-    const row = ensure(uid, uid.slice(-6), uid.slice(0, 1).toUpperCase());
+    const identity = rowIdentityForUid(uid);
+    const row = ensure(uid, identity.name, identity.initial, identity.alternates);
     row.revenueCents += revenueCents;
     row.revenueMissionCount += 1;
   }
@@ -115,7 +134,8 @@ export function buildPatronTechnicianRows(params: {
     if (manualEntryMonth(entry) !== monthKey) continue;
     const uid = resolveAssignedUid(entry.technicianUid);
     if (!uid) continue;
-    const row = ensure(uid, uid.slice(-6), uid.slice(0, 1).toUpperCase());
+    const identity = rowIdentityForUid(uid);
+    const row = ensure(uid, identity.name, identity.initial, identity.alternates);
     row.manualCents += Math.round(entry.amountEuros * 100);
   }
 

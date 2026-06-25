@@ -5,6 +5,13 @@ export type { Technician } from "@/features/technicians/types";
 export { useTechnicians } from "@/features/technicians/hooks";
 export { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
 export {
+  buildTechnicianDocIdToAuthUidMap,
+  findTechnicianByAssignUid,
+  resolveAssignedTechnicianUid,
+  resolveTechnicianAuthUid,
+  resolveTechnicianProfileLabel,
+} from "@/features/technicians/resolveTechnicianIdentity";
+export {
   INTERVENTION_SKILLS,
   SKILL_LABELS,
   technicianHasRequiredSkills,

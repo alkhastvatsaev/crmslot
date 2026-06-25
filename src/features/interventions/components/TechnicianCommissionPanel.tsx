@@ -90,9 +90,12 @@ export default function TechnicianCommissionPanel({
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
           {t("technician_hub.commission.title")}
         </span>
-        {row ? (
-          <span className="truncate text-[13px] font-semibold text-slate-700">{row.name}</span>
-        ) : null}
+        <span
+          data-testid="technician-commission-display-name"
+          className="truncate text-[13px] font-semibold text-slate-700"
+        >
+          {summary.displayName}
+        </span>
       </div>
 
       <div className="flex flex-col gap-2 rounded-[20px] border border-sky-100/80 bg-gradient-to-b from-sky-50/80 to-white p-3 shadow-[0_6px_18px_-6px_rgba(15,23,42,0.12)]">
