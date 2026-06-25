@@ -34,6 +34,12 @@ export type CrmHistoryEventMeta = {
   dotClass: string;
 };
 
+const DEFAULT_EVENT_META: CrmHistoryEventMeta = {
+  Icon: ClipboardList,
+  colorClass: "text-slate-600",
+  dotClass: "bg-slate-400",
+};
+
 export const CRM_HISTORY_EVENT_META: Record<CrmEventType, CrmHistoryEventMeta> = {
   intervention_created: { Icon: FilePlus, colorClass: "text-blue-600", dotClass: "bg-blue-500" },
   intervention_assigned: {
@@ -141,3 +147,7 @@ export const CRM_HISTORY_EVENT_META: Record<CrmEventType, CrmHistoryEventMeta> =
   email_viewed: { Icon: MousePointer, colorClass: "text-slate-500", dotClass: "bg-slate-400" },
   user_session_start: { Icon: LogIn, colorClass: "text-green-600", dotClass: "bg-green-500" },
 };
+
+export function getCrmHistoryEventMeta(type: CrmEventType | string): CrmHistoryEventMeta {
+  return CRM_HISTORY_EVENT_META[type as CrmEventType] ?? DEFAULT_EVENT_META;
+}

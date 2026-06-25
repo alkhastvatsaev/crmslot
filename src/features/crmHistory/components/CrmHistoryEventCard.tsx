@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { getCrmHistoryEventMeta } from "@/features/crmHistory/crmHistoryEventMeta";
 import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
@@ -17,7 +17,7 @@ type Props = {
 
 export default function CrmHistoryEventCard({ event, onSelect, isNew, isSelected, index }: Props) {
   const { t } = useTranslation();
-  const meta = CRM_HISTORY_EVENT_META[event.type];
+  const meta = getCrmHistoryEventMeta(event.type);
   const { Icon, colorClass, dotClass } = meta;
   const isClickable = Boolean(onSelect);
 
