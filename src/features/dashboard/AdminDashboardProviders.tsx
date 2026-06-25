@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import LoginOverlay from "@/features/auth/components/LoginOverlay";
-import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
@@ -34,49 +33,47 @@ type Props = {
 export default function AdminDashboardProviders({ pageCount, children }: Props) {
   return (
     <DateProvider>
-      <DesktopOnlyGate>
-        <LoginOverlay>
-          <DevServiceWorkerCleanup />
-          <CompanyWorkspaceProvider>
-            <FeatureFlagsProvider>
-              <GalaxyLayerBridgeProvider>
-                <MobileGalaxyComposerOpenProvider>
-                  <DashboardPagerProvider pageCount={pageCount}>
-                    <DashboardPageSelectorProvider>
-                      <MobileDockOnboardingProvider>
-                        <ChatbotProvider>
-                          <BackofficeInboxIntentProvider>
-                            <CompanyStockIntentProvider>
-                              <CompanyStockAgentBridgeProvider>
-                                <CrmHistoryAgentBridgeProvider>
-                                  <BillingHubAgentBridgeProvider>
-                                    <BillingHubIntentProvider>
-                                      <TechnicianBackofficeReportBridgeProvider>
-                                        <OfflineSyncProvider>
-                                          <TechnicianQueryProvider>
-                                            <RequesterHubProvider>
-                                              <DeferredAdminBootstraps />
-                                              {children}
-                                            </RequesterHubProvider>
-                                          </TechnicianQueryProvider>
-                                        </OfflineSyncProvider>
-                                      </TechnicianBackofficeReportBridgeProvider>
-                                    </BillingHubIntentProvider>
-                                  </BillingHubAgentBridgeProvider>
-                                </CrmHistoryAgentBridgeProvider>
-                              </CompanyStockAgentBridgeProvider>
-                            </CompanyStockIntentProvider>
-                          </BackofficeInboxIntentProvider>
-                        </ChatbotProvider>
-                      </MobileDockOnboardingProvider>
-                    </DashboardPageSelectorProvider>
-                  </DashboardPagerProvider>
-                </MobileGalaxyComposerOpenProvider>
-              </GalaxyLayerBridgeProvider>
-            </FeatureFlagsProvider>
-          </CompanyWorkspaceProvider>
-        </LoginOverlay>
-      </DesktopOnlyGate>
+      <LoginOverlay>
+        <DevServiceWorkerCleanup />
+        <CompanyWorkspaceProvider>
+          <FeatureFlagsProvider>
+            <GalaxyLayerBridgeProvider>
+              <MobileGalaxyComposerOpenProvider>
+                <DashboardPagerProvider pageCount={pageCount}>
+                  <DashboardPageSelectorProvider>
+                    <MobileDockOnboardingProvider>
+                      <ChatbotProvider>
+                        <BackofficeInboxIntentProvider>
+                          <CompanyStockIntentProvider>
+                            <CompanyStockAgentBridgeProvider>
+                              <CrmHistoryAgentBridgeProvider>
+                                <BillingHubAgentBridgeProvider>
+                                  <BillingHubIntentProvider>
+                                    <TechnicianBackofficeReportBridgeProvider>
+                                      <OfflineSyncProvider>
+                                        <TechnicianQueryProvider>
+                                          <RequesterHubProvider>
+                                            <DeferredAdminBootstraps />
+                                            {children}
+                                          </RequesterHubProvider>
+                                        </TechnicianQueryProvider>
+                                      </OfflineSyncProvider>
+                                    </TechnicianBackofficeReportBridgeProvider>
+                                  </BillingHubIntentProvider>
+                                </BillingHubAgentBridgeProvider>
+                              </CrmHistoryAgentBridgeProvider>
+                            </CompanyStockAgentBridgeProvider>
+                          </CompanyStockIntentProvider>
+                        </BackofficeInboxIntentProvider>
+                      </ChatbotProvider>
+                    </MobileDockOnboardingProvider>
+                  </DashboardPageSelectorProvider>
+                </DashboardPagerProvider>
+              </MobileGalaxyComposerOpenProvider>
+            </GalaxyLayerBridgeProvider>
+          </FeatureFlagsProvider>
+        </CompanyWorkspaceProvider>
+      </LoginOverlay>
     </DateProvider>
   );
 }

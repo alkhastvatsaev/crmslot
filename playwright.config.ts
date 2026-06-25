@@ -14,12 +14,6 @@ const e2ePublicEnv: Record<string, string> = {
   NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "pk.placeholder",
 };
 
-/** Serveur prod-like : pas de preview dev, pas d’ALLOW_MOBILE build-time. */
-const desktopGateProdEnv: Record<string, string> = {
-  ...e2ePublicEnv,
-  NEXT_PUBLIC_DISABLE_DEV_UI_PREVIEW: "true",
-};
-
 const defaultDevWebServer = {
   command: "npm run dev",
   url: "http://localhost:3000",
@@ -30,21 +24,6 @@ const defaultDevWebServer = {
     ...process.env,
   },
 };
-
-/** Build + start port 3001 — Next 16 n’autorise qu’un seul `next dev` par repo. */
-const desktopGateProdWebServer = {
-  command: "bash scripts/dev/e2e-desktop-gate-server.sh",
-  url: "http://localhost:3001",
-  reuseExistingServer: !process.env.CI,
-  timeout: 300_000,
-  env: {
-    ...desktopGateProdEnv,
-    ...process.env,
-    NEXT_E2E_GATE_DIST: "1",
-  },
-};
-
-const gateE2eMode = process.env.PLAYWRIGHT_GATE_E2E === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -59,18 +38,14 @@ export default defineConfig({
   reporter: "html",
   use: {
     actionTimeout: 0,
-    baseURL: gateE2eMode ? "http://localhost:3001" : "http://localhost:3000",
+    baseURL: "http://localhost:3000",
     trace: "on-first-retry",
   },
 
   projects: [
     {
       name: "chromium",
-      testIgnore: [
-        /mobile-shell\.spec\.ts/,
-        /desktop-only-gate-prod\.spec\.ts/,
-        /portal-chat-client-ui\.spec\.ts/,
-      ],
+      testIgnore: [/mobile-shell\.spec\.ts/, /portal-chat-client-ui\.spec\.ts/],
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
@@ -121,32 +96,7 @@ export default defineConfig({
         },
       },
     },
-    {
-      name: "desktop-gate-prod",
-      testMatch: /desktop-only-gate-prod\.spec\.ts/,
-      grepInvert: /@desktop/,
-      use: {
-        ...devices["iPhone 13"],
-        baseURL: "http://localhost:3001",
-        launchOptions: {
-          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
-        },
-      },
-    },
-    {
-      name: "desktop-gate-prod-chrome",
-      testMatch: /desktop-only-gate-prod\.spec\.ts/,
-      grep: /@desktop/,
-      dependencies: ["desktop-gate-prod"],
-      use: {
-        ...devices["Desktop Chrome"],
-        baseURL: "http://localhost:3001",
-        launchOptions: {
-          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
-        },
-      },
-    },
   ],
 
-  webServer: gateE2eMode ? desktopGateProdWebServer : defaultDevWebServer,
+  webServer: defaultDevWebServer,
 });

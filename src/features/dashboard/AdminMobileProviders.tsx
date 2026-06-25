@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import LoginOverlay from "@/features/auth/components/LoginOverlay";
-import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
@@ -25,29 +24,27 @@ type Props = {
 export default function AdminMobileProviders({ children }: Props) {
   return (
     <DateProvider>
-      <DesktopOnlyGate>
-        <LoginOverlay>
-          <DevServiceWorkerCleanup />
-          <CompanyWorkspaceProvider>
-            <FeatureFlagsProvider>
-              <GalaxyLayerBridgeProvider>
-                <MobileGalaxyComposerOpenProvider>
-                  <DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}>
-                    <DashboardPageSelectorProvider>
-                      <MobileDockOnboardingProvider>
-                        <BackofficeInboxIntentProvider>
-                          <DeferredAdminBootstraps />
-                          {children}
-                        </BackofficeInboxIntentProvider>
-                      </MobileDockOnboardingProvider>
-                    </DashboardPageSelectorProvider>
-                  </DashboardPagerProvider>
-                </MobileGalaxyComposerOpenProvider>
-              </GalaxyLayerBridgeProvider>
-            </FeatureFlagsProvider>
-          </CompanyWorkspaceProvider>
-        </LoginOverlay>
-      </DesktopOnlyGate>
+      <LoginOverlay>
+        <DevServiceWorkerCleanup />
+        <CompanyWorkspaceProvider>
+          <FeatureFlagsProvider>
+            <GalaxyLayerBridgeProvider>
+              <MobileGalaxyComposerOpenProvider>
+                <DashboardPagerProvider pageCount={ADMIN_MOBILE_PAGE_COUNT}>
+                  <DashboardPageSelectorProvider>
+                    <MobileDockOnboardingProvider>
+                      <BackofficeInboxIntentProvider>
+                        <DeferredAdminBootstraps />
+                        {children}
+                      </BackofficeInboxIntentProvider>
+                    </MobileDockOnboardingProvider>
+                  </DashboardPageSelectorProvider>
+                </DashboardPagerProvider>
+              </MobileGalaxyComposerOpenProvider>
+            </GalaxyLayerBridgeProvider>
+          </FeatureFlagsProvider>
+        </CompanyWorkspaceProvider>
+      </LoginOverlay>
     </DateProvider>
   );
 }

@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import TechnicianLoginGate from "@/features/auth/components/TechnicianLoginGate";
-import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
@@ -26,29 +25,27 @@ type Props = {
 export default function TechnicianMobileProviders({ children }: Props) {
   return (
     <DateProvider>
-      <DesktopOnlyGate>
-        <DevServiceWorkerCleanup />
-        <CompanyWorkspaceProvider>
-          <FeatureFlagsProvider>
-            <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
-              <DashboardPageSelectorProvider>
-                <MobileDockOnboardingProvider>
-                  <TechnicianQueryProvider>
-                    <OfflineSyncProvider>
-                      <TechnicianCaseIntentProvider>
-                        <TechnicianFinishJobProvider>
-                          <DeferredTechnicianBootstraps />
-                          <TechnicianLoginGate>{children}</TechnicianLoginGate>
-                        </TechnicianFinishJobProvider>
-                      </TechnicianCaseIntentProvider>
-                    </OfflineSyncProvider>
-                  </TechnicianQueryProvider>
-                </MobileDockOnboardingProvider>
-              </DashboardPageSelectorProvider>
-            </DashboardPagerProvider>
-          </FeatureFlagsProvider>
-        </CompanyWorkspaceProvider>
-      </DesktopOnlyGate>
+      <DevServiceWorkerCleanup />
+      <CompanyWorkspaceProvider>
+        <FeatureFlagsProvider>
+          <DashboardPagerProvider pageCount={TECHNICIAN_MOBILE_PAGE_COUNT}>
+            <DashboardPageSelectorProvider>
+              <MobileDockOnboardingProvider>
+                <TechnicianQueryProvider>
+                  <OfflineSyncProvider>
+                    <TechnicianCaseIntentProvider>
+                      <TechnicianFinishJobProvider>
+                        <DeferredTechnicianBootstraps />
+                        <TechnicianLoginGate>{children}</TechnicianLoginGate>
+                      </TechnicianFinishJobProvider>
+                    </TechnicianCaseIntentProvider>
+                  </OfflineSyncProvider>
+                </TechnicianQueryProvider>
+              </MobileDockOnboardingProvider>
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
+        </FeatureFlagsProvider>
+      </CompanyWorkspaceProvider>
     </DateProvider>
   );
 }

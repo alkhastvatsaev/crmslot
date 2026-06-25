@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import DesktopOnlyGate from "@/features/app/DesktopOnlyGate";
 import { DateProvider } from "@/context/DateContext";
 import { CompanyWorkspaceProvider } from "@/context/CompanyWorkspaceContext";
 import { FeatureFlagsProvider } from "@/core/FeatureFlagsProvider";
@@ -26,29 +25,27 @@ type Props = {
 export default function ClientMobileProviders({ children }: Props) {
   return (
     <DateProvider>
-      <DesktopOnlyGate>
-        <DevServiceWorkerCleanup />
-        <CompanyWorkspaceProvider>
-          <FeatureFlagsProvider>
-            <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
-              <DashboardPageSelectorProvider>
-                <MobileDockOnboardingProvider>
-                  <RequesterHubProvider>
-                    <ClientPortalPushProvider>
-                      <ClientPortalAuthEffects />
-                      <Suspense fallback={null}>
-                        <ClientPortalPaymentReturnEffects />
-                      </Suspense>
-                      <DeferredClientBootstraps />
-                      {children}
-                    </ClientPortalPushProvider>
-                  </RequesterHubProvider>
-                </MobileDockOnboardingProvider>
-              </DashboardPageSelectorProvider>
-            </DashboardPagerProvider>
-          </FeatureFlagsProvider>
-        </CompanyWorkspaceProvider>
-      </DesktopOnlyGate>
+      <DevServiceWorkerCleanup />
+      <CompanyWorkspaceProvider>
+        <FeatureFlagsProvider>
+          <DashboardPagerProvider pageCount={CLIENT_MOBILE_PAGE_COUNT}>
+            <DashboardPageSelectorProvider>
+              <MobileDockOnboardingProvider>
+                <RequesterHubProvider>
+                  <ClientPortalPushProvider>
+                    <ClientPortalAuthEffects />
+                    <Suspense fallback={null}>
+                      <ClientPortalPaymentReturnEffects />
+                    </Suspense>
+                    <DeferredClientBootstraps />
+                    {children}
+                  </ClientPortalPushProvider>
+                </RequesterHubProvider>
+              </MobileDockOnboardingProvider>
+            </DashboardPageSelectorProvider>
+          </DashboardPagerProvider>
+        </FeatureFlagsProvider>
+      </CompanyWorkspaceProvider>
     </DateProvider>
   );
 }
