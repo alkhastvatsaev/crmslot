@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { render, screen } from "@/test-utils/render";
+import { fireEvent, render, screen } from "@/test-utils/render";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 
 class MockPointerEvent extends Event {
@@ -83,7 +83,43 @@ function firePointerSwipe(
   );
 }
 
+function fireTouchSwipe(
+  el: HTMLElement,
+  start: { x: number; y: number },
+  end: { x: number; y: number }
+) {
+  fireEvent.touchStart(el, { touches: [{ clientX: start.x, clientY: start.y }] });
+  fireEvent.touchMove(el, { touches: [{ clientX: end.x, clientY: end.y }] });
+}
+
 describe("usePanelSwipe", () => {
+  it("calls onSwipeLeft via touch events (Android)", () => {
+    const onSwipeLeft = jest.fn();
+    render(<SwipeHost onSwipeLeft={onSwipeLeft} onSwipeRight={jest.fn()} />);
+    fireTouchSwipe(screen.getByTestId("swipe-host"), { x: 200, y: 100 }, { x: 120, y: 100 });
+    expect(onSwipeLeft).toHaveBeenCalledTimes(1);
+  });
+
+  it("swipe works when gesture starts on a button", () => {
+    const onSwipeLeft = jest.fn();
+    function Host() {
+      const ref = useRef<HTMLDivElement>(null);
+      usePanelSwipe(ref, onSwipeLeft, jest.fn());
+      return (
+        <div ref={ref} data-testid="swipe-host">
+          <button type="button">tile</button>
+        </div>
+      );
+    }
+    render(<Host />);
+    fireTouchSwipe(
+      screen.getByRole("button", { name: "tile" }),
+      { x: 200, y: 100 },
+      { x: 120, y: 100 }
+    );
+    expect(onSwipeLeft).toHaveBeenCalledTimes(1);
+  });
+
   it("calls onSwipeLeft when pointer drags left", () => {
     const onSwipeLeft = jest.fn();
     const onSwipeRight = jest.fn();
