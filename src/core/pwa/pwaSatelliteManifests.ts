@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-/** Manifests PWA distincts — une icône écran d'accueil par rôle (admin / client / technicien). */
+/**
+ * Manifests PWA distincts — une icône écran d'accueil par rôle (admin / client / technicien).
+ * Contenu JSON : `pwaManifestDefinitions.ts` → `npm run sync:pwa-manifests` → `public/manifest*.json`.
+ * Scopes satellites (`/m/demande`, `/m/technician`) obligatoires pour des installs Android séparées.
+ */
 
 export const PWA_THEME_COLOR = "#09090B";
 

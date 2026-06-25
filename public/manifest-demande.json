@@ -3,7 +3,7 @@
   "short_name": "Demande",
   "description": "Formulaire et suivi client CRMSLOT",
   "start_url": "/m/demande",
-  "scope": "/",
+  "scope": "/m/demande",
   "display": "standalone",
   "orientation": "portrait-primary",
   "lang": "fr",

@@ -117,6 +117,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   /** Exclut assets statiques et flux PWA (manifest, sw.js) du middleware. */
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|workbox-.*|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|otf|css|js|map)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest(?:-[\\w-]+)?\\.json|manifest.webmanifest|sw.js|workbox-.*|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|otf|css|js|map)$).*)",
   ],
 };
