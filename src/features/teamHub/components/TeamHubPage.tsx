@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -9,23 +9,19 @@ import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import TeamHubStaffGrid from "@/features/teamHub/components/TeamHubStaffGrid";
 import TeamHubRightPanel from "@/features/teamHub/components/TeamHubRightPanel";
 import { useCompanyStaff } from "@/features/teamHub/hooks/useCompanyStaff";
-import { buildTeamHubKpis, filterTeamStaff } from "@/features/teamHub/teamHubPatronMetrics";
-import type { TeamHubStaffFilter } from "@/features/teamHub/teamHubTypes";
 import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
-import { PatronHubChipRow, PatronHubGuide } from "@/core/ui/hub";
 import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
+import { cn } from "@/lib/utils";
 
 type Props = { slotIndex?: number };
-
-type TeamView = "active" | "all";
 
 const sideShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 const mainShell = `flex min-h-0 flex-1 flex-col overflow-hidden ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
 
-/** Hub équipe — qui travaille chez moi, en clair. */
+/** Hub équipe — annuaire staff société. */
 export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) {
   const humanPage = slotIndex + 1;
   const { t } = useTranslation();
@@ -34,12 +30,7 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { staff, loading, error, refresh } = useCompanyStaff(pageActive ? companyId : null);
 
-  const [view, setView] = useState<TeamView>("active");
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
-
-  const kpis = useMemo(() => buildTeamHubKpis(staff), [staff]);
-  const filter: TeamHubStaffFilter = view === "active" ? "active" : "all";
-  const filteredStaff = useMemo(() => filterTeamStaff(staff, filter), [staff, filter]);
 
   const gate =
     companyPhase === "loading" ? (
@@ -75,37 +66,11 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
       rightPadding={false}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
       left={
-        <section className={sideShell} data-testid="team-hub-page">
-          {gate}
-          {companyId && !gate ? (
-            <>
-              <PatronHubGuide
-                value={String(kpis.activeCount)}
-                label={t("teamHub.guide.value_label")}
-                hint={t("teamHub.guide.hint")}
-                valueTestId="team-hub-kpi-active"
-                rootTestId="team-hub-kpi-strip"
-              />
-              <PatronHubChipRow
-                testId="team-hub-view-chips"
-                value={view}
-                onChange={(id) => setView(id as TeamView)}
-                options={[
-                  {
-                    id: "active",
-                    label: t("teamHub.guide.chip_active"),
-                    testId: "team-hub-filter-active",
-                  },
-                  {
-                    id: "all",
-                    label: t("teamHub.guide.chip_all"),
-                    testId: "team-hub-filter-all",
-                  },
-                ]}
-              />
-            </>
-          ) : null}
-        </section>
+        <section
+          className={cn(sideShell, "bg-white")}
+          data-testid="team-hub-left-empty"
+          aria-hidden="true"
+        />
       }
       center={
         <section className={mainShell}>
@@ -122,7 +87,7 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
                 </div>
               ) : null}
               <TeamHubStaffGrid
-                staff={filteredStaff}
+                staff={staff}
                 loading={loading}
                 selectedUid={selectedUid}
                 onSelect={setSelectedUid}

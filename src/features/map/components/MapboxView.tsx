@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
+import { AnimatePresence } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapHubMobileTripleLayout from "@/features/map/components/MapHubMobileTripleLayout";
 import MapboxMapControls from "@/features/map/components/MapboxMapControls";
+import MapMissionSelectedOverlay from "@/features/map/components/MapMissionSelectedOverlay";
 import MapboxViewDesktopLayout from "@/features/map/components/MapboxViewDesktopLayout";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
@@ -16,12 +18,10 @@ import { useMapHubMissions } from "@/features/map/hooks/useMapHubMissions";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { useMapboxInstance } from "@/features/map/hooks/useMapboxInstance";
 import { useMapMissionMarkers } from "@/features/map/hooks/useMapMissionMarkers";
-import { useMapRouteLineLayer } from "@/features/map/hooks/useMapRouteLineLayer";
 import { useMapUserPuckAndCamera } from "@/features/map/hooks/useMapUserPuckAndCamera";
 import { resolveMapCameraDuration } from "@/features/map/mapboxPowerProfile";
 import { scheduleMapboxResizeBurst } from "@/features/map/mapboxMapLifecycle";
 import type { MobileHubRail } from "@/features/dashboard";
-import type { Intervention } from "@/features/interventions";
 import type { Mission } from "@/features/map/missionTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
@@ -39,11 +39,9 @@ export default function MapboxView() {
   const mapWebGLActive = resolveMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);
   const { t } = useTranslation();
   const requestMobileHubRail = useRequestMobileHubRail();
-  const [routeLine, setRouteLine] = useState<Array<[number, number]>>([]);
 
   const {
     visibleMissions,
-    visibleInterventions,
     selectedMission,
     setSelectedMission,
     handleArchiveMission,
@@ -66,8 +64,6 @@ export default function MapboxView() {
     setSelectedMission,
   });
 
-  useMapRouteLineLayer(mapRef, mapReady, mapWebGLActive, routeLine);
-
   useMapUserPuckAndCamera({
     mapRef,
     mapReady,
@@ -79,27 +75,15 @@ export default function MapboxView() {
     mapHubDataActive,
   });
 
-  const handleRouteOptimized = useCallback((ordered: Intervention[]) => {
-    const coords: Array<[number, number]> = ordered
-      .filter((iv) => iv.location?.lat && iv.location?.lng)
-      .map((iv) => [iv.location.lng, iv.location.lat]);
-    setRouteLine(coords);
-  }, []);
-
   const handleMissionClick = useCallback(
     (mission: Mission) => {
       hubMissionClick(mission);
+      if (mobileHubLayout) {
+        requestMobileHubRail("left");
+        if (mission.coordinates) flyToMission(mission.coordinates as [number, number]);
+      }
     },
-    [hubMissionClick]
-  );
-
-  const handleViewMissionOnMap = useCallback(
-    (mission: Mission) => {
-      requestMobileHubRail("left");
-      if (mission.coordinates) flyToMission(mission.coordinates as [number, number]);
-      setSelectedMission(null);
-    },
-    [flyToMission, requestMobileHubRail, setSelectedMission]
+    [flyToMission, hubMissionClick, mobileHubLayout, requestMobileHubRail]
   );
 
   const handleRecenter = useCallback(() => {
@@ -147,12 +131,18 @@ export default function MapboxView() {
           ) : null}
         </div>
       ) : null}
-      <MapboxMapControls
-        layout="mobile"
-        onRecenter={handleRecenter}
-        visibleInterventions={visibleInterventions}
-        onRouteOptimized={handleRouteOptimized}
-      />
+      <MapboxMapControls layout="mobile" onRecenter={handleRecenter} />
+      <AnimatePresence>
+        {selectedMission ? (
+          <MapMissionSelectedOverlay
+            mission={selectedMission}
+            onClose={() => setSelectedMission(null)}
+            onArchive={handleArchiveMission}
+            onDelete={handleDeleteMission}
+            variant="desktop"
+          />
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 
@@ -165,13 +155,8 @@ export default function MapboxView() {
           </div>
         }
         visibleMissions={visibleMissions}
-        selectedMission={selectedMission}
         inboxDataActive={powerGate.inboxDataActive}
         onMissionClick={handleMissionClick}
-        onCloseMission={() => setSelectedMission(null)}
-        onArchiveMission={handleArchiveMission}
-        onDeleteMission={handleDeleteMission}
-        onViewOnMap={handleViewMissionOnMap}
         onRailChange={handleMobileMapResize}
       />
     );
@@ -182,7 +167,6 @@ export default function MapboxView() {
       mapContainerRef={mapContainerRef}
       mapBootError={mapBootError}
       visibleMissions={visibleMissions}
-      visibleInterventions={visibleInterventions}
       selectedMission={selectedMission}
       setSelectedMission={setSelectedMission}
       onMissionClick={(mission) => {
@@ -199,7 +183,6 @@ export default function MapboxView() {
       onArchiveMission={handleArchiveMission}
       onDeleteMission={handleDeleteMission}
       onRecenter={handleRecenter}
-      onRouteOptimized={handleRouteOptimized}
       dashboardPageIndex={dashboardPageIndex}
       inboxDataActive={isMobile !== true || powerGate.inboxDataActive}
     />

@@ -9,4 +9,5 @@ export { joinDefaultCompanyMembership } from "@/features/company/server/joinDefa
 export { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
 export { requireCompanyMember } from "@/features/company/server/requireCompanyMember";
 export { setCompanyStaffActive } from "@/features/company/server/setCompanyStaffActive";
+export { removeCompanyStaffMember } from "@/features/company/server/removeCompanyStaffMember";
 export { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";

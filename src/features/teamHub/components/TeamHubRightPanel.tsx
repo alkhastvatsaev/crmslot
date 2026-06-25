@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Pencil, UserCheck, UserX } from "lucide-react";
+import { Loader2, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import HubButton from "@/core/ui/hub/HubButton";
 import type { CompanyStaffMember } from "@/features/teamHub/types";
@@ -30,10 +30,8 @@ export default function TeamHubRightPanel({
 
   const selected = staff.find((m) => m.uid === selectedUid) ?? null;
 
-  const { busyUid, error, updateMember, setMemberActive, clearError } = useCompanyStaffActions(
-    companyId,
-    () => void onRefresh()
-  );
+  const { busyUid, error, updateMember, setMemberActive, deleteMember, clearError } =
+    useCompanyStaffActions(companyId, () => void onRefresh());
 
   useEffect(() => {
     if (!selected) {
@@ -69,6 +67,13 @@ export default function TeamHubRightPanel({
       email: email.trim() || null,
       vehicle: vehicle.trim() || undefined,
     });
+    if (ok) onClearSelection();
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(String(t("teamHub.delete_account_confirm")));
+    if (!confirmed) return;
+    const ok = await deleteMember(selected.uid);
     if (ok) onClearSelection();
   };
 
@@ -168,6 +173,21 @@ export default function TeamHubRightPanel({
             {t("teamHub.reactivate")}
           </HubButton>
         )}
+
+        <button
+          type="button"
+          data-testid="team-staff-delete-account"
+          disabled={busyUid === selected.uid}
+          onClick={() => void handleDelete()}
+          className="mx-auto inline-flex min-h-[32px] items-center justify-center gap-1.5 px-2 text-[12px] font-semibold text-red-600 transition-colors hover:text-red-700 disabled:opacity-50"
+        >
+          {busyUid === selected.uid ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          )}
+          {t("teamHub.delete_account")}
+        </button>
       </div>
     </div>
   );

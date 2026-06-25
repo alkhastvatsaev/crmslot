@@ -12,6 +12,18 @@ type Props = {
   onSelect: (uid: string) => void;
 };
 
+function resolveNameLines(member: CompanyStaffMember): { firstLine: string; secondLine: string } {
+  const firstName = member.firstName.trim();
+  const lastName = member.lastName.trim();
+  if (firstName || lastName) {
+    return { firstLine: firstName || "—", secondLine: lastName };
+  }
+  const parts = member.displayName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { firstLine: "—", secondLine: "" };
+  if (parts.length === 1) return { firstLine: parts[0] ?? "—", secondLine: "" };
+  return { firstLine: parts[0] ?? "—", secondLine: parts.slice(1).join(" ") };
+}
+
 export default function TeamHubStaffGrid({ staff, loading, selectedUid, onSelect }: Props) {
   const { t } = useTranslation();
 
@@ -40,12 +52,12 @@ export default function TeamHubStaffGrid({ staff, loading, selectedUid, onSelect
   return (
     <div
       data-testid="team-hub-staff-grid"
-      className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-6 pt-2"
+      className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-6 pt-3"
     >
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]">
         {staff.map((member) => {
           const active = selectedUid === member.uid;
-          const initial = (member.displayName.trim().charAt(0) || "?").toUpperCase();
+          const { firstLine, secondLine } = resolveNameLines(member);
 
           return (
             <button
@@ -54,7 +66,8 @@ export default function TeamHubStaffGrid({ staff, loading, selectedUid, onSelect
               data-testid={`team-staff-row-${member.uid}`}
               onClick={() => onSelect(member.uid)}
               className={cn(
-                "flex min-h-[108px] flex-col items-center justify-center gap-1 rounded-[22px] border bg-white/95 p-3 text-center shadow-[0_6px_18px_-6px_rgba(15,23,42,0.1)] transition hover:scale-[1.02] active:scale-[0.97]",
+                "aspect-square w-full max-w-[104px] justify-self-center rounded-[24px] border bg-white/95 p-2.5 text-center shadow-[0_6px_18px_-6px_rgba(15,23,42,0.1)] transition hover:scale-[1.02] active:scale-[0.97]",
+                "flex flex-col items-center justify-center gap-0.5",
                 active
                   ? "border-slate-900 ring-2 ring-slate-900/15"
                   : member.active
@@ -62,17 +75,14 @@ export default function TeamHubStaffGrid({ staff, loading, selectedUid, onSelect
                     : "border-black/[0.06] ring-1 ring-slate-200/80 opacity-90"
               )}
             >
-              <span
-                className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold",
-                  active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
-                )}
-              >
-                {initial}
+              <span className="line-clamp-2 w-full text-[13px] font-semibold leading-tight text-slate-900">
+                {firstLine}
               </span>
-              <span className="line-clamp-2 w-full text-[13px] font-semibold text-slate-800">
-                {member.displayName}
-              </span>
+              {secondLine ? (
+                <span className="line-clamp-2 w-full text-[11px] font-medium leading-tight text-slate-500">
+                  {secondLine}
+                </span>
+              ) : null}
             </button>
           );
         })}

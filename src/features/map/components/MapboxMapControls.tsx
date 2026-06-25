@@ -1,25 +1,16 @@
 "use client";
 
-import TourOptimizeButton from "@/features/technicians/components/TourOptimizeButton";
 import {
   DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS,
   DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
-import type { Intervention } from "@/features/interventions";
 
 type Props = {
   onRecenter: () => void;
-  visibleInterventions: Intervention[];
-  onRouteOptimized: (ordered: Intervention[]) => void;
   layout: "mobile" | "desktop";
 };
 
-export default function MapboxMapControls({
-  onRecenter,
-  visibleInterventions,
-  onRouteOptimized,
-  layout,
-}: Props) {
+export default function MapboxMapControls({ onRecenter, layout }: Props) {
   if (layout === "mobile") {
     return (
       <div
@@ -30,13 +21,6 @@ export default function MapboxMapControls({
           onRecenter={onRecenter}
           className="h-10 w-10 rounded-[12px] opacity-90 hover:opacity-100"
         />
-        {visibleInterventions.length >= 2 ? (
-          <TourOptimizeButton
-            missions={visibleInterventions}
-            onOptimized={onRouteOptimized}
-            className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-white/75 bg-white/95 opacity-90 shadow-md backdrop-blur-xl transition-all duration-300 hover:opacity-100"
-          />
-        ) : null}
       </div>
     );
   }

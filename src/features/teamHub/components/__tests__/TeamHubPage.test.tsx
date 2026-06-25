@@ -35,12 +35,15 @@ jest.mock("@/features/teamHub/hooks/useCompanyStaff", () => ({
 }));
 
 describe("TeamHubPage premium patron", () => {
-  it("shows KPI strip, filters and staff grid", () => {
+  it("shows empty left rail and staff grid with all members", () => {
     render(<TeamHubPage slotIndex={TEAM_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
-    expect(screen.getByTestId("team-hub-kpi-strip")).toBeInTheDocument();
+    expect(screen.getByTestId("team-hub-left-empty")).toBeInTheDocument();
+    expect(screen.queryByTestId("team-hub-kpi-strip")).not.toBeInTheDocument();
     expect(screen.getByTestId("team-hub-staff-grid")).toBeInTheDocument();
     expect(screen.getByTestId("team-staff-row-uid-tech-1")).toBeInTheDocument();
+    expect(screen.getByText("Jean")).toBeInTheDocument();
+    expect(screen.getByText("Martin")).toBeInTheDocument();
   });
 
   it("opens right panel on staff click", () => {

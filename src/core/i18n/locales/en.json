@@ -990,7 +990,7 @@
     },
     "empty": "No employees for this filter.",
     "no_email": "No email on file",
-    "select_member": "Tap a name on the left.",
+    "select_member": "Select an employee.",
     "save": "Save",
     "deactivate": "Deactivate",
     "reactivate": "Reactivate",
@@ -1030,7 +1030,9 @@
       "rail_left": "Summary",
       "rail_center": "Staff",
       "rail_right": "Profile"
-    }
+    },
+    "delete_account": "Delete account",
+    "delete_account_confirm": "Remove this employee from the company?"
   },
   "caseHub": {
     "company_required": "Select a company.",

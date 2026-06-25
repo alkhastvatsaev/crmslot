@@ -11,13 +11,8 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 type Props = {
   mapRail: ReactNode;
   visibleMissions: Mission[];
-  selectedMission: Mission | null;
   inboxDataActive: boolean;
   onMissionClick: (mission: Mission) => void;
-  onCloseMission: () => void;
-  onArchiveMission: (mission: Mission) => void;
-  onDeleteMission: (mission: Mission) => void;
-  onViewOnMap?: (mission: Mission) => void;
   onRailChange?: (rail: MobileHubRail) => void;
 };
 
@@ -28,13 +23,8 @@ type Props = {
 export default function MapHubMobileTripleLayout({
   mapRail,
   visibleMissions,
-  selectedMission,
   inboxDataActive,
   onMissionClick,
-  onCloseMission,
-  onArchiveMission,
-  onDeleteMission,
-  onViewOnMap,
   onRailChange,
 }: Props) {
   const { t } = useTranslation();
@@ -55,15 +45,7 @@ export default function MapHubMobileTripleLayout({
       onRailChange={onRailChange}
       left={mapRail}
       center={
-        <MapHubMissionsRail
-          visibleMissions={visibleMissions}
-          selectedMission={selectedMission}
-          onMissionClick={onMissionClick}
-          onCloseMission={onCloseMission}
-          onArchiveMission={onArchiveMission}
-          onDeleteMission={onDeleteMission}
-          onViewOnMap={onViewOnMap}
-        />
+        <MapHubMissionsRail visibleMissions={visibleMissions} onMissionClick={onMissionClick} />
       }
       right={
         <BackOfficeInboxPanel dayMissions={visibleMissions} inboxDataActive={inboxDataActive} />

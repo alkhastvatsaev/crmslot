@@ -75,4 +75,17 @@ describe("TeamHubRightPanel", () => {
     );
     expect(onRefresh).toHaveBeenCalled();
   });
+  it("shows delete account action", () => {
+    render(
+      <TeamHubRightPanel
+        companyId="co-abc"
+        staff={staff}
+        selectedUid="uid-tech-1"
+        onClearSelection={jest.fn()}
+        onRefresh={jest.fn().mockResolvedValue(undefined)}
+      />
+    );
+
+    expect(screen.getByTestId("team-staff-delete-account")).toBeInTheDocument();
+  });
 });

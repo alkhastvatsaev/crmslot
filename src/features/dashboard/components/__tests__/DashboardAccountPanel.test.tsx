@@ -56,15 +56,14 @@ describe("DashboardAccountPanel", () => {
     handleDeleteAccount.mockClear();
   });
 
-  it("affiche les champs du compte et les boutons modifier / déconnexion", () => {
+  it("affiche le profil compact et les boutons modifier / déconnexion", () => {
     render(<DashboardAccountPanel onClose={jest.fn()} variant="mobile" />);
 
-    expect(screen.getByTestId("dashboard-account-first-name")).toHaveTextContent("Jean");
-    expect(screen.getByTestId("dashboard-account-last-name")).toHaveTextContent("Dupont");
-    expect(screen.getByTestId("dashboard-account-email")).toHaveTextContent("test@example.com");
+    expect(screen.getByText("Jean Dupont")).toBeInTheDocument();
+    expect(screen.getByText("test@example.com")).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-account-phone")).toHaveTextContent("+32 470 00 00 00");
     expect(screen.getByTestId("dashboard-account-company")).toHaveTextContent("ABC");
-    expect(screen.getByTestId("dashboard-account-role")).toHaveTextContent("ADMIN");
+    expect(screen.getByTestId("dashboard-account-role-badge")).toHaveTextContent("ADMIN");
     expect(screen.getByTestId("dashboard-account-edit")).toBeInTheDocument();
     expect(screen.getByTestId("dashboard-account-signout")).toBeInTheDocument();
   });
