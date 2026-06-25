@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import BillingHubAgentPanel from "@/features/billingHub/components/BillingHubAgentPanel";
 import BillingHubCenterPanel from "@/features/billingHub/components/BillingHubCenterPanel";
-import ChatbotRightRail from "@/features/chatbot/components/ChatbotRightRail";
+import BillingHubRightPanel from "@/features/billingHub/components/BillingHubRightPanel";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { computeBillingHubMetrics } from "@/features/billingHub/billingHubMetrics";
 import { useCompanyBillingInterventions } from "@/features/billingHub/hooks/useCompanyBillingInterventions";
@@ -99,7 +99,7 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
           className={`${documentsRailShell} min-h-0 overflow-hidden`}
           data-testid="billing-hub-documents-rail"
         >
-          <ChatbotRightRail />
+          <BillingHubRightPanel interventions={interventions} loading={loading} />
         </section>
       }
     />

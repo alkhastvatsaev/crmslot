@@ -976,6 +976,11 @@
       "rail_left": "Agent",
       "rail_center": "Factures",
       "rail_right": "Documents"
+    },
+    "right_tabs": {
+      "aria": "Panneau facturation",
+      "documents": "Documents",
+      "dossier": "Dossier"
     }
   },
   "teamHub": {
