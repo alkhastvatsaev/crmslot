@@ -1,7 +1,14 @@
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import type { CompanyRole } from "@/features/company";
+import {
+  isStaffAccountRoleOption,
+  resolveStaffAccountRoleOption,
+  staffAccountRoleToMembershipRole,
+  type StaffAccountRoleOption,
+} from "@/features/auth/staffAccountRoleDisplay";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
+import { provisionTechnicianStaffRecord } from "@/features/company/server/provisionTechnicianStaff";
 import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
 import { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
 import type { UpdateCompanyStaffResult } from "@/features/company/server/updateCompanyStaffMember";
@@ -16,11 +23,105 @@ export type SelfStaffAccountUpdateInput = {
   phone?: string | null;
   email?: string | null;
   companyId?: string;
-  role?: CompanyRole;
+  accountRole?: StaffAccountRoleOption;
 };
 
 function resolveMembershipRole(data: Record<string, unknown> | undefined): CompanyRole {
   return data?.role === "admin" ? "admin" : "collaborateur";
+}
+
+async function readCurrentAccountRole(
+  db: admin.firestore.Firestore,
+  uid: string,
+  companyId: string
+): Promise<StaffAccountRoleOption> {
+  const membershipSnap = await db.doc(`users/${uid}/company_memberships/${companyId}`).get();
+  const membershipRole = membershipSnap.exists
+    ? resolveMembershipRole(membershipSnap.data())
+    : "collaborateur";
+
+  const techSnap = await db.collection("technicians").doc(uid).get();
+  const techData = techSnap.exists ? techSnap.data() : null;
+
+  return resolveStaffAccountRoleOption(
+    membershipRole,
+    techData
+      ? {
+          active: techData.active === false ? false : true,
+          companyId: typeof techData.companyId === "string" ? techData.companyId : "",
+        }
+      : null,
+    companyId
+  );
+}
+
+async function deactivateTechnicianForCompany(
+  db: admin.firestore.Firestore,
+  uid: string,
+  companyId: string
+): Promise<void> {
+  const techRef = db.collection("technicians").doc(uid);
+  const techSnap = await techRef.get();
+  if (!techSnap.exists) return;
+
+  const techCompanyId =
+    typeof techSnap.data()?.companyId === "string" ? techSnap.data()!.companyId.trim() : "";
+  if (!techCompanyId || techCompanyId === companyId.trim()) {
+    await techRef.set(
+      {
+        active: false,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  }
+}
+
+async function applyAccountRole(
+  db: admin.firestore.Firestore,
+  auth: typeof admin.auth,
+  uid: string,
+  companyId: string,
+  accountRole: StaffAccountRoleOption,
+  profile: { firstName?: string; lastName?: string; email?: string | null }
+): Promise<void> {
+  const membershipRole = staffAccountRoleToMembershipRole(accountRole);
+  const membershipRef = db.doc(`users/${uid}/company_memberships/${companyId}`);
+  const membershipSnap = await membershipRef.get();
+
+  if (membershipSnap.exists) {
+    const currentRole = resolveMembershipRole(membershipSnap.data());
+    if (currentRole !== membershipRole) {
+      await membershipRef.update({
+        role: membershipRole,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      await upsertCompanyStaffDirectoryEntry(db, companyId, uid, membershipRole);
+      await syncTenantClaims(auth, db, uid, companyId);
+    }
+  }
+
+  if (accountRole === "technician") {
+    await provisionTechnicianStaffRecord(db, {
+      uid,
+      companyId,
+      profile: {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email ?? null,
+      },
+    });
+    await db.collection("technicians").doc(uid).set(
+      {
+        active: true,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    return;
+  }
+
+  await deactivateTechnicianForCompany(db, uid, companyId);
 }
 
 /** Met à jour le profil staff connecté (technicien + Auth). Rôle : admin société uniquement. */
@@ -40,7 +141,7 @@ export async function updateSelfStaffAccount(
   if (!membershipSnap.exists) {
     const envDefaultId = readDefaultStaffCompanyIdFromEnv();
     if (envDefaultId && companyId === envDefaultId && isSelfServiceStaffRoleEditEnabled()) {
-      const bootstrapRole = input.role === "admin" ? "admin" : "collaborateur";
+      const bootstrapRole = staffAccountRoleToMembershipRole(input.accountRole ?? "dispatcher");
       await membershipRef.set({
         companyId,
         role: bootstrapRole,
@@ -54,24 +155,26 @@ export async function updateSelfStaffAccount(
     }
   }
 
-  const currentRole = resolveMembershipRole(membershipSnap.data());
-  if (input.role && input.role !== currentRole) {
-    if (!isSelfServiceStaffRoleEditEnabled()) {
-      const adminCtx = await requireCompanyAdmin(db, uid, companyId);
-      if ("status" in adminCtx) {
-        return {
-          ok: false,
-          status: 403,
-          error: "Modification du rôle réservée aux administrateurs.",
-        };
+  if (input.accountRole && isStaffAccountRoleOption(input.accountRole)) {
+    const currentAccountRole = await readCurrentAccountRole(db, uid, companyId);
+    if (input.accountRole !== currentAccountRole) {
+      if (!isSelfServiceStaffRoleEditEnabled()) {
+        const adminCtx = await requireCompanyAdmin(db, uid, companyId);
+        if ("status" in adminCtx) {
+          return {
+            ok: false,
+            status: 403,
+            error: "Modification du rôle réservée aux administrateurs.",
+          };
+        }
       }
+
+      await applyAccountRole(db, auth, uid, companyId, input.accountRole, {
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email,
+      });
     }
-    await membershipRef.update({
-      role: input.role,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-    await upsertCompanyStaffDirectoryEntry(db, companyId, uid, input.role);
-    await syncTenantClaims(auth, db, uid, companyId);
   }
 
   const staffResult = await updateCompanyStaffMember(db, auth, companyId, uid, {
@@ -80,6 +183,20 @@ export async function updateSelfStaffAccount(
     email: input.email,
   });
   if (!staffResult.ok) return staffResult;
+
+  if (input.accountRole && isStaffAccountRoleOption(input.accountRole)) {
+    if (input.accountRole === "technician") {
+      await db.collection("technicians").doc(uid).set(
+        {
+          active: true,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } else {
+      await deactivateTechnicianForCompany(db, uid, companyId);
+    }
+  }
 
   if (input.phone !== undefined) {
     await db
@@ -113,3 +230,5 @@ export async function updateSelfStaffAccount(
 
   return { ok: true };
 }
+
+export { readCurrentAccountRole };

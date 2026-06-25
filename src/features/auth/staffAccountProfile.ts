@@ -1,6 +1,9 @@
 import { deleteUser, type User } from "firebase/auth";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
-import type { CompanyRole } from "@/features/company";
+import {
+  isStaffAccountRoleOption,
+  type StaffAccountRoleOption,
+} from "@/features/auth/staffAccountRoleDisplay";
 
 export type StaffAccountDraft = {
   firstName: string;
@@ -8,7 +11,7 @@ export type StaffAccountDraft = {
   email: string;
   phone: string;
   companyId: string;
-  role: CompanyRole;
+  accountRole: StaffAccountRoleOption;
 };
 
 export async function saveStaffAccountProfile(
@@ -29,14 +32,14 @@ export async function saveStaffAccountProfile(
       phone: draft.phone,
       email: draft.email,
       companyId: draft.companyId,
-      role: draft.role,
+      accountRole: draft.accountRole,
     }),
   });
 
   const data = (await res.json().catch(() => ({}))) as {
     ok?: boolean;
     error?: string;
-    role?: CompanyRole;
+    accountRole?: StaffAccountRoleOption;
     companyId?: string;
   };
   if (!res.ok || !data.ok) {
@@ -44,7 +47,9 @@ export async function saveStaffAccountProfile(
   }
 
   const savedCompanyId = data.companyId?.trim() || draft.companyId.trim();
-  const savedRole = data.role === "admin" || data.role === "collaborateur" ? data.role : draft.role;
+  const savedAccountRole = isStaffAccountRoleOption(data.accountRole)
+    ? data.accountRole
+    : draft.accountRole;
 
   if (savedCompanyId) {
     options.setActiveCompanyId(savedCompanyId);
@@ -54,7 +59,7 @@ export async function saveStaffAccountProfile(
   return {
     ...draft,
     companyId: savedCompanyId,
-    role: savedRole,
+    accountRole: savedAccountRole,
   };
 }
 

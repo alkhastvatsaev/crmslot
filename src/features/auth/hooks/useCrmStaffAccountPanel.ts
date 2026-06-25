@@ -7,18 +7,24 @@ import { toast } from "sonner";
 import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import type { CompanyMembershipRow, CompanyRole } from "@/features/company";
+import type { CompanyMembershipRow } from "@/features/company";
 import {
   deleteStaffAccount,
   saveStaffAccountProfile,
   type StaffAccountDraft,
 } from "@/features/auth/staffAccountProfile";
+import {
+  resolveStaffAccountRoleOption,
+  type StaffAccountRoleOption,
+} from "@/features/auth/staffAccountRoleDisplay";
 import { readClientPortalDefaultCompanyIdFromEnv } from "@/features/company/clientPortalCompanyId";
 
 type TechnicianFirestoreProfile = {
   firstName: string;
   lastName: string;
   phone: string;
+  active: boolean;
+  companyId: string;
 };
 
 export type CrmStaffAccountFields = {
@@ -28,7 +34,7 @@ export type CrmStaffAccountFields = {
   phone: string;
   companyId: string;
   companyName: string;
-  roleLabel: CompanyRole | null;
+  accountRole: StaffAccountRoleOption | null;
 };
 
 function splitDisplayName(displayName: string): { firstName: string; lastName: string } {
@@ -50,6 +56,12 @@ function resolveStaffAccountFields(
     workspace?.memberships.find((m) => m.companyId === workspace.activeCompanyId) ??
     workspace?.memberships[0];
   const activeCompanyId = workspace?.activeCompanyId?.trim() || membership?.companyId?.trim() || "";
+  const membershipRole =
+    workspace?.activeRole ??
+    workspace?.memberships.find((m) => m.companyId === activeCompanyId)?.role ??
+    membership?.role ??
+    null;
+
   return {
     email: user?.email?.trim() ?? "",
     firstName,
@@ -57,11 +69,7 @@ function resolveStaffAccountFields(
     phone: technicianProfile?.phone?.trim() ?? "",
     companyId: activeCompanyId,
     companyName: membership?.companyName?.trim() || "—",
-    roleLabel:
-      workspace?.activeRole ??
-      workspace?.memberships.find((m) => m.companyId === activeCompanyId)?.role ??
-      membership?.role ??
-      null,
+    accountRole: resolveStaffAccountRoleOption(membershipRole, technicianProfile, activeCompanyId),
   };
 }
 
@@ -71,13 +79,17 @@ function draftFromFields(
 ): StaffAccountDraft {
   const envCompanyId = readClientPortalDefaultCompanyIdFromEnv();
   const membership = memberships.find((m) => m.companyId === fields.companyId) ?? memberships[0];
+  const companyId = membership?.companyId ?? (fields.companyId.trim() || envCompanyId);
+
   return {
     firstName: fields.firstName,
     lastName: fields.lastName,
     email: fields.email,
     phone: fields.phone,
-    companyId: membership?.companyId ?? (fields.companyId.trim() || envCompanyId),
-    role: membership?.role ?? fields.roleLabel ?? "collaborateur",
+    companyId,
+    accountRole:
+      fields.accountRole ??
+      resolveStaffAccountRoleOption(membership?.role ?? null, null, companyId),
   };
 }
 
@@ -95,20 +107,34 @@ export function useCrmStaffAccountPanel() {
     email: "",
     phone: "",
     companyId: "",
-    role: "collaborateur",
+    accountRole: "dispatcher",
   });
   const [signingOut, setSigningOut] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [savedRoleHint, setSavedRoleHint] = useState<CompanyRole | null>(null);
+  const [savedRoleHint, setSavedRoleHint] = useState<StaffAccountRoleOption | null>(null);
 
   useEffect(() => {
     if (!savedRoleHint || !workspace) return;
-    const live =
-      workspace.memberships.find((m) => m.companyId === workspace.activeCompanyId)?.role ??
-      workspace.memberships[0]?.role;
+    const activeCompanyId =
+      workspace.activeCompanyId?.trim() || workspace.memberships[0]?.companyId;
+    const membershipRole =
+      workspace.memberships.find((m) => m.companyId === activeCompanyId)?.role ??
+      workspace.memberships[0]?.role ??
+      null;
+    const live = resolveStaffAccountRoleOption(
+      membershipRole,
+      technicianProfile,
+      activeCompanyId ?? ""
+    );
     if (live === savedRoleHint) setSavedRoleHint(null);
-  }, [savedRoleHint, workspace?.memberships, workspace?.activeCompanyId, workspace]);
+  }, [
+    savedRoleHint,
+    workspace?.memberships,
+    workspace?.activeCompanyId,
+    workspace,
+    technicianProfile,
+  ]);
 
   useEffect(() => {
     if (!auth) return () => {};
@@ -135,6 +161,8 @@ export function useCrmStaffAccountPanel() {
           firstName: typeof data.firstName === "string" ? data.firstName.trim() : "",
           lastName: typeof data.lastName === "string" ? data.lastName.trim() : "",
           phone: typeof data.phone === "string" ? data.phone.trim() : "",
+          active: data.active !== false,
+          companyId: typeof data.companyId === "string" ? data.companyId.trim() : "",
         });
       },
       () => setTechnicianProfile(null)
@@ -143,7 +171,7 @@ export function useCrmStaffAccountPanel() {
 
   const memberships = workspace?.memberships ?? [];
   const baseFields = resolveStaffAccountFields(user, workspace, technicianProfile);
-  const fields = savedRoleHint != null ? { ...baseFields, roleLabel: savedRoleHint } : baseFields;
+  const fields = savedRoleHint != null ? { ...baseFields, accountRole: savedRoleHint } : baseFields;
 
   const startEditing = useCallback(() => {
     setDraft(draftFromFields(fields, memberships));
@@ -164,10 +192,14 @@ export function useCrmStaffAccountPanel() {
       setDraft((prev) => ({
         ...prev,
         companyId,
-        role: membership?.role ?? prev.role,
+        accountRole: resolveStaffAccountRoleOption(
+          membership?.role ?? null,
+          technicianProfile,
+          companyId
+        ),
       }));
     },
-    [memberships]
+    [memberships, technicianProfile]
   );
 
   const handleSave = useCallback(async () => {
@@ -179,7 +211,7 @@ export function useCrmStaffAccountPanel() {
         setActiveCompanyId: workspace?.setActiveCompanyId ?? (() => {}),
         refreshClaimsSilent: workspace?.refreshClaimsSilent ?? (async () => false),
       });
-      setSavedRoleHint(saved.role);
+      setSavedRoleHint(saved.accountRole);
       setEditing(false);
       toast.success(String(t("staff_account.save_success")));
     } catch (error) {
