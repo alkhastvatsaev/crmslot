@@ -41,7 +41,7 @@ function isVerticallyScrollable(node: HTMLElement): boolean {
   return allowsYScroll && node.scrollHeight > node.clientHeight + 1;
 }
 
-function findVerticalScrollParent(
+export function findVerticalScrollParent(
   target: EventTarget | null,
   boundary: HTMLElement
 ): HTMLElement | null {

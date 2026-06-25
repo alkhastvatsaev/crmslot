@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import {
+  canConsumeVerticalScroll,
+  findVerticalScrollParent,
+  MOBILE_SCROLL_AXIS_LOCK_THRESHOLD_PX,
+  MOBILE_SCROLL_AXIS_RATIO,
+  resolveMobileScrollAxis,
+} from "@/features/dashboard/mobileNestedScrollGesture";
 
-const SWIPE_THRESHOLD_PX = 40;
-const AXIS_LOCK_PX = 10;
-const AXIS_RATIO = 1.15;
+const SWIPE_THRESHOLD_PX = 36;
+const SWIPE_AXIS_RATIO = 1.35;
 /** Bloque seulement les champs où le drag horizontal sert à sélectionner du texte. */
 const SWIPE_START_BLOCK_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
 
@@ -17,6 +23,7 @@ type GestureState = {
   axisLock: AxisLock;
   activePointerId: number | null;
   touchGestureActive: boolean;
+  innerScrollEl: HTMLElement | null;
 };
 
 function shouldBlockSwipeStart(target: EventTarget | null): boolean {
@@ -34,21 +41,57 @@ function tryPanelSwipe(
 ): void {
   if (disabled || state.fired) return;
   if (Math.hypot(dx, dy) < SWIPE_THRESHOLD_PX) return;
-  if (Math.abs(dx) < Math.abs(dy) * AXIS_RATIO) return;
+  if (Math.abs(dx) < Math.abs(dy) * SWIPE_AXIS_RATIO) return;
   state.fired = true;
   if (dx < 0) onSwipeLeft();
   else onSwipeRight();
 }
 
-function resolveAxisLock(dx: number, dy: number, current: AxisLock): AxisLock {
-  if (current) return current;
-  if (Math.hypot(dx, dy) < AXIS_LOCK_PX) return null;
-  return Math.abs(dx) >= Math.abs(dy) ? "horizontal" : "vertical";
+/**
+ * Verrou d'axe scroll-aware : le scroll vertical interne prime seulement s'il peut
+ * absorber le geste ; aux bords de liste, le swipe horizontal reprend la main.
+ */
+function resolvePanelSwipeAxis(
+  dx: number,
+  dy: number,
+  current: AxisLock,
+  innerScrollEl: HTMLElement | null
+): AxisLock {
+  if (current === "horizontal") return "horizontal";
+
+  if (current === "vertical") {
+    if (innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
+      return "vertical";
+    }
+  }
+
+  const dominant = resolveMobileScrollAxis(
+    dx,
+    dy,
+    MOBILE_SCROLL_AXIS_LOCK_THRESHOLD_PX,
+    MOBILE_SCROLL_AXIS_RATIO
+  );
+
+  if (dominant === "x") return "horizontal";
+
+  if (dominant === "y") {
+    if (innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
+      return "vertical";
+    }
+    if (Math.abs(dx) >= MOBILE_SCROLL_AXIS_LOCK_THRESHOLD_PX) return "horizontal";
+    return null;
+  }
+
+  if (current === "vertical" && innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
+    return "vertical";
+  }
+
+  return current;
 }
 
 /**
  * Swipe horizontal (touch + souris) sur `element` → `onSwipeLeft` / `onSwipeRight`.
- * Capture + verrou d'axe : Android / grilles scrollables ne bloquent plus le geste.
+ * Capture + verrou d'axe scroll-aware : listes scrollables ne bloquent plus le geste.
  */
 export function usePanelSwipe(
   element: HTMLElement | null,
@@ -74,18 +117,21 @@ export function usePanelSwipe(
       axisLock: null,
       activePointerId: null,
       touchGestureActive: false,
+      innerScrollEl: null,
     };
 
     const resetTouch = () => {
       state.touchGestureActive = false;
       state.axisLock = null;
       state.fired = false;
+      state.innerScrollEl = null;
     };
 
     const resetPointer = () => {
       state.activePointerId = null;
       state.axisLock = null;
       state.fired = false;
+      state.innerScrollEl = null;
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -94,6 +140,7 @@ export function usePanelSwipe(
       state.touchGestureActive = true;
       state.axisLock = null;
       state.fired = false;
+      state.innerScrollEl = findVerticalScrollParent(e.target, el);
       state.sx = e.touches[0].clientX;
       state.sy = e.touches[0].clientY;
     };
@@ -102,7 +149,7 @@ export function usePanelSwipe(
       if (disabledRef.current || !state.touchGestureActive || e.touches.length !== 1) return;
       const dx = e.touches[0].clientX - state.sx;
       const dy = e.touches[0].clientY - state.sy;
-      state.axisLock = resolveAxisLock(dx, dy, state.axisLock);
+      state.axisLock = resolvePanelSwipeAxis(dx, dy, state.axisLock, state.innerScrollEl);
       if (state.axisLock === "vertical") return;
       if (state.axisLock === "horizontal") e.preventDefault();
       tryPanelSwipe(
@@ -128,6 +175,7 @@ export function usePanelSwipe(
       state.sy = e.clientY;
       state.fired = false;
       state.axisLock = null;
+      state.innerScrollEl = findVerticalScrollParent(e.target, el);
       state.activePointerId = e.pointerId;
       if (e.pointerType === "mouse") {
         try {
@@ -144,7 +192,7 @@ export function usePanelSwipe(
       if (state.activePointerId !== e.pointerId) return;
       const dx = e.clientX - state.sx;
       const dy = e.clientY - state.sy;
-      state.axisLock = resolveAxisLock(dx, dy, state.axisLock);
+      state.axisLock = resolvePanelSwipeAxis(dx, dy, state.axisLock, state.innerScrollEl);
       if (state.axisLock === "vertical") return;
       if (state.axisLock === "horizontal") e.preventDefault();
       tryPanelSwipe(

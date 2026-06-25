@@ -144,4 +144,48 @@ describe("usePanelSwipe", () => {
     firePointerSwipe(screen.getByTestId("swipe-host"), { x: 200, y: 100 }, { x: 120, y: 100 });
     expect(onSwipeLeft).not.toHaveBeenCalled();
   });
+
+  it("does not swipe horizontally when scrolling a list vertically", () => {
+    const onSwipeLeft = jest.fn();
+    function Host() {
+      const [node, setNode] = useState<HTMLDivElement | null>(null);
+      usePanelSwipe(node, onSwipeLeft, jest.fn());
+      return (
+        <div ref={setNode} data-testid="swipe-host">
+          <div data-testid="scroll-list" style={{ height: 80, overflowY: "auto" }}>
+            <div style={{ height: 400 }}>content</div>
+          </div>
+        </div>
+      );
+    }
+    render(<Host />);
+    const list = screen.getByTestId("scroll-list");
+    Object.defineProperty(list, "scrollHeight", { value: 400, configurable: true });
+    Object.defineProperty(list, "clientHeight", { value: 80, configurable: true });
+    list.scrollTop = 120;
+    fireTouchSwipe(list, { x: 100, y: 100 }, { x: 108, y: 180 });
+    expect(onSwipeLeft).not.toHaveBeenCalled();
+  });
+
+  it("swipes horizontally from a list at scroll top", () => {
+    const onSwipeLeft = jest.fn();
+    function Host() {
+      const [node, setNode] = useState<HTMLDivElement | null>(null);
+      usePanelSwipe(node, onSwipeLeft, jest.fn());
+      return (
+        <div ref={setNode} data-testid="swipe-host">
+          <div data-testid="scroll-list" style={{ height: 80, overflowY: "auto" }}>
+            <div style={{ height: 400 }}>content</div>
+          </div>
+        </div>
+      );
+    }
+    render(<Host />);
+    const list = screen.getByTestId("scroll-list");
+    Object.defineProperty(list, "scrollHeight", { value: 400, configurable: true });
+    Object.defineProperty(list, "clientHeight", { value: 80, configurable: true });
+    list.scrollTop = 0;
+    fireTouchSwipe(list, { x: 200, y: 100 }, { x: 120, y: 100 });
+    expect(onSwipeLeft).toHaveBeenCalledTimes(1);
+  });
 });
