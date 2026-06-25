@@ -34,9 +34,9 @@ jest.mock("@/features/billingHub/components/BillingHubAgentPanel", () => ({
   default: () => <div data-testid="billing-hub-agent-panel" />,
 }));
 
-jest.mock("@/features/chatbot/components/ChatbotRightRail", () => ({
+jest.mock("@/features/billingHub/components/BillingHubRightPanel", () => ({
   __esModule: true,
-  default: () => <div data-testid="chatbot-right-rail" />,
+  default: () => <div data-testid="billing-hub-right-panel" />,
 }));
 
 function renderPage() {
@@ -59,12 +59,9 @@ describe("BillingHubPage", () => {
     expect(screen.getByTestId("billing-hub-agent-panel")).toBeInTheDocument();
   });
 
-  it("renders documents rail on the right without legacy invoice assist panel", () => {
+  it("renders tabbed right panel on the documents rail", () => {
     renderPage();
     expect(screen.getByTestId("billing-hub-documents-rail")).toBeInTheDocument();
-    expect(screen.getByTestId("chatbot-right-rail")).toBeInTheDocument();
-    expect(screen.queryByTestId("billing-hub-ask-chatbot")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("billing-hub-right-assist")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("billing-hub-payroll-export")).not.toBeInTheDocument();
+    expect(screen.getByTestId("billing-hub-right-panel")).toBeInTheDocument();
   });
 });

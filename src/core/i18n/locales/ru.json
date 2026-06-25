@@ -976,6 +976,11 @@
       "rail_left": "Агент",
       "rail_center": "Счета",
       "rail_right": "Документы"
+    },
+    "right_tabs": {
+      "aria": "Панель счетов",
+      "documents": "Документы",
+      "dossier": "Дело"
     }
   },
   "teamHub": {
