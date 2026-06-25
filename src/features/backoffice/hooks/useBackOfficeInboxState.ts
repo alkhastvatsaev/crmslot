@@ -13,6 +13,7 @@ import {
   isBackofficeReportInInboxArchive,
 } from "@/features/backoffice/backofficeReportsInboxArchive";
 import {
+  computeAwaitingTechnicianAcceptance,
   computeBridgedTerrainVisible,
   computeInboxListMetrics,
   computePendingRequests,
@@ -110,6 +111,10 @@ export function useBackOfficeInboxState(
     });
 
   const pendingRequests = useMemo(() => computePendingRequests(interventions), [interventions]);
+  const awaitingTechnicianAcceptance = useMemo(
+    () => computeAwaitingTechnicianAcceptance(interventions),
+    [interventions]
+  );
   const validationReports = useMemo(() => computeValidationReports(interventions), [interventions]);
   const reportsToValidateList = useMemo(
     () => validationReports.filter((iv) => isBackofficeReportInInboxActiveQueue(iv)),
@@ -130,11 +135,13 @@ export function useBackOfficeInboxState(
       computeInboxListMetrics(
         selection.activeTab,
         pendingRequests,
+        awaitingTechnicianAcceptance,
         reportsToValidateList,
         reportsArchivedList,
         bridgedTerrainCount
       ),
     [
+      awaitingTechnicianAcceptance,
       bridgedTerrainCount,
       pendingRequests,
       reportsArchivedList,
@@ -209,6 +216,7 @@ export function useBackOfficeInboxState(
     terrainBridge,
     setSelectedItemId: selection.setSelectedItemId,
     setSelectedTerrainLocalId: selection.setSelectedTerrainLocalId,
+    setActiveTab: selection.setActiveTab,
     setAssignPickerOpen: selection.setAssignPickerOpen,
     setIsAssigning: selection.setIsAssigning,
     setIsEditingDateTime: selection.setIsEditingDateTime,
@@ -264,6 +272,7 @@ export function useBackOfficeInboxState(
     isResolvingAudio,
     audioStorageResolveFailed,
     pendingRequests,
+    awaitingTechnicianAcceptance,
     reportsToValidateList,
     reportsArchivedList,
     bridgedTerrainVisible,

@@ -5,6 +5,8 @@ import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import type { BackofficeInboxIntentApi } from "@/context/BackofficeInboxIntentContext";
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import type { Intervention } from "@/features/interventions";
+import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
+import { isInterventionInBackofficeReportsInboxQueue } from "@/features/backoffice/backOfficeInboxLists";
 
 type SelectionArgs = {
   interventions: Intervention[];
@@ -78,7 +80,12 @@ export function useBackOfficeInboxSelection({
   useEffect(() => {
     if (!selectedItemId || activeTab !== "reports") return;
     const iv = interventions.find((x) => x.id === selectedItemId);
-    if (iv && iv.status !== "done" && iv.status !== "invoiced") {
+    if (!iv) return;
+    if (isInterventionInBackofficeRequestsQueue(iv)) {
+      setActiveTab("requests");
+      return;
+    }
+    if (!isInterventionInBackofficeReportsInboxQueue(iv)) {
       setSelectedItemId(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
