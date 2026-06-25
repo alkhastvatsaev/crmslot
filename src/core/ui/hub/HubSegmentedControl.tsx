@@ -72,6 +72,8 @@ export default function HubSegmentedControl({
         const badgeAccent = opt.badgeAccent ?? "blue";
         const showBadge = typeof opt.badge === "number" && opt.badge > 0;
 
+        const badgeLabel = typeof opt.badge === "number" && opt.badge > 99 ? "99+" : opt.badge;
+
         return (
           <button
             key={opt.id}
@@ -82,7 +84,7 @@ export default function HubSegmentedControl({
             data-testid={opt.testId}
             onClick={() => onChange(opt.id)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 transition-all",
+              "relative flex min-w-0 flex-1 items-center justify-center transition-all",
               HUB_TYPE.segmentLabel,
               HUB_FOCUS_RING,
               isScroll
@@ -96,22 +98,26 @@ export default function HubSegmentedControl({
                 : cn(
                     HUB_RADIUS.control,
                     pillSizeClass[size],
+                    showBadge && "px-1",
                     active
                       ? cn("bg-white shadow-sm", HUB_ACTIVE_ACCENT[accent])
                       : "text-slate-500 hover:bg-slate-300/30"
                   )
             )}
           >
-            {opt.icon}
-            <span className="min-w-0 truncate text-center">{opt.label}</span>
+            <span className="flex min-w-0 items-center justify-center gap-1">
+              {opt.icon}
+              <span className="min-w-0 truncate text-center leading-tight">{opt.label}</span>
+            </span>
             {showBadge ? (
               <span
+                aria-hidden
                 className={cn(
-                  "flex h-4.5 min-w-[18px] items-center justify-center rounded-full border px-1 text-[9px] font-bold",
+                  "pointer-events-none absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full border px-0.5 text-[9px] font-bold leading-none",
                   HUB_BADGE_ACCENT[badgeAccent]
                 )}
               >
-                {opt.badge}
+                {badgeLabel}
               </span>
             ) : null}
           </button>

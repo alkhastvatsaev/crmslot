@@ -20,20 +20,17 @@ import {
 } from "@/core/ui/dashboardDesktopLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Mission } from "@/features/map/missionTypes";
-import type { Intervention } from "@/features/interventions";
 
 type Props = {
   mapContainerRef: React.RefObject<HTMLDivElement | null>;
   mapBootError: "token" | "load" | null;
   visibleMissions: Mission[];
-  visibleInterventions: Intervention[];
   selectedMission: Mission | null;
   setSelectedMission: (mission: Mission | null) => void;
   onMissionClick: (mission: Mission) => void;
   onArchiveMission: (mission: Mission) => void;
   onDeleteMission: (mission: Mission) => void;
   onRecenter: () => void;
-  onRouteOptimized: (ordered: Intervention[]) => void;
   dashboardPageIndex: number;
   inboxDataActive: boolean;
 };
@@ -42,14 +39,12 @@ export default function MapboxViewDesktopLayout({
   mapContainerRef,
   mapBootError,
   visibleMissions,
-  visibleInterventions,
   selectedMission,
   setSelectedMission,
   onMissionClick,
   onArchiveMission,
   onDeleteMission,
   onRecenter,
-  onRouteOptimized,
   dashboardPageIndex,
   inboxDataActive,
 }: Props) {
@@ -100,12 +95,7 @@ export default function MapboxViewDesktopLayout({
               </div>
             ) : null}
 
-            <MapboxMapControls
-              layout="desktop"
-              onRecenter={onRecenter}
-              visibleInterventions={visibleInterventions}
-              onRouteOptimized={onRouteOptimized}
-            />
+            <MapboxMapControls layout="desktop" onRecenter={onRecenter} />
 
             <AnimatePresence>
               {selectedMission ? (

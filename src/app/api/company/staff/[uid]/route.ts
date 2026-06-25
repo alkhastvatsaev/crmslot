@@ -5,6 +5,7 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
 import { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
 import { setCompanyStaffActive } from "@/features/company/server/setCompanyStaffActive";
+import { removeCompanyStaffMember } from "@/features/company/server/removeCompanyStaffMember";
 
 export const runtime = "nodejs";
 
@@ -80,4 +81,26 @@ export async function POST(req: Request, context: RouteContext) {
   }
 
   return NextResponse.json({ ok: true, active: body.active });
+}
+
+/** Retire un employé de la société (admin uniquement). */
+export async function DELETE(req: Request, context: RouteContext) {
+  const authResult = await requireAuthenticatedUser(req);
+  if ("response" in authResult) return authResult.response;
+
+  const { uid: targetUid } = await context.params;
+  const companyId = parseCompanyId(req);
+  const db = admin.firestore();
+
+  const adminCtx = await requireCompanyAdmin(db, authResult.uid, companyId);
+  if ("status" in adminCtx) {
+    return NextResponse.json({ ok: false, error: adminCtx.error }, { status: adminCtx.status });
+  }
+
+  const result = await removeCompanyStaffMember(db, adminCtx.companyId, targetUid, authResult.uid);
+  if (!result.ok) {
+    return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
+  }
+
+  return NextResponse.json({ ok: true });
 }

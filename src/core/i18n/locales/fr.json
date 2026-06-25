@@ -990,7 +990,7 @@
     },
     "empty": "Aucun employé pour ce filtre.",
     "no_email": "E-mail non renseigné",
-    "select_member": "Touchez un nom à gauche.",
+    "select_member": "Sélectionnez un employé.",
     "save": "Enregistrer",
     "deactivate": "Désactiver",
     "reactivate": "Réactiver",
@@ -1030,7 +1030,9 @@
       "rail_left": "Résumé",
       "rail_center": "Liste",
       "rail_right": "Profil"
-    }
+    },
+    "delete_account": "Supprimer le compte",
+    "delete_account_confirm": "Retirer cet employé de la société ?"
   },
   "caseHub": {
     "company_required": "Sélectionnez une société.",

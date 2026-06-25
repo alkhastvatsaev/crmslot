@@ -68,7 +68,33 @@ export function useCompanyStaffActions(companyId: string | null, onSuccess?: () 
     [companyId, onSuccess]
   );
 
+  const deleteMember = useCallback(
+    async (uid: string) => {
+      if (!companyId) return false;
+      setBusyUid(uid);
+      setError(null);
+      try {
+        const res = await fetchWithAuth(
+          `/api/company/staff/${encodeURIComponent(uid)}?companyId=${encodeURIComponent(companyId)}`,
+          { method: "DELETE" }
+        );
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error?.trim() || "Suppression impossible.");
+        }
+        onSuccess?.();
+        return true;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Suppression impossible.");
+        return false;
+      } finally {
+        setBusyUid(null);
+      }
+    },
+    [companyId, onSuccess]
+  );
+
   const clearError = useCallback(() => setError(null), []);
 
-  return { busyUid, error, updateMember, setMemberActive, clearError };
+  return { busyUid, error, updateMember, setMemberActive, deleteMember, clearError };
 }
