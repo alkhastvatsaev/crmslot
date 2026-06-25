@@ -2551,7 +2551,9 @@
     "google_review_saved": "Enregistré",
     "google_review_need_link": "Ajoutez votre fiche Google pour activer.",
     "google_review_subtitle": "1 email · 48 h après paiement",
-    "google_review_link_placeholder": "Place ID ou lien Google"
+    "google_review_link_placeholder": "Place ID ou lien Google",
+    "google_review_on": "Actif",
+    "google_review_off": "Inactif"
   },
   "planning": {
     "title": "Planning journalier",

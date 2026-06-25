@@ -2549,7 +2549,9 @@
     "google_review_saved": "Opgeslagen",
     "google_review_need_link": "Voeg uw Google-vermelding toe om te activeren.",
     "google_review_subtitle": "1 e-mail · 48 u na betaling",
-    "google_review_link_placeholder": "Place ID of Google-link"
+    "google_review_link_placeholder": "Place ID of Google-link",
+    "google_review_on": "Aan",
+    "google_review_off": "Uit"
   },
   "planning": {
     "title": "Dagplanning",

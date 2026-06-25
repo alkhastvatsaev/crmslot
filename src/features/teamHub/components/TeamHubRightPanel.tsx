@@ -5,6 +5,7 @@ import { Loader2, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import HubButton from "@/core/ui/hub/HubButton";
 import type { CompanyStaffMember } from "@/features/teamHub/types";
+import { resolveCompanyStaffKind } from "@/features/teamHub/resolveCompanyStaffKind";
 import { useCompanyStaffActions } from "@/features/teamHub/hooks/useCompanyStaffActions";
 
 type Props = {
@@ -95,8 +96,7 @@ export default function TeamHubRightPanel({
       <div className="rounded-[24px] border border-black/[0.06] bg-white/95 p-4 text-center">
         <p className="text-lg font-bold text-slate-900">{selected.displayName}</p>
         <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-          {t(`teamHub.role.${selected.role}`)}
-          {selected.hasTechnicianProfile ? ` · ${t("teamHub.technician_badge")}` : ""}
+          {t(`teamHub.staff_kind.${resolveCompanyStaffKind(selected)}`)}
         </p>
       </div>
 
