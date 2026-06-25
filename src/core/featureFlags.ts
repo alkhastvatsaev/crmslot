@@ -43,6 +43,8 @@ export type CrmslotFeatureFlags = {
   analyticsReports: boolean;
   /** Blocage acceptation mission si dossiers terrain non clôturés. */
   technicianClosureBlock: boolean;
+  /** Demande d'avis Google (GMB) post-intervention — cron dédié, opt-in société. */
+  googleReviewRequest: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
@@ -69,6 +71,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   remoteESign: true,
   analyticsReports: true,
   technicianClosureBlock: true,
+  googleReviewRequest: false,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -149,6 +152,10 @@ export function featureFlagsFromEnv(): CrmslotFeatureFlags {
     technicianClosureBlock: readEnvBool(
       "NEXT_PUBLIC_FF_TECHNICIAN_CLOSURE_BLOCK",
       DEFAULT_FEATURE_FLAGS.technicianClosureBlock
+    ),
+    googleReviewRequest: readEnvBool(
+      "NEXT_PUBLIC_FF_GOOGLE_REVIEW",
+      DEFAULT_FEATURE_FLAGS.googleReviewRequest
     ),
   };
 }

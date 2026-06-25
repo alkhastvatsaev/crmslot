@@ -24,6 +24,7 @@ import StockManagementPanel from "@/features/materials/components/StockManagemen
 import MultiCompanyOverviewPanel from "@/features/company/components/MultiCompanyOverviewPanel";
 import SiteQrCodePanel from "@/features/clients/components/SiteQrCodePanel";
 import CompanyCatalogPanel from "@/features/catalog/components/CompanyCatalogPanel";
+import CompanyGoogleReviewSettingsPanel from "@/features/company/components/CompanyGoogleReviewSettingsPanel";
 import CompanyKpiPanel from "@/features/dashboard/components/CompanyKpiPanel";
 import {
   COMPANY_SPACE_GLASS_ROW,
@@ -42,6 +43,7 @@ export default function CompanySpacePanelContent(props: CompanySpaceState) {
   const pager = useDashboardPagerOptional();
   const crmEnabled = useFeatureFlag("crmContacts");
   const lecotEnabled = useFeatureFlag("lecotProductSearch");
+  const googleReviewEnabled = useFeatureFlag("googleReviewRequest");
 
   const {
     memberships,
@@ -244,6 +246,12 @@ export default function CompanySpacePanelContent(props: CompanySpaceState) {
       {activeCompanyId ? (
         <div data-testid="company-site-qr-panel" className="min-h-0 shrink-0">
           <SiteQrCodePanel companyId={activeCompanyId} siteName={activeCompanyLabel} />
+        </div>
+      ) : null}
+
+      {activeCompanyId && googleReviewEnabled && isAdmin ? (
+        <div data-testid="company-google-review-panel-wrap" className="min-h-0 shrink-0">
+          <CompanyGoogleReviewSettingsPanel />
         </div>
       ) : null}
 

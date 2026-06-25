@@ -115,6 +115,41 @@ export function buildClientAppointmentReminderEmail(opts: {
   };
 }
 
+export function buildGoogleReviewRequestEmail(opts: {
+  interventionId: string;
+  iv: {
+    clientFirstName?: string | null;
+    title?: string | null;
+    problem?: string | null;
+    portalAccessToken?: string | null;
+  };
+  reviewUrl: string;
+}): ExtraTemplatePayload {
+  const title = safeTitle(opts.iv);
+  const reviewUrl = opts.reviewUrl.trim();
+
+  return {
+    template: "client.google_review.request",
+    subject: `Votre avis nous aiderait — ${title}`,
+    preheader: "Un court avis Google nous aide à améliorer notre service.",
+    heading: "Votre avis compte pour nous",
+    intro: `${hello(opts.iv)} Nous espérons que l'intervention « ${title} » s'est bien déroulée.`,
+    bodyHtml: `
+      <p style="margin:0 0 8px">Si vous avez une minute, un avis sur Google nous aide beaucoup à faire connaître notre travail — et à continuer à vous servir avec la même exigence.</p>
+      <p style="margin:0 0 8px;color:#aab;font-size:13px">Ce message est envoyé une seule fois, quelques jours après votre intervention. Vous pouvez l'ignorer sans conséquence.</p>
+      <p style="margin:8px 0 0;color:#aab">Référence : ${escapeHtml(opts.interventionId)}</p>
+    `,
+    bodyLines: [
+      `Nous espérons que l'intervention « ${title} » s'est bien déroulée.`,
+      "Si vous avez une minute, un avis Google nous aide beaucoup.",
+      "Ce message est envoyé une seule fois — vous pouvez l'ignorer.",
+      `Référence : ${opts.interventionId}`,
+    ],
+    ctaLabel: "Laisser un avis sur Google",
+    ctaUrl: reviewUrl,
+  };
+}
+
 export function buildClientInterventionCreatedEmail(opts: {
   interventionId: string;
   iv: {
