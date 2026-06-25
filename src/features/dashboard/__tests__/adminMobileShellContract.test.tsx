@@ -12,6 +12,7 @@ import { MOBILE_SHELL_SLOT_GRID_CLASS } from "@/core/ui/dashboardMobileLayout";
 
 jest.mock("@/features/dashboard/hooks/useMobileFooterGalaxyVisible", () => ({
   useMobileFooterGalaxyVisible: jest.fn(() => false),
+  useMobileHubAgentRailActive: jest.fn(() => false),
 }));
 
 jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
