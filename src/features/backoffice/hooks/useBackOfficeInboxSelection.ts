@@ -6,6 +6,7 @@ import type { BackofficeInboxIntentApi } from "@/context/BackofficeInboxIntentCo
 import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import type { Intervention } from "@/features/interventions";
 import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
+import { isBackofficeReportInInboxArchive } from "@/features/backoffice/backofficeReportsInboxArchive";
 import { isInterventionInBackofficeReportsInboxQueue } from "@/features/backoffice/backOfficeInboxLists";
 
 type SelectionArgs = {
@@ -85,7 +86,7 @@ export function useBackOfficeInboxSelection({
       setActiveTab("requests");
       return;
     }
-    if (!isInterventionInBackofficeReportsInboxQueue(iv)) {
+    if (!isInterventionInBackofficeReportsInboxQueue(iv) && !isBackofficeReportInInboxArchive(iv)) {
       setSelectedItemId(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
