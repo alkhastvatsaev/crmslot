@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildCrmActivityEventDetail } from "@/features/crmHistory/crmActivityEventDetail";
+import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 import CrmHistoryQmSnapshotPanel from "@/features/crmHistory/components/CrmHistoryQmSnapshotPanel";
 import {
@@ -56,7 +57,7 @@ export default function CrmHistoryEventDetailPanel({
           className="mt-1 text-[18px] font-semibold leading-snug text-slate-900"
           data-testid="crm-history-detail-title"
         >
-          {t(`crmHistory.event.${event.type}`)}
+          {crmHistoryEventLabel(t, event.type)}
         </h2>
         <time
           className="mt-1 block text-[12px] text-slate-500"

@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 
@@ -65,7 +66,7 @@ export default function CrmHistoryEventCard({ event, onSelect, isNew, isSelected
 
       <div className="flex flex-col gap-0.5 w-full">
         <span className="text-[10px] font-semibold leading-tight text-slate-700 line-clamp-2">
-          {t(`crmHistory.event.${event.type}`)}
+          {crmHistoryEventLabel(t, event.type)}
         </span>
         {subtitle && <span className="text-[9px] text-slate-400 truncate">{subtitle}</span>}
       </div>

@@ -1,6 +1,7 @@
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
-import type { CrmActivityEvent, CrmEventType } from "./crmActivityTypes";
+import type { CrmActivityEvent } from "./crmActivityTypes";
+import { crmHistoryEventDetailBody } from "./crmHistoryEventLabel";
 
 export type CrmActivityEventDetail = {
   lines: string[];
@@ -60,53 +61,12 @@ function commonContextLines(event: CrmActivityEvent, t: Translate): string[] {
   return lines;
 }
 
-const DETAIL_BODY_KEY: Record<CrmEventType, string> = {
-  intervention_created: "crmHistory.detail.body.intervention_created",
-  intervention_assigned: "crmHistory.detail.body.intervention_assigned",
-  intervention_status: "crmHistory.detail.body.intervention_status",
-  intervention_completed: "crmHistory.detail.body.intervention_completed",
-  intervention_invoiced: "crmHistory.detail.body.intervention_invoiced",
-  intervention_technician_declined: "crmHistory.detail.body.intervention_technician_declined",
-  intervention_returned_to_requests: "crmHistory.detail.body.intervention_returned_to_requests",
-  intervention_deleted: "crmHistory.detail.body.intervention_deleted",
-  intervention_report_validated: "crmHistory.detail.body.intervention_report_validated",
-  intervention_report_rejected: "crmHistory.detail.body.intervention_report_rejected",
-  intervention_report_archived: "crmHistory.detail.body.intervention_report_archived",
-  intervention_cancelled: "crmHistory.detail.body.intervention_cancelled",
-  intervention_schedule_updated: "crmHistory.detail.body.intervention_schedule_updated",
-  intervention_billing_updated: "crmHistory.detail.body.intervention_billing_updated",
-  intervention_payment_updated: "crmHistory.detail.body.intervention_payment_updated",
-  intervention_terrain_report_received:
-    "crmHistory.detail.body.intervention_terrain_report_received",
-  bridged_report_dismissed: "crmHistory.detail.body.bridged_report_dismissed",
-  ivana_chat_message: "crmHistory.detail.body.ivana_chat_message",
-  material_order_status_changed: "crmHistory.detail.body.material_order_status_changed",
-  supplier_order_lecot: "crmHistory.detail.body.supplier_order_lecot",
-  chatbot_intervention_status: "crmHistory.detail.body.chatbot_intervention_status",
-  chatbot_timeline_comment: "crmHistory.detail.body.chatbot_timeline_comment",
-  chatbot_email_sent: "crmHistory.detail.body.chatbot_email_sent",
-  chatbot_gmail_action: "crmHistory.detail.body.chatbot_gmail_action",
-  chatbot_write_action: "crmHistory.detail.body.chatbot_write_action",
-  material_ordered: "crmHistory.detail.body.material_ordered",
-  supplier_ordered: "crmHistory.detail.body.supplier_ordered",
-  email_sent: "crmHistory.detail.body.email_sent",
-  email_received: "crmHistory.detail.body.email_received",
-  commission_calculated: "crmHistory.detail.body.commission_calculated",
-  quote_created: "crmHistory.detail.body.quote_created",
-  quote_status_changed: "crmHistory.detail.body.quote_status_changed",
-  page_navigated: "crmHistory.detail.body.page_navigated",
-  intervention_viewed: "crmHistory.detail.body.intervention_viewed",
-  email_viewed: "crmHistory.detail.body.email_viewed",
-  user_session_start: "crmHistory.detail.body.user_session_start",
-  time_entry_recorded: "crmHistory.detail.body.time_entry_recorded",
-};
-
 /** Texte explicatif pour le panneau droit de l’historique CRM. */
 export function buildCrmActivityEventDetail(
   event: CrmActivityEvent,
   t: Translate
 ): CrmActivityEventDetail {
-  const lines: string[] = [t(DETAIL_BODY_KEY[event.type])];
+  const lines: string[] = [crmHistoryEventDetailBody(t, event.type)];
 
   const actorKey = event.actorRole ? (`crmHistory.actor.${event.actorRole}` as const) : null;
   if (actorKey) {

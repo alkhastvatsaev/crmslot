@@ -653,7 +653,8 @@
       "interventions": "Interventions",
       "materials": "Materials",
       "suppliers": "Suppliers",
-      "communications": "Communications"
+      "communications": "Communications",
+      "navigation": "Navigation"
     },
     "event": {
       "intervention_created": "Case created",
@@ -688,7 +689,11 @@
       "commission_calculated": "Commission calculated",
       "quote_created": "Quote created",
       "quote_status_changed": "Quote status updated",
-      "time_entry_recorded": "Field time entry"
+      "time_entry_recorded": "Field time entry",
+      "page_navigated": "Page navigation",
+      "intervention_viewed": "Case viewed",
+      "email_viewed": "Email viewed",
+      "user_session_start": "User sign-in"
     },
     "loading": "Loading history…",
     "live": "Live",
@@ -765,7 +770,11 @@
         "commission_calculated": "A sales commission was calculated or recalculated from company rules.",
         "quote_created": "A quote was created for the client linked to this case or request.",
         "quote_status_changed": "The quote status changed (draft, sent, accepted, declined, etc.).",
-        "time_entry_recorded": "A technician time entry (travel, on site, break…) was recorded for this case."
+        "time_entry_recorded": "A technician time entry (travel, on site, break…) was recorded for this case.",
+        "page_navigated": "A user switched pages in the app (map, hub, billing, etc.).",
+        "intervention_viewed": "A user opened this case file for review.",
+        "email_viewed": "An email was opened in the interface (read or detail view).",
+        "user_session_start": "A user signed in to the platform for this company."
       }
     },
     "agent_placeholder": "KPIs, performance, quality analysis…",
