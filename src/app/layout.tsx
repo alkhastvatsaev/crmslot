@@ -54,6 +54,8 @@ import PwaBootRecovery from "@/core/pwa/PwaBootRecoveryClient";
 import { buildPwaBootRecoveryInlineScript } from "@/core/pwa/pwaBootRecoveryCore";
 import MobileServiceWorkerDisabler from "@/core/pwa/MobileServiceWorkerDisabler";
 import LivePerfProbeRoot from "@/core/perf/LivePerfProbeRoot";
+import IosPowerSaveMimicRoot from "@/core/perf/IosPowerSaveMimicRoot";
+import { buildIosPowerSaveMimicInlineScript } from "@/core/perf/buildIosPowerSaveMimicInlineScript";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -75,11 +77,15 @@ export default function RootLayout({
             {buildPwaBootRecoveryInlineScript(appGitSha)}
           </Script>
         ) : null}
+        <Script id="ios-lpm-mimic" strategy="beforeInteractive">
+          {buildIosPowerSaveMimicInlineScript()}
+        </Script>
         <NativeShellBootstrap />
         <MobileServiceWorkerDisabler />
         <PwaBootRecovery />
         <PwaStaleBundleGuard />
         <LivePerfProbeRoot />
+        <IosPowerSaveMimicRoot />
         <DeferredRootBootstraps />
         <I18nProvider>{children}</I18nProvider>
         <Toaster position="top-center" theme="light" richColors closeButton />
