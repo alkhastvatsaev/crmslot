@@ -63,7 +63,7 @@ describe("updateSelfStaffAccount", () => {
 
     const result = await updateSelfStaffAccount(db, auth, "uid-1", {
       companyId: "co-1",
-      role: "admin",
+      accountRole: "admin",
       firstName: "Al",
     });
 
