@@ -31,7 +31,7 @@ export default function MobileShellFooterDock() {
   const showHubComposer = hubComposer != null && showGalaxyFooter;
   const showDispatchDock =
     dispatchVoice && pageIndex === MAP_PAGE_INDEX && showGalaxyFooter && !showHubComposer;
-  const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
+  const audioBackgroundTasksEnabled = Boolean(dispatchVoice && showDispatchDock);
 
   return (
     <div className="relative h-full w-full min-h-0">
@@ -42,7 +42,6 @@ export default function MobileShellFooterDock() {
           onUserPressPlay={armTranscription}
           onInterventionCreated={emitInterventionCreated}
           backgroundTasksEnabled={audioBackgroundTasksEnabled}
-          mobilePowerSave={false}
         />
       ) : null}
       {showHubComposer ? hubComposer : null}

@@ -245,7 +245,7 @@ export default function MobileHubLayout({
                   mobileHubRailLayerSideClass(railKey, rail, availableRails)
                 )}
               >
-                {panels[RAIL_PANEL[railKey]]}
+                {active ? panels[RAIL_PANEL[railKey]] : null}
               </div>
             );
           })}

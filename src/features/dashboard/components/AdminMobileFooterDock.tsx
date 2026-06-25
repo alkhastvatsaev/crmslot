@@ -22,7 +22,6 @@ export default function AdminMobileFooterDock() {
         onUserPressPlay={armTranscription}
         onInterventionCreated={emitInterventionCreated}
         backgroundTasksEnabled={dispatchVoice && transcriptionArmed}
-        mobilePowerSave={false}
       />
     </div>
   );

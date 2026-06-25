@@ -24,9 +24,8 @@ function isMobilePageHidden(pageIndex: number, activeIndex: number, overlayOpen:
 }
 
 /**
- * Panneau central mobile — page carte (0) toujours montée ; les autres hubs se montent à la
- * première visite puis restent en keep-alive (visibilité CSS, pas de démontage).
- * Navigation entre pages : sélecteur (calendrier / profil), pas de swipe vertical.
+ * Panneau central mobile — une seule page montée (hub actif). Hors écran = démontage React
+ * (thermique iOS). Navigation : sélecteur calendrier / profil.
  *
  * Contrat : voir `mobileShellContract.ts` + `npm run test:mobile-shell`.
  */

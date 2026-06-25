@@ -1403,3 +1403,32 @@
     --mobile-shell-pad-x: 1.0625rem;
   }
 }
+
+/**
+ * Thermique mobile — blur GPU coûteux : fond opaque + galaxy statique sur tactile.
+ */
+@media (hover: none) and (pointer: coarse) {
+  [data-mobile-shell] .panel-glass--blur,
+  [data-mobile-shell] .mobile-profile-bar-chrome,
+  [data-mobile-shell] .mobile-galaxy-dock-chrome {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-shell] .panel-glass {
+    background: rgb(255 255 255 / 0.97) !important;
+  }
+
+  [data-mobile-shell] .premium-btn .galaxy-stars-canvas,
+  [data-mobile-shell] .chatbot-galaxy-orb__canvas {
+    display: none;
+  }
+
+  [data-mobile-shell] .premium-btn {
+    background: linear-gradient(145deg, rgb(30 58 138), rgb(37 99 235)) !important;
+  }
+
+  [data-mobile-shell] .chatbot-galaxy-orb {
+    background: linear-gradient(145deg, rgb(30 58 138), rgb(37 99 235)) !important;
+  }
+}

@@ -32,18 +32,18 @@ export default function DashboardGalaxyLayer() {
 
   const showHubComposer = hubComposer != null && (isMobile !== true || composerOpen);
   const hideMapGalaxyDockStrip = showHubComposer;
-  const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
+  const showMapDispatchDock =
+    dispatchVoice && pageIndex === MAP_HUB_SLOT_INDEX && !hideMapGalaxyDockStrip;
 
   return (
     <>
       {dispatchVoice ? (
         <MapGalaxyTranscriptionLayer
-          hideDockStrip={hideMapGalaxyDockStrip}
+          hideDockStrip={!showMapDispatchDock}
           transcriptionArmed={transcriptionArmed}
           onUserPressPlay={armTranscription}
           onInterventionCreated={emitInterventionCreated}
-          backgroundTasksEnabled={audioBackgroundTasksEnabled}
-          mobilePowerSave={false}
+          backgroundTasksEnabled={showMapDispatchDock}
         />
       ) : null}
       {showHubComposer ? hubComposer : null}

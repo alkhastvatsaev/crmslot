@@ -156,6 +156,7 @@ describe("MobileHubLayout", () => {
 
     renderMobileHubLayout(
       <MobileHubLayout
+        mobileInitialRail="left"
         leftTestId="mobile-hub-left"
         centerTestId="mobile-hub-center"
         rightTestId="mobile-hub-right"
