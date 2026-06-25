@@ -13,11 +13,6 @@ jest.mock("@/features/interventions/components/TechnicianHubPage", () => ({
   ),
 }));
 
-jest.mock("@/features/app/DesktopOnlyGate", () => ({
-  __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
 jest.mock("@/features/dev/DevServiceWorkerCleanup", () => ({
   __esModule: true,
   default: () => null,
@@ -35,7 +30,7 @@ jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
       firstName: "Jean",
       lastName: "Martin",
       companyName: "ABC",
-      roleLabel: "collaborateur",
+      accountRole: "technician",
     },
     ready: true,
     signingOut: false,

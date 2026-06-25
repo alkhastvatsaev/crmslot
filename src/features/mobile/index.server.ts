@@ -6,11 +6,6 @@ export {
   buildMobileRuntimeConfig,
   isMobileAccessAllowedAtBuild,
 } from "@/features/mobile/server/mobileRuntimeConfig";
-export {
-  shouldBypassDesktopOnlyGate,
-  shouldBlockPhoneOnDesktopOnlyGate,
-  resolveRuntimeMobileAccessAllowed,
-} from "@/features/mobile/server/desktopOnlyGatePolicy";
 export type {
   PwaRegistryPayload,
   PwaRegistryFirestore,

@@ -1,6 +1,6 @@
 # mobile
 
-Config runtime PWA + DesktopOnlyGate policy.
+Config runtime PWA mobile.
 
 ## Points d'entrée
 
