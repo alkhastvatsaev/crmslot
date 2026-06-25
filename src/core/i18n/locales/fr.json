@@ -653,7 +653,8 @@
       "interventions": "Interventions",
       "materials": "Matériaux",
       "suppliers": "Fournisseurs",
-      "communications": "Communications"
+      "communications": "Communications",
+      "navigation": "Navigation"
     },
     "event": {
       "intervention_created": "Dossier créé",
@@ -688,7 +689,11 @@
       "commission_calculated": "Commission calculée",
       "quote_created": "Devis créé",
       "quote_status_changed": "Statut devis modifié",
-      "time_entry_recorded": "Pointage terrain"
+      "time_entry_recorded": "Pointage terrain",
+      "page_navigated": "Navigation page",
+      "intervention_viewed": "Dossier consulté",
+      "email_viewed": "Email consulté",
+      "user_session_start": "Connexion utilisateur"
     },
     "loading": "Chargement de l'historique…",
     "live": "Temps réel",
@@ -765,7 +770,11 @@
         "commission_calculated": "Une commission commerciale a été calculée ou recalculée sur la base des règles société.",
         "quote_created": "Un devis a été créé pour le client lié à ce dossier ou à cette demande.",
         "quote_status_changed": "Le statut du devis a changé (brouillon, envoyé, accepté, refusé, etc.).",
-        "time_entry_recorded": "Un pointage technicien (déplacement, sur site, pause…) a été enregistré pour ce dossier."
+        "time_entry_recorded": "Un pointage technicien (déplacement, sur site, pause…) a été enregistré pour ce dossier.",
+        "page_navigated": "Un utilisateur a changé de page dans l'application (carte, hub, facturation, etc.).",
+        "intervention_viewed": "Un utilisateur a ouvert la fiche de ce dossier pour consultation.",
+        "email_viewed": "Un email a été ouvert depuis l'interface (lecture ou détail du message).",
+        "user_session_start": "Un utilisateur s'est connecté à la plateforme pour cette société."
       }
     },
     "agent_placeholder": "KPIs, performance, analyse qualité…",

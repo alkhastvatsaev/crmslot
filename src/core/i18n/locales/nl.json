@@ -653,7 +653,8 @@
       "interventions": "Interventies",
       "materials": "Materialen",
       "suppliers": "Leveranciers",
-      "communications": "Communicaties"
+      "communications": "Communicaties",
+      "navigation": "Navigatie"
     },
     "event": {
       "intervention_created": "Dossier aangemaakt",
@@ -688,7 +689,11 @@
       "commission_calculated": "Commissie berekend",
       "quote_created": "Offerte aangemaakt",
       "quote_status_changed": "Offertestatus bijgewerkt",
-      "time_entry_recorded": "Tijdregistratie terrein"
+      "time_entry_recorded": "Tijdregistratie terrein",
+      "page_navigated": "Paginanavigatie",
+      "intervention_viewed": "Dossier bekeken",
+      "email_viewed": "E-mail bekeken",
+      "user_session_start": "Gebruiker aangemeld"
     },
     "loading": "Geschiedenis laden…",
     "live": "Live",
@@ -765,7 +770,11 @@
         "commission_calculated": "Een verkoopcommissie werd berekend of herberekend op basis van de bedrijfsregels.",
         "quote_created": "Een offerte werd aangemaakt voor de klant gekoppeld aan dit dossier of deze aanvraag.",
         "quote_status_changed": "De offertestatus is gewijzigd (concept, verzonden, geaccepteerd, geweigerd, enz.).",
-        "time_entry_recorded": "Een technische tijdregistratie (verplaatsing, ter plaatse, pauze…) is voor dit dossier vastgelegd."
+        "time_entry_recorded": "Een technische tijdregistratie (verplaatsing, ter plaatse, pauze…) is voor dit dossier vastgelegd.",
+        "page_navigated": "Een gebruiker is van pagina gewisseld in de app (kaart, hub, facturatie, enz.).",
+        "intervention_viewed": "Een gebruiker heeft dit dossier geopend ter consultatie.",
+        "email_viewed": "Een e-mail is geopend in de interface (lezen of detailweergave).",
+        "user_session_start": "Een gebruiker is aangemeld op het platform voor dit bedrijf."
       }
     },
     "agent_placeholder": "KPI's, prestaties, kwaliteitsanalyse…",

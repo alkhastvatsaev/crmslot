@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { statusLabelKey } from "@/features/interventions/technicianSchedule";
 import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 import type { Intervention } from "@/features/interventions";
@@ -91,7 +92,7 @@ export default function CrmHistoryEventRow({ event, onSelect, isNew, isSelected 
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-1 flex-wrap">
           <span className="text-[13px] font-semibold text-slate-800 leading-tight">
-            {t(`crmHistory.event.${event.type}`)}
+            {crmHistoryEventLabel(t, event.type)}
           </span>
           {statusBadge}
           {event.interventionTitle && (

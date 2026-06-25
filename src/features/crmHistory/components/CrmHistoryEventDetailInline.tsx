@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { buildCrmActivityEventDetail } from "@/features/crmHistory/crmActivityEventDetail";
 import { CRM_HISTORY_EVENT_META } from "@/features/crmHistory/crmHistoryEventMeta";
+import { crmHistoryEventLabel } from "@/features/crmHistory/crmHistoryEventLabel";
 import { formatCrmFeedDateTime } from "@/features/crmHistory/crmHistoryFeedFormat";
 import type { CrmActivityEvent } from "@/features/crmHistory/crmActivityTypes";
 
@@ -44,7 +45,7 @@ export default function CrmHistoryEventDetailInline({ event, onBack, onOpenInter
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-[13px] font-semibold text-slate-800 leading-tight truncate">
-            {t(`crmHistory.event.${event.type}`)}
+            {crmHistoryEventLabel(t, event.type)}
           </span>
           <time className="text-[11px] text-slate-400">{formatCrmFeedDateTime(event.ts)}</time>
         </div>
