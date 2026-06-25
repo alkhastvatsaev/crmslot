@@ -1604,7 +1604,9 @@
       "page": "Страница",
       "left": "техник: мой день",
       "center": "техник: выезды",
-      "right": "техник: фото"
+      "right": "техник: фото",
+      "right_gains": "техник: мои доходы",
+      "right_photos": "техник: фото"
     },
     "dashboard": {
       "detail": {
@@ -1818,7 +1820,8 @@
     "mobile": {
       "rail_left": "Выезды",
       "rail_center": "Детали",
-      "rail_right": "Фото"
+      "rail_right": "Доходы",
+      "rail_right_photos": "Фото"
     },
     "validation": {
       "report_rejected_title": "Отчёт требует исправления"
@@ -1835,6 +1838,18 @@
       "modal_body": "У вас ещё есть открытые заявки. Закройте их перед принятием новой.",
       "modal_go": "К заявкам на закрытие",
       "modal_dismiss": "Закрыть"
+    },
+    "commission": {
+      "title": "Мои доходы",
+      "revenue_label": "Сгенерированная выручка",
+      "payable_label": "К получению",
+      "rate_personal": "Личная ставка",
+      "rate_inherited": "Ставка компании",
+      "missions_meta": "{{count}} заявок · {{revenue}}",
+      "bonus": "+{{amount}} бонус",
+      "sparkline_title": "Последние 6 месяцев",
+      "empty": "Нет доходов в этом месяце",
+      "company_required": "Выберите компанию."
     }
   },
   "common": {

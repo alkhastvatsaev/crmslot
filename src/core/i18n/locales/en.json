@@ -1606,7 +1606,9 @@
       "page": "Page",
       "left": "technician: my day",
       "center": "technician: missions",
-      "right": "technician: photos"
+      "right": "technician: photos",
+      "right_gains": "technician: my earnings",
+      "right_photos": "technician: photos"
     },
     "dashboard": {
       "detail": {
@@ -1820,7 +1822,8 @@
     "mobile": {
       "rail_left": "Jobs",
       "rail_center": "Detail",
-      "rail_right": "Photos"
+      "rail_right": "Earnings",
+      "rail_right_photos": "Photos"
     },
     "validation": {
       "report_rejected_title": "Report needs correction"
@@ -1837,6 +1840,18 @@
       "modal_body": "You still have open jobs. Close them before accepting a new assignment.",
       "modal_go": "Go to jobs to close",
       "modal_dismiss": "Close"
+    },
+    "commission": {
+      "title": "My earnings",
+      "revenue_label": "Revenue generated",
+      "payable_label": "To receive",
+      "rate_personal": "Personal rate",
+      "rate_inherited": "Company rate",
+      "missions_meta": "{{count}} jobs · {{revenue}}",
+      "bonus": "+{{amount}} bonus",
+      "sparkline_title": "Last 6 months",
+      "empty": "No earnings this month",
+      "company_required": "Select a company."
     }
   },
   "common": {
