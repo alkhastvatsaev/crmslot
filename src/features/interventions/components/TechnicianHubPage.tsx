@@ -5,7 +5,9 @@ import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveT
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
-import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
+import TechnicianHubRightPanel from "@/features/interventions/components/TechnicianHubRightPanel";
+import { interventionOpenForTerrainPhotos } from "@/features/interventions/technicianCommissionScope";
+import { useTechnicians } from "@/features/technicians/hooks";
 import DailyMissions from "@/features/dashboard/components/DailyMissions";
 import type { Mission } from "@/features/map";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
@@ -38,7 +40,7 @@ type Props = { slotIndex: number };
 
 /**
  * Une page carrousel = tout le poste **technicien** : Ma Journée (gauche), missions (centre),
- * photos client (droite).
+ * gains / photos (droite, adaptatif).
  */
 export default function TechnicianHubPage({ slotIndex }: Props) {
   const humanPage = slotIndex + 1;
@@ -54,6 +56,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const documentPageVisible = useDocumentPageVisible();
 
   const { interventions, firebaseUid } = useTechnicianAssignments();
+  const { technicians } = useTechnicians();
   const missionDayAnchor = useTechnicianMissionDayAnchor();
   const { logIntervention } = useActivityLog();
   const pageSelector = useDashboardPageSelectorOptional();
@@ -123,6 +126,12 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const centerView = calendarOpen ? "calendar" : finishJobInterventionId ? "finish" : "detail";
 
+  const showPhotosInRightPanel = Boolean(
+    selectedCaseId &&
+    liveSelectedIntervention &&
+    interventionOpenForTerrainPhotos(liveSelectedIntervention)
+  );
+
   const leftPanel = (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <DailyMissions missions={todayMissions} onMissionClick={handleMissionClick} isEmbedded />
@@ -164,14 +173,24 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
       id={TECHNICIAN_HUB_ANCHOR_FINISH}
       className="scroll-mt-2 flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <TechnicianDashboardImagesPanel caseId={selectedCaseId} />
+      <TechnicianHubRightPanel
+        caseId={selectedCaseId}
+        liveIntervention={liveSelectedIntervention}
+        technicianUid={firebaseUid}
+        interventions={interventions}
+        technicians={technicians}
+      />
     </div>
   );
+
+  const rightAriaSuffix = showPhotosInRightPanel
+    ? t("technician_hub.aria.right_photos")
+    : t("technician_hub.aria.right_gains");
 
   const layoutLabels = {
     left: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.left")}`,
     center: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.center")}`,
-    right: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.right")}`,
+    right: `${t("technician_hub.aria.page")} ${humanPage} — ${rightAriaSuffix}`,
   };
 
   return (
@@ -202,7 +221,13 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         rightAriaLabel={layoutLabels.right}
         mobileLeftLabel={String(t("technician_hub.mobile.rail_left"))}
         mobileCenterLabel={String(t("technician_hub.mobile.rail_center"))}
-        mobileRightLabel={String(t("technician_hub.mobile.rail_right"))}
+        mobileRightLabel={String(
+          t(
+            showPhotosInRightPanel
+              ? "technician_hub.mobile.rail_right_photos"
+              : "technician_hub.mobile.rail_right"
+          )
+        )}
         left={leftPanel}
         center={centerPanel}
         right={rightPanel}

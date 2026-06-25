@@ -1604,7 +1604,9 @@
       "page": "Pagina",
       "left": "technicus: mijn dag",
       "center": "technicus: opdrachten",
-      "right": "technicus: foto's"
+      "right": "technicus: foto's",
+      "right_gains": "technicus: mijn verdiensten",
+      "right_photos": "technicus: foto's"
     },
     "dashboard": {
       "detail": {
@@ -1818,7 +1820,8 @@
     "mobile": {
       "rail_left": "Klussen",
       "rail_center": "Detail",
-      "rail_right": "Foto's"
+      "rail_right": "Verdiensten",
+      "rail_right_photos": "Foto's"
     },
     "validation": {
       "report_rejected_title": "Rapport moet worden gecorrigeerd"
@@ -1835,6 +1838,18 @@
       "modal_body": "U hebt nog open opdrachten. Sluit ze af voordat u een nieuwe accepteert.",
       "modal_go": "Naar opdrachten om af te sluiten",
       "modal_dismiss": "Sluiten"
+    },
+    "commission": {
+      "title": "Mijn verdiensten",
+      "revenue_label": "Gegenereerde omzet",
+      "payable_label": "Te ontvangen",
+      "rate_personal": "Persoonlijk tarief",
+      "rate_inherited": "Bedrijfst tarief",
+      "missions_meta": "{{count}} opdrachten · {{revenue}}",
+      "bonus": "+{{amount}} bonus",
+      "sparkline_title": "Laatste 6 maanden",
+      "empty": "Geen verdiensten deze maand",
+      "company_required": "Selecteer een bedrijf."
     }
   },
   "common": {

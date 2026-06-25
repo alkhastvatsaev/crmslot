@@ -1606,7 +1606,9 @@
       "page": "Page",
       "left": "technicien : ma journée",
       "center": "technicien : missions",
-      "right": "technicien : photos"
+      "right": "technicien : photos",
+      "right_gains": "technicien : mes gains",
+      "right_photos": "technicien : photos"
     },
     "dashboard": {
       "detail": {
@@ -1820,7 +1822,8 @@
     "mobile": {
       "rail_left": "Missions",
       "rail_center": "Détail",
-      "rail_right": "Photos"
+      "rail_right": "Mes gains",
+      "rail_right_photos": "Photos"
     },
     "validation": {
       "report_rejected_title": "Rapport à corriger"
@@ -1837,6 +1840,18 @@
       "modal_body": "Vous avez encore des missions ouvertes. Clôturez-les avant d'en accepter une nouvelle.",
       "modal_go": "Aller aux missions à clôturer",
       "modal_dismiss": "Fermer"
+    },
+    "commission": {
+      "title": "Mes gains",
+      "revenue_label": "CA généré",
+      "payable_label": "À percevoir",
+      "rate_personal": "Taux perso",
+      "rate_inherited": "Taux société",
+      "missions_meta": "{{count}} missions · {{revenue}}",
+      "bonus": "+{{amount}} bonus",
+      "sparkline_title": "6 derniers mois",
+      "empty": "Aucun gain ce mois",
+      "company_required": "Sélectionnez une société."
     }
   },
   "common": {
