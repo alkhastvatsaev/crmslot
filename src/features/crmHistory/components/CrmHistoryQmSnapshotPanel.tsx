@@ -50,11 +50,7 @@ export default function CrmHistoryQmSnapshotPanel({ events, dateLabel }: Props) 
         billing++;
       else if (e.type === "quote_created" || e.type === "quote_status_changed") quotes++;
       else if (e.type === "intervention_assigned") assigned++;
-      else if (
-        e.type === "intervention_report_validated" ||
-        e.type === "intervention_terrain_report_received"
-      )
-        reports++;
+      else if (e.type === "intervention_terrain_report_received") reports++;
       else if (e.type === "intervention_schedule_updated") scheduled++;
 
       if (
