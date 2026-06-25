@@ -13,6 +13,7 @@ export type AuditAction =
   | "intervention.delete"
   | "intervention.invoice_change"
   | "company.accept_invite"
+  | "company.create_staff"
   | "company.sync_claims"
   | "supplier.order"
   | "auth.bypass_attempt";
