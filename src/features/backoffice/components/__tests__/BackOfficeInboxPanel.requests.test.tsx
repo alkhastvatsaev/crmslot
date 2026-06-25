@@ -179,7 +179,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
     expect(screen.getByTestId("backoffice-inbox-request-row-req-inbox-1")).toBeInTheDocument();
   });
 
-  it("affiche une mission assigned non acceptée dans Demandes", () => {
+  it("affiche une mission assigned non acceptée dans Rapports", () => {
     mockUseBackOffice.mockReturnValue({
       interventions: [
         {
@@ -194,9 +194,9 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
       firebaseUid: "ivana-uid",
     });
     renderInbox(<BackOfficeInboxPanel />);
-    openRequestsTab();
+    fireEvent.click(screen.getByTestId("backoffice-inbox-tab-reports"));
     expect(
-      screen.getByTestId("backoffice-inbox-request-row-req-assigned-stuck")
+      screen.getByTestId("backoffice-inbox-report-row-req-assigned-stuck")
     ).toBeInTheDocument();
   });
 
