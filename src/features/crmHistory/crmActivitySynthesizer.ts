@@ -58,7 +58,7 @@ export function synthesizeInterventionEvents(interventions: Intervention[]): Crm
     const invoicedTs =
       parseTs(iv.invoicedAt) ||
       (iv.status === "invoiced" || iv.invoicePdfUrl
-        ? parseTs(iv.statusUpdatedAt) || parseTs(iv.updatedAt) || parseTs(iv.completedAt)
+        ? parseTs(iv.statusUpdatedAt) || parseTs(iv.completedAt)
         : 0);
     if (invoicedTs) {
       events.push({
@@ -174,11 +174,7 @@ export function synthesizeBillingEvents(interventions: Intervention[]): CrmActiv
     const lines = Array.isArray(iv.billingLines) ? iv.billingLines : [];
     if (lines.length === 0) continue;
 
-    const ts =
-      parseTs(iv.invoicedAt) ||
-      parseTs(iv.statusUpdatedAt) ||
-      parseTs(iv.updatedAt) ||
-      parseTs(iv.completedAt);
+    const ts = parseTs(iv.invoicedAt) || parseTs(iv.statusUpdatedAt) || parseTs(iv.completedAt);
     if (!ts) continue;
 
     const totalCents =
