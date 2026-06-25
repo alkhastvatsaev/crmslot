@@ -37,8 +37,8 @@ export const ADMIN_MOBILE_SHELL_CONTRACT = {
     "src/features/dashboard/components/AdminMobileShell.tsx": [
       "admin-mobile-app",
       "admin-mobile-header-profile",
-      "MobileHubDotsBar",
-      "data-admin-shell-dock",
+      "MobileShellFooterDockRow",
+      "admin-mobile-shell-footer",
     ],
     "src/app/m/admin/page.tsx": ['redirect("/")'],
     "src/app/page.tsx": ["MobileShell", "isTechnicianAccount", "isClientPortalAccount"],
