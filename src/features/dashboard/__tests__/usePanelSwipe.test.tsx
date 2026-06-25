@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { fireEvent, render, screen } from "@/test-utils/render";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 
@@ -44,9 +44,9 @@ function SwipeHost({
   onSwipeRight: () => void;
   disabled?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  usePanelSwipe(ref, onSwipeLeft, onSwipeRight, disabled);
-  return <div ref={ref} data-testid="swipe-host" />;
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
+  usePanelSwipe(node, onSwipeLeft, onSwipeRight, disabled);
+  return <div ref={setNode} data-testid="swipe-host" />;
 }
 
 function firePointerSwipe(
@@ -103,10 +103,10 @@ describe("usePanelSwipe", () => {
   it("swipe works when gesture starts on a button", () => {
     const onSwipeLeft = jest.fn();
     function Host() {
-      const ref = useRef<HTMLDivElement>(null);
-      usePanelSwipe(ref, onSwipeLeft, jest.fn());
+      const [node, setNode] = useState<HTMLDivElement | null>(null);
+      usePanelSwipe(node, onSwipeLeft, jest.fn());
       return (
-        <div ref={ref} data-testid="swipe-host">
+        <div ref={setNode} data-testid="swipe-host">
           <button type="button">tile</button>
         </div>
       );

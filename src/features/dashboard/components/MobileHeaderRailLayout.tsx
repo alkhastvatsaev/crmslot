@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 import {
   MOBILE_HUB_PANEL_ANIMATED_CLASS,
@@ -38,7 +38,10 @@ export default function MobileHeaderRailLayout({
   rootTestId,
   swipeDisabled = false,
 }: Props) {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [rootNode, setRootNode] = useState<HTMLDivElement | null>(null);
+  const setRootRef = useCallback((node: HTMLDivElement | null) => {
+    setRootNode(node);
+  }, []);
   const [rail, setRail] = useState<HeaderRail>("left");
 
   const panels: Record<HeaderRail, ReactNode> = { left, center };
@@ -62,11 +65,11 @@ export default function MobileHeaderRailLayout({
   }, [rail, pickRail]);
 
   // Swipe doigt gauche / droit → rail suivant en boucle.
-  usePanelSwipe(rootRef, navigateRight, navigateLeft, swipeDisabled);
+  usePanelSwipe(rootNode, navigateRight, navigateLeft, swipeDisabled);
 
   return (
     <div
-      ref={rootRef}
+      ref={setRootRef}
       className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, MOBILE_HUB_PANEL_ANIMATED_CLASS)}
       data-testid={rootTestId}
     >

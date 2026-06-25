@@ -1,24 +1,28 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 
-const SWIPE_THRESHOLD_PX = 44;
-const AXIS_RATIO = 1.5;
+const SWIPE_THRESHOLD_PX = 40;
+const AXIS_LOCK_PX = 10;
+const AXIS_RATIO = 1.15;
 /** Bloque seulement les champs où le drag horizontal sert à sélectionner du texte. */
 const SWIPE_START_BLOCK_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
 
-function shouldBlockSwipeStart(target: EventTarget | null): boolean {
-  if (!(target instanceof Element)) return false;
-  return Boolean(target.closest(SWIPE_START_BLOCK_SELECTOR));
-}
+type AxisLock = "horizontal" | "vertical" | null;
 
 type GestureState = {
   sx: number;
   sy: number;
   fired: boolean;
+  axisLock: AxisLock;
   activePointerId: number | null;
   touchGestureActive: boolean;
 };
+
+function shouldBlockSwipeStart(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  return Boolean(target.closest(SWIPE_START_BLOCK_SELECTOR));
+}
 
 function tryPanelSwipe(
   state: GestureState,
@@ -26,28 +30,28 @@ function tryPanelSwipe(
   dy: number,
   disabled: boolean,
   onSwipeLeft: () => void,
-  onSwipeRight: () => void,
-  preventDefault?: (e: Event) => void,
-  e?: Event
+  onSwipeRight: () => void
 ): void {
   if (disabled || state.fired) return;
   if (Math.hypot(dx, dy) < SWIPE_THRESHOLD_PX) return;
   if (Math.abs(dx) < Math.abs(dy) * AXIS_RATIO) return;
   state.fired = true;
-  if (preventDefault && e) preventDefault(e);
   if (dx < 0) onSwipeLeft();
   else onSwipeRight();
 }
 
+function resolveAxisLock(dx: number, dy: number, current: AxisLock): AxisLock {
+  if (current) return current;
+  if (Math.hypot(dx, dy) < AXIS_LOCK_PX) return null;
+  return Math.abs(dx) >= Math.abs(dy) ? "horizontal" : "vertical";
+}
+
 /**
- * Swipe horizontal (touch + souris) sur `ref` → `onSwipeLeft` (vers la gauche)
- * ou `onSwipeRight` (vers la droite). Ignoré quand `disabled` est true.
- *
- * Touch + pointer : Android WebView et grilles de boutons (missions, équipe)
- * reposent sur touchmove ; la souris utilise pointer capture.
+ * Swipe horizontal (touch + souris) sur `element` → `onSwipeLeft` / `onSwipeRight`.
+ * Capture + verrou d'axe : Android / grilles scrollables ne bloquent plus le geste.
  */
 export function usePanelSwipe(
-  ref: RefObject<HTMLElement | null>,
+  element: HTMLElement | null,
   onSwipeLeft: () => void,
   onSwipeRight: () => void,
   disabled = false
@@ -60,49 +64,59 @@ export function usePanelSwipe(
   onRightRef.current = onSwipeRight;
 
   useEffect(() => {
-    const el = ref.current;
+    const el = element;
     if (!el) return;
 
     const state: GestureState = {
       sx: 0,
       sy: 0,
       fired: false,
+      axisLock: null,
       activePointerId: null,
       touchGestureActive: false,
     };
 
-    const reset = () => {
-      state.activePointerId = null;
-      state.fired = false;
+    const resetTouch = () => {
       state.touchGestureActive = false;
+      state.axisLock = null;
+      state.fired = false;
+    };
+
+    const resetPointer = () => {
+      state.activePointerId = null;
+      state.axisLock = null;
+      state.fired = false;
     };
 
     const onTouchStart = (e: TouchEvent) => {
       if (disabledRef.current || e.touches.length !== 1) return;
       if (shouldBlockSwipeStart(e.target)) return;
       state.touchGestureActive = true;
+      state.axisLock = null;
+      state.fired = false;
       state.sx = e.touches[0].clientX;
       state.sy = e.touches[0].clientY;
-      state.fired = false;
     };
 
     const onTouchMove = (e: TouchEvent) => {
       if (disabledRef.current || !state.touchGestureActive || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - state.sx;
+      const dy = e.touches[0].clientY - state.sy;
+      state.axisLock = resolveAxisLock(dx, dy, state.axisLock);
+      if (state.axisLock === "vertical") return;
+      if (state.axisLock === "horizontal") e.preventDefault();
       tryPanelSwipe(
         state,
-        e.touches[0].clientX - state.sx,
-        e.touches[0].clientY - state.sy,
+        dx,
+        dy,
         disabledRef.current,
         () => onLeftRef.current(),
-        () => onRightRef.current(),
-        (ev) => ev.preventDefault(),
-        e
+        () => onRightRef.current()
       );
     };
 
     const onTouchEnd = () => {
-      state.touchGestureActive = false;
-      state.fired = false;
+      resetTouch();
     };
 
     const onPointerDown = (e: PointerEvent) => {
@@ -113,6 +127,7 @@ export function usePanelSwipe(
       state.sx = e.clientX;
       state.sy = e.clientY;
       state.fired = false;
+      state.axisLock = null;
       state.activePointerId = e.pointerId;
       if (e.pointerType === "mouse") {
         try {
@@ -124,16 +139,21 @@ export function usePanelSwipe(
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      if (disabledRef.current || state.fired || activePointerIdMismatch(state, e)) return;
+      if (disabledRef.current || state.fired) return;
+      if (e.pointerType === "touch" && state.touchGestureActive) return;
+      if (state.activePointerId !== e.pointerId) return;
+      const dx = e.clientX - state.sx;
+      const dy = e.clientY - state.sy;
+      state.axisLock = resolveAxisLock(dx, dy, state.axisLock);
+      if (state.axisLock === "vertical") return;
+      if (state.axisLock === "horizontal") e.preventDefault();
       tryPanelSwipe(
         state,
-        e.clientX - state.sx,
-        e.clientY - state.sy,
+        dx,
+        dy,
         disabledRef.current,
         () => onLeftRef.current(),
-        () => onRightRef.current(),
-        (ev) => ev.preventDefault(),
-        e
+        () => onRightRef.current()
       );
     };
 
@@ -144,36 +164,32 @@ export function usePanelSwipe(
       } catch {
         /* ignore */
       }
-      reset();
+      resetPointer();
     };
 
     const onPointerCancel = (e: PointerEvent) => {
       if (state.activePointerId !== e.pointerId) return;
-      reset();
+      resetPointer();
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd);
-    el.addEventListener("touchcancel", onTouchEnd);
-    el.addEventListener("pointerdown", onPointerDown);
-    el.addEventListener("pointermove", onPointerMove);
-    el.addEventListener("pointerup", onPointerUp);
-    el.addEventListener("pointercancel", onPointerCancel);
+    const touchOpts = { capture: true } as const;
+    el.addEventListener("touchstart", onTouchStart, { ...touchOpts, passive: true });
+    el.addEventListener("touchmove", onTouchMove, { ...touchOpts, passive: false });
+    el.addEventListener("touchend", onTouchEnd, touchOpts);
+    el.addEventListener("touchcancel", onTouchEnd, touchOpts);
+    el.addEventListener("pointerdown", onPointerDown, touchOpts);
+    el.addEventListener("pointermove", onPointerMove, touchOpts);
+    el.addEventListener("pointerup", onPointerUp, touchOpts);
+    el.addEventListener("pointercancel", onPointerCancel, touchOpts);
     return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
-      el.removeEventListener("pointerdown", onPointerDown);
-      el.removeEventListener("pointermove", onPointerMove);
-      el.removeEventListener("pointerup", onPointerUp);
-      el.removeEventListener("pointercancel", onPointerCancel);
+      el.removeEventListener("touchstart", onTouchStart, touchOpts);
+      el.removeEventListener("touchmove", onTouchMove, touchOpts);
+      el.removeEventListener("touchend", onTouchEnd, touchOpts);
+      el.removeEventListener("touchcancel", onTouchEnd, touchOpts);
+      el.removeEventListener("pointerdown", onPointerDown, touchOpts);
+      el.removeEventListener("pointermove", onPointerMove, touchOpts);
+      el.removeEventListener("pointerup", onPointerUp, touchOpts);
+      el.removeEventListener("pointercancel", onPointerCancel, touchOpts);
     };
-  }, [ref]);
-}
-
-function activePointerIdMismatch(state: GestureState, e: PointerEvent): boolean {
-  if (e.pointerType === "touch" && state.touchGestureActive) return true;
-  return state.activePointerId !== e.pointerId;
+  }, [element]);
 }
