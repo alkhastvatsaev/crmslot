@@ -124,7 +124,7 @@ function isTravelLine(line: DraftBillingLine): boolean {
 
 function surchargeBaseCents(lines: DraftBillingLine[], applyTo: BillingSurchargeApplyTo): number {
   return lines.reduce((sum, line) => {
-    if (applyTo === "subtotal_excl_travel" && isTravelLine(line.description)) return sum;
+    if (applyTo === "subtotal_excl_travel" && isTravelLine(line)) return sum;
     const qty = line.quantity > 0 ? line.quantity : 1;
     return sum + Math.round(line.unitPriceCents) * qty;
   }, 0);
