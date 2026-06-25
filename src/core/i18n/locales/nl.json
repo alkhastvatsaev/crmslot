@@ -1890,7 +1890,8 @@
     "delete_account_failed": "Account kon niet worden verwijderd. Meld u opnieuw aan en probeer het opnieuw.",
     "save_success": "Profiel opgeslagen.",
     "save_failed": "Profiel kon niet worden opgeslagen. Controleer uw gegevens.",
-    "role_dispatcher": "Dispatcher"
+    "role_dispatcher": "Dispatcher",
+    "role_technician": "Technicus"
   },
   "map": {
     "boot_error_token": "Kaart niet beschikbaar — Mapbox-token ontbreekt",

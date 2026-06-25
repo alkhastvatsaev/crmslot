@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
-import { updateSelfStaffAccount } from "@/features/auth/server/updateSelfStaffAccount";
-import type { CompanyRole } from "@/features/company";
+import {
+  readCurrentAccountRole,
+  updateSelfStaffAccount,
+} from "@/features/auth/server/updateSelfStaffAccount";
+import { isStaffAccountRoleOption } from "@/features/auth/staffAccountRoleDisplay";
 
 export const runtime = "nodejs";
 
-function parseRole(value: unknown): CompanyRole | undefined {
-  if (value === "admin" || value === "collaborateur") return value;
-  return undefined;
+function parseAccountRole(value: unknown) {
+  return isStaffAccountRoleOption(value) ? value : undefined;
 }
 
 /** Met à jour le profil staff de l'utilisateur connecté. */
@@ -25,29 +27,27 @@ export async function PATCH(req: Request) {
   }
 
   const db = admin.firestore();
+  const companyId = typeof body.companyId === "string" ? body.companyId.trim() : "";
   const result = await updateSelfStaffAccount(db, admin.auth, authResult.uid, {
     firstName: typeof body.firstName === "string" ? body.firstName : undefined,
     lastName: typeof body.lastName === "string" ? body.lastName : undefined,
     phone: typeof body.phone === "string" ? body.phone : body.phone === null ? null : undefined,
     email: typeof body.email === "string" ? body.email : body.email === null ? null : undefined,
-    companyId: typeof body.companyId === "string" ? body.companyId : undefined,
-    role: parseRole(body.role),
+    companyId: companyId || undefined,
+    accountRole: parseAccountRole(body.accountRole),
   });
 
   if (!result.ok) {
     return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
   }
 
-  const companyId = typeof body.companyId === "string" ? body.companyId.trim() : "";
-  let role = parseRole(body.role);
-  if (companyId) {
-    const membershipSnap = await db
-      .doc(`users/${authResult.uid}/company_memberships/${companyId}`)
-      .get();
-    if (membershipSnap.exists) {
-      role = (membershipSnap.data()?.role as CompanyRole) === "admin" ? "admin" : "collaborateur";
-    }
-  }
+  const accountRole = companyId
+    ? await readCurrentAccountRole(db, authResult.uid, companyId)
+    : parseAccountRole(body.accountRole);
 
-  return NextResponse.json({ ok: true, companyId: companyId || undefined, role });
+  return NextResponse.json({
+    ok: true,
+    companyId: companyId || undefined,
+    accountRole,
+  });
 }

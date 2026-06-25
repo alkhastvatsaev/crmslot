@@ -25,7 +25,7 @@ export default function AdminMobileProfileChip() {
     String(t("technician_hub.dashboard.detail.not_provided"))
   );
   const firstNameClass = technicianFirstNameTextClass(firstName);
-  const roleKey = resolveStaffProfileRoleKey(fields.roleLabel);
+  const roleKey = resolveStaffProfileRoleKey(fields.accountRole);
 
   return (
     <button

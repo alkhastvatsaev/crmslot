@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
-import type { CompanyRole } from "@/features/company";
 import {
   resolveStaffProfileRoleKey,
   STAFF_ACCOUNT_ROLE_OPTIONS,
   staffAccountRoleOptionLabelKey,
+  type StaffAccountRoleOption,
 } from "@/features/auth/staffAccountRoleDisplay";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
@@ -232,7 +232,9 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
     handleSignOut,
   } = useCrmStaffAccountPanel();
   const isDesktop = variant === "desktop";
-  const displayRoleKey = resolveStaffProfileRoleKey(editing ? draft.role : fields.roleLabel);
+  const displayRoleKey = resolveStaffProfileRoleKey(
+    editing ? draft.accountRole : fields.accountRole
+  );
   const showPhoneRow = Boolean(fields.phone?.trim());
   const showCompanyRow = Boolean(fields.companyName?.trim());
 
@@ -322,8 +324,10 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
                   icon={<Shield className="h-4 w-4 opacity-70" aria-hidden />}
                   label={String(t("staff_account.role"))}
                   testId="dashboard-account-role-select"
-                  value={draft.role}
-                  onChange={(value) => updateDraft({ role: value as CompanyRole })}
+                  value={draft.accountRole}
+                  onChange={(value) =>
+                    updateDraft({ accountRole: value as StaffAccountRoleOption })
+                  }
                 >
                   {STAFF_ACCOUNT_ROLE_OPTIONS.map((role) => (
                     <option key={role} value={role}>

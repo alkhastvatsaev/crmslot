@@ -1892,7 +1892,8 @@
     "delete_account_failed": "Impossible de supprimer le compte. Reconnectez-vous puis réessayez.",
     "save_success": "Profil enregistré.",
     "save_failed": "Enregistrement impossible. Vérifiez vos informations.",
-    "role_dispatcher": "Dispatcher"
+    "role_dispatcher": "Dispatcher",
+    "role_technician": "Technicien"
   },
   "map": {
     "boot_error_token": "Carte indisponible — jeton Mapbox manquant",

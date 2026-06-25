@@ -1890,7 +1890,8 @@
     "delete_account_failed": "Не удалось удалить аккаунт. Войдите снова и повторите.",
     "save_success": "Профиль сохранён.",
     "save_failed": "Не удалось сохранить профиль. Проверьте данные.",
-    "role_dispatcher": "Диспетчер"
+    "role_dispatcher": "Диспетчер",
+    "role_technician": "Техник"
   },
   "map": {
     "boot_error_token": "Карта недоступна — отсутствует токен Mapbox",

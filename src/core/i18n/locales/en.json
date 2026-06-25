@@ -1892,7 +1892,8 @@
     "delete_account_failed": "Could not delete account. Sign in again and retry.",
     "save_success": "Profile saved.",
     "save_failed": "Could not save profile. Check your details.",
-    "role_dispatcher": "Dispatcher"
+    "role_dispatcher": "Dispatcher",
+    "role_technician": "Technician"
   },
   "map": {
     "boot_error_token": "Map unavailable — missing Mapbox token",
