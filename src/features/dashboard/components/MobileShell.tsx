@@ -7,6 +7,7 @@ import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileShellFooterDock from "@/features/dashboard/components/MobileShellFooterDock";
 import MobileShellGalaxyDockSlot from "@/features/dashboard/components/MobileShellGalaxyDockSlot";
+import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { MobileHubRailProvider } from "@/features/dashboard/MobileHubRailContext";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
@@ -22,6 +23,7 @@ type Props = { pages: ReactNode[] };
 export default function MobileShell({ pages }: Props) {
   const { open: pageSelectorOpen } = useDashboardPageSelector();
   const dockHintAttrs = useMobileShellDockHintAttrs();
+  const showGalaxyFooter = useMobileFooterGalaxyVisible();
 
   return (
     <MobileHubRailProvider>
@@ -47,7 +49,7 @@ export default function MobileShell({ pages }: Props) {
         </div>
 
         <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="mobile-shell-footer">
-          <MobileCalendarFooterBar />
+          {showGalaxyFooter ? null : <MobileCalendarFooterBar />}
           <MobileShellGalaxyDockSlot>
             <MobileShellFooterDock />
           </MobileShellGalaxyDockSlot>

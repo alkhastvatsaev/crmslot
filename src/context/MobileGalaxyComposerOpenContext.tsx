@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { useDashboardPagerOptional } from "@/features/dashboard";
+import { useMobileHubAgentRailActive } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import {
   MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT,
   peekPendingMaterialAgentQuickPrompt,
@@ -35,9 +37,14 @@ const COMPOSER_OPEN_EVENTS = [
 /** Ouvre le dock Galaxy (saisie chatbot / dispatch) à la demande — fermé par défaut sur mobile. */
 export function MobileGalaxyComposerOpenProvider({ children }: { children: ReactNode }) {
   const pager = useDashboardPagerOptional();
+  const requestRail = useRequestMobileHubRail();
+  const agentRailActive = useMobileHubAgentRailActive();
   const [open, setOpen] = useState(false);
 
-  const requestOpen = useCallback(() => setOpen(true), []);
+  const requestOpen = useCallback(() => {
+    setOpen(true);
+    requestRail("left");
+  }, [requestRail]);
 
   useEffect(() => {
     const onOpen = () => requestOpen();
@@ -59,6 +66,10 @@ export function MobileGalaxyComposerOpenProvider({ children }: { children: React
   useEffect(() => {
     setOpen(false);
   }, [pager?.pageIndex]);
+
+  useEffect(() => {
+    setOpen(agentRailActive);
+  }, [agentRailActive]);
 
   const value = useMemo(
     () => ({

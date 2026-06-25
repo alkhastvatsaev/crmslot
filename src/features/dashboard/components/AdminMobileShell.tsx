@@ -8,6 +8,7 @@ import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTo
 import MobileShellGalaxyDockSlot from "@/features/dashboard/components/MobileShellGalaxyDockSlot";
 import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
 import { useDashboardPageSelector } from "@/features/dashboard";
+import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
@@ -41,6 +42,7 @@ export default function AdminMobileShell({ children, dock }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
   const accountOpen = view === "account";
   const dockHintAttrs = useMobileShellDockHintAttrs();
+  const showGalaxyFooter = useMobileFooterGalaxyVisible();
 
   return (
     <div
@@ -91,12 +93,14 @@ export default function AdminMobileShell({ children, dock }: Props) {
         data-testid="admin-mobile-shell-footer"
         data-admin-shell-dock="true"
       >
-        <MobileCalendarFooterBar
-          toggleTarget="calendar"
-          footerTestId="admin-mobile-footer-calendar-bar"
-          railTestId="admin-mobile-footer-calendar-rail"
-          calendarTestId="admin-mobile-footer-calendar"
-        />
+        {showGalaxyFooter ? null : (
+          <MobileCalendarFooterBar
+            toggleTarget="calendar"
+            footerTestId="admin-mobile-footer-calendar-bar"
+            railTestId="admin-mobile-footer-calendar-rail"
+            calendarTestId="admin-mobile-footer-calendar"
+          />
+        )}
         {dock ? (
           <MobileShellGalaxyDockSlot testId="admin-mobile-shell-dock">
             {dock}
