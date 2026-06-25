@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { CASE_HUB_SLOT_INDEX } from "@/features/caseHub/caseHubConstants";
 import CaseHubChoosePanel from "@/features/caseHub/components/CaseHubChoosePanel";
 import CaseHubOverviewPanel from "@/features/caseHub/components/CaseHubOverviewPanel";
@@ -38,9 +39,26 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
     pageActive ? companyId || null : null
   );
 
+  const requestMobileHubRail = useRequestMobileHubRail();
   const [bucket, setBucket] = useState<CaseHubBucket>("to_assign");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [bucketAutoPicked, setBucketAutoPicked] = useState(false);
+
+  const handleBucketChange = useCallback(
+    (next: CaseHubBucket) => {
+      setBucket(next);
+      requestMobileHubRail("center");
+    },
+    [requestMobileHubRail]
+  );
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+      requestMobileHubRail("right");
+    },
+    [requestMobileHubRail]
+  );
 
   const sorted = useMemo(() => sortCaseInterventionsByUrgency(interventions), [interventions]);
   const bucketCounts = useMemo<Record<CaseHubBucket, number>>(
@@ -117,6 +135,7 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
       mobileRightLabel={String(t("caseHub.mobile.rail_right"))}
       centerPadding={false}
       rightPadding={false}
+      mobileInitialRail="left"
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
       left={
         <section className={sideShell} data-testid="case-hub-page">
@@ -125,7 +144,7 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
             <CaseHubOverviewPanel
               bucket={bucket}
               counts={bucketCounts}
-              onBucketChange={setBucket}
+              onBucketChange={handleBucketChange}
             />
           ) : null}
         </section>
@@ -134,20 +153,20 @@ export default function CaseHubPage({ slotIndex = CASE_HUB_SLOT_INDEX }: Props) 
         <section className={mainShell}>
           {gate}
           {companyId && !gate ? (
-            <CaseHubRightPanel intervention={selected} peerInterventions={sorted} />
+            <CaseHubChoosePanel
+              interventions={filtered}
+              loading={loading}
+              selectedId={selectedId}
+              onSelect={handleSelect}
+              bucket={bucket}
+            />
           ) : null}
         </section>
       }
       right={
         <section className={mainShell}>
           {companyId && !gate ? (
-            <CaseHubChoosePanel
-              interventions={filtered}
-              loading={loading}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              bucket={bucket}
-            />
+            <CaseHubRightPanel intervention={selected} peerInterventions={sorted} />
           ) : null}
         </section>
       }
