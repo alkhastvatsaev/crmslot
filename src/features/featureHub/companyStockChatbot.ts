@@ -33,6 +33,7 @@ export function dispatchMaterialAgentDraftPrompt(text: string): void {
   window.dispatchEvent(
     new CustomEvent("material-agent-draft-prompt", { detail: { text: text.trim() } })
   );
+  focusMaterialAgentMobileRail();
 }
 
 /** Sur mobile hub, bascule vers le rail agent matériel (panneau gauche). */

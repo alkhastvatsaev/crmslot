@@ -1,9 +1,9 @@
 "use client";
 
 import { useFeatureFlag } from "@/core/useFeatureFlags";
-import { useMobileGalaxyComposerOpen } from "@/context/MobileGalaxyComposerOpenContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { CRM_HISTORY_SLOT_INDEX } from "@/features/crmHistory/crmHistoryConstants";
@@ -11,19 +11,31 @@ import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstant
 
 const MAP_PAGE_INDEX = 0;
 
-const HUB_COMPOSER_PAGE_INDICES = new Set([
+/** Hubs avec agent chatbot sur le rail gauche mobile. */
+export const MOBILE_HUB_AGENT_PAGE_INDICES = new Set([
   FEATURE_HUB_SLOT_INDEX,
   CRM_HISTORY_SLOT_INDEX,
   BILLING_HUB_SLOT_INDEX,
 ]);
 
-/** Afficher le dock Galaxy (saisie) au lieu du profil — mobile uniquement. */
+/** Rail agent / chatbot actif sur un hub mobile (panneau gauche). */
+export function useMobileHubAgentRailActive(): boolean {
+  const pager = useDashboardPagerOptional();
+  const railSnapshot = useMobileHubRailSnapshot();
+  const pageIndex = pager?.pageIndex ?? MAP_PAGE_INDEX;
+
+  if (!MOBILE_HUB_AGENT_PAGE_INDICES.has(pageIndex)) return false;
+  if (!railSnapshot?.visible || !railSnapshot.rails.includes("left")) return false;
+  return railSnapshot.activeRail === "left";
+}
+
+/** Afficher le dock Galaxy (saisie) à la place du calendrier — mobile uniquement. */
 export function useMobileFooterGalaxyVisible(): boolean {
   const isMobile = useIsMobile();
-  const composerOpen = useMobileGalaxyComposerOpen();
   const dispatchVoice = useFeatureFlag("dispatchVoice");
   const pager = useDashboardPagerOptional();
   const bridge = useGalaxyLayerBridgeOptional();
+  const agentRailActive = useMobileHubAgentRailActive();
   const pageIndex = pager?.pageIndex ?? MAP_PAGE_INDEX;
 
   if (isMobile !== true) return false;
@@ -32,7 +44,7 @@ export function useMobileFooterGalaxyVisible(): boolean {
     return true;
   }
 
-  if (HUB_COMPOSER_PAGE_INDICES.has(pageIndex) && composerOpen) {
+  if (agentRailActive) {
     return true;
   }
 

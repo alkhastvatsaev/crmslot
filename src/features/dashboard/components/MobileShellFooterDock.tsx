@@ -3,10 +3,8 @@
 import type { ReactNode } from "react";
 import MapGalaxyTranscriptionLayer from "@/features/map/components/MapGalaxyTranscriptionLayer";
 import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
-import { useMobileGalaxyComposerOpen } from "@/context/MobileGalaxyComposerOpenContext";
 import { useGalaxyLayerBridge } from "@/features/map/GalaxyLayerBridgeContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
-import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import BillingHubGalaxyComposer from "@/features/billingHub/components/BillingHubGalaxyComposer";
 import CrmHistoryGalaxyComposer from "@/features/crmHistory/components/CrmHistoryGalaxyComposer";
@@ -20,11 +18,9 @@ const MAP_PAGE_INDEX = 0;
 /** Footer mobile admin — Galaxy (saisie / dispatch) seulement si actif. */
 export default function MobileShellFooterDock() {
   const showGalaxyFooter = useMobileFooterGalaxyVisible();
-  const composerOpen = useMobileGalaxyComposerOpen();
   const { transcriptionArmed, armTranscription, emitInterventionCreated } = useGalaxyLayerBridge();
   const pager = useDashboardPagerOptional();
   const pageIndex = pager?.pageIndex ?? MAP_PAGE_INDEX;
-  const isMobile = useIsMobile();
   const dispatchVoice = useFeatureFlag("dispatchVoice");
 
   let hubComposer: ReactNode = null;
@@ -32,8 +28,7 @@ export default function MobileShellFooterDock() {
   else if (pageIndex === CRM_HISTORY_SLOT_INDEX) hubComposer = <CrmHistoryGalaxyComposer />;
   else if (pageIndex === BILLING_HUB_SLOT_INDEX) hubComposer = <BillingHubGalaxyComposer />;
 
-  const showHubComposer =
-    hubComposer != null && (isMobile !== true || composerOpen) && showGalaxyFooter;
+  const showHubComposer = hubComposer != null && showGalaxyFooter;
   const showDispatchDock =
     dispatchVoice && pageIndex === MAP_PAGE_INDEX && showGalaxyFooter && !showHubComposer;
   const audioBackgroundTasksEnabled = Boolean(dispatchVoice);
