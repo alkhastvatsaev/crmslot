@@ -115,15 +115,13 @@ export function isInterventionAwaitingTechnicianAcceptance(
 }
 
 /**
- * Onglet dispatch « Demandes » : nouvelles soumissions + dossiers revenus du terrain
- * (refus technicien ou acceptation jamais confirmée).
+ * Onglet dispatch « Demandes » : nouvelles soumissions client (avant envoi terrain).
+ * Les missions assignées en attente d’acceptation technicien sont dans l’onglet « Rapports ».
  */
 export function isInterventionInBackofficeRequestsQueue(
   iv: Pick<Intervention, "status" | "technicianAcceptedAt">
 ): boolean {
-  return (
-    isInterventionPendingBackOfficeIntake(iv) || isInterventionAwaitingTechnicianAcceptance(iv)
-  );
+  return isInterventionPendingBackOfficeIntake(iv);
 }
 
 /** Visible sur le hub technicien (liste + offres) : après passage back-office (ex. statut ≠ pending). */

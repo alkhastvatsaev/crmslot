@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Clock, ChevronRight, CheckCircle2, Hourglass } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { coerceFirestoreLikeDate } from "@/features/interventions/technicianSchedule";
@@ -8,6 +8,7 @@ import { capitalizeName } from "@/utils/stringUtils";
 import { guessGenderPrefixFromName } from "@/utils/genderDetection";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
+import { isInterventionAwaitingTechnicianAcceptance } from "@/features/interventions/technicianSchedule";
 import { useFeatureFlag } from "@/core/useFeatureFlags";
 import type { Intervention } from "@/features/interventions";
 import SlaBadge from "@/features/interventions/components/SlaBadge";
@@ -35,6 +36,8 @@ export function BackOfficeInboxInterventionRow({
   const { t } = useTranslation();
   const slaTrackerEnabled = useFeatureFlag("slaTracker");
   const isRequest = variant === "request";
+  const isAwaitingTechnician =
+    variant === "report-active" && isInterventionAwaitingTechnicianAcceptance(item);
   const isUrgent = item.urgency;
   const hasTechnicianAmendment = hasPendingTechnicianReportAmendment(item);
 
@@ -72,11 +75,13 @@ export function BackOfficeInboxInterventionRow({
             : "border-slate-100"
           : variant === "report-archived"
             ? "border-slate-200/70 bg-slate-50/50 opacity-85"
-            : hasTechnicianAmendment
-              ? "border-amber-200 bg-amber-50/30"
-              : item.status === "invoiced"
-                ? "border-green-100 opacity-70"
-                : "border-blue-100"
+            : isAwaitingTechnician
+              ? "border-amber-100 bg-amber-50/30"
+              : hasTechnicianAmendment
+                ? "border-amber-200 bg-amber-50/30"
+                : item.status === "invoiced"
+                  ? "border-green-100 opacity-70"
+                  : "border-blue-100"
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -89,6 +94,8 @@ export function BackOfficeInboxInterventionRow({
                   isUrgent ? "bg-amber-500 animate-pulse" : "bg-blue-500"
                 )}
               />
+            ) : isAwaitingTechnician ? (
+              <Hourglass className="w-4 h-4 text-amber-500" />
             ) : (
               <CheckCircle2 className="w-4 h-4 text-green-500" />
             )}
@@ -109,9 +116,11 @@ export function BackOfficeInboxInterventionRow({
                 ? item.createdAt
                   ? formatBackofficeRowTime(item.createdAt)
                   : t("backoffice.inbox.now")
-                : item.completedAt
-                  ? formatBackofficeRowTime(item.completedAt)
-                  : ""}
+                : isAwaitingTechnician
+                  ? item.scheduledTime || item.requestedTime || "—"
+                  : item.completedAt
+                    ? formatBackofficeRowTime(item.completedAt)
+                    : ""}
             </span>
             <span className="truncate max-w-[120px]">
               {(item.address ?? "").split(",")[0]?.trim() || "—"}
@@ -127,22 +136,26 @@ export function BackOfficeInboxInterventionRow({
                 ? isUrgent
                   ? "bg-amber-100 text-amber-700"
                   : "bg-blue-100 text-blue-700"
-                : hasTechnicianAmendment
-                  ? "bg-amber-100 text-amber-800"
-                  : item.status === "invoiced"
-                    ? "bg-slate-100 text-slate-500"
-                    : "bg-green-100 text-green-700"
+                : isAwaitingTechnician
+                  ? "bg-amber-100 text-amber-700"
+                  : hasTechnicianAmendment
+                    ? "bg-amber-100 text-amber-800"
+                    : item.status === "invoiced"
+                      ? "bg-slate-100 text-slate-500"
+                      : "bg-green-100 text-green-700"
             )}
           >
             {isRequest
               ? isUrgent
                 ? t("backoffice.inbox.tag_urgent")
                 : t("backoffice.inbox.tag_request")
-              : hasTechnicianAmendment
-                ? t("backoffice.inbox.tag_amended")
-                : item.status === "invoiced"
-                  ? t("backoffice.inbox.tag_verified")
-                  : t("backoffice.inbox.tag_report")}
+              : isAwaitingTechnician
+                ? t("backoffice.inbox.tag_awaiting")
+                : hasTechnicianAmendment
+                  ? t("backoffice.inbox.tag_amended")
+                  : item.status === "invoiced"
+                    ? t("backoffice.inbox.tag_verified")
+                    : t("backoffice.inbox.tag_report")}
           </div>
           <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" />
         </div>

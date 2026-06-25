@@ -92,9 +92,11 @@ export default function InterventionDetailPanel({
   const scheduleEditorOpen =
     isEditingDateTime && isInterventionInBackofficeRequestsQueue(selectedItem);
   const actionBarFill = assignPickerOpen || scheduleEditorOpen;
+  const isAwaitingTechnician = isInterventionAwaitingTechnicianAcceptance(selectedItem);
   const isReportQueue = !isInterventionInBackofficeRequestsQueue(selectedItem);
-  const canRejectReport = isReportQueue && selectedItem.status === "done";
-  const canArchiveReport = isReportQueue && canArchiveBackofficeReportInInbox(selectedItem);
+  const canRejectReport = isReportQueue && !isAwaitingTechnician && selectedItem.status === "done";
+  const canArchiveReport =
+    isReportQueue && !isAwaitingTechnician && canArchiveBackofficeReportInInbox(selectedItem);
 
   const handleRejectConfirm = async () => {
     if (rejectBusy) return;
@@ -124,10 +126,10 @@ export default function InterventionDetailPanel({
             : scheduleEditorOpen
               ? t("backoffice.inbox.requested_schedule")
               : isInterventionInBackofficeRequestsQueue(selectedItem)
-                ? isInterventionAwaitingTechnicianAcceptance(selectedItem)
-                  ? t("backoffice.inbox.detail_title_returned")
-                  : t("backoffice.inbox.detail_title_request")
-                : t("backoffice.inbox.detail_title_report")
+                ? t("backoffice.inbox.detail_title_request")
+                : isAwaitingTechnician
+                  ? t("backoffice.inbox.detail_title_awaiting")
+                  : t("backoffice.inbox.detail_title_report")
         }
         onBack={() => {
           onClose();

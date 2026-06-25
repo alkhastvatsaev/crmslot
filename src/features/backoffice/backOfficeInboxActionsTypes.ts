@@ -1,4 +1,5 @@
 import type { TechnicianBackofficeReportBridgeApi } from "@/context/TechnicianBackofficeReportBridgeContext";
+import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import type { Intervention } from "@/features/interventions";
 
 export type BackOfficeInboxActionsArgs = {
@@ -11,6 +12,7 @@ export type BackOfficeInboxActionsArgs = {
   terrainBridge: TechnicianBackofficeReportBridgeApi | null;
   setSelectedItemId: (id: string | null) => void;
   setSelectedTerrainLocalId: (id: string | null) => void;
+  setActiveTab: (tab: BackOfficeInboxTab) => void;
   setAssignPickerOpen: (open: boolean) => void;
   setIsAssigning: (assigning: boolean) => void;
   setIsEditingDateTime: (editing: boolean) => void;

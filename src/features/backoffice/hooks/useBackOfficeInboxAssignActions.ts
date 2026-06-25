@@ -18,6 +18,7 @@ type Args = Pick<
   | "editDate"
   | "editTime"
   | "setSelectedItemId"
+  | "setActiveTab"
   | "setAssignPickerOpen"
   | "setIsAssigning"
   | "setIsEditingDateTime"
@@ -32,6 +33,7 @@ export function useBackOfficeInboxAssignActions({
   editDate,
   editTime,
   setSelectedItemId,
+  setActiveTab,
   setAssignPickerOpen,
   setIsAssigning,
   setIsEditingDateTime,
@@ -50,7 +52,8 @@ export function useBackOfficeInboxAssignActions({
         if (id.startsWith("demo-")) {
           toast.success(t("backoffice.toasts.request_assigned"));
           setAssignPickerOpen(false);
-          setSelectedItemId(null);
+          setActiveTab("reports");
+          setSelectedItemId(id);
           return;
         }
         if (!row) {
@@ -70,7 +73,8 @@ export function useBackOfficeInboxAssignActions({
           toast.success(t("backoffice.toasts.request_assigned"));
         }
         setAssignPickerOpen(false);
-        setSelectedItemId(null);
+        setActiveTab("reports");
+        setSelectedItemId(id);
       } catch (e) {
         const code =
           typeof e === "object" && e !== null && "code" in e
@@ -89,7 +93,7 @@ export function useBackOfficeInboxAssignActions({
         setIsAssigning(false);
       }
     },
-    [interventions, setAssignPickerOpen, setIsAssigning, setSelectedItemId, t]
+    [interventions, setActiveTab, setAssignPickerOpen, setIsAssigning, setSelectedItemId, t]
   );
 
   const handleCancelIntervention = useCallback(

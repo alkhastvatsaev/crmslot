@@ -30,7 +30,7 @@ export default function InterventionDetailClientHeader({ selectedItem }: Props) 
           )}
         >
           {isInterventionAwaitingTechnicianAcceptance(selectedItem)
-            ? t("backoffice.inbox.kind_returned")
+            ? t("backoffice.inbox.kind_awaiting")
             : isInterventionPendingBackOfficeIntake(selectedItem)
               ? t("backoffice.inbox.kind_request")
               : t("backoffice.inbox.kind_report")}{" "}

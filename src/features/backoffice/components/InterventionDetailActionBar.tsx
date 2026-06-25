@@ -1,10 +1,13 @@
 "use client";
 
-import { UserPlus, CheckCircle2, Pencil, RotateCcw, Archive } from "lucide-react";
+import { UserPlus, CheckCircle2, Pencil, RotateCcw, Archive, Hourglass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HubActionBar, HubButton } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
+import {
+  isInterventionAwaitingTechnicianAcceptance,
+  isInterventionInBackofficeRequestsQueue,
+} from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
@@ -68,6 +71,7 @@ export default function InterventionDetailActionBar({
   onArchiveReport,
 }: Props) {
   const { t } = useTranslation();
+  const isAwaitingTechnician = isInterventionAwaitingTechnicianAcceptance(selectedItem);
 
   return (
     <HubActionBar fill={actionBarFill}>
@@ -160,6 +164,14 @@ export default function InterventionDetailActionBar({
             </HubButton>
           </>
         )
+      ) : isAwaitingTechnician ? (
+        <div
+          data-testid="backoffice-inbox-awaiting-technician"
+          className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-[16px] border border-amber-200 bg-amber-50 px-4 text-center text-[13px] font-semibold text-amber-800"
+        >
+          <Hourglass className="h-4 w-4 shrink-0" aria-hidden />
+          {t("backoffice.inbox.awaiting_technician_response")}
+        </div>
       ) : (
         <>
           {canRejectReport && !rejectOpen ? (

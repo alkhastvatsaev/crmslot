@@ -1,13 +1,13 @@
 import { interventionBillingTotalCents } from "@/features/billingHub/billingHubMetrics";
+import { canApplyBackofficeTechnicianAssignment } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
 import { hasPendingTechnicianReportAmendment } from "@/features/interventions/technicianInvoicedReportAmend";
-import { isInterventionInBackofficeRequestsQueue } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import { bucketForIntervention } from "@/features/caseHub/caseHubPatronMetrics";
 import type { UnifiedDrawerTab } from "@/features/interventions";
 import type { CaseHubAlert } from "@/features/caseHub/caseHubInterventionDetailTypes";
 
 export function canCaseHubAssignTechnician(iv: Intervention): boolean {
-  return isInterventionInBackofficeRequestsQueue(iv);
+  return canApplyBackofficeTechnicianAssignment(iv);
 }
 
 export function buildCaseHubDrawerTabBadges(
