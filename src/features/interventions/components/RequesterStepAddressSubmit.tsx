@@ -5,6 +5,7 @@ import { Loader2, MapPin, SendHorizontal } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import SmartFormAddressAutocomplete from "@/features/interventions/components/SmartFormAddressAutocomplete";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
+import InterventionPriceEstimateCard from "@/features/interventions/components/InterventionPriceEstimateCard";
 import RequesterSubmittedDossierBanner from "@/features/interventions/components/RequesterSubmittedDossierBanner";
 
 type LatLng = { lat: number; lng: number };
@@ -12,6 +13,12 @@ type LatLng = { lat: number; lng: number };
 type Props = {
   showSubmitSuccess: boolean;
   dossierNumber: string | null;
+  problemTemplateId: string;
+  problemLabel: string;
+  description: string;
+  urgency: boolean;
+  interventionDate?: string;
+  interventionTime?: string;
   interventionAddress: string;
   interventionLatLng: LatLng | null;
   locatingAddress: boolean;
@@ -27,6 +34,12 @@ type Props = {
 export default function RequesterStepAddressSubmit({
   showSubmitSuccess,
   dossierNumber,
+  problemTemplateId,
+  problemLabel,
+  description,
+  urgency,
+  interventionDate,
+  interventionTime,
   interventionAddress,
   interventionLatLng,
   locatingAddress,
@@ -84,6 +97,17 @@ export default function RequesterStepAddressSubmit({
           <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />
         </div>
       </div>
+
+      <InterventionPriceEstimateCard
+        problemTemplateId={problemTemplateId}
+        problemLabel={problemLabel}
+        problem={description}
+        category="serrurerie"
+        address={interventionAddress}
+        urgency={urgency}
+        requestedDate={interventionDate}
+        requestedTime={interventionTime}
+      />
 
       <div className="shrink-0 pb-1">
         <button

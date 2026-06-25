@@ -10,6 +10,7 @@ import type { InterventionRequestData, RequesterProfile } from "@/context/Reques
 import { capitalizeName } from "@/utils/stringUtils";
 import { normalizePortalEmail } from "@/features/interventions/portalEmail";
 import { SMART_FORM_MAX_PHOTOS } from "@/features/interventions/hooks/useSmartForm";
+import { estimateInterventionBilling } from "@/features/interventions/estimateInterventionBilling";
 
 export type RequesterClientFields = {
   clientFirstRaw: string;
@@ -98,6 +99,7 @@ export async function buildRequesterInterventionDocPayload(params: {
   } = params;
 
   const {
+    problemTemplateId,
     problemLabel,
     description,
     urgency,
@@ -114,6 +116,17 @@ export async function buildRequesterInterventionDocPayload(params: {
   const hour =
     interventionTime ||
     new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+
+  const priceEstimate = estimateInterventionBilling({
+    problemTemplateId,
+    problemLabel,
+    problem: problemForDedupe,
+    category: "serrurerie",
+    address: interventionAddress.trim(),
+    urgency,
+    requestedDate: interventionDate,
+    requestedTime: interventionTime,
+  });
 
   return {
     title,
@@ -139,6 +152,15 @@ export async function buildRequesterInterventionDocPayload(params: {
     ...(clientEmailRaw ? { clientEmailNormalized: normalizePortalEmail(clientEmailRaw) } : {}),
     ...(interventionDate ? { requestedDate: interventionDate } : {}),
     ...(interventionTime ? { requestedTime: interventionTime } : {}),
+    ...(problemTemplateId ? { problemTemplateId } : {}),
+    ...(priceEstimate
+      ? {
+          billingLines: priceEstimate.lines,
+          invoiceAmountCents: priceEstimate.totalCents,
+          draftBillingSource: "template",
+          draftBillingPreparedAt: nowIso,
+        }
+      : {}),
     ...(audioUrlForDoc && isPersistableClientAudioUrl(audioUrlForDoc)
       ? { audioUrl: audioUrlForDoc }
       : {}),

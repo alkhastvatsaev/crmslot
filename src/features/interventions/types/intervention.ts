@@ -37,6 +37,8 @@ export interface Intervention {
   urgency?: boolean;
   category?: "serrurerie" | "autre";
   problem?: string | null;
+  /** Gabarit client (`SMART_FORM_TEMPLATES[].id`) — tarification automatique. */
+  problemTemplateId?: string | null;
   date?: string | null;
   hour?: string | null;
   createdAt?: string;
@@ -165,6 +167,8 @@ export interface Intervention {
   } | null;
   /** Rappels RDV déjà envoyés (clé = 24h | 2h | 30min, valeur = ISO sentAt). */
   appointmentRemindersSent?: Partial<Record<"24h" | "2h" | "30min", string>> | null;
+  /** Demande d'avis Google envoyée (ISO) — un seul envoi par dossier. */
+  googleReviewRequestSentAt?: string | null;
 
   // === Portail client + e-sign ===
   /** Token UUID d'accès portail client (lecture anonyme via API route). */
