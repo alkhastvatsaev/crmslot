@@ -973,6 +973,7 @@
   gap: var(--mobile-panel-gap);
   padding-inline: var(--mobile-shell-pad-x);
   box-sizing: border-box;
+  touch-action: pan-x pan-y;
 }
 
 .mobile-rail-segment {

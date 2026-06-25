@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState } from "react";
 
 /** Vrai si le layout hub est dans un panneau mobile visible (pas carte masquée). */
-export function useMobileHubPanelVisible(rootRef: RefObject<HTMLElement | null>): boolean {
+export function useMobileHubPanelVisible(element: HTMLElement | null): boolean {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
+    if (!element) return;
 
-    const panel = root.closest<HTMLElement>(".mobile-screen-host-panel");
+    const panel = element.closest<HTMLElement>(".mobile-screen-host-panel");
     if (!panel) {
       setVisible(true);
       return;
@@ -29,7 +28,7 @@ export function useMobileHubPanelVisible(rootRef: RefObject<HTMLElement | null>)
       attributeFilter: ["aria-hidden", "style"],
     });
     return () => observer.disconnect();
-  }, [rootRef]);
+  }, [element]);
 
   return visible;
 }

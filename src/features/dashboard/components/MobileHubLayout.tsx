@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect, useId, useMemo, type ReactNode } from "react";
+import { useState, useCallback, useEffect, useId, useMemo, type ReactNode } from "react";
 import { MOBILE_HUB_RAILS, type MobileHubRail } from "@/features/dashboard/dashboardMobileNav";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 import { useMobileHubPanelVisible } from "@/features/dashboard/hooks/useMobileHubPanelVisible";
@@ -77,10 +77,13 @@ export default function MobileHubLayout({
   mobileInitialRail = "center",
   swipeDisabled = false,
 }: Props) {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [rootNode, setRootNode] = useState<HTMLDivElement | null>(null);
+  const setRootRef = useCallback((node: HTMLDivElement | null) => {
+    setRootNode(node);
+  }, []);
   const registrationId = useId();
   const setRegistration = useMobileHubRailRegistration();
-  const panelVisible = useMobileHubPanelVisible(rootRef);
+  const panelVisible = useMobileHubPanelVisible(rootNode);
   const dockOnboarding = useMobileDockOnboardingOptional();
   const [rail, setRail] = useState<MobileHubRail>(mobileInitialRail);
 
@@ -133,7 +136,7 @@ export default function MobileHubLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeRail]);
 
-  usePanelSwipe(rootRef, navigateLeft, navigateRight, swipeDisabled);
+  usePanelSwipe(rootNode, navigateLeft, navigateRight, swipeDisabled);
 
   const innerClassFor = useCallback(
     (railKey: MobileHubRail) => {
@@ -177,11 +180,36 @@ export default function MobileHubLayout({
 
   return (
     <div
-      ref={rootRef}
+      ref={setRootRef}
       className={MOBILE_HUB_LAYOUT_CLASS}
       data-testid={rootTestId}
       data-mobile-hub-swipe-hint={swipeHintSide}
     >
+      {availableRails.length > 1 ? (
+        <div
+          className="mobile-rail-segment shrink-0"
+          role="tablist"
+          aria-label={centerLabel}
+          data-testid="mobile-hub-rail-tabs"
+        >
+          {availableRails.map((railKey) => (
+            <button
+              key={railKey}
+              type="button"
+              role="tab"
+              aria-selected={rail === railKey}
+              data-testid={`mobile-hub-rail-tab-${railKey}`}
+              className={cn(
+                "mobile-rail-segment-btn",
+                rail === railKey && "mobile-rail-segment-btn--active"
+              )}
+              onClick={() => pickRail(railKey)}
+            >
+              {labels[railKey]}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="mobile-hub-panel-stack relative flex min-h-0 min-w-0 flex-1 flex-col">
         {swipeHintSide ? (
           <div

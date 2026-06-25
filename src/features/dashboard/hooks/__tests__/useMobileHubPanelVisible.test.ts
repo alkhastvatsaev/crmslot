@@ -1,5 +1,4 @@
 import { renderHook } from "@testing-library/react";
-import { useRef } from "react";
 import { useMobileHubPanelVisible } from "@/features/dashboard/hooks/useMobileHubPanelVisible";
 
 describe("useMobileHubPanelVisible", () => {
@@ -12,10 +11,7 @@ describe("useMobileHubPanelVisible", () => {
     host.appendChild(root);
     document.body.appendChild(host);
 
-    const { result } = renderHook(() => {
-      const rootRef = useRef<HTMLDivElement>(root);
-      return useMobileHubPanelVisible(rootRef);
-    });
+    const { result } = renderHook(() => useMobileHubPanelVisible(root));
 
     expect(result.current).toBe(false);
 
