@@ -99,7 +99,10 @@ export default function BillingHubPage({ slotIndex = BILLING_HUB_SLOT_INDEX }: P
           className={`${documentsRailShell} min-h-0 overflow-hidden`}
           data-testid="billing-hub-documents-rail"
         >
-          <BillingHubRightPanel interventions={interventions} loading={loading} />
+          <BillingHubRightPanel
+            companyId={companyId || null}
+            isAdmin={workspace?.activeRole === "admin"}
+          />
         </section>
       }
     />

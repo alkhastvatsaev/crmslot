@@ -980,7 +980,23 @@
     "right_tabs": {
       "aria": "Панель счетов",
       "documents": "Документы",
-      "dossier": "Дело"
+      "surcharges": "Надбавки"
+    },
+    "surcharge": {
+      "hint": "Автоматическая надбавка в черновике счёта по запланированному слоту.",
+      "enabled": "Включить надбавки",
+      "line_label": "Название строки счёта",
+      "weekend": "Выходные",
+      "after_hour": "После часа",
+      "before_hour_optional": "До часа (необязательно)",
+      "hour": "Час (0–23)",
+      "hour_optional": "Час (пусто = выкл.)",
+      "rate_percent": "Ставка %",
+      "apply_to": "База расчёта",
+      "apply_subtotal": "Полный подитог",
+      "apply_excl_travel": "Подитог без выезда",
+      "save": "Сохранить надбавки",
+      "saved": "Надбавки сохранены"
     }
   },
   "teamHub": {
@@ -993,7 +1009,7 @@
       "chip_active": "Активные",
       "chip_all": "Все"
     },
-    "empty": "Нет сотрудников по этому фильтру.",
+    "empty": "Пока нет сотрудников.",
     "no_email": "E-mail не указан",
     "select_member": "Коснитесь имени слева.",
     "save": "Сохранить",
@@ -1027,14 +1043,49 @@
     },
     "aria": {
       "page": "Страница",
-      "left": "сводка",
+      "left": "добавление",
       "center": "список",
       "right": "профиль"
     },
     "mobile": {
-      "rail_left": "Сводка",
+      "rail_left": "Добавить",
       "rail_center": "Список",
       "rail_right": "Профиль"
+    },
+    "staff_kind": {
+      "dirigeant": "Руководитель",
+      "dispatcher": "Диспетчер",
+      "technician": "Техник"
+    },
+    "add": {
+      "title": "Добавить сотрудника",
+      "smart_title": "Обзор команды",
+      "smart_hint": "{{total}} человек · {{active}} активных · {{technicians}} в поле",
+      "contact_placeholder": "E-mail или телефон",
+      "contact_detected_email": "Аккаунт создан или привязан по e-mail",
+      "contact_detected_phone": "Приглашение по телефону",
+      "role_label": "Роль",
+      "submit": "Добавить",
+      "admin_only": "Только руководители могут добавлять сотрудников.",
+      "success_invite": "Приглашение создано — передайте этот ID:",
+      "success_existing": "Этот человек уже в команде.",
+      "success_created": "Аккаунт создан — отправьте ссылку для пароля:",
+      "success_member": "Сотрудник добавлен в команду.",
+      "eyebrow": "Новый",
+      "staff_kind_short": {
+        "dirigeant": "Рук.",
+        "dispatcher": "Дисп.",
+        "technician": "Тех."
+      },
+      "success_invite_short": "Приглашение готово",
+      "success_created_short": "Аккаунт создан",
+      "copy": "Копировать",
+      "copied": "Скопировано"
+    },
+    "staff_kind_short": {
+      "dirigeant": "Рук.",
+      "dispatcher": "Дисп.",
+      "technician": "Тех."
     }
   },
   "caseHub": {
@@ -1940,7 +1991,11 @@
       "invoice_review_alert_title": "Техник — счёт требует исправления",
       "technician_amendment_alert_title": "Отчёт изменён техником",
       "technician_amendment_alert_body": "{{name}} изменил информацию по этому выезду после закрытия.",
-      "unknown_technician": "Техник"
+      "unknown_technician": "Техник",
+      "tag_awaiting": "Ожидание",
+      "kind_awaiting": "Ожидает техника",
+      "detail_title_awaiting": "Миссия отправлена",
+      "awaiting_technician_response": "Ожидание ответа техника"
     },
     "toasts": {
       "request_deleted": "Заявка удалена",
@@ -2480,7 +2535,21 @@
       "login_required": "Требуется вход",
       "token_updated": "Токен обновлён",
       "sync_failed": "Синхронизация не удалась"
-    }
+    },
+    "google_review_title": "Отзывы Google",
+    "google_review_hint": "One separate email after a delay (48 h default), never mixed with status updates. Off by default.",
+    "google_review_enabled": "Enable Google review request",
+    "google_review_place_id": "Google Place ID (recommended)",
+    "google_review_url": "Or direct Google review URL (https://…)",
+    "google_review_trigger": "Send after",
+    "google_review_trigger_paid": "Payment received (recommended)",
+    "google_review_trigger_done": "Job completion form signed",
+    "google_review_delay": "Minimum delay (hours, {min}–{max})",
+    "google_review_save": "Save",
+    "google_review_saved": "Сохранено",
+    "google_review_need_link": "Добавьте карточку Google для активации.",
+    "google_review_subtitle": "1 письмо · через 48 ч после оплаты",
+    "google_review_link_placeholder": "Place ID или ссылка Google"
   },
   "planning": {
     "title": "Дневное расписание",

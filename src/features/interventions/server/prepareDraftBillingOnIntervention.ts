@@ -4,6 +4,7 @@ import {
   type DraftBillingLine,
 } from "@/features/interventions/draftInvoiceBilling";
 import type { Intervention } from "@/features/interventions/types";
+import { normalizeBillingSurchargeSettings } from "@/features/billing/billingSurchargeSettings";
 
 export type PrepareDraftBillingResult = {
   billingLines: DraftBillingLine[];
@@ -15,7 +16,7 @@ export type PrepareDraftBillingResult = {
 export async function prepareDraftBillingOnIntervention(
   db: admin.firestore.Firestore,
   interventionId: string,
-  opts?: { forceRegenerate?: boolean },
+  opts?: { forceRegenerate?: boolean }
 ): Promise<PrepareDraftBillingResult> {
   const snap = await db.collection("interventions").doc(interventionId).get();
   if (!snap.exists) {
@@ -23,14 +24,28 @@ export async function prepareDraftBillingOnIntervention(
   }
   const iv = { id: snap.id, ...snap.data() } as Intervention;
 
-  const pkg = await buildDraftBillingPackage(iv, opts);
-  await db.collection("interventions").doc(interventionId).update({
-    billingLines: pkg.lines,
-    invoiceAmountCents: pkg.invoiceAmountCents,
-    draftBillingSource: pkg.source,
-    draftBillingAiNote: pkg.aiNote ?? null,
-    draftBillingPreparedAt: new Date().toISOString(),
-  });
+  let surchargeSettings;
+  const companyId = typeof iv.companyId === "string" ? iv.companyId.trim() : "";
+  if (companyId) {
+    const companySnap = await db.collection("companies").doc(companyId).get();
+    if (companySnap.exists) {
+      surchargeSettings = normalizeBillingSurchargeSettings(
+        companySnap.data()?.billingSurchargeSettings
+      );
+    }
+  }
+
+  const pkg = await buildDraftBillingPackage(iv, { ...opts, surchargeSettings });
+  await db
+    .collection("interventions")
+    .doc(interventionId)
+    .update({
+      billingLines: pkg.lines,
+      invoiceAmountCents: pkg.invoiceAmountCents,
+      draftBillingSource: pkg.source,
+      draftBillingAiNote: pkg.aiNote ?? null,
+      draftBillingPreparedAt: new Date().toISOString(),
+    });
 
   return {
     billingLines: pkg.lines,

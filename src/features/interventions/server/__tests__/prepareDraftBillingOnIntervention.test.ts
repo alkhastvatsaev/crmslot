@@ -49,17 +49,17 @@ describe("prepareDraftBillingOnIntervention", () => {
 
     const result = await prepareDraftBillingOnIntervention(
       db as unknown as Parameters<typeof prepareDraftBillingOnIntervention>[0],
-      iv.id,
+      iv.id
     );
 
-    expect(mockBuild).toHaveBeenCalledWith(iv, undefined);
+    expect(mockBuild).toHaveBeenCalledWith(iv, { surchargeSettings: undefined });
     expect(db.__update).toHaveBeenCalledWith(
       expect.objectContaining({
         billingLines: [{ description: "Déplacement", quantity: 1, unitPriceCents: 4500 }],
         invoiceAmountCents: 4500,
         draftBillingSource: "template",
         draftBillingAiNote: "ok",
-      }),
+      })
     );
     expect(result.invoiceAmountCents).toBe(4500);
   });
@@ -75,8 +75,8 @@ describe("prepareDraftBillingOnIntervention", () => {
     await expect(
       prepareDraftBillingOnIntervention(
         db as unknown as Parameters<typeof prepareDraftBillingOnIntervention>[0],
-        "missing",
-      ),
+        "missing"
+      )
     ).rejects.toThrow("Intervention introuvable");
   });
 });

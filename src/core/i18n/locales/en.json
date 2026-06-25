@@ -980,7 +980,23 @@
     "right_tabs": {
       "aria": "Billing panel",
       "documents": "Documents",
-      "dossier": "Case"
+      "surcharges": "Surcharges"
+    },
+    "surcharge": {
+      "hint": "Automatic surcharge on draft invoices based on the scheduled slot.",
+      "enabled": "Enable surcharges",
+      "line_label": "Invoice line label",
+      "weekend": "Weekend",
+      "after_hour": "After hour",
+      "before_hour_optional": "Before hour (optional)",
+      "hour": "Hour (0–23)",
+      "hour_optional": "Hour (leave empty to disable)",
+      "rate_percent": "Rate %",
+      "apply_to": "Calculation base",
+      "apply_subtotal": "Full subtotal",
+      "apply_excl_travel": "Subtotal excluding travel",
+      "save": "Save surcharges",
+      "saved": "Surcharges saved"
     }
   },
   "teamHub": {
@@ -993,7 +1009,7 @@
       "chip_active": "Active",
       "chip_all": "All"
     },
-    "empty": "No employees for this filter.",
+    "empty": "No employees yet.",
     "no_email": "No email on file",
     "select_member": "Select an employee.",
     "save": "Save",
@@ -1027,17 +1043,52 @@
     },
     "aria": {
       "page": "Page",
-      "left": "summary",
+      "left": "add",
       "center": "list",
       "right": "profile"
     },
     "mobile": {
-      "rail_left": "Summary",
+      "rail_left": "Add",
       "rail_center": "Staff",
       "rail_right": "Profile"
     },
     "delete_account": "Delete account",
-    "delete_account_confirm": "Remove this employee from the company?"
+    "delete_account_confirm": "Remove this employee from the company?",
+    "staff_kind": {
+      "dirigeant": "Director",
+      "dispatcher": "Dispatcher",
+      "technician": "Technician"
+    },
+    "add": {
+      "title": "Add employee",
+      "smart_title": "Team overview",
+      "smart_hint": "{{total}} people · {{active}} active · {{technicians}} field",
+      "contact_placeholder": "Email or phone",
+      "contact_detected_email": "Account created or linked by email",
+      "contact_detected_phone": "Phone invitation",
+      "role_label": "Role",
+      "submit": "Add",
+      "admin_only": "Only directors can add employees.",
+      "success_invite": "Invitation created — share this ID:",
+      "success_existing": "This person is already on the team.",
+      "success_created": "Account created — send this password link:",
+      "success_member": "Employee added to the team.",
+      "eyebrow": "New",
+      "staff_kind_short": {
+        "dirigeant": "Lead",
+        "dispatcher": "Disp.",
+        "technician": "Tech."
+      },
+      "success_invite_short": "Invite ready",
+      "success_created_short": "Account created",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "staff_kind_short": {
+      "dirigeant": "Lead",
+      "dispatcher": "Disp.",
+      "technician": "Tech."
+    }
   },
   "caseHub": {
     "company_required": "Select a company.",
@@ -1942,7 +1993,11 @@
       "invoice_review_alert_title": "Technician — invoice needs correction",
       "technician_amendment_alert_title": "Report amended by technician",
       "technician_amendment_alert_body": "{{name}} modified this intervention's details after closure.",
-      "unknown_technician": "A technician"
+      "unknown_technician": "A technician",
+      "tag_awaiting": "Pending",
+      "kind_awaiting": "Awaiting technician",
+      "detail_title_awaiting": "Mission sent",
+      "awaiting_technician_response": "Waiting for the technician to respond"
     },
     "toasts": {
       "request_deleted": "Request deleted",
@@ -2482,7 +2537,21 @@
       "login_required": "Login required",
       "token_updated": "Token updated",
       "sync_failed": "Sync failed"
-    }
+    },
+    "google_review_title": "Google reviews",
+    "google_review_hint": "One separate email after a delay (48 h default), never mixed with status updates. Off by default.",
+    "google_review_enabled": "Enable Google review request",
+    "google_review_place_id": "Google Place ID (recommended)",
+    "google_review_url": "Or direct Google review URL (https://…)",
+    "google_review_trigger": "Send after",
+    "google_review_trigger_paid": "Payment received (recommended)",
+    "google_review_trigger_done": "Job completion form signed",
+    "google_review_delay": "Minimum delay (hours, {min}–{max})",
+    "google_review_save": "Save",
+    "google_review_saved": "Saved",
+    "google_review_need_link": "Add your Google listing to enable.",
+    "google_review_subtitle": "1 email · 48 h after payment",
+    "google_review_link_placeholder": "Place ID or Google link"
   },
   "planning": {
     "title": "Daily planning",

@@ -3,6 +3,8 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { BillingPaymentFilter } from "@/features/billingHub";
 
+export type BillingHubRightPanelTab = "documents" | "surcharges";
+
 type BillingHubIntentApi = {
   filter: BillingPaymentFilter;
   setFilter: (f: BillingPaymentFilter) => void;
@@ -10,6 +12,8 @@ type BillingHubIntentApi = {
   setSearch: (q: string) => void;
   selectedInterventionId: string | null;
   setSelectedInterventionId: (id: string | null) => void;
+  rightPanelTab: BillingHubRightPanelTab;
+  setRightPanelTab: (tab: BillingHubRightPanelTab) => void;
 };
 
 const BillingHubIntentContext = createContext<BillingHubIntentApi | null>(null);
@@ -18,11 +22,15 @@ export function BillingHubIntentProvider({ children }: { children: ReactNode }) 
   const [filter, setFilterState] = useState<BillingPaymentFilter>("all");
   const [search, setSearchState] = useState("");
   const [selectedInterventionId, setSelectedInterventionIdState] = useState<string | null>(null);
+  const [rightPanelTab, setRightPanelTabState] = useState<BillingHubRightPanelTab>("documents");
 
   const setFilter = useCallback((f: BillingPaymentFilter) => setFilterState(f), []);
   const setSearch = useCallback((q: string) => setSearchState(q), []);
   const setSelectedInterventionId = useCallback((id: string | null) => {
     setSelectedInterventionIdState(id?.trim() ? id.trim() : null);
+  }, []);
+  const setRightPanelTab = useCallback((tab: BillingHubRightPanelTab) => {
+    setRightPanelTabState(tab);
   }, []);
 
   const value = useMemo(
@@ -33,8 +41,19 @@ export function BillingHubIntentProvider({ children }: { children: ReactNode }) 
       setSearch,
       selectedInterventionId,
       setSelectedInterventionId,
+      rightPanelTab,
+      setRightPanelTab,
     }),
-    [filter, setFilter, search, setSearch, selectedInterventionId, setSelectedInterventionId]
+    [
+      filter,
+      setFilter,
+      search,
+      setSearch,
+      selectedInterventionId,
+      setSelectedInterventionId,
+      rightPanelTab,
+      setRightPanelTab,
+    ]
   );
 
   return (

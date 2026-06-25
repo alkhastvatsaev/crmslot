@@ -980,7 +980,23 @@
     "right_tabs": {
       "aria": "Panneau facturation",
       "documents": "Documents",
-      "dossier": "Dossier"
+      "surcharges": "Majorations"
+    },
+    "surcharge": {
+      "hint": "Majoration automatique sur le brouillon de facture selon le créneau planifié.",
+      "enabled": "Activer les majorations",
+      "line_label": "Libellé ligne facture",
+      "weekend": "Week-end",
+      "after_hour": "Après l'heure",
+      "before_hour_optional": "Avant l'heure (optionnel)",
+      "hour": "Heure (0–23)",
+      "hour_optional": "Heure (vide = désactivé)",
+      "rate_percent": "Taux %",
+      "apply_to": "Base de calcul",
+      "apply_subtotal": "Sous-total complet",
+      "apply_excl_travel": "Sous-total hors déplacement",
+      "save": "Enregistrer les majorations",
+      "saved": "Majorations enregistrées"
     }
   },
   "teamHub": {
@@ -993,7 +1009,7 @@
       "chip_active": "Actifs",
       "chip_all": "Tous"
     },
-    "empty": "Aucun employé pour ce filtre.",
+    "empty": "Aucun employé pour le moment.",
     "no_email": "E-mail non renseigné",
     "select_member": "Sélectionnez un employé.",
     "save": "Enregistrer",
@@ -1027,17 +1043,52 @@
     },
     "aria": {
       "page": "Page",
-      "left": "résumé",
+      "left": "ajout",
       "center": "liste",
       "right": "profil"
     },
     "mobile": {
-      "rail_left": "Résumé",
+      "rail_left": "Ajouter",
       "rail_center": "Liste",
       "rail_right": "Profil"
     },
     "delete_account": "Supprimer le compte",
-    "delete_account_confirm": "Retirer cet employé de la société ?"
+    "delete_account_confirm": "Retirer cet employé de la société ?",
+    "staff_kind": {
+      "dirigeant": "Dirigeant",
+      "dispatcher": "Dispatcher",
+      "technician": "Technicien"
+    },
+    "add": {
+      "title": "Ajouter un employé",
+      "smart_title": "Vue équipe",
+      "smart_hint": "{{total}} personnes · {{active}} actifs · {{technicians}} terrain",
+      "contact_placeholder": "E-mail ou téléphone",
+      "contact_detected_email": "Compte créé ou rattaché par e-mail",
+      "contact_detected_phone": "Invitation par téléphone",
+      "role_label": "Rôle",
+      "submit": "Ajouter",
+      "admin_only": "Seuls les dirigeants peuvent ajouter des employés.",
+      "success_invite": "Invitation créée — partagez cet identifiant :",
+      "success_existing": "Cette personne est déjà dans l'équipe.",
+      "success_created": "Compte créé — envoyez ce lien de mot de passe :",
+      "success_member": "Employé ajouté à l'équipe.",
+      "eyebrow": "Nouveau",
+      "staff_kind_short": {
+        "dirigeant": "Dir.",
+        "dispatcher": "Disp.",
+        "technician": "Tech."
+      },
+      "success_invite_short": "Invitation prête",
+      "success_created_short": "Compte créé",
+      "copy": "Copier",
+      "copied": "Copié"
+    },
+    "staff_kind_short": {
+      "dirigeant": "Dir.",
+      "dispatcher": "Disp.",
+      "technician": "Tech."
+    }
   },
   "caseHub": {
     "company_required": "Sélectionnez une société.",
@@ -1942,7 +1993,11 @@
       "invoice_review_alert_title": "Technicien — facture à corriger",
       "technician_amendment_alert_title": "Rapport modifié par le technicien",
       "technician_amendment_alert_body": "{{name}} a modifié les informations de cette intervention après clôture.",
-      "unknown_technician": "Un technicien"
+      "unknown_technician": "Un technicien",
+      "tag_awaiting": "En attente",
+      "kind_awaiting": "En attente technicien",
+      "detail_title_awaiting": "Mission envoyée",
+      "awaiting_technician_response": "En attente de la réponse du technicien"
     },
     "toasts": {
       "request_deleted": "Demande supprimée",
@@ -2482,7 +2537,21 @@
       "login_required": "Connexion requise",
       "token_updated": "Token mis à jour",
       "sync_failed": "Sync impossible"
-    }
+    },
+    "google_review_title": "Avis Google",
+    "google_review_hint": "Un seul email séparé, envoyé après un délai (48 h par défaut), jamais mélangé aux mails de suivi. Désactivé par défaut — activez seulement si votre fiche Google est à jour.",
+    "google_review_enabled": "Activer la demande d'avis Google",
+    "google_review_place_id": "Google Place ID (recommandé)",
+    "google_review_url": "Ou URL directe d'avis Google (https://…)",
+    "google_review_trigger": "Envoyer après",
+    "google_review_trigger_paid": "Paiement reçu (recommandé — moins intrusif)",
+    "google_review_trigger_done": "Clôture du bon d'intervention",
+    "google_review_delay": "Délai minimum (heures, entre {min} et {max})",
+    "google_review_save": "Enregistrer",
+    "google_review_saved": "Enregistré",
+    "google_review_need_link": "Ajoutez votre fiche Google pour activer.",
+    "google_review_subtitle": "1 email · 48 h après paiement",
+    "google_review_link_placeholder": "Place ID ou lien Google"
   },
   "planning": {
     "title": "Planning journalier",

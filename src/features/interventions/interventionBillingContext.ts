@@ -1,3 +1,9 @@
+import {
+  applyBillingSurchargeToLines,
+  DEFAULT_BILLING_SURCHARGE_SETTINGS,
+  resolveBillingSurchargeRatePercent,
+  type BillingSurchargeSettings,
+} from "@/features/billing/billingSurchargeSettings";
 import type { DraftBillingLine } from "@/features/interventions/draftInvoiceBilling";
 import type { Intervention } from "@/features/interventions/types";
 
@@ -5,8 +11,6 @@ const TRAVEL_STANDARD_CENTS = 3500;
 const TRAVEL_URGENT_CENTS = 4500;
 const TRAVEL_LONG_DISTANCE_CENTS = 5500;
 const LABOR_HOURLY_CENTS = 5500;
-const NIGHT_SURCHARGE_LINE = "Majoration soir / week-end";
-const NIGHT_SURCHARGE_RATE = 0.25;
 
 export type InterventionBillingContext = Partial<
   Pick<
@@ -61,16 +65,13 @@ export function resolveInterventionSchedule(iv: InterventionBillingContext): {
   return { dateYmd, timeHm };
 }
 
-export function isAfterHoursOrWeekend(dateYmd: string | null, timeHm: string | null): boolean {
-  if (dateYmd) {
-    const day = new Date(`${dateYmd}T12:00:00`).getDay();
-    if (day === 0 || day === 6) return true;
-  }
-  if (!timeHm) return false;
-  const match = /^(\d{1,2}):(\d{2})/.exec(timeHm);
-  if (!match) return false;
-  const hours = Number(match[1]);
-  return hours < 7 || hours >= 19;
+/** @deprecated Préférer resolveBillingSurchargeRatePercent + réglages société. */
+export function isAfterHoursOrWeekend(
+  dateYmd: string | null,
+  timeHm: string | null,
+  settings: BillingSurchargeSettings = DEFAULT_BILLING_SURCHARGE_SETTINGS
+): boolean {
+  return resolveBillingSurchargeRatePercent(dateYmd, timeHm, settings) > 0;
 }
 
 export function isLongDistanceAddress(address: string | null | undefined): boolean {
@@ -119,11 +120,12 @@ export function materialHintsFromPhotos(
 /** Règles déterministes avant / après enrichissement IA. */
 export function enrichDraftBillingLines(
   iv: InterventionBillingContext,
-  lines: DraftBillingLine[]
+  lines: DraftBillingLine[],
+  surchargeSettings: BillingSurchargeSettings = DEFAULT_BILLING_SURCHARGE_SETTINGS
 ): DraftBillingLine[] {
   const travelCents = resolveTravelUnitPriceCents(iv);
   const { dateYmd, timeHm } = resolveInterventionSchedule(iv);
-  const afterHours = isAfterHoursOrWeekend(dateYmd, timeHm);
+  const surchargeApplies = isAfterHoursOrWeekend(dateYmd, timeHm, surchargeSettings);
 
   let next = lines.map((line) => {
     if (normalizeTravelDescription(line.description)) {
@@ -162,32 +164,19 @@ export function enrichDraftBillingLines(
     }
   }
 
-  if (afterHours) {
-    const subtotal = next.reduce(
-      (sum, l) => sum + Math.round(l.unitPriceCents) * (l.quantity > 0 ? l.quantity : 1),
-      0
-    );
-    const surchargeCents = Math.round(subtotal * NIGHT_SURCHARGE_RATE);
-    const hasSurcharge = next.some((l) => l.description.toLowerCase().includes("majoration"));
-    if (surchargeCents > 0 && !hasSurcharge) {
-      next = [
-        ...next,
-        {
-          description: NIGHT_SURCHARGE_LINE,
-          quantity: 1,
-          unitPriceCents: surchargeCents,
-          reference: "majoration",
-        },
-      ];
-    }
+  if (surchargeApplies) {
+    next = applyBillingSurchargeToLines(next, dateYmd, timeHm, surchargeSettings);
   }
 
   return next.filter((l) => l.description.trim().length > 0);
 }
 
-export function buildInterventionBillingContextText(iv: InterventionBillingContext): string {
+export function buildInterventionBillingContextText(
+  iv: InterventionBillingContext,
+  surchargeSettings: BillingSurchargeSettings = DEFAULT_BILLING_SURCHARGE_SETTINGS
+): string {
   const { dateYmd, timeHm } = resolveInterventionSchedule(iv);
-  const afterHours = isAfterHoursOrWeekend(dateYmd, timeHm);
+  const surchargeRate = resolveBillingSurchargeRatePercent(dateYmd, timeHm, surchargeSettings);
   const photoHints = materialHintsFromPhotos(iv);
 
   return [
@@ -200,7 +189,7 @@ export function buildInterventionBillingContextText(iv: InterventionBillingConte
     dateYmd || timeHm ? `Créneau : ${[dateYmd, timeHm].filter(Boolean).join(" ")}` : null,
     iv.urgency ? "Urgence client : oui" : null,
     iv.priority ? `Priorité : ${iv.priority}` : null,
-    afterHours ? "Majoration soir/week-end applicable" : null,
+    surchargeRate > 0 ? `Majoration applicable : +${surchargeRate} %` : null,
     isLongDistanceAddress(iv.address) ? "Trajet long (hors Bruxelles proche)" : null,
     typeof iv.estimatedDurationMinutes === "number"
       ? `Durée prévue : ${iv.estimatedDurationMinutes} min`

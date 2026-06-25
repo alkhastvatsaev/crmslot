@@ -11,6 +11,9 @@ import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
+import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
+import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
+import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 import { useChatbotStreamSession } from "@/features/chatbot/hooks/useChatbotStreamSession";
 import { useChatbotInvoicesPanel } from "@/features/chatbot/hooks/useChatbotInvoicesPanel";
@@ -31,8 +34,15 @@ export function useChatbot() {
   const uid = workspace?.firebaseUid ?? "anon";
   const isMobile = useIsMobile();
   const inboxIntent = useBackofficeInboxIntentOptional();
+  const billingIntent = useBillingHubIntentOptional();
+  const railSnapshot = useMobileHubRailSnapshot();
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const documentVisible = useDocumentPageVisible();
+  const billingHubPageActive = pager?.pageIndex === BILLING_HUB_SLOT_INDEX;
+  const billingHubDocumentsTab =
+    billingHubPageActive && (billingIntent?.rightPanelTab ?? "documents") === "documents";
+  const billingHubDocumentsRailActive =
+    billingHubDocumentsTab && (isMobile !== true || railSnapshot?.activeRail === "right");
   const [streaming, setStreaming] = useState(false);
   const workspaceReady = workspace?.workspaceReady === true;
   const hasDocumentPreview = Boolean(documentPreviewApi.documentPreview.interventionId?.trim());
@@ -42,6 +52,7 @@ export function useChatbot() {
     documentVisible &&
     (isMobile !== true ||
       (powerGate.documentsTabActive && powerGate.inboxDataActive) ||
+      billingHubDocumentsRailActive ||
       hasDocumentPreview ||
       streaming)
   );

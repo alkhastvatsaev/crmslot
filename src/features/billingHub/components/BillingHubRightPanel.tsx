@@ -1,24 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
-import BillingHubRightAssistPanel from "@/features/billingHub/components/BillingHubRightAssistPanel";
-import type { Intervention } from "@/features/interventions";
-
-type BillingHubRightTab = "documents" | "dossier";
+import { useBillingHubIntent } from "@/context/BillingHubIntentContext";
+import ChatbotRightRail from "@/features/chatbot/components/ChatbotRightRail";
+import BillingSurchargeSettingsPanel from "@/features/billingHub/components/BillingSurchargeSettingsPanel";
+import type { BillingHubRightPanelTab } from "@/context/BillingHubIntentContext";
 
 type Props = {
-  interventions: Intervention[];
-  loading: boolean;
+  companyId: string | null;
+  isAdmin: boolean;
 };
 
-/** Panneau droit hub facturation — onglets Documents / Dossier (même pattern que l'inbox back-office). */
-export default function BillingHubRightPanel({ interventions, loading }: Props) {
+/** Panneau droit hub facturation — Documents PDF + réglages majorations. */
+export default function BillingHubRightPanel({ companyId, isAdmin }: Props) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<BillingHubRightTab>("documents");
+  const { rightPanelTab, setRightPanelTab } = useBillingHubIntent();
+  const [activeTab, setActiveTab] = useState<BillingHubRightPanelTab>(rightPanelTab);
+
+  useEffect(() => {
+    setActiveTab(rightPanelTab);
+  }, [rightPanelTab]);
+
+  const pickTab = (id: string) => {
+    const tab = id as BillingHubRightPanelTab;
+    setActiveTab(tab);
+    setRightPanelTab(tab);
+  };
 
   return (
     <div
@@ -30,7 +40,7 @@ export default function BillingHubRightPanel({ interventions, loading }: Props) 
     >
       <HubSegmentedControl
         value={activeTab}
-        onChange={(id) => setActiveTab(id as BillingHubRightTab)}
+        onChange={pickTab}
         ariaLabel={String(t("billingHub.right_tabs.aria"))}
         className="mx-4 my-4 shrink-0"
         options={[
@@ -41,9 +51,9 @@ export default function BillingHubRightPanel({ interventions, loading }: Props) 
             activeAccent: "slate",
           },
           {
-            id: "dossier",
-            label: t("billingHub.right_tabs.dossier"),
-            testId: "billing-hub-right-tab-dossier",
+            id: "surcharges",
+            label: t("billingHub.right_tabs.surcharges"),
+            testId: "billing-hub-right-tab-surcharges",
             activeAccent: "blue",
           },
         ]}
@@ -57,18 +67,18 @@ export default function BillingHubRightPanel({ interventions, loading }: Props) 
         aria-hidden={activeTab !== "documents"}
         data-testid="billing-hub-documents-panel"
       >
-        <ChatbotDocumentsRightPanel />
+        <ChatbotRightRail />
       </div>
 
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-4",
-          activeTab !== "dossier" && "hidden"
+          activeTab !== "surcharges" && "hidden"
         )}
-        aria-hidden={activeTab !== "dossier"}
-        data-testid="billing-hub-dossier-panel"
+        aria-hidden={activeTab !== "surcharges"}
+        data-testid="billing-hub-surcharges-panel"
       >
-        <BillingHubRightAssistPanel interventions={interventions} loading={loading} />
+        <BillingSurchargeSettingsPanel companyId={companyId} isAdmin={isAdmin} />
       </div>
     </div>
   );
