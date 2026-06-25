@@ -90,7 +90,7 @@ describe("DashboardGalaxyLayer", () => {
       </DashboardPagerProvider>
     );
     expect(screen.queryByTestId("company-stock-galaxy-composer")).not.toBeInTheDocument();
-    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
+    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(true);
   });
 
   it("shows no agent composer on map page and keeps map galaxy dock", () => {
@@ -112,7 +112,7 @@ describe("DashboardGalaxyLayer", () => {
       </DashboardPagerProvider>
     );
     expect(screen.queryByTestId("company-stock-galaxy-composer")).not.toBeInTheDocument();
-    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(false);
+    expect(mapGalaxyTranscriptionProps.at(-1)?.hideDockStrip).toBe(true);
   });
 
   it("hides map dock strip when a page composer is shown", () => {

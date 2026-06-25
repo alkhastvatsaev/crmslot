@@ -4,7 +4,7 @@ import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerConte
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
 
 describe("MobileScreenHost", () => {
-  it("affiche la page active et garde la carte montée en arrière-plan", () => {
+  it("ne monte que la page active (démontage thermique)", () => {
     render(
       <DashboardPagerProvider pageCount={3} initialPageIndex={1}>
         <DashboardPageSelectorProvider>
@@ -20,9 +20,8 @@ describe("MobileScreenHost", () => {
     );
 
     expect(screen.getByText("Page B")).toBeInTheDocument();
-    expect(screen.getByText("Page A")).toBeInTheDocument();
+    expect(screen.queryByText("Page A")).not.toBeInTheDocument();
     expect(screen.queryByText("Page C")).not.toBeInTheDocument();
-    expect(screen.getByText("Page A").closest("[aria-hidden=\'true\']")).toBeTruthy();
     expect(screen.getByText("Page B").closest("[aria-hidden=\'false\']")).toBeTruthy();
   });
 });

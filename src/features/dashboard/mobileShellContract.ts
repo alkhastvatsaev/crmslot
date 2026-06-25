@@ -9,7 +9,7 @@
  * (WebGL) ou le carrousel sans réintégrer le sélecteur de pages.
  */
 export const MOBILE_SHELL_CONTRACT = {
-  /** Page carte — toujours montée (navigation fluide). WebGL libéré hors écran côté Mapbox. */
+  /** Index page carte — montée seulement quand le pager est sur ce hub (pas de keep-alive). */
   mapPageIndex: 0,
   layout: {
     slotGridClass: "mobile-shell-slot-grid",
