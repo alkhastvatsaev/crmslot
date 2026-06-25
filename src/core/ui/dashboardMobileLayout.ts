@@ -28,6 +28,8 @@ export const MOBILE_CSS_VAR = {
   galaxyHeight: "--mobile-galaxy-height",
   panelRadius: "--mobile-panel-radius",
   panelGap: "--mobile-panel-gap",
+  controlRadius: "--mobile-control-radius",
+  controlRadiusNested: "--mobile-control-radius-nested",
   stackGap: "--mobile-stack-gap",
   panelWidth: "--mobile-panel-width",
   mapRecenterOffset: "--mobile-map-recenter-offset",
