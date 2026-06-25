@@ -2,13 +2,10 @@
 
 import type { ReactNode } from "react";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
-import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
-import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTopBar";
-import MobileShellGalaxyDockSlot from "@/features/dashboard/components/MobileShellGalaxyDockSlot";
+import MobileShellFooterDockRow from "@/features/dashboard/components/MobileShellFooterDockRow";
 import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
 import { useDashboardPageSelector } from "@/features/dashboard";
-import { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import {
@@ -17,14 +14,13 @@ import {
   MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
   MOBILE_SHELL_BODY_CLASS,
   MOBILE_SHELL_CLASS,
-  MOBILE_SHELL_FOOTER_CLASS,
   MOBILE_SHELL_HEADER_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
 import { cn } from "@/lib/utils";
 
 type Props = {
   children: ReactNode;
-  /** Dock bas : calendrier + Galaxy si actif (`MobileShellFooterDock`). */
+  /** Dock bas Galaxy (`MobileShellFooterDock`). */
   dock?: ReactNode;
 };
 
@@ -36,13 +32,12 @@ const accountOverlayClass = cn(
 
 /**
  * Chrome mobile admin — même grammaire que `MobileShell` / `TechnicianMobileShell` :
- * profil en haut · panneaux centraux (children) · calendrier + Galaxy en bas.
+ * profil en haut · panneaux centraux (children) · calendrier OU Galaxy en bas.
  */
 export default function AdminMobileShell({ children, dock }: Props) {
   const { view, close: closeOverlay, open: overlayOpen } = useDashboardPageSelector();
   const accountOpen = view === "account";
   const dockHintAttrs = useMobileShellDockHintAttrs();
-  const showGalaxyFooter = useMobileFooterGalaxyVisible();
 
   return (
     <div
@@ -88,26 +83,17 @@ export default function AdminMobileShell({ children, dock }: Props) {
         </div>
       </div>
 
-      <footer
-        className={MOBILE_SHELL_FOOTER_CLASS}
-        data-testid="admin-mobile-shell-footer"
-        data-admin-shell-dock="true"
-      >
-        {showGalaxyFooter ? null : (
-          <MobileCalendarFooterBar
-            toggleTarget="calendar"
-            footerTestId="admin-mobile-footer-calendar-bar"
-            railTestId="admin-mobile-footer-calendar-rail"
-            calendarTestId="admin-mobile-footer-calendar"
-          />
-        )}
-        {dock ? (
-          <MobileShellGalaxyDockSlot testId="admin-mobile-shell-dock">
-            {dock}
-          </MobileShellGalaxyDockSlot>
-        ) : null}
-        <MobileHubDotsBar />
-      </footer>
+      <MobileShellFooterDockRow
+        dock={dock}
+        galaxyDockTestId="admin-mobile-shell-dock"
+        footerTestId="admin-mobile-shell-footer"
+        calendar={{
+          toggleTarget: "calendar",
+          calendarBarTestId: "admin-mobile-footer-calendar-bar",
+          railTestId: "admin-mobile-footer-calendar-rail",
+          calendarTestId: "admin-mobile-footer-calendar",
+        }}
+      />
     </div>
   );
 }
