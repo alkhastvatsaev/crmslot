@@ -3,6 +3,8 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
+import { provisionTechnicianStaffRecord } from "@/features/company/server/provisionTechnicianStaff";
+import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
 import { writeAuditLog, auditMetaFromRequest } from "@/core/services/audit/writeAuditLog";
 
 export const runtime = "nodejs";
@@ -20,13 +22,8 @@ function phonesMatch(a: string | undefined, b: string | undefined): boolean {
   if (!da || !db) return false;
   if (da === db) return true;
 
-  // Si les deux sont en E.164 (préfixés +), exiger égalité stricte des digits —
-  // tolérer un suffixe commun ouvrait à des collisions inter-pays (cf. audit sécurité).
   if (ta.startsWith("+") && tb.startsWith("+")) return false;
 
-  // Fallback : un seul des deux est en E.164. On compare le numéro local au suffixe
-  // de l'E.164 — mais on exige une longueur locale réaliste (≥ 9 digits) ET on retire
-  // les zéros de tête nationaux (0 6 12 34 56 78 → 612345678) pour éviter les collisions.
   const stripLeadingZero = (s: string) => s.replace(/^0+/, "");
   const localA = ta.startsWith("+") ? null : stripLeadingZero(da);
   const localB = tb.startsWith("+") ? null : stripLeadingZero(db);
@@ -38,8 +35,13 @@ function phonesMatch(a: string | undefined, b: string | undefined): boolean {
   return false;
 }
 
+function resolveInviteRole(role: unknown): "admin" | "collaborateur" | null {
+  if (role === "admin" || role === "collaborateur") return role;
+  return null;
+}
+
 /**
- * Accepte une invitation : crée le doc membership collaborateur (Admin SDK, hors rules client).
+ * Accepte une invitation : crée le doc membership (Admin SDK, hors rules client).
  * Body : { inviteId: string }
  */
 export async function POST(req: Request) {
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
   const phoneFromAuth = decoded.phone_number;
   if (!phoneFromAuth) {
     return NextResponse.json(
-      { ok: false, error: "Connexion téléphone requise pour accepter l’invitation." },
+      { ok: false, error: "Connexion téléphone requise pour accepter l'invitation." },
       { status: 403 }
     );
   }
@@ -94,17 +96,21 @@ export async function POST(req: Request) {
     companyId?: string;
     phone?: string;
     role?: string;
+    staffKind?: string;
+    firstName?: string;
+    lastName?: string;
   };
 
   const companyId = typeof inv.companyId === "string" ? inv.companyId.trim() : "";
   const invitePhone = typeof inv.phone === "string" ? inv.phone.trim() : "";
-  if (!companyId || !invitePhone || inv.role !== "collaborateur") {
+  const membershipRole = resolveInviteRole(inv.role) ?? "collaborateur";
+  if (!companyId || !invitePhone) {
     return NextResponse.json({ ok: false, error: "Invitation invalide." }, { status: 400 });
   }
 
   if (!phonesMatch(phoneFromAuth, invitePhone)) {
     return NextResponse.json(
-      { ok: false, error: "Ce numéro ne correspond pas à l’invitation." },
+      { ok: false, error: "Ce numéro ne correspond pas à l'invitation." },
       { status: 403 }
     );
   }
@@ -122,26 +128,27 @@ export async function POST(req: Request) {
 
   await db.doc(`users/${uid}/company_memberships/${companyId}`).set({
     companyId,
-    role: "collaborateur",
+    role: membershipRole,
     joinedAt: FieldValue.serverTimestamp(),
     companyName,
+    active: true,
   });
 
-  await upsertCompanyStaffDirectoryEntry(db, companyId, uid, "collaborateur");
+  await upsertCompanyStaffDirectoryEntry(db, companyId, uid, membershipRole);
 
-  const snap = await db.collection(`users/${uid}/company_memberships`).get();
-  const tenants = snap.docs.map((d) => {
-    const role = (d.data().role as string) === "admin" ? "admin" : "collaborateur";
-    return `${d.id}:${role}`;
-  });
-  const fallbackActive = tenants.some((t) => t.startsWith(`${companyId}:`))
-    ? companyId
-    : (snap.docs[0]?.id ?? companyId);
+  if (inv.staffKind === "technician") {
+    await provisionTechnicianStaffRecord(db, {
+      uid,
+      companyId,
+      profile: {
+        firstName: typeof inv.firstName === "string" ? inv.firstName : "",
+        lastName: typeof inv.lastName === "string" ? inv.lastName : "",
+        email: decoded.email ?? null,
+      },
+    });
+  }
 
-  await admin.auth().setCustomUserClaims(uid, {
-    bmTenants: tenants,
-    bmActive: fallbackActive || null,
-  });
+  await syncTenantClaims(admin.auth, db, uid, companyId);
 
   await writeAuditLog({
     action: "company.accept_invite",
@@ -150,7 +157,7 @@ export async function POST(req: Request) {
     targetType: "company_invite",
     targetId: inviteId,
     ...auditMetaFromRequest(req),
-    meta: { tenantsCount: tenants.length },
+    meta: { staffKind: inv.staffKind ?? "dispatcher" },
   });
 
   return NextResponse.json({ ok: true, companyId });

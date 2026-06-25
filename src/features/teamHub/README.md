@@ -14,7 +14,7 @@ Hub Équipe (slot 5) : annuaire staff société, édition profils.
 ## Données
 
 - Firestore (serveur) : `companies/{id}/staff_directory`, `technicians`
-- API : `GET|PATCH /api/company/staff`
+- API : `GET|POST|PATCH /api/company/staff`
 
 ## Dépendances
 

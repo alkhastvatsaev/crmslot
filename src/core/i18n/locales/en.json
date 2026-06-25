@@ -2551,7 +2551,9 @@
     "google_review_saved": "Saved",
     "google_review_need_link": "Add your Google listing to enable.",
     "google_review_subtitle": "1 email · 48 h after payment",
-    "google_review_link_placeholder": "Place ID or Google link"
+    "google_review_link_placeholder": "Place ID or Google link",
+    "google_review_on": "On",
+    "google_review_off": "Off"
   },
   "planning": {
     "title": "Daily planning",

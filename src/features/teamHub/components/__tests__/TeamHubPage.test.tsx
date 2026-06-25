@@ -21,6 +21,7 @@ const staff: CompanyStaffMember[] = [
 jest.mock("@/context/CompanyWorkspaceContext", () => ({
   useCompanyWorkspaceOptional: () => ({
     activeCompanyId: "co-demo",
+    activeRole: "admin",
     workspaceReady: true,
   }),
 }));
@@ -34,12 +35,22 @@ jest.mock("@/features/teamHub/hooks/useCompanyStaff", () => ({
   }),
 }));
 
+jest.mock("@/features/teamHub/hooks/useCreateCompanyStaff", () => ({
+  useCreateCompanyStaff: () => ({
+    busy: false,
+    error: null,
+    lastResult: null,
+    createMember: jest.fn(),
+    clearFeedback: jest.fn(),
+  }),
+  COMPANY_STAFF_KIND_OPTIONS: ["dirigeant", "dispatcher", "technician"],
+}));
+
 describe("TeamHubPage premium patron", () => {
-  it("shows empty left rail and staff grid with all members", () => {
+  it("shows add member panel for admins and staff grid", () => {
     render(<TeamHubPage slotIndex={TEAM_HUB_SLOT_INDEX} />, { pageCount: 9 });
 
-    expect(screen.getByTestId("team-hub-left-empty")).toBeInTheDocument();
-    expect(screen.queryByTestId("team-hub-kpi-strip")).not.toBeInTheDocument();
+    expect(screen.getByTestId("team-hub-add-member-panel")).toBeInTheDocument();
     expect(screen.getByTestId("team-hub-staff-grid")).toBeInTheDocument();
     expect(screen.getByTestId("team-staff-row-uid-tech-1")).toBeInTheDocument();
     expect(screen.getByText("Jean")).toBeInTheDocument();

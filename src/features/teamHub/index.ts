@@ -6,15 +6,19 @@ export { default as TeamHubPage } from "@/features/teamHub/components/TeamHubPag
 export { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 export { useCompanyStaff } from "@/features/teamHub/hooks/useCompanyStaff";
 export { useCompanyStaffActions } from "@/features/teamHub/hooks/useCompanyStaffActions";
-export {
-  buildTeamHubKpis,
-  filterTeamStaff,
-  countForTeamFilter,
-} from "@/features/teamHub/teamHubPatronMetrics";
+export { useCreateCompanyStaff } from "@/features/teamHub/hooks/useCreateCompanyStaff";
+export { buildTeamHubKpis } from "@/features/teamHub/teamHubPatronMetrics";
 export type { TeamHubKpis } from "@/features/teamHub/teamHubPatronMetrics";
-export type { TeamHubStaffFilter } from "@/features/teamHub/teamHubTypes";
+export {
+  resolveCompanyStaffKind,
+  parseStaffContactInput,
+  companyStaffKindToMembershipRole,
+} from "@/features/teamHub/resolveCompanyStaffKind";
 export type {
   CompanyStaffMember,
   CompanyStaffRole,
+  CompanyStaffKind,
   CompanyStaffUpdateInput,
+  CreateCompanyStaffInput,
+  CreateCompanyStaffResult,
 } from "@/features/teamHub/types";

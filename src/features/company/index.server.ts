@@ -11,3 +11,4 @@ export { requireCompanyMember } from "@/features/company/server/requireCompanyMe
 export { setCompanyStaffActive } from "@/features/company/server/setCompanyStaffActive";
 export { removeCompanyStaffMember } from "@/features/company/server/removeCompanyStaffMember";
 export { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
+export { createCompanyStaffMember } from "@/features/company/server/createCompanyStaffMember";

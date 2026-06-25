@@ -8,13 +8,13 @@ import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import TeamHubStaffGrid from "@/features/teamHub/components/TeamHubStaffGrid";
 import TeamHubRightPanel from "@/features/teamHub/components/TeamHubRightPanel";
+import TeamHubAddMemberPanel from "@/features/teamHub/components/TeamHubAddMemberPanel";
 import { useCompanyStaff } from "@/features/teamHub/hooks/useCompanyStaff";
 import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
 } from "@/core/ui/dashboardDesktopLayout";
 import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
-import { cn } from "@/lib/utils";
 
 type Props = { slotIndex?: number };
 
@@ -29,6 +29,7 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { staff, loading, error, refresh } = useCompanyStaff(pageActive ? companyId : null);
+  const isAdmin = workspace?.activeRole === "admin";
 
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
 
@@ -66,11 +67,19 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
       rightPadding={false}
       leftShellClassName={dashboardTripleSideOpaqueShellClass}
       left={
-        <section
-          className={cn(sideShell, "bg-white")}
-          data-testid="team-hub-left-empty"
-          aria-hidden="true"
-        />
+        <section className={sideShell}>
+          {gate}
+          {companyId && !gate && isAdmin ? (
+            <TeamHubAddMemberPanel companyId={companyId} staff={staff} onRefresh={refresh} />
+          ) : companyId && !gate ? (
+            <div
+              data-testid="team-hub-add-admin-only"
+              className="flex min-h-0 flex-1 items-center justify-center px-4 text-center text-[12px] text-slate-500"
+            >
+              {t("teamHub.add.admin_only")}
+            </div>
+          ) : null}
+        </section>
       }
       center={
         <section className={mainShell}>

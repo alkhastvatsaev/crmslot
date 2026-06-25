@@ -2549,7 +2549,9 @@
     "google_review_saved": "Сохранено",
     "google_review_need_link": "Добавьте карточку Google для активации.",
     "google_review_subtitle": "1 письмо · через 48 ч после оплаты",
-    "google_review_link_placeholder": "Place ID или ссылка Google"
+    "google_review_link_placeholder": "Place ID или ссылка Google",
+    "google_review_on": "Вкл.",
+    "google_review_off": "Выкл."
   },
   "planning": {
     "title": "Дневное расписание",
