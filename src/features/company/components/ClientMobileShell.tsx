@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import MobileCalendarFooterBar from "@/features/dashboard/components/MobileCalendarFooterBar";
 import MobileProfileTopBar from "@/features/dashboard/components/MobileProfileTopBar";
 import ClientMobileProfileChip from "@/features/company/components/ClientMobileProfileChip";
-import { useMobileShellDockHintAttrs } from "@/features/dashboard/MobileDockOnboardingContext";
 import {
   MOBILE_SHELL_BODY_CLASS,
   MOBILE_SHELL_CLASS,
@@ -18,14 +17,11 @@ type Props = {
 
 /** Shell portail client — profil (header) + calendrier (footer), hub unique. */
 export default function ClientMobileShell({ children }: Props) {
-  const dockHintAttrs = useMobileShellDockHintAttrs();
-
   return (
     <div
       className={`${MOBILE_SHELL_CLASS} client-mobile-app`}
       data-mobile-shell
       data-testid="client-mobile-app"
-      {...dockHintAttrs}
     >
       <div
         id="dashboard-overlay-root"
@@ -49,6 +45,7 @@ export default function ClientMobileShell({ children }: Props) {
 
       <footer className={MOBILE_SHELL_FOOTER_CLASS} data-testid="client-mobile-shell-footer">
         <MobileCalendarFooterBar
+          interactive={false}
           footerTestId="client-mobile-footer-calendar-bar"
           railTestId="client-mobile-footer-calendar-rail"
           calendarTestId="client-mobile-footer-calendar"
