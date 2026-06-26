@@ -967,6 +967,32 @@
   overflow: visible;
 }
 
+/**
+ * Overlay « Mon compte » dans TechnicianMobileShell / AdminMobileShell.
+ * Le hub (segment Missions/Détail/…) reste monté : sans couche opaque plein écran,
+ * le haut du rail transparaît sous le gap `.mobile-hub-layout` (surtout iOS WebKit).
+ */
+.mobile-shell-account-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: rgb(241 245 249);
+}
+
+.mobile-shell-account-overlay .mobile-hub-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  gap: 0;
+  padding-inline: var(--mobile-shell-pad-x);
+  padding-block: 0;
+  box-sizing: border-box;
+}
+
 [data-mobile-shell][data-page-selector-open="true"] #map,
 [data-mobile-shell][data-page-selector-open="true"] .mapboxgl-canvas,
 [data-mobile-shell][data-page-selector-open="true"] .mapboxgl-map {

@@ -3,10 +3,9 @@ import type { CommissionRule } from "@/features/commissions";
 import type { Intervention } from "@/features/interventions";
 import type { Technician } from "@/features/technicians";
 import {
-  buildTechnicianDocIdToAuthUidMap,
   findTechnicianByAssignUid,
   isTechnicianUidFallbackLabel,
-  resolveAssignedTechnicianUid,
+  resolveCanonicalTechnicianAssignUid,
   resolveTechnicianAuthUid,
   resolveTechnicianProfileLabel,
   technicianProfileInitial,
@@ -101,10 +100,8 @@ export function buildPatronTechnicianRows(params: {
     ensure(canonicalUid, name, initial, alternates);
   }
 
-  const assignUidByDocId = buildTechnicianDocIdToAuthUidMap(params.technicians);
-
   const resolveAssignedUid = (rawUid: string): string =>
-    resolveAssignedTechnicianUid(rawUid, assignUidByDocId);
+    resolveCanonicalTechnicianAssignUid(params.technicians, rawUid);
 
   for (const iv of params.interventions) {
     if (interventionCommissionMonth(iv) !== monthKey) continue;

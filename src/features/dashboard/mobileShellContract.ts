@@ -82,6 +82,7 @@ export const MOBILE_SHELL_CONTRACT = {
       "gap: var(--mobile-stack-gap)",
       ".mobile-screen-host",
       ".mobile-screen-host-panel--selector",
+      ".mobile-shell-account-overlay",
       ".mobile-hub-rail-layer",
       ".mobile-header-rail-host",
     ],

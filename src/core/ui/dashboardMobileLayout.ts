@@ -61,6 +61,9 @@ export const MOBILE_SCREEN_HOST_PANEL_CLASS = "mobile-screen-host-panel";
 export const MOBILE_SCREEN_HOST_PANEL_BASE_CLASS = "mobile-screen-host-panel--base";
 export const MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS = "mobile-screen-host-panel--selector";
 
+/** Overlay compte terrain/admin — plein corps, fond opaque (évite le rail hub visible sur iOS). */
+export const MOBILE_SHELL_ACCOUNT_OVERLAY_CLASS = "mobile-shell-account-overlay";
+
 export const MOBILE_TOP_BAR_CLASS = "mobile-top-bar";
 
 export const MOBILE_TAB_BAR_CLASS = "mobile-tab-bar";

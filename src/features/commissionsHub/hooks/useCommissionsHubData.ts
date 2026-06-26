@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { auth, firestore } from "@/core/config/firebase";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { logger } from "@/core/logger";
@@ -19,10 +19,26 @@ import type {
   CommissionValueType,
 } from "@/features/commissions/types";
 import { useBackOfficeInterventions } from "@/features/backoffice/useBackOfficeInterventions";
+import { mergeCommissionsHubInterventions } from "@/features/commissionsHub/commissionsHubInterventionsScope";
+import { useCommissionsHubSupplementalInterventions } from "@/features/commissionsHub/hooks/useCommissionsHubSupplementalInterventions";
+import type { Technician } from "@/features/technicians";
 
-export function useCommissionsHubData(companyId: string | null) {
+export function useCommissionsHubData(companyId: string | null, technicians: Technician[] = []) {
   const { rules, loading: rulesLoading } = useCommissionRules(companyId);
-  const { interventions, loading: interventionsLoading } = useBackOfficeInterventions(companyId);
+  const { interventions: companyInterventions, loading: interventionsLoading } =
+    useBackOfficeInterventions(companyId);
+  const { supplementalInterventions, supplementalLoading } =
+    useCommissionsHubSupplementalInterventions(companyId, technicians);
+
+  const interventions = useMemo(() => {
+    if (!companyId) return companyInterventions;
+    return mergeCommissionsHubInterventions(
+      companyId,
+      companyInterventions,
+      supplementalInterventions,
+      technicians
+    );
+  }, [companyId, companyInterventions, supplementalInterventions, technicians]);
   const [manualEntries, setManualEntries] = useState<ManualCommissionEntry[]>([]);
   const [manualLoading, setManualLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -174,7 +190,7 @@ export function useCommissionsHubData(companyId: string | null) {
     interventions,
     manualEntries,
     rulesLoading,
-    interventionsLoading,
+    interventionsLoading: interventionsLoading || supplementalLoading,
     manualLoading,
     saving,
     saveRule,

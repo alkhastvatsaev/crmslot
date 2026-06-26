@@ -81,12 +81,42 @@ export function buildTechnicianDocIdToAuthUidMap(technicians: Technician[]): Map
   return map;
 }
 
+/** Tous les alias connus (id doc + authUid) → UID canonique pour agrégats commissions. */
+export function buildTechnicianAssignUidToCanonicalMap(
+  technicians: Technician[]
+): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const tech of technicians) {
+    const docId = tech.id.trim();
+    const authUid = resolveTechnicianAuthUid(tech);
+    const canonical = authUid || docId;
+    if (!canonical) continue;
+    map.set(canonical, canonical);
+    if (docId) map.set(docId, canonical);
+    if (authUid) map.set(authUid, canonical);
+  }
+  return map;
+}
+
 export function resolveAssignedTechnicianUid(
   rawUid: string,
   docIdToAuthUid: Map<string, string>
 ): string {
   const trimmed = rawUid.trim();
   return docIdToAuthUid.get(trimmed) ?? trimmed;
+}
+
+export function resolveCanonicalTechnicianAssignUid(
+  technicians: Technician[],
+  rawUid: string
+): string {
+  const trimmed = rawUid.trim();
+  if (!trimmed) return "";
+  const map = buildTechnicianAssignUidToCanonicalMap(technicians);
+  if (map.has(trimmed)) return map.get(trimmed)!;
+  const tech = findTechnicianByAssignUid(technicians, trimmed);
+  if (!tech) return trimmed;
+  return resolveTechnicianAuthUid(tech) || tech.id.trim() || trimmed;
 }
 
 export function isTechnicianUidFallbackLabel(name: string, uid: string): boolean {
