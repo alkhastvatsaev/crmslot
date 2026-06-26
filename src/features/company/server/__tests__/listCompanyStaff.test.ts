@@ -4,45 +4,64 @@
 import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 
 const mockGetUser = jest.fn();
+const mockGetUsers = jest.fn();
 
 describe("listCompanyStaff", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetUser.mockResolvedValue({ email: "tech@abc.be", displayName: "Jean Martin" });
+    mockGetUser.mockResolvedValue({ uid: "uid", email: "tech@abc.be", displayName: "Jean Martin" });
+    mockGetUsers.mockImplementation(async (identifiers: { uid: string }[]) => ({
+      users: identifiers.map((id) => ({
+        uid: id.uid,
+        email: id.uid === "uid-admin-1" ? "admin@abc.be" : "tech@abc.be",
+        displayName: id.uid === "uid-admin-1" ? "Admin ABC" : "Jean Martin",
+      })),
+      notFound: [],
+    }));
   });
 
+  function makeAuth() {
+    return jest.fn(() => ({ getUser: mockGetUser, getUsers: mockGetUsers }));
+  }
+
   it("merges membership role with technician profile", async () => {
-    const technicianDoc = {
-      get: jest.fn().mockResolvedValue({
-        exists: true,
-        data: () => ({
-          companyId: "co-abc",
-          authUid: "uid-tech-1",
-          name: "Jean Martin",
-          firstName: "Jean",
-          lastName: "Martin",
-          email: "tech@abc.be",
-          active: true,
-        }),
-      }),
+    const technicianData = {
+      companyId: "co-abc",
+      authUid: "uid-tech-1",
+      name: "Jean Martin",
+      firstName: "Jean",
+      lastName: "Martin",
+      email: "tech@abc.be",
+      active: true,
     };
 
-    const staffDirectoryGet = jest.fn().mockResolvedValue({ docs: [] });
-
     const db = {
+      getAll: jest.fn((...refs: { path: string }[]) => {
+        const paths = refs.map((ref) => ref.path);
+        if (paths.some((path) => path.includes("company_memberships"))) {
+          return Promise.resolve([
+            {
+              exists: true,
+              ref: { parent: { parent: { id: "uid-tech-1" } } },
+              data: () => ({ role: "collaborateur" }),
+            },
+          ]);
+        }
+        return Promise.resolve([]);
+      }),
       collection: jest.fn((name: string) => {
         if (name === "technicians") {
           return {
             where: jest.fn(() => ({
               get: jest.fn().mockResolvedValue({
-                docs: [{ id: "uid-tech-1" }],
+                docs: [{ id: "uid-tech-1", data: () => technicianData }],
               }),
             })),
-            doc: jest.fn(() => technicianDoc),
+            doc: jest.fn(),
           };
         }
         if (name === "companies/co-abc/staff_directory") {
-          return { get: staffDirectoryGet };
+          return { get: jest.fn().mockResolvedValue({ docs: [] }) };
         }
         if (name === "companies") {
           return {
@@ -53,25 +72,10 @@ describe("listCompanyStaff", () => {
         }
         throw new Error(name);
       }),
-      doc: jest.fn((path: string) => {
-        if (path === "users/uid-tech-1/company_memberships/co-abc") {
-          return {
-            get: jest.fn().mockResolvedValue({
-              exists: true,
-              data: () => ({ role: "collaborateur" }),
-            }),
-          };
-        }
-        if (path === "companies/co-abc/staff_directory/uid-tech-1") {
-          return { set: jest.fn().mockResolvedValue(undefined) };
-        }
-        throw new Error(path);
-      }),
+      doc: jest.fn((path: string) => ({ path })),
     };
 
-    const auth = jest.fn(() => ({ getUser: mockGetUser }));
-
-    const staff = await listCompanyStaff(db as never, auth as never, "co-abc");
+    const staff = await listCompanyStaff(db as never, makeAuth() as never, "co-abc");
 
     expect(staff).toHaveLength(1);
     expect(staff[0]).toMatchObject({
@@ -82,21 +86,34 @@ describe("listCompanyStaff", () => {
       hasTechnicianProfile: true,
       authUid: "uid-tech-1",
     });
+    expect(mockGetUsers).toHaveBeenCalled();
   });
 
   it("inclut les admins listés dans staff_directory sans fiche technicien", async () => {
-    const technicianDoc = {
-      get: jest.fn().mockResolvedValue({ exists: false }),
-    };
-
     const db = {
+      getAll: jest.fn((...refs: { path: string }[]) => {
+        const paths = refs.map((ref) => ref.path);
+        if (paths.some((path) => path.includes("company_memberships"))) {
+          return Promise.resolve([
+            {
+              exists: true,
+              ref: { parent: { parent: { id: "uid-admin-1" } } },
+              data: () => ({ role: "admin" }),
+            },
+          ]);
+        }
+        if (paths.some((path) => path.startsWith("technicians/"))) {
+          return Promise.resolve([{ exists: false, id: "uid-admin-1" }]);
+        }
+        return Promise.resolve([]);
+      }),
       collection: jest.fn((name: string) => {
         if (name === "technicians") {
           return {
             where: jest.fn(() => ({
               get: jest.fn().mockResolvedValue({ docs: [] }),
             })),
-            doc: jest.fn(() => technicianDoc),
+            doc: jest.fn((uid: string) => ({ path: `technicians/${uid}` })),
           };
         }
         if (name === "companies/co-abc/staff_directory") {
@@ -115,27 +132,10 @@ describe("listCompanyStaff", () => {
         }
         throw new Error(name);
       }),
-      doc: jest.fn((path: string) => {
-        if (path === "users/uid-admin-1/company_memberships/co-abc") {
-          return {
-            get: jest.fn().mockResolvedValue({
-              exists: true,
-              data: () => ({ role: "admin" }),
-            }),
-          };
-        }
-        if (path.startsWith("companies/co-abc/staff_directory/")) {
-          return { set: jest.fn().mockResolvedValue(undefined) };
-        }
-        throw new Error(path);
-      }),
+      doc: jest.fn((path: string) => ({ path })),
     };
 
-    const auth = jest.fn(() => ({
-      getUser: jest.fn().mockResolvedValue({ email: "admin@abc.be", displayName: "Admin ABC" }),
-    }));
-
-    const staff = await listCompanyStaff(db as never, auth as never, "co-abc");
+    const staff = await listCompanyStaff(db as never, makeAuth() as never, "co-abc");
 
     expect(staff).toHaveLength(1);
     expect(staff[0]).toMatchObject({

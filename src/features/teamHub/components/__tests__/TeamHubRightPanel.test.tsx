@@ -70,11 +70,48 @@ describe("TeamHubRightPanel", () => {
     await waitFor(() =>
       expect(fetchWithAuth).toHaveBeenCalledWith(
         "/api/company/staff/uid-tech-1?companyId=co-abc",
-        expect.objectContaining({ method: "PATCH" })
+        expect.objectContaining({
+          method: "PATCH",
+          body: expect.stringContaining('"staffKind":"technician"'),
+        })
       )
     );
     expect(onRefresh).toHaveBeenCalled();
   });
+
+  it("allows changing staff role before save", async () => {
+    const { fetchWithAuth } = jest.requireMock("@/core/api/fetchWithAuth") as {
+      fetchWithAuth: jest.Mock;
+    };
+    fetchWithAuth.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    });
+
+    render(
+      <TeamHubRightPanel
+        companyId="co-abc"
+        staff={staff}
+        selectedUid="uid-tech-1"
+        onClearSelection={jest.fn()}
+        onRefresh={jest.fn().mockResolvedValue(undefined)}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("team-staff-edit-role-dispatcher"));
+    fireEvent.click(screen.getByTestId("team-staff-save"));
+
+    await waitFor(() =>
+      expect(fetchWithAuth).toHaveBeenCalledWith(
+        "/api/company/staff/uid-tech-1?companyId=co-abc",
+        expect.objectContaining({
+          method: "PATCH",
+          body: expect.stringContaining('"staffKind":"dispatcher"'),
+        })
+      )
+    );
+  });
+
   it("shows delete account action", () => {
     render(
       <TeamHubRightPanel

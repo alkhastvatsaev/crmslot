@@ -49,6 +49,10 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
     [refresh, upsertStaffMember]
   );
 
+  const handleRefresh = useCallback(async () => {
+    await refresh();
+  }, [refresh]);
+
   const gate =
     companyPhase === "loading" ? (
       <div
@@ -133,7 +137,7 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
               staff={staff}
               selectedUid={selectedUid}
               onClearSelection={() => setSelectedUid(null)}
-              onRefresh={refresh}
+              onRefresh={handleRefresh}
             />
           ) : null}
         </section>

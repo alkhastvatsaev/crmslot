@@ -21,6 +21,7 @@ export type CompanyStaffUpdateInput = {
   lastName?: string;
   email?: string | null;
   vehicle?: string;
+  staffKind?: CompanyStaffKind;
 };
 
 export type CreateCompanyStaffInput = {
