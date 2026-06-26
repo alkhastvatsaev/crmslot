@@ -2,10 +2,7 @@ import type * as admin from "firebase-admin";
 import type { CompanyStaffMember } from "@/features/teamHub";
 import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 import { buildTechnicianDisplayName } from "@/features/company/server/provisionTechnicianStaff";
-import {
-  listStaffDirectoryUids,
-  upsertCompanyStaffDirectoryEntry,
-} from "@/features/company/server/companyStaffDirectory";
+import { listStaffDirectoryUids } from "@/features/company/server/companyStaffDirectory";
 
 function splitDisplayName(displayName: string): { firstName: string; lastName: string } {
   const parts = displayName.trim().split(/\s+/).filter(Boolean);
@@ -14,32 +11,25 @@ function splitDisplayName(displayName: string): { firstName: string; lastName: s
   return { firstName: parts[0] ?? "", lastName: parts.slice(1).join(" ") };
 }
 
-type TechnicianRow = Record<string, unknown> | null;
+type TechnicianRow = Record<string, unknown> | null | undefined;
 
-async function buildStaffMember(
-  db: admin.firestore.Firestore,
-  auth: typeof admin.auth,
+function buildStaffMember(
   companyId: string,
   uid: string,
   membershipData: Record<string, unknown>,
-  techData: TechnicianRow
-): Promise<CompanyStaffMember> {
+  techData: TechnicianRow,
+  authUser?: admin.auth.UserRecord | null
+): CompanyStaffMember {
   const role = (membershipData.role as string) === "admin" ? "admin" : "collaborateur";
   const membershipActive = membershipData.active !== false;
 
-  const tech = techData;
+  const tech = techData ?? null;
   const techCompanyId = typeof tech?.companyId === "string" ? tech.companyId.trim() : "";
   const hasTechnicianProfile = Boolean(tech) && (!techCompanyId || techCompanyId === companyId);
 
-  let email = typeof tech?.email === "string" ? tech.email.trim() : "";
-  let authDisplayName = "";
-  try {
-    const userRecord = await auth().getUser(uid);
-    email = email || userRecord.email?.trim() || "";
-    authDisplayName = userRecord.displayName?.trim() ?? "";
-  } catch {
-    /* compte Auth supprimé */
-  }
+  const email =
+    (typeof tech?.email === "string" ? tech.email.trim() : "") || authUser?.email?.trim() || "";
+  const authDisplayName = authUser?.displayName?.trim() ?? "";
 
   const firstName =
     (typeof tech?.firstName === "string" ? tech.firstName.trim() : "") ||
@@ -75,68 +65,40 @@ async function buildStaffMember(
   };
 }
 
-async function loadMemberByUid(
-  db: admin.firestore.Firestore,
+async function loadAuthUsersByUid(
   auth: typeof admin.auth,
-  companyId: string,
-  uid: string
-): Promise<CompanyStaffMember | null> {
-  const membershipSnap = await db.doc(`users/${uid}/company_memberships/${companyId}`).get();
-  if (!membershipSnap.exists) return null;
+  uids: string[]
+): Promise<Map<string, admin.auth.UserRecord>> {
+  const byUid = new Map<string, admin.auth.UserRecord>();
+  const uniqueUids = [...new Set(uids.filter(Boolean))];
+  if (uniqueUids.length === 0) return byUid;
 
-  const techSnap = await db.collection("technicians").doc(uid).get();
-  const tech = techSnap.exists ? (techSnap.data() as Record<string, unknown>) : null;
-  const member = await buildStaffMember(
-    db,
-    auth,
-    companyId,
-    uid,
-    membershipSnap.data() ?? {},
-    tech
-  );
-
-  void upsertCompanyStaffDirectoryEntry(db, companyId, uid, member.role).catch(() => {});
-
-  return member;
-}
-
-async function listMembersFromTechnicians(
-  db: admin.firestore.Firestore,
-  auth: typeof admin.auth,
-  companyId: string
-): Promise<CompanyStaffMember[]> {
-  const techSnap = await db.collection("technicians").where("companyId", "==", companyId).get();
-  const members: CompanyStaffMember[] = [];
-
-  for (const techDoc of techSnap.docs) {
-    const member = await loadMemberByUid(db, auth, companyId, techDoc.id);
-    if (member) {
-      members.push(member);
+  for (let offset = 0; offset < uniqueUids.length; offset += 100) {
+    const chunk = uniqueUids.slice(offset, offset + 100);
+    try {
+      const batch = await auth().getUsers(chunk.map((uid) => ({ uid })));
+      for (const user of batch.users) {
+        byUid.set(user.uid, user);
+      }
+    } catch {
+      await Promise.all(
+        chunk.map(async (uid) => {
+          try {
+            const user = await auth().getUser(uid);
+            byUid.set(uid, user);
+          } catch {
+            /* compte Auth supprimé */
+          }
+        })
+      );
     }
   }
 
-  return members;
+  return byUid;
 }
 
-async function listMembersFromStaffDirectory(
-  db: admin.firestore.Firestore,
-  auth: typeof admin.auth,
-  companyId: string,
-  knownUids: Set<string>
-): Promise<CompanyStaffMember[]> {
-  const uids = await listStaffDirectoryUids(db, companyId);
-  const members: CompanyStaffMember[] = [];
-
-  for (const uid of uids) {
-    if (knownUids.has(uid)) continue;
-    const member = await loadMemberByUid(db, auth, companyId, uid);
-    if (member) {
-      members.push(member);
-      knownUids.add(uid);
-    }
-  }
-
-  return members;
+function membershipUidFromSnap(snap: admin.firestore.DocumentSnapshot): string | null {
+  return snap.ref.parent?.parent?.id ?? null;
 }
 
 /** Liste les membres d'une société (memberships + profil technicien optionnel). */
@@ -145,24 +107,58 @@ export async function listCompanyStaff(
   auth: typeof admin.auth,
   companyId: string
 ): Promise<CompanyStaffMember[]> {
-  const knownUids = new Set<string>();
-  const members: CompanyStaffMember[] = [];
+  const [techSnap, directoryUids, companySnap] = await Promise.all([
+    db.collection("technicians").where("companyId", "==", companyId).get(),
+    listStaffDirectoryUids(db, companyId),
+    db.collection("companies").doc(companyId).get(),
+  ]);
 
-  for (const member of await listMembersFromTechnicians(db, auth, companyId)) {
-    members.push(member);
-    knownUids.add(member.uid);
+  const techByUid = new Map<string, Record<string, unknown>>();
+  for (const techDoc of techSnap.docs) {
+    techByUid.set(techDoc.id, techDoc.data());
   }
 
-  members.push(...(await listMembersFromStaffDirectory(db, auth, companyId, knownUids)));
-
-  const companySnap = await db.collection("companies").doc(companyId).get();
+  const allUids = new Set<string>([...techByUid.keys(), ...directoryUids]);
   const createdByUid =
     typeof companySnap.data()?.createdByUid === "string"
       ? companySnap.data()!.createdByUid.trim()
       : "";
-  if (createdByUid && !knownUids.has(createdByUid)) {
-    const creator = await loadMemberByUid(db, auth, companyId, createdByUid);
-    if (creator) members.push(creator);
+  if (createdByUid) allUids.add(createdByUid);
+
+  const uids = [...allUids];
+  if (uids.length === 0) return [];
+
+  const missingTechUids = uids.filter((uid) => !techByUid.has(uid));
+  if (missingTechUids.length > 0) {
+    const missingTechSnaps = await db.getAll(
+      ...missingTechUids.map((uid) => db.collection("technicians").doc(uid))
+    );
+    for (const snap of missingTechSnaps) {
+      if (snap.exists) {
+        techByUid.set(snap.id, snap.data() ?? {});
+      }
+    }
+  }
+
+  const membershipSnaps = await db.getAll(
+    ...uids.map((uid) => db.doc(`users/${uid}/company_memberships/${companyId}`))
+  );
+  const membershipByUid = new Map<string, Record<string, unknown>>();
+  for (const snap of membershipSnaps) {
+    if (!snap.exists) continue;
+    const uid = membershipUidFromSnap(snap);
+    if (uid) membershipByUid.set(uid, snap.data() ?? {});
+  }
+
+  const authUsers = await loadAuthUsersByUid(auth, uids);
+
+  const members: CompanyStaffMember[] = [];
+  for (const uid of uids) {
+    const membershipData = membershipByUid.get(uid);
+    if (!membershipData) continue;
+    members.push(
+      buildStaffMember(companyId, uid, membershipData, techByUid.get(uid), authUsers.get(uid))
+    );
   }
 
   return stripLegacyDemoTechnicians(

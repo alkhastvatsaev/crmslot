@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { Loader2, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import HubButton from "@/core/ui/hub/HubButton";
-import type { CompanyStaffMember } from "@/features/teamHub/types";
+import HubSegmentedControl from "@/core/ui/hub/HubSegmentedControl";
+import type { CompanyStaffKind, CompanyStaffMember } from "@/features/teamHub/types";
 import { resolveCompanyStaffKind } from "@/features/teamHub/resolveCompanyStaffKind";
 import { useCompanyStaffActions } from "@/features/teamHub/hooks/useCompanyStaffActions";
+import { COMPANY_STAFF_KIND_OPTIONS } from "@/features/teamHub/hooks/useCreateCompanyStaff";
 
 type Props = {
   companyId: string;
@@ -28,6 +30,7 @@ export default function TeamHubRightPanel({
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [vehicle, setVehicle] = useState("");
+  const [staffKind, setStaffKind] = useState<CompanyStaffKind>("technician");
 
   const selected = staff.find((m) => m.uid === selectedUid) ?? null;
 
@@ -40,12 +43,14 @@ export default function TeamHubRightPanel({
       setLastName("");
       setEmail("");
       setVehicle("");
+      setStaffKind("technician");
       return;
     }
     setFirstName(selected.firstName);
     setLastName(selected.lastName);
     setEmail(selected.email ?? "");
     setVehicle(selected.vehicle ?? "");
+    setStaffKind(resolveCompanyStaffKind(selected));
     clearError();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUid]);
@@ -67,6 +72,7 @@ export default function TeamHubRightPanel({
       lastName,
       email: email.trim() || null,
       vehicle: vehicle.trim() || undefined,
+      staffKind,
     });
     if (ok) onClearSelection();
   };
@@ -95,10 +101,21 @@ export default function TeamHubRightPanel({
 
       <div className="rounded-[24px] border border-black/[0.06] bg-white/95 p-4 text-center">
         <p className="text-lg font-bold text-slate-900">{selected.displayName}</p>
-        <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-          {t(`teamHub.staff_kind.${resolveCompanyStaffKind(selected)}`)}
-        </p>
       </div>
+
+      <HubSegmentedControl
+        value={staffKind}
+        onChange={(id) => setStaffKind(id as CompanyStaffKind)}
+        ariaLabel={t("teamHub.add.role_label")}
+        layout="scroll"
+        size="compact"
+        options={COMPANY_STAFF_KIND_OPTIONS.map((kind) => ({
+          id: kind,
+          label: t(`teamHub.staff_kind_short.${kind}`),
+          title: t(`teamHub.staff_kind.${kind}`),
+          testId: `team-staff-edit-role-${kind}`,
+        }))}
+      />
 
       <div className="space-y-2 rounded-[20px] border border-black/[0.06] bg-white/95 p-3">
         <input

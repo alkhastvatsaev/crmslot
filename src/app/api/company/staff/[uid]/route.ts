@@ -6,10 +6,18 @@ import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdm
 import { updateCompanyStaffMember } from "@/features/company/server/updateCompanyStaffMember";
 import { setCompanyStaffActive } from "@/features/company/server/setCompanyStaffActive";
 import { removeCompanyStaffMember } from "@/features/company/server/removeCompanyStaffMember";
+import type { CompanyStaffKind } from "@/features/teamHub/types";
 
 export const runtime = "nodejs";
 
 type RouteContext = { params: Promise<{ uid: string }> };
+
+function parseStaffKind(value: unknown): CompanyStaffKind | undefined {
+  if (value === "dirigeant" || value === "dispatcher" || value === "technician") {
+    return value;
+  }
+  return undefined;
+}
 
 function parseCompanyId(req: Request): string {
   return new URL(req.url).searchParams.get("companyId")?.trim() ?? "";
@@ -41,6 +49,7 @@ export async function PATCH(req: Request, context: RouteContext) {
     lastName: typeof body.lastName === "string" ? body.lastName : undefined,
     email: typeof body.email === "string" ? body.email : body.email === null ? null : undefined,
     vehicle: typeof body.vehicle === "string" ? body.vehicle : undefined,
+    staffKind: parseStaffKind(body.staffKind),
   });
 
   if (!result.ok) {
