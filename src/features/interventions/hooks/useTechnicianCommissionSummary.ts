@@ -28,6 +28,7 @@ import {
 import type { Technician } from "@/features/technicians";
 import {
   findTechnicianByAssignUid,
+  resolveCanonicalTechnicianAssignUid,
   resolveTechnicianProfileLabel,
 } from "@/features/technicians/resolveTechnicianIdentity";
 
@@ -120,20 +121,26 @@ export function useTechnicianCommissionSummary(params: {
 
   const row = useMemo(() => {
     if (!activeCompanyId || !params.technicianUid?.trim()) return null;
-    const technicians = currentTechnician ? [currentTechnician] : [];
     const rows = buildPatronTechnicianRows({
       interventions: scopedInterventions,
       manualEntries: scopedManualEntries,
       rules,
       companyId: activeCompanyId,
-      technicians,
+      technicians: params.technicians,
     });
-    const uid = params.technicianUid.trim();
-    return rows.find((item) => item.uid === uid) ?? rows[0] ?? null;
+    const canonicalUid = resolveCanonicalTechnicianAssignUid(
+      params.technicians,
+      params.technicianUid
+    );
+    return (
+      rows.find((item) => item.uid === canonicalUid) ??
+      rows.find((item) => item.alternateTargetIds.includes(canonicalUid)) ??
+      null
+    );
   }, [
     activeCompanyId,
-    currentTechnician,
     params.technicianUid,
+    params.technicians,
     rules,
     scopedInterventions,
     scopedManualEntries,

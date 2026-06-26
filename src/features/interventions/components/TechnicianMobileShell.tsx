@@ -13,6 +13,7 @@ import {
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_CLASS,
   MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
+  MOBILE_SHELL_ACCOUNT_OVERLAY_CLASS,
   MOBILE_SHELL_BODY_CLASS,
   MOBILE_SHELL_CLASS,
   MOBILE_SHELL_FOOTER_CLASS,
@@ -27,7 +28,8 @@ type Props = {
 const accountOverlayClass = cn(
   MOBILE_SCREEN_HOST_PANEL_CLASS,
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
-  MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS
+  MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
+  MOBILE_SHELL_ACCOUNT_OVERLAY_CLASS
 );
 
 /**
@@ -65,7 +67,10 @@ export default function TechnicianMobileShell({ children }: Props) {
       <div className={`${MOBILE_SHELL_BODY_CLASS} min-h-0 flex-1`}>
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-hidden"
+            className={cn(
+              "flex min-h-0 flex-1 flex-col overflow-hidden",
+              accountOpen && "mobile-screen-host-panel--suspended"
+            )}
             aria-hidden={accountOpen ? true : undefined}
             inert={accountOpen ? true : undefined}
           >

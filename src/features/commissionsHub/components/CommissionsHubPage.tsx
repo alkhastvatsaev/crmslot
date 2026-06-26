@@ -63,7 +63,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     interventionsLoading,
     manualLoading,
     saveTechnicianRate,
-  } = useCommissionsHubData(pageActive ? companyId || null : null);
+  } = useCommissionsHubData(pageActive ? companyId || null : null, technicians);
 
   const patronKpis = useMemo(
     () => buildPatronCommissionKpis({ interventions, manualEntries, rules }),
