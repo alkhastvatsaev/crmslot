@@ -1049,6 +1049,11 @@
   box-shadow: var(--mobile-elevation-sm);
 }
 
+/* Portail client `/m/demande` — swipe entre panneaux, sans onglets ni tutoriel dock. */
+.client-mobile-app .mobile-rail-segment {
+  display: none;
+}
+
 .mobile-hub-panel-shell {
   flex: 1 1 auto;
   min-height: 0;
