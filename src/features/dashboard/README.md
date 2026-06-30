@@ -15,6 +15,14 @@ Shell admin CRMSLOT : carrousel 9 pages (`src/app/page.tsx`), layout desktop/mob
 | `components/MobileShell.tsx`               | Shell mobile                                                           |
 | `components/AdaptiveTriplePanelLayout.tsx` | Layout 3 panneaux hubs                                                 |
 | `hooks/useIsMobile.ts`                     | Détection mobile                                                       |
+| `hooks/useHubRailActive.ts`                | Rail hub actif — desktop = toujours true, mobile = snapshot rail       |
+
+## Contrat mobile / desktop
+
+- **Shell** : `LayoutShellProvider` (`mode="desktop"` | `"mobile"`) — source de vérité pour `useMobileHubLayout()`.
+- **Rails hub** : toute logique `MobileHubRailContext` dans un composant partagé doit passer par `useHubRailActive()` / `useHubAnyRailActive()` (jamais `useMobileHubRailSnapshot()` seul).
+- **Desktop** : `DashboardPager` garde toutes les pages montées ; `useHubPageActive` coupe les listeners Firestore hors page.
+- **Mobile** : `MobileScreenHost` démonte les hubs hors écran (thermique iOS).
 
 ## Données
 
@@ -35,5 +43,6 @@ Shell admin CRMSLOT : carrousel 9 pages (`src/app/page.tsx`), layout desktop/mob
 
 ```bash
 npm run test:mobile-shell
+npm run test:e2e:desktop
 npx jest src/features/dashboard --no-coverage
 ```

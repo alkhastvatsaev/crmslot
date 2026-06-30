@@ -1,11 +1,5 @@
-import type { ReactNode } from "react";
-import { render, screen, fireEvent } from "@/test-utils/render";
-import MobileShell from "@/features/dashboard/components/MobileShell";
-import { DateProvider } from "@/context/DateContext";
-import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
-import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
-import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
-import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
+import { screen, fireEvent } from "@/test-utils/render";
+import { renderMobileShell } from "@/test-utils/renderMobileShell";
 
 jest.mock("@/features/map/components/MapGalaxyTranscriptionLayer", () => ({
   __esModule: true,
@@ -26,23 +20,6 @@ jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
     signOut: jest.fn(),
   }),
 }));
-
-function renderMobileShell(pages: ReactNode[]) {
-  return render(
-    <DateProvider>
-      <GalaxyLayerBridgeProvider>
-        <MobileGalaxyComposerOpenProvider>
-          <DashboardPagerProvider pageCount={pages.length}>
-            <DashboardPageSelectorProvider>
-              <MobileShell pages={pages} />
-            </DashboardPageSelectorProvider>
-          </DashboardPagerProvider>
-        </MobileGalaxyComposerOpenProvider>
-      </GalaxyLayerBridgeProvider>
-    </DateProvider>
-  );
-}
-
 describe("MobileShell", () => {
   it("compose header, écran unique et footer", () => {
     renderMobileShell([<div key="0">Hub A</div>, <div key="1">Hub B</div>]);

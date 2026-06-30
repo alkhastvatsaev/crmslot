@@ -45,7 +45,11 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: [/mobile-shell\.spec\.ts/, /portal-chat-client-ui\.spec\.ts/],
+      testIgnore: [
+        /mobile-shell\.spec\.ts/,
+        /portal-chat-client-ui\.spec\.ts/,
+        /dashboard-desktop-hubs\.spec\.ts/,
+      ],
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
@@ -68,6 +72,18 @@ export default defineConfig({
       testMatch: /technician-mobile-app\.spec\.ts/,
       use: {
         ...devices["Pixel 7"],
+        launchOptions: {
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
+      },
+    },
+    {
+      name: "desktop-hubs",
+      testMatch: /dashboard-desktop-hubs\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+        storageState: process.env.PLAYWRIGHT_ADMIN_STORAGE_STATE,
         launchOptions: {
           args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
         },

@@ -9,11 +9,11 @@ import { useChatbotDocumentPreview } from "@/features/chatbot/hooks/useChatbotDo
 import { useChatbotSupplierOrdersPanel } from "@/features/chatbot/hooks/useChatbotSupplierOrdersPanel";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
-import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
 import { useChatbotStreamSession } from "@/features/chatbot/hooks/useChatbotStreamSession";
 import { useChatbotInvoicesPanel } from "@/features/chatbot/hooks/useChatbotInvoicesPanel";
@@ -35,14 +35,13 @@ export function useChatbot() {
   const isMobile = useIsMobile();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const billingIntent = useBillingHubIntentOptional();
-  const railSnapshot = useMobileHubRailSnapshot();
+  const billingHubRightRailActive = useHubRailActive("right");
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const documentVisible = useDocumentPageVisible();
   const billingHubPageActive = pager?.pageIndex === BILLING_HUB_SLOT_INDEX;
   const billingHubDocumentsTab =
     billingHubPageActive && (billingIntent?.rightPanelTab ?? "documents") === "documents";
-  const billingHubDocumentsRailActive =
-    billingHubDocumentsTab && (isMobile !== true || railSnapshot?.activeRail === "right");
+  const billingHubDocumentsRailActive = billingHubDocumentsTab && billingHubRightRailActive;
   const [streaming, setStreaming] = useState(false);
   const workspaceReady = workspace?.workspaceReady === true;
   const hasDocumentPreview = Boolean(documentPreviewApi.documentPreview.interventionId?.trim());

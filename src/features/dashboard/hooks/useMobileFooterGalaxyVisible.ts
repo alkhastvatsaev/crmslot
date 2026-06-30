@@ -1,8 +1,10 @@
 "use client";
 
 import { useFeatureFlag } from "@/core/useFeatureFlags";
+import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
 import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { useGalaxyLayerBridgeOptional } from "@/features/map/GalaxyLayerBridgeContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
@@ -20,13 +22,16 @@ export const MOBILE_HUB_AGENT_PAGE_INDICES = new Set([
 
 /** Rail agent / chatbot actif sur un hub mobile (panneau gauche). */
 export function useMobileHubAgentRailActive(): boolean {
+  const mobileHubLayout = useMobileHubLayout();
   const pager = useDashboardPagerOptional();
   const railSnapshot = useMobileHubRailSnapshot();
+  const leftRailActive = useHubRailActive("left");
   const pageIndex = pager?.pageIndex ?? MAP_PAGE_INDEX;
 
+  if (!mobileHubLayout) return false;
   if (!MOBILE_HUB_AGENT_PAGE_INDICES.has(pageIndex)) return false;
   if (!railSnapshot?.visible || !railSnapshot.rails.includes("left")) return false;
-  return railSnapshot.activeRail === "left";
+  return leftRailActive;
 }
 
 /** Afficher le dock Galaxy (saisie) à la place du calendrier — mobile uniquement. */

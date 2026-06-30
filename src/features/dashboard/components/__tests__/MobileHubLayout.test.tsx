@@ -1,21 +1,12 @@
 import type { ReactElement } from "react";
 import { fireEvent, render, screen } from "@/test-utils/render";
+import { swipeLeft, swipeRight } from "@/test-utils/mobileGestures";
 import MobileHubLayout from "@/features/dashboard/components/MobileHubLayout";
 import MobileHubDotsBar from "@/features/dashboard/components/MobileHubDotsBar";
 import {
   MobileHubRailProvider,
   useRequestMobileHubRail,
 } from "@/features/dashboard/MobileHubRailContext";
-
-function swipeLeft(el: HTMLElement) {
-  fireEvent.pointerDown(el, { clientX: 220, clientY: 200, pointerId: 1, pointerType: "touch" });
-  fireEvent.pointerMove(el, { clientX: 120, clientY: 200, pointerId: 1, pointerType: "touch" });
-}
-
-function swipeRight(el: HTMLElement) {
-  fireEvent.pointerDown(el, { clientX: 120, clientY: 200, pointerId: 1, pointerType: "touch" });
-  fireEvent.pointerMove(el, { clientX: 220, clientY: 200, pointerId: 1, pointerType: "touch" });
-}
 
 function renderMobileHubLayout(ui: ReactElement) {
   return render(
@@ -27,7 +18,7 @@ function renderMobileHubLayout(ui: ReactElement) {
 }
 
 describe("MobileHubLayout", () => {
-  it("affiche le rail centre par défaut", () => {
+  it("affiche le rail centre par défaut (un seul rail monté)", () => {
     renderMobileHubLayout(
       <MobileHubLayout
         rootTestId="mobile-hub-root"
@@ -46,13 +37,11 @@ describe("MobileHubLayout", () => {
       "true"
     );
     expect(screen.getByText("centre")).toBeVisible();
-    expect(screen.getByTestId("mobile-hub-left")).toHaveAttribute(
-      "data-mobile-hub-rail-active",
-      "false"
-    );
+    expect(screen.queryByTestId("mobile-hub-left")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mobile-hub-right")).not.toBeInTheDocument();
   });
 
-  it("garde le panneau centre monté (rails latéraux toujours en DOM)", () => {
+  it("ne monte que le rail actif (thermique)", () => {
     renderMobileHubLayout(
       <MobileHubLayout
         leftTestId="mobile-hub-left"
@@ -65,10 +54,8 @@ describe("MobileHubLayout", () => {
     );
 
     expect(screen.getByTestId("center-marker")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-hub-center")).toHaveAttribute(
-      "data-mobile-hub-rail-active",
-      "true"
-    );
+    expect(screen.queryByText("gauche")).not.toBeInTheDocument();
+    expect(screen.queryByText("droite")).not.toBeInTheDocument();
   });
 
   it("affiche les dots de position quand plusieurs panneaux", () => {

@@ -8,6 +8,7 @@ import { useMobileHubRailRegistration } from "@/features/dashboard/MobileHubRail
 import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import {
   MOBILE_HUB_PANEL_ANIMATED_CLASS,
+  MOBILE_HUB_RAIL_LAYER_ACTIVE_CLASS,
   MOBILE_HUB_RAIL_LAYER_CLASS,
   mobileHubRailLayerSideClass,
   stepMobileHubRail,
@@ -229,26 +230,29 @@ export default function MobileHubLayout({
           innerClassName="relative min-h-0 flex-1 flex-col overflow-hidden"
           style={{ position: "relative" }}
         >
-          {availableRails.map((railKey) => {
-            const active = rail === railKey;
+          {(() => {
+            const railKey = rail;
+            const panel = panels[RAIL_PANEL[railKey]];
+            if (!panel) return null;
+
             return (
               <div
                 key={railKey}
                 aria-label={labels[railKey]}
-                aria-hidden={!active}
                 data-testid={testIds[railKey]}
                 data-mobile-hub-rail={railKey}
-                data-mobile-hub-rail-active={active ? "true" : "false"}
+                data-mobile-hub-rail-active="true"
                 className={cn(
                   innerClassFor(railKey),
                   MOBILE_HUB_RAIL_LAYER_CLASS,
+                  MOBILE_HUB_RAIL_LAYER_ACTIVE_CLASS,
                   mobileHubRailLayerSideClass(railKey, rail, availableRails)
                 )}
               >
-                {active ? panels[RAIL_PANEL[railKey]] : null}
+                {panel}
               </div>
             );
-          })}
+          })()}
         </GlassPanel>
       </div>
     </div>

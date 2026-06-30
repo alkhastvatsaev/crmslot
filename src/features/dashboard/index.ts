@@ -41,6 +41,7 @@ export {
 } from "@/features/dashboard/dashboardCarouselRegistry";
 export { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 export { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
+export { useHubAnyRailActive, useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
 export { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
 export { useMobileFooterGalaxyVisible } from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 export { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";

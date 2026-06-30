@@ -4,8 +4,8 @@ import { useCallback, useState, type ReactNode } from "react";
 import { usePanelSwipe } from "@/features/dashboard/hooks/usePanelSwipe";
 import {
   MOBILE_HUB_PANEL_ANIMATED_CLASS,
+  MOBILE_HUB_RAIL_LAYER_ACTIVE_CLASS,
   MOBILE_HUB_RAIL_LAYER_CLASS,
-  mobileHubRailLayerSideClass,
 } from "@/features/dashboard/mobileHubRailMotion";
 import { cn } from "@/lib/utils";
 import { MOBILE_HEADER_RAIL_HOST_CLASS } from "@/core/ui/dashboardMobileLayout";
@@ -73,25 +73,24 @@ export default function MobileHeaderRailLayout({
       className={cn(MOBILE_HEADER_RAIL_HOST_CLASS, MOBILE_HUB_PANEL_ANIMATED_CLASS)}
       data-testid={rootTestId}
     >
-      {HEADER_RAILS.map((railKey) => {
-        const active = rail === railKey;
+      {(() => {
+        const railKey = rail;
         return (
           <div
             key={railKey}
-            aria-hidden={!active}
             data-testid={testIds[railKey]}
             data-mobile-header-rail={railKey}
-            data-mobile-header-rail-active={active ? "true" : "false"}
+            data-mobile-header-rail-active="true"
             className={cn(
               MOBILE_HUB_RAIL_LAYER_CLASS,
-              "mobile-header-rail-layer",
-              mobileHubRailLayerSideClass(railKey, rail, HEADER_RAILS)
+              MOBILE_HUB_RAIL_LAYER_ACTIVE_CLASS,
+              "mobile-header-rail-layer"
             )}
           >
             {panels[railKey]}
           </div>
         );
-      })}
+      })()}
     </div>
   );
 }

@@ -3,11 +3,11 @@
 import { useEffect, useState, useMemo } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
+import { useHubAnyRailActive, useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
 import TechnicianHubRightPanel from "@/features/interventions/components/TechnicianHubRightPanel";
 import { interventionOpenForTerrainPhotos } from "@/features/interventions/technicianCommissionScope";
-import { useTechnicians } from "@/features/technicians/hooks";
 import DailyMissions from "@/features/dashboard/components/DailyMissions";
 import type { Mission } from "@/features/map";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
@@ -54,21 +54,29 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
   const commandPaletteEnabled = useFeatureFlag("interventionCommandPalette");
   const geofenceAuto = useFeatureFlag("geofenceAuto");
   const documentPageVisible = useDocumentPageVisible();
-
-  const { interventions, firebaseUid } = useTechnicianAssignments();
-  const { technicians } = useTechnicians();
-  const missionDayAnchor = useTechnicianMissionDayAnchor();
-  const { logIntervention } = useActivityLog();
   const pageSelector = useDashboardPageSelectorOptional();
   const calendarOpen = pageSelector?.view === "calendar";
+  const accountOpen = pageSelector?.view === "account";
+  const hubOverlayOpen = calendarOpen || accountOpen;
+  const detailRailMounted =
+    useHubAnyRailActive(["center", "right"]) || Boolean(finishJobInterventionId);
+  const rightRailActive = useHubRailActive("right");
+
+  const { interventions, firebaseUid } = useTechnicianAssignments({
+    pollingEnabled: !hubOverlayOpen,
+  });
+  const missionDayAnchor = useTechnicianMissionDayAnchor();
+  const { logIntervention } = useActivityLog();
 
   const selectedFromList = useMemo(
     () => (selectedCaseId ? (interventions.find((x) => x.id === selectedCaseId) ?? null) : null),
     [selectedCaseId, interventions]
   );
 
-  /** Pas de 2e listener doc si la mission est déjà dans la query assignée (réduit race Firestore ca9). */
-  const needsDocListener = Boolean(selectedCaseId && !finishJobInterventionId && !selectedFromList);
+  /** Listener doc seulement si le panneau détail/photos est monté (thermique terrain). */
+  const needsDocListener = Boolean(
+    detailRailMounted && selectedCaseId && !finishJobInterventionId && !selectedFromList
+  );
   const liveFromSnapshot = useInterventionLive(needsDocListener ? selectedCaseId : null);
 
   const liveSelectedIntervention = selectedFromList ?? liveFromSnapshot;
@@ -178,7 +186,6 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         liveIntervention={liveSelectedIntervention}
         technicianUid={firebaseUid}
         interventions={interventions}
-        technicians={technicians}
       />
     </div>
   );
@@ -195,7 +202,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   return (
     <>
-      {geofenceAuto && documentPageVisible ? (
+      {geofenceAuto && documentPageVisible && !hubOverlayOpen && !rightRailActive ? (
         <TechnicianGeofenceWatcher missions={interventions} />
       ) : null}
       {commandPaletteEnabled ? (

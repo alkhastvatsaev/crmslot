@@ -28,6 +28,7 @@ export function useTechnicianAssignments(
   options: UseTechnicianAssignmentsOptions = {}
 ): UseTechnicianAssignmentsResult {
   const hookEnabled = options.enabled !== false;
+  const pollingEnabled = options.pollingEnabled !== false && hookEnabled;
   const queryClient = useQueryClient();
 
   const noFirebaseAuth = !isConfigured || !firestore || !auth;
@@ -129,7 +130,10 @@ export function useTechnicianAssignments(
   };
 
   useTechnicianAssignmentsResyncEffects(resyncParams);
-  useTechnicianAssignmentsPolling(resyncParams);
+  useTechnicianAssignmentsPolling({
+    ...resyncParams,
+    hookEnabled: pollingEnabled,
+  });
 
   return { interventions, loading, error, firebaseUid };
 }
