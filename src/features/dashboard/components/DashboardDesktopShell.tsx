@@ -23,9 +23,9 @@ import {
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
+import AdminMobileProfileChip from "@/features/dashboard/components/AdminMobileProfileChip";
 import ClockCalendar from "@/features/dashboard/components/ClockCalendar";
 import SpotlightSearch from "@/features/dashboard/components/SpotlightSearch";
-import UserProfile from "@/features/dashboard/components/UserProfile";
 
 type Props = {
   pager: ReactNode;
@@ -42,7 +42,7 @@ function DashboardDesktopHeader() {
       <aside
         className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-auto`}
       >
-        <ClockCalendar />
+        <ClockCalendar compact interactive variant="desktop" />
       </aside>
       <div
         className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center pointer-events-auto flex flex-col gap-2`}
@@ -52,7 +52,7 @@ function DashboardDesktopHeader() {
       <aside
         className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-auto`}
       >
-        <UserProfile interactive />
+        <AdminMobileProfileChip variant="desktop" />
       </aside>
     </>
   );

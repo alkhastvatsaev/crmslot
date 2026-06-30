@@ -5,6 +5,10 @@ import { useDateContext } from "@/context/DateContext";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useMobileDockOnboardingOptional } from "@/features/dashboard/MobileDockOnboardingContext";
 import { useTranslation, type Language } from "@/core/i18n/I18nContext";
+import {
+  dashboardHeaderPanelShellClass,
+  DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
+} from "@/core/ui/dashboardDesktopLayout";
 import { cn } from "@/lib/utils";
 
 type ClockCalendarProps = {
@@ -12,6 +16,7 @@ type ClockCalendarProps = {
   /** Clic sur date/heure → grille de pages (admin) ou calendrier mois (terrain). */
   interactive?: boolean;
   toggleTarget?: "pages" | "calendar";
+  variant?: "mobile" | "desktop";
 };
 
 function resolveDateLocale(language: Language): string {
@@ -31,6 +36,7 @@ export default function ClockCalendar({
   compact = false,
   interactive = false,
   toggleTarget = "pages",
+  variant = "mobile",
 }: ClockCalendarProps) {
   const [time, setTime] = useState<Date | null>(null);
   const { selectedDate, setSelectedDate } = useDateContext();
@@ -93,12 +99,21 @@ export default function ClockCalendar({
     </>
   );
 
+  const isDesktop = variant === "desktop";
+  const compactShellClass = isDesktop
+    ? cn(dashboardHeaderPanelShellClass, DASHBOARD_PANEL_SHADOW_HOVER_CLASS, "bg-white/70")
+    : "mobile-header-chip mobile-profile-chip";
+  const compactToggleClass = isDesktop
+    ? "flex min-w-0 flex-1 cursor-pointer flex-row items-center justify-center gap-4 rounded-[inherit] ease-out hover:scale-[1.01] active:scale-[0.99]"
+    : "mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]";
+
   if (compact) {
     return (
       <div
         data-testid="clock-calendar-widget"
         className={cn(
-          "mobile-header-chip mobile-profile-chip h-full w-full flex-row items-center justify-between gap-2 px-4"
+          compactShellClass,
+          "h-full w-full flex-row items-center justify-between gap-2 px-4"
         )}
         onClick={dismissFooterDockHint}
       >
@@ -115,7 +130,7 @@ export default function ClockCalendar({
           <button
             type="button"
             data-testid="clock-calendar-toggle"
-            className="mobile-header-chip--interactive flex min-w-0 flex-1 flex-row items-center justify-center gap-4 rounded-[inherit]"
+            className={compactToggleClass}
             aria-label={
               toggleTarget === "calendar"
                 ? String(t("mobile.calendar_open_calendar"))

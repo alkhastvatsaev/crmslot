@@ -9,10 +9,18 @@ import {
   resolveTechnicianProfileFirstName,
   technicianFirstNameTextClass,
 } from "@/features/interventions/technicianMobileProfileLabel";
+import {
+  dashboardHeaderPanelShellClass,
+  DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
+} from "@/core/ui/dashboardDesktopLayout";
 import { cn } from "@/lib/utils";
 
-/** Profil staff connecté — dock haut admin (même pattern que technicien). */
-export default function AdminMobileProfileChip() {
+type Props = {
+  variant?: "mobile" | "desktop";
+};
+
+/** Profil staff connecté — dock admin (mobile haut · desktop haut droite). */
+export default function AdminMobileProfileChip({ variant = "mobile" }: Props) {
   const { t } = useTranslation();
   const pageSelector = useDashboardPageSelector();
   const dockOnboarding = useMobileDockOnboardingOptional();
@@ -27,13 +35,21 @@ export default function AdminMobileProfileChip() {
   const firstNameClass = technicianFirstNameTextClass(firstName);
   const roleKey = resolveStaffProfileRoleKey(fields.accountRole);
 
+  const isDesktop = variant === "desktop";
+
   return (
     <button
       type="button"
       data-testid="admin-mobile-profile-chip"
       className={cn(
-        "mobile-header-chip mobile-header-chip--interactive mobile-profile-chip",
-        "h-full w-full flex-row items-center justify-center gap-2 px-3"
+        "h-full w-full flex-row items-center justify-center gap-2",
+        isDesktop
+          ? cn(
+              dashboardHeaderPanelShellClass,
+              DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
+              "cursor-pointer bg-white/70 ease-out hover:scale-[1.01] hover:bg-white/80 active:scale-[0.99] px-4"
+            )
+          : "mobile-header-chip mobile-header-chip--interactive mobile-profile-chip px-3"
       )}
       aria-label={String(t("staff_account.title"))}
       aria-expanded={accountOpen}
