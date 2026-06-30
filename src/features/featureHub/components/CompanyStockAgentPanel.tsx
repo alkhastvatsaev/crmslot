@@ -15,7 +15,10 @@ import { useCompanyStockAgentBridge } from "@/context/CompanyStockAgentBridgeCon
 import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
 import type { CompanyStockAgentContext } from "@/features/featureHub/companyStockAgentTypes";
 import { useMaterialAgent } from "@/features/featureHub/hooks/useMaterialAgent";
-import { MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT } from "@/features/featureHub/companyStockChatbot";
+import {
+  consumePendingMaterialAgentQuickPrompt,
+  MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT,
+} from "@/features/featureHub/companyStockChatbot";
 
 function suggestionsToActions(suggestions: string[]): ChatbotQuickAction[] {
   return suggestions.map((label, i) => ({
@@ -151,7 +154,9 @@ export default function CompanyStockAgentPanel({
       resetConversation: bridgeReset,
       disabled: !agent.enabled || agent.thinking,
     });
-    window.dispatchEvent(new CustomEvent(MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT));
+    const pending = consumePendingMaterialAgentQuickPrompt();
+    if (pending) bridgeSendMessage(pending);
+    else window.dispatchEvent(new CustomEvent(MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT));
     return () => registerHandlers(null);
   }, [
     pageActive,

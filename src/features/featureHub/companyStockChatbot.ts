@@ -42,15 +42,17 @@ export function focusMaterialAgentMobileRail(): void {
   window.dispatchEvent(new CustomEvent("material-agent-focus-left-rail"));
 }
 
-/** Envoi immédiat — l’agent matériel doit déjà être monté (page Matériel active). */
+/** Envoi immédiat — file d’attente si l’agent / le dock Galaxy ne sont pas encore montés (rail centre mobile). */
 export function dispatchMaterialAgentQuickPrompt(text: string): void {
   if (typeof window === "undefined") return;
   const trimmed = text.trim();
   if (!trimmed) return;
+  pendingMaterialAgentQuickPrompt = trimmed;
   window.dispatchEvent(
     new CustomEvent("material-agent-quick-prompt", { detail: { text: trimmed } })
   );
   focusMaterialAgentMobileRail();
+  window.dispatchEvent(new CustomEvent(MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT));
 }
 
 /**

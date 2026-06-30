@@ -50,6 +50,7 @@ export default function CompanyStockGalaxyComposer() {
       const text = (e as CustomEvent<{ text?: string }>).detail?.text?.trim();
       if (!text || !handlers || handlers.disabled) return;
       handlers.sendMessage(text);
+      consumePendingMaterialAgentQuickPrompt();
       setInput("");
     };
     const onDraft = (e: Event) => {

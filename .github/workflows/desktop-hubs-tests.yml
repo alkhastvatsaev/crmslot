@@ -1,0 +1,84 @@
+name: Desktop hubs tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/features/dashboard/**"
+      - "src/features/chatbot/hooks/useChatbot.ts"
+      - "src/features/chatbot/hooks/useChatbotDocumentsRightPanelController.ts"
+      - "src/features/interventions/components/TechnicianHubPage.tsx"
+      - "src/test-utils/renderWithPager.tsx"
+      - "tests/e2e/dashboard-desktop-hubs.spec.ts"
+      - "tests/e2e/dashboard-load.spec.ts"
+      - "tests/e2e/dashboard-pager.spec.ts"
+      - "tests/e2e/helpers/dashboardDesktop.ts"
+      - "playwright.config.ts"
+      - "package.json"
+      - ".github/workflows/desktop-hubs-tests.yml"
+  pull_request:
+    paths:
+      - "src/features/dashboard/**"
+      - "tests/e2e/dashboard-desktop-hubs.spec.ts"
+      - "tests/e2e/dashboard-load.spec.ts"
+      - "tests/e2e/dashboard-pager.spec.ts"
+      - "tests/e2e/helpers/dashboardDesktop.ts"
+      - "playwright.config.ts"
+      - "package.json"
+      - ".github/workflows/desktop-hubs-tests.yml"
+
+jobs:
+  desktop-shell-jest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Desktop layout unit tests
+        run: >-
+          npx jest
+          src/features/dashboard/components/__tests__/AdaptiveTriplePanelLayout.test.tsx
+          src/features/dashboard/components/__tests__/DashboardDesktopShell.test.tsx
+          src/features/dashboard/hooks/__tests__/useHubRailActive.test.ts
+          --no-coverage
+
+  desktop-hubs-e2e-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Desktop hubs E2E smoke
+        run: npm run test:e2e:desktop
+        env:
+          CI: "true"
+          NEXT_PUBLIC_FIREBASE_API_KEY: placeholder
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: placeholder.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: placeholder
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: placeholder.appspot.com
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "0"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:0:web:0"
+          NEXT_PUBLIC_MAPBOX_TOKEN: pk.placeholder

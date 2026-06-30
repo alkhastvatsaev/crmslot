@@ -1,30 +1,38 @@
-# Mobile infra (detection, config API, pwa-registry) when F-infra paths change.
-name: Mobile infra tests
+# Mobile PWA — unit (contrats + infra + native) + E2E smoke shell.
+name: Mobile tests
 
 on:
   pull_request:
     paths:
+      - "src/features/dashboard/**"
       - "src/features/mobile/**"
-      - "src/app/api/mobile/**"
-      - "src/app/api/companies/*/pwa-registry/**"
+      - "src/core/native/**"
       - "src/core/config/mobileAccess.ts"
       - "src/core/config/mobileClientDetection.ts"
-      - "src/core/config/__tests__/mobileAccess.test.ts"
-      - "src/core/config/__tests__/mobileClientDetection.test.ts"
+      - "src/core/config/mobileDevOrigins.ts"
+      - "src/core/ui/dashboardMobileLayout.ts"
       - "src/core/ui/useIsMobile.ts"
-      - "src/core/ui/__tests__/useIsMobile.test.ts"
+      - "src/app/page.tsx"
+      - "src/app/dashboard-mobile-layout.css"
+      - "src/app/api/mobile/**"
+      - "src/app/api/companies/*/pwa-registry/**"
+      - "src/test-utils/renderMobileShell.tsx"
+      - "src/test-utils/mobileGestures.ts"
       - "tests/e2e/mobile-shell.spec.ts"
+      - "tests/e2e/helpers/mobileShell.ts"
       - "tests/e2e/api-mobile-config.spec.ts"
       - "tests/e2e/api-pwa-registry.spec.ts"
       - "playwright.config.ts"
       - "jest.config.ts"
       - "jest.setup.ts"
-      - ".github/workflows/mobile-infra-tests.yml"
+      - "package.json"
+      - ".github/workflows/mobile-tests.yml"
+  workflow_dispatch:
 
 jobs:
-  mobile-infra-unit:
+  mobile-unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -38,12 +46,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run mobile infra unit tests
-        run: npm run test:mobile-infra
+      - name: Run mobile unit suite
+        run: npm run test:mobile
 
-  mobile-infra-e2e-smoke:
+  mobile-e2e-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -60,8 +68,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run mobile API E2E smoke
-        run: npx playwright test tests/e2e/api-mobile-config.spec.ts tests/e2e/api-pwa-registry.spec.ts --project=chromium
+      - name: Run mobile E2E smoke
+        run: npm run test:e2e:mobile
         env:
           CI: "true"
           NEXT_PUBLIC_FIREBASE_API_KEY: placeholder

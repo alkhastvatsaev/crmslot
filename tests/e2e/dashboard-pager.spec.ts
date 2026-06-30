@@ -1,66 +1,36 @@
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
+import {
+  DESKTOP_VIEWPORT,
+  ensureDesktopShell,
+  expectDesktopTripleRail,
+  openDesktopHub,
+  skipIfStaffLoginGate,
+} from "./helpers/dashboardDesktop";
 
-async function openSpotlight(page: import("@playwright/test").Page) {
-  await page.locator('[data-testid="spotlight-trigger"]').click();
-}
+test.describe("Dashboard carousel (desktop)", () => {
+  test.use({ viewport: DESKTOP_VIEWPORT });
 
-test.describe("Dashboard carousel", () => {
-  test("navigates across hub pages via spotlight (skips company and technician)", async ({
-    page,
-  }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto("/");
-
-    await expect(page.locator('[data-testid="dashboard-pager-root"]')).toBeVisible();
-    await expect(page.locator('[data-testid="dashboard-page-home"]')).toBeVisible();
-
-    const gotoPage = async (navIndex: number) => {
-      await openSpotlight(page);
-      await page.locator(`[data-testid="nav-item-${navIndex}"]`).click();
-    };
-
-    await gotoPage(3);
-    await expect(page.locator('[data-testid="dashboard-page-3"]')).toBeVisible({
-      timeout: 20_000,
-    });
-    await expect(page.locator('[data-testid="dashboard-pager-slot-3-panel-center"]')).toBeVisible({
-      timeout: 20_000,
-    });
-
-    await gotoPage(4);
-    await expect(page.locator('[data-testid="dashboard-page-4"]')).toBeVisible({
-      timeout: 20_000,
-    });
-    await expect(page.locator('[data-testid="dashboard-pager-slot-4-panel-center"]')).toBeVisible({
-      timeout: 20_000,
-    });
-
-    await gotoPage(5);
-    await expect(page.locator('[data-testid="dashboard-page-5"]')).toBeVisible({
-      timeout: 20_000,
-    });
-    await expect(page.locator('[data-testid="dashboard-pager-slot-5-panel-center"]')).toBeVisible({
-      timeout: 20_000,
-    });
-
-    await gotoPage(3);
-    await expect(page.locator('[data-testid="dashboard-pager-slot-3-panel-center"]')).toBeVisible();
+    await skipIfStaffLoginGate(page);
+    await ensureDesktopShell(page);
   });
 
-  test("reaches company hub via spotlight only", async ({ page }) => {
-    await page.goto("/");
-    await openSpotlight(page);
-    await page.locator('[data-testid="nav-item-1"]').click();
-    await expect(page.locator('[data-testid="company-hub-rail-demande"]')).toBeVisible({
-      timeout: 20_000,
-    });
+  test("navigue facturation · Gmail · équipe via initialPageIndex", async ({ page }) => {
+    for (const slot of [3, 4, 5] as const) {
+      await openDesktopHub(page, slot);
+      await expectDesktopTripleRail(page, slot);
+    }
   });
 
-  test("reaches Gmail via spotlight only", async ({ page }) => {
-    await page.goto("/");
-    await openSpotlight(page);
-    await page.locator('[data-testid="nav-item-6"]').click();
-    await expect(page.locator('[data-testid="gmail-hub-panel-center"]')).toBeVisible({
-      timeout: 20_000,
-    });
+  test("atteint le hub Matériel (slot 1)", async ({ page }) => {
+    await openDesktopHub(page, 1);
+    await expectDesktopTripleRail(page, 1);
+  });
+
+  test("atteint Gmail (slot 4)", async ({ page }) => {
+    await openDesktopHub(page, 4);
+    await expectDesktopTripleRail(page, 4);
+    await page.getByTestId("gmail-hub-panel-center").waitFor({ state: "visible", timeout: 30_000 });
   });
 });

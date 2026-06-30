@@ -1,6 +1,7 @@
 import {
   buildStockCenterMaterialOrderPrompt,
   consumePendingMaterialAgentQuickPrompt,
+  dispatchMaterialAgentQuickPrompt,
   navigateMaterialAgentWithQuickPrompt,
   peekPendingMaterialAgentQuickPrompt,
 } from "@/features/featureHub/companyStockChatbot";
@@ -20,6 +21,12 @@ describe("companyStockChatbot pending prompt", () => {
         companyName: "ACME Serrures",
       })
     ).toBe('Commander 2× "Cylindre européen 80 mm" (réf. CYL-EURO-80) — société : ACME Serrures');
+  });
+
+  it("queues prompt on material page when agent is not mounted yet", () => {
+    dispatchMaterialAgentQuickPrompt('Commander 1× "Cylindre"');
+    expect(peekPendingMaterialAgentQuickPrompt()).toBe('Commander 1× "Cylindre"');
+    expect(consumePendingMaterialAgentQuickPrompt()).toBe('Commander 1× "Cylindre"');
   });
 
   it("queues prompt when navigating away from material page", () => {

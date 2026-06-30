@@ -61,7 +61,10 @@ export default defineConfig({
       name: "mobile-shell",
       testMatch: /mobile-shell\.spec\.ts/,
       use: {
-        ...devices["iPhone 13"],
+        ...devices["Pixel 7"],
+        ...(process.env.PLAYWRIGHT_ADMIN_STORAGE_STATE
+          ? { storageState: process.env.PLAYWRIGHT_ADMIN_STORAGE_STATE }
+          : {}),
         launchOptions: {
           args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
         },

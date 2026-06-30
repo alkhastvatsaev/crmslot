@@ -5,40 +5,40 @@ Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichi
 
 ---
 
-## 1. État actuel (mai 2026)
+## 1. État actuel (juin 2026)
 
 | Indicateur              | Valeur                                                                                                        |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Suites Jest             | **~260** (~1 300 tests)                                                                                       |
+| Suites Jest             | **~554** (~2 430 tests)                                                                                       |
 | CI unitaire             | `npm run test:ci` (= typecheck + coverage) dans [`.github/workflows/test.yml`](../.github/workflows/test.yml) |
-| E2E                     | **9** specs Playwright dans `tests/e2e/` (job séparé)                                                         |
-| Seuils coverage globaux | Faibles (~4 % statements) + **planchers par fichier P0** dispatch/interventions                               |
-| Chatbot                 | **28 suites / 78 tests** — **100 % verts** en isolation                                                       |
+| E2E                     | **23** specs Playwright dans `tests/e2e/` (job séparé)                                                        |
+| Seuils coverage globaux | ~45 % statements + **planchers par fichier P0** (dispatch, chatbot, portail client, facturation)              |
+| Garde-fou agent         | `npm run test:agent-check` — typecheck + eslint + jest --findRelatedTests sur fichiers modifiés               |
+| Mobile shell            | `npm run test:mobile-shell` — 15 suites / contrat `mobileShellContract.ts`                                    |
 
 ### CI
 
-`npm run test:ci` doit rester **verte** avant tout merge. En cas d’échec : corriger en priorité (Phase 0).
+`npm run test:ci` doit rester **verte** avant tout merge. En cas d'échec : corriger en priorité (Phase 0).
 
 ### Ce qui fonctionne déjà bien
 
 - **Jest + RTL + jsdom** via `next/jest`, mocks globaux dans [`jest.setup.ts`](../jest.setup.ts).
 - **Tests colocalisés** `src/features/*/__tests__/`.
-- **`render` / `mockState`** : [`src/test-utils/render.tsx`](../src/test-utils/render.tsx).
-- **P0 métier dispatch** : seuils stricts sur `assignInterventionToTechnician`, `technicianSchedule`, etc.
-- **Chatbot « cerveau local »** : bonne couverture des modules **purs** (intents, billing parse, adresses, workspace search, side-effects document/commande).
+- **`render` / `mockState` / `factories`** : [`src/test-utils/`](../src/test-utils/).
+- **P0 métier** : seuils stricts dispatch, chatbot executor/routing, facturation serveur, `RequesterHubContext`.
+- **OAuth** : tests `crmStaffOAuthMode`, `gmailHubOAuthReturn`, `CrmStaffAuthEffects` (régression Gmail vs CRM).
+- **Recettes agents** : [`docs/reference/AGENT_TEST_RECIPES.md`](../docs/reference/AGENT_TEST_RECIPES.md).
+- **Ratchet coverage** : `npm run coverage:ratchet` — pas de baisse vs baseline `main`.
 
-### Lacunes principales
+### Lacunes principales (priorité solo dev)
 
-| Zone                                          | Problème                                                                          |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| **`useChatbot.ts`** (~600+ lignes)            | Orchestration stream, preview facture, localStorage — **aucun test dédié**        |
-| **`chatbot-tool-executor.ts`** (~900+ lignes) | Tous les outils Firestore/email — **aucun test direct**                           |
-| **Routes API** `src/app/api/ai/chatbot/*`     | Exclues du coverage ; pas de tests d’intégration                                  |
-| **E2E chatbot**                               | Aucun parcours Playwright                                                         |
-| **Fichiers dupliqués**                        | `chatbot-tools 2.ts`, `chatbot-openai 3.ts`, `route 2.ts` — piège pour les agents |
-| **Doc agent**                                 | Pas de checklist « j’ai touché le chatbot → je lance quoi »                       |
-
----
+| Zone                  | Prochaine action                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| **E2E PR**            | Tiering smoke vs full nightly (Phase 20) — 23 specs sur chaque PR = lent              |
+| **Contract API**      | Étendre `tests/contract/` à `/api/ai/chatbot`, `validate-report` (Phase 19)           |
+| **Auth hooks**        | `useCrmStaffAccountPanel`, `useClientPortalAuthSignIn` — gros fichiers sans test hook |
+| **Backoffice**        | `useBackOfficeInboxState.ts` (~287 L)                                                 |
+| **Baseline coverage** | `npm run coverage:ratchet:update` après chaque palier de tests P1                     |
 
 ## 2. Pyramide cible
 
