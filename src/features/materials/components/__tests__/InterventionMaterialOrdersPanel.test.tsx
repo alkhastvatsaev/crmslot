@@ -19,8 +19,12 @@ jest.mock("@/features/materials/materialOrderFirestore", () => ({
 }));
 
 const mockUseMaterialOrders = useMaterialOrders as jest.MockedFunction<typeof useMaterialOrders>;
-const mockCreateMaterialOrder = createMaterialOrder as jest.MockedFunction<typeof createMaterialOrder>;
-const mockUpdateStatus = updateMaterialOrderStatus as jest.MockedFunction<typeof updateMaterialOrderStatus>;
+const mockCreateMaterialOrder = createMaterialOrder as jest.MockedFunction<
+  typeof createMaterialOrder
+>;
+const mockUpdateStatus = updateMaterialOrderStatus as jest.MockedFunction<
+  typeof updateMaterialOrderStatus
+>;
 
 const intervention = {
   id: "iv-mat-1",
@@ -44,17 +48,13 @@ describe("InterventionMaterialOrdersPanel", () => {
   });
 
   it("renders collapsed panel with toggle", () => {
-    render(
-      <InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />,
-    );
+    render(<InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />);
     expect(screen.getByTestId("intervention-material-orders-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("material-orders-list")).not.toBeInTheDocument();
   });
 
   it("shows empty state when expanded", () => {
-    render(
-      <InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />,
-    );
+    render(<InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />);
     fireEvent.click(screen.getByTestId("material-orders-toggle"));
     expect(screen.getByTestId("material-orders-list")).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe("InterventionMaterialOrdersPanel", () => {
         technicianUid="tech-1"
         allowStatusUpdate
         allowCreate={false}
-      />,
+      />
     );
     fireEvent.click(screen.getByTestId("material-orders-toggle"));
 
@@ -90,14 +90,21 @@ describe("InterventionMaterialOrdersPanel", () => {
     fireEvent.click(screen.getByTestId("material-order-status-o1-ordered"));
 
     await waitFor(() => {
-      expect(mockUpdateStatus).toHaveBeenCalledWith(expect.anything(), "o1", "ordered");
+      expect(mockUpdateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        "o1",
+        "ordered",
+        expect.objectContaining({
+          companyId: "co-1",
+          fromStatus: "pending",
+          interventionId: "iv-mat-1",
+        })
+      );
     });
   });
 
   it("opens form and submits new order", async () => {
-    render(
-      <InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />,
-    );
+    render(<InterventionMaterialOrdersPanel intervention={intervention} technicianUid="tech-1" />);
     fireEvent.click(screen.getByTestId("material-orders-toggle"));
     fireEvent.click(screen.getByTestId("material-order-new"));
 
@@ -112,7 +119,7 @@ describe("InterventionMaterialOrdersPanel", () => {
           intervention,
           technicianUid: "tech-1",
           partsRequested: [{ description: "Cylindre européen", quantity: 1, reference: "" }],
-        }),
+        })
       );
     });
   });
