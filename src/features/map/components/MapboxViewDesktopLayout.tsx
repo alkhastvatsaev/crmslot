@@ -22,7 +22,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Mission } from "@/features/map/missionTypes";
 
 type Props = {
-  mapContainerRef: React.RefObject<HTMLDivElement | null>;
+  mapContainerRef: React.Ref<HTMLDivElement | null>;
   mapBootError: "token" | "load" | null;
   visibleMissions: Mission[];
   selectedMission: Mission | null;

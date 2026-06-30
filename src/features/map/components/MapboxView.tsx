@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapHubMobileTripleLayout from "@/features/map/components/MapHubMobileTripleLayout";
@@ -26,13 +26,16 @@ import type { Mission } from "@/features/map/missionTypes";
 import { useTranslation } from "@/core/i18n/I18nContext";
 
 export default function MapboxView() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapContainer, setMapContainer] = useState<HTMLDivElement | null>(null);
+  const bindMapContainer = useCallback((node: HTMLDivElement | null) => {
+    setMapContainer(node);
+  }, []);
   const isMobileClient = useIsMobile();
   const mobileHubLayout = useMobileHubLayout();
   const isMobile = mobileHubLayout || isMobileClient === true;
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
-  const mapRenderActive = useMobileMapRenderGate(mapContainerRef);
+  const mapRenderActive = useMobileMapRenderGate(mapContainer);
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
   const dashboardPageIndex = pager?.pageIndex ?? 0;
@@ -50,7 +53,7 @@ export default function MapboxView() {
   } = useMapHubMissions({ mapHubDataActive });
 
   const { mapRef, mapReady, mapBootError } = useMapboxInstance(
-    mapContainerRef,
+    mapContainer,
     isMobile === true,
     mapWebGLActive
   );
@@ -117,7 +120,7 @@ export default function MapboxView() {
         background: "#f8fafc",
       }}
     >
-      <div ref={mapContainerRef} id="map" className="absolute inset-0 h-full w-full" />
+      <div ref={bindMapContainer} id="map" className="absolute inset-0 h-full w-full" />
       {mapBootError ? (
         <div
           data-testid="map-boot-error"
@@ -164,7 +167,7 @@ export default function MapboxView() {
 
   return (
     <MapboxViewDesktopLayout
-      mapContainerRef={mapContainerRef}
+      mapContainerRef={bindMapContainer}
       mapBootError={mapBootError}
       visibleMissions={visibleMissions}
       selectedMission={selectedMission}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState } from "react";
 
 function isMapRenderAllowed(container: HTMLElement): boolean {
   if (typeof document !== "undefined" && document.hidden) return false;
@@ -15,25 +15,24 @@ function isMapRenderAllowed(container: HTMLElement): boolean {
 }
 
 /**
- * Sur mobile, la carte reste montée (WebGL) mais doit s’arrêter dès qu’elle n’est plus visible :
+ * Sur mobile, la carte reste montée (WebGL) mais doit s'arrêter dès qu'elle n'est plus visible :
  * autre page hub, sélecteur profil, rail missions/inbox, onglet arrière-plan.
  */
-export function useMobileMapRenderGate(containerRef: RefObject<HTMLElement | null>): boolean {
-  const [active, setActive] = useState(() => {
-    const root = containerRef.current;
-    return root ? isMapRenderAllowed(root) : true;
-  });
+export function useMobileMapRenderGate(container: HTMLElement | null): boolean {
+  const [active, setActive] = useState(() => (container ? isMapRenderAllowed(container) : false));
 
   useEffect(() => {
-    const root = containerRef.current;
-    if (!root) return;
+    if (!container) {
+      setActive(false);
+      return;
+    }
 
-    const sync = () => setActive(isMapRenderAllowed(root));
+    const sync = () => setActive(isMapRenderAllowed(container));
 
     sync();
 
     const watched = new Set<HTMLElement>();
-    let node: HTMLElement | null = root;
+    let node: HTMLElement | null = container;
     while (node) {
       if (
         node.hasAttribute("aria-hidden") ||
@@ -59,7 +58,7 @@ export function useMobileMapRenderGate(containerRef: RefObject<HTMLElement | nul
       observers.forEach((o) => o.disconnect());
       document.removeEventListener("visibilitychange", sync);
     };
-  }, [containerRef]);
+  }, [container]);
 
   return active;
 }
