@@ -37,7 +37,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const workspace = useCompanyWorkspaceOptional();
   const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { technicians } = useTechnicians();
+  const { technicians, loading: techniciansLoading } = useTechnicians();
 
   const [selection, setSelection] = useState<CommissionsHubSelection>({ kind: "none" });
   const [pendingRateByUid, setPendingRateByUid] = useState<Record<string, number>>({});
@@ -55,15 +55,8 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     });
   }, []);
 
-  const {
-    rules,
-    interventions,
-    manualEntries,
-    rulesLoading,
-    interventionsLoading,
-    manualLoading,
-    saveTechnicianRate,
-  } = useCommissionsHubData(pageActive ? companyId || null : null, technicians);
+  const { rules, interventions, manualEntries, rulesLoading, manualLoading, saveTechnicianRate } =
+    useCommissionsHubData(pageActive ? companyId || null : null, technicians);
 
   const patronKpis = useMemo(
     () => buildPatronCommissionKpis({ interventions, manualEntries, rules }),
@@ -119,7 +112,7 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
     ) : null;
 
   const selectedTechUid = selection.kind === "technician" ? selection.uid : null;
-  const teamLoading = interventionsLoading || rulesLoading || manualLoading;
+  const teamLoading = techniciansLoading || rulesLoading || manualLoading;
 
   return (
     <AdaptiveTriplePanelLayout

@@ -13,16 +13,23 @@ export function useCommissionRules(companyId: string | null) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!activeCompanyId || !firestore) return;
-    scheduleEffectUpdate(() => setLoading(true));
+    if (!activeCompanyId || !firestore) {
+      setRules([]);
+      setLoading(false);
+      return;
+    }
+
+    let pendingLoad = true;
     const unsub = subscribeCommissionRules(
       firestore,
       activeCompanyId,
       (rows) => {
+        pendingLoad = false;
         setRules(rows);
         setLoading(false);
       },
       (error) => {
+        pendingLoad = false;
         logger.warn("[useCommissionRules] listener error", {
           companyId: activeCompanyId,
           error: error.message,
@@ -31,6 +38,9 @@ export function useCommissionRules(companyId: string | null) {
         setLoading(false);
       }
     );
+    scheduleEffectUpdate(() => {
+      if (pendingLoad) setLoading(true);
+    });
     return unsub;
   }, [activeCompanyId]);
 

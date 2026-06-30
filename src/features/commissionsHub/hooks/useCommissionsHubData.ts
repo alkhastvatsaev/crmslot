@@ -40,7 +40,7 @@ export function useCommissionsHubData(companyId: string | null, technicians: Tec
     );
   }, [companyId, companyInterventions, supplementalInterventions, technicians]);
   const [manualEntries, setManualEntries] = useState<ManualCommissionEntry[]>([]);
-  const [manualLoading, setManualLoading] = useState(true);
+  const [manualLoading, setManualLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -190,7 +190,8 @@ export function useCommissionsHubData(companyId: string | null, technicians: Tec
     interventions,
     manualEntries,
     rulesLoading,
-    interventionsLoading: interventionsLoading || supplementalLoading,
+    interventionsLoading,
+    supplementalLoading,
     manualLoading,
     saving,
     saveRule,

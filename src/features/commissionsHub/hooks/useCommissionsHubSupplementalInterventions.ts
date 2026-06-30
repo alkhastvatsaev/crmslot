@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { firestore, isConfigured } from "@/core/config/firebase";
+import { logger } from "@/core/logger";
 import { stripKnownSyntheticInterventions } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions";
 import { collectCompanyTechnicianAssignUids } from "@/features/commissionsHub/commissionsHubInterventionsScope";
@@ -52,15 +53,28 @@ export function useCommissionsHubSupplementalInterventions(
         collection(firestore!, "interventions"),
         where("assignedTechnicianUid", "in", batch)
       );
-      return onSnapshot(q, (snap) => {
-        const batchMap = new Map<string, Intervention>();
-        for (const d of snap.docs) {
-          batchMap.set(d.id, { id: d.id, ...d.data() } as Intervention);
+      return onSnapshot(
+        q,
+        (snap) => {
+          const batchMap = new Map<string, Intervention>();
+          for (const d of snap.docs) {
+            batchMap.set(d.id, { id: d.id, ...d.data() } as Intervention);
+          }
+          batchMaps[batchIdx] = batchMap;
+          batchReady.add(batchIdx);
+          publish();
+        },
+        (error) => {
+          logger.warn("[useCommissionsHubSupplementalInterventions] snapshot error", {
+            companyId,
+            batchIdx,
+            error: error.message,
+          });
+          batchMaps[batchIdx] = new Map();
+          batchReady.add(batchIdx);
+          publish();
         }
-        batchMaps[batchIdx] = batchMap;
-        batchReady.add(batchIdx);
-        publish();
-      });
+      );
     });
 
     return () => {
