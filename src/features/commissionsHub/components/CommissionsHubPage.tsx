@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AdaptiveTriplePanelLayout from "@/features/dashboard/components/AdaptiveTriplePanelLayout";
 import { COMMISSIONS_HUB_SLOT_INDEX } from "@/features/commissionsHub/commissionsHubConstants";
 import CommissionsHubRevenuePanel from "@/features/commissionsHub/components/CommissionsHubRevenuePanel";
@@ -18,6 +18,8 @@ import type { CommissionsHubSelection } from "@/features/commissionsHub/commissi
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useTechnicians } from "@/features/technicians/hooks";
+import { useCompanyStaff } from "@/features/teamHub";
+import { prefetchCompanyStaff } from "@/features/teamHub/companyStaffCache";
 import {
   DASHBOARD_DESKTOP_PANEL_GAP_CLASS,
   dashboardTripleSideOpaqueShellClass,
@@ -38,6 +40,11 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
   const pageActive = useHubPageActive(slotIndex);
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const { technicians, loading: techniciansLoading } = useTechnicians();
+  const { staff } = useCompanyStaff(pageActive ? companyId : null);
+
+  useEffect(() => {
+    if (pageActive && companyId) prefetchCompanyStaff(companyId);
+  }, [pageActive, companyId]);
 
   const [selection, setSelection] = useState<CommissionsHubSelection>({ kind: "none" });
   const [pendingRateByUid, setPendingRateByUid] = useState<Record<string, number>>({});
@@ -81,8 +88,9 @@ export default function CommissionsHubPage({ slotIndex = COMMISSIONS_HUB_SLOT_IN
       rules,
       companyId,
       technicians,
+      staffMembers: staff,
     });
-  }, [companyId, interventions, manualEntries, rules, technicians]);
+  }, [companyId, interventions, manualEntries, rules, technicians, staff]);
 
   const totalPayableCents = useMemo(
     () =>

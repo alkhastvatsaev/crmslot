@@ -31,6 +31,8 @@ type Props = {
   variant?: "mobile" | "desktop";
 };
 
+const PAGE_SELECTOR_PLACEHOLDER_COUNT = 3;
+
 export default function DashboardPageSelector({ onClose, variant = "mobile" }: Props) {
   const { pageIndex, setPageIndex } = useDashboardPager();
   const workspace = useCompanyWorkspaceOptional();
@@ -57,14 +59,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
         key={page.slotIndex}
         type="button"
         data-testid={`dashboard-page-selector-item-${page.slotIndex}`}
-        className={cn(
-          "dashboard-page-selector-item",
-          isDesktop ? "dashboard-page-selector-item--desktop" : "mobile-page-selector-item",
-          active &&
-            (isDesktop
-              ? "dashboard-page-selector-item--active"
-              : "mobile-page-selector-item--active")
-        )}
+        className={cn("mobile-page-selector-item", active && "mobile-page-selector-item--active")}
         onClick={() => navigate(page.slotIndex)}
         onPointerEnter={() => {
           if (page.slotIndex === TEAM_HUB_SLOT_INDEX) {
@@ -74,31 +69,20 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
         }}
         aria-current={active ? "page" : undefined}
       >
-        <span
-          className={cn(isDesktop ? "dashboard-page-selector-icon" : "mobile-page-selector-icon")}
-        >
-          <Icon size={isDesktop ? 28 : 24} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
+        <span className="mobile-page-selector-icon">
+          <Icon size={24} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
         </span>
-        <span
-          className={cn(isDesktop ? "dashboard-page-selector-label" : "mobile-page-selector-label")}
-        >
+        <span className="mobile-page-selector-label">
           {String(t(MOBILE_TAB_I18N[page.spotlightLabelKey]))}
         </span>
       </button>
     );
   });
 
-  const grid = isDesktop ? (
-    <nav
-      className="dashboard-page-selector-grid dashboard-page-selector-grid--desktop"
-      aria-label="Navigation"
-    >
-      {pageButtons}
-    </nav>
-  ) : (
+  const grid = (
     <nav className="mobile-page-selector-grid" aria-label="Navigation">
       {pageButtons}
-      {Array.from({ length: 3 }, (_, index) => (
+      {Array.from({ length: PAGE_SELECTOR_PLACEHOLDER_COUNT }, (_, index) => (
         <div
           key={`placeholder-${index}`}
           className="mobile-page-selector-item mobile-page-selector-item--placeholder"
@@ -117,6 +101,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
       <section
         className={cn(
           "dashboard-page-selector",
+          "mobile-page-selector",
           dashboardTripleCenterShellClass,
           DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
           "dashboard-page-selector--desktop"

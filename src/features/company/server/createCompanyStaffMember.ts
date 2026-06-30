@@ -52,15 +52,19 @@ async function attachStaffToCompany(
   await upsertCompanyStaffDirectoryEntry(db, params.companyId, params.uid, membershipRole);
 
   if (companyStaffKindNeedsTechnicianProfile(params.input.staffKind)) {
-    await provisionTechnicianStaffRecord(db, {
-      uid: params.uid,
-      companyId: params.companyId,
-      profile: {
-        firstName: params.input.firstName,
-        lastName: params.input.lastName,
-        email: params.input.email ?? null,
+    await provisionTechnicianStaffRecord(
+      db,
+      {
+        uid: params.uid,
+        companyId: params.companyId,
+        profile: {
+          firstName: params.input.firstName,
+          lastName: params.input.lastName,
+          email: params.input.email ?? null,
+        },
       },
-    });
+      { auth }
+    );
   }
 
   await syncTenantClaims(auth, db, params.uid, params.companyId);

@@ -17,6 +17,7 @@ describe("DashboardPageSelector", () => {
       "desktop"
     );
     expect(screen.queryByTestId("dashboard-language-selector")).not.toBeInTheDocument();
+    expect(screen.getAllByTestId(/dashboard-page-selector-placeholder-/)).toHaveLength(3);
     fireEvent.click(screen.getByTestId("dashboard-page-selector-item-4"));
     expect(onClose).toHaveBeenCalled();
   });
