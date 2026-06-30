@@ -76,7 +76,7 @@ export async function joinDefaultCompanyMembership(
 
   if (staffKind === "technician") {
     const profile = await resolveTechnicianProfile(auth, uid, options?.technicianProfile);
-    await provisionTechnicianStaffRecord(db, { uid, companyId, profile });
+    await provisionTechnicianStaffRecord(db, { uid, companyId, profile }, { auth });
   }
 
   await syncTenantClaims(auth, db, uid, companyId);

@@ -38,12 +38,17 @@ export function findTechnicianByAssignUid(
   return technicians.find((tech) => tech.email?.trim().toLowerCase() === email);
 }
 
+/** Libellé générique Firestore quand le profil n'a pas encore de nom réel. */
+export function isTechnicianPlaceholderLabel(name: string): boolean {
+  return name.trim().toLowerCase() === "technicien";
+}
+
 export function resolveTechnicianProfileLabel(
   tech: Technician | null | undefined,
   fallback?: { displayName?: string; email?: string }
 ): string {
   const name = tech?.name?.trim();
-  if (name) return name;
+  if (name && !isTechnicianPlaceholderLabel(name)) return name;
 
   const full = [tech?.firstName, tech?.lastName].filter(Boolean).join(" ").trim();
   if (full) return full;
@@ -124,4 +129,8 @@ export function isTechnicianUidFallbackLabel(name: string, uid: string): boolean
   if (!trimmed) return false;
   const label = name.trim();
   return label === trimmed.slice(-6) || label === trimmed.slice(0, 8);
+}
+
+export function shouldUpgradeTechnicianDisplayLabel(name: string, uid: string): boolean {
+  return isTechnicianPlaceholderLabel(name) || isTechnicianUidFallbackLabel(name, uid);
 }

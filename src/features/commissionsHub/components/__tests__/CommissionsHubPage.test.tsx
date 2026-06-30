@@ -52,6 +52,16 @@ jest.mock("@/features/commissionsHub/hooks/useCommissionsHubData", () => ({
   }),
 }));
 
+jest.mock("@/features/teamHub", () => ({
+  useCompanyStaff: () => ({
+    staff: [],
+    loading: false,
+    error: null,
+    refresh: jest.fn(),
+    upsertStaffMember: jest.fn(),
+  }),
+}));
+
 jest.mock("@/features/technicians/hooks", () => ({
   useTechnicians: () => ({
     technicians: [

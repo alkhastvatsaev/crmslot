@@ -102,15 +102,19 @@ async function applyAccountRole(
   }
 
   if (accountRole === "technician") {
-    await provisionTechnicianStaffRecord(db, {
-      uid,
-      companyId,
-      profile: {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        email: profile.email ?? null,
+    await provisionTechnicianStaffRecord(
+      db,
+      {
+        uid,
+        companyId,
+        profile: {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email ?? null,
+        },
       },
-    });
+      { auth }
+    );
     await db.collection("technicians").doc(uid).set(
       {
         active: true,

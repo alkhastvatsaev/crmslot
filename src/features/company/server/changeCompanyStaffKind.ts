@@ -61,15 +61,19 @@ export async function changeCompanyStaffKind(
   }
 
   if (companyStaffKindNeedsTechnicianProfile(staffKind)) {
-    await provisionTechnicianStaffRecord(db, {
-      uid: targetUid,
-      companyId,
-      profile: {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        email: profile.email ?? null,
+    await provisionTechnicianStaffRecord(
+      db,
+      {
+        uid: targetUid,
+        companyId,
+        profile: {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email ?? null,
+        },
       },
-    });
+      { auth }
+    );
     await db.collection("technicians").doc(targetUid).set(
       {
         active: true,

@@ -4,12 +4,16 @@ import type { Intervention } from "@/features/interventions";
 import type { Technician } from "@/features/technicians";
 import {
   findTechnicianByAssignUid,
-  isTechnicianUidFallbackLabel,
   resolveCanonicalTechnicianAssignUid,
   resolveTechnicianAuthUid,
-  resolveTechnicianProfileLabel,
+  shouldUpgradeTechnicianDisplayLabel,
   technicianProfileInitial,
 } from "@/features/technicians/resolveTechnicianIdentity";
+import {
+  buildStaffDisplayLookup,
+  resolvePatronTechnicianDisplayName,
+} from "@/features/commissionsHub/commissionsHubStaffDisplay";
+import type { CompanyStaffMember } from "@/features/teamHub/types";
 import {
   interventionCommissionMonth,
   interventionRevenueMonth,
@@ -26,10 +30,12 @@ export function buildPatronTechnicianRows(params: {
   rules: CommissionRule[];
   companyId: string;
   technicians: Technician[];
+  staffMembers?: CompanyStaffMember[];
   now?: Date;
 }): PatronTechnicianRow[] {
   const now = params.now ?? new Date();
   const monthKey = monthKeyFromDate(now);
+  const staffLookup = buildStaffDisplayLookup(params.staffMembers ?? []);
 
   const byUid = new Map<
     string,
@@ -66,9 +72,9 @@ export function buildPatronTechnicianRows(params: {
       return byUid.get(uid)!;
     }
     if (
-      isTechnicianUidFallbackLabel(existing.name, uid) &&
+      shouldUpgradeTechnicianDisplayLabel(existing.name, uid) &&
       name.trim() &&
-      !isTechnicianUidFallbackLabel(name, uid)
+      !shouldUpgradeTechnicianDisplayLabel(name, uid)
     ) {
       existing.name = name;
       existing.initial = initial;
@@ -81,7 +87,7 @@ export function buildPatronTechnicianRows(params: {
 
   const rowIdentityForUid = (uid: string) => {
     const tech = findTechnicianByAssignUid(params.technicians, uid);
-    const name = resolveTechnicianProfileLabel(tech);
+    const name = resolvePatronTechnicianDisplayName(uid, tech, staffLookup);
     const initial = technicianProfileInitial(tech, name);
     const alternates = tech
       ? [tech.id.trim(), resolveTechnicianAuthUid(tech)].filter((id) => id && id !== uid)
@@ -92,10 +98,10 @@ export function buildPatronTechnicianRows(params: {
   for (const tech of params.technicians) {
     const docId = tech.id.trim();
     const authUid = resolveTechnicianAuthUid(tech);
-    const name = resolveTechnicianProfileLabel(tech);
-    const initial = technicianProfileInitial(tech, name);
     const canonicalUid = authUid || docId;
     if (!canonicalUid) continue;
+    const name = resolvePatronTechnicianDisplayName(canonicalUid, tech, staffLookup);
+    const initial = technicianProfileInitial(tech, name);
     const alternates = [docId, authUid].filter((id) => id && id !== canonicalUid);
     ensure(canonicalUid, name, initial, alternates);
   }
