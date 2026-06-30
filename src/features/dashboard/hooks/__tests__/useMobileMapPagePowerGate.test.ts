@@ -1,95 +1,101 @@
 import { renderHook } from "@testing-library/react";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
+import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerContext";
+import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 
 jest.mock("@/features/dashboard/hooks/useIsMobile", () => ({
-  useIsMobile: jest.fn(() => true),
+  useIsMobile: jest.fn(),
 }));
 
 jest.mock("@/features/dashboard/dashboardPagerContext", () => ({
-  useDashboardPagerOptional: jest.fn(() => ({
-    pageIndex: 0,
-    pageCount: 9,
-    setPageIndex: jest.fn(),
-  })),
+  useDashboardPagerOptional: jest.fn(),
 }));
 
 jest.mock("@/features/dashboard/MobileHubRailContext", () => ({
-  useMobileHubRailSnapshot: jest.fn(() => ({
-    rails: ["left", "center", "right"],
-    activeRail: "center",
-    visible: true,
-    requestRail: jest.fn(),
-  })),
+  useMobileHubRailSnapshot: jest.fn(),
 }));
 
-const mockUseIsMobile = jest.requireMock("@/features/dashboard/hooks/useIsMobile")
-  .useIsMobile as jest.Mock;
-const mockUseDashboardPager = jest.requireMock("@/features/dashboard/dashboardPagerContext")
-  .useDashboardPagerOptional as jest.Mock;
-const mockUseMobileHubRailSnapshot = jest.requireMock("@/features/dashboard/MobileHubRailContext")
-  .useMobileHubRailSnapshot as jest.Mock;
+const useIsMobileMock = useIsMobile as jest.MockedFunction<typeof useIsMobile>;
+const usePagerMock = useDashboardPagerOptional as jest.MockedFunction<
+  typeof useDashboardPagerOptional
+>;
+const useRailMock = useMobileHubRailSnapshot as jest.MockedFunction<
+  typeof useMobileHubRailSnapshot
+>;
 
 describe("useMobileMapPagePowerGate", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseIsMobile.mockReturnValue(true);
-    mockUseDashboardPager.mockReturnValue({ pageIndex: 0, pageCount: 9, setPageIndex: jest.fn() });
-    mockUseMobileHubRailSnapshot.mockReturnValue({
-      rails: ["left", "center", "right"],
-      activeRail: "center",
+    useIsMobileMock.mockReturnValue(true);
+    usePagerMock.mockReturnValue({
+      pageIndex: 0,
+      pageCount: 7,
+      setPageIndex: jest.fn(),
+      goNext: jest.fn(),
+      goPrev: jest.fn(),
+    });
+    useRailMock.mockReturnValue({
       visible: true,
+      activeRail: "left",
+      rails: ["left", "center", "right"],
       requestRail: jest.fn(),
     });
   });
 
-  it("active les données hub sur rail centre sans WebGL carte", () => {
+  it("desktop — tous les flux carte/inbox restent actifs", () => {
+    useIsMobileMock.mockReturnValue(false);
+
+    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
+
+    expect(result.current).toEqual({
+      mapPageVisible: true,
+      mapHubDataActive: true,
+      mapRenderDataActive: true,
+      inboxDataActive: true,
+      documentsTabActive: true,
+    });
+  });
+
+  it("mobile carte rail gauche — WebGL actif, inbox coupé", () => {
     const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
+
+    expect(result.current.mapPageVisible).toBe(true);
+    expect(result.current.mapRenderDataActive).toBe(true);
     expect(result.current.mapHubDataActive).toBe(true);
-    expect(result.current.mapRenderDataActive).toBe(false);
     expect(result.current.inboxDataActive).toBe(false);
     expect(result.current.documentsTabActive).toBe(false);
   });
 
-  it("active WebGL carte sur rail gauche", () => {
-    mockUseMobileHubRailSnapshot.mockReturnValue({
-      rails: ["left", "center", "right"],
-      activeRail: "left",
-      visible: true,
-      requestRail: jest.fn(),
+  it("mobile autre hub — carte démontée", () => {
+    usePagerMock.mockReturnValue({
+      pageIndex: 2,
+      pageCount: 7,
+      setPageIndex: jest.fn(),
+      goNext: jest.fn(),
+      goPrev: jest.fn(),
     });
-    const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
-    expect(result.current.mapHubDataActive).toBe(true);
-    expect(result.current.mapRenderDataActive).toBe(true);
-    expect(result.current.inboxDataActive).toBe(false);
-  });
 
-  it("active inbox seulement sur rail droit", () => {
-    mockUseMobileHubRailSnapshot.mockReturnValue({
-      rails: ["left", "center", "right"],
-      activeRail: "right",
-      visible: true,
-      requestRail: jest.fn(),
-    });
-    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
-    expect(result.current.inboxDataActive).toBe(true);
-    expect(result.current.documentsTabActive).toBe(true);
-    expect(result.current.mapHubDataActive).toBe(false);
-    expect(result.current.mapRenderDataActive).toBe(false);
-  });
+    const { result } = renderHook(() => useMobileMapPagePowerGate(null));
 
-  it("coupe tout quand une autre page hub est affichée", () => {
-    mockUseDashboardPager.mockReturnValue({ pageIndex: 3, pageCount: 9, setPageIndex: jest.fn() });
-    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
     expect(result.current.mapPageVisible).toBe(false);
     expect(result.current.mapHubDataActive).toBe(false);
+    expect(result.current.mapRenderDataActive).toBe(false);
     expect(result.current.inboxDataActive).toBe(false);
   });
 
-  it("laisse tout actif sur desktop", () => {
-    mockUseIsMobile.mockReturnValue(false);
-    const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
-    expect(result.current.mapHubDataActive).toBe(true);
+  it("mobile rail droit — inbox actif, WebGL coupé", () => {
+    useRailMock.mockReturnValue({
+      visible: true,
+      activeRail: "right",
+      rails: ["left", "center", "right"],
+      requestRail: jest.fn(),
+    });
+
+    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
+
     expect(result.current.inboxDataActive).toBe(true);
-    expect(result.current.mapRenderDataActive).toBe(true);
+    expect(result.current.documentsTabActive).toBe(true);
+    expect(result.current.mapRenderDataActive).toBe(false);
   });
 });

@@ -32,13 +32,13 @@ Les règles opérationnelles restent dans [`AGENTS.md`](../AGENTS.md) ; ce fichi
 
 ### Lacunes principales (priorité solo dev)
 
-| Zone                  | Prochaine action                                                                      |
-| --------------------- | ------------------------------------------------------------------------------------- |
-| **E2E PR**            | Tiering smoke vs full nightly (Phase 20) — 23 specs sur chaque PR = lent              |
-| **Contract API**      | Étendre `tests/contract/` à `/api/ai/chatbot`, `validate-report` (Phase 19)           |
-| **Auth hooks**        | `useCrmStaffAccountPanel`, `useClientPortalAuthSignIn` — gros fichiers sans test hook |
-| **Backoffice**        | `useBackOfficeInboxState.ts` (~287 L)                                                 |
-| **Baseline coverage** | `npm run coverage:ratchet:update` après chaque palier de tests P1                     |
+| Zone                  | Prochaine action                                                                   |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| **E2E PR**            | ✅ smoke PR (`test:e2e:smoke`) · full sur push `main` (Phase 20)                   |
+| **Contract API**      | ✅ `chatbot` + `validate-report` (`tests/contract/`, Phase 19)                     |
+| **Auth hooks**        | ✅ `test:auth` — `useCrmStaffAccountPanel`, `useClientPortalAuthSignIn` (Phase 17) |
+| **Backoffice**        | ✅ `useBackOfficeInboxState` hook tests (Phase 21)                                 |
+| **Baseline coverage** | `npm run coverage:ratchet:update` après chaque palier de tests P1                  |
 
 ## 2. Pyramide cible
 
@@ -380,7 +380,7 @@ Suite complète documentée dans **`docs/agents/MOBILE_TESTING.md`**.
 
 Helpers : `src/test-utils/renderMobileShell.tsx`, `mobileGestures.ts`, `tests/e2e/helpers/mobileShell.ts`.
 
-Phases 5–7 : bridges natifs (`test:native-infra`). Phase 8 : `MobileShellGalaxyDockSlot` + `MobileShellFooterDock`. Phase 9 : couverture complète `src/core/native/` (push, Apple Sign-In, photo).
+Phases 5–7 : bridges natifs (`test:native-infra`). Phase 8 : `MobileShellGalaxyDockSlot` + `MobileShellFooterDock`. Phase 9 : couverture complète `src/core/native/` (push, Apple Sign-In, photo). Phase 10 : hooks power gate + garde CODEX `useTechnicianAssignmentsFirestoreListener`.
 
 ---
 
