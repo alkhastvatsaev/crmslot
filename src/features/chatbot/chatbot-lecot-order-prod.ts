@@ -10,6 +10,7 @@ import {
 import { buildLecotOrderLineRows } from "@/features/chatbot/chatbot-lecot-order-lines";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
 import { lecotShopBaseUrl } from "@/features/catalog/lecotShopConfig";
+import { notifyMaterialOrderStatusAdmin } from "@/features/notifications/server/notifyMaterialOrderStatusAdmin";
 import type { SupplierOrderLine } from "@/features/suppliers";
 
 export async function executeProductionLecotOrder(params: {
@@ -65,6 +66,21 @@ export async function executeProductionLecotOrder(params: {
   }
 
   await orderRef.update(patch);
+
+  if (status === "sent") {
+    void notifyMaterialOrderStatusAdmin({
+      db: firestore,
+      auth: admin.auth,
+      companyId: ctx.companyId,
+      actorUid: ctx.actorUid,
+      kind: "supplier",
+      fromStatus: "draft",
+      toStatus: "sent",
+      supplierOrderId: orderRef.id,
+      interventionId: interventionId || null,
+      clientName: orderClientName ?? null,
+    }).catch(() => {});
+  }
 
   const materialStatus: "ordered" | "pending" =
     lecot.ok && (lecot.source === "api" || lecot.source === "playwright") ? "ordered" : "pending";

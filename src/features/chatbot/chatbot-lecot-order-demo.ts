@@ -10,6 +10,7 @@ import {
 } from "@/features/chatbot/chatbot-lecot-order-helpers";
 import { buildLecotOrderLineRows } from "@/features/chatbot/chatbot-lecot-order-lines";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import { notifyMaterialOrderStatusAdmin } from "@/features/notifications/server/notifyMaterialOrderStatusAdmin";
 import { lecotShopBaseUrl } from "@/features/catalog/lecotShopConfig";
 import type { SupplierOrderLine } from "@/features/suppliers";
 
@@ -47,6 +48,19 @@ export async function executeDemoLecotOrder(params: {
     notes: notes ? `${notes}\n${demoNote}` : demoNote,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
+
+  void notifyMaterialOrderStatusAdmin({
+    db: firestore,
+    auth: admin.auth,
+    companyId: ctx.companyId,
+    actorUid: ctx.actorUid,
+    kind: "supplier",
+    fromStatus: "draft",
+    toStatus: "sent",
+    supplierOrderId: orderRef.id,
+    interventionId: interventionId || null,
+    clientName: orderClientName ?? null,
+  }).catch(() => {});
 
   let materialOrderId: string | null = null;
   if (interventionId && linkMaterialOrder) {

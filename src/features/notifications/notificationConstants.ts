@@ -15,3 +15,6 @@ export const BM_CLIENT_CHAT_PARAM = "bmClientChat";
 
 /** Ouvre l’inbox carte sur l’onglet chat (message client portail). */
 export const BM_BACKOFFICE_CHAT_PARAM = "bmBackofficeChat";
+
+/** Ouvre le hub Matériel depuis une push commande matériel. */
+export const BM_MATERIAL_ORDER_PARAM = "bmMaterialOrder";

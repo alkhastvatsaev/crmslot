@@ -1,4 +1,5 @@
 import type { Firestore } from "firebase/firestore";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
 import { resolveInterventionClientName } from "@/features/interventions/resolveInterventionClientName";
 import type { Intervention } from "@/features/interventions";
 import type { MaterialOrder, MaterialOrderPart } from "@/features/materials/types";
@@ -72,6 +73,18 @@ export async function createMaterialOrder(params: CreateMaterialOrderParams): Pr
       },
       note: `Demande matériel terrain · ${summary.slice(0, 240)}`,
     });
+
+    void fetchWithAuth("/api/notifications/material-order-placed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        companyId: intervention.companyId,
+        materialOrderId: orderId,
+        interventionId: intervention.id,
+        clientName,
+        partsSummary: summary,
+      }),
+    }).catch(() => {});
   }
 
   if (setWaitingMaterial && intervention.status === "in_progress" && partsRequested.length > 0) {

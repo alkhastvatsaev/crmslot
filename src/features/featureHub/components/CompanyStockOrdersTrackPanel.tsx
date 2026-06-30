@@ -76,11 +76,22 @@ export default function CompanyStockOrdersTrackPanel({
   );
 
   const handleApprove = useCallback(
-    async (orderId: string) => {
-      setApprovingId(orderId);
+    async (order: MaterialOrderDoc) => {
+      setApprovingId(order.id);
       try {
-        if (firestore) {
-          await updateMaterialOrderStatus(firestore, orderId, "ordered" as MaterialOrder["status"]);
+        if (firestore && order.companyId) {
+          await updateMaterialOrderStatus(
+            firestore,
+            order.id,
+            "ordered" as MaterialOrder["status"],
+            {
+              companyId: order.companyId,
+              fromStatus: order.status,
+              clientName: order.clientName ?? null,
+              interventionId: order.interventionId,
+              supplierOrderId: order.supplierOrderId ?? null,
+            }
+          );
         }
         toast.success(String(t("companyStock.order_approved")));
       } catch {
@@ -89,7 +100,7 @@ export default function CompanyStockOrdersTrackPanel({
         setApprovingId(null);
       }
     },
-    [onDismissDemoOrder, t]
+    [t]
   );
 
   if (loading) {
@@ -157,7 +168,7 @@ export default function CompanyStockOrdersTrackPanel({
                         type="button"
                         data-testid={`company-stock-approve-order-${order.id}`}
                         disabled={approvingId === order.id}
-                        onClick={() => void handleApprove(order.id)}
+                        onClick={() => void handleApprove(order)}
                         className="inline-flex items-center gap-1 rounded-[10px] bg-slate-900 px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
                       >
                         {approvingId === order.id ? (

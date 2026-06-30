@@ -4,6 +4,7 @@ import {
   DASHBOARD_DESKTOP_GALAXY_BOTTOM_CLASS,
   DASHBOARD_DESKTOP_GALAXY_INSET_END_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
+import { MOBILE_MAP_RECENTER_BTN_CLASS } from "@/core/ui/dashboardMobileLayout";
 
 type Props = {
   onRecenter: () => void;
@@ -13,15 +14,10 @@ type Props = {
 export default function MapboxMapControls({ onRecenter, layout }: Props) {
   if (layout === "mobile") {
     return (
-      <div
-        className="absolute z-[1] flex flex-col gap-2"
-        style={{ bottom: "calc(env(safe-area-inset-bottom,0px) + 16px)", right: "16px" }}
-      >
-        <RecenterButton
-          onRecenter={onRecenter}
-          className="h-10 w-10 rounded-[12px] opacity-90 hover:opacity-100"
-        />
-      </div>
+      <RecenterButton
+        onRecenter={onRecenter}
+        className={`${MOBILE_MAP_RECENTER_BTN_CLASS} h-10 w-10 rounded-[12px] opacity-90 hover:opacity-100`}
+      />
     );
   }
 
