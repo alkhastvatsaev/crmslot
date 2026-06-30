@@ -123,6 +123,21 @@ Composants encore sans test isolé (couverture parent/contrat) : `AdminMobileShe
 
 ---
 
+## Hooks mobile power & CODEX (Phase 10)
+
+Tests dans `src/features/dashboard/hooks/__tests__/` :
+
+| Hook                              | Rôle                                     |
+| --------------------------------- | ---------------------------------------- |
+| `computeMobileMountedPageIndices` | thermique — 1 hub monté                  |
+| `useMobileMapPagePowerGate`       | coupe WebGL / Firestore inbox hors écran |
+| `useMobileFooterGalaxyVisible`    | calendrier vs dock Galaxy                |
+| `useMobileHubAgentRailActive`     | rail agent chatbot hub                   |
+
+**CODEX mobile** (`TESTING.md` §11) — `useTechnicianAssignmentsFirestoreListener` :
+`src/features/interventions/hooks/__tests__/useTechnicianAssignmentsFirestoreListener.test.tsx`
+→ pas de `onSnapshot` si `firebaseUid` null / hook désactivé.
+
 ## Composants shell Phase 8 (dock Galaxy)
 
 | Composant                   | Fichier test                   | Vérifié                                    |
@@ -165,6 +180,47 @@ Helper : `tests/e2e/helpers/mobileShell.ts` (`gotoMobileShellOrSkip`, `dispatchH
 `workflow_dispatch` disponible sur `mobile-tests.yml` pour un check manuel.
 
 ---
+
+## E2E apps satellites (Phase 11)
+
+| Route           | Spec                            | Projet Playwright          |
+| --------------- | ------------------------------- | -------------------------- |
+| `/m/technician` | `technician-mobile-app.spec.ts` | `technician-app` (Pixel 7) |
+| `/m/demande`    | `client-mobile-app.spec.ts`     | `client-app` (Pixel 7)     |
+
+Helper : `tests/e2e/helpers/satelliteMobileApps.ts`
+
+| Suite             | CI sans auth                                                                    |
+| ----------------- | ------------------------------------------------------------------------------- |
+| **Infra**         | shell **ou** login gate (technicien) · shell client (guest OK) · manifests HTML |
+| **UX technicien** | skip sans session                                                               |
+| **UX client**     | chrome complet (guest)                                                          |
+
+```bash
+npm run test:e2e:satellite-apps   # terrain + demande seuls
+npm run test:e2e:mobile           # admin shell + satellites + API mobile
+npm run e2e:auth:admin            # générer tests/e2e/.auth/admin.json
+```
+
+## Seuils Jest P0 mobile (Phase 12)
+
+Fichiers à **100 %** (ou branches ≥ 80 %) — vérifiés via `npm run test:ci` :
+
+| Fichier                           | Seuil                       |
+| --------------------------------- | --------------------------- |
+| `mobileShellContract.ts`          | 100 %                       |
+| `adminMobileShellContract.ts`     | 100 %                       |
+| `dashboardMobileLayout.ts`        | 100 %                       |
+| `useMobileMapPagePowerGate.ts`    | 100 %                       |
+| `useMobileFooterGalaxyVisible.ts` | 100 % stmts · 80 % branches |
+| `useMobileMountedPageIndices.ts`  | 100 %                       |
+
+Auth E2E local :
+
+```bash
+npm run e2e:auth:admin        # tests/e2e/.auth/admin.json
+npm run e2e:auth:technician   # tests/e2e/.auth/technician.json
+```
 
 ## Bridges natifs Capacitor (Phase 5–9)
 

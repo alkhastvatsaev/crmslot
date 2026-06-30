@@ -141,6 +141,29 @@ describe("useMobileFooterGalaxyVisible", () => {
     expect(renderHook(() => useMobileFooterGalaxyVisible()).result.current).toBe(true);
   });
 
+  it("false si le rail gauche n'est pas dans le snapshot", () => {
+    mockPager(FEATURE_HUB_SLOT_INDEX);
+    useRailSnapshotMock.mockReturnValue({
+      visible: true,
+      activeRail: "left",
+      rails: ["center", "right"],
+      requestRail: jest.fn(),
+    });
+    expect(renderHook(() => useMobileHubAgentRailActive()).result.current).toBe(false);
+  });
+
+  it("false si dispatchVoice désactivé même transcription armée", () => {
+    useFeatureFlagMock.mockReturnValue(false);
+    useBridgeMock.mockReturnValue({
+      transcriptionArmed: true,
+      armTranscription: jest.fn(),
+      disarmTranscription: jest.fn(),
+      emitInterventionCreated: jest.fn(),
+      registerInterventionConsumer: jest.fn(),
+    });
+    expect(renderHook(() => useMobileFooterGalaxyVisible()).result.current).toBe(false);
+  });
+
   it("false par défaut (calendrier footer)", () => {
     expect(renderHook(() => useMobileFooterGalaxyVisible()).result.current).toBe(false);
   });
