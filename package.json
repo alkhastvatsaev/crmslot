@@ -26,6 +26,7 @@
     "test:gmail": "jest src/features/gmail --no-coverage",
     "test:auth": "jest src/features/auth --no-coverage",
     "test:crm": "jest src/features/crmHistory --no-coverage",
+    "test:backoffice": "jest src/features/backoffice --no-coverage",
     "test:billing-hub": "jest src/features/billingHub src/features/billing --no-coverage",
     "test:patron-hubs": "jest src/features/caseHub src/features/teamHub src/features/planningHub src/features/commissionsHub src/core/ui/hub --no-coverage",
     "test:webhooks": "jest src/app/api/webhooks --no-coverage",
@@ -33,7 +34,7 @@
     "test:mobile-shell": "jest src/features/dashboard/__tests__/mobileShellContract.test.tsx src/features/dashboard/components/__tests__/MobileShell.test.tsx src/features/dashboard/components/__tests__/MobileScreenHost.test.tsx src/features/dashboard/components/__tests__/DashboardPageSelector.test.tsx src/features/dashboard/components/__tests__/UserProfile.test.tsx src/features/dashboard/components/__tests__/DashboardDesktopShell.test.tsx src/features/dashboard/components/__tests__/MobileHeaderRailLayout.test.tsx src/features/dashboard/components/__tests__/MobileHubLayout.test.tsx src/features/dashboard/components/__tests__/MobileTopBar.test.tsx src/features/dashboard/components/__tests__/MobileShellFooterDockRow.test.tsx src/features/dashboard/components/__tests__/MobileShellSlotGrid.test.tsx src/features/dashboard/components/__tests__/MobileCentralPanelFrame.test.tsx src/features/dashboard/components/__tests__/MobileProfileTopBar.test.tsx src/features/dashboard/components/__tests__/AdminMobileProfileChip.test.tsx src/features/dashboard/components/__tests__/MobileNavDrawer.test.tsx src/features/dashboard/components/__tests__/MobileShellGalaxyDockSlot.test.tsx src/features/dashboard/components/__tests__/MobileShellFooterDock.test.tsx --no-coverage",
     "test:mobile-admin": "jest src/features/dashboard/__tests__/adminMobileShellContract.test.tsx src/core/pwa/__tests__/PwaUpdateBanner.test.tsx src/core/pwa/__tests__/pwaBundleUpdate.test.ts src/features/offline/__tests__/adminInboxInterventionsCache.test.ts src/features/offline/__tests__/adminInterventionDetailCache.test.ts src/features/backoffice/__tests__/useBackOfficeInterventions.offline.test.ts --no-coverage",
     "test:mobile": "npm run test:mobile-infra && npm run test:mobile-shell && npm run test:mobile-admin && npm run test:native-infra",
-    "test:e2e:mobile": "playwright test tests/e2e/mobile-shell.spec.ts tests/e2e/api-mobile-config.spec.ts tests/e2e/api-pwa-registry.spec.ts --project=mobile-shell --project=chromium",
+    "test:e2e:mobile": "playwright test tests/e2e/mobile-shell.spec.ts tests/e2e/technician-mobile-app.spec.ts tests/e2e/client-mobile-app.spec.ts tests/e2e/api-mobile-config.spec.ts tests/e2e/api-pwa-registry.spec.ts --project=mobile-shell --project=technician-app --project=client-app --project=chromium",
     "test:e2e:mobile-shell": "playwright test tests/e2e/mobile-shell.spec.ts --project=mobile-shell",
     "test:ci": "npm run typecheck && npm run test:coverage",
     "test:agent-check": "node scripts/ci/agent-test-check.mjs",
@@ -105,7 +106,8 @@
     "i18n:parity": "node scripts/i18n/parity-check.mjs --require ru",
     "test:i18n": "jest src/core/i18n --no-coverage",
     "audit:barrels:client-safe": "node scripts/ci/detect-cross-feature-imports.mjs --verify-client-safe",
-    "test:e2e:smoke": "playwright test tests/e2e/dashboard-load.spec.ts tests/e2e/api-health.spec.ts tests/e2e/api-routes-auth-matrix.spec.ts --project=chromium"
+    "test:e2e:smoke": "playwright test tests/e2e/dashboard-load.spec.ts tests/e2e/api-health.spec.ts tests/e2e/api-routes-auth-matrix.spec.ts --project=chromium",
+    "e2e:auth:admin": "playwright codegen --save-storage=tests/e2e/.auth/admin.json http://localhost:3000"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
