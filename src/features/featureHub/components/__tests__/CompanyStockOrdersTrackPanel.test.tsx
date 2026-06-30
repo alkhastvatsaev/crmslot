@@ -74,7 +74,16 @@ describe("CompanyStockOrdersTrackPanel", () => {
     );
     fireEvent.click(screen.getByTestId("company-stock-approve-order-mo-1"));
     await waitFor(() => {
-      expect(mockUpdateStatus).toHaveBeenCalledWith(expect.anything(), "mo-1", "ordered");
+      expect(mockUpdateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        "mo-1",
+        "ordered",
+        expect.objectContaining({
+          companyId: "co-1",
+          fromStatus: "pending",
+          interventionId: "INT-1",
+        })
+      );
       expect(toast.success).toHaveBeenCalled();
     });
   });
