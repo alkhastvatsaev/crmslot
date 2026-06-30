@@ -130,6 +130,7 @@ describe("FeatureHubPage", () => {
 
     expect(container.querySelector(".dashboard-desktop-grid")).toBeInTheDocument();
     expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-lecot-logo")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-lecot-catalog")).not.toBeInTheDocument();
     expect(
       screen.getByTestId(`dashboard-pager-slot-${FEATURE_HUB_SLOT_INDEX}-panel-left`)

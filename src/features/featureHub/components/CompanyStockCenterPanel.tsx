@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
@@ -92,6 +93,15 @@ export default function CompanyStockCenterPanel({ items, orders, category, loadi
         data-testid="company-stock-center"
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
       >
+        <div className="mb-2 flex shrink-0 justify-center" data-testid="company-stock-lecot-logo">
+          <Image
+            src="/brand/lecot-logo.png"
+            alt="Lecot"
+            width={88}
+            height={28}
+            className="h-7 w-auto object-contain"
+          />
+        </div>
         <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
           <CompanyStockItemList
             items={listRows}
