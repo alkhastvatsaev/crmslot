@@ -1,4 +1,5 @@
 import type * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import "@/core/config/firebase-admin";
 import { logger } from "@/core/logger";
 import { notifyMaterialOrderStatusAdmin } from "@/features/notifications/server/notifyMaterialOrderStatusAdmin";
@@ -27,7 +28,7 @@ async function applySupplierOrderAdvance(
   const now = new Date().toISOString();
   const patch: Record<string, unknown> = {
     status: candidate.toStatus,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   };
   if (candidate.toStatus === "sent") patch.sentAt = now;
   if (candidate.toStatus === "delivered") patch.deliveredAt = now;
