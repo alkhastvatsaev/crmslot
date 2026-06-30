@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import AppBootLoadingScreen from "@/core/ui/AppBootLoadingScreen";
 import { auth, isConfigured } from "@/core/config/firebase";
 import { ensureNativeAuthPersistence } from "@/core/native/nativeAuthPersistence";
 import CrmEmailLoginPanel from "@/features/auth/components/CrmEmailLoginPanel";
@@ -56,12 +56,7 @@ export default function CrmEmailLoginGate({ variant, children }: Props) {
 
   if (phase === "checking") {
     return (
-      <div
-        data-testid={crmEmailLoginTestId(variant, "gate-loading")}
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-50"
-      >
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" strokeWidth={1.5} />
-      </div>
+      <AppBootLoadingScreen variant="fixed" testId={crmEmailLoginTestId(variant, "gate-loading")} />
     );
   }
 
