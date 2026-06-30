@@ -2,7 +2,7 @@
 
 import { Lock, Loader2 } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import GmailGoogleConnectButton from "@/features/gmail/components/GmailGoogleConnectButton";
+import CrmBrandOAuthButton from "@/features/auth/components/CrmBrandOAuthButton";
 import type { ClientPortalAuthTab } from "@/features/auth/hooks/useClientPortalAuth";
 
 type Props = {
@@ -116,10 +116,12 @@ export default function ClientPortalAuthForm({
       </div>
 
       <div className="flex w-full justify-center" data-testid="client-portal-google-wrap">
-        <GmailGoogleConnectButton
-          dataTestId="client-portal-google-signin"
-          ariaLabel={String(t("auth.connect_with_google"))}
+        <CrmBrandOAuthButton
+          variant="google"
+          testId="client-portal-google-signin"
+          label={String(t("auth.connect_with_google"))}
           disabled={emailAuthBusy || googleBusy}
+          busy={googleBusy}
           onClick={() => void onGoogleSignIn()}
         />
       </div>

@@ -39,7 +39,7 @@ const BRAND_ASSETS = {
 /** Délai court pour voir l’animation avant redirection OAuth. */
 const PRESS_FEEDBACK_MS = 140;
 
-/** Bouton Google pré-approuvé (asset officiel) — clic → OAuth CRMSLOT. */
+/** Bouton Google pré-approuvé — connexion boîte Gmail (OAuth serveur, pas Firebase Auth CRM). */
 export default function GmailGoogleConnectButton({
   onClick,
   disabled,
