@@ -9,6 +9,7 @@ import {
 } from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
 import { resolveInterventionClientNameFromRecord } from "@/features/interventions/resolveInterventionClientName";
 import { requireMaterialOrderClientName } from "@/features/materials/materialOrderClientName";
+import { notifyMaterialOrderPlacedAdmin } from "@/features/notifications/server/notifyMaterialOrderPlacedAdmin";
 import type { SupplierOrderLine } from "@/features/suppliers";
 
 export async function assertInterventionAccess(companyId: string, interventionId: string) {
@@ -166,6 +167,26 @@ export async function logLecotOrderPlacedCrm(params: {
       supplierOrderId: params.supplierOrderId,
     });
   }
+
+  void notifyMaterialOrderPlacedAdmin({
+    db: admin.firestore(),
+    auth: admin.auth,
+    companyId: params.ctx.companyId,
+    actorUid: params.ctx.actorUid,
+    supplierOrderId: params.supplierOrderId,
+    materialOrderId: params.materialOrderId,
+    interventionId: params.interventionId || null,
+    clientName: params.orderClientName ?? null,
+    body:
+      params.lines
+        .map((l) => `${l.quantity}× ${l.label}`)
+        .join(", ")
+        .slice(0, 180) || "Nouvelle commande matériel enregistrée.",
+  }).catch((err) => {
+    logger.warn("[logLecotOrderPlacedCrm] material order push failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+  });
 }
 
 export async function sendLecotOrderEmailAndMarkPending(params: {

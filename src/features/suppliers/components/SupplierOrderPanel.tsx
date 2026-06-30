@@ -71,8 +71,14 @@ export default function SupplierOrderPanel() {
 
   const handleUpdateStatus = async (id: string, status: SupplierOrderStatus) => {
     if (!firestore) return;
+    const order = orders.find((o) => o.id === id);
+    if (!order) return;
     try {
-      await updateSupplierOrderStatus(firestore, companyId, id, status);
+      await updateSupplierOrderStatus(firestore, companyId, id, status, {
+        fromStatus: order.status,
+        clientName: order.clientName ?? null,
+        interventionId: order.interventionId ?? null,
+      });
     } catch {
       toast.error(String(t("common.error")));
     }
@@ -150,7 +156,11 @@ export default function SupplierOrderPanel() {
               </div>
             ))}
           </div>
-          <button type="button" onClick={addLine} className="text-xs font-semibold text-blue-600 hover:underline">
+          <button
+            type="button"
+            onClick={addLine}
+            className="text-xs font-semibold text-blue-600 hover:underline"
+          >
             + {t("suppliers.add_line")}
           </button>
           <button

@@ -15,7 +15,7 @@ export function paintGalaxyBackground(
   variant: GalaxyStarsVariant = "dock"
 ) {
   if (variant === "avatar") {
-    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #2563eb 0%, #172554 38%, rgba(23, 37, 84, 0.35) 52%, rgba(23, 37, 84, 0.08) 62%, transparent 72%)`;
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, rgba(191, 219, 254, 0.92) 0%, #60a5fa 6%, #3b82f6 16%, #2563eb 30%, #1d4ed8 44%, #1e3a8a 56%, rgba(23, 37, 84, 0.72) 68%, rgba(15, 23, 42, 0.38) 78%, rgba(15, 23, 42, 0.14) 88%, rgba(15, 23, 42, 0.04) 95%, transparent 100%)`;
   } else {
     surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
   }
@@ -64,7 +64,7 @@ export function createGalaxyStars({
     const color = GALAXY_STAR_COLORS[Math.floor(Math.random() * GALAXY_STAR_COLORS.length)]!;
 
     const size = isAvatar
-      ? Math.random() * 0.2 + 0.1
+      ? Math.random() * 0.32 + 0.14
       : isCompactDock
         ? Math.random() * 0.55 + 0.35
         : Math.random() * 0.4 + 0.1;
@@ -78,7 +78,7 @@ export function createGalaxyStars({
         (isCompactDock ? 2 : 1),
       size,
       opacity: isAvatar
-        ? Math.random() * 0.4 + 0.35
+        ? Math.random() * 0.32 + 0.42
         : isCompactDock
           ? Math.random() * 0.35 + 0.45
           : Math.random() * 0.6 + 0.2,
@@ -102,6 +102,8 @@ export type DrawGalaxyStarsParams = {
   maxDrawRadius: number;
   depthZScale: number;
   now: number;
+  /** Fondu doux en bordure — orbe chatbot. */
+  softEdge?: boolean;
 };
 
 export function drawGalaxyStars({
@@ -115,7 +117,11 @@ export function drawGalaxyStars({
   maxDrawRadius,
   depthZScale,
   now,
+  softEdge = false,
 }: DrawGalaxyStarsParams) {
+  const mini = Math.min(width, height);
+  const edgeRadius = mini * 0.5;
+
   for (const star of stars) {
     star.angle += star.angularVelocity * speedMultiplier;
 
@@ -140,7 +146,16 @@ export function drawGalaxyStars({
       ctx.arc(finalX, finalY, finalSize, 0, Math.PI * 2);
 
       const twinkle = (Math.sin(now * 0.002 * star.twinkleSpeed) + 1) * 0.5;
-      const alpha = star.opacity * (0.3 + twinkle * 0.7) * Math.min(1, depthScale);
+      let alpha = star.opacity * (0.3 + twinkle * 0.7) * Math.min(1, depthScale);
+
+      if (softEdge && edgeRadius > 0) {
+        const dx = finalX - currentX;
+        const dy = finalY - currentY;
+        const dist = Math.sqrt(dx * dx + dy * dy) / edgeRadius;
+        const edge = Math.max(0, Math.min(1, (dist - 0.42) / 0.58));
+        alpha *= 1 - edge * edge * (3 - 2 * edge);
+      }
+
       const c = star.color;
       ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${Math.max(0, alpha)})`;
       ctx.fill();

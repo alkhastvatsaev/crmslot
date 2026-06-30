@@ -8,8 +8,15 @@ import {
   type Firestore,
 } from "firebase/firestore";
 import { logger } from "@/core/logger";
+import { dispatchOrderStatusPushClient } from "@/features/notifications/dispatchOrderStatusPushClient";
 import type { SupplierOrder, SupplierOrderStatus } from "./types";
 import { computeOrderTotal } from "./types";
+
+export type SupplierOrderStatusNotifyContext = {
+  fromStatus: string;
+  clientName?: string | null;
+  interventionId?: string | null;
+};
 
 const col = (db: Firestore, companyId: string) =>
   collection(db, "companies", companyId, "supplierOrders");
@@ -79,7 +86,8 @@ export async function updateSupplierOrderStatus(
   db: Firestore,
   companyId: string,
   orderId: string,
-  status: SupplierOrderStatus
+  status: SupplierOrderStatus,
+  notify?: SupplierOrderStatusNotifyContext
 ): Promise<void> {
   const now = new Date().toISOString();
   await updateDoc(doc(db, "companies", companyId, "supplierOrders", orderId), {
@@ -87,5 +95,16 @@ export async function updateSupplierOrderStatus(
     updatedAt: serverTimestamp(),
     ...(status === "sent" ? { sentAt: now } : {}),
     ...(status === "delivered" ? { deliveredAt: now } : {}),
+  });
+
+  if (!notify) return;
+  dispatchOrderStatusPushClient({
+    companyId,
+    kind: "supplier",
+    fromStatus: notify.fromStatus,
+    toStatus: status,
+    supplierOrderId: orderId,
+    interventionId: notify.interventionId ?? null,
+    clientName: notify.clientName ?? null,
   });
 }

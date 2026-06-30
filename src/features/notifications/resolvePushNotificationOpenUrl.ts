@@ -4,6 +4,7 @@ import {
   BM_BACKOFFICE_CHAT_PARAM,
   BM_CLIENT_CASE_PARAM,
   BM_CLIENT_CHAT_PARAM,
+  BM_MATERIAL_ORDER_PARAM,
   BM_TECH_CASE_PARAM,
   BM_TECH_REMINDER_PARAM,
 } from "@/features/notifications/notificationConstants";
@@ -71,6 +72,17 @@ export function resolvePushNotificationOpenUrl(
           ? interventionId
           : "global";
     return `${base}/?${BM_BACKOFFICE_CHAT_PARAM}=${encodeURIComponent(chatIv)}`;
+  }
+
+  if (pushType === "material_order_placed" || pushType === "material_order_status_changed") {
+    const orderId =
+      (typeof data[BM_MATERIAL_ORDER_PARAM] === "string" ? data[BM_MATERIAL_ORDER_PARAM] : "") ||
+      (typeof data.supplierOrderId === "string" ? data.supplierOrderId : "") ||
+      (typeof data.materialOrderId === "string" ? data.materialOrderId : "");
+    if (orderId.trim()) {
+      return `${base}/?${BM_MATERIAL_ORDER_PARAM}=${encodeURIComponent(orderId.trim())}`;
+    }
+    return `${base}/`;
   }
 
   if (interventionId.length > 0) {

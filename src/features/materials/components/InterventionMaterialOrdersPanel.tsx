@@ -125,8 +125,16 @@ export default function InterventionMaterialOrdersPanel({
 
   const handleStatus = async (orderId: string, status: MaterialOrder["status"]) => {
     if (!firestore) return;
+    const order = orders.find((o) => o.id === orderId);
+    if (!order || !intervention.companyId) return;
     try {
-      await updateMaterialOrderStatus(firestore, orderId, status);
+      await updateMaterialOrderStatus(firestore, orderId, status, {
+        companyId: intervention.companyId,
+        fromStatus: order.status,
+        clientName: order.clientName ?? null,
+        interventionId: order.interventionId,
+        supplierOrderId: (order as { supplierOrderId?: string | null }).supplierOrderId ?? null,
+      });
       toast.success(String(t("materials.status_updated")));
     } catch {
       toast.error(String(t("common.error")));

@@ -77,6 +77,10 @@
       "schedule": "0 10 * * *"
     },
     {
+      "path": "/api/cron/supplier-order-progress",
+      "schedule": "0 */6 * * *"
+    },
+    {
       "path": "/api/cron/technician-unclosed-reminders",
       "schedule": "0 18 * * *"
     },

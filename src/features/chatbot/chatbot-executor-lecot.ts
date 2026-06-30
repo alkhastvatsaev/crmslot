@@ -11,8 +11,11 @@ import {
   suggestGmailInterventionLinksForChatbot,
 } from "@/features/chatbot/chatbot-gmail";
 import { logCrmMaterialOrderApprovedAdmin } from "@/features/crmHistory/logCrmSupplierAndMaterialOrder";
+import { notifyMaterialOrderStatusAdmin } from "@/features/notifications/server/notifyMaterialOrderStatusAdmin";
 import { db } from "@/features/chatbot/chatbot-executor-queries";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import * as admin from "firebase-admin";
+import "@/core/config/firebase-admin";
 
 /** Texte de commande / navigation — jamais un nom de client réel. */
 const LECOT_COMMAND_RE =
@@ -84,6 +87,18 @@ export async function approveMaterialOrders(
         interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
         clientName: typeof data.clientName === "string" ? data.clientName : null,
       });
+      void notifyMaterialOrderStatusAdmin({
+        db: firestore,
+        auth: admin.auth,
+        companyId: ctx.companyId,
+        actorUid: ctx.actorUid,
+        kind: "material",
+        fromStatus: "pending",
+        toStatus: "ordered",
+        materialOrderId: doc.id,
+        interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
+        clientName: typeof data.clientName === "string" ? data.clientName : null,
+      }).catch(() => {});
     }
     return {
       ok: true,
@@ -118,6 +133,18 @@ export async function approveMaterialOrders(
       interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
       clientName: typeof data.clientName === "string" ? data.clientName : null,
     });
+    void notifyMaterialOrderStatusAdmin({
+      db: firestore,
+      auth: admin.auth,
+      companyId: ctx.companyId,
+      actorUid: ctx.actorUid,
+      kind: "material",
+      fromStatus: "pending",
+      toStatus: "ordered",
+      materialOrderId: orderId,
+      interventionId: typeof data.interventionId === "string" ? data.interventionId : null,
+      clientName: typeof data.clientName === "string" ? data.clientName : null,
+    }).catch(() => {});
   }
 
   return {

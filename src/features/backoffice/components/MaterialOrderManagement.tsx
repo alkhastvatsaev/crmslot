@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { auth, firestore } from "@/core/config/firebase";
 import { logCrmCompanyAction } from "@/features/crmHistory/logCrmCompanyAction";
+import { updateMaterialOrderStatus } from "@/features/materials/materialOrderFirestore";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { scheduleEffectUpdate } from "@/utils/scheduleEffectUpdate";
 
@@ -16,6 +17,7 @@ interface MaterialOrder {
   interventionId: string;
   companyId: string;
   technicianUid: string;
+  clientName?: string | null;
   partsRequested: { description: string; quantity: number; reference?: string }[];
   urgency: "low" | "normal" | "high";
   status: "pending" | "approved" | "ordered" | "delivered" | "cancelled";
@@ -75,11 +77,14 @@ export default function MaterialOrderManagement({ companyId }: Props) {
     setUpdatingId(orderId);
     try {
       const order = orders.find((o) => o.id === orderId);
-      await updateDoc(doc(firestore, "material_orders", orderId), {
-        status: newStatus,
-        updatedAt: new Date().toISOString(),
-      });
-      if (activeCompanyId && order) {
+      if (!order) return;
+      if (activeCompanyId) {
+        await updateMaterialOrderStatus(firestore, orderId, newStatus as MaterialOrder["status"], {
+          companyId: activeCompanyId,
+          fromStatus: order.status,
+          clientName: order.clientName ?? null,
+          interventionId: order.interventionId,
+        });
         await logCrmCompanyAction({
           companyId: activeCompanyId,
           kind: "material_order_status_changed",
@@ -87,6 +92,11 @@ export default function MaterialOrderManagement({ companyId }: Props) {
           actorRole: "dispatcher",
           interventionId: order.interventionId,
           note: `Commande matériel → ${newStatus}`,
+        });
+      } else {
+        await updateDoc(doc(firestore, "material_orders", orderId), {
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
         });
       }
       toast.success("Statut mis à jour");
