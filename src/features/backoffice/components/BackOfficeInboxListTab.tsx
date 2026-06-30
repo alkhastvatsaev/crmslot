@@ -44,7 +44,7 @@ export default function BackOfficeInboxListTab({
     <div
       className={cn(
         GLASS_PANEL_BODY_SCROLL_COMPACT,
-        "flex min-h-0 flex-1 flex-col gap-3 px-4 pb-6",
+        "flex min-h-0 flex-1 flex-col gap-2 px-4 pb-6",
         !active && "hidden"
       )}
       aria-hidden={!active}
@@ -60,11 +60,11 @@ export default function BackOfficeInboxListTab({
         ))}
 
       {loading ? (
-        <div className="space-y-3 py-2">
+        <div className="space-y-2 py-2">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-[24px] bg-white/50 border border-slate-200/50"
+              className="h-16 animate-pulse rounded-[16px] bg-white/50 border border-slate-200/50"
             />
           ))}
         </div>
@@ -90,7 +90,7 @@ export default function BackOfficeInboxListTab({
       ) : null}
 
       {!loading && itemsToShow.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-2">
           {itemsToShow.map((item, index) => (
             <BackOfficeInboxInterventionRow
               key={item.id}
