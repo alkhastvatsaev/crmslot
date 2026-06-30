@@ -14,6 +14,7 @@ function lineLookupFields(line: SupplierOrderLine) {
   return {
     sku: line.sku,
     label: line.label,
+    description: line.label,
   };
 }
 

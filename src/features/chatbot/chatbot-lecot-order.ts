@@ -13,13 +13,17 @@ import {
 } from "@/features/chatbot/chatbot-lecot-order-lines";
 import { executeProductionLecotOrder } from "@/features/chatbot/chatbot-lecot-order-prod";
 import type { ChatbotToolContext } from "@/features/chatbot/chatbot-tool-executor";
+import { parseMaterialOrderStockReference } from "@/features/materials/interventionMaterialOrderPrompt";
 
 export async function orderLecotPartsForChatbot(
   ctx: ChatbotToolContext,
   input: Record<string, unknown>
 ) {
   const parsed = parseOrderLines(input.lines);
-  const lines = await enrichLecotOrderLinesWithCatalogPrices(ctx.companyId, parsed);
+  const stockReference = parseMaterialOrderStockReference(ctx.lastUserText ?? "");
+  const lines = await enrichLecotOrderLinesWithCatalogPrices(ctx.companyId, parsed, {
+    stockReference,
+  });
   const notes = typeof input.notes === "string" && input.notes.trim() ? input.notes.trim() : null;
   const interventionId =
     typeof input.interventionId === "string" ? input.interventionId.trim() : "";

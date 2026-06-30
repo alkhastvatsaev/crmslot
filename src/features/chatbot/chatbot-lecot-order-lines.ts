@@ -1,5 +1,6 @@
 import { loadCompanyCatalogProducts } from "@/features/catalog/loadCompanyCatalog";
 import { LECOT_CATALOG } from "@/features/catalog/lecotCatalog";
+import { lookupClientLecotProductImageOverlay } from "@/features/catalog/lecotProductImageClientOverlay";
 import { STUB_CATALOG, type CatalogProduct } from "@/features/catalog/productQuickAdd";
 import {
   mergeCatalogProducts,
@@ -11,10 +12,64 @@ import type { SupplierOrderLine } from "@/features/suppliers";
 
 const LOCAL_CATALOG = mergeCatalogProducts(LECOT_CATALOG, STUB_CATALOG);
 
+type EnrichLecotOrderLinesOptions = {
+  /** Référence stock inventaire (dock central) — vignette même si le SKU commandé diffère. */
+  stockReference?: string | null;
+};
+
+function resolveLecotOrderLineImageUrl(
+  line: SupplierOrderLine,
+  stockReference?: string | null
+): string | null {
+  if (line.imageUrl?.trim()) return line.imageUrl.trim();
+
+  const stockRef = stockReference?.trim();
+  if (stockRef) {
+    const fromStockRef = lookupClientLecotProductImageOverlay({
+      reference: stockRef,
+      description: line.label,
+    });
+    if (fromStockRef) return fromStockRef;
+  }
+
+  const sku = line.sku.trim();
+  return lookupClientLecotProductImageOverlay({
+    reference: sku,
+    lecotSku: /^lec-/i.test(sku) ? sku : null,
+    description: line.label,
+  });
+}
+
+function enrichLineFromCatalogHit(
+  line: SupplierOrderLine,
+  hit: CatalogProduct,
+  stockReference?: string | null
+): SupplierOrderLine {
+  const imageUrl =
+    line.imageUrl?.trim() ||
+    hit.imageUrl?.trim() ||
+    resolveLecotOrderLineImageUrl(line, stockReference);
+  return {
+    ...line,
+    unitPriceCents: hit.unitPriceCents > 0 ? hit.unitPriceCents : line.unitPriceCents,
+    ...(imageUrl ? { imageUrl } : {}),
+  };
+}
+
+function enrichLineImage(
+  line: SupplierOrderLine,
+  stockReference?: string | null
+): SupplierOrderLine {
+  const imageUrl = resolveLecotOrderLineImageUrl(line, stockReference);
+  return imageUrl ? { ...line, imageUrl } : line;
+}
+
 export async function enrichLecotOrderLinesWithCatalogPrices(
   companyId: string,
-  lines: SupplierOrderLine[]
+  lines: SupplierOrderLine[],
+  options?: EnrichLecotOrderLinesOptions
 ): Promise<SupplierOrderLine[]> {
+  const stockReference = options?.stockReference ?? null;
   let companyProducts: CatalogProduct[] = [];
   try {
     companyProducts = await loadCompanyCatalogProducts(companyId);
@@ -32,7 +87,7 @@ export async function enrichLecotOrderLinesWithCatalogPrices(
   for (const line of lines) {
     const skuHit = bySku.get(line.sku.trim().toUpperCase());
     if (skuHit && skuHit.unitPriceCents > 0) {
-      out.push({ ...line, unitPriceCents: skuHit.unitPriceCents });
+      out.push(enrichLineFromCatalogHit(line, skuHit, stockReference));
       continue;
     }
     const labelQ = line.label.trim();
@@ -40,7 +95,7 @@ export async function enrichLecotOrderLinesWithCatalogPrices(
       const ranked = searchCatalogProductsScored(catalog, labelQ, 1);
       const best = ranked[0];
       if (best && best.unitPriceCents > 0) {
-        out.push({ ...line, unitPriceCents: best.unitPriceCents });
+        out.push(enrichLineFromCatalogHit(line, best, stockReference));
         continue;
       }
     }
@@ -49,11 +104,11 @@ export async function enrichLecotOrderLinesWithCatalogPrices(
       const ranked2 = searchCatalogProductsScored(catalog, combo, 1);
       const best2 = ranked2[0];
       if (best2 && best2.unitPriceCents > 0) {
-        out.push({ ...line, unitPriceCents: best2.unitPriceCents });
+        out.push(enrichLineFromCatalogHit(line, best2, stockReference));
         continue;
       }
     }
-    out.push(line);
+    out.push(enrichLineImage(line, stockReference));
   }
   return out;
 }
