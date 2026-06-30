@@ -7,7 +7,7 @@ import {
 
 describe("mobilePageTransition", () => {
   it("expose une durée alignée sur le spring mobile", () => {
-    expect(MOBILE_PAGE_TRANSITION_MS).toBe(380);
+    expect(MOBILE_PAGE_TRANSITION_MS).toBe(420);
   });
 
   describe("computeMobilePageTransitionDirection", () => {

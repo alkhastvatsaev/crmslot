@@ -68,6 +68,8 @@ export const MOBILE_SCREEN_HOST_PANEL_ENTER_PREV_CLASS = "mobile-screen-host-pan
 export const MOBILE_SCREEN_HOST_PANEL_EXIT_NEXT_CLASS = "mobile-screen-host-panel--exit-next";
 export const MOBILE_SCREEN_HOST_PANEL_EXIT_PREV_CLASS = "mobile-screen-host-panel--exit-prev";
 export const MOBILE_SCREEN_HOST_PANEL_SUSPENDED_CLASS = "mobile-screen-host-panel--suspended";
+export const MOBILE_SCREEN_HOST_PANEL_MOTION_RUN_CLASS = "mobile-screen-host-panel--motion-run";
+export const MOBILE_HUB_TITLE_CHIP_LABEL_CLASS = "mobile-hub-title-chip-label";
 
 export const MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS = {
   active: MOBILE_SCREEN_HOST_PANEL_ACTIVE_CLASS,

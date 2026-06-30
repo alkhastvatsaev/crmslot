@@ -1,14 +1,27 @@
 import { render, screen } from "@/test-utils/render";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
+import { useMobilePageTransition } from "@/features/dashboard/hooks/useMobilePageTransition";
 import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
+
+function MobileScreenHostHarness({
+  pages,
+  pageIndex,
+}: {
+  pages: React.ReactNode[];
+  pageIndex: number;
+}) {
+  const pageTransition = useMobilePageTransition(pageIndex);
+  return <MobileScreenHost pages={pages} pageTransition={pageTransition} />;
+}
 
 describe("MobileScreenHost", () => {
   it("ne monte que la page active (démontage thermique)", () => {
     render(
       <DashboardPagerProvider pageCount={3} initialPageIndex={1}>
         <DashboardPageSelectorProvider>
-          <MobileScreenHost
+          <MobileScreenHostHarness
+            pageIndex={1}
             pages={[
               <div key="0">Page A</div>,
               <div key="1">Page B</div>,

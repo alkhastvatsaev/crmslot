@@ -2,20 +2,21 @@
 
 import DashboardPageSelector from "@/features/dashboard/components/DashboardPageSelector";
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
+import MobileScreenHostPanel from "@/features/dashboard/components/MobileScreenHostPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
-import { useMobilePageTransition } from "@/features/dashboard/hooks/useMobilePageTransition";
+import type { MobilePageTransitionState } from "@/features/dashboard/hooks/useMobilePageTransition";
 import {
   MOBILE_SCREEN_HOST_CLASS,
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_CLASS,
-  MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
 import { cn } from "@/lib/utils";
 
 type Props = {
   pages: React.ReactNode[];
+  pageTransition: MobilePageTransitionState;
 };
 
 const visiblePanelClass = cn(MOBILE_SCREEN_HOST_PANEL_CLASS, MOBILE_SCREEN_HOST_PANEL_BASE_CLASS);
@@ -26,11 +27,11 @@ const visiblePanelClass = cn(MOBILE_SCREEN_HOST_PANEL_CLASS, MOBILE_SCREEN_HOST_
  *
  * Contrat : voir `mobileShellContract.ts` + `npm run test:mobile-shell`.
  */
-export default function MobileScreenHost({ pages }: Props) {
+export default function MobileScreenHost({ pages, pageTransition }: Props) {
   const { pageIndex, pageCount } = useDashboardPager();
   const { view, close: closeOverlay } = useDashboardPageSelector();
   const overlayOpen = view !== "closed";
-  const { mountedIndices, getPanelPhase } = useMobilePageTransition(pageIndex);
+  const { mountedIndices, getPanelPhase } = pageTransition;
 
   return (
     <main className={MOBILE_SCREEN_HOST_CLASS} data-testid="mobile-screen-host" aria-live="polite">
@@ -38,23 +39,10 @@ export default function MobileScreenHost({ pages }: Props) {
         if (!mountedIndices.has(index)) return null;
 
         const phase = getPanelPhase(index, overlayOpen);
-        const hidden = phase === "suspended" || phase === "exit-next" || phase === "exit-prev";
-        const inert = phase !== "active";
         return (
-          <div
-            key={index}
-            className={cn(
-              MOBILE_SCREEN_HOST_PANEL_CLASS,
-              MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
-              MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS[phase]
-            )}
-            aria-hidden={hidden}
-            inert={inert ? true : undefined}
-            data-testid={`mobile-page-${index}`}
-            data-mobile-page-phase={phase}
-          >
+          <MobileScreenHostPanel key={index} index={index} phase={phase}>
             {page}
-          </div>
+          </MobileScreenHostPanel>
         );
       })}
 
