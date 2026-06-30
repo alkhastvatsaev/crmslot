@@ -4,11 +4,12 @@ import DashboardPageSelector from "@/features/dashboard/components/DashboardPage
 import DashboardAccountPanel from "@/features/dashboard/components/DashboardAccountPanel";
 import { useDashboardPageSelector } from "@/features/dashboard/DashboardPageSelectorContext";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
-import { useMobileMountedPageIndices } from "@/features/dashboard/hooks/useMobileMountedPageIndices";
+import { useMobilePageTransition } from "@/features/dashboard/hooks/useMobilePageTransition";
 import {
   MOBILE_SCREEN_HOST_CLASS,
   MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_CLASS,
+  MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS,
   MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS,
 } from "@/core/ui/dashboardMobileLayout";
 import { cn } from "@/lib/utils";
@@ -18,10 +19,6 @@ type Props = {
 };
 
 const visiblePanelClass = cn(MOBILE_SCREEN_HOST_PANEL_CLASS, MOBILE_SCREEN_HOST_PANEL_BASE_CLASS);
-
-function isMobilePageHidden(pageIndex: number, activeIndex: number, overlayOpen: boolean): boolean {
-  return overlayOpen || activeIndex !== pageIndex;
-}
 
 /**
  * Panneau central mobile — une seule page montée (hub actif). Hors écran = démontage React
@@ -33,25 +30,28 @@ export default function MobileScreenHost({ pages }: Props) {
   const { pageIndex, pageCount } = useDashboardPager();
   const { view, close: closeOverlay } = useDashboardPageSelector();
   const overlayOpen = view !== "closed";
-  const mountedPageIndices = useMobileMountedPageIndices(pageIndex);
+  const { mountedIndices, getPanelPhase } = useMobilePageTransition(pageIndex);
 
   return (
     <main className={MOBILE_SCREEN_HOST_CLASS} data-testid="mobile-screen-host" aria-live="polite">
       {pages.slice(0, pageCount).map((page, index) => {
-        if (!mountedPageIndices.has(index)) return null;
+        if (!mountedIndices.has(index)) return null;
 
-        const hidden = isMobilePageHidden(index, pageIndex, overlayOpen);
+        const phase = getPanelPhase(index, overlayOpen);
+        const hidden = phase === "suspended" || phase === "exit-next" || phase === "exit-prev";
+        const inert = phase !== "active";
         return (
           <div
             key={index}
             className={cn(
               MOBILE_SCREEN_HOST_PANEL_CLASS,
               MOBILE_SCREEN_HOST_PANEL_BASE_CLASS,
-              hidden && "mobile-screen-host-panel--suspended"
+              MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS[phase]
             )}
             aria-hidden={hidden}
-            inert={hidden ? true : undefined}
+            inert={inert ? true : undefined}
             data-testid={`mobile-page-${index}`}
+            data-mobile-page-phase={phase}
           >
             {page}
           </div>
