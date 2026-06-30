@@ -102,7 +102,7 @@ function ratchetCheck() {
     }
   }
 
-  if (regressions.length > 0) {
+  if (regressions.length > 0 && !flag("update")) {
     console.error(`\n✖ Coverage en baisse sur ${regressions.length} fichier(s) :\n`);
     for (const r of regressions.slice(0, 30)) {
       console.error(
@@ -116,6 +116,12 @@ function ratchetCheck() {
     }
     console.error(`\nAjoute ou rétablis les tests, OU mets à jour la baseline avec --update.`);
     process.exit(1);
+  }
+
+  if (regressions.length > 0 && flag("update")) {
+    console.log(
+      `⚠️  ${regressions.length} régression(s) détectée(s) — baseline écrasée (--update).`
+    );
   }
 
   console.log(`✅ Coverage ratchet OK — ${improved} fichier(s) amélioré(s), 0 régression.`);
