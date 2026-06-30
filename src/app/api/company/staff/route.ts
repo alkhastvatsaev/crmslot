@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import "@/core/config/firebase-admin";
 import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
+import { requireCompanyMember } from "@/features/company/server/requireCompanyMember";
 import { createCompanyStaffMember } from "@/features/company/server/createCompanyStaffMember";
 import { listCompanyStaff } from "@/features/company/index.server";
 import type { CompanyStaffKind } from "@/features/teamHub/types";
@@ -26,13 +27,13 @@ export async function GET(req: Request) {
   const companyId = url.searchParams.get("companyId")?.trim() ?? "";
   const db = admin.firestore();
 
-  const adminCtx = await requireCompanyAdmin(db, authResult.uid, companyId);
-  if ("status" in adminCtx) {
-    return NextResponse.json({ ok: false, error: adminCtx.error }, { status: adminCtx.status });
+  const memberCtx = await requireCompanyMember(db, authResult.uid, companyId);
+  if ("status" in memberCtx) {
+    return NextResponse.json({ ok: false, error: memberCtx.error }, { status: memberCtx.status });
   }
 
   try {
-    const staff = await listCompanyStaff(db, admin.auth, adminCtx.companyId);
+    const staff = await listCompanyStaff(db, admin.auth, memberCtx.companyId);
     return NextResponse.json({ ok: true, staff });
   } catch (error) {
     const message =

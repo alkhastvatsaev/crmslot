@@ -2,6 +2,7 @@ import type * as admin from "firebase-admin";
 import type { CompanyStaffMember } from "@/features/teamHub";
 import { stripLegacyDemoTechnicians } from "@/core/config/legacyDemoTechnicians";
 import { buildTechnicianDisplayName } from "@/features/company/server/provisionTechnicianStaff";
+import { batchedFirestoreGetAll } from "@/features/company/server/batchedFirestoreGetAll";
 import { listStaffDirectoryUids } from "@/features/company/server/companyStaffDirectory";
 
 function splitDisplayName(displayName: string): { firstName: string; lastName: string } {
@@ -65,12 +66,25 @@ function buildStaffMember(
   };
 }
 
+function staffRowNeedsAuthLookup(techData: TechnicianRow): boolean {
+  const tech = techData ?? null;
+  const hasEmail = typeof tech?.email === "string" && tech.email.trim().length > 0;
+  const hasDisplayName =
+    (typeof tech?.firstName === "string" && tech.firstName.trim().length > 0) ||
+    (typeof tech?.lastName === "string" && tech.lastName.trim().length > 0) ||
+    (typeof tech?.name === "string" && tech.name.trim().length > 0);
+  return !hasEmail || !hasDisplayName;
+}
+
 async function loadAuthUsersByUid(
   auth: typeof admin.auth,
-  uids: string[]
+  uids: string[],
+  techByUid: Map<string, Record<string, unknown>>
 ): Promise<Map<string, admin.auth.UserRecord>> {
   const byUid = new Map<string, admin.auth.UserRecord>();
-  const uniqueUids = [...new Set(uids.filter(Boolean))];
+  const uniqueUids = [
+    ...new Set(uids.filter((uid) => uid && staffRowNeedsAuthLookup(techByUid.get(uid)))),
+  ];
   if (uniqueUids.length === 0) return byUid;
 
   for (let offset = 0; offset < uniqueUids.length; offset += 100) {
@@ -130,8 +144,9 @@ export async function listCompanyStaff(
 
   const missingTechUids = uids.filter((uid) => !techByUid.has(uid));
   if (missingTechUids.length > 0) {
-    const missingTechSnaps = await db.getAll(
-      ...missingTechUids.map((uid) => db.collection("technicians").doc(uid))
+    const missingTechSnaps = await batchedFirestoreGetAll(
+      db,
+      missingTechUids.map((uid) => db.collection("technicians").doc(uid))
     );
     for (const snap of missingTechSnaps) {
       if (snap.exists) {
@@ -140,8 +155,9 @@ export async function listCompanyStaff(
     }
   }
 
-  const membershipSnaps = await db.getAll(
-    ...uids.map((uid) => db.doc(`users/${uid}/company_memberships/${companyId}`))
+  const membershipSnaps = await batchedFirestoreGetAll(
+    db,
+    uids.map((uid) => db.doc(`users/${uid}/company_memberships/${companyId}`))
   );
   const membershipByUid = new Map<string, Record<string, unknown>>();
   for (const snap of membershipSnaps) {
@@ -150,7 +166,7 @@ export async function listCompanyStaff(
     if (uid) membershipByUid.set(uid, snap.data() ?? {});
   }
 
-  const authUsers = await loadAuthUsersByUid(auth, uids);
+  const authUsers = await loadAuthUsersByUid(auth, uids, techByUid);
 
   const members: CompanyStaffMember[] = [];
   for (const uid of uids) {

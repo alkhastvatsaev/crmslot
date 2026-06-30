@@ -86,7 +86,7 @@ describe("listCompanyStaff", () => {
       hasTechnicianProfile: true,
       authUid: "uid-tech-1",
     });
-    expect(mockGetUsers).toHaveBeenCalled();
+    expect(mockGetUsers).not.toHaveBeenCalled();
   });
 
   it("inclut les admins listés dans staff_directory sans fiche technicien", async () => {
@@ -143,5 +143,6 @@ describe("listCompanyStaff", () => {
       role: "admin",
       hasTechnicianProfile: false,
     });
+    expect(mockGetUsers).toHaveBeenCalled();
   });
 });
