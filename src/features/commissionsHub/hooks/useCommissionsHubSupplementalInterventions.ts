@@ -66,7 +66,7 @@ export function useCommissionsHubSupplementalInterventions(
     return () => {
       for (const unsub of unsubs) unsub();
     };
-  }, [companyId, uidKey, assignUids]);
+  }, [companyId, uidKey]);
 
   const loading = Boolean(companyId && assignUids.length > 0 && loadedKey !== uidKey);
 
