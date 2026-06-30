@@ -4,6 +4,7 @@
  * Toute modification de `MobileShell`, `MobileScreenHost`, `MobileTopBar`,
  * `DashboardPageSelector*` ou `page.tsx` (providers) doit faire passer :
  *   npm run test:mobile-shell
+ *   (ou npm run test:mobile pour toute la zone mobile)
  *
  * Objectif : éviter les régressions quand d’autres features touchent la carte
  * (WebGL) ou le carrousel sans réintégrer le sélecteur de pages.
@@ -63,12 +64,39 @@ export const MOBILE_SHELL_CONTRACT = {
     ],
     "src/features/dashboard/components/MobileHubLayout.tsx": [
       "MOBILE_HUB_RAIL_LAYER_CLASS",
+      "MOBILE_HUB_RAIL_LAYER_ACTIVE_CLASS",
       "mobileHubRailLayerSideClass",
       "data-mobile-hub-rail-active",
     ],
     "src/features/dashboard/components/MobileTopBar.tsx": [
       "MobileProfileTopBar",
       "AdminMobileProfileChip",
+    ],
+    "src/features/dashboard/components/MobileHeaderRailLayout.tsx": [
+      "MOBILE_HEADER_RAIL_HOST_CLASS",
+      "data-mobile-header-rail-active",
+      "data-mobile-header-rail",
+      "usePanelSwipe",
+      "MOBILE_HUB_RAIL_LAYER_CLASS",
+      "swipeDisabled",
+      "mobile-header-rail-layer",
+    ],
+    "src/features/dashboard/components/MobileProfileTopBar.tsx": [
+      "MOBILE_HEADER_RAIL_HOST_CLASS",
+      "mobile-header-rail-layer",
+      "data-mobile-header-rail-active",
+    ],
+    "src/features/dashboard/components/MobileShellFooterDockRow.tsx": [
+      "useMobileFooterGalaxyVisible",
+      "MobileShellSlotGrid",
+      "ClockCalendar",
+      "MobileHubDotsBar",
+      "mobile-footer-calendar",
+    ],
+    "src/features/dashboard/components/MobileShellSlotGrid.tsx": ["MOBILE_SHELL_SLOT_GRID_CLASS"],
+    "src/features/dashboard/components/MobileCentralPanelFrame.tsx": [
+      "MOBILE_HUB_LAYOUT_CLASS",
+      "mobileHubPanelGlassShellClass",
     ],
     "src/app/page.tsx": ["AdminDashboardProviders", "MobileShell", "DashboardDesktopShell"],
     "src/features/dashboard/AdminDashboardProviders.tsx": [
@@ -85,6 +113,7 @@ export const MOBILE_SHELL_CONTRACT = {
       ".mobile-shell-account-overlay",
       ".mobile-hub-rail-layer",
       ".mobile-header-rail-host",
+      ".mobile-header-rail-layer",
     ],
   } as const,
 } as const;

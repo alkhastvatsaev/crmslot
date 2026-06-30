@@ -10,4 +10,6 @@ export type UseTechnicianAssignmentsResult = {
 export type UseTechnicianAssignmentsOptions = {
   /** Désactiver l’écoute Firestore (ex. carte dispatch qui utilise le back-office). */
   enabled?: boolean;
+  /** Polling resync serveur (défaut : true). Couper en overlay calendrier / compte. */
+  pollingEnabled?: boolean;
 };

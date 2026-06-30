@@ -2,13 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ReactNode } from "react";
 import { render, screen, fireEvent } from "@/test-utils/render";
-import MobileShell from "@/features/dashboard/components/MobileShell";
+import { renderMobileShell } from "@/test-utils/renderMobileShell";
 import MobileScreenHost from "@/features/dashboard/components/MobileScreenHost";
-import { DateProvider } from "@/context/DateContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
-import { DashboardPageSelectorProvider } from "@/features/dashboard/DashboardPageSelectorContext";
-import { GalaxyLayerBridgeProvider } from "@/features/map/GalaxyLayerBridgeContext";
-import { MobileGalaxyComposerOpenProvider } from "@/context/MobileGalaxyComposerOpenContext";
 import { MOBILE_SHELL_CONTRACT } from "@/features/dashboard/mobileShellContract";
 import * as mobileFooterGalaxyVisible from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import {
@@ -48,23 +44,6 @@ jest.mock("@/features/auth/hooks/useCrmStaffAccountPanel", () => ({
 }));
 
 const repoRoot = path.resolve(__dirname, "../../../../");
-
-function renderMobileShell(pages: ReactNode[], initialOpen = false) {
-  return render(
-    <DateProvider>
-      <GalaxyLayerBridgeProvider>
-        <MobileGalaxyComposerOpenProvider>
-          <DashboardPagerProvider pageCount={pages.length}>
-            <DashboardPageSelectorProvider initialOpen={initialOpen}>
-              <MobileShell pages={pages} />
-            </DashboardPageSelectorProvider>
-          </DashboardPagerProvider>
-        </MobileGalaxyComposerOpenProvider>
-      </GalaxyLayerBridgeProvider>
-    </DateProvider>
-  );
-}
-
 describe("mobileShellContract — source guards", () => {
   it.each(Object.entries(MOBILE_SHELL_CONTRACT.guardedSourceSnippets))(
     "preserve les invariants dans %s",
@@ -157,7 +136,9 @@ describe("mobileShellContract — MobileScreenHost", () => {
   });
 
   it("ne monte pas les hubs non visités quand le sélecteur est ouvert", () => {
-    renderMobileShell([<div key="0">Map</div>, <div key="1">Hub</div>], true);
+    renderMobileShell([<div key="0">Map</div>, <div key="1">Hub</div>], {
+      initialSelectorOpen: true,
+    });
 
     expect(screen.getByText("Map")).toBeInTheDocument();
     expect(screen.queryByText("Hub")).not.toBeInTheDocument();

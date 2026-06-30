@@ -1,15 +1,6 @@
-import { fireEvent, render, screen } from "@/test-utils/render";
+import { render, screen } from "@/test-utils/render";
+import { swipeLeft, swipeRight } from "@/test-utils/mobileGestures";
 import MobileHeaderRailLayout from "@/features/dashboard/components/MobileHeaderRailLayout";
-
-function swipeLeft(el: HTMLElement) {
-  fireEvent.pointerDown(el, { clientX: 220, clientY: 40, pointerId: 1, pointerType: "touch" });
-  fireEvent.pointerMove(el, { clientX: 120, clientY: 40, pointerId: 1, pointerType: "touch" });
-}
-
-function swipeRight(el: HTMLElement) {
-  fireEvent.pointerDown(el, { clientX: 120, clientY: 40, pointerId: 1, pointerType: "touch" });
-  fireEvent.pointerMove(el, { clientX: 220, clientY: 40, pointerId: 1, pointerType: "touch" });
-}
 
 describe("MobileHeaderRailLayout", () => {
   it("affiche le calendrier (gauche) par défaut", () => {
@@ -27,10 +18,7 @@ describe("MobileHeaderRailLayout", () => {
       "data-mobile-header-rail-active",
       "true"
     );
-    expect(screen.getByTestId("mobile-header-profile")).toHaveAttribute(
-      "data-mobile-header-rail-active",
-      "false"
-    );
+    expect(screen.queryByTestId("mobile-header-profile")).not.toBeInTheDocument();
   });
 
   it("swipe en boucle profil ↔ calendrier", () => {
@@ -51,16 +39,36 @@ describe("MobileHeaderRailLayout", () => {
 
     expectActive("mobile-header-calendar");
 
-    swipeLeft(root);
+    swipeLeft(root, 40);
     expectActive("mobile-header-profile");
 
-    swipeLeft(root);
+    swipeLeft(root, 40);
     expectActive("mobile-header-calendar");
 
-    swipeRight(root);
+    swipeRight(root, 40);
     expectActive("mobile-header-profile");
 
-    swipeRight(root);
+    swipeRight(root, 40);
     expectActive("mobile-header-calendar");
+  });
+
+  it("ignore swipe when swipeDisabled is true", () => {
+    render(
+      <MobileHeaderRailLayout
+        rootTestId="mobile-header-rail"
+        leftTestId="mobile-header-calendar"
+        centerTestId="mobile-header-profile"
+        swipeDisabled
+        left={<span>calendrier</span>}
+        center={<span>profil</span>}
+      />
+    );
+
+    const root = screen.getByTestId("mobile-header-rail");
+    swipeLeft(root, 40);
+    expect(screen.getByTestId("mobile-header-calendar")).toHaveAttribute(
+      "data-mobile-header-rail-active",
+      "true"
+    );
   });
 });

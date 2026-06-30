@@ -6,8 +6,8 @@ import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxInten
 import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
+import { useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { isPreviewOverlayForTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import {
@@ -51,12 +51,12 @@ export function useChatbotDocumentsRightPanelController() {
   const pager = useDashboardPagerOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const billingIntent = useBillingHubIntentOptional();
-  const railSnapshot = useMobileHubRailSnapshot();
+  const billingHubRightRailActive = useHubRailActive("right");
   const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const billingHubDocumentsRailActive =
     pager?.pageIndex === BILLING_HUB_SLOT_INDEX &&
     (billingIntent?.rightPanelTab ?? "documents") === "documents" &&
-    (isMobile !== true || railSnapshot?.activeRail === "right");
+    billingHubRightRailActive;
   const interventionsCompanyId =
     (workspace?.isTenantUser ? workspace.activeCompanyId : null) ?? companyId;
   const interventionsFirestoreEnabled =

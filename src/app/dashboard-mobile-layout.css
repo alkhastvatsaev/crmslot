@@ -1462,4 +1462,15 @@
   [data-mobile-shell] .chatbot-galaxy-orb {
     background: linear-gradient(145deg, rgb(30 58 138), rgb(37 99 235)) !important;
   }
+
+  [data-mobile-shell] .mobile-hub-rail-layer,
+  [data-mobile-shell] .mobile-header-rail-layer {
+    will-change: auto !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  [data-mobile-shell] .mobile-hub-panel--animated {
+    transform: none !important;
+  }
 }

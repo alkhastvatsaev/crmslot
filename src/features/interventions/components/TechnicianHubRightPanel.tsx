@@ -4,14 +4,13 @@ import TechnicianCommissionPanel from "@/features/interventions/components/Techn
 import TechnicianDashboardImagesPanel from "@/features/interventions/components/TechnicianDashboardImagesPanel";
 import { interventionOpenForTerrainPhotos } from "@/features/interventions/technicianCommissionScope";
 import type { Intervention } from "@/features/interventions/types";
-import type { Technician } from "@/features/technicians";
+import { useTechnicians } from "@/features/technicians/hooks";
 
 type Props = {
   caseId: string | null;
   liveIntervention?: Intervention | null;
   technicianUid: string | null;
   interventions: Intervention[];
-  technicians: Technician[];
 };
 
 /**
@@ -22,8 +21,8 @@ export default function TechnicianHubRightPanel({
   liveIntervention,
   technicianUid,
   interventions,
-  technicians,
 }: Props) {
+  const { technicians } = useTechnicians();
   const showMissionPhotos = Boolean(
     caseId && liveIntervention && interventionOpenForTerrainPhotos(liveIntervention)
   );
