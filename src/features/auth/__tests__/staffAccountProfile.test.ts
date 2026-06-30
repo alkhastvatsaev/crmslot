@@ -30,7 +30,7 @@ describe("saveStaffAccountProfile", () => {
         email: "jean@example.com",
         phone: "+32 1",
         companyId: "co-2",
-        role: "collaborateur",
+        accountRole: "dispatcher",
       },
       {
         previousCompanyId: "co-1",
@@ -62,7 +62,7 @@ describe("saveStaffAccountProfile", () => {
           email: "jean@example.com",
           phone: "",
           companyId: "co-1",
-          role: "collaborateur",
+          accountRole: "dispatcher",
         },
         {
           previousCompanyId: "co-1",

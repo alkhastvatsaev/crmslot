@@ -24,17 +24,18 @@ const technician: Technician = {
 
 function mission(overrides: Partial<Intervention> & Pick<Intervention, "id">): Intervention {
   const month = monthKeyFromDate(new Date());
+  const { id, ...rest } = overrides;
   return {
-    id: overrides.id,
     title: "Mission",
     address: "Rue Test",
     time: "10:00",
     status: "done",
     location: { lat: 0, lng: 0 },
     assignedTechnicianUid: AUTH_UID,
-    completedAt: `${month}-15T10:00:00.000Z`,
+    completedAt: month + "-15T10:00:00.000Z",
     invoiceAmountCents: 16_000,
-    ...overrides,
+    ...rest,
+    id,
   };
 }
 

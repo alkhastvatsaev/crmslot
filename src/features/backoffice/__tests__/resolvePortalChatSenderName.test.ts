@@ -27,8 +27,10 @@ describe("resolvePortalChatSenderName", () => {
         firstName: "Jean",
         lastName: "Martin",
         email: "staff@co.com",
+        phone: "",
+        companyId: "co-1",
         companyName: "Co",
-        roleLabel: "admin",
+        accountRole: "dispatcher",
       },
       t,
     });

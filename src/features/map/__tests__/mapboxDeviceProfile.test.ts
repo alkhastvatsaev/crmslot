@@ -6,7 +6,7 @@ describe("resolveMapboxDeviceTier", () => {
       resolveMapboxDeviceTier("Mozilla/5.0 (Linux; Android 12)", {
         deviceMemory: 2,
         hardwareConcurrency: 8,
-      } as Navigator)
+      } as unknown as Navigator)
     ).toBe("low");
   });
 
@@ -14,7 +14,7 @@ describe("resolveMapboxDeviceTier", () => {
     expect(
       resolveMapboxDeviceTier("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", {
         hardwareConcurrency: 6,
-      } as Navigator)
+      } as unknown as Navigator)
     ).toBe("high");
   });
 
@@ -23,7 +23,7 @@ describe("resolveMapboxDeviceTier", () => {
       resolveMapboxDeviceTier("Mozilla/5.0 (Linux; Android 13)", {
         deviceMemory: 4,
         hardwareConcurrency: 6,
-      } as Navigator)
+      } as unknown as Navigator)
     ).toBe("standard");
   });
 });

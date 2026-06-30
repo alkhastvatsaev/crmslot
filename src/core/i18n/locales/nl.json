@@ -1102,7 +1102,9 @@
       "dirigeant": "Dir.",
       "dispatcher": "Disp.",
       "technician": "Tech."
-    }
+    },
+    "delete_account": "Account verwijderen",
+    "delete_account_confirm": "Deze medewerker uit het bedrijf verwijderen?"
   },
   "caseHub": {
     "company_required": "Selecteer een bedrijf.",

@@ -164,6 +164,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
     mockAssign.mockResolvedValue(null);
   });
@@ -192,6 +193,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
     renderInbox(<BackOfficeInboxPanel />);
     fireEvent.click(screen.getByTestId("backoffice-inbox-tab-reports"));
@@ -253,6 +255,7 @@ describe("BackOfficeInboxPanel — onglet Demandes (A→Z)", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
 
     renderInbox(<BackOfficeInboxPanel />);

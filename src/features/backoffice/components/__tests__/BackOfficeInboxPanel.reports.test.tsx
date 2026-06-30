@@ -145,6 +145,7 @@ describe("BackOfficeInboxPanel — onglet Rapports", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
   });
 
@@ -167,6 +168,7 @@ describe("BackOfficeInboxPanel — onglet Rapports", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
 
     renderInbox(<BackOfficeInboxPanel />);
