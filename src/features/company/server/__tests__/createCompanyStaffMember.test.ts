@@ -114,14 +114,18 @@ describe("createCompanyStaffMember", () => {
     const { provisionTechnicianStaffRecord } = jest.requireMock(
       "@/features/company/server/provisionTechnicianStaff"
     );
-    expect(provisionTechnicianStaffRecord).toHaveBeenCalledWith(db, {
-      uid: "uid-new-tech",
-      companyId: "co-abc",
-      profile: {
-        firstName: "Jean",
-        lastName: "Martin",
-        email: "jean@abc.be",
+    expect(provisionTechnicianStaffRecord).toHaveBeenCalledWith(
+      db,
+      {
+        uid: "uid-new-tech",
+        companyId: "co-abc",
+        profile: {
+          firstName: "Jean",
+          lastName: "Martin",
+          email: "jean@abc.be",
+        },
       },
-    });
+      { auth }
+    );
   });
 });

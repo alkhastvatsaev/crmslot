@@ -115,7 +115,8 @@ describe("changeCompanyStaffKind", () => {
       expect.objectContaining({
         uid: "uid-dispatch-1",
         companyId: "co-abc",
-      })
+      }),
+      expect.objectContaining({ auth: expect.any(Function) })
     );
     expect(techSet).toHaveBeenCalledWith(
       expect.objectContaining({ active: true }),
