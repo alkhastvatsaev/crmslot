@@ -38,6 +38,7 @@ describe("CompanyStockCenterPanel", () => {
   it("renders stock list only", () => {
     renderPanel();
     expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-lecot-logo")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-lecot-catalog")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-preview-banner")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-search")).not.toBeInTheDocument();
