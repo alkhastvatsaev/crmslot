@@ -1,0 +1,39 @@
+---
+description: Tests mobile PWA — contrats, commandes, fin de tâche agent
+globs: src/features/dashboard/**,src/features/mobile/**,src/core/native/**,src/core/config/mobile*.ts,src/core/ui/dashboardMobileLayout.ts,tests/e2e/mobile-shell.spec.ts,tests/e2e/helpers/mobileShell.ts,src/test-utils/renderMobileShell.tsx,src/test-utils/mobileGestures.ts
+alwaysApply: false
+---
+
+# Tests mobile (Android / iPhone PWA)
+
+Doc complète : `docs/agents/MOBILE_TESTING.md`
+
+## Fin de tâche (obligatoire si tu touches le shell ou l’infra mobile)
+
+```bash
+npm run test:mobile
+```
+
+Merge sensible ou changement `mobileShellContract` / `page.tsx` : ajouter `npm run test:e2e:mobile-shell` (UX skippés sans session staff en CI).
+
+## Règles rapides
+
+| Modification | Commande |
+|--------------|----------|
+| `mobileShellContract`, `MobileShell*`, `MobileHubLayout`, `page.tsx` | `npm run test:mobile-shell` |
+| `adminMobileShellContract`, `/m/admin` | `npm run test:mobile-admin` |
+| `mobileClientDetection`, `src/features/mobile/` | `npm run test:mobile-infra` |
+| `src/core/native/*` | `npm run test:native-infra` |
+| Nouveau `data-testid` mobile | l’ajouter dans `MOBILE_SHELL_CONTRACT.testIds` |
+| Hook Firestore / API | règle CODEX mobile — test `firebaseUid` null (`docs/agents/TESTING.md` §11) |
+
+## Helpers test
+
+- `src/test-utils/renderMobileShell.tsx` — montage `MobileShell` (mocks dans chaque fichier test)
+- `src/test-utils/mobileGestures.ts` — `swipeLeft` / `swipeRight` pour rails hub/header
+
+## E2E UX (session staff)
+
+```bash
+PLAYWRIGHT_ADMIN_STORAGE_STATE=tests/e2e/.auth/admin.json npm run test:e2e:mobile-shell
+```

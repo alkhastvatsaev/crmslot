@@ -6,6 +6,8 @@ on:
     paths:
       - "src/features/chatbot/**"
       - "src/app/api/ai/chatbot/**"
+      - "tests/contract/chatbot.contract.test.ts"
+      - "src/core/api/schemas/chatbot.ts"
       - "src/features/chatbot/testFixtures/**"
       - "jest.config.ts"
       - "jest.setup.ts"
@@ -29,4 +31,4 @@ jobs:
         run: npm ci
 
       - name: Run chatbot unit tests
-        run: npm run test:chatbot
+        run: npm run test:chatbot && npm run test:contract -- tests/contract/chatbot.contract.test.ts

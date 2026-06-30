@@ -27,7 +27,12 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: npm run test:e2e
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npm run test:e2e:smoke
+          else
+            npm run test:e2e
+          fi
         env:
           CI: "true"
           NEXT_PUBLIC_FIREBASE_API_KEY: placeholder
