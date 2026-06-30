@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ExternalLink, Loader2 } from "lucide-react";
-import { useTranslation } from "@/core/i18n/I18nContext";
+import { Loader2 } from "lucide-react";
 import { useCompanyStockIntent } from "@/context/CompanyStockIntentContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import CompanyStockItemList from "@/features/featureHub/components/CompanyStockItemList";
@@ -25,18 +24,10 @@ type Props = {
   orders: MaterialOrderDoc[];
   category: StockCategoryId | "all";
   loading: boolean;
-  isPreviewCatalog?: boolean;
 };
 
 /** Panneau central Matériel — grille stock (tuiles carrées). */
-export default function CompanyStockCenterPanel({
-  items,
-  orders,
-  category,
-  loading,
-  isPreviewCatalog = false,
-}: Props) {
-  const { t } = useTranslation();
+export default function CompanyStockCenterPanel({ items, orders, category, loading }: Props) {
   const { selectedStockItemId, setSelectedStockItemId } = useCompanyStockIntent();
   const workspace = useCompanyWorkspaceOptional();
 
@@ -101,26 +92,6 @@ export default function CompanyStockCenterPanel({
         data-testid="company-stock-center"
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
       >
-        {isPreviewCatalog ? (
-          <p
-            data-testid="company-stock-preview-banner"
-            className="mb-2 shrink-0 rounded-[12px] border border-teal-100/90 bg-teal-50/70 px-3 py-2 text-center text-[11px] font-medium text-teal-900"
-          >
-            {t("companyStock.pro_preview_short")}
-          </p>
-        ) : null}
-        <button
-          type="button"
-          data-testid="company-stock-lecot-catalog"
-          onClick={() => dispatchMaterialAgentQuickPrompt("catalogue lecot")}
-          className="mb-2 flex shrink-0 items-center justify-between gap-2 rounded-[14px] border border-slate-200/90 bg-white px-3 py-2.5 text-left shadow-sm transition hover:border-teal-200 hover:bg-teal-50/40"
-        >
-          <span className="min-w-0">
-            <span className="block text-[13px] font-bold text-slate-900">Lecot.be</span>
-            <span className="block text-[11px] text-slate-500">{t("catalog.open_catalog")}</span>
-          </span>
-          <ExternalLink className="h-4 w-4 shrink-0 text-teal-600" aria-hidden />
-        </button>
         <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
           <CompanyStockItemList
             items={listRows}

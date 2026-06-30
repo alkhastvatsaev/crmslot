@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { renderWithPager } from "@/test-utils/renderWithPager";
+import { renderWithDesktopPager, renderWithPager } from "@/test-utils/renderWithPager";
 import FeatureHubPage from "@/features/featureHub/components/FeatureHubPage";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
 import { CompanyStockAgentBridgeProvider } from "@/context/CompanyStockAgentBridgeContext";
@@ -116,5 +116,29 @@ describe("FeatureHubPage", () => {
     expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-search")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-autopilot-primary")).not.toBeInTheDocument();
+  });
+  it("renders desktop triple grid with stock grid in center panel", () => {
+    const { container } = renderWithDesktopPager(
+      <CompanyStockAgentBridgeProvider>
+        <CompanyStockIntentProvider>
+          <FeatureHubPage />
+        </CompanyStockIntentProvider>
+      </CompanyStockAgentBridgeProvider>,
+      FEATURE_HUB_SLOT_INDEX + 1,
+      { initialPageIndex: FEATURE_HUB_SLOT_INDEX }
+    );
+
+    expect(container.querySelector(".dashboard-desktop-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-lecot-catalog")).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId(`dashboard-pager-slot-${FEATURE_HUB_SLOT_INDEX}-panel-left`)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId(`dashboard-pager-slot-${FEATURE_HUB_SLOT_INDEX}-panel-center`)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId(`dashboard-pager-slot-${FEATURE_HUB_SLOT_INDEX}-panel-right`)
+    ).toBeInTheDocument();
   });
 });

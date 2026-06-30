@@ -128,7 +128,6 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
                 orders={orders}
                 category="all"
                 loading={loading}
-                isPreviewCatalog={isPreviewCatalog}
               />
             ) : companyId ? (
               <CompanyStockProWorkspace

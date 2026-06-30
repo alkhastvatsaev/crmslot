@@ -38,28 +38,14 @@ describe("CompanyStockCenterPanel", () => {
   it("renders stock list only", () => {
     renderPanel();
     expect(screen.getByTestId("company-stock-center")).toBeInTheDocument();
-    expect(screen.getByTestId("company-stock-lecot-catalog")).toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-lecot-catalog")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("company-stock-preview-banner")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-search")).not.toBeInTheDocument();
     expect(screen.getByTestId("company-stock-list")).toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-pulse")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-filter-bar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-autopilot-primary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("company-stock-add")).not.toBeInTheDocument();
-  });
-
-  it("shows preview banner when catalog is preview-only", () => {
-    render(
-      <CompanyStockIntentProvider>
-        <CompanyStockCenterPanel
-          items={items}
-          orders={[]}
-          category="all"
-          loading={false}
-          isPreviewCatalog
-        />
-      </CompanyStockIntentProvider>
-    );
-    expect(screen.getByTestId("company-stock-preview-banner")).toBeInTheDocument();
   });
 
   it("shows stock card for item in grid layout", () => {
