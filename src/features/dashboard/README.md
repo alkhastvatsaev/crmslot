@@ -42,7 +42,10 @@ Shell admin CRMSLOT : carrousel 9 pages (`src/app/page.tsx`), layout desktop/mob
 ## Tests
 
 ```bash
+npm run test:mobile
 npm run test:mobile-shell
 npm run test:e2e:desktop
 npx jest src/features/dashboard --no-coverage
 ```
+
+Voir `docs/agents/MOBILE_TESTING.md`.

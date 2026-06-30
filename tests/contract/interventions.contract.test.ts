@@ -26,29 +26,28 @@ describe("contract /api/interventions/[id]/document-pdf?type=…", () => {
 });
 
 describe("contract /api/interventions/[id]/validate-report", () => {
-  it("accepte validated:true sans rejectionReason", () => {
-    const parsed = ValidateReportRequestSchema.safeParse({ validated: true });
+  it("accepte un corps vide (sendEmail par défaut côté serveur)", () => {
+    const parsed = ValidateReportRequestSchema.safeParse({});
     expect(parsed.success).toBe(true);
   });
 
-  it("accepte validated:false + rejectionReason", () => {
-    const parsed = ValidateReportRequestSchema.safeParse({
-      validated: false,
-      rejectionReason: "Photos manquantes",
-    });
+  it("accepte sendEmail:false pour désactiver l'envoi client", () => {
+    const parsed = ValidateReportRequestSchema.safeParse({ sendEmail: false });
     expect(parsed.success).toBe(true);
   });
 
-  it("refuse rejectionReason trop court", () => {
-    const parsed = ValidateReportRequestSchema.safeParse({
-      validated: false,
-      rejectionReason: "no",
-    });
+  it("refuse sendEmail non booléen", () => {
+    const parsed = ValidateReportRequestSchema.safeParse({ sendEmail: "yes" });
     expect(parsed.success).toBe(false);
   });
 
-  it("réponse succès expose le status final", () => {
-    const parsed = ValidateReportResponseSchema.safeParse({ ok: true, status: "invoiced" });
+  it("réponse succès expose la facture émise", () => {
+    const parsed = ValidateReportResponseSchema.safeParse({
+      ok: true,
+      invoicePdfUrl: "https://storage.example/inv.pdf",
+      invoiceAmountCents: 12000,
+      emailSent: true,
+    });
     expect(parsed.success).toBe(true);
   });
 

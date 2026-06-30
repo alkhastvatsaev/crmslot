@@ -2,6 +2,8 @@ import {
   buildStockCenterMaterialOrderPrompt,
   consumePendingMaterialAgentQuickPrompt,
   dispatchMaterialAgentQuickPrompt,
+  MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT,
+  scheduleMaterialOrdersMobileRailFocus,
   navigateMaterialAgentWithQuickPrompt,
   peekPendingMaterialAgentQuickPrompt,
 } from "@/features/featureHub/companyStockChatbot";
@@ -21,6 +23,18 @@ describe("companyStockChatbot pending prompt", () => {
         companyName: "ACME Serrures",
       })
     ).toBe('Commander 2× "Cylindre européen 80 mm" (réf. CYL-EURO-80) — société : ACME Serrures');
+  });
+
+  it("schedules mobile orders rail focus after supplier order", () => {
+    jest.useFakeTimers();
+    const handler = jest.fn();
+    window.addEventListener(MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT, handler);
+    scheduleMaterialOrdersMobileRailFocus();
+    expect(handler).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(1000);
+    expect(handler).toHaveBeenCalledTimes(1);
+    window.removeEventListener(MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT, handler);
+    jest.useRealTimers();
   });
 
   it("queues prompt on material page when agent is not mounted yet", () => {

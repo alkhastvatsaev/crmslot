@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useChatbotContextOptional } from "@/features/chatbot/ChatbotContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { useDashboardPagerOptional } from "@/features/dashboard";
@@ -14,6 +15,7 @@ import { navigateBackOfficeHub } from "@/features/backoffice/backofficeHubNaviga
 import type { ChatbotStreamEvent } from "@/features/chatbot/chatbot-types";
 import type { DocumentPreviewOverlayTarget } from "@/features/chatbot/chatbot-document-preview-ui";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { scheduleMaterialOrdersMobileRailFocus } from "@/features/featureHub/companyStockChatbot";
 import { dispatchCrmOrdersChanged } from "@/features/crmHistory/crmOrdersChangedEvent";
 
 export type HubAgentStreamHandlerOptions = {
@@ -36,6 +38,7 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
   const billingIntent = useBillingHubIntentOptional();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const chatbot = useChatbotContextOptional();
+  const mobileHubLayout = useMobileHubLayout();
   const billingDocOnBillingPage = options?.billingDocumentOnBillingPage ?? false;
   const docTarget = options?.documentPreviewTarget ?? "materialRight";
   const onExportAccountingCsv = options?.onExportAccountingCsv;
@@ -106,6 +109,9 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
           supplierOrderId: ev.highlightOrderId,
           materialOrderId: ev.materialOrderId ?? null,
         });
+        if (mobileHubLayout && pager?.pageIndex === FEATURE_HUB_SLOT_INDEX) {
+          scheduleMaterialOrdersMobileRailFocus();
+        }
         return;
       }
 
@@ -123,6 +129,7 @@ export function useHubAgentStreamHandler(options?: HubAgentStreamHandlerOptions)
       chatbot,
       billingDocOnBillingPage,
       docTarget,
+      mobileHubLayout,
       options?.companyId,
       onExportAccountingCsv,
       onExportPayrollCsv,
