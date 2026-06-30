@@ -365,6 +365,23 @@ Quatre phases ajoutées pour faciliter la maintenance par agents IA (Claude / Cu
 - **Avantage** : pas besoin de `jest.mock("@capacitor/foo")` qui crashe en jsdom — les tests passent des objets typés directement.
 - Voir `docs/reference/AGENT_TEST_RECIPES.md` §7 pour le pattern complet.
 
+### Phase 16 — Architecture tests mobile PWA (2026-06-30)
+
+Suite complète documentée dans **`docs/agents/MOBILE_TESTING.md`**.
+
+| Couche           | Commande                                                           |
+| ---------------- | ------------------------------------------------------------------ |
+| Unit tout mobile | `npm run test:mobile`                                              |
+| Contrats shell   | `npm run test:mobile-shell`                                        |
+| E2E smoke CI     | `npm run test:e2e:mobile`                                          |
+| E2E UX (session) | `PLAYWRIGHT_ADMIN_STORAGE_STATE=... npm run test:e2e:mobile-shell` |
+| CI PR            | `.github/workflows/mobile-tests.yml`                               |
+| Règle agent      | `.cursor/rules/mobile-testing.mdc`                                 |
+
+Helpers : `src/test-utils/renderMobileShell.tsx`, `mobileGestures.ts`, `tests/e2e/helpers/mobileShell.ts`.
+
+Phases 5–7 : bridges natifs (`test:native-infra`). Phase 8 : `MobileShellGalaxyDockSlot` + `MobileShellFooterDock`. Phase 9 : couverture complète `src/core/native/` (push, Apple Sign-In, photo).
+
 ---
 
 ## 8. Definition of Done (feature + agent)

@@ -94,6 +94,16 @@ export const MOBILE_SHELL_CONTRACT = {
       "mobile-footer-calendar",
     ],
     "src/features/dashboard/components/MobileShellSlotGrid.tsx": ["MOBILE_SHELL_SLOT_GRID_CLASS"],
+    "src/features/dashboard/components/MobileShellGalaxyDockSlot.tsx": [
+      "useMobileFooterGalaxyVisible",
+      "MOBILE_GALAXY_DOCK_CLASS",
+      "MOBILE_GALAXY_DOCK_CHROME_CLASS",
+    ],
+    "src/features/dashboard/components/MobileShellFooterDock.tsx": [
+      "useMobileFooterGalaxyVisible",
+      "MapGalaxyTranscriptionLayer",
+      "CompanyStockGalaxyComposer",
+    ],
     "src/features/dashboard/components/MobileCentralPanelFrame.tsx": [
       "MOBILE_HUB_LAYOUT_CLASS",
       "mobileHubPanelGlassShellClass",

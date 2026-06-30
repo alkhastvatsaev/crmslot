@@ -23,5 +23,5 @@ export function prefetchDashboardHubChunksIdle(): void {
     window.requestIdleCallback(() => run(), { timeout: 4_000 });
     return;
   }
-  window.setTimeout(run, 1_500);
+  setTimeout(run, 1_500);
 }

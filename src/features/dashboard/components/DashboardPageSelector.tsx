@@ -45,53 +45,60 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
     onClose();
   };
 
-  const grid = (
+  const pageButtons = hubPages.map((page) => {
+    const Icon = DASHBOARD_MOBILE_NAV_ICONS[page.spotlightLabelKey];
+    const active = pageIndex === page.slotIndex;
+    return (
+      <button
+        key={page.slotIndex}
+        type="button"
+        data-testid={`dashboard-page-selector-item-${page.slotIndex}`}
+        className={cn(
+          "dashboard-page-selector-item",
+          isDesktop ? "dashboard-page-selector-item--desktop" : "mobile-page-selector-item",
+          active &&
+            (isDesktop
+              ? "dashboard-page-selector-item--active"
+              : "mobile-page-selector-item--active")
+        )}
+        onClick={() => navigate(page.slotIndex)}
+        onPointerEnter={() => {
+          if (page.slotIndex === TEAM_HUB_SLOT_INDEX) prefetchTeamHubPageChunk();
+        }}
+        aria-current={active ? "page" : undefined}
+      >
+        <span
+          className={cn(isDesktop ? "dashboard-page-selector-icon" : "mobile-page-selector-icon")}
+        >
+          <Icon size={isDesktop ? 28 : 24} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
+        </span>
+        <span
+          className={cn(isDesktop ? "dashboard-page-selector-label" : "mobile-page-selector-label")}
+        >
+          {String(t(MOBILE_TAB_I18N[page.spotlightLabelKey]))}
+        </span>
+      </button>
+    );
+  });
+
+  const grid = isDesktop ? (
     <nav
-      className={cn(
-        "dashboard-page-selector-grid",
-        isDesktop ? "dashboard-page-selector-grid--desktop" : "mobile-page-selector-grid"
-      )}
+      className="dashboard-page-selector-grid dashboard-page-selector-grid--desktop"
       aria-label="Navigation"
     >
-      {hubPages.map((page) => {
-        const Icon = DASHBOARD_MOBILE_NAV_ICONS[page.spotlightLabelKey];
-        const active = pageIndex === page.slotIndex;
-        return (
-          <button
-            key={page.slotIndex}
-            type="button"
-            data-testid={`dashboard-page-selector-item-${page.slotIndex}`}
-            className={cn(
-              "dashboard-page-selector-item",
-              isDesktop ? "dashboard-page-selector-item--desktop" : "mobile-page-selector-item",
-              active &&
-                (isDesktop
-                  ? "dashboard-page-selector-item--active"
-                  : "mobile-page-selector-item--active")
-            )}
-            onClick={() => navigate(page.slotIndex)}
-            onPointerEnter={() => {
-              if (page.slotIndex === TEAM_HUB_SLOT_INDEX) prefetchTeamHubPageChunk();
-            }}
-            aria-current={active ? "page" : undefined}
-          >
-            <span
-              className={cn(
-                isDesktop ? "dashboard-page-selector-icon" : "mobile-page-selector-icon"
-              )}
-            >
-              <Icon size={isDesktop ? 28 : 24} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
-            </span>
-            <span
-              className={cn(
-                isDesktop ? "dashboard-page-selector-label" : "mobile-page-selector-label"
-              )}
-            >
-              {String(t(MOBILE_TAB_I18N[page.spotlightLabelKey]))}
-            </span>
-          </button>
-        );
-      })}
+      {pageButtons}
+    </nav>
+  ) : (
+    <nav className="mobile-page-selector-grid" aria-label="Navigation">
+      {pageButtons}
+      {Array.from({ length: 3 }, (_, index) => (
+        <div
+          key={`placeholder-${index}`}
+          className="mobile-page-selector-item mobile-page-selector-item--placeholder"
+          data-testid={`dashboard-page-selector-placeholder-${index}`}
+          aria-hidden
+        />
+      ))}
     </nav>
   );
 

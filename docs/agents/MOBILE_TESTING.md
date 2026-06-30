@@ -123,6 +123,15 @@ Composants encore sans test isolé (couverture parent/contrat) : `AdminMobileShe
 
 ---
 
+## Composants shell Phase 8 (dock Galaxy)
+
+| Composant                   | Fichier test                   | Vérifié                                    |
+| --------------------------- | ------------------------------ | ------------------------------------------ |
+| `MobileShellGalaxyDockSlot` | visibilité + classes dock      | grille masquée / visible                   |
+| `MobileShellFooterDock`     | dispatch carte + composers hub | pageIndex × `useMobileFooterGalaxyVisible` |
+
+`AdminMobileShell` reste couvert par `adminMobileShellContract.test.tsx`.
+
 ## E2E Playwright (Phase 4)
 
 | Commande                        | Rôle                                                      |
@@ -156,6 +165,35 @@ Helper : `tests/e2e/helpers/mobileShell.ts` (`gotoMobileShellOrSkip`, `dispatchH
 `workflow_dispatch` disponible sur `mobile-tests.yml` pour un check manuel.
 
 ---
+
+## Bridges natifs Capacitor (Phase 5–9)
+
+Commande : `npm run test:native-infra` (inclus dans `npm run test:mobile`).
+
+| Module                  | Tests                         | Pattern                            |
+| ----------------------- | ----------------------------- | ---------------------------------- |
+| `capacitorRuntime.ts`   | détection web / ios / android | mock `window.Capacitor`            |
+| `nativeGeolocation.ts`  | permission + coords           | **injection `deps`**               |
+| `nativeDocumentSave.ts` | filesystem + share            | **injection `deps`**               |
+| `nativeCamera.ts`       | web guard + capture           | mock runtime + `@capacitor/camera` |
+| `nativeFcmToken.ts`     | permission push + token       | mock runtime + plugins             |
+| `nativeShellBoot.ts`    | no-op web                     | mock `isCapacitorNative`           |
+
+Nouveau bridge natif : préférer **injection `deps`** (`docs/reference/AGENT_TEST_RECIPES.md` §7) plutôt que `jest.mock("@capacitor/...")` seul.
+
+## Push & auth natifs (Phase 9)
+
+Couverture complète `src/core/native/` — tous les bridges ont un test dédié.
+
+| Module                         | Fichier test                                      |
+| ------------------------------ | ------------------------------------------------- |
+| `nativePush.ts`                | permission + callback registration                |
+| `nativePushForeground.ts`      | toast premier plan                                |
+| `nativePushClickHandler.ts`    | routage tap notif                                 |
+| `ensureAndroidPushChannels.ts` | canaux FCM Android (idempotent)                   |
+| `photoCapture.ts`              | dataUrl → File                                    |
+| `nativeAppleSignIn.ts`         | iOS only + annulation                             |
+| `nativeFcmToken.ts`            | `fetchNativeFcmToken` + `onNativeFcmTokenRefresh` |
 
 ## Capacitor (Android / iOS)
 

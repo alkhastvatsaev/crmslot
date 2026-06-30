@@ -8,6 +8,7 @@ import CompanyStockCenterPanel from "@/features/featureHub/components/CompanySto
 import CompanyStockOrdersRightRail from "@/features/featureHub/components/CompanyStockOrdersRightRail";
 import CompanyStockProWorkspace from "@/features/featureHub/components/CompanyStockProWorkspace";
 import { FEATURE_HUB_SLOT_INDEX } from "@/features/featureHub/featureHubConstants";
+import { MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT } from "@/features/featureHub/companyStockChatbot";
 import { computeCompanyStockMetrics } from "@/features/featureHub/companyStockMetrics";
 import { useCompanyMaterialOrdersRecent } from "@/features/featureHub/hooks/useCompanyMaterialOrdersRecent";
 import { useCompanyStockItems } from "@/features/featureHub/hooks/useCompanyStockItems";
@@ -46,6 +47,12 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
     const onFocusAgent = () => requestMobileHubRail("left");
     window.addEventListener("material-agent-focus-left-rail", onFocusAgent);
     return () => window.removeEventListener("material-agent-focus-left-rail", onFocusAgent);
+  }, [requestMobileHubRail]);
+
+  useEffect(() => {
+    const onFocusOrders = () => requestMobileHubRail("right");
+    window.addEventListener(MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT, onFocusOrders);
+    return () => window.removeEventListener(MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT, onFocusOrders);
   }, [requestMobileHubRail]);
 
   const {

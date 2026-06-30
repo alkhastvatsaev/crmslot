@@ -23,15 +23,27 @@ export const DocumentPdfQuerySchema = z.object({
   type: InterventionDocumentKindSchema.default("invoice"),
 });
 
-/** POST /api/interventions/[id]/validate-report — validation rapport back-office. */
+/** POST /api/interventions/[id]/validate-report — émission facture après validation rapport. */
 export const ValidateReportRequestSchema = z.object({
-  validated: z.boolean(),
-  rejectionReason: z.string().min(3).optional(),
+  sendEmail: z.boolean().optional(),
 });
 export type ValidateReportRequest = z.infer<typeof ValidateReportRequestSchema>;
 
+export const ValidateReportSuccessResponseSchema = z.object({
+  ok: z.literal(true),
+  invoicePdfUrl: z.string(),
+  invoiceAmountCents: z.number(),
+  emailSent: z.boolean(),
+  emailError: z.string().optional(),
+});
+
+export const ValidateReportErrorResponseSchema = z.object({
+  ok: z.literal(false),
+  error: z.string(),
+});
+
 export const ValidateReportResponseSchema = z.discriminatedUnion("ok", [
-  z.object({ ok: z.literal(true), status: InterventionStatusSchema }),
-  z.object({ ok: z.literal(false), error: z.string() }),
+  ValidateReportSuccessResponseSchema,
+  ValidateReportErrorResponseSchema,
 ]);
 export type ValidateReportResponse = z.infer<typeof ValidateReportResponseSchema>;

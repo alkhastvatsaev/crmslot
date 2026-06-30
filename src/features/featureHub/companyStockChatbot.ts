@@ -6,6 +6,10 @@ import type { DashboardPagerApi } from "@/features/dashboard";
 /** Signal : une commande matériel attend que le bridge agent soit prêt (après changement de page). */
 export const MATERIAL_AGENT_PENDING_QUICK_PROMPT_EVENT = "material-agent-pending-quick-prompt";
 
+/** Mobile : bascule vers le rail « Suivi commandes » après commande Lecot réussie. */
+export const MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT = "material-agent-focus-orders-rail";
+export const MATERIAL_ORDERS_RAIL_FOCUS_DELAY_MS = 1000;
+
 let pendingMaterialAgentQuickPrompt: string | null = null;
 
 export function peekPendingMaterialAgentQuickPrompt(): string | null {
@@ -40,6 +44,16 @@ export function dispatchMaterialAgentDraftPrompt(text: string): void {
 export function focusMaterialAgentMobileRail(): void {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new CustomEvent("material-agent-focus-left-rail"));
+}
+
+/** Mobile : après commande Lecot, ouvre le rail suivi commandes (délai pour lire la réponse agent). */
+export function scheduleMaterialOrdersMobileRailFocus(
+  delayMs = MATERIAL_ORDERS_RAIL_FOCUS_DELAY_MS
+): void {
+  if (typeof window === "undefined") return;
+  window.setTimeout(() => {
+    window.dispatchEvent(new CustomEvent(MATERIAL_AGENT_FOCUS_ORDERS_RAIL_EVENT));
+  }, delayMs);
 }
 
 /** Envoi immédiat — file d’attente si l’agent / le dock Galaxy ne sont pas encore montés (rail centre mobile). */

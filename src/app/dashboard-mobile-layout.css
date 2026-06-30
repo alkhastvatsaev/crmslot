@@ -712,10 +712,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
-  flex: 1;
-  align-content: center;
-  height: 100%;
-  min-height: 0;
+  align-content: start;
   padding: 0.875rem;
   box-sizing: border-box;
 }
@@ -774,6 +771,15 @@
 
 .mobile-page-selector-item--active .mobile-page-selector-label {
   color: rgb(37 99 235);
+}
+
+.mobile-page-selector-item--placeholder {
+  pointer-events: none;
+  cursor: default;
+  min-height: 5.5rem;
+  background: rgb(248 250 252 / 0.45);
+  border-style: dashed;
+  border-color: rgb(203 213 225);
 }
 
 /* ── Account panel (profil staff) ───────────────────────── */

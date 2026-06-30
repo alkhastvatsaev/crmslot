@@ -8,6 +8,7 @@ alwaysApply: true
 Zone : `docs/agents/PARALLEL_WORK.md` · workflow : `docs/agents/CURSOR_WORKFLOW.md` · protocole détaillé : règle `agent-large-codebase`
 
 - Un dossier feature à la fois · `Grep`/`SemanticSearch` scopés · i18n → grep clé dans `src/core/i18n/locales/`
+- Mobile shell / PWA → `docs/agents/MOBILE_TESTING.md` · fin de tâche `npm run test:mobile`
 - Jamais `git add .` · commit/push si demandé
 - Tests : `npx jest <zone> --no-coverage` · merge `npm run test:ci`
 - Fichiers hors index (tests, api, locales) : utiliser `@chemin/fichier` pour les ouvrir
