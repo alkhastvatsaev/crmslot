@@ -255,7 +255,7 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
         className="shrink-0 border-b-0 px-0 py-2"
       />
 
-      {!isDesktop ? <DashboardLanguageSelector variant="mobile" /> : null}
+      <DashboardLanguageSelector variant={isDesktop ? "desktop" : "mobile"} />
 
       {!ready ? (
         <div

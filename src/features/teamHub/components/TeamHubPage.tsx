@@ -55,7 +55,7 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   }, [refresh]);
 
   const gate =
-    companyPhase === "loading" ? (
+    companyPhase === "loading" && !bootCompanyId ? (
       <div
         data-testid="team-hub-loading"
         className="flex min-h-0 flex-1 items-center justify-center"

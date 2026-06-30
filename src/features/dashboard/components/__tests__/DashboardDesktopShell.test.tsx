@@ -59,12 +59,14 @@ describe("DashboardDesktopShell", () => {
     fireEvent.click(screen.getByTestId("admin-mobile-profile-chip"));
     const host = screen.getByTestId("dashboard-account-panel-host");
     expect(host).toBeInTheDocument();
-    expect(host).toHaveClass("dashboard-desktop-col--center");
+    expect(host.closest("[data-testid='dashboard-desktop-overlay-center']")).toHaveClass(
+      "dashboard-desktop-col--center"
+    );
     expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
   });
 
-  it("affiche le menu pages à droite au clic calendrier desktop", () => {
+  it("affiche le menu pages au centre au clic calendrier desktop", () => {
     renderShell(
       <DashboardDesktopShell
         pager={<span data-testid="shell-pager">pager</span>}
@@ -76,8 +78,26 @@ describe("DashboardDesktopShell", () => {
     fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
     const host = screen.getByTestId("dashboard-page-selector-host");
     expect(host).toBeInTheDocument();
-    expect(host).toHaveClass("dashboard-desktop-col--right");
+    expect(host.closest("[data-testid='dashboard-desktop-overlay-center']")).toHaveClass(
+      "dashboard-desktop-col--center"
+    );
     expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
     expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
   });
+});
+
+it("garde les docks header cliquables quand le panneau compte est ouvert", () => {
+  renderShell(
+    <DashboardDesktopShell
+      pager={<span data-testid="shell-pager">pager</span>}
+      galaxy={<span>galaxy</span>}
+    />
+  );
+
+  fireEvent.click(screen.getByTestId("admin-mobile-profile-chip"));
+  expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
+  expect(screen.getByTestId("dashboard-page-selector")).toBeInTheDocument();
+  expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
 });

@@ -16,8 +16,7 @@ describe("DashboardPageSelector", () => {
       "data-variant",
       "desktop"
     );
-    expect(screen.getByTestId("dashboard-language-selector")).toBeInTheDocument();
-    expect(screen.getByTestId("dashboard-language-fr")).toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-language-selector")).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("dashboard-page-selector-item-4"));
     expect(onClose).toHaveBeenCalled();
   });

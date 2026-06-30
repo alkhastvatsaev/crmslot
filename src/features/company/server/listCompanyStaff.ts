@@ -143,22 +143,25 @@ export async function listCompanyStaff(
   if (uids.length === 0) return [];
 
   const missingTechUids = uids.filter((uid) => !techByUid.has(uid));
-  if (missingTechUids.length > 0) {
-    const missingTechSnaps = await batchedFirestoreGetAll(
-      db,
-      missingTechUids.map((uid) => db.collection("technicians").doc(uid))
-    );
-    for (const snap of missingTechSnaps) {
-      if (snap.exists) {
-        techByUid.set(snap.id, snap.data() ?? {});
-      }
-    }
-  }
 
-  const membershipSnaps = await batchedFirestoreGetAll(
-    db,
-    uids.map((uid) => db.doc(`users/${uid}/company_memberships/${companyId}`))
-  );
+  const [, membershipSnaps] = await Promise.all([
+    (async () => {
+      if (missingTechUids.length === 0) return;
+      const missingTechSnaps = await batchedFirestoreGetAll(
+        db,
+        missingTechUids.map((uid) => db.collection("technicians").doc(uid))
+      );
+      for (const snap of missingTechSnaps) {
+        if (snap.exists) {
+          techByUid.set(snap.id, snap.data() ?? {});
+        }
+      }
+    })(),
+    batchedFirestoreGetAll(
+      db,
+      uids.map((uid) => db.doc(`users/${uid}/company_memberships/${companyId}`))
+    ),
+  ]);
   const membershipByUid = new Map<string, Record<string, unknown>>();
   for (const snap of membershipSnaps) {
     if (!snap.exists) continue;
