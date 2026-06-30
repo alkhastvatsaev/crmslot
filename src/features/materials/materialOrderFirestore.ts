@@ -85,7 +85,7 @@ export async function createMaterialOrderDoc(
 export async function updateMaterialOrderStatus(
   db: Firestore,
   orderId: string,
-  status: MaterialOrder["status"],
+  status: MaterialOrder["status"] | "approved" | "delivered",
   notify?: MaterialOrderStatusNotifyContext
 ): Promise<void> {
   await updateDoc(doc(db, MATERIAL_ORDERS_COLLECTION, orderId), {
