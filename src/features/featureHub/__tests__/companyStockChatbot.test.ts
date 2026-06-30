@@ -23,7 +23,13 @@ describe("companyStockChatbot pending prompt", () => {
   });
 
   it("queues prompt when navigating away from material page", () => {
-    const pager = { pageIndex: 6, setPageIndex: jest.fn() };
+    const pager = {
+      pageIndex: 6,
+      pageCount: 9,
+      setPageIndex: jest.fn(),
+      goNext: jest.fn(),
+      goPrev: jest.fn(),
+    };
     navigateMaterialAgentWithQuickPrompt(pager, 'Commander 1× "Test"');
     expect(pager.setPageIndex).toHaveBeenCalledWith(FEATURE_HUB_SLOT_INDEX);
     expect(peekPendingMaterialAgentQuickPrompt()).toBe('Commander 1× "Test"');

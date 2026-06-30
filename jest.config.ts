@@ -77,6 +77,18 @@ const config: Config = {
       functions: 100,
       lines: 100,
     },
+    "./src/core/ui/dashboardMobileLayout.ts": {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+    "./src/features/dashboard/mobileShellContract.ts": {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
     // Chatbot P0 — ratchet progressif (voir docs/agents/TESTING.md §3.4).
     "./src/features/chatbot/chatbot-pwa-intent.ts": {
       statements: 65,
@@ -115,7 +127,7 @@ const config: Config = {
       lines: 65,
     },
     // Page 2 — portail client
-    "./src/features/interventions/context/RequesterHubContext.tsx": {
+    "./src/context/RequesterHubContext.tsx": {
       statements: 80,
       branches: 70,
       functions: 90,

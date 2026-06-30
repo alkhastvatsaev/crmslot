@@ -92,6 +92,7 @@ describe("IncomingClientRequestsPanel", () => {
       loading: false,
       error: null,
       firebaseUid: "ivana-uid",
+      fromCache: false,
     });
   });
 

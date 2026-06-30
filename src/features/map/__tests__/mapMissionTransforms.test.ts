@@ -59,6 +59,7 @@ describe("mapMissionTransforms", () => {
         coordinates: [4.4, 50.9],
         time: "09:00",
         date: "2026-06-23",
+        status: "assigned",
       },
     ];
     const missions = buildMapHubMissions({

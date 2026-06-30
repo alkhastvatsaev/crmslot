@@ -47,7 +47,7 @@ describe("useBackOfficeInterventions — offline cache", () => {
       companyId,
       title: "Mission cache",
       status: "new",
-    } as Intervention;
+    } as unknown as Intervention;
     writeAdminInboxInterventionsCache(companyId, [iv]);
 
     const { result } = renderHook(() => useBackOfficeInterventions(companyId));

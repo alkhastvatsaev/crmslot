@@ -12,13 +12,14 @@ import type { Intervention } from "@/features/interventions";
 function iv(
   partial: Partial<Intervention> & { id: string; status: Intervention["status"] }
 ): Intervention {
+  const { id, ...rest } = partial;
   return {
-    id: partial.id,
     title: "T",
     address: "A",
     time: "10:00",
     location: { lat: 1, lng: 2 },
-    ...partial,
+    ...rest,
+    id,
   };
 }
 
@@ -38,7 +39,15 @@ describe("backOfficeInboxLists", () => {
   });
 
   it("computeBridgedTerrainVisible hides synced bridged reports", () => {
-    const bridged = [{ interventionId: "synced", report: {} as never }];
+    const bridged = [
+      {
+        localId: "local-synced",
+        interventionId: "synced",
+        photoDataUrls: [],
+        signaturePngDataUrl: "",
+        receivedAt: 1,
+      },
+    ];
     const synced = [iv({ id: "synced", status: "done" })];
     expect(computeBridgedTerrainVisible(bridged, synced)).toEqual([]);
   });

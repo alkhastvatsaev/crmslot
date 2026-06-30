@@ -1102,7 +1102,9 @@
       "dirigeant": "Рук.",
       "dispatcher": "Дисп.",
       "technician": "Тех."
-    }
+    },
+    "delete_account": "Удалить аккаунт",
+    "delete_account_confirm": "Удалить этого сотрудника из компании?"
   },
   "caseHub": {
     "company_required": "Выберите компанию.",

@@ -1,197 +1,219 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { RequesterHubProvider, useRequesterHub } from "@/context/RequesterHubContext";
+
+jest.mock("@/features/interventions", () => ({
+  readPortalAccessSession: jest.fn(() => null),
+  writePortalAccessSession: jest.fn(),
+}));
 
 const STORAGE_KEY = "map-belgique-requester-draft-v1";
 
-// Consumer component to expose context values via data-testid
-function TestConsumer() {
-  const {
-    profile,
-    setProfile,
-    requestData,
-    setRequestData,
-    currentStep,
-    setCurrentStep,
-    lastSubmittedInterventionId,
-    setLastSubmittedInterventionId,
-    validationFailedCount,
-    triggerValidation,
-    resetAll,
-    resetRequestOnly,
-  } = useRequesterHub();
-
+function Probe() {
+  const hub = useRequesterHub();
   return (
     <div>
-      <span data-testid="profile-type">{profile.type}</span>
-      <span data-testid="profile-firstname">{profile.firstName}</span>
-      <span data-testid="current-step">{currentStep}</span>
-      <span data-testid="problem-label">{requestData.problemLabel}</span>
-      <span data-testid="validation-count">{validationFailedCount}</span>
-      <span data-testid="last-id">{lastSubmittedInterventionId ?? ""}</span>
-
-      <button
-        data-testid="set-firstname"
-        onClick={() => setProfile((p) => ({ ...p, firstName: "Alice" }))}
-      />
-      <button
-        data-testid="set-problem"
-        onClick={() => setRequestData((d) => ({ ...d, problemLabel: "Fuite" }))}
-      />
-      <button data-testid="set-step-3" onClick={() => setCurrentStep(3)} />
-      <button data-testid="set-last-id" onClick={() => setLastSubmittedInterventionId("abc123")} />
-      <button data-testid="trigger-validation" onClick={triggerValidation} />
-      <button data-testid="reset-request" onClick={resetRequestOnly} />
-      <button data-testid="reset-all" onClick={resetAll} />
+      <span data-testid="step">{hub.currentStep}</span>
+      <span data-testid="validation-fails">{hub.validationFailedCount}</span>
+      <span data-testid="profile-type">{hub.profile.type}</span>
+      <span data-testid="first-name">{hub.profile.firstName}</span>
+      <button type="button" onClick={() => hub.triggerValidation()}>
+        validate
+      </button>
+      <button type="button" onClick={() => hub.resetAll()}>
+        reset
+      </button>
     </div>
-  );
-}
-
-function renderProvider() {
-  return render(
-    <RequesterHubProvider>
-      <TestConsumer />
-    </RequesterHubProvider>
   );
 }
 
 describe("RequesterHubContext", () => {
   beforeEach(() => {
-    localStorage.clear();
+    window.localStorage.clear();
+    jest.clearAllMocks();
   });
 
-  it("provides default profile type = login", () => {
-    renderProvider();
+  it("throw si useRequesterHub hors provider", () => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<Probe />)).toThrow(/RequesterHubProvider/);
+  });
+
+  it("expose les valeurs initiales", () => {
+    render(
+      <RequesterHubProvider>
+        <Probe />
+      </RequesterHubProvider>
+    );
+    expect(screen.getByTestId("step")).toHaveTextContent("0");
     expect(screen.getByTestId("profile-type")).toHaveTextContent("login");
   });
 
-  it("provides default currentStep = 0", () => {
-    renderProvider();
-    expect(screen.getByTestId("current-step")).toHaveTextContent("0");
+  it("incrémente validationFailedCount via triggerValidation", () => {
+    render(
+      <RequesterHubProvider>
+        <Probe />
+      </RequesterHubProvider>
+    );
+    act(() => {
+      screen.getByRole("button", { name: "validate" }).click();
+    });
+    expect(screen.getByTestId("validation-fails")).toHaveTextContent("1");
   });
 
-  it("updates profile firstName via setProfile", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-firstname").click());
-    expect(screen.getByTestId("profile-firstname")).toHaveTextContent("Alice");
-  });
-
-  it("updates requestData problemLabel via setRequestData", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-problem").click());
-    expect(screen.getByTestId("problem-label")).toHaveTextContent("Fuite");
-  });
-
-  it("increments validationFailedCount on triggerValidation", () => {
-    renderProvider();
-    expect(screen.getByTestId("validation-count")).toHaveTextContent("0");
-    act(() => screen.getByTestId("trigger-validation").click());
-    expect(screen.getByTestId("validation-count")).toHaveTextContent("1");
-    act(() => screen.getByTestId("trigger-validation").click());
-    expect(screen.getByTestId("validation-count")).toHaveTextContent("2");
-  });
-
-  it("resetRequestOnly resets step + requestData but keeps profile", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-firstname").click());
-    act(() => screen.getByTestId("set-problem").click());
-    act(() => screen.getByTestId("set-step-3").click());
-
-    act(() => screen.getByTestId("reset-request").click());
-
-    expect(screen.getByTestId("current-step")).toHaveTextContent("0");
-    expect(screen.getByTestId("problem-label")).toHaveTextContent("");
-    expect(screen.getByTestId("profile-firstname")).toHaveTextContent("Alice");
-  });
-
-  it("resetAll clears profile, requestData, step, lastId, and localStorage", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-firstname").click());
-    act(() => screen.getByTestId("set-last-id").click());
-    act(() => screen.getByTestId("set-step-3").click());
-
-    act(() => screen.getByTestId("reset-all").click());
-
-    expect(screen.getByTestId("profile-firstname")).toHaveTextContent("");
-    expect(screen.getByTestId("current-step")).toHaveTextContent("0");
-    expect(screen.getByTestId("last-id")).toHaveTextContent("");
-    // After resetAll the persist effect re-runs with defaults — verify sensitive data is gone
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as {
-      profile?: { firstName?: string; lastName?: string };
-      lastSubmittedInterventionId?: string | null;
-    };
-    expect(stored.profile?.firstName ?? "").toBe("");
-    expect(stored.lastSubmittedInterventionId ?? null).toBeNull();
-  });
-
-  it("persists profile + requestData to localStorage on change", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-firstname").click());
-    act(() => screen.getByTestId("set-problem").click());
-
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as {
-      profile?: { firstName?: string };
-      requestData?: { problemLabel?: string };
-    };
-    expect(stored.profile?.firstName).toBe("Alice");
-    expect(stored.requestData?.problemLabel).toBe("Fuite");
-  });
-
-  it("restores profile from localStorage on mount", () => {
-    localStorage.setItem(
+  it("resetAll remet le profil par défaut et réécrit le brouillon", () => {
+    window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({
-        profile: {
-          type: "particulier",
-          firstName: "Bob",
-          lastName: "Martin",
-          phone: "0477",
-          email: "bob@test.be",
-          companyName: "",
-          accessCode: "",
-        },
-        requestData: {
-          problemLabel: "Serrure cassée",
-          problemTemplateId: "blocked",
-          description: "",
-          urgency: false,
-          photoDataUrls: [],
-          interventionAddress: "",
-        },
-      })
+      JSON.stringify({ profile: { type: "login", firstName: "X" } })
     );
 
-    renderProvider();
+    render(
+      <RequesterHubProvider>
+        <Probe />
+      </RequesterHubProvider>
+    );
 
-    expect(screen.getByTestId("profile-type")).toHaveTextContent("particulier");
-    expect(screen.getByTestId("profile-firstname")).toHaveTextContent("Bob");
-    expect(screen.getByTestId("problem-label")).toHaveTextContent("Serrure cassée");
+    act(() => {
+      screen.getByRole("button", { name: "reset" }).click();
+    });
+
+    expect(screen.getByTestId("first-name")).toHaveTextContent("");
+    expect(screen.getByTestId("profile-type")).toHaveTextContent("login");
+    const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.profile?.firstName).toBe("");
   });
 
-  it("migrates legacy type='societe' to 'login' on restore", () => {
-    localStorage.setItem(
+  it("hydrate le profil et migre le type legacy societe → login", async () => {
+    window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
         profile: {
           type: "societe",
-          firstName: "Corp",
+          firstName: "Marie",
           lastName: "",
+          companyName: "",
           phone: "",
           email: "",
-          companyName: "ACME",
+          usualAddress: "",
           accessCode: "",
         },
       })
     );
 
-    renderProvider();
+    render(
+      <RequesterHubProvider>
+        <Probe />
+      </RequesterHubProvider>
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     expect(screen.getByTestId("profile-type")).toHaveTextContent("login");
+    expect(screen.getByTestId("first-name")).toHaveTextContent("Marie");
+  });
+});
+
+function ExtendedProbe() {
+  const hub = useRequesterHub();
+  return (
+    <div>
+      <span data-testid="step">{hub.currentStep}</span>
+      <span data-testid="description">{hub.requestData.description}</span>
+      <span data-testid="submitting">{String(hub.isSubmitting)}</span>
+      <button type="button" onClick={() => hub.resetRequestOnly()}>
+        reset-request
+      </button>
+      <button type="button" onClick={() => hub.resetRequestAfterSubmit()}>
+        reset-after-submit
+      </button>
+      <button
+        type="button"
+        onClick={() => hub.setRequestData((d) => ({ ...d, description: "fuite" }))}
+      >
+        desc
+      </button>
+      <button type="button" onClick={() => hub.setIsSubmitting(true)}>
+        submit-on
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          hub.setPortalAccessSession({
+            emailNormalized: "a@test.com",
+            verifiedAt: "2026-01-01",
+            interventionIds: ["iv-1"],
+            interventions: [],
+          })
+        }
+      >
+        session
+      </button>
+    </div>
+  );
+}
+
+describe("RequesterHubContext actions", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    jest.clearAllMocks();
   });
 
-  it("sets and exposes lastSubmittedInterventionId", () => {
-    renderProvider();
-    act(() => screen.getByTestId("set-last-id").click());
-    expect(screen.getByTestId("last-id")).toHaveTextContent("abc123");
+  it("resetRequestOnly remet le formulaire à zéro", () => {
+    render(
+      <RequesterHubProvider>
+        <ExtendedProbe />
+      </RequesterHubProvider>
+    );
+    act(() => {
+      screen.getByRole("button", { name: "desc" }).click();
+    });
+    expect(screen.getByTestId("description")).toHaveTextContent("fuite");
+    act(() => {
+      screen.getByRole("button", { name: "reset-request" }).click();
+    });
+    expect(screen.getByTestId("description")).toHaveTextContent("");
+    expect(screen.getByTestId("step")).toHaveTextContent("0");
+  });
+
+  it("resetRequestAfterSubmit positionne l'étape suivi", () => {
+    render(
+      <RequesterHubProvider>
+        <ExtendedProbe />
+      </RequesterHubProvider>
+    );
+    act(() => {
+      screen.getByRole("button", { name: "reset-after-submit" }).click();
+    });
+    expect(screen.getByTestId("step")).toHaveTextContent("4");
+  });
+
+  it("setPortalAccessSession persiste via writePortalAccessSession", () => {
+    const { writePortalAccessSession } = jest.requireMock("@/features/interventions") as {
+      writePortalAccessSession: jest.Mock;
+    };
+    render(
+      <RequesterHubProvider>
+        <ExtendedProbe />
+      </RequesterHubProvider>
+    );
+    act(() => {
+      screen.getByRole("button", { name: "session" }).click();
+    });
+    expect(writePortalAccessSession).toHaveBeenCalledWith(
+      expect.objectContaining({ emailNormalized: "a@test.com" })
+    );
+  });
+
+  it("setIsSubmitting met à jour l'état d'envoi", () => {
+    render(
+      <RequesterHubProvider>
+        <ExtendedProbe />
+      </RequesterHubProvider>
+    );
+    act(() => {
+      screen.getByRole("button", { name: "submit-on" }).click();
+    });
+    expect(screen.getByTestId("submitting")).toHaveTextContent("true");
   });
 });

@@ -8,6 +8,19 @@ import {
   formatRuleShort,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
 import type { CommissionRule } from "@/features/commissions";
+import type { Intervention } from "@/features/interventions";
+import type { Technician } from "@/features/technicians";
+
+function stubTechnician(
+  partial: Pick<Technician, "id" | "name" | "initial" | "authUid"> & Partial<Technician>
+): Technician {
+  return {
+    vehicle: "V1",
+    status: "available",
+    location: { lat: 0, lng: 0 },
+    ...partial,
+  };
+}
 
 const NOW = new Date("2026-06-15T12:00:00.000Z");
 
@@ -67,8 +80,8 @@ describe("commissionsHubPatronMetrics", () => {
       companyId: "co-1",
       rules: [groupRule],
       technicians: [
-        { id: "t1", name: "Alex", initial: "A", authUid: "tech-a" },
-        { id: "t2", name: "Bob", initial: "B", authUid: "tech-b" },
+        stubTechnician({ id: "t1", name: "Alex", initial: "A", authUid: "tech-a" }),
+        stubTechnician({ id: "t2", name: "Bob", initial: "B", authUid: "tech-b" }),
       ],
       manualEntries: [],
       interventions: [
@@ -145,7 +158,7 @@ describe("commissionsHubPatronMetrics", () => {
   });
 
   it("agrège le CA technicien par mois de clôture avec repli billingLines", () => {
-    const interventions = [
+    const interventions: Intervention[] = [
       {
         id: "a",
         title: "A",
@@ -234,7 +247,7 @@ describe("commissionsHubPatronMetrics", () => {
       now: NOW,
       companyId: "co-1",
       rules: [groupRule],
-      technicians: [{ id: "t1", name: "Alex", initial: "A", authUid: "tech-a" }],
+      technicians: [stubTechnician({ id: "t1", name: "Alex", initial: "A", authUid: "tech-a" })],
       manualEntries: [],
       interventions: [
         {
@@ -268,7 +281,7 @@ describe("commissionsHubPatronMetrics", () => {
       now: NOW,
       companyId: "co-1",
       rules: [groupRule],
-      technicians: [{ id: "t1", name: "Alex", initial: "A", authUid: "tech-a" }],
+      technicians: [stubTechnician({ id: "t1", name: "Alex", initial: "A", authUid: "tech-a" })],
       manualEntries: [
         {
           id: "m1",

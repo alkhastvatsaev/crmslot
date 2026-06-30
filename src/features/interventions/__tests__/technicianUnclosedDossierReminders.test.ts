@@ -28,13 +28,13 @@ describe("technicianUnclosedDossierReminders", () => {
         id: "new",
         status: "assigned",
         assignedTechnicianUid: uid,
-        assignedAt: "2026-06-24T11:00:00.000Z",
+        statusUpdatedAt: "2026-06-24T11:00:00.000Z",
       }),
       makeIntervention({
         id: "old",
         status: "in_progress",
         assignedTechnicianUid: uid,
-        assignedAt: "2026-06-24T08:00:00.000Z",
+        statusUpdatedAt: "2026-06-24T08:00:00.000Z",
       }),
     ];
     expect(pickPrimaryUnclosedIntervention(rows).id).toBe("old");
