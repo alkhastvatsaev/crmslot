@@ -97,7 +97,10 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
           className="mobile-page-selector-item mobile-page-selector-item--placeholder"
           data-testid={`dashboard-page-selector-placeholder-${index}`}
           aria-hidden
-        />
+        >
+          <span className="mobile-page-selector-icon" aria-hidden />
+          <span className="mobile-page-selector-label" aria-hidden />
+        </div>
       ))}
     </nav>
   );
