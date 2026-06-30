@@ -61,6 +61,23 @@ export const MOBILE_SCREEN_HOST_PANEL_CLASS = "mobile-screen-host-panel";
 export const MOBILE_SCREEN_HOST_PANEL_BASE_CLASS = "mobile-screen-host-panel--base";
 export const MOBILE_SCREEN_HOST_PANEL_SELECTOR_CLASS = "mobile-screen-host-panel--selector";
 
+/** Phases d'animation entre hubs — voir `mobilePageTransition.ts`. */
+export const MOBILE_SCREEN_HOST_PANEL_ACTIVE_CLASS = "mobile-screen-host-panel--active";
+export const MOBILE_SCREEN_HOST_PANEL_ENTER_NEXT_CLASS = "mobile-screen-host-panel--enter-next";
+export const MOBILE_SCREEN_HOST_PANEL_ENTER_PREV_CLASS = "mobile-screen-host-panel--enter-prev";
+export const MOBILE_SCREEN_HOST_PANEL_EXIT_NEXT_CLASS = "mobile-screen-host-panel--exit-next";
+export const MOBILE_SCREEN_HOST_PANEL_EXIT_PREV_CLASS = "mobile-screen-host-panel--exit-prev";
+export const MOBILE_SCREEN_HOST_PANEL_SUSPENDED_CLASS = "mobile-screen-host-panel--suspended";
+
+export const MOBILE_SCREEN_HOST_PANEL_PHASE_CLASS = {
+  active: MOBILE_SCREEN_HOST_PANEL_ACTIVE_CLASS,
+  "enter-next": MOBILE_SCREEN_HOST_PANEL_ENTER_NEXT_CLASS,
+  "enter-prev": MOBILE_SCREEN_HOST_PANEL_ENTER_PREV_CLASS,
+  "exit-next": MOBILE_SCREEN_HOST_PANEL_EXIT_NEXT_CLASS,
+  "exit-prev": MOBILE_SCREEN_HOST_PANEL_EXIT_PREV_CLASS,
+  suspended: MOBILE_SCREEN_HOST_PANEL_SUSPENDED_CLASS,
+} as const;
+
 /** Overlay compte terrain/admin — plein corps, fond opaque (évite le rail hub visible sur iOS). */
 export const MOBILE_SHELL_ACCOUNT_OVERLAY_CLASS = "mobile-shell-account-overlay";
 

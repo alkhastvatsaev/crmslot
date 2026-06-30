@@ -23,6 +23,7 @@
   --mobile-tab-inactive: rgb(148 163 184);
   /** Courbe iOS spring (mêmes valeurs partout pour cohérence du toucher). */
   --mobile-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --mobile-page-transition-duration: 0.38s;
   --mobile-elevation-sm: 0 1px 3px rgb(15 23 42 / 0.05);
   --mobile-elevation-md: 0 4px 12px rgb(15 23 42 / 0.08);
   --mobile-elevation-accent: 0 4px 12px rgb(37 99 235 / 0.32);
@@ -944,6 +945,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .mobile-screen-host-panel {
@@ -957,6 +959,99 @@
   position: relative;
   z-index: 1;
   overflow: visible;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mobile-screen-host-panel--active {
+  z-index: 2;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  pointer-events: auto;
+}
+
+.mobile-screen-host-panel--enter-next,
+.mobile-screen-host-panel--enter-prev,
+.mobile-screen-host-panel--exit-next,
+.mobile-screen-host-panel--exit-prev {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.mobile-screen-host-panel--exit-next,
+.mobile-screen-host-panel--exit-prev {
+  z-index: 1;
+}
+
+.mobile-screen-host-panel--enter-next {
+  animation: mobile-page-enter-from-right var(--mobile-page-transition-duration)
+    var(--mobile-spring) forwards;
+}
+
+.mobile-screen-host-panel--enter-prev {
+  animation: mobile-page-enter-from-left var(--mobile-page-transition-duration) var(--mobile-spring)
+    forwards;
+}
+
+.mobile-screen-host-panel--exit-next {
+  animation: mobile-page-exit-to-left var(--mobile-page-transition-duration) var(--mobile-spring)
+    forwards;
+}
+
+.mobile-screen-host-panel--exit-prev {
+  animation: mobile-page-exit-to-right var(--mobile-page-transition-duration) var(--mobile-spring)
+    forwards;
+}
+
+@keyframes mobile-page-enter-from-right {
+  from {
+    opacity: 0.9;
+    transform: translate3d(1.75rem, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mobile-page-enter-from-left {
+  from {
+    opacity: 0.9;
+    transform: translate3d(-1.75rem, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mobile-page-exit-to-left {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0.82;
+    transform: translate3d(-1.25rem, 0, 0) scale(0.99);
+  }
+}
+
+@keyframes mobile-page-exit-to-right {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0.82;
+    transform: translate3d(1.25rem, 0, 0) scale(0.99);
+  }
 }
 
 .mobile-screen-host-panel--suspended {
@@ -971,6 +1066,40 @@
   position: relative;
   z-index: 2;
   overflow: visible;
+  animation: mobile-screen-overlay-enter 0.34s var(--mobile-spring) forwards;
+}
+
+@keyframes mobile-screen-overlay-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-screen-host-panel--enter-next,
+  .mobile-screen-host-panel--enter-prev,
+  .mobile-screen-host-panel--exit-next,
+  .mobile-screen-host-panel--exit-prev,
+  .mobile-screen-host-panel--selector {
+    animation: mobile-page-crossfade-reduced 0.14s ease forwards !important;
+    transform: none !important;
+  }
+
+  @keyframes mobile-page-crossfade-reduced {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /**

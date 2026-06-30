@@ -1,38 +1,73 @@
-import { act, renderHook } from "@testing-library/react";
 import {
   MOBILE_MOUNTED_HUB_MAX,
   computeMobileMountedPageIndices,
-  useMobileMountedPageIndices,
 } from "@/features/dashboard/hooks/useMobileMountedPageIndices";
+import { MOBILE_PAGE_TRANSITION_MS } from "@/features/dashboard/mobilePageTransition";
 
 describe("computeMobileMountedPageIndices", () => {
-  it("ne monte que la page active (thermique)", () => {
-    expect(computeMobileMountedPageIndices(4)).toEqual(new Set([4]));
+  it("ne monte qu'une seule page hub au repos (thermique mobile)", () => {
+    expect(MOBILE_MOUNTED_HUB_MAX).toBe(1);
+    expect(computeMobileMountedPageIndices(3)).toEqual(new Set([3]));
     expect(computeMobileMountedPageIndices(0)).toEqual(new Set([0]));
   });
 
-  it("démonte la carte quand un autre hub est actif", () => {
-    const mounted = computeMobileMountedPageIndices(2);
-    expect(mounted.has(0)).toBe(false);
-    expect(mounted.has(2)).toBe(true);
-    expect(mounted.size).toBe(MOBILE_MOUNTED_HUB_MAX);
+  it("conserve brièvement l'ancienne page pendant une transition", () => {
+    expect(computeMobileMountedPageIndices(3, 1)).toEqual(new Set([3, 1]));
   });
 });
 
-describe("useMobileMountedPageIndices", () => {
-  it("suit la page active uniquement", () => {
-    const { result, rerender } = renderHook(({ page }) => useMobileMountedPageIndices(page), {
-      initialProps: { page: 1 },
-    });
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { useMobileMountedPageIndices } from "@/features/dashboard/hooks/useMobileMountedPageIndices";
+import { useMobilePageTransition } from "@/features/dashboard/hooks/useMobilePageTransition";
 
-    expect(result.current).toEqual(new Set([1]));
-    expect(result.current.has(0)).toBe(false);
+describe("useMobileMountedPageIndices", () => {
+  it("synchronise le Set monté avec la page active", async () => {
+    const { result, rerender } = renderHook(
+      ({ pageIndex }: { pageIndex: number }) => useMobileMountedPageIndices(pageIndex),
+      { initialProps: { pageIndex: 0 } }
+    );
+
+    expect(result.current).toEqual(new Set([0]));
+
+    rerender({ pageIndex: 4 });
+    await waitFor(() => {
+      expect(result.current).toEqual(new Set([4]));
+    });
+  });
+});
+
+describe("useMobilePageTransition", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("monte les deux pages le temps de l'animation puis libère l'ancienne", async () => {
+    const { result, rerender } = renderHook(
+      ({ pageIndex }: { pageIndex: number }) => useMobilePageTransition(pageIndex),
+      { initialProps: { pageIndex: 0 } }
+    );
+
+    expect(result.current.mountedIndices).toEqual(new Set([0]));
+    expect(result.current.getPanelPhase(0, false)).toBe("active");
+
+    rerender({ pageIndex: 2 });
+
+    expect(result.current.mountedIndices).toEqual(new Set([2, 0]));
+    expect(result.current.direction).toBe("next");
+    expect(result.current.getPanelPhase(2, false)).toBe("enter-next");
+    expect(result.current.getPanelPhase(0, false)).toBe("exit-next");
 
     act(() => {
-      rerender({ page: 2 });
+      jest.advanceTimersByTime(MOBILE_PAGE_TRANSITION_MS);
     });
 
-    expect(result.current).toEqual(new Set([2]));
-    expect(result.current.has(1)).toBe(false);
+    await waitFor(() => {
+      expect(result.current.mountedIndices).toEqual(new Set([2]));
+      expect(result.current.outgoingIndex).toBeNull();
+    });
   });
 });
