@@ -1,5 +1,6 @@
 import type { Intervention } from "@/features/interventions";
 import {
+  collectCompanyTechnicianAssignUids,
   interventionCountsForCompanyCommissions,
   mergeCommissionsHubInterventions,
 } from "@/features/commissionsHub/commissionsHubInterventionsScope";
@@ -38,6 +39,30 @@ function mission(overrides: Partial<Intervention> & Pick<Intervention, "id">): I
     id,
   };
 }
+
+describe("collectCompanyTechnicianAssignUids", () => {
+  it("retourne les UIDs triés quel que soit l'ordre des techniciens", () => {
+    const techA: Technician = {
+      ...technician,
+      id: "doc-z",
+      authUid: "auth-a",
+      name: "Tech A",
+    };
+    const techB: Technician = {
+      ...technician,
+      id: "doc-m",
+      authUid: "auth-b",
+      name: "Tech B",
+    };
+
+    const forward = collectCompanyTechnicianAssignUids([techA, techB]);
+    const reverse = collectCompanyTechnicianAssignUids([techB, techA]);
+
+    expect(forward).toEqual(reverse);
+    expect(forward).toEqual([...forward].sort());
+    expect(forward).toEqual(["auth-a", "auth-b", "doc-m", "doc-z"]);
+  });
+});
 
 describe("mergeCommissionsHubInterventions", () => {
   it("inclut une mission assignée au technicien sans companyId", () => {

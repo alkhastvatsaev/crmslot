@@ -14,7 +14,7 @@ export function collectCompanyTechnicianAssignUids(technicians: Technician[]): s
     if (docId) uids.add(docId);
     if (authUid) uids.add(authUid);
   }
-  return [...uids];
+  return [...uids].sort();
 }
 
 /**
