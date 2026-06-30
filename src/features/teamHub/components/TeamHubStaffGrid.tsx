@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { CompanyStaffMember } from "@/features/teamHub/types";
@@ -27,13 +26,21 @@ function resolveNameLines(member: CompanyStaffMember): { firstLine: string; seco
 export default function TeamHubStaffGrid({ staff, loading, selectedUid, onSelect }: Props) {
   const { t } = useTranslation();
 
-  if (loading) {
+  if (loading && staff.length === 0) {
     return (
       <div
         data-testid="team-hub-staff-loading"
-        className="flex min-h-[200px] flex-1 items-center justify-center"
+        className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-6 pt-3"
+        aria-busy="true"
       >
-        <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
+        <div className="grid grid-cols-3 gap-3 content-start [grid-template-columns:repeat(3,minmax(0,1fr))]">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="aspect-square w-full max-w-[104px] animate-pulse justify-self-center rounded-[24px] bg-slate-100"
+            />
+          ))}
+        </div>
       </div>
     );
   }

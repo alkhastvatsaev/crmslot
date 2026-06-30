@@ -25,6 +25,7 @@ import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";
 import { prefetchDashboardHubChunksIdle } from "@/features/dashboard/prefetchDashboardHubChunks";
+import TeamHubBootPrefetch from "@/features/teamHub/components/TeamHubBootPrefetch";
 
 type Props = {
   pageCount: number;
@@ -60,6 +61,7 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                         <TechnicianQueryProvider>
                                           <RequesterHubProvider>
                                             <DeferredAdminBootstraps />
+                                            <TeamHubBootPrefetch />
                                             {children}
                                           </RequesterHubProvider>
                                         </TechnicianQueryProvider>

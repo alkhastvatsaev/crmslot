@@ -81,25 +81,27 @@ export default function ClockCalendar({
     setSelectedDate(newDate);
   };
 
+  const isDesktop = variant === "desktop";
+
+  const dateTimeTextClass = isDesktop
+    ? "min-w-0 truncate whitespace-nowrap text-lg font-semibold uppercase tracking-wider text-slate-800"
+    : "min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800";
+  const timeTextClass = isDesktop
+    ? "shrink-0 whitespace-nowrap text-lg font-semibold tabular-nums text-slate-800"
+    : "shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800";
+
   const compactDateTime = (
     <>
-      <span
-        data-testid="date-display"
-        className="min-w-0 truncate whitespace-nowrap text-sm font-semibold uppercase tracking-wider text-slate-800"
-      >
+      <span data-testid="date-display" className={dateTimeTextClass}>
         {dateString}
       </span>
       <span className="h-4 w-px shrink-0 bg-slate-300" aria-hidden />
-      <span
-        data-testid="time-display"
-        className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-slate-800"
-      >
+      <span data-testid="time-display" className={timeTextClass}>
         {timeString}
       </span>
     </>
   );
 
-  const isDesktop = variant === "desktop";
   const compactShellClass = isDesktop
     ? cn(dashboardHeaderPanelShellClass, DASHBOARD_PANEL_SHADOW_HOVER_CLASS, "bg-white/70")
     : "mobile-header-chip mobile-profile-chip";

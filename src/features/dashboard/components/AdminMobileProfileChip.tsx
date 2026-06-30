@@ -26,16 +26,17 @@ export default function AdminMobileProfileChip({ variant = "mobile" }: Props) {
   const dockOnboarding = useMobileDockOnboardingOptional();
   const { fields, ready } = useCrmStaffAccountPanel();
   const accountOpen = pageSelector.view === "account";
+  const isDesktop = variant === "desktop";
 
   const firstName = resolveTechnicianProfileFirstName(
     fields.firstName,
     fields.email,
     String(t("technician_hub.dashboard.detail.not_provided"))
   );
-  const firstNameClass = technicianFirstNameTextClass(firstName);
+  const firstNameClass = isDesktop
+    ? "text-base sm:text-[20px]"
+    : technicianFirstNameTextClass(firstName);
   const roleKey = resolveStaffProfileRoleKey(fields.accountRole);
-
-  const isDesktop = variant === "desktop";
 
   return (
     <button
@@ -71,7 +72,10 @@ export default function AdminMobileProfileChip({ variant = "mobile" }: Props) {
         </span>
         <span
           data-testid="admin-profile-role"
-          className="shrink-0 rounded-md border border-[#CCE3FF] bg-[#E5F1FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-widest text-[#007AFF]"
+          className={cn(
+            "shrink-0 rounded-md border border-[#CCE3FF] bg-[#E5F1FF] font-extrabold uppercase tracking-widest text-[#007AFF]",
+            isDesktop ? "px-2 py-1 text-[10px] shadow-sm" : "px-2 py-0.5 text-[9px]"
+          )}
         >
           {t(`profiles.roles.${roleKey}`)}
         </span>

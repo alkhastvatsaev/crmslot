@@ -7,6 +7,7 @@ import {
   MOBILE_TAB_I18N,
 } from "@/features/dashboard/dashboardMobileNav";
 import { useDashboardPager } from "@/features/dashboard/dashboardPagerContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
@@ -17,12 +18,12 @@ import {
   dashboardTripleCenterShellClass,
   DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
-import DashboardLanguageSelector from "@/features/dashboard/components/DashboardLanguageSelector";
 import {
   prefetchDashboardHubChunksIdle,
   prefetchTeamHubPageChunk,
 } from "@/features/dashboard/prefetchDashboardHubChunks";
 import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
+import { prefetchCompanyStaff } from "@/features/teamHub/companyStaffCache";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -32,6 +33,8 @@ type Props = {
 
 export default function DashboardPageSelector({ onClose, variant = "mobile" }: Props) {
   const { pageIndex, setPageIndex } = useDashboardPager();
+  const workspace = useCompanyWorkspaceOptional();
+  const companyId = (workspace?.activeCompanyId ?? "").trim() || null;
   const { t } = useTranslation();
   const hubPages = getDashboardCarouselHubPages();
   const isDesktop = variant === "desktop";
@@ -41,6 +44,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
   }, []);
 
   const navigate = (index: number) => {
+    if (index === TEAM_HUB_SLOT_INDEX) prefetchCompanyStaff(companyId);
     setPageIndex(index);
     onClose();
   };
@@ -63,7 +67,10 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
         )}
         onClick={() => navigate(page.slotIndex)}
         onPointerEnter={() => {
-          if (page.slotIndex === TEAM_HUB_SLOT_INDEX) prefetchTeamHubPageChunk();
+          if (page.slotIndex === TEAM_HUB_SLOT_INDEX) {
+            prefetchTeamHubPageChunk();
+            prefetchCompanyStaff(companyId);
+          }
         }}
         aria-current={active ? "page" : undefined}
       >
@@ -118,10 +125,7 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
         data-variant={variant}
         aria-label="Navigation"
       >
-        <div className="dashboard-page-selector-inner">
-          <DashboardLanguageSelector variant="desktop" />
-          {grid}
-        </div>
+        <div className="dashboard-page-selector-inner">{grid}</div>
       </section>
     );
   }

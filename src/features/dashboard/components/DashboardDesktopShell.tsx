@@ -105,25 +105,34 @@ export default function DashboardDesktopShell({ pager, galaxy }: Props) {
                     className={`${DASHBOARD_DESKTOP_GRID_CLASS} ${DASHBOARD_DESKTOP_GRID_FILL_CLASS} dashboard-page-selector-host-grid`}
                   >
                     <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left`}
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--left pointer-events-none`}
                       aria-hidden
                     />
                     <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center dashboard-account-center-slot`}
-                      data-testid="dashboard-account-panel-host"
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--center dashboard-desktop-overlay-center-slot`}
+                      data-testid="dashboard-desktop-overlay-center"
                     >
+                      {view === "pages" ? (
+                        <div
+                          className="dashboard-desktop-overlay-center-panel"
+                          data-testid="dashboard-page-selector-host"
+                        >
+                          <DashboardPageSelector onClose={closeOverlay} variant="desktop" />
+                        </div>
+                      ) : null}
                       {view === "account" ? (
-                        <DashboardAccountPanel onClose={closeOverlay} variant="desktop" />
+                        <div
+                          className="dashboard-desktop-overlay-center-panel"
+                          data-testid="dashboard-account-panel-host"
+                        >
+                          <DashboardAccountPanel onClose={closeOverlay} variant="desktop" />
+                        </div>
                       ) : null}
                     </div>
                     <div
-                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right dashboard-page-selector-right-slot`}
-                      data-testid="dashboard-page-selector-host"
-                    >
-                      {view === "pages" ? (
-                        <DashboardPageSelector onClose={closeOverlay} variant="desktop" />
-                      ) : null}
-                    </div>
+                      className={`${DASHBOARD_DESKTOP_COL_CLASS} dashboard-desktop-col--right pointer-events-none`}
+                      aria-hidden
+                    />
                   </div>
                 </div>
               ) : null}
