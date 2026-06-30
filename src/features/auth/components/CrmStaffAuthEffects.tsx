@@ -11,7 +11,11 @@ import {
   CrmStaffOAuthModeError,
   completeCrmStaffOAuthSession,
 } from "@/features/auth/crmEmailRegister";
-import { consumeCrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
+import { consumeCrmStaffOAuthMode, peekCrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
+import {
+  shouldSkipCrmStaffOAuthRedirectHandling,
+  clearGmailHubOAuthPending,
+} from "@/features/gmail/gmailHubOAuthReturn";
 import { readStaffJoinPayload } from "@/features/auth/staffJoinPayload";
 import { crmStaffOAuthSignInErrorFeedback } from "@/features/auth/crmStaffOAuthSignIn";
 
@@ -23,9 +27,22 @@ export default function CrmStaffAuthEffects() {
     if (!auth || !isConfigured || typeof window === "undefined") return;
 
     void (async () => {
+      if (shouldSkipCrmStaffOAuthRedirectHandling()) {
+        clearGmailHubOAuthPending();
+        return;
+      }
+
+      const pendingMode = peekCrmStaffOAuthMode();
       try {
         const result = await getRedirectResult(auth);
-        if (!result?.user) return;
+        if (!result?.user) {
+          if (pendingMode) consumeCrmStaffOAuthMode();
+          return;
+        }
+        if (!pendingMode) {
+          logger.warn("[CrmStaffAuthEffects] redirect sans mode CRM — ignoré (OAuth Gmail ?)");
+          return;
+        }
         const mode = consumeCrmStaffOAuthMode();
         const staffJoin = readStaffJoinPayload();
         const outcome = await completeCrmStaffOAuthSession(result, mode, auth, staffJoin);
@@ -42,6 +59,7 @@ export default function CrmStaffAuthEffects() {
           )
         );
       } catch (e) {
+        if (pendingMode) consumeCrmStaffOAuthMode();
         logger.warn("[CrmStaffAuthEffects] getRedirectResult", {
           error: e instanceof Error ? e.message : String(e),
         });

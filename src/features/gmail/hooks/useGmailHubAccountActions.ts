@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import { markGmailHubOAuthPending } from "@/features/gmail/gmailHubOAuthReturn";
 import type { useGmailHub } from "@/features/gmail/useGmailHub";
 
 type GmailHub = ReturnType<typeof useGmailHub>;
@@ -23,6 +24,7 @@ export function useGmailHubAccountActions(params: {
       if (!res.ok || !data.url) {
         throw new Error(data.error ?? "Impossible de démarrer OAuth Gmail.");
       }
+      markGmailHubOAuthPending();
       window.location.href = data.url;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(t("common.error")));
