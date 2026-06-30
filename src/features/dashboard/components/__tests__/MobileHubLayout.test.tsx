@@ -109,6 +109,45 @@ describe("MobileHubLayout", () => {
     expectActive("mobile-hub-left");
   });
 
+  it("swipe depuis un contenu scrollable du panneau droit → centre (équipe)", () => {
+    renderMobileHubLayout(
+      <MobileHubLayout
+        rootTestId="mobile-hub-root"
+        leftTestId="mobile-hub-left"
+        centerTestId="mobile-hub-center"
+        rightTestId="mobile-hub-right"
+        left={<span>gauche</span>}
+        center={<span>centre</span>}
+        right={
+          <div
+            data-testid="mobile-hub-right-scroll"
+            className="mobile-hub-panel-inner mobile-hub-panel-inner--scroll flex min-h-0 flex-1 flex-col gap-3 p-4"
+          >
+            <span>détail membre</span>
+          </div>
+        }
+      />
+    );
+
+    const root = screen.getByTestId("mobile-hub-root");
+    swipeLeft(root);
+    expect(screen.getByTestId("mobile-hub-right")).toHaveAttribute(
+      "data-mobile-hub-rail-active",
+      "true"
+    );
+
+    const scrollPanel = screen.getByTestId("mobile-hub-right-scroll");
+    Object.defineProperty(scrollPanel, "scrollHeight", { value: 1200, configurable: true });
+    Object.defineProperty(scrollPanel, "clientHeight", { value: 400, configurable: true });
+    Object.defineProperty(scrollPanel, "scrollTop", { value: 120, writable: true });
+
+    swipeRight(scrollPanel);
+    expect(screen.getByTestId("mobile-hub-center")).toHaveAttribute(
+      "data-mobile-hub-rail-active",
+      "true"
+    );
+  });
+
   it("ignore swipe when swipeDisabled is true", () => {
     renderMobileHubLayout(
       <MobileHubLayout

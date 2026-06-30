@@ -31,6 +31,10 @@ function shouldBlockSwipeStart(target: EventTarget | null): boolean {
   return Boolean(target.closest(SWIPE_START_BLOCK_SELECTOR));
 }
 
+function shouldPreferHorizontalRailSwipe(dx: number, dy: number): boolean {
+  return Math.abs(dx) >= SWIPE_THRESHOLD_PX && Math.abs(dx) >= Math.abs(dy) * SWIPE_AXIS_RATIO;
+}
+
 function tryPanelSwipe(
   state: GestureState,
   dx: number,
@@ -60,6 +64,7 @@ function resolvePanelSwipeAxis(
   if (current === "horizontal") return "horizontal";
 
   if (current === "vertical") {
+    if (shouldPreferHorizontalRailSwipe(dx, dy)) return "horizontal";
     if (innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
       return "vertical";
     }
@@ -76,6 +81,7 @@ function resolvePanelSwipeAxis(
 
   if (dominant === "y") {
     if (innerScrollEl && canConsumeVerticalScroll(innerScrollEl, dy)) {
+      if (shouldPreferHorizontalRailSwipe(dx, dy)) return "horizontal";
       return "vertical";
     }
     if (Math.abs(dx) >= MOBILE_SCROLL_AXIS_LOCK_THRESHOLD_PX) return "horizontal";
