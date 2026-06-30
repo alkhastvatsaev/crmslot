@@ -15,7 +15,8 @@ export function paintGalaxyBackground(
   variant: GalaxyStarsVariant = "dock"
 ) {
   if (variant === "avatar") {
-    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, rgba(191, 219, 254, 0.92) 0%, #60a5fa 6%, #3b82f6 16%, #2563eb 30%, #1d4ed8 44%, #1e3a8a 56%, rgba(23, 37, 84, 0.72) 68%, rgba(15, 23, 42, 0.38) 78%, rgba(15, 23, 42, 0.14) 88%, rgba(15, 23, 42, 0.04) 95%, transparent 100%)`;
+    surface.style.background =
+      "radial-gradient(circle at 48% 42%, #93c5fd 0%, #60a5fa 12%, #3b82f6 28%, #2563eb 48%, #1d4ed8 68%, #1e3a8a 100%)";
   } else {
     surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
   }
