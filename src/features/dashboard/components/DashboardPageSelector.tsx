@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { getDashboardCarouselHubPages } from "@/features/dashboard/dashboardCarouselRegistry";
 import {
   DASHBOARD_MOBILE_NAV_ICONS,
@@ -17,6 +18,11 @@ import {
   DASHBOARD_PANEL_SHADOW_HOVER_CLASS,
 } from "@/core/ui/dashboardDesktopLayout";
 import DashboardLanguageSelector from "@/features/dashboard/components/DashboardLanguageSelector";
+import {
+  prefetchDashboardHubChunksIdle,
+  prefetchTeamHubPageChunk,
+} from "@/features/dashboard/prefetchDashboardHubChunks";
+import { TEAM_HUB_SLOT_INDEX } from "@/features/teamHub/teamHubConstants";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -29,6 +35,10 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
   const { t } = useTranslation();
   const hubPages = getDashboardCarouselHubPages();
   const isDesktop = variant === "desktop";
+
+  useEffect(() => {
+    prefetchDashboardHubChunksIdle();
+  }, []);
 
   const navigate = (index: number) => {
     setPageIndex(index);
@@ -60,6 +70,9 @@ export default function DashboardPageSelector({ onClose, variant = "mobile" }: P
                   : "mobile-page-selector-item--active")
             )}
             onClick={() => navigate(page.slotIndex)}
+            onPointerEnter={() => {
+              if (page.slotIndex === TEAM_HUB_SLOT_INDEX) prefetchTeamHubPageChunk();
+            }}
             aria-current={active ? "page" : undefined}
           >
             <span

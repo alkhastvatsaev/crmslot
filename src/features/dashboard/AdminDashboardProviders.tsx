@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import LoginOverlay from "@/features/auth/components/LoginOverlay";
 import { ChatbotProvider } from "@/features/chatbot/ChatbotContext";
 import { DashboardPagerProvider } from "@/features/dashboard/dashboardPagerContext";
@@ -23,6 +24,7 @@ import { RequesterHubProvider } from "@/context/RequesterHubContext";
 import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";
+import { prefetchDashboardHubChunksIdle } from "@/features/dashboard/prefetchDashboardHubChunks";
 
 type Props = {
   pageCount: number;
@@ -31,6 +33,10 @@ type Props = {
 
 /** Providers back-office admin uniquement — importé par `src/app/page.tsx`. */
 export default function AdminDashboardProviders({ pageCount, children }: Props) {
+  useEffect(() => {
+    prefetchDashboardHubChunksIdle();
+  }, []);
+
   return (
     <DateProvider>
       <LoginOverlay>

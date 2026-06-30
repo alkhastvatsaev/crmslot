@@ -27,6 +27,7 @@ import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { useAccountRole } from "@/features/auth";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions";
+import HubPageChunkLoading from "@/features/dashboard/components/HubPageChunkLoading";
 
 const MapPageSlot = dynamic(() => import("@/features/map").then((m) => m.MapPageSlot), {
   ssr: false,
@@ -62,7 +63,7 @@ const BillingHubPage = dynamic(() => import("@/features/billingHub/components/Bi
 
 const TeamHubPage = dynamic(() => import("@/features/teamHub/components/TeamHubPage"), {
   ssr: false,
-  loading: () => null,
+  loading: () => <HubPageChunkLoading testId="team-hub-chunk-loading" />,
 });
 
 const CaseHubPage = dynamic(() => import("@/features/caseHub/components/CaseHubPage"), {

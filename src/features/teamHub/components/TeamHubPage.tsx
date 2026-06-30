@@ -28,11 +28,12 @@ export default function TeamHubPage({ slotIndex = TEAM_HUB_SLOT_INDEX }: Props) 
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const pageActive = useHubPageActive(slotIndex);
-  const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
-  const { staff, loading, error, refresh, upsertStaffMember } = useCompanyStaff(
-    pageActive ? companyId : null
-  );
+  const { companyId: verifiedCompanyId, phase: companyPhase } = resolveHubCompanyId(workspace);
+  const bootCompanyId = (workspace?.activeCompanyId ?? "").trim() || null;
+  const staffCompanyId = pageActive ? (verifiedCompanyId ?? bootCompanyId) : null;
+  const { staff, loading, error, refresh, upsertStaffMember } = useCompanyStaff(staffCompanyId);
   const isAdmin = workspace?.activeRole === "admin";
+  const companyId = verifiedCompanyId ?? bootCompanyId;
 
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
 
