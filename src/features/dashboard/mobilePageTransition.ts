@@ -1,5 +1,5 @@
-/** Durée slide + fondu entre hubs (alignée tab bar / dots). */
-export const MOBILE_PAGE_TRANSITION_MS = 380;
+/** Durée slide + fondu entre hubs — calée sur `--mobile-page-transition-duration`. */
+export const MOBILE_PAGE_TRANSITION_MS = 420;
 
 export type MobilePageTransitionDirection = "next" | "prev";
 

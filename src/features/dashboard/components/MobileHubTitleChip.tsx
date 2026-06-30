@@ -5,7 +5,9 @@ import {
   clampDashboardCarouselPageIndex,
   getDashboardCarouselPage,
 } from "@/features/dashboard/dashboardCarouselRegistry";
+import { MOBILE_HUB_TITLE_CHIP_LABEL_CLASS } from "@/core/ui/dashboardMobileLayout";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { cn } from "@/lib/utils";
 
 /** Titre du hub actif — header mobile (remplace le profil déplacé en footer). */
 export default function MobileHubTitleChip() {
@@ -20,7 +22,13 @@ export default function MobileHubTitleChip() {
       data-testid="mobile-hub-title-chip"
       className="mobile-header-chip flex h-full w-full items-center justify-center px-4"
     >
-      <span className="truncate text-sm font-semibold uppercase tracking-wider text-slate-800">
+      <span
+        key={pageIndex}
+        className={cn(
+          "truncate text-sm font-semibold uppercase tracking-wider text-slate-800",
+          MOBILE_HUB_TITLE_CHIP_LABEL_CLASS
+        )}
+      >
         {label}
       </span>
     </div>
