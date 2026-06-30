@@ -68,7 +68,7 @@ export default function ChatbotGalaxyOrb({ className, size = "sm", onPress }: Pr
         className={cn(
           "chatbot-galaxy-orb shrink-0",
           isHero && "chatbot-galaxy-orb--hero",
-          "cursor-pointer border-0 bg-transparent p-0",
+          "cursor-pointer p-0",
           className
         )}
         data-testid="chatbot-galaxy-orb"

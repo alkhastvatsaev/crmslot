@@ -1616,18 +1616,14 @@
   }
 
   [data-mobile-shell] .chatbot-galaxy-orb {
-    background: radial-gradient(
-      circle at 44% 40%,
-      rgb(147 197 253) 0%,
-      rgb(59 130 246) 18%,
-      rgb(37 99 235) 36%,
-      rgb(30 64 175) 52%,
-      rgba(23 37 84 / 0.55) 68%,
-      rgba(15 23 42 / 0.18) 84%,
-      transparent 100%
-    ) !important;
-    filter: drop-shadow(0 0 14px rgba(59, 130, 246, 0.24))
-      drop-shadow(0 0 5px rgba(37, 99, 235, 0.14));
+    --orb-fill: linear-gradient(145deg, rgb(30 58 138), rgb(37 99 235));
+    background: var(--orb-fill) !important;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 2px 8px -2px rgba(15, 23, 42, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16) !important;
   }
 
   [data-mobile-shell] .mobile-hub-rail-layer,

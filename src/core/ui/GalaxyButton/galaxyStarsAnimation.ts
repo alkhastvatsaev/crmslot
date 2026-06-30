@@ -135,7 +135,7 @@ export function startGalaxyStarsAnimation(
       maxDrawRadius,
       depthZScale,
       now,
-      softEdge: variant === "avatar",
+      softEdge: false,
     });
 
     if (
