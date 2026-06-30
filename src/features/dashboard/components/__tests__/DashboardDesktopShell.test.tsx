@@ -47,7 +47,24 @@ describe("DashboardDesktopShell", () => {
     expect(DASHBOARD_GALAXY_GRID_COLUMN).toBe(2);
   });
 
-  it("affiche le menu pages à droite au clic profil desktop", () => {
+  it("affiche le panneau compte au centre au clic profil desktop", () => {
+    renderShell(
+      <DashboardDesktopShell
+        pager={<span data-testid="shell-pager">pager</span>}
+        galaxy={<span>galaxy</span>}
+      />
+    );
+
+    expect(screen.queryByTestId("dashboard-account-panel")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("admin-mobile-profile-chip"));
+    const host = screen.getByTestId("dashboard-account-panel-host");
+    expect(host).toBeInTheDocument();
+    expect(host).toHaveClass("dashboard-desktop-col--center");
+    expect(screen.getByTestId("dashboard-account-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
+  });
+
+  it("affiche le menu pages à droite au clic calendrier desktop", () => {
     renderShell(
       <DashboardDesktopShell
         pager={<span data-testid="shell-pager">pager</span>}
@@ -56,7 +73,7 @@ describe("DashboardDesktopShell", () => {
     );
 
     expect(screen.queryByTestId("dashboard-page-selector")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("user-profile-toggle"));
+    fireEvent.click(screen.getByTestId("clock-calendar-toggle"));
     const host = screen.getByTestId("dashboard-page-selector-host");
     expect(host).toBeInTheDocument();
     expect(host).toHaveClass("dashboard-desktop-col--right");
