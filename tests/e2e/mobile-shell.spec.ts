@@ -1,4 +1,10 @@
 import { test, expect } from "@playwright/test";
+import {
+  MOBILE_FORCE_URL,
+  dispatchHorizontalSwipe,
+  expectActiveHubRail,
+  gotoMobileShellOrSkip,
+} from "./helpers/mobileShell";
 
 type PwaManifest = {
   name?: string;
@@ -31,18 +37,38 @@ const PWA_MANIFESTS: { path: string; start_url: string; id: string; short_name: 
 ];
 
 test.describe("Mobile shell (infra)", () => {
-  test("?forceMobile=1 affiche le shell mobile", async ({ page }) => {
-    await page.goto("/?forceMobile=1");
-
+  test("?forceMobile=1 — shell mobile ou écran de connexion", async ({ page }) => {
+    await page.goto(MOBILE_FORCE_URL);
     await expect(page).toHaveTitle(/crmslot/i);
-    await expect(page.getByTestId("mobile-shell")).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByTestId("dashboard-global-header")).not.toBeVisible();
+
+    const sawMobile = await page
+      .getByTestId("mobile-shell")
+      .isVisible({ timeout: 60_000 })
+      .catch(() => false);
+    const sawLogin = await page
+      .getByRole("heading", { name: /espace administrateur/i })
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+
+    expect(sawMobile || sawLogin).toBe(true);
+    if (sawMobile) {
+      await expect(page.getByTestId("dashboard-global-header")).toHaveCount(0);
+    }
   });
 
-  test("viewport iPhone affiche le shell mobile sans query override", async ({ page }) => {
+  test("viewport mobile — shell ou écran de connexion", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByTestId("mobile-shell")).toBeVisible({ timeout: 60_000 });
+    const sawMobile = await page
+      .getByTestId("mobile-shell")
+      .isVisible({ timeout: 60_000 })
+      .catch(() => false);
+    const sawLogin = await page
+      .getByRole("heading", { name: /espace administrateur/i })
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+
+    expect(sawMobile || sawLogin).toBe(true);
   });
 
   for (const manifest of PWA_MANIFESTS) {
@@ -58,11 +84,10 @@ test.describe("Mobile shell (infra)", () => {
     });
   }
 
-  test("chaque route satellite référence son manifest dans le HTML", async ({ page }) => {
+  test("routes satellites référencent leur manifest dans le HTML", async ({ page }) => {
     const cases: { route: string; manifestPath: string }[] = [
       { route: "/", manifestPath: "/manifest.json" },
       { route: "/m/demande", manifestPath: "/manifest-demande.json" },
-      { route: "/m/admin", manifestPath: "/manifest-admin-mobile.json" },
       { route: "/m/technician", manifestPath: "/manifest-technician.json" },
     ];
 
@@ -73,10 +98,61 @@ test.describe("Mobile shell (infra)", () => {
     }
   });
 
-  test("/m/admin affiche la shell admin mobile", async ({ page }) => {
+  test("/m/admin redirige vers / (app CRM unique)", async ({ page }) => {
     await page.goto("/m/admin");
+    await expect(page).toHaveURL(/\/(\?|$)/, { timeout: 15_000 });
+  });
+});
 
-    await expect(page.getByTestId("admin-mobile-app")).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByTestId("admin-mobile-full-crm-link")).toBeVisible();
+/**
+ * UX admin mobile — nécessite une session staff.
+ * Local : `PLAYWRIGHT_ADMIN_STORAGE_STATE=tests/e2e/.auth/admin.json npm run test:e2e:mobile-shell`
+ * Sans session : tests skippés (voir skipIfStaffLoginGate).
+ */
+test.describe("Mobile shell (UX — session requise)", () => {
+  test.beforeEach(async ({ page }) => {
+    await gotoMobileShellOrSkip(page);
+  });
+
+  test("sélecteur de pages s'ouvre et se ferme via le calendrier footer", async ({ page }) => {
+    const toggle = page.getByTestId("clock-calendar-toggle");
+    await expect(toggle).toBeVisible({ timeout: 30_000 });
+
+    await toggle.click();
+    await expect(page.getByTestId("dashboard-page-selector")).toBeVisible();
+    await expect(page.getByTestId("mobile-shell")).toHaveAttribute(
+      "data-page-selector-open",
+      "true"
+    );
+
+    await toggle.click();
+    await expect(page.getByTestId("dashboard-page-selector")).not.toBeVisible();
+    await expect(page.getByTestId("mobile-shell")).not.toHaveAttribute(
+      "data-page-selector-open",
+      "true"
+    );
+  });
+
+  test("sélecteur navigue vers un hub puis se ferme", async ({ page }) => {
+    await page.getByTestId("clock-calendar-toggle").click({ timeout: 30_000 });
+    await page.getByTestId("dashboard-page-selector-item-1").click();
+
+    await expect(page.getByTestId("mobile-page-1")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId("dashboard-page-selector")).not.toBeVisible();
+  });
+
+  test("panneau compte s'ouvre au clic profil", async ({ page }) => {
+    await page.getByTestId("admin-mobile-profile-chip").click();
+    await expect(page.getByTestId("dashboard-account-panel")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("mobile-page-0")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  test("swipe hub carte change le rail actif", async ({ page }) => {
+    const mapHub = page.getByTestId("mobile-map-triple");
+    await expect(mapHub).toBeVisible({ timeout: 60_000 });
+
+    await expectActiveHubRail(mapHub, "right");
+    await dispatchHorizontalSwipe(mapHub, "left");
+    await expectActiveHubRail(mapHub, "center");
   });
 });

@@ -30,7 +30,10 @@
 
 ## Tests
 
+Voir aussi [`MOBILE_TESTING.md`](MOBILE_TESTING.md).
+
 ```bash
+npm run test:mobile         # tout le mobile (unit)
 npm run test:mobile-admin   # contrat /m/admin + PWA update + caches offline
 npm run test:mobile-shell   # carrousel desktop/mobile /
 ```
