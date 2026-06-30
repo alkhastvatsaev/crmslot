@@ -61,6 +61,11 @@ const withPWA = withPWAInit({
 const devTunnelOrigins = resolveMobileDevOrigins();
 
 const nextConfig: NextConfig = {
+  /** Réduit le pic RAM webpack — requis sur Vercel Hobby (8 Go, SIGKILL OOM). */
+  experimental: {
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+  },
   serverExternalPackages: [
     "fluent-ffmpeg",
     "playwright",
