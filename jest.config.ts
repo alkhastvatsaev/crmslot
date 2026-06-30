@@ -90,6 +90,30 @@ const config: Config = {
       functions: 100,
       lines: 100,
     },
+    "./src/features/dashboard/adminMobileShellContract.ts": {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+    "./src/features/dashboard/hooks/useMobileMapPagePowerGate.ts": {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+    "./src/features/dashboard/hooks/useMobileFooterGalaxyVisible.ts": {
+      statements: 100,
+      branches: 80,
+      functions: 100,
+      lines: 100,
+    },
+    "./src/features/dashboard/hooks/useMobileMountedPageIndices.ts": {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
     // Chatbot P0 — ratchet progressif (voir docs/agents/TESTING.md §3.4).
     "./src/features/chatbot/chatbot-pwa-intent.ts": {
       statements: 65,

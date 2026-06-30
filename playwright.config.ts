@@ -47,6 +47,8 @@ export default defineConfig({
       name: "chromium",
       testIgnore: [
         /mobile-shell\.spec\.ts/,
+        /technician-mobile-app\.spec\.ts/,
+        /client-mobile-app\.spec\.ts/,
         /portal-chat-client-ui\.spec\.ts/,
         /dashboard-desktop-hubs\.spec\.ts/,
       ],
@@ -75,6 +77,9 @@ export default defineConfig({
       testMatch: /technician-mobile-app\.spec\.ts/,
       use: {
         ...devices["Pixel 7"],
+        ...(process.env.PLAYWRIGHT_TECHNICIAN_STORAGE_STATE
+          ? { storageState: process.env.PLAYWRIGHT_TECHNICIAN_STORAGE_STATE }
+          : {}),
         launchOptions: {
           args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
         },
@@ -109,7 +114,7 @@ export default defineConfig({
       name: "client-app",
       testMatch: /client-mobile-app\.spec\.ts/,
       use: {
-        ...devices["iPhone 13"],
+        ...devices["Pixel 7"],
         launchOptions: {
           args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
         },

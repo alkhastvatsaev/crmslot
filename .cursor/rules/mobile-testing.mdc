@@ -16,6 +16,8 @@ npm run test:mobile
 
 Merge sensible ou changement `mobileShellContract` / `page.tsx` : ajouter `npm run test:e2e:mobile-shell` (UX skippés sans session staff en CI).
 
+Satellites : `npm run test:e2e:satellite-apps` · inclus dans `test:e2e:mobile`.
+
 ## Règles rapides
 
 | Modification | Commande |
@@ -24,6 +26,7 @@ Merge sensible ou changement `mobileShellContract` / `page.tsx` : ajouter `npm r
 | `adminMobileShellContract`, `/m/admin` | `npm run test:mobile-admin` |
 | `mobileClientDetection`, `src/features/mobile/` | `npm run test:mobile-infra` |
 | `src/core/native/*` | `npm run test:native-infra` |
+| Seuils P0 mobile hooks | `jest.config.ts` — `useMobileMapPagePowerGate`, `useMobileFooterGalaxyVisible`, `useMobileMountedPageIndices` |
 | Nouveau bridge Capacitor | injection `deps` — voir `AGENT_TEST_RECIPES.md` §7 |
 | Nouveau `data-testid` mobile | l’ajouter dans `MOBILE_SHELL_CONTRACT.testIds` |
 | Hook Firestore / API | règle CODEX mobile — test `firebaseUid` null (`docs/agents/TESTING.md` §11) |

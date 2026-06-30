@@ -380,7 +380,7 @@ Suite complète documentée dans **`docs/agents/MOBILE_TESTING.md`**.
 
 Helpers : `src/test-utils/renderMobileShell.tsx`, `mobileGestures.ts`, `tests/e2e/helpers/mobileShell.ts`.
 
-Phases 5–7 : bridges natifs (`test:native-infra`). Phase 8 : `MobileShellGalaxyDockSlot` + `MobileShellFooterDock`. Phase 9 : couverture complète `src/core/native/` (push, Apple Sign-In, photo). Phase 10 : hooks power gate + garde CODEX `useTechnicianAssignmentsFirestoreListener`. Phase 11 : E2E satellites `/m/technician` + `/m/demande` dans `test:e2e:mobile` + CI.
+Phases 5–7 : bridges natifs (`test:native-infra`). Phase 8 : `MobileShellGalaxyDockSlot` + `MobileShellFooterDock`. Phase 9 : couverture complète `src/core/native/` (push, Apple Sign-In, photo). Phase 10 : hooks power gate + garde CODEX `useTechnicianAssignmentsFirestoreListener`. Phase 11 : E2E satellites `/m/technician` + `/m/demande` dans `test:e2e:mobile` + CI. Phase 12 : seuils Jest P0 hooks mobile + `e2e:auth:technician`.
 
 ---
 

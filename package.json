@@ -107,7 +107,8 @@
     "test:i18n": "jest src/core/i18n --no-coverage",
     "audit:barrels:client-safe": "node scripts/ci/detect-cross-feature-imports.mjs --verify-client-safe",
     "test:e2e:smoke": "playwright test tests/e2e/dashboard-load.spec.ts tests/e2e/api-health.spec.ts tests/e2e/api-routes-auth-matrix.spec.ts --project=chromium",
-    "e2e:auth:admin": "playwright codegen --save-storage=tests/e2e/.auth/admin.json http://localhost:3000"
+    "e2e:auth:admin": "playwright codegen --save-storage=tests/e2e/.auth/admin.json http://localhost:3000",
+    "e2e:auth:technician": "playwright codegen --save-storage=tests/e2e/.auth/technician.json http://localhost:3000/m/technician"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
