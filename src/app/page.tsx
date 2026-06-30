@@ -28,6 +28,7 @@ import { useAccountRole } from "@/features/auth";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions";
 import HubPageChunkLoading from "@/features/dashboard/components/HubPageChunkLoading";
+import AppBootLoadingScreen from "@/core/ui/AppBootLoadingScreen";
 
 const MapPageSlot = dynamic(() => import("@/features/map").then((m) => m.MapPageSlot), {
   ssr: false,
@@ -139,31 +140,13 @@ export default function Dashboard() {
   );
 
   if (isAccountRoleLoading || satelliteAppRedirectPending) {
-    return (
-      <div
-        data-testid="satellite-app-redirect-loading"
-        className="flex min-h-dvh items-center justify-center bg-slate-50"
-      >
-        <div
-          className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
-          aria-hidden
-        />
-      </div>
-    );
+    return <AppBootLoadingScreen testId="satellite-app-redirect-loading" />;
   }
 
   return (
     <AdminDashboardProviders pageCount={dashboardPages.length}>
       {isMobile === null ? (
-        <div
-          data-testid="mobile-detection-loading"
-          className="flex min-h-dvh items-center justify-center bg-slate-50"
-        >
-          <div
-            className="h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600"
-            aria-hidden
-          />
-        </div>
+        <AppBootLoadingScreen testId="mobile-detection-loading" />
       ) : isMobile ? (
         <LayoutShellProvider mode="mobile">
           <MobileShell pages={dashboardPages} />

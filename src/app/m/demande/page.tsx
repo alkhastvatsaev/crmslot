@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import AppBootLoadingScreen from "@/core/ui/AppBootLoadingScreen";
 import { ClientMobileApp } from "@/features/company";
 
 export const metadata: Metadata = {
@@ -9,15 +10,7 @@ export const metadata: Metadata = {
 
 export default function ClientMobileRoutePage() {
   return (
-    <Suspense
-      fallback={
-        <div
-          data-testid="client-mobile-route-loading"
-          className="flex min-h-dvh items-center justify-center bg-slate-50"
-          aria-busy="true"
-        />
-      }
-    >
+    <Suspense fallback={<AppBootLoadingScreen testId="client-mobile-route-loading" />}>
       <ClientMobileApp />
     </Suspense>
   );
