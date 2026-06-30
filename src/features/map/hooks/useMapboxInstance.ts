@@ -25,7 +25,7 @@ import {
 import { resolveMapboxStyleSlug, resolveMapboxStyleUrl } from "@/features/map/mapboxStyleUrl";
 
 export function useMapboxInstance(
-  mapContainerRef: React.RefObject<HTMLDivElement | null>,
+  mapContainer: HTMLDivElement | null,
   isMobile: boolean,
   mapWebGLActive: boolean
 ) {
@@ -38,7 +38,7 @@ export function useMapboxInstance(
   const androidMapWebView = mapPauseOptions.skipStop === true;
 
   useEffect(() => {
-    const container = mapContainerRef.current;
+    const container = mapContainer;
     if (!container || !mapWebGLActive || mapRef.current) return;
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() ?? "";
@@ -192,7 +192,7 @@ export function useMapboxInstance(
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMobile, mapWebGLActive, androidMapWebView]);
+  }, [isMobile, mapWebGLActive, androidMapWebView, mapContainer]);
 
   useEffect(() => {
     if (!isCapacitorNative()) return;

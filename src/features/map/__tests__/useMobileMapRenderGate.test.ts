@@ -1,38 +1,29 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, waitFor } from "@/test-utils/render";
 import { useMobileMapRenderGate } from "@/features/map/useMobileMapRenderGate";
 
 describe("useMobileMapRenderGate", () => {
-  it("retourne false quand la page carte est aria-hidden", () => {
-    const host = document.createElement("div");
-    host.dataset.testid = "mobile-page-0";
-    host.setAttribute("aria-hidden", "true");
-    const map = document.createElement("div");
-    host.appendChild(map);
-    document.body.appendChild(host);
-
-    const ref = { current: map };
-    const { result } = renderHook(() => useMobileMapRenderGate(ref));
-
-    act(() => {
-      host.setAttribute("aria-hidden", "true");
-    });
+  it("reste inactif tant que le conteneur carte n'est pas monté", async () => {
+    const { result, rerender } = renderHook(
+      ({ container }: { container: HTMLDivElement | null }) => useMobileMapRenderGate(container),
+      { initialProps: { container: null as HTMLDivElement | null } }
+    );
 
     expect(result.current).toBe(false);
-    host.remove();
-  });
 
-  it("retourne false quand le rail carte hub est inactif", () => {
+    const page = document.createElement("div");
+    page.dataset.testid = "mobile-page-0";
     const rail = document.createElement("div");
     rail.dataset.mobileHubRail = "left";
-    rail.dataset.mobileHubRailActive = "false";
+    rail.dataset.mobileHubRailActive = "true";
     const map = document.createElement("div");
     rail.appendChild(map);
-    document.body.appendChild(rail);
+    page.appendChild(rail);
+    document.body.appendChild(page);
 
-    const ref = { current: map };
-    const { result } = renderHook(() => useMobileMapRenderGate(ref));
+    rerender({ container: map });
 
-    expect(result.current).toBe(false);
-    rail.remove();
+    await waitFor(() => expect(result.current).toBe(true));
+
+    page.remove();
   });
 });
