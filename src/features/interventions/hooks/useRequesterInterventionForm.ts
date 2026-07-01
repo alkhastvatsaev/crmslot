@@ -18,11 +18,6 @@ import { useRequesterHub } from "@/context/RequesterHubContext";
 import { REQUESTER_GEOLOC_OPTIONS } from "@/features/interventions/requesterInterventionFormHelpers";
 import { submitRequesterIntervention } from "@/features/interventions/requesterInterventionFormSubmit";
 import { logger } from "@/core/logger";
-import { triggerRequesterMobileHaptic } from "@/features/interventions/requesterMobileHaptics";
-import {
-  computeRequesterSubmitReadiness,
-  type RequesterSubmitReadiness,
-} from "@/features/interventions/requesterSubmitReadiness";
 
 export function useRequesterInterventionForm() {
   const {
@@ -44,13 +39,6 @@ export function useRequesterInterventionForm() {
 
   const workspace = useCompanyWorkspaceOptional();
   const requestMobileHubRail = useRequestMobileHubRail();
-  const focusMobileRail = useCallback(
-    (rail: "left" | "center" | "right") => {
-      triggerRequesterMobileHaptic("light");
-      requestMobileHubRail(rail);
-    },
-    [requestMobileHubRail]
-  );
   const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pager = useDashboardPagerOptional();
@@ -185,11 +173,6 @@ export function useRequesterInterventionForm() {
     (problemLabel.trim() || description.trim()) &&
     !isSubmitting;
 
-  const readiness: RequesterSubmitReadiness = computeRequesterSubmitReadiness({
-    profile,
-    requestData,
-  });
-
   const handleSubmit = () =>
     void submitRequesterIntervention({
       profile,
@@ -210,7 +193,7 @@ export function useRequesterInterventionForm() {
       setLastSubmittedPortalAccessCode,
       onInboxPendingId: inboxIntent ? (id) => inboxIntent.setPendingInboxId(id) : undefined,
       onNavigateMap: pager ? () => pager.setPageIndex(0) : undefined,
-      onFocusMobileRail: focusMobileRail,
+      onFocusMobileRail: requestMobileHubRail,
       onSwitchToParticulierTab: () => {
         setProfile((prev) =>
           prev.type === "particulier" ? prev : { ...prev, type: "particulier" }
@@ -223,8 +206,6 @@ export function useRequesterInterventionForm() {
     interventionCompanyId,
     locatingAddress,
     canSubmit,
-    readiness,
-    focusMobileRail,
     handleSubmit,
     handleAudioRecorded,
     fillAddressFromGeolocation,

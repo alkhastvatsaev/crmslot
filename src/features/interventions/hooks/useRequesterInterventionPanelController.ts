@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
-import type { RequesterChecklistItem } from "@/features/interventions/requesterSubmitReadiness";
-import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
 import {
   REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT,
   SMART_FORM_TEMPLATES,
@@ -15,7 +13,6 @@ import { useBrowserSpeechDictation } from "@/features/interventions/useBrowserSp
 
 export function useRequesterInterventionPanelController() {
   const {
-    profile,
     requestData,
     setRequestData,
     currentStep,
@@ -32,8 +29,6 @@ export function useRequesterInterventionPanelController() {
     tenantCompanyId,
     locatingAddress,
     canSubmit,
-    readiness,
-    focusMobileRail,
     handleSubmit,
     handleAudioRecorded,
     fillAddressFromGeolocation,
@@ -53,17 +48,6 @@ export function useRequesterInterventionPanelController() {
     photoDataUrls,
     urgency: requestDataUrgency,
   } = requestData;
-
-  const [addressConfirmed, setAddressConfirmed] = useState(false);
-  const addressSnapshotRef = useRef("");
-
-  useEffect(() => {
-    const snapshot = `${interventionAddress}|${interventionLatLng?.lat ?? ""}|${interventionLatLng?.lng ?? ""}`;
-    if (snapshot !== addressSnapshotRef.current) {
-      addressSnapshotRef.current = snapshot;
-      setAddressConfirmed(false);
-    }
-  }, [interventionAddress, interventionLatLng?.lat, interventionLatLng?.lng]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,32 +94,26 @@ export function useRequesterInterventionPanelController() {
     interimTranscript,
   } = useBrowserSpeechDictation(appendDescriptionFromVoice, handleAudioRecorded);
 
-  const hasValidAddress =
-    interventionAddress.trim().length > 0 &&
-    interventionAddress !== REQUESTER_GEOLOC_ADDRESS_PENDING;
-
-  const canSubmitStep4 = Boolean(canSubmit && (!hasValidAddress || addressConfirmed));
-
   const trySubmitOnEnter = useCallback(
     (e: KeyboardEvent) => {
       if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.defaultPrevented) return;
-      if (currentStep !== 4 || !canSubmitStep4 || isSubmitting) return;
+      if (currentStep !== 4 || !canSubmit || isSubmitting) return;
       e.preventDefault();
       void handleSubmit();
     },
-    [currentStep, canSubmitStep4, isSubmitting, handleSubmit]
+    [currentStep, canSubmit, isSubmitting, handleSubmit]
   );
 
   useEffect(() => {
     if (currentStep !== 4) return;
     const onEnterSubmit = () => {
-      if (!canSubmitStep4 || isSubmitting) return;
+      if (!canSubmit || isSubmitting) return;
       void handleSubmit();
     };
     window.addEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
     return () =>
       window.removeEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
-  }, [currentStep, canSubmitStep4, isSubmitting, handleSubmit]);
+  }, [currentStep, canSubmit, isSubmitting, handleSubmit]);
 
   const handleProblemSelect = useCallback(
     (tpl: SmartFormTemplate) => {
@@ -151,19 +129,6 @@ export function useRequesterInterventionPanelController() {
       setCurrentStep(1);
     },
     [setLastSubmittedPortalAccessCode, setRequestData, setCurrentStep, t]
-  );
-
-  const focusChecklistItem = useCallback(
-    (item: RequesterChecklistItem) => {
-      if (item === "profile") {
-        focusMobileRail("left");
-        return;
-      }
-      focusMobileRail("center");
-      if (item === "problem") setCurrentStep(0);
-      if (item === "address") setCurrentStep(4);
-    },
-    [focusMobileRail, setCurrentStep]
   );
 
   const showSubmitSuccess = Boolean(
@@ -184,13 +149,7 @@ export function useRequesterInterventionPanelController() {
     lastSubmittedPortalAccessCode,
     tenantCompanyId,
     locatingAddress,
-    canSubmit: canSubmitStep4,
-    readiness,
-    focusChecklistItem,
-    profile,
-    addressConfirmed,
-    setAddressConfirmed,
-    hasValidAddress,
+    canSubmit,
     handleSubmit,
     fillAddressFromGeolocation,
     ingestFiles,

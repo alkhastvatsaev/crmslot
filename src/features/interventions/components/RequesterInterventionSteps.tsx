@@ -84,9 +84,9 @@ export default function RequesterInterventionSteps({ c }: Props) {
           <RequesterStepPhotos
             fileInputRef={c.fileInputRef}
             photoDataUrls={c.photoDataUrls}
+            validationFailedCount={c.validationFailedCount}
             onIngestFiles={(files) => void c.ingestFiles(files)}
             onRemovePhoto={c.removePhoto}
-            onSkip={() => c.setCurrentStep(3)}
           />
         </motion.div>
       )}
@@ -135,19 +135,6 @@ export default function RequesterInterventionSteps({ c }: Props) {
             locatingAddress={c.locatingAddress}
             canSubmit={Boolean(c.canSubmit)}
             isSubmitting={c.isSubmitting}
-            addressConfirmed={c.addressConfirmed}
-            hasValidAddress={c.hasValidAddress}
-            checklistProfile={c.readiness.profile}
-            checklistProblem={c.readiness.problem}
-            checklistAddress={c.hasValidAddress && c.addressConfirmed}
-            recapFirstName={c.profile.firstName}
-            recapLastName={c.profile.lastName}
-            recapPhone={c.profile.phone}
-            recapProblemLabel={c.problemLabel}
-            recapDescription={c.description}
-            recapDate={c.interventionDate}
-            recapTime={c.interventionTime}
-            recapUrgency={c.requestDataUrgency}
             onAddressChange={(val) =>
               c.setRequestData((prev) => ({ ...prev, interventionAddress: val }))
             }
@@ -159,8 +146,6 @@ export default function RequesterInterventionSteps({ c }: Props) {
               }))
             }
             onLocate={c.fillAddressFromGeolocation}
-            onConfirmAddress={() => c.setAddressConfirmed(true)}
-            onFocusChecklistItem={c.focusChecklistItem}
             onSubmit={() => void c.handleSubmit()}
             onKeyDown={c.showSubmitSuccess ? undefined : c.trySubmitOnEnter}
           />

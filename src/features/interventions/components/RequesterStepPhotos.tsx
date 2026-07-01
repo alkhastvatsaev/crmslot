@@ -10,30 +10,25 @@ import { SMART_FORM_MAX_PHOTOS } from "@/features/interventions/hooks/useSmartFo
 type Props = {
   fileInputRef: RefObject<HTMLInputElement | null>;
   photoDataUrls: string[];
+  validationFailedCount: number;
   onIngestFiles: (files: FileList) => void;
   onRemovePhoto: (index: number) => void;
-  onSkip?: () => void;
 };
 
 export default function RequesterStepPhotos({
   fileInputRef,
   photoDataUrls,
+  validationFailedCount,
   onIngestFiles,
   onRemovePhoto,
-  onSkip,
 }: Props) {
   const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-4 mt-1">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-800">
-          {String(t("requester.intervention.photos_heading"))}
-        </h2>
-        <p className="mt-1 text-[13px] text-slate-500">
-          {String(t("requester.ux.photo_recommended_hint"))}
-        </p>
-      </div>
+      <h2 className="text-center text-xl font-bold text-slate-800">
+        {String(t("requester.intervention.photos_heading"))}
+      </h2>
       <input
         type="file"
         accept="image/*"
@@ -81,14 +76,24 @@ export default function RequesterStepPhotos({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex h-full w-full flex-col gap-2 items-center justify-center rounded-[24px] bg-slate-100 transition-all duration-300 hover:bg-slate-200 text-slate-600 active:scale-[0.98]"
+                  className={cn(
+                    "flex h-full w-full flex-col gap-2 items-center justify-center rounded-[24px] transition-all duration-300 active:scale-[0.98]",
+                    i === 0 && validationFailedCount > 0
+                      ? "bg-red-50/50 border-2 border-dashed border-red-300 hover:bg-red-50 hover:border-red-400 text-red-600 shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                  )}
                 >
                   <div className="rounded-full bg-white shadow-sm p-3 transition-transform duration-300 group-hover:scale-105">
-                    <ImagePlus className="h-6 w-6 text-slate-800" />
+                    <ImagePlus
+                      className={cn(
+                        "h-6 w-6",
+                        i === 0 && validationFailedCount > 0 ? "text-red-500" : "text-slate-800"
+                      )}
+                    />
                   </div>
                   <span className="text-base font-bold tracking-tight">
-                    {i === 0
-                      ? String(t("requester.ux.photo_recommended"))
+                    {i === 0 && validationFailedCount > 0
+                      ? String(t("requester.intervention.photo_required"))
                       : String(t("requester.intervention.photo_add"))}
                   </span>
                 </button>
@@ -101,16 +106,6 @@ export default function RequesterStepPhotos({
           );
         })}
       </div>
-      {onSkip ? (
-        <button
-          type="button"
-          data-testid="requester-photo-skip"
-          onClick={onSkip}
-          className="mx-auto min-h-[48px] rounded-[14px] px-4 py-3 text-[14px] font-semibold text-slate-600 underline-offset-4 transition hover:text-slate-900 hover:underline"
-        >
-          {String(t("requester.ux.photo_skip"))}
-        </button>
-      ) : null}
     </div>
   );
 }

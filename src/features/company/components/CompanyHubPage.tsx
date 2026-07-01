@@ -15,7 +15,6 @@ import {
 import { DASHBOARD_DESKTOP_PANEL_GAP_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { HUB_RAIL_BODY_CLASS, HubSegmentedControl } from "@/core/ui/hub";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { triggerRequesterMobileHaptic } from "@/features/interventions/requesterMobileHaptics";
 
 /** Rails hub — remplissent la hauteur vitre sans marge basse (évite le rectangle blanc). */
 const railBody = `${HUB_RAIL_BODY_CLASS} ${DASHBOARD_DESKTOP_PANEL_GAP_CLASS}`;
@@ -144,10 +143,6 @@ export default function CompanyHubPage() {
       leftAriaLabel={t("company_hub.aria.left")}
       centerAriaLabel={t("company_hub.aria.center")}
       rightAriaLabel={t("company_hub.aria.right")}
-      mobileLeftLabel={String(t("company_hub.mobile_rails.profile"))}
-      mobileCenterLabel={String(t("company_hub.mobile_rails.request"))}
-      mobileRightLabel={String(t("company_hub.mobile_rails.tracking"))}
-      onRailChange={() => triggerRequesterMobileHaptic("light")}
       left={leftPanel}
       center={centerPanel}
       right={rightPanel}
