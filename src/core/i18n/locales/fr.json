@@ -1556,6 +1556,38 @@
     "tracking": {
       "switched_to_case_prefix": "Dossier basculé sur",
       "client_fallback": "le client"
+    },
+    "ux": {
+      "checklist_aria": "État de la demande",
+      "checklist_profile": "Profil",
+      "checklist_problem": "Problème",
+      "checklist_address": "Adresse",
+      "profile_submit_need_problem": "Complétez le problème dans Demande",
+      "profile_submit_need_address": "Complétez l'adresse dans Demande",
+      "recap_aria": "Récapitulatif",
+      "recap_contact": "Contact",
+      "recap_problem": "Problème",
+      "recap_address": "Adresse",
+      "recap_slot": "Créneau",
+      "recap_missing": "Non renseigné",
+      "recap_slot_flexible": "Flexible",
+      "recap_urgent": "Urgent",
+      "address_confirm_title": "C'est bien ici ?",
+      "address_confirm_yes": "Oui, c'est correct",
+      "address_confirm_edit": "Modifier",
+      "address_confirm_required": "Confirmez l'adresse sur la carte",
+      "dossier_copy": "Copier",
+      "dossier_copied": "Numéro copié",
+      "photo_recommended": "Recommandé",
+      "photo_skip": "Continuer sans photo",
+      "photo_recommended_hint": "Une photo aide le technicien, mais ce n'est pas obligatoire.",
+      "step_label_problem": "Problème",
+      "step_label_detail": "Détail",
+      "step_label_photos": "Photos",
+      "step_label_slot": "Créneau",
+      "step_label_place": "Lieu",
+      "tracking_response_hint": "Réponse habituelle sous 24 h ouvrées",
+      "tracking_push_prompt": "Soyez prévenu dès qu'un technicien prend en charge votre dossier."
     }
   },
   "company_hub": {
@@ -1584,6 +1616,11 @@
     },
     "requester": {
       "guest": "Invité"
+    },
+    "mobile_rails": {
+      "profile": "Profil",
+      "request": "Demande",
+      "tracking": "Suivi"
     }
   },
   "technician_lab": {

@@ -76,7 +76,7 @@ interface RequesterHubContextValue {
 }
 
 const defaultProfile: RequesterProfile = {
-  type: "login",
+  type: "particulier",
   firstName: "",
   lastName: "",
   companyName: "",
