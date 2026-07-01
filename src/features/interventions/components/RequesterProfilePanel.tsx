@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, type KeyboardEvent } from "react";
-import { Mail, Phone, User } from "lucide-react";
+import { Loader2, Mail, Phone, SendHorizontal, User } from "lucide-react";
 import ClientPortalAuthPanel from "@/features/auth/components/ClientPortalAuthPanel";
 import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAccount";
 import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
 import RequesterClientAccountPanel from "@/features/interventions/components/RequesterClientAccountPanel";
+import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
 import { useRequesterHub, RequesterType } from "@/context/RequesterHubContext";
 import { HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,7 @@ export default function RequesterProfilePanel() {
     saving: accountSaving,
   } = useClientPortalAccount();
   const { t } = useTranslation();
+  const { canSubmit, handleSubmit, isSubmitting } = useRequesterInterventionForm();
   const shakeControls = useAnimation();
   useEffect(() => {
     if (validationFailedCount > 0) {
@@ -225,6 +227,25 @@ export default function RequesterProfilePanel() {
                   className={cn(inputClass, isInvalid(profile.email) && "placeholder:text-red-300")}
                 />
               </motion.div>
+            </div>
+
+            <div className="shrink-0 pb-1 pt-1">
+              <button
+                type="button"
+                data-testid="requester-profile-submit-btn"
+                disabled={isSubmitting}
+                onClick={() => void handleSubmit()}
+                className="mx-auto flex w-full max-w-none items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-4 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <SendHorizontal className="h-5 w-5" />
+                    {String(t("requester.intervention.submit_request"))}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}

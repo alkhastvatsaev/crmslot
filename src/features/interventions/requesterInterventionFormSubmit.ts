@@ -92,6 +92,8 @@ export async function submitRequesterIntervention(
     setLastSubmittedPortalAccessCode,
     onInboxPendingId,
     onNavigateMap,
+    onFocusMobileRail,
+    onSwitchToParticulierTab,
   } = input;
 
   const validation = validateRequesterInterventionSubmit({
@@ -106,6 +108,8 @@ export async function submitRequesterIntervention(
 
   if (!validation.ok) {
     if (validation.triggerValidation) triggerValidation();
+    if (validation.switchToParticulierTab) onSwitchToParticulierTab?.();
+    if (validation.focusMobileRail) onFocusMobileRail?.(validation.focusMobileRail);
     toast.error(validation.message);
     return;
   }
@@ -249,6 +253,8 @@ export async function submitRequesterIntervention(
     } else {
       toast.success(String(t("requester.toasts.request_saved")));
     }
+
+    onFocusMobileRail?.("right");
   } catch (e) {
     const errMsg = e instanceof Error ? e.message : String(e);
     const errCode =

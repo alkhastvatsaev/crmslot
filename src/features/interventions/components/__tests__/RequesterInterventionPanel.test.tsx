@@ -150,7 +150,7 @@ describe("RequesterInterventionPanel", () => {
     expect(btn).toBeDisabled();
   });
 
-  it("blocks submit without login on connexion tab", async () => {
+  it("blocks submit without login and switches to particulier tab", async () => {
     mockState.currentUser = {
       uid: "anon-uid",
       isAnonymous: true,
@@ -173,9 +173,12 @@ describe("RequesterInterventionPanel", () => {
     fireEvent.click(btn);
 
     await waitFor(() => {
-      expect(screen.getByTestId("profile-type-probe")).toHaveTextContent("login");
+      expect(screen.getByTestId("profile-type-probe")).toHaveTextContent("particulier");
     });
-    expect(screen.getByTestId("requester-type-login")).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("requester-type-particulier")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
 
     const { setDoc } = jest.requireMock("firebase/firestore") as { setDoc: jest.Mock };
     expect(setDoc).not.toHaveBeenCalled();
