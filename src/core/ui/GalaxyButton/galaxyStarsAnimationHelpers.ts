@@ -15,8 +15,7 @@ export function paintGalaxyBackground(
   variant: GalaxyStarsVariant = "dock"
 ) {
   if (variant === "avatar") {
-    surface.style.background =
-      "radial-gradient(circle at 48% 42%, #93c5fd 0%, #60a5fa 12%, #3b82f6 28%, #2563eb 48%, #1d4ed8 68%, #1e3a8a 100%)";
+    surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #93c5fd 0%, #60a5fa 14%, #3b82f6 32%, #2563eb 52%, #1d4ed8 68%, rgba(30, 58, 138, 0.78) 80%, rgba(30, 58, 138, 0.38) 90%, rgba(30, 58, 138, 0.1) 96%, transparent 100%)`;
   } else {
     surface.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, #3b82f6 0%, #1e3a8a 120%)`;
   }
@@ -153,7 +152,7 @@ export function drawGalaxyStars({
         const dx = finalX - currentX;
         const dy = finalY - currentY;
         const dist = Math.sqrt(dx * dx + dy * dy) / edgeRadius;
-        const edge = Math.max(0, Math.min(1, (dist - 0.42) / 0.58));
+        const edge = Math.max(0, Math.min(1, (dist - 0.32) / 0.68));
         alpha *= 1 - edge * edge * (3 - 2 * edge);
       }
 
