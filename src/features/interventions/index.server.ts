@@ -34,4 +34,4 @@ export {
   isTechnicianClosureBlockEnabledForCompany,
   technicianClosureBlockHttpError,
 } from "@/features/interventions/server/technicianClosureBlockServer";
-export { runTechnicianUnclosedDossierRemindersAdmin } from "@/features/interventions/server/technicianUnclosedDossierRemindersAdmin";
+export { createPublicRequesterInterventionAdmin } from "@/features/interventions/server/createPublicRequesterInterventionAdmin";

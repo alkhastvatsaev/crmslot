@@ -1,5 +1,14 @@
 import { toast } from "sonner";
-import { collection, doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  type DocumentReference,
+  type Firestore,
+} from "firebase/firestore";
+import type { User } from "firebase/auth";
+import { fetchWithAuth } from "@/core/api/fetchWithAuth";
+import type { RequesterProfile } from "@/context/RequesterHubContext";
 import { resolveRequesterSubmitClients } from "@/features/interventions/requesterInterventionSubmitClients";
 import { logger } from "@/core/logger";
 import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
@@ -24,6 +33,42 @@ import {
 } from "@/features/interventions/requesterInterventionSubmitValidation";
 
 export type { RequesterInterventionSubmitInput } from "@/features/interventions/requesterInterventionSubmitValidation";
+
+async function persistRequesterInterventionDoc(params: {
+  profileType: RequesterProfile["type"];
+  db: Firestore;
+  user: User;
+  newDocRef: DocumentReference;
+  companyId: string;
+  docPayload: Record<string, unknown>;
+}): Promise<void> {
+  const { profileType, user, newDocRef, companyId, docPayload } = params;
+
+  if (profileType === "particulier") {
+    const res = await fetchWithAuth(
+      "/api/interventions/public-request",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId,
+          interventionId: newDocRef.id,
+          payload: docPayload,
+        }),
+      },
+      { user }
+    );
+    const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+    if (!res.ok || body.ok === false) {
+      throw Object.assign(new Error(body.error ?? `HTTP ${res.status}`), {
+        code: res.status === 403 ? "permission-denied" : undefined,
+      });
+    }
+    return;
+  }
+
+  await setDoc(newDocRef, docPayload);
+}
 
 export async function submitRequesterIntervention(
   input: RequesterInterventionSubmitInput
@@ -131,7 +176,14 @@ export async function submitRequesterIntervention(
       portalFields,
     });
 
-    await setDoc(newDocRef, docPayload);
+    await persistRequesterInterventionDoc({
+      profileType: profile.type,
+      db,
+      user,
+      newDocRef,
+      companyId,
+      docPayload,
+    });
 
     const { clientFirstRaw, clientLastRaw, clientEmailRaw } = clientFields;
 

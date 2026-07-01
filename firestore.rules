@@ -498,6 +498,23 @@ service cloud.firestore {
         && interventionSensitiveBillingUnchanged();
     }
 
+    /** Particulier anonyme — audio / photos tant que la demande est pending. */
+    function canUpdateInterventionAsCreatorPending() {
+      return resource.data.keys().hasAny(['createdByUid'])
+        && resource.data.createdByUid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'pending'
+        && request.resource.data.companyId == resource.data.companyId
+        && request.resource.data.createdByUid == resource.data.createdByUid
+        && interventionSensitiveBillingUnchanged()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'audioUrl',
+          'audioStoragePath',
+          'audioMimeType',
+          'attachmentThumbnails',
+        ]);
+    }
+
     function canDeleteInterventionAsAdmin() {
       return interventionHasTenantScope(resource.data)
         && (
@@ -598,6 +615,7 @@ service cloud.firestore {
         canUpdateInterventionAsTenantStaff()
         || canUpdateInterventionViaMembershipStaff()
         || canUpdateInterventionAsAssignee()
+        || canUpdateInterventionAsCreatorPending()
       );
 
       allow delete: if isAuthed() && canDeleteInterventionAsAdmin();
