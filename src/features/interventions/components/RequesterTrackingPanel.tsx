@@ -95,6 +95,11 @@ export default function RequesterTrackingPanel() {
   const isComposingNewRequest =
     hasDraft && !selectedId && !pendingTrackingInterventionId && !isSubmitting;
 
+  useEffect(() => {
+    if (!lastSubmittedInterventionId || isComposingNewRequest) return;
+    setSelectedId((prev) => prev ?? lastSubmittedInterventionId);
+  }, [lastSubmittedInterventionId, isComposingNewRequest]);
+
   const pinnedIntervention =
     lastSubmittedInterventionId &&
     interventions.find((row) => row.id === lastSubmittedInterventionId);
@@ -111,7 +116,12 @@ export default function RequesterTrackingPanel() {
   const showTrackingView =
     hasDraft || isSubmitting || hasPortalTracking || hasAuthenticatedTracking;
 
-  const showList = interventions.length > 1 && !selectedId && !isComposingNewRequest;
+  const showList =
+    interventions.length > 1 &&
+    !selectedId &&
+    !resolvedSelectedId &&
+    !isComposingNewRequest &&
+    !lastSubmittedInterventionId;
 
   const trackedIntervention = isComposingNewRequest ? null : selectedIntervention;
 

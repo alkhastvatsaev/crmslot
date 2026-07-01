@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useDashboardPagerOptional } from "@/features/dashboard";
+import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
 import { useClientPortalLinkedCompanyId } from "@/features/auth/hooks/useClientPortalLinkedCompanyId";
 import { useTranslation } from "@/core/i18n/I18nContext";
@@ -33,9 +34,11 @@ export function useRequesterInterventionForm() {
     resetRequestAfterSubmit,
     triggerValidation,
     setRequestData,
+    setProfile,
   } = useRequesterHub();
 
   const workspace = useCompanyWorkspaceOptional();
+  const requestMobileHubRail = useRequestMobileHubRail();
   const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pager = useDashboardPagerOptional();
@@ -190,6 +193,12 @@ export function useRequesterInterventionForm() {
       setLastSubmittedPortalAccessCode,
       onInboxPendingId: inboxIntent ? (id) => inboxIntent.setPendingInboxId(id) : undefined,
       onNavigateMap: pager ? () => pager.setPageIndex(0) : undefined,
+      onFocusMobileRail: requestMobileHubRail,
+      onSwitchToParticulierTab: () => {
+        setProfile((prev) =>
+          prev.type === "particulier" ? prev : { ...prev, type: "particulier" }
+        );
+      },
     });
 
   return {

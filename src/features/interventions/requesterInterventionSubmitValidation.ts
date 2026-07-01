@@ -29,12 +29,18 @@ export type RequesterInterventionSubmitInput = {
   setLastSubmittedPortalAccessCode: (code: string) => void;
   onInboxPendingId?: (id: string) => void;
   onNavigateMap?: () => void;
+  onFocusMobileRail?: (rail: "left" | "center" | "right") => void;
+  onSwitchToParticulierTab?: () => void;
 };
 
 export type RequesterSubmitValidationFailure = {
   ok: false;
   message: string;
   triggerValidation?: boolean;
+  /** Dock mobile à afficher (évite le swipe manuel). */
+  focusMobileRail?: "left" | "center" | "right";
+  /** Basculer l’onglet profil vers « particulier » (invité sans compte). */
+  switchToParticulierTab?: boolean;
 };
 
 export type RequesterSubmitValidationSuccess = { ok: true };
@@ -71,6 +77,8 @@ export function validateRequesterInterventionSubmit(params: {
         ok: false,
         message: String(t("requester.toasts.fill_left_panel")),
         triggerValidation: true,
+        focusMobileRail: "left",
+        switchToParticulierTab: true,
       };
     }
 
@@ -80,6 +88,7 @@ export function validateRequesterInterventionSubmit(params: {
         ok: false,
         message: String(t("requester.toasts.fill_account_profile")),
         triggerValidation: true,
+        focusMobileRail: "left",
       };
     }
   } else {
@@ -94,6 +103,7 @@ export function validateRequesterInterventionSubmit(params: {
         ok: false,
         message: String(t("requester.toasts.fill_left_panel")),
         triggerValidation: true,
+        focusMobileRail: "left",
       };
     }
 
@@ -102,18 +112,31 @@ export function validateRequesterInterventionSubmit(params: {
         ok: false,
         message: String(t("requester.toasts.email_invalid")),
         triggerValidation: true,
+        focusMobileRail: "left",
       };
     }
   }
 
   if (!interventionAddress.trim()) {
-    return { ok: false, message: String(t("requester.toasts.address_required")) };
+    return {
+      ok: false,
+      message: String(t("requester.toasts.address_required")),
+      focusMobileRail: "center",
+    };
   }
   if (interventionAddress === REQUESTER_GEOLOC_ADDRESS_PENDING) {
-    return { ok: false, message: String(t("requester.toasts.address_searching")) };
+    return {
+      ok: false,
+      message: String(t("requester.toasts.address_searching")),
+      focusMobileRail: "center",
+    };
   }
   if (!problemLabel.trim() && !description.trim()) {
-    return { ok: false, message: String(t("requester.toasts.problem_required")) };
+    return {
+      ok: false,
+      message: String(t("requester.toasts.problem_required")),
+      focusMobileRail: "center",
+    };
   }
   if (isTenantUser && !tenantCompanyId) {
     return { ok: false, message: String(t("requester.toasts.company_required")) };
