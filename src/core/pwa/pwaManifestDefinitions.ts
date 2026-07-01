@@ -1,11 +1,14 @@
 import {
+  PWA_ADMIN_MOBILE_MANIFEST_ICONS,
   PWA_ADMIN_MOBILE_SHORT_NAME,
   PWA_ADMIN_MOBILE_TITLE,
   PWA_ADMIN_SHORT_NAME,
   PWA_ADMIN_TITLE,
+  PWA_DEMANDE_MANIFEST_ICONS,
   PWA_DEMANDE_SHORT_NAME,
   PWA_DEMANDE_TITLE,
   PWA_MANIFEST_ICONS,
+  PWA_TECHNICIAN_MANIFEST_ICONS,
   PWA_TECHNICIAN_SHORT_NAME,
   PWA_TECHNICIAN_TITLE,
   PWA_THEME_COLOR,
@@ -18,7 +21,14 @@ export type PwaManifestDefinition = {
   description: string;
   start_url: string;
   scope: string;
+  /** Identifiant opaque — requis pour plusieurs PWA sur la même origine (Chrome Android). */
   id: string;
+  icons: readonly {
+    src: string;
+    sizes: string;
+    type: string;
+    purpose: string;
+  }[];
 };
 
 /** Manifests statiques (`public/manifest*.json`) — source unique pour éviter les dérives. */
@@ -30,7 +40,8 @@ export const PWA_MANIFEST_DEFINITIONS = [
     description: "Dispatcher et pilotage CRMSLOT",
     start_url: "/",
     scope: "/",
-    id: "/",
+    id: "crmslot-pwa-admin",
+    icons: PWA_MANIFEST_ICONS,
   },
   {
     filename: "manifest-admin-mobile.json",
@@ -39,7 +50,8 @@ export const PWA_MANIFEST_DEFINITIONS = [
     description: "Inbox et missions du jour CRMSLOT",
     start_url: "/m/admin",
     scope: "/m/admin",
-    id: "/m/admin",
+    id: "crmslot-pwa-inbox",
+    icons: PWA_ADMIN_MOBILE_MANIFEST_ICONS,
   },
   {
     filename: "manifest-demande.json",
@@ -48,7 +60,8 @@ export const PWA_MANIFEST_DEFINITIONS = [
     description: "Formulaire et suivi client CRMSLOT",
     start_url: "/m/demande",
     scope: "/m/demande",
-    id: "/m/demande",
+    id: "crmslot-pwa-demande",
+    icons: PWA_DEMANDE_MANIFEST_ICONS,
   },
   {
     filename: "manifest-technician.json",
@@ -57,7 +70,8 @@ export const PWA_MANIFEST_DEFINITIONS = [
     description: "Missions et clôture technicien CRMSLOT",
     start_url: "/m/technician",
     scope: "/m/technician",
-    id: "/m/technician",
+    id: "crmslot-pwa-technician",
+    icons: PWA_TECHNICIAN_MANIFEST_ICONS,
   },
 ] as const satisfies readonly PwaManifestDefinition[];
 
@@ -76,7 +90,7 @@ export function buildPwaManifestJson(definition: PwaManifestDefinition): string 
       id: definition.id,
       background_color: PWA_THEME_COLOR,
       theme_color: PWA_THEME_COLOR,
-      icons: PWA_MANIFEST_ICONS.map((icon) => ({ ...icon })),
+      icons: definition.icons.map((icon) => ({ ...icon })),
     },
     null,
     2

@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import {
+  PWA_DEMANDE_METADATA_ICONS,
   PWA_DEMANDE_SHORT_NAME,
   PWA_DEMANDE_TITLE,
   PWA_MANIFEST_DEMANDE,
-  PWA_METADATA_ICONS,
   PWA_THEME_COLOR,
 } from "@/core/pwa/pwaSatelliteManifests";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Formulaire et suivi client",
   applicationName: PWA_DEMANDE_SHORT_NAME,
   manifest: PWA_MANIFEST_DEMANDE,
-  icons: PWA_METADATA_ICONS,
+  icons: PWA_DEMANDE_METADATA_ICONS,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

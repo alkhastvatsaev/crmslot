@@ -1,31 +1,35 @@
 import { buildPwaManifestJson, PWA_MANIFEST_DEFINITIONS } from "@/core/pwa/pwaManifestDefinitions";
 
-describe("pwaManifestDefinitions", () => {
-  it("donne un scope distinct par app satellite (évite fusion PWA Android)", () => {
-    const demande = PWA_MANIFEST_DEFINITIONS.find((d) => d.filename === "manifest-demande.json");
-    const terrain = PWA_MANIFEST_DEFINITIONS.find((d) => d.filename === "manifest-technician.json");
-    const admin = PWA_MANIFEST_DEFINITIONS.find((d) => d.filename === "manifest.json");
-
-    expect(demande?.scope).toBe("/m/demande");
-    expect(terrain?.scope).toBe("/m/technician");
-    expect(admin?.scope).toBe("/");
-
-    expect(demande?.start_url.startsWith(demande?.scope ?? "")).toBe(true);
-    expect(terrain?.start_url.startsWith(terrain?.scope ?? "")).toBe(true);
-  });
-
-  it("aligne id et start_url pour chaque manifest", () => {
-    for (const def of PWA_MANIFEST_DEFINITIONS) {
-      expect(def.id).toBe(def.start_url);
+describe("PWA_MANIFEST_DEFINITIONS", () => {
+  it("assigns opaque unique ids for Android multi-install", () => {
+    const ids = PWA_MANIFEST_DEFINITIONS.map((definition) => definition.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) {
+      expect(id.startsWith("crmslot-pwa-")).toBe(true);
+      expect(id.includes("/")).toBe(false);
     }
   });
 
-  it("produit un JSON valide avec icônes et couleurs", () => {
-    const def = PWA_MANIFEST_DEFINITIONS[0];
-    const parsed = JSON.parse(buildPwaManifestJson(def));
+  it("keeps satellite scopes narrow and distinct from each other", () => {
+    const satellites = PWA_MANIFEST_DEFINITIONS.filter((definition) =>
+      definition.start_url.startsWith("/m/")
+    );
+    const scopes = satellites.map((definition) => definition.scope);
+    expect(new Set(scopes).size).toBe(scopes.length);
+    for (const definition of satellites) {
+      expect(definition.scope).toBe(definition.start_url);
+    }
+  });
 
-    expect(parsed.display).toBe("standalone");
-    expect(parsed.theme_color).toBe("#09090B");
-    expect(parsed.icons.length).toBeGreaterThanOrEqual(3);
+  it("uses per-surface icon paths in generated JSON", () => {
+    const demande = PWA_MANIFEST_DEFINITIONS.find(
+      (definition) => definition.filename === "manifest-demande.json"
+    );
+    expect(demande).toBeDefined();
+    const json = JSON.parse(buildPwaManifestJson(demande!));
+    expect(json.id).toBe("crmslot-pwa-demande");
+    expect(json.icons.some((icon: { src: string }) => icon.src.includes("/pwa/icon-demande"))).toBe(
+      true
+    );
   });
 });
