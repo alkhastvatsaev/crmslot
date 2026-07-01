@@ -25,7 +25,8 @@ const iconRail = cn(
 const glassRow = cn("flex items-center gap-3 transition-colors duration-300", HUB_SURFACE.fieldRow);
 
 export default function RequesterProfilePanel() {
-  const { profile, setProfile, validationFailedCount, currentStep } = useRequesterHub();
+  const { profile, setProfile, validationFailedCount, currentStep, isSubmitting } =
+    useRequesterHub();
   const {
     isAuthenticated,
     loading: accountLoading,
@@ -36,7 +37,7 @@ export default function RequesterProfilePanel() {
     saving: accountSaving,
   } = useClientPortalAccount();
   const { t } = useTranslation();
-  const { canSubmit, handleSubmit, isSubmitting } = useRequesterInterventionForm();
+  const { handleSubmit } = useRequesterInterventionForm();
   const shakeControls = useAnimation();
   useEffect(() => {
     if (validationFailedCount > 0) {
