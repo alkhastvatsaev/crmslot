@@ -1556,38 +1556,6 @@
     "tracking": {
       "switched_to_case_prefix": "Дело переключено на",
       "client_fallback": "клиент"
-    },
-    "ux": {
-      "checklist_aria": "Request status",
-      "checklist_profile": "Profile",
-      "checklist_problem": "Issue",
-      "checklist_address": "Address",
-      "profile_submit_need_problem": "Complete the issue in Request",
-      "profile_submit_need_address": "Complete the address in Request",
-      "recap_aria": "Summary",
-      "recap_contact": "Contact",
-      "recap_problem": "Issue",
-      "recap_address": "Address",
-      "recap_slot": "Slot",
-      "recap_missing": "Not provided",
-      "recap_slot_flexible": "Flexible",
-      "recap_urgent": "Urgent",
-      "address_confirm_title": "Is this the right place?",
-      "address_confirm_yes": "Yes, that's correct",
-      "address_confirm_edit": "Edit",
-      "address_confirm_required": "Confirm the address on the map",
-      "dossier_copy": "Copy",
-      "dossier_copied": "Number copied",
-      "photo_recommended": "Recommended",
-      "photo_skip": "Continue without photo",
-      "photo_recommended_hint": "A photo helps the technician, but it is optional.",
-      "step_label_problem": "Issue",
-      "step_label_detail": "Details",
-      "step_label_photos": "Photos",
-      "step_label_slot": "Slot",
-      "step_label_place": "Location",
-      "tracking_response_hint": "Typical response within 1 business day",
-      "tracking_push_prompt": "Get notified when a technician picks up your case."
     }
   },
   "company_hub": {
@@ -1616,11 +1584,6 @@
     },
     "requester": {
       "guest": "Гость"
-    },
-    "mobile_rails": {
-      "profile": "Profile",
-      "request": "Request",
-      "tracking": "Tracking"
     }
   },
   "technician_lab": {

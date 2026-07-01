@@ -10,7 +10,6 @@ import {
   getTrackingHeadlineKey,
 } from "@/features/interventions/requesterTrackingSteps";
 import RequesterTrackingProgressBar from "@/features/interventions/components/RequesterTrackingProgressBar";
-import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 import ClientRatingPanel from "@/features/interventions/components/ClientRatingPanel";
 
@@ -119,24 +118,6 @@ export default function RequesterTrackingStepScreen({
           <p data-testid="tracking-eta" className="mt-2 text-[13px] font-medium text-slate-500">
             {etaLabel}
           </p>
-        ) : null}
-
-        {phase.id === "received" && hasIntervention && status === "pending" ? (
-          <p
-            data-testid="tracking-response-hint"
-            className="mt-2 max-w-[280px] text-[13px] leading-relaxed text-slate-500"
-          >
-            {String(t("requester.ux.tracking_response_hint"))}
-          </p>
-        ) : null}
-
-        {phase.id === "received" && hasIntervention ? (
-          <div data-testid="tracking-push-prompt" className="mt-4 w-full max-w-[280px] shrink-0">
-            <p className="mb-2 text-[12px] leading-relaxed text-slate-500">
-              {String(t("requester.ux.tracking_push_prompt"))}
-            </p>
-            <RequesterPushNotificationButton />
-          </div>
         ) : null}
 
         {status === "waiting_material" ? (
