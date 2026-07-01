@@ -1,7 +1,8 @@
-import { signInAnonymously, type User } from "firebase/auth";
+import { signInAnonymously, signOut, type User } from "firebase/auth";
 import { auth, clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import type { RequesterProfile } from "@/context/RequesterHubContext";
+import { usesClientPortalSession } from "@/features/interventions/requesterInterventionSubmitClients";
 
 export const REQUESTER_GEOLOC_OPTIONS: PositionOptions = {
   enableHighAccuracy: false,
@@ -34,7 +35,7 @@ export async function ensureRequesterUserForSubmit(
 ): Promise<User | null> {
   if (!isConfigured) return null;
 
-  if (profileType === "login" || profileType === "register") {
+  if (usesClientPortalSession(profileType)) {
     const clientUser = clientPortalAuth?.currentUser ?? null;
     if (clientUser && !clientUser.isAnonymous && clientUser.emailVerified) {
       return clientUser;
@@ -43,7 +44,16 @@ export async function ensureRequesterUserForSubmit(
   }
 
   if (!auth) return null;
-  if (auth.currentUser) return auth.currentUser;
+  if (auth.currentUser?.isAnonymous) return auth.currentUser;
+  if (auth.currentUser) {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      logger.warn("ensureRequesterUserForSubmit signOut CRM session", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
   try {
     const cred = await withRequesterFormTimeout(signInAnonymously(auth), 10000, "Auth timeout");
     return cred.user;

@@ -6,6 +6,7 @@ import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { resolveClientPortalInterventionCompanyId } from "@/features/company/clientPortalCompanyId";
+import { useClientPortalLinkedCompanyId } from "@/features/auth/hooks/useClientPortalLinkedCompanyId";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { compressImageToDataUrl } from "@/features/interventions/compressImageToDataUrl";
 import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
@@ -35,6 +36,7 @@ export function useRequesterInterventionForm() {
   } = useRequesterHub();
 
   const workspace = useCompanyWorkspaceOptional();
+  const linkedPortalCompanyId = useClientPortalLinkedCompanyId();
   const inboxIntent = useBackofficeInboxIntentOptional();
   const pager = useDashboardPagerOptional();
   const { t, language } = useTranslation();
@@ -45,6 +47,7 @@ export function useRequesterInterventionForm() {
     workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
   const interventionCompanyId = resolveClientPortalInterventionCompanyId({
     tenantActiveCompanyId: tenantCompanyId,
+    linkedPortalCompanyId,
   });
 
   const { interventionAddress, problemLabel, description } = requestData;
@@ -53,7 +56,7 @@ export function useRequesterInterventionForm() {
     async (blob: Blob) => {
       setRequestData((prev) => ({ ...prev, audioBlob: blob }));
       try {
-        const firebaseSaved = await uploadInterventionAudioToFirebase(blob);
+        const firebaseSaved = await uploadInterventionAudioToFirebase(blob, profile.type);
         if (firebaseSaved) {
           setRequestData((prev) => ({
             ...prev,

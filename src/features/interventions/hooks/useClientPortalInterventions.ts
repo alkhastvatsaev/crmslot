@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { clientPortalAuth, firestore, isConfigured } from "@/core/config/firebase";
+import {
+  auth,
+  clientPortalAuth,
+  clientPortalFirestore,
+  firestore,
+  isConfigured,
+} from "@/core/config/firebase";
+import {
+  resolveRequesterSessionAuth,
+  usesClientPortalSession,
+} from "@/features/interventions/requesterInterventionSubmitClients";
 import { logger } from "@/core/logger";
 import type { RequesterProfile } from "@/context/RequesterHubContext";
 import type { PortalAccessSessionCase } from "@/features/interventions/portalAccessSession";
@@ -25,8 +35,11 @@ export function useClientPortalInterventions<T extends { id: string; createdAt?:
   options: UseClientPortalInterventionsOptions
 ) {
   const { profile, portalAccessCases = [] } = options;
-  const canSubscribe = Boolean(isConfigured && clientPortalAuth && firestore);
-  const [authUser, setAuthUser] = useState<User | null>(clientPortalAuth?.currentUser ?? null);
+  const portalSession = usesClientPortalSession(profile.type);
+  const sessionAuth = resolveRequesterSessionAuth(profile.type);
+  const sessionDb = portalSession ? clientPortalFirestore : firestore;
+  const canSubscribe = Boolean(isConfigured && sessionAuth && sessionDb);
+  const [authUser, setAuthUser] = useState<User | null>(sessionAuth?.currentUser ?? null);
   const [rawInterventions, setRawInterventions] = useState<T[]>([]);
   const [loading, setLoading] = useState(canSubscribe);
 
@@ -38,9 +51,9 @@ export function useClientPortalInterventions<T extends { id: string; createdAt?:
   const canLoadFirestoreCases = canResolveClientPortalIdentity(identity);
 
   useEffect(() => {
-    if (!clientPortalAuth) return;
-    return onAuthStateChanged(clientPortalAuth, setAuthUser);
-  }, []);
+    if (!sessionAuth) return;
+    return onAuthStateChanged(sessionAuth, setAuthUser);
+  }, [sessionAuth]);
 
   useEffect(() => {
     if (!canSubscribe || !canLoadFirestoreCases || !identity.uid) {
@@ -49,7 +62,7 @@ export function useClientPortalInterventions<T extends { id: string; createdAt?:
       return;
     }
 
-    const db = firestore!;
+    const db = sessionDb!;
     const q = query(collection(db, "interventions"), where("createdByUid", "==", identity.uid));
 
     const unsubSnap = onSnapshot(
@@ -71,7 +84,7 @@ export function useClientPortalInterventions<T extends { id: string; createdAt?:
     return () => {
       unsubSnap();
     };
-  }, [canSubscribe, canLoadFirestoreCases, identity.uid]);
+  }, [canSubscribe, canLoadFirestoreCases, identity.uid, sessionDb]);
 
   const firestoreInterventions = useMemo(
     () => filterInterventionsForClientPortal(rawInterventions, identity),
