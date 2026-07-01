@@ -31,6 +31,7 @@ import {
   validateRequesterInterventionSubmit,
   type RequesterInterventionSubmitInput,
 } from "@/features/interventions/requesterInterventionSubmitValidation";
+import { triggerRequesterMobileHaptic } from "@/features/interventions/requesterMobileHaptics";
 
 export type { RequesterInterventionSubmitInput } from "@/features/interventions/requesterInterventionSubmitValidation";
 
@@ -254,6 +255,7 @@ export async function submitRequesterIntervention(
       toast.success(String(t("requester.toasts.request_saved")));
     }
 
+    triggerRequesterMobileHaptic("medium");
     onFocusMobileRail?.("right");
   } catch (e) {
     const errMsg = e instanceof Error ? e.message : String(e);

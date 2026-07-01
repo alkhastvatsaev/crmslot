@@ -1556,6 +1556,38 @@
     "tracking": {
       "switched_to_case_prefix": "Overgeschakeld naar dossier voor",
       "client_fallback": "de klant"
+    },
+    "ux": {
+      "checklist_aria": "Status van de aanvraag",
+      "checklist_profile": "Profiel",
+      "checklist_problem": "Probleem",
+      "checklist_address": "Adres",
+      "profile_submit_need_problem": "Vul het probleem in bij Aanvraag",
+      "profile_submit_need_address": "Vul het adres in bij Aanvraag",
+      "recap_aria": "Overzicht",
+      "recap_contact": "Contact",
+      "recap_problem": "Probleem",
+      "recap_address": "Adres",
+      "recap_slot": "Tijdslot",
+      "recap_missing": "Niet ingevuld",
+      "recap_slot_flexible": "Flexibel",
+      "recap_urgent": "Dringend",
+      "address_confirm_title": "Is dit de juiste plek?",
+      "address_confirm_yes": "Ja, klopt",
+      "address_confirm_edit": "Wijzigen",
+      "address_confirm_required": "Bevestig het adres op de kaart",
+      "dossier_copy": "Kopiëren",
+      "dossier_copied": "Nummer gekopieerd",
+      "photo_recommended": "Aanbevolen",
+      "photo_skip": "Doorgaan zonder foto",
+      "photo_recommended_hint": "Een foto helpt de technieker, maar is niet verplicht.",
+      "step_label_problem": "Probleem",
+      "step_label_detail": "Detail",
+      "step_label_photos": "Foto's",
+      "step_label_slot": "Tijdslot",
+      "step_label_place": "Plaats",
+      "tracking_response_hint": "Meestal antwoord binnen 1 werkdag",
+      "tracking_push_prompt": "Ontvang een melding zodra een technieker uw dossier oppakt."
     }
   },
   "company_hub": {
@@ -1584,6 +1616,11 @@
     },
     "requester": {
       "guest": "Gast"
+    },
+    "mobile_rails": {
+      "profile": "Profiel",
+      "request": "Aanvraag",
+      "tracking": "Opvolging"
     }
   },
   "technician_lab": {

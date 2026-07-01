@@ -7,6 +7,7 @@ import { useClientPortalAccount } from "@/features/auth/hooks/useClientPortalAcc
 import { dispatchRequesterInterventionEnterSubmit } from "@/features/interventions/smartInterventionConstants";
 import RequesterClientAccountPanel from "@/features/interventions/components/RequesterClientAccountPanel";
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
+import RequesterSubmitChecklist from "@/features/interventions/components/RequesterSubmitChecklist";
 import { useRequesterHub, RequesterType } from "@/context/RequesterHubContext";
 import { HUB_RADIUS, HUB_SURFACE, HubSegmentedControl } from "@/core/ui/hub";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,8 @@ const iconRail = cn(
 const glassRow = cn("flex items-center gap-3 transition-colors duration-300", HUB_SURFACE.fieldRow);
 
 export default function RequesterProfilePanel() {
-  const { profile, setProfile, validationFailedCount, currentStep } = useRequesterHub();
+  const { profile, setProfile, validationFailedCount, currentStep, setCurrentStep, isSubmitting } =
+    useRequesterHub();
   const {
     isAuthenticated,
     loading: accountLoading,
@@ -36,7 +38,7 @@ export default function RequesterProfilePanel() {
     saving: accountSaving,
   } = useClientPortalAccount();
   const { t } = useTranslation();
-  const { canSubmit, handleSubmit, isSubmitting } = useRequesterInterventionForm();
+  const { readiness, focusMobileRail, handleSubmit } = useRequesterInterventionForm();
   const shakeControls = useAnimation();
   useEffect(() => {
     if (validationFailedCount > 0) {
@@ -60,8 +62,28 @@ export default function RequesterProfilePanel() {
     dispatchRequesterInterventionEnterSubmit();
   };
 
+  const profileSubmitBlocked = Boolean(readiness.profileSubmitHintKey);
+  const profileSubmitDisabled = isSubmitting || profileSubmitBlocked;
+
+  const focusChecklistItem = (item: "profile" | "problem" | "address") => {
+    if (item === "profile") {
+      focusMobileRail("left");
+      return;
+    }
+    focusMobileRail("center");
+    if (item === "problem") setCurrentStep(0);
+    if (item === "address") setCurrentStep(4);
+  };
+
   return (
     <div data-testid="requester-profile-panel" className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <RequesterSubmitChecklist
+        profile={readiness.profile}
+        problem={readiness.problem}
+        address={readiness.address}
+        onFocusItem={focusChecklistItem}
+        className="mb-3 shrink-0"
+      />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
         <HubSegmentedControl
           value={profile.type}
@@ -233,16 +255,18 @@ export default function RequesterProfilePanel() {
               <button
                 type="button"
                 data-testid="requester-profile-submit-btn"
-                disabled={isSubmitting}
+                disabled={profileSubmitDisabled}
                 onClick={() => void handleSubmit()}
-                className="mx-auto flex w-full max-w-none items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-4 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                className="mx-auto flex w-full max-w-none min-h-[52px] items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-5 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
                     <SendHorizontal className="h-5 w-5" />
-                    {String(t("requester.intervention.submit_request"))}
+                    {profileSubmitBlocked && readiness.profileSubmitHintKey
+                      ? String(t(readiness.profileSubmitHintKey))
+                      : String(t("requester.intervention.submit_request"))}
                   </>
                 )}
               </button>
