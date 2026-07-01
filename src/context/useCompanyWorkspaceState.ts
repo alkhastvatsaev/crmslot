@@ -18,6 +18,7 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
     membershipsReady,
     storedActiveCompanyId,
     resolvedClaimsCompanyId,
+    hasRealMemberships,
   } = useCompanyWorkspaceMemberships(firebaseUid, initialActiveCompanyId);
 
   const membershipCompanyIds = useMemo(
@@ -82,7 +83,7 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
       setActiveCompanyId,
       activeRole,
       workspaceReady: !authLoading && workspaceBootstrapReady && !joinBlocksWorkspace,
-      isTenantUser: !authLoading && membershipsReady && memberships.length > 0,
+      isTenantUser: !authLoading && membershipsReady && hasRealMemberships,
       membershipJoinPending,
       membershipJoinError,
       retryDefaultCompanyJoin,
@@ -99,6 +100,7 @@ export function useCompanyWorkspaceState(initialActiveCompanyId?: string): Compa
       membershipsReady,
       workspaceBootstrapReady,
       joinBlocksWorkspace,
+      hasRealMemberships,
       membershipJoinPending,
       membershipJoinError,
       retryDefaultCompanyJoin,

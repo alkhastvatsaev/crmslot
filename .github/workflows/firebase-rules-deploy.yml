@@ -26,8 +26,12 @@ jobs:
 
       - name: Skip si secrets Firebase absents
         id: gate
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          if [[ -z "${{ secrets.FIREBASE_PROJECT_ID }}" || -z "${{ secrets.FIREBASE_CLIENT_EMAIL }}" || -z "${{ secrets.FIREBASE_PRIVATE_KEY }}" ]]; then
+          if [ -z "$FIREBASE_PROJECT_ID" ] || [ -z "$FIREBASE_CLIENT_EMAIL" ] || [ -z "$FIREBASE_PRIVATE_KEY" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "::warning::Secrets FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY requis."
           else

@@ -8,6 +8,14 @@ import {
 } from "@/features/interventions/detectDuplicates";
 import type { Intervention } from "@/features/interventions/types";
 
+/** Particulier = jamais la requête société entière (permission-denied pour anonymes). */
+export function shouldUseTenantDuplicateScope(
+  profileType: RequesterProfile["type"],
+  tenantCompanyId: string | null
+): boolean {
+  return profileType !== "particulier" && Boolean(tenantCompanyId?.trim());
+}
+
 export async function findRequesterDuplicateInterventions(params: {
   db: Firestore;
   user: User;
@@ -19,7 +27,7 @@ export async function findRequesterDuplicateInterventions(params: {
   const { db, user, tenantCompanyId, interventionCompanyId, profile, requestData } = params;
   const problemForDedupe = requestData.description.trim() || requestData.problemLabel.trim();
 
-  const qDup = tenantCompanyId
+  const qDup = shouldUseTenantDuplicateScope(profile.type, tenantCompanyId)
     ? query(collection(db, "interventions"), where("companyId", "==", interventionCompanyId))
     : query(collection(db, "interventions"), where("createdByUid", "==", user.uid));
 
