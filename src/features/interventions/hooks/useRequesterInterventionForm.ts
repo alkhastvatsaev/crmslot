@@ -44,7 +44,9 @@ export function useRequesterInterventionForm() {
   const [locatingAddress, setLocatingAddress] = useState(false);
 
   const tenantCompanyId =
-    workspace?.isTenantUser && workspace.activeCompanyId ? workspace.activeCompanyId : null;
+    profile.type !== "particulier" && workspace?.isTenantUser && workspace.activeCompanyId
+      ? workspace.activeCompanyId
+      : null;
   const interventionCompanyId = resolveClientPortalInterventionCompanyId({
     tenantActiveCompanyId: tenantCompanyId,
     linkedPortalCompanyId,
@@ -175,7 +177,7 @@ export function useRequesterInterventionForm() {
       requestData,
       tenantCompanyId,
       interventionCompanyId,
-      isTenantUser: Boolean(workspace?.isTenantUser),
+      isTenantUser: profile.type !== "particulier" && Boolean(workspace?.isTenantUser),
       locale,
       t,
       triggerValidation,

@@ -204,5 +204,7 @@ export function useCompanyWorkspaceMemberships(
     membershipsReady,
     storedActiveCompanyId,
     resolvedClaimsCompanyId,
+    /** Vrai membership Firestore — sans le fallback env-only du boot portail client. */
+    hasRealMemberships: membershipDocs.length > 0,
   };
 }
