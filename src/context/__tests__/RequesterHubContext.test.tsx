@@ -45,7 +45,7 @@ describe("RequesterHubContext", () => {
       </RequesterHubProvider>
     );
     expect(screen.getByTestId("step")).toHaveTextContent("0");
-    expect(screen.getByTestId("profile-type")).toHaveTextContent("particulier");
+    expect(screen.getByTestId("profile-type")).toHaveTextContent("login");
   });
 
   it("incrémente validationFailedCount via triggerValidation", () => {
@@ -77,7 +77,7 @@ describe("RequesterHubContext", () => {
     });
 
     expect(screen.getByTestId("first-name")).toHaveTextContent("");
-    expect(screen.getByTestId("profile-type")).toHaveTextContent("particulier");
+    expect(screen.getByTestId("profile-type")).toHaveTextContent("login");
     const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}");
     expect(stored.profile?.firstName).toBe("");
   });
