@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import { collection, doc, setDoc } from "firebase/firestore";
-import { firestore, storage } from "@/core/config/firebase";
+import { resolveRequesterSubmitClients } from "@/features/interventions/requesterInterventionSubmitClients";
 import { logger } from "@/core/logger";
 import { logCrmInterventionCreated } from "@/features/crmHistory/logCrmInterventionCreated";
 import { ensureRequesterUserForSubmit } from "@/features/interventions/requesterInterventionFormHelpers";
@@ -68,14 +68,16 @@ export async function submitRequesterIntervention(
   setIsSubmitting(true);
   try {
     const user = await ensureRequesterUserForSubmit(profile.type);
-    if (!user || !firestore) {
+    const clients = user ? resolveRequesterSubmitClients(profile.type, user) : null;
+    if (!clients) {
       toast.error(String(t("requester.toasts.auth_failed")));
       return;
     }
+    const { db, storage: submitStorage } = clients;
 
     const companyId = interventionCompanyId!;
     const matches = await findRequesterDuplicateInterventions({
-      db: firestore,
+      db,
       user,
       tenantCompanyId,
       interventionCompanyId: companyId,
@@ -91,7 +93,7 @@ export async function submitRequesterIntervention(
     }
 
     const audioUrlForDoc = await resolveRequesterSubmitAudioUrl(requestData);
-    const newDocRef = doc(collection(firestore, "interventions"));
+    const newDocRef = doc(collection(db, "interventions"));
     setLastSubmittedInterventionId(newDocRef.id);
     setPendingTrackingInterventionId(newDocRef.id);
     setPortalRightTab("tracking");
@@ -149,8 +151,8 @@ export async function submitRequesterIntervention(
     });
 
     runRequesterSubmitBackgroundTasks({
-      db: firestore,
-      storage,
+      db,
+      storage: submitStorage,
       newDocRef,
       user,
       interventionCompanyId: companyId,

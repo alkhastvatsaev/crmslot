@@ -1,10 +1,29 @@
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, isConfigured, storage } from "@/core/config/firebase";
+import {
+  auth,
+  clientPortalAuth,
+  clientPortalStorage,
+  isConfigured,
+  storage,
+} from "@/core/config/firebase";
+import type { RequesterProfile } from "@/context/RequesterHubContext";
+import { usesClientPortalSession } from "@/features/interventions/requesterInterventionSubmitClients";
 import { logger } from "@/core/logger";
 
-async function ensureUserForAudioUpload() {
-  if (!isConfigured || !auth) return null;
-  return auth.currentUser;
+function resolveAudioUploadSession(profileType?: RequesterProfile["type"]) {
+  if (profileType && usesClientPortalSession(profileType)) {
+    return {
+      auth: clientPortalAuth,
+      storage: clientPortalStorage,
+    };
+  }
+  return { auth, storage };
+}
+
+async function ensureUserForAudioUpload(profileType?: RequesterProfile["type"]) {
+  const session = resolveAudioUploadSession(profileType);
+  if (!isConfigured || !session.auth) return null;
+  return session.auth.currentUser;
 }
 
 function extFromBlob(blob: Blob): string {
@@ -16,19 +35,23 @@ function extFromBlob(blob: Blob): string {
 }
 
 /** Upload vocal vers Firebase Storage. */
-export async function uploadInterventionAudioToFirebase(blob: Blob): Promise<{
+export async function uploadInterventionAudioToFirebase(
+  blob: Blob,
+  profileType?: RequesterProfile["type"]
+): Promise<{
   url: string;
   storagePath: string;
   mime: string;
 } | null> {
-  if (!storage) return null;
+  const session = resolveAudioUploadSession(profileType);
+  if (!session.storage) return null;
   try {
-    const user = await ensureUserForAudioUpload();
+    const user = await ensureUserForAudioUpload(profileType);
     if (!user) return null;
     const mime = blob.type || "audio/webm";
     const ext = extFromBlob(blob);
     const storagePath = `interventions_audio/${user.uid}/${Date.now()}.${ext}`;
-    const r = ref(storage, storagePath);
+    const r = ref(session.storage, storagePath);
     await uploadBytes(r, blob, { contentType: mime });
     const url = await getDownloadURL(r);
     return { url, storagePath, mime };
