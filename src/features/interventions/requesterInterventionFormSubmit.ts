@@ -67,13 +67,13 @@ export async function submitRequesterIntervention(
 
   setIsSubmitting(true);
   try {
-    const user = await ensureRequesterUserForSubmit(profile.type);
-    const clients = user ? resolveRequesterSubmitClients(profile.type, user) : null;
+    const authUser = await ensureRequesterUserForSubmit(profile.type);
+    const clients = authUser ? resolveRequesterSubmitClients(profile.type, authUser) : null;
     if (!clients) {
       toast.error(String(t("requester.toasts.auth_failed")));
       return;
     }
-    const { db, storage: submitStorage } = clients;
+    const { db, storage: submitStorage, user } = clients;
 
     const companyId = interventionCompanyId!;
     const matches = await findRequesterDuplicateInterventions({
