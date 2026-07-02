@@ -19,5 +19,8 @@ export const BM_BACKOFFICE_CHAT_PARAM = "bmBackofficeChat";
 /** Ouvre l'inbox carte sur l'onglet Demandes (nouvelle demande client). */
 export const BM_BACKOFFICE_REQUEST_PARAM = "bmBackofficeRequest";
 
+/** Type FCM — nouvelle demande client (staff). */
+export const NEW_CLIENT_REQUEST_PUSH_TYPE = "new_client_request";
+
 /** Ouvre le hub Matériel depuis une push commande matériel. */
 export const BM_MATERIAL_ORDER_PARAM = "bmMaterialOrder";

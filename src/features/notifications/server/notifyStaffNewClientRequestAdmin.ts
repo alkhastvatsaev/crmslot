@@ -4,11 +4,12 @@ import {
   channelAllowed,
   normalizeNotificationPreferences,
 } from "@/features/notifications/notificationPreferences";
-import { BM_BACKOFFICE_REQUEST_PARAM } from "@/features/notifications/notificationConstants";
+import {
+  BM_BACKOFFICE_REQUEST_PARAM,
+  NEW_CLIENT_REQUEST_PUSH_TYPE,
+} from "@/features/notifications/notificationConstants";
 import { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
 import { logger } from "@/core/logger";
-
-export const NEW_CLIENT_REQUEST_PUSH_TYPE = "new_client_request";
 
 async function staffPushEnabled(db: admin.firestore.Firestore, uid: string): Promise<boolean> {
   const snap = await db.collection("users").doc(uid).get();

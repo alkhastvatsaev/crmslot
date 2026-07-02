@@ -1,5 +1,7 @@
-import { BM_BACKOFFICE_REQUEST_PARAM } from "@/features/notifications/notificationConstants";
-import { NEW_CLIENT_REQUEST_PUSH_TYPE } from "@/features/notifications/server/notifyStaffNewClientRequestAdmin";
+import {
+  BM_BACKOFFICE_REQUEST_PARAM,
+  NEW_CLIENT_REQUEST_PUSH_TYPE,
+} from "@/features/notifications/notificationConstants";
 
 export type BackofficeRequestNotificationIntent =
   | { kind: "request"; interventionId: string }
