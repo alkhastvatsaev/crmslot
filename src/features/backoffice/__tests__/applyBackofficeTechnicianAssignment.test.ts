@@ -5,6 +5,12 @@ import type { Intervention } from "@/features/interventions";
 const mockTransitionAdmin = jest.fn(async () => ({ id: "evt-1" }));
 const mockUpdate = jest.fn(async () => undefined);
 
+const mockNotifyAssignment = jest.fn(async () => ({ sent: 1 }));
+
+jest.mock("@/features/interventions/server/notifyTechnicianAssignmentAdmin", () => ({
+  notifyTechnicianAssignmentAdmin: (...args: unknown[]) => mockNotifyAssignment(...args),
+}));
+
 jest.mock("@/features/interventions/workflow/transitionInterventionStatusAdmin", () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transitionInterventionStatusAdmin: (...args: any[]) => (mockTransitionAdmin as any)(...args),
@@ -52,6 +58,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
   beforeEach(() => {
     mockTransitionAdmin.mockClear();
     mockUpdate.mockClear();
+    mockNotifyAssignment.mockClear();
   });
 
   it("transitions pending to assigned", async () => {
@@ -68,6 +75,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
 
     expect(mockTransitionAdmin).toHaveBeenCalledTimes(1);
     expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockNotifyAssignment).toHaveBeenCalledTimes(1);
   });
 
   it("reassigns assigned awaiting accept without status transition", async () => {
@@ -92,6 +100,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
     expect(patch.assignedTechnicianUid).toBe("tech-2");
     expect(patch.status).toBe("assigned");
     expect(patch.technicianAcceptedAt).toBe("__delete__");
+    expect(mockNotifyAssignment).toHaveBeenCalledTimes(1);
   });
 
   it("rejects en_route dossiers", () => {

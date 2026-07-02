@@ -39,7 +39,13 @@ describe("notifyTechnicianAssignmentAdmin", () => {
       expect.objectContaining({
         uid: "tech-1",
         title: "Nouvelle intervention",
-        data: { type: "assignment", interventionId: "iv-1" },
+        audiences: ["backoffice", "technician"],
+        data: expect.objectContaining({
+          type: "assignment",
+          audience: "technician",
+          interventionId: "iv-1",
+          bmTechCase: "iv-1",
+        }),
       })
     );
   });
