@@ -1,37 +1,68 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/core/config/firebase";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
-import { fetchNativeFcmToken } from "@/core/native/nativeFcmToken";
-import { persistFcmToken } from "@/features/notifications/fcmWebPush";
+import { fetchNativeFcmToken, onNativeFcmTokenRefresh } from "@/core/native/nativeFcmToken";
+import { persistFcmTokenAudiences } from "@/features/notifications/fcmWebPush";
+import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { logger } from "@/core/logger";
 
 /**
- * APK / IPA : enregistre le jeton FCM natif (`ios` / `android`) avec audience `technician`
- * quand le technicien ouvre `/m/technician` (le bootstrap racine tague souvent `backoffice`).
+ * APK / IPA terrain : jeton FCM natif (`ios` / `android`) avec audiences staff.
+ * Complète NativePushBootstrap si le pathname initial n’est pas encore `/m/technician`.
  */
 export function useTechnicianNativePushBootstrap(enabled = true): void {
+  const registerNative = useCallback(async (uid: string): Promise<void> => {
+    const reg = await fetchNativeFcmToken();
+    if (!reg) return;
+    await persistFcmTokenAudiences(uid, reg.token, ["technician", "backoffice"], reg.platform);
+  }, []);
+
   useEffect(() => {
     if (!enabled || !isCapacitorNative() || !auth) return;
 
+    let cancelled = false;
+    let cleanupRefresh: (() => Promise<void>) | null = null;
+    let currentUid: string | null = null;
+
     const unsub = onAuthStateChanged(auth, (user) => {
-      const uid = user?.uid;
-      if (!uid) return;
+      const uid = user?.uid ?? null;
+      if (!uid || uid === currentUid) return;
+      currentUid = uid;
+
       void (async () => {
-        const reg = await fetchNativeFcmToken();
-        if (!reg) return;
         try {
-          await persistFcmToken(uid, reg.token, "technician", reg.platform);
+          await registerNative(uid);
+          if (cancelled) return;
+          cleanupRefresh = await onNativeFcmTokenRefresh(async (next) => {
+            if (!currentUid) return;
+            await persistFcmTokenAudiences(
+              currentUid,
+              next.token,
+              ["technician", "backoffice"],
+              next.platform
+            );
+          });
         } catch (err) {
-          logger.warn("[technician-native-push] persist failed", {
+          logger.warn("[technician-native-push] register failed", {
             error: err instanceof Error ? err.message : String(err),
           });
         }
       })();
     });
 
-    return () => unsub();
-  }, [enabled]);
+    return () => {
+      cancelled = true;
+      unsub();
+      void cleanupRefresh?.();
+    };
+  }, [enabled, registerNative]);
+
+  usePushTokenResyncOnResume(() => {
+    const uid = auth?.currentUser?.uid;
+    if (!uid) return;
+    void registerNative(uid).catch(() => null);
+  }, enabled && isCapacitorNative());
 }

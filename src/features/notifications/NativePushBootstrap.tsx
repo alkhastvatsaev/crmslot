@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { ensureAndroidPushChannels } from "@/core/native/ensureAndroidPushChannels";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { registerNativePushClickHandler } from "@/core/native/nativePushClickHandler";
 import { registerNativePushForegroundHandler } from "@/core/native/nativePushForeground";
 import { useStaffNativePushBootstrap } from "@/features/notifications/hooks/useStaffNativePushBootstrap";
@@ -14,6 +16,10 @@ export default function NativePushBootstrap() {
   useStaffNativePushBootstrap(audience);
 
   useEffect(() => {
+    if (isCapacitorNative()) {
+      void ensureAndroidPushChannels();
+    }
+
     let unlistenClick: (() => void) | null = null;
     let unlistenForeground: (() => void) | null = null;
     void registerNativePushClickHandler().then((fn) => {
