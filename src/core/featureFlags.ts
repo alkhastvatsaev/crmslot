@@ -45,6 +45,8 @@ export type CrmslotFeatureFlags = {
   technicianClosureBlock: boolean;
   /** Demande d'avis Google (GMB) post-intervention — cron dédié, opt-in société. */
   googleReviewRequest: boolean;
+  /** Kit mission intelligent — pièces à emporter avant dispatch. */
+  missionKit: boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
@@ -72,6 +74,7 @@ export const DEFAULT_FEATURE_FLAGS: CrmslotFeatureFlags = {
   analyticsReports: true,
   technicianClosureBlock: true,
   googleReviewRequest: false,
+  missionKit: false,
 };
 
 function readEnvBool(key: string, fallback: boolean): boolean {
@@ -157,6 +160,7 @@ export function featureFlagsFromEnv(): CrmslotFeatureFlags {
       "NEXT_PUBLIC_FF_GOOGLE_REVIEW",
       DEFAULT_FEATURE_FLAGS.googleReviewRequest
     ),
+    missionKit: readEnvBool("NEXT_PUBLIC_FF_MISSION_KIT", DEFAULT_FEATURE_FLAGS.missionKit),
   };
 }
 

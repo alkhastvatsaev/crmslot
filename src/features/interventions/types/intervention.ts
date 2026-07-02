@@ -206,4 +206,10 @@ export interface Intervention {
   clientRating?: number | null;
   clientComment?: string | null;
   clientRatedAt?: string | null;
+
+  // === Kit mission intelligent ===
+  /** Items cochés « chargés » par le technicien avant départ. */
+  missionKitCheckedItemIds?: string[] | null;
+  missionKitCheckedAt?: string | null;
+  missionKitCheckedByUid?: string | null;
 }

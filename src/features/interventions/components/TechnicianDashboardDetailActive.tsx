@@ -13,6 +13,12 @@ import { formatScheduledTimeOnly } from "@/features/interventions/technicianSche
 import { formatAddress } from "@/utils/stringUtils";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import MissionKitPanel from "@/features/missionKit/components/MissionKitPanel";
+import { useMissionKit } from "@/features/missionKit/hooks/useMissionKit";
+import { useMissionKitChecklist } from "@/features/missionKit/hooks/useMissionKitChecklist";
+import { shouldShowMissionKitMissingWarning } from "@/features/missionKit/missionKitChecklistFirestore";
+import { useMissionKitMaterialOrder } from "@/features/missionKit/hooks/useMissionKitMaterialOrder";
 
 export default function TechnicianDashboardDetailActive({
   liveIv,
@@ -54,6 +60,24 @@ export default function TechnicianDashboardDetailActive({
   onStartFinishJob: () => void;
 }) {
   const { t } = useTranslation();
+  const missionKitEnabled = useFeatureFlag("missionKit");
+  const missionKit = useMissionKit({
+    enabled: missionKitEnabled,
+    intervention: liveIv,
+    technicianUid,
+  });
+  const checklist = useMissionKitChecklist({
+    enabled: missionKitEnabled && Boolean(technicianUid),
+    interventionId: liveIv.id,
+    technicianUid,
+    initialCheckedIds: liveIv.missionKitCheckedItemIds,
+  });
+  const materialOrder = useMissionKitMaterialOrder({
+    enabled: missionKitEnabled && Boolean(technicianUid),
+    intervention: liveIv,
+    technicianUid,
+  });
+  const showKitWarning = shouldShowMissionKitMissingWarning(liveIv.status, missionKit.missingCount);
 
   return (
     <>
@@ -84,6 +108,20 @@ export default function TechnicianDashboardDetailActive({
                 ) : null
               }
             />
+
+            {missionKitEnabled ? (
+              <MissionKitPanel
+                kit={missionKit.kit}
+                loading={missionKit.loading}
+                interactive={!awaitingAssignment && liveIv.status !== "in_progress"}
+                checkedItemIds={checklist.checkedItemIds}
+                onToggleItem={checklist.toggleItem}
+                showMissingWarning={showKitWarning}
+                onOrderItem={(item) => void materialOrder.orderItem(item)}
+                orderingItemId={materialOrder.orderingItemId}
+                orderedItemIds={materialOrder.orderedItemIds}
+              />
+            ) : null}
 
             {liveIv.status === "waiting_material" ? (
               <p className="!m-0 shrink-0 border-t border-amber-200/80 pt-3 text-center text-[12px] font-semibold leading-snug text-amber-900 line-clamp-3">
