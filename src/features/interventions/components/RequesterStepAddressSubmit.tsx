@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { Loader2, MapPin, Plus, SendHorizontal } from "lucide-react";
+import { Loader2, MapPin, SendHorizontal } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import SmartFormAddressAutocomplete from "@/features/interventions/components/SmartFormAddressAutocomplete";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
@@ -20,7 +20,6 @@ type Props = {
   onAddressChange: (value: string) => void;
   onPlaceSelect: (formatted: string, loc: LatLng) => void;
   onLocate: () => void;
-  onNewRequest: () => void;
   onSubmit: () => void;
   onKeyDown?: (e: KeyboardEvent) => void;
 };
@@ -36,7 +35,6 @@ export default function RequesterStepAddressSubmit({
   onAddressChange,
   onPlaceSelect,
   onLocate,
-  onNewRequest,
   onSubmit,
   onKeyDown,
 }: Props) {
@@ -44,17 +42,8 @@ export default function RequesterStepAddressSubmit({
 
   if (showSubmitSuccess && dossierNumber) {
     return (
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-2">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-2">
         <RequesterSubmittedDossierBanner dossierNumber={dossierNumber} />
-        <button
-          type="button"
-          data-testid="requester-new-request-btn"
-          onClick={onNewRequest}
-          className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full bg-blue-500 px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 active:scale-[0.98]"
-        >
-          <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
-          {String(t("requester.ux.new_request"))}
-        </button>
       </div>
     );
   }

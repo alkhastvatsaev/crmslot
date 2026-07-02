@@ -146,7 +146,6 @@ export default function RequesterInterventionSteps({ c }: Props) {
               }))
             }
             onLocate={c.fillAddressFromGeolocation}
-            onNewRequest={c.handleNewRequest}
             onSubmit={() => void c.handleSubmit()}
             onKeyDown={c.showSubmitSuccess ? undefined : c.trySubmitOnEnter}
           />
