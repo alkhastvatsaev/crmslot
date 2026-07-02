@@ -1,6 +1,7 @@
 import type * as admin from "firebase-admin";
 import { ensureCompanyAcceptsPublicInterventionsAdmin } from "@/features/backoffice/server/ensureCompanyAcceptsPublicInterventionsAdmin";
 import { notifyStaffNewClientRequestAdmin } from "@/features/notifications/server/notifyStaffNewClientRequestAdmin";
+import { logger } from "@/core/logger";
 
 const BLOCKED_PAYLOAD_KEYS = new Set([
   "paymentStatus",
@@ -95,15 +96,23 @@ export async function createPublicRequesterInterventionAdmin(
   });
 
   if (adminAuth) {
-    void notifyStaffNewClientRequestAdmin({
-      db,
-      auth: adminAuth,
-      companyId: trimmedCompany,
-      senderUid: uid,
-      interventionId: trimmedId,
-      title: typeof payload.title === "string" ? payload.title : null,
-      address: typeof payload.address === "string" ? payload.address : null,
-    }).catch(() => null);
+    try {
+      await notifyStaffNewClientRequestAdmin({
+        db,
+        auth: adminAuth,
+        companyId: trimmedCompany,
+        senderUid: uid,
+        interventionId: trimmedId,
+        title: typeof payload.title === "string" ? payload.title : null,
+        address: typeof payload.address === "string" ? payload.address : null,
+      });
+    } catch (err) {
+      logger.warn("[createPublicRequesterInterventionAdmin] notify staff failed", {
+        interventionId: trimmedId,
+        companyId: trimmedCompany,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   return { ok: true, id: trimmedId };
