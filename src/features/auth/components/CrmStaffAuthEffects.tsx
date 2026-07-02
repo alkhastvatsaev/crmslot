@@ -18,6 +18,7 @@ import {
 } from "@/features/gmail/gmailHubOAuthReturn";
 import { readStaffJoinPayload } from "@/features/auth/staffJoinPayload";
 import { crmStaffOAuthSignInErrorFeedback } from "@/features/auth/crmStaffOAuthSignIn";
+import { markStaffPushOnboardingPending } from "@/features/notifications/staffPushOnboarding";
 
 /** Finalise OAuth redirect (Google / Apple) pour l'auth CRM staff. */
 export default function CrmStaffAuthEffects() {
@@ -46,6 +47,9 @@ export default function CrmStaffAuthEffects() {
         const mode = consumeCrmStaffOAuthMode();
         const staffJoin = readStaffJoinPayload();
         const outcome = await completeCrmStaffOAuthSession(result, mode, auth, staffJoin);
+        if (outcome === "register") {
+          markStaffPushOnboardingPending();
+        }
         const providerId = result.providerId?.includes("apple") ? "apple" : "google";
         toast.success(
           String(

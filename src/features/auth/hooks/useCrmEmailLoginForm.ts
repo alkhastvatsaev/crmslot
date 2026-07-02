@@ -22,6 +22,7 @@ import {
 } from "@/features/auth/technicianEmailSignIn";
 import type { CrmEmailAuthTab, CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
 import { useCrmStaffOAuth } from "@/features/auth/hooks/useCrmStaffOAuth";
+import { markStaffPushOnboardingPending } from "@/features/notifications/staffPushOnboarding";
 
 type Args = {
   variant: CrmEmailLoginVariant;
@@ -94,6 +95,7 @@ export function useCrmEmailLoginForm({ variant }: Args) {
     try {
       if (authTab === "register") {
         await registerCrmStaffAccount({ auth, email, password, staffJoin });
+        markStaffPushOnboardingPending();
         toast.success(String(t("auth.register_success")));
       } else {
         const cred = await signInTechnicianWithEmail({ auth, email, password });

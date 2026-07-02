@@ -46,20 +46,18 @@ function DeferredAdminBootstrapsInner() {
     parseBackofficeRequestNotificationSearchParams(searchParams).kind !== "none" ||
     parseMaterialOrderNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
-    minDelayMs: pushIntent || isMobile !== true ? 0 : 2_500,
-    idleTimeoutMs: isMobile === true ? 5_000 : 0,
+    minDelayMs: 0,
+    idleTimeoutMs: isMobile === true ? 1_000 : 0,
   });
 
-  if (!pushIntent && !idleReady) return null;
-
-  const pushBootstrapReady = isMobile === true || idleReady;
+  const deferredReady = pushIntent || idleReady;
 
   return (
     <>
-      {pushIntent || idleReady ? <BackofficeChatNotificationBootstrap /> : null}
-      {pushIntent || idleReady ? <BackofficeRequestNotificationBootstrap /> : null}
-      {pushIntent || idleReady ? <MaterialOrderNotificationBootstrap /> : null}
-      {pushBootstrapReady ? <BackofficePushBootstrap /> : null}
+      <BackofficePushBootstrap />
+      {deferredReady ? <BackofficeChatNotificationBootstrap /> : null}
+      {deferredReady ? <BackofficeRequestNotificationBootstrap /> : null}
+      {deferredReady ? <MaterialOrderNotificationBootstrap /> : null}
       {idleReady ? (
         <>
           <AndroidAppInstallPromoBootstrap surface="admin" />

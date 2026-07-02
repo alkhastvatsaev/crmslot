@@ -22,6 +22,9 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import { useHubPageActive } from "@/features/dashboard/hooks/useHubPageActive";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
+import MissionKitHubKpiStrip from "@/features/missionKit/components/MissionKitHubKpiStrip";
+import { computeMissionKitHubMetrics } from "@/features/missionKit/missionKitHubMetrics";
 
 type Props = { slotIndex?: number };
 
@@ -37,6 +40,7 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   const { t } = useTranslation();
   const workspace = useCompanyWorkspaceOptional();
   const pageActive = useHubPageActive(slotIndex);
+  const missionKitEnabled = useFeatureFlag("missionKit");
   const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
   const dataCompanyId = pageActive ? companyId || null : null;
 
@@ -73,6 +77,11 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
   const metrics = useMemo(
     () => computeCompanyStockMetrics(items, orders, supplierOrders, waitingMaterialJobs),
     [items, orders, supplierOrders, waitingMaterialJobs]
+  );
+
+  const missionKitMetrics = useMemo(
+    () => computeMissionKitHubMetrics(interventions, items),
+    [interventions, items]
   );
 
   const loading = stockLoading || ordersLoading || supplierLoading || ivLoading;
@@ -128,21 +137,27 @@ export default function FeatureHubPage({ slotIndex = FEATURE_HUB_SLOT_INDEX }: P
       }
       center={
         <section className={mainShell}>
-          {gate ??
-            (showInventory ? (
-              <CompanyStockCenterPanel
-                items={items}
-                orders={orders}
-                category="all"
-                loading={loading}
-              />
-            ) : companyId ? (
-              <CompanyStockProWorkspace
-                companyId={companyId}
-                metrics={metrics}
-                isPreviewCatalog={isPreviewCatalog}
-              />
-            ) : null)}
+          {gate ?? (
+            <>
+              {missionKitEnabled && companyId ? (
+                <MissionKitHubKpiStrip metrics={missionKitMetrics} />
+              ) : null}
+              {showInventory ? (
+                <CompanyStockCenterPanel
+                  items={items}
+                  orders={orders}
+                  category="all"
+                  loading={loading}
+                />
+              ) : companyId ? (
+                <CompanyStockProWorkspace
+                  companyId={companyId}
+                  metrics={metrics}
+                  isPreviewCatalog={isPreviewCatalog}
+                />
+              ) : null}
+            </>
+          )}
         </section>
       }
       right={

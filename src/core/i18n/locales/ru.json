@@ -951,7 +951,10 @@
       "left": "навигация и фильтры",
       "center": "основной инвентарь",
       "right": "отслеживание заказов"
-    }
+    },
+    "mission_kit_kpi_complete": "Полные комплекты (30д)",
+    "mission_kit_kpi_waiting": "Объекты без материала",
+    "mission_kit_kpi_ratio": "({{complete}}/{{total}})"
   },
   "billingHub": {
     "title": "Счета",
@@ -1864,6 +1867,24 @@
       "sparkline_title": "Последние 6 месяцев",
       "empty": "Нет доходов в этом месяце",
       "company_required": "Выберите компанию."
+    },
+    "mission_kit": {
+      "title": "Взять с собой",
+      "loading": "Подготовка комплекта…",
+      "empty": "Для этой задачи детали не предложены.",
+      "hint": "История",
+      "status_in_vehicle": "В машине",
+      "status_in_warehouse": "На складе",
+      "status_missing": "Нет в наличии",
+      "status_unknown": "Проверить",
+      "qty": "Кол-во {{count}}",
+      "checklist_label": "Загружено в машину",
+      "warning_missing": "{{count}} деталей нет — загрузите перед выездом",
+      "progress": "{{checked}}/{{total}} загружено",
+      "order": "Заказать",
+      "order_success": "Запрос отправлен",
+      "order_error": "Ошибка заказа",
+      "ordered": "Заказано"
     }
   },
   "common": {
@@ -2445,6 +2466,13 @@
       "status_en_route": "В пути",
       "status_on_site": "На месте",
       "missing_auth_uid": "Этот техник не привязан к Firebase-аккаунту (отсутствует authUid)."
+    },
+    "mission_kit": {
+      "badge_ready": "Комплект готов",
+      "badge_complete": "Комплект {{score}}%",
+      "badge_missing": "{{count}} недостающих деталей",
+      "badge_items": "{{count}} поз.",
+      "loading": "Анализ комплекта…"
     }
   },
   "invoice": {
@@ -2762,7 +2790,10 @@
   },
   "notifications": {
     "prefs_title": "Настройки уведомлений",
-    "prefs_saved": "Настройки сохранены"
+    "prefs_saved": "Настройки сохранены",
+    "staff_onboarding_ios_title": "Включить уведомления",
+    "staff_onboarding_ios_desc": "Добавьте CRMSLOT на главный экран (Поделиться → На экран «Домой») и снова откройте приложение.",
+    "staff_onboarding_enabled": "Уведомления включены — вы будете получать новые заявки и сообщения."
   },
   "integrations": {
     "webhooks_title": "Исходящие webhook'и",
