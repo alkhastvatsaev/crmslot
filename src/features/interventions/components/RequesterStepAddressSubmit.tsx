@@ -2,7 +2,6 @@
 
 import type { KeyboardEvent } from "react";
 import { Loader2, MapPin, Plus, SendHorizontal } from "lucide-react";
-import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import SmartFormAddressAutocomplete from "@/features/interventions/components/SmartFormAddressAutocomplete";
 import SmartFormAddressMiniMap from "@/features/interventions/components/SmartFormAddressMiniMap";
@@ -18,12 +17,9 @@ type Props = {
   locatingAddress: boolean;
   canSubmit: boolean;
   isSubmitting: boolean;
-  addressConfirmed: boolean;
-  hasValidAddress: boolean;
   onAddressChange: (value: string) => void;
   onPlaceSelect: (formatted: string, loc: LatLng) => void;
   onLocate: () => void;
-  onConfirmAddress: () => void;
   onNewRequest: () => void;
   onSubmit: () => void;
   onKeyDown?: (e: KeyboardEvent) => void;
@@ -37,12 +33,9 @@ export default function RequesterStepAddressSubmit({
   locatingAddress,
   canSubmit,
   isSubmitting,
-  addressConfirmed,
-  hasValidAddress,
   onAddressChange,
   onPlaceSelect,
   onLocate,
-  onConfirmAddress,
   onNewRequest,
   onSubmit,
   onKeyDown,
@@ -65,9 +58,6 @@ export default function RequesterStepAddressSubmit({
       </div>
     );
   }
-
-  const needsAddressConfirm = hasValidAddress && !addressConfirmed;
-  const submitDisabled = !canSubmit || needsAddressConfirm;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col justify-between gap-3" onKeyDown={onKeyDown}>
@@ -103,34 +93,6 @@ export default function RequesterStepAddressSubmit({
             className="h-full min-h-[140px] w-full !border-none"
           />
           <div className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]" />
-          {needsAddressConfirm ? (
-            <div
-              data-testid="requester-address-confirm"
-              className="absolute inset-x-2 bottom-2 rounded-[14px] border border-white/80 bg-white/95 p-3 shadow-lg backdrop-blur-sm"
-            >
-              <p className="text-center text-[13px] font-semibold text-slate-900">
-                {String(t("requester.ux.address_confirm_title"))}
-              </p>
-              <div className="mt-2.5 flex gap-2">
-                <button
-                  type="button"
-                  data-testid="requester-address-confirm-yes"
-                  onClick={onConfirmAddress}
-                  className="min-h-[48px] flex-1 rounded-[12px] bg-black px-3 py-3 text-[13px] font-bold text-white transition hover:bg-slate-900"
-                >
-                  {String(t("requester.ux.address_confirm_yes"))}
-                </button>
-                <button
-                  type="button"
-                  data-testid="requester-address-confirm-edit"
-                  onClick={() => onAddressChange(interventionAddress)}
-                  className="min-h-[48px] flex-1 rounded-[12px] border border-slate-200 bg-white px-3 py-3 text-[13px] font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  {String(t("requester.ux.address_confirm_edit"))}
-                </button>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -138,14 +100,8 @@ export default function RequesterStepAddressSubmit({
         <button
           type="button"
           data-testid="intervention-submit-btn"
-          disabled={submitDisabled}
-          onClick={() => {
-            if (needsAddressConfirm) {
-              toast.message(String(t("requester.ux.address_confirm_required")));
-              return;
-            }
-            onSubmit();
-          }}
+          disabled={!canSubmit}
+          onClick={onSubmit}
           className="mx-auto flex w-full max-w-none min-h-[52px] items-center justify-center gap-2 rounded-[16px] bg-black px-8 py-5 text-lg font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
           {isSubmitting ? (

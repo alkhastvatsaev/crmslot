@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
-import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
 import {
   REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT,
   SMART_FORM_TEMPLATES,
@@ -51,17 +50,6 @@ export function useRequesterInterventionPanelController() {
     urgency: requestDataUrgency,
   } = requestData;
 
-  const [addressConfirmed, setAddressConfirmed] = useState(false);
-  const addressSnapshotRef = useRef("");
-
-  useEffect(() => {
-    const snapshot = `${interventionAddress}|${interventionLatLng?.lat ?? ""}|${interventionLatLng?.lng ?? ""}`;
-    if (snapshot !== addressSnapshotRef.current) {
-      addressSnapshotRef.current = snapshot;
-      setAddressConfirmed(false);
-    }
-  }, [interventionAddress, interventionLatLng?.lat, interventionLatLng?.lng]);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -107,11 +95,7 @@ export function useRequesterInterventionPanelController() {
     interimTranscript,
   } = useBrowserSpeechDictation(appendDescriptionFromVoice, handleAudioRecorded);
 
-  const hasValidAddress =
-    interventionAddress.trim().length > 0 &&
-    interventionAddress !== REQUESTER_GEOLOC_ADDRESS_PENDING;
-
-  const canSubmitStep4 = Boolean(canSubmit && (!hasValidAddress || addressConfirmed));
+  const canSubmitStep4 = Boolean(canSubmit);
 
   const trySubmitOnEnter = useCallback(
     (e: KeyboardEvent) => {
@@ -174,9 +158,6 @@ export function useRequesterInterventionPanelController() {
     tenantCompanyId,
     locatingAddress,
     canSubmit: canSubmitStep4,
-    addressConfirmed,
-    setAddressConfirmed,
-    hasValidAddress,
     handleSubmit,
     fillAddressFromGeolocation,
     ingestFiles,
