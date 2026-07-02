@@ -52,7 +52,7 @@ describe("createPublicRequesterInterventionAdmin", () => {
         address: "Rue Test 1",
       },
     });
-    expect(result).toEqual({ ok: true, id: "iv-1" });
+    expect(result).toEqual({ ok: true, id: "iv-1", notified: 0 });
     expect((db as { _set: jest.Mock })._set).toHaveBeenCalled();
   });
 });

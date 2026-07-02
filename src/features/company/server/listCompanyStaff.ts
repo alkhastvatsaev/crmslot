@@ -45,7 +45,13 @@ function buildStaffMember(
     email ||
     uid.slice(0, 8);
 
-  const active = hasTechnicianProfile ? tech?.active !== false : membershipActive;
+  // Admin backoffice : l'activité terrain (technicien) ne doit pas couper les notifs staff.
+  const active =
+    role === "admin"
+      ? membershipActive
+      : hasTechnicianProfile
+        ? tech?.active !== false
+        : membershipActive;
 
   return {
     uid,
@@ -173,7 +179,10 @@ export async function listCompanyStaff(
 
   const members: CompanyStaffMember[] = [];
   for (const uid of uids) {
-    const membershipData = membershipByUid.get(uid);
+    let membershipData = membershipByUid.get(uid);
+    if (!membershipData && uid === createdByUid) {
+      membershipData = { role: "admin", active: true };
+    }
     if (!membershipData) continue;
     members.push(
       buildStaffMember(companyId, uid, membershipData, techByUid.get(uid), authUsers.get(uid))

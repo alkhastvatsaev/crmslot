@@ -191,15 +191,13 @@ export async function submitRequesterIntervention(
       docPayload,
     });
 
-    if (profile.type !== "particulier") {
-      notifyStaffNewClientRequestClient({
-        companyId,
-        interventionId: newDocRef.id,
-        title,
-        address: requestData.interventionAddress.trim(),
-        user,
-      });
-    }
+    void notifyStaffNewClientRequestClient({
+      companyId,
+      interventionId: newDocRef.id,
+      title,
+      address: requestData.interventionAddress.trim(),
+      user,
+    });
 
     const { clientFirstRaw, clientLastRaw, clientEmailRaw } = clientFields;
 

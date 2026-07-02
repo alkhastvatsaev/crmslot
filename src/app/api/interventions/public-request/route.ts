@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
     }
 
-    return NextResponse.json({ ok: true, id: result.id });
+    return NextResponse.json({ ok: true, id: result.id, notified: result.notified });
   } catch (error) {
     logger.error("[interventions/public-request]", {
       uid: auth.uid,
