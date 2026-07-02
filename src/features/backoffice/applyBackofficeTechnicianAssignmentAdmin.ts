@@ -7,8 +7,10 @@ import {
 } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
 import type { Intervention } from "@/features/interventions";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
+import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/server/notifyTechnicianAssignmentAdmin";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
+import { logger } from "@/core/logger";
 
 function clearTechnicianResponseFields(): Record<string, unknown> {
   return {
@@ -67,21 +69,41 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
       extraPatch: basePatch,
       writeInboxAlerts: false,
     });
-    return {
-      scheduledDate: resolved.scheduledDate,
-      scheduledTime: resolved.scheduledTime,
-      rescheduled: resolved.rescheduled,
-    };
+  } else {
+    await db
+      .collection("interventions")
+      .doc(interventionId)
+      .update({
+        ...basePatch,
+        ...clearTechnicianResponseFields(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
   }
 
-  await db
-    .collection("interventions")
-    .doc(interventionId)
-    .update({
-      ...basePatch,
-      ...clearTechnicianResponseFields(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+  const previousUid = (iv.assignedTechnicianUid ?? "").trim();
+  const nextUid = technicianUid.trim();
+  if (nextUid && previousUid !== nextUid) {
+    try {
+      const push = await notifyTechnicianAssignmentAdmin({
+        db,
+        technicianUid: nextUid,
+        interventionId,
+        iv,
+      });
+      if (push.sent === 0) {
+        logger.warn("[applyBackofficeTechnicianAssignmentAdmin] 0 push technicien", {
+          interventionId,
+          technicianUid: nextUid,
+        });
+      }
+    } catch (err) {
+      logger.warn("[applyBackofficeTechnicianAssignmentAdmin] push notify failed", {
+        interventionId,
+        technicianUid: nextUid,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
 
   return {
     scheduledDate: resolved.scheduledDate,

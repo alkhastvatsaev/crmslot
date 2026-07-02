@@ -4,6 +4,7 @@ import {
   channelAllowed,
   normalizeNotificationPreferences,
 } from "@/features/notifications/notificationPreferences";
+import { BM_TECH_CASE_PARAM } from "@/features/notifications/notificationConstants";
 import { interventionAssignmentPreview } from "@/features/interventions/technicianNewAssignmentAlerts";
 import type { Intervention } from "@/features/interventions/types";
 import { logger } from "@/core/logger";
@@ -34,12 +35,21 @@ export async function notifyTechnicianAssignmentAdmin(params: {
       uid,
       title: "Nouvelle intervention",
       body,
-      audiences: ["technician"],
+      audiences: ["backoffice", "technician"],
       data: {
         type: "assignment",
+        audience: "technician",
         interventionId,
+        [BM_TECH_CASE_PARAM]: interventionId,
       },
     });
+    if (report.sent === 0) {
+      logger.warn("[notifyTechnicianAssignmentAdmin] 0 jeton FCM actif", {
+        uid,
+        interventionId,
+        tokenCount: report.failed + report.removedStale,
+      });
+    }
     return { sent: report.sent };
   } catch (err) {
     logger.warn("[notifyTechnicianAssignmentAdmin] push failed", {

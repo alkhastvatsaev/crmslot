@@ -5,7 +5,6 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import { assertCanAssignInterventionServer } from "@/features/backoffice";
 import type { Intervention } from "@/features/interventions";
 import { applyBackofficeTechnicianAssignmentAdmin } from "@/features/backoffice/index.server";
-import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/index.server";
 import { logger } from "@/core/logger";
 
 export const runtime = "nodejs";
@@ -74,17 +73,6 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       technicianUid,
       actorUid: auth.uid,
       schedule,
-    });
-
-    void notifyTechnicianAssignmentAdmin({
-      db,
-      technicianUid,
-      interventionId,
-      iv,
-    }).catch((err) => {
-      logger.warn("[interventions/assign] push notify", {
-        error: err instanceof Error ? err.message : String(err),
-      });
     });
 
     return NextResponse.json({
