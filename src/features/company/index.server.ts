@@ -2,6 +2,10 @@
  * API serveur company — staff Firestore Admin (routes API uniquement).
  */
 export { listCompanyStaff } from "@/features/company/server/listCompanyStaff";
+export {
+  ensureAssignableTechnicianProfiles,
+  listAssignableTechnicians,
+} from "@/features/company/server/listAssignableTechnicians";
 export { assertCompanyStaffAccess } from "@/features/company/server/assertCompanyStaffAccess";
 export { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 export type { JoinDefaultCompanyOptions } from "@/features/company/server/joinDefaultCompanyMembership";

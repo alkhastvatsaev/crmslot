@@ -136,6 +136,10 @@
   },
   {
     "method": "GET",
+    "path": "/api/company/assignable-technicians"
+  },
+  {
+    "method": "GET",
     "path": "/api/company/staff"
   },
   {

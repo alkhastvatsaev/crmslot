@@ -79,9 +79,17 @@ export async function joinDefaultCompanyMembership(
 
   await upsertCompanyStaffDirectoryEntry(db, companyId, uid, membershipRole);
 
-  if (staffKind === "technician") {
-    const profile = await resolveTechnicianProfile(auth, uid, options?.technicianProfile);
-    await provisionTechnicianStaffRecord(db, { uid, companyId, profile }, { auth });
+  const profile = await resolveTechnicianProfile(auth, uid, options?.technicianProfile);
+  await provisionTechnicianStaffRecord(db, { uid, companyId, profile }, { auth });
+  if (staffKind === "admin") {
+    await db.collection("technicians").doc(uid).set(
+      {
+        active: true,
+        companyId,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
   }
 
   await syncTenantClaims(auth, db, uid, companyId);

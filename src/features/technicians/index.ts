@@ -3,6 +3,7 @@
  */
 export type { Technician } from "@/features/technicians/types";
 export { useTechnicians } from "@/features/technicians/hooks";
+export { useAssignableTechnicians } from "@/features/technicians/hooks/useAssignableTechnicians";
 export { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
 export {
   buildTechnicianAssignUidToCanonicalMap,

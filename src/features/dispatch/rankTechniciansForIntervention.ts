@@ -26,16 +26,13 @@ export type RankedTechnician = {
   rank: number;
 };
 
-/** Classe les techniciens par proximité (Haversine). Priorise ceux « available ». */
+/** Classe les techniciens par proximité (Haversine). Les « available » passent devant. */
 export function rankTechniciansForIntervention(
   technicians: Technician[],
   interventionLat: number,
   interventionLng: number
 ): RankedTechnician[] {
-  const available = technicians.filter((t) => t.status === "available");
-  const pool = available.length > 0 ? available : [...technicians];
-
-  return pool
+  return [...technicians]
     .map((technician) => {
       const tLat = technician.location?.lat;
       const tLng = technician.location?.lng;
@@ -59,7 +56,13 @@ export function rankTechniciansForIntervention(
         distanceKm: Number.isNaN(distanceKm) ? Number.MAX_VALUE : distanceKm,
       };
     })
-    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .sort((a, b) => {
+      const availableScore = (status: Technician["status"]) => (status === "available" ? 0 : 1);
+      const availabilityDelta =
+        availableScore(a.technician.status) - availableScore(b.technician.status);
+      if (availabilityDelta !== 0) return availabilityDelta;
+      return a.distanceKm - b.distanceKm;
+    })
     .map((row, index) => ({ ...row, rank: index + 1 }));
 }
 
