@@ -1,11 +1,11 @@
-import { getCapacitorPlatform, isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { isPwaStandalone } from "@/core/pwa/isPwaStandalone";
 import { isPushServiceWorkerEnabled } from "@/features/notifications/fcmWebPush";
 
 /**
  * Web Push FCM utilisable sur ce device ?
  * - PWA écran d’accueil (iOS obligatoire, Android recommandé)
- * - Capacitor Android : secours si FCM natif indisponible (WebView Chrome)
+ * - Capacitor : jetons natifs uniquement (iOS + Android) — pas de secours WebView
  */
 export function isWebPushRegistrationAllowed(): boolean {
   if (typeof window === "undefined") return false;
@@ -13,7 +13,7 @@ export function isWebPushRegistrationAllowed(): boolean {
   if (typeof Notification === "undefined") return false;
 
   if (isCapacitorNative()) {
-    return getCapacitorPlatform() === "android";
+    return false;
   }
 
   const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);

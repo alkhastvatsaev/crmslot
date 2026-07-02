@@ -49,18 +49,30 @@ export async function sendNativePushToUser(
     ? new Set<FcmTokenAudience>(params.audiences)
     : null;
 
-  for (const docSnap of tokensSnap.docs) {
+  const eligibleDocs = tokensSnap.docs.filter((docSnap) => {
+    const data = docSnap.data();
+    const token = String(data?.token ?? "");
+    if (!token) return false;
+    if (!allowedAudiences) return true;
+    const rawAudience = typeof data?.audience === "string" ? data.audience.trim() : "";
+    if (rawAudience && !allowedAudiences.has(rawAudience as FcmTokenAudience)) return false;
+    return true;
+  });
+
+  const hasNativeToken = eligibleDocs.some((docSnap) => {
+    const platform = normalizeFcmTokenPlatform(docSnap.data()?.platform);
+    return platform === "ios" || platform === "android";
+  });
+
+  for (const docSnap of eligibleDocs) {
     const data = docSnap.data();
     const token = String(data?.token ?? "");
     if (!token) continue;
 
-    if (allowedAudiences) {
-      const rawAudience = typeof data?.audience === "string" ? data.audience.trim() : "";
-      if (rawAudience && !allowedAudiences.has(rawAudience as FcmTokenAudience)) continue;
-    }
+    const platform = normalizeFcmTokenPlatform(data?.platform);
+    if (hasNativeToken && platform === "web") continue;
 
     try {
-      const platform = normalizeFcmTokenPlatform(data?.platform);
       const payload = buildFcmPayloadForPlatform(platform, {
         title: params.title,
         body: params.body,

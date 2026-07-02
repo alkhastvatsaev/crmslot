@@ -1,18 +1,42 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, clientPortalAuth } from "@/core/config/firebase";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { fetchNativeFcmToken, onNativeFcmTokenRefresh } from "@/core/native/nativeFcmToken";
 import { persistFcmToken, persistFcmTokenAudiences } from "@/features/notifications/fcmWebPush";
 import type { FcmAudience } from "@/features/notifications/fcmWebPush";
+import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { logger } from "@/core/logger";
 
 type StaffNativeAudience = "backoffice" | "technician";
 
 /** Capacitor : enregistre le jeton natif avec la bonne audience (et staff = admin + terrain). */
 export function useStaffNativePushBootstrap(audience: FcmAudience, enabled = true): void {
+  const currentUidRef = useRef<string | null>(null);
+
+  const registerNative = useCallback(
+    async (uid: string): Promise<void> => {
+      const reg = await fetchNativeFcmToken();
+      if (!reg) return;
+      if (audience === "client") {
+        await persistFcmToken(uid, reg.token, "client", reg.platform);
+        return;
+      }
+      const staffAudiences: StaffNativeAudience[] =
+        audience === "technician" ? ["technician", "backoffice"] : ["backoffice", "technician"];
+      await persistFcmTokenAudiences(uid, reg.token, staffAudiences, reg.platform);
+    },
+    [audience]
+  );
+
+  usePushTokenResyncOnResume(() => {
+    const uid = currentUidRef.current;
+    if (!uid) return;
+    void registerNative(uid).catch(() => null);
+  }, enabled && isCapacitorNative());
+
   useEffect(() => {
     if (!enabled || !isCapacitorNative()) return;
 
@@ -22,53 +46,43 @@ export function useStaffNativePushBootstrap(audience: FcmAudience, enabled = tru
 
     let cancelled = false;
     let cleanupRefresh: (() => Promise<void>) | null = null;
-    let currentUid: string | null = null;
-
-    const persist = async (uid: string, token: string, platform: "ios" | "android") => {
-      if (audience === "client") {
-        await persistFcmToken(uid, token, "client", platform);
-        return;
-      }
-      const staffAudiences: StaffNativeAudience[] =
-        audience === "technician" ? ["technician", "backoffice"] : ["backoffice", "technician"];
-      await persistFcmTokenAudiences(uid, token, staffAudiences, platform);
-    };
-
-    const register = async (uid: string) => {
-      const reg = await fetchNativeFcmToken();
-      if (!reg || cancelled) return;
-      try {
-        await persist(uid, reg.token, reg.platform);
-      } catch (err) {
-        logger.warn("[staff-native-push] persist failed", {
-          audience,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    };
 
     const unsub = onAuthStateChanged(authBinding, (user) => {
       const uid = user?.uid ?? null;
-      if (!uid || uid === currentUid) return;
-      currentUid = uid;
+      if (!uid || uid === currentUidRef.current) return;
+      currentUidRef.current = uid;
 
       void (async () => {
-        await register(uid);
-        cleanupRefresh = await onNativeFcmTokenRefresh(async (next) => {
-          if (currentUid) await persist(currentUid, next.token, next.platform);
-        });
-      })().catch((err) => {
-        logger.warn("[staff-native-push] register failed", {
-          audience,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      });
+        try {
+          await registerNative(uid);
+          if (cancelled) return;
+          cleanupRefresh = await onNativeFcmTokenRefresh(async (next) => {
+            const activeUid = currentUidRef.current;
+            if (!activeUid) return;
+            if (audience === "client") {
+              await persistFcmToken(activeUid, next.token, "client", next.platform);
+              return;
+            }
+            const staffAudiences: StaffNativeAudience[] =
+              audience === "technician"
+                ? ["technician", "backoffice"]
+                : ["backoffice", "technician"];
+            await persistFcmTokenAudiences(activeUid, next.token, staffAudiences, next.platform);
+          });
+        } catch (err) {
+          logger.warn("[staff-native-push] register failed", {
+            audience,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      })();
     });
 
     return () => {
       cancelled = true;
+      currentUidRef.current = null;
       unsub();
       void cleanupRefresh?.();
     };
-  }, [audience, enabled]);
+  }, [audience, enabled, registerNative]);
 }
