@@ -29,12 +29,13 @@ export async function notifyStaffNewClientRequestAdmin(params: {
   clientLabel?: string | null;
 }): Promise<{ notified: number }> {
   const companyId = params.companyId.trim();
-  const senderUid = params.senderUid.trim();
   const interventionId = params.interventionId.trim();
   if (!companyId || !interventionId) return { notified: 0 };
 
   const staff = await listCompanyStaff(params.db, params.auth, companyId);
-  const recipients = staff.filter((m) => m.active && m.uid.trim() !== senderUid);
+  // Toujours notifier tout le staff actif : le demandeur (souvent anonyme) n'est pas dans la liste ;
+  // si un admin teste depuis /m/demande avec sa session CRM, il doit quand même recevoir la push.
+  const recipients = staff.filter((m) => m.active);
 
   if (recipients.length === 0) {
     logger.warn("[notifyStaffNewClientRequestAdmin] aucun destinataire staff actif", {
