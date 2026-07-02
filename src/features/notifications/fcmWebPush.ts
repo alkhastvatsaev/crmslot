@@ -1,5 +1,5 @@
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { firestore } from "@/core/config/firebase";
+import { doc, serverTimestamp, setDoc, type Firestore } from "firebase/firestore";
+import { clientPortalFirestore, firestore } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 
 export type FcmUiStatus =
@@ -97,6 +97,7 @@ export async function resolvePushServiceWorkerRegistration(): Promise<ServiceWor
 }
 
 export type FcmPlatform = "web" | "ios" | "android";
+export type FcmAudience = "technician" | "client" | "backoffice";
 
 const PLATFORM_PREFIX: Record<FcmPlatform, string> = {
   web: "w",
@@ -104,15 +105,33 @@ const PLATFORM_PREFIX: Record<FcmPlatform, string> = {
   android: "a",
 };
 
-export function tokenDocId(token: string, platform: FcmPlatform = "web"): string {
+const AUDIENCE_PREFIX: Record<FcmAudience, string> = {
+  backoffice: "b",
+  technician: "t",
+  client: "c",
+};
+
+export function tokenDocId(
+  token: string,
+  platform: FcmPlatform = "web",
+  audience?: FcmAudience
+): string {
   let h = 0;
   for (let i = 0; i < token.length; i++) {
     h = (Math.imul(31, h) + token.charCodeAt(i)) | 0;
   }
-  return `${PLATFORM_PREFIX[platform]}_${Math.abs(h).toString(36)}`;
+  const audienceKey = audience ? AUDIENCE_PREFIX[audience] : "x";
+  return `${PLATFORM_PREFIX[platform]}${audienceKey}_${Math.abs(h).toString(36)}`;
 }
 
-export type FcmAudience = "technician" | "client" | "backoffice";
+export function resolveFirestoreForFcmAudience(audience: FcmAudience): Firestore {
+  if (audience === "client") {
+    if (!clientPortalFirestore) throw new Error("Firestore portail client indisponible");
+    return clientPortalFirestore;
+  }
+  if (!firestore) throw new Error("Firestore indisponible");
+  return firestore;
+}
 
 export async function persistFcmToken(
   uid: string,
@@ -120,11 +139,23 @@ export async function persistFcmToken(
   audience: FcmAudience,
   platform: FcmPlatform = "web"
 ): Promise<void> {
-  if (!firestore) throw new Error("Firestore indisponible");
-  await setDoc(doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token, platform)), {
+  const db = resolveFirestoreForFcmAudience(audience);
+  await setDoc(doc(db, "users", uid, "fcm_tokens", tokenDocId(token, platform, audience)), {
     token,
     platform,
     audience,
     updatedAt: serverTimestamp(),
   });
+}
+
+/** Un même jeton natif peut servir admin + terrain — une entrée Firestore par audience. */
+export async function persistFcmTokenAudiences(
+  uid: string,
+  token: string,
+  audiences: readonly FcmAudience[],
+  platform: FcmPlatform = "web"
+): Promise<void> {
+  for (const audience of audiences) {
+    await persistFcmToken(uid, token, audience, platform);
+  }
 }

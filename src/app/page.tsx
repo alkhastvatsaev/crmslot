@@ -22,7 +22,6 @@ import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub";
 import { DashboardGalaxyLayer } from "@/features/map";
 import { DASHBOARD_DESKTOP_COL_CLASS } from "@/core/ui/dashboardDesktopLayout";
 import { ErrorBoundary } from "@/core/ui/ErrorBoundary";
-import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { LayoutShellProvider } from "@/context/LayoutShellContext";
 import { useAccountRole } from "@/features/auth";
 import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company";
@@ -91,10 +90,7 @@ export default function Dashboard() {
   } = useAccountRole();
 
   const satelliteAppRedirectPending =
-    !isAccountRoleLoading &&
-    isMobile === true &&
-    !isCapacitorNative() &&
-    (isTechnicianAccount || isClientPortalAccount);
+    !isAccountRoleLoading && isMobile === true && (isTechnicianAccount || isClientPortalAccount);
 
   useEffect(() => {
     if (!satelliteAppRedirectPending) return;

@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 import { toast } from "sonner";
-import { auth, app, firestore, isConfigured } from "@/core/config/firebase";
+import { app, clientPortalAuth, clientPortalFirestore, isConfigured } from "@/core/config/firebase";
 import { CLIENT_PORTAL_PROFILE_COLLECTION } from "@/features/auth";
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useRequesterHub } from "@/context/RequesterHubContext";
@@ -90,7 +90,7 @@ export function useClientPortalPushMessaging(
 
   const syncTokenForUser = useCallback(
     async (uid: string): Promise<void> => {
-      if (!app || !firestore || !vapidKey?.trim()) return;
+      if (!app || !clientPortalFirestore || !vapidKey?.trim()) return;
       const registration = await resolvePushServiceWorkerRegistration();
       const messaging = getMessaging(app);
       const token = await getToken(messaging, {
@@ -110,17 +110,10 @@ export function useClientPortalPushMessaging(
     unsubForegroundRef.current?.();
     unsubForegroundRef.current = undefined;
 
-    const db = firestore;
-    const firebaseAuth = auth;
+    const db = clientPortalFirestore;
+    const portalAuth = clientPortalAuth;
 
-    if (
-      !enabled ||
-      !isConfigured ||
-      !app ||
-      !db ||
-      !firebaseAuth ||
-      !isFirebasePublicConfigured()
-    ) {
+    if (!enabled || !isConfigured || !app || !db || !portalAuth || !isFirebasePublicConfigured()) {
       scheduleEffectUpdate(() => setStatus("unsupported"));
       return () => {};
     }
@@ -138,7 +131,7 @@ export function useClientPortalPushMessaging(
         return;
       }
 
-      unsubAuth = onAuthStateChanged(auth!, (user) => {
+      unsubAuth = onAuthStateChanged(portalAuth, (user) => {
         void (async () => {
           setLastError(null);
           if (!user) {
@@ -147,7 +140,7 @@ export function useClientPortalPushMessaging(
           }
 
           const profileSnap = await getDoc(
-            doc(firestore!, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid)
+            doc(db, CLIENT_PORTAL_PROFILE_COLLECTION, user.uid)
           ).catch(() => null);
           if (!profileSnap?.exists()) {
             setStatus("not_client");
@@ -194,7 +187,7 @@ export function useClientPortalPushMessaging(
   }, [enabled, vapidKey, syncTokenForUser]);
 
   usePushTokenResyncOnResume(() => {
-    const uid = auth?.currentUser?.uid;
+    const uid = clientPortalAuth?.currentUser?.uid;
     if (!uid || typeof Notification === "undefined" || Notification.permission !== "granted")
       return;
     if (!isWebPushRegistrationAllowed()) return;
@@ -202,16 +195,16 @@ export function useClientPortalPushMessaging(
   }, enabled);
 
   const registerPush = useCallback(async () => {
-    const uid = auth?.currentUser?.uid;
+    const uid = clientPortalAuth?.currentUser?.uid;
     if (!uid) {
       setStatus("needs_sign_in");
       return;
     }
-    if (!app || !firestore || !vapidKey?.trim()) return;
+    if (!app || !clientPortalFirestore || !vapidKey?.trim()) return;
 
-    const profileSnap = await getDoc(doc(firestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid)).catch(
-      () => null
-    );
+    const profileSnap = await getDoc(
+      doc(clientPortalFirestore, CLIENT_PORTAL_PROFILE_COLLECTION, uid)
+    ).catch(() => null);
     if (!profileSnap?.exists()) {
       setStatus("not_client");
       return;
