@@ -239,16 +239,14 @@ export default function RequesterProfilePanel() {
                 data-testid="requester-profile-submit-btn"
                 disabled={profileSubmitDisabled}
                 onClick={() => void handleSubmit()}
-                className="mx-auto flex w-full max-w-none min-h-[52px] items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-5 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                className="mx-auto flex w-full max-w-none min-h-[52px] items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-5 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:bg-slate-300 disabled:text-slate-500 disabled:opacity-100 disabled:hover:bg-slate-300 disabled:active:scale-100"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
                     <SendHorizontal className="h-5 w-5" />
-                    {profileSubmitBlocked && readiness.profileSubmitHintKey
-                      ? String(t(readiness.profileSubmitHintKey))
-                      : String(t("requester.intervention.submit_request"))}
+                    {String(t("requester.intervention.submit_request"))}
                   </>
                 )}
               </button>
