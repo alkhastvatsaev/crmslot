@@ -1566,7 +1566,8 @@
       "profile_submit_need_address": "Complete the address in Request",
       "dossier_copy": "Copy",
       "dossier_copied": "Number copied",
-      "tracking_push_prompt": "Get notified when a technician picks up your case. Typical response within 1 business day."
+      "tracking_push_prompt": "Get notified when a technician picks up your case. Typical response within 1 business day.",
+      "new_request": "New request"
     }
   },
   "company_hub": {

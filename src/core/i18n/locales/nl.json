@@ -1566,7 +1566,8 @@
       "profile_submit_need_address": "Vul het adres in bij Aanvraag",
       "dossier_copy": "Kopiëren",
       "dossier_copied": "Nummer gekopieerd",
-      "tracking_push_prompt": "Ontvang een melding zodra een technieker uw dossier oppakt. Meestal antwoord binnen 1 werkdag."
+      "tracking_push_prompt": "Ontvang een melding zodra een technieker uw dossier oppakt. Meestal antwoord binnen 1 werkdag.",
+      "new_request": "Nieuwe aanvraag"
     }
   },
   "company_hub": {

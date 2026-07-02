@@ -1566,7 +1566,8 @@
       "profile_submit_need_address": "Complétez l'adresse dans Demande",
       "dossier_copy": "Copier",
       "dossier_copied": "Numéro copié",
-      "tracking_push_prompt": "Soyez prévenu quand un technicien prend en charge votre dossier. Réponse habituelle sous 24 h ouvrées."
+      "tracking_push_prompt": "Soyez prévenu quand un technicien prend en charge votre dossier. Réponse habituelle sous 24 h ouvrées.",
+      "new_request": "Nouvelle demande"
     }
   },
   "company_hub": {

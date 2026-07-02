@@ -68,11 +68,6 @@ export default function RequesterSubmittedDossierBanner({
         )}
         {String(t("requester.ux.dossier_copy"))}
       </button>
-      {!compact ? (
-        <p className="mt-3 text-[13px] leading-relaxed text-emerald-900/70">
-          {t("requester.intervention.submitted_dossier_hint")}
-        </p>
-      ) : null}
     </div>
   );
 }
