@@ -951,7 +951,10 @@
       "left": "navigation et filtres",
       "center": "inventaire principal",
       "right": "suivi des commandes"
-    }
+    },
+    "mission_kit_kpi_complete": "Kits complets (30j)",
+    "mission_kit_kpi_waiting": "Chantiers sans matériel",
+    "mission_kit_kpi_ratio": "({{complete}}/{{total}})"
   },
   "billingHub": {
     "title": "Facturation",
@@ -1864,6 +1867,24 @@
       "sparkline_title": "6 derniers mois",
       "empty": "Aucun gain ce mois",
       "company_required": "Sélectionnez une société."
+    },
+    "mission_kit": {
+      "title": "À emporter",
+      "loading": "Préparation du kit…",
+      "empty": "Aucune pièce suggérée pour cette mission.",
+      "hint": "Historique",
+      "status_in_vehicle": "Dans le véhicule",
+      "status_in_warehouse": "En entrepôt",
+      "status_missing": "Manquant",
+      "status_unknown": "À vérifier",
+      "qty": "Qté {{count}}",
+      "checklist_label": "Chargé dans le véhicule",
+      "warning_missing": "{{count}} pièce(s) manquante(s) — chargez-les avant le départ",
+      "progress": "{{checked}}/{{total}} chargé(s)",
+      "order": "Commander",
+      "order_success": "Demande matériel envoyée",
+      "order_error": "Échec de la commande",
+      "ordered": "Commandé"
     }
   },
   "common": {
@@ -2445,6 +2466,13 @@
       "status_en_route": "En route",
       "status_on_site": "Sur place",
       "missing_auth_uid": "Ce technicien n’est pas lié à un compte Firebase (authUid manquant)."
+    },
+    "mission_kit": {
+      "badge_ready": "Kit prêt",
+      "badge_complete": "Kit {{score}}%",
+      "badge_missing": "{{count}} pièce(s) manquante(s)",
+      "badge_items": "{{count}} élément(s)",
+      "loading": "Analyse du kit…"
     }
   },
   "invoice": {
@@ -2762,7 +2790,10 @@
   },
   "notifications": {
     "prefs_title": "Préférences de notifications",
-    "prefs_saved": "Préférences enregistrées"
+    "prefs_saved": "Préférences enregistrées",
+    "staff_onboarding_ios_title": "Activer les notifications",
+    "staff_onboarding_ios_desc": "Ajoutez CRMSLOT à l'écran d'accueil (Partager → Sur l'écran d'accueil), puis rouvrez l'app pour recevoir les alertes.",
+    "staff_onboarding_enabled": "Notifications activées — vous recevrez les nouvelles demandes et messages."
   },
   "integrations": {
     "webhooks_title": "Webhooks sortants",

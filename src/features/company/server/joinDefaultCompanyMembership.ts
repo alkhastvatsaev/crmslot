@@ -7,6 +7,7 @@ import {
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
 import { readDefaultStaffCompanyIdFromEnv } from "@/features/company/server/readDefaultStaffCompanyId";
+import { DEFAULT_NOTIFICATION_PREFERENCES } from "@/features/notifications/notificationPreferences";
 
 export type JoinDefaultCompanyOptions = {
   staffKind?: "admin" | "technician";
@@ -68,6 +69,10 @@ export async function joinDefaultCompanyMembership(
       joinedAt: FieldValue.serverTimestamp(),
       companyName,
     });
+    await db
+      .collection("users")
+      .doc(uid)
+      .set({ notificationPreferences: DEFAULT_NOTIFICATION_PREFERENCES }, { merge: true });
   } else if (staffKind === "admin" && (existing.data()?.role as string) !== "admin") {
     await membershipRef.update({ role: "admin" });
   }

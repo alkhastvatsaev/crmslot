@@ -951,7 +951,10 @@
       "left": "navigatie en filters",
       "center": "hoofdinventaris",
       "right": "orderopvolging"
-    }
+    },
+    "mission_kit_kpi_complete": "Volledige kits (30d)",
+    "mission_kit_kpi_waiting": "Jobs zonder materiaal",
+    "mission_kit_kpi_ratio": "({{complete}}/{{total}})"
   },
   "billingHub": {
     "title": "Facturatie",
@@ -1864,6 +1867,24 @@
       "sparkline_title": "Laatste 6 maanden",
       "empty": "Geen verdiensten deze maand",
       "company_required": "Selecteer een bedrijf."
+    },
+    "mission_kit": {
+      "title": "Mee te nemen",
+      "loading": "Kit voorbereiden…",
+      "empty": "Geen onderdelen voorgesteld voor deze opdracht.",
+      "hint": "Historiek",
+      "status_in_vehicle": "In voertuig",
+      "status_in_warehouse": "In magazijn",
+      "status_missing": "Ontbreekt",
+      "status_unknown": "Te controleren",
+      "qty": "Aantal {{count}}",
+      "checklist_label": "In voertuig geladen",
+      "warning_missing": "{{count}} ontbrekend(e) onderdeel(en) — laad ze voor vertrek",
+      "progress": "{{checked}}/{{total}} geladen",
+      "order": "Bestellen",
+      "order_success": "Materiaalaanvraag verstuurd",
+      "order_error": "Bestelling mislukt",
+      "ordered": "Besteld"
     }
   },
   "common": {
@@ -2422,6 +2443,13 @@
       "status_en_route": "Onderweg",
       "status_on_site": "Ter plaatse",
       "missing_auth_uid": "Deze technicus heeft geen gekoppeld Firebase-account (authUid ontbreekt)."
+    },
+    "mission_kit": {
+      "badge_ready": "Kit klaar",
+      "badge_complete": "Kit {{score}}%",
+      "badge_missing": "{{count}} ontbrekend(e) onderdeel(en)",
+      "badge_items": "{{count}} item(s)",
+      "loading": "Kit analyseren…"
     }
   },
   "billing": {
@@ -2762,7 +2790,10 @@
   },
   "notifications": {
     "prefs_title": "Meldingsvoorkeuren",
-    "prefs_saved": "Voorkeuren opgeslagen"
+    "prefs_saved": "Voorkeuren opgeslagen",
+    "staff_onboarding_ios_title": "Meldingen inschakelen",
+    "staff_onboarding_ios_desc": "Voeg CRMSLOT toe aan je startscherm (Delen → Zet op beginscherm) en open de app opnieuw voor meldingen.",
+    "staff_onboarding_enabled": "Meldingen ingeschakeld — u ontvangt nieuwe aanvragen en berichten."
   },
   "integrations": {
     "webhooks_title": "Uitgaande webhooks",

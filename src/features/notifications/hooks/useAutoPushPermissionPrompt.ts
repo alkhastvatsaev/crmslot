@@ -2,9 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import type { FcmUiStatus } from "@/features/notifications/fcmWebPush";
+import {
+  consumeStaffPushOnboardingPending,
+  peekStaffPushOnboardingPending,
+} from "@/features/notifications/staffPushOnboarding";
 import { shouldAutoPromptForPush } from "@/features/notifications/webPushRegistrationPolicy";
 
-/** Demande la permission push une fois sur PWA installée / APK Android. */
+/** Demande la permission push une fois (dashboard staff ou après inscription). */
 export function useAutoPushPermissionPrompt(
   registerPush: () => Promise<void>,
   status: FcmUiStatus,
@@ -14,10 +18,19 @@ export function useAutoPushPermissionPrompt(
 
   useEffect(() => {
     if (!enabled) return;
-    if (!shouldAutoPromptForPush()) return;
+    const freshSignup = peekStaffPushOnboardingPending();
+    if (!shouldAutoPromptForPush() && !freshSignup) return;
     if (promptedRef.current || status !== "idle") return;
     if (typeof Notification === "undefined" || Notification.permission !== "default") return;
+
     promptedRef.current = true;
-    void registerPush();
+    if (freshSignup) consumeStaffPushOnboardingPending();
+
+    const delayMs = freshSignup ? 400 : 0;
+    const timer = window.setTimeout(() => {
+      void registerPush();
+    }, delayMs);
+
+    return () => window.clearTimeout(timer);
   }, [enabled, status, registerPush]);
 }

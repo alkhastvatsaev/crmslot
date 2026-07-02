@@ -50,6 +50,13 @@ describe("joinDefaultCompanyMembership", () => {
         if (path === "users/uid-1/company_memberships") {
           return { get: membershipsGet };
         }
+        if (path === "users") {
+          return {
+            doc: jest.fn(() => ({
+              set: jest.fn().mockResolvedValue(undefined),
+            })),
+          };
+        }
         throw new Error(`unexpected collection ${path}`);
       }),
       doc: jest.fn(() => ({
@@ -109,6 +116,13 @@ describe("joinDefaultCompanyMembership", () => {
             doc: jest.fn(() => ({
               get: technicianGet,
               set: technicianSet,
+            })),
+          };
+        }
+        if (path === "users") {
+          return {
+            doc: jest.fn(() => ({
+              set: jest.fn().mockResolvedValue(undefined),
             })),
           };
         }

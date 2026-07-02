@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
 import { useTechnicianNativePushBootstrap } from "@/features/interventions/hooks/useTechnicianNativePushBootstrap";
+import { useStaffPushOnboardingHint } from "@/features/notifications/hooks/useStaffPushOnboardingHint";
 import { parseTechnicianNotificationSearchParams } from "@/features/notifications/technicianNotificationUrls";
 
 const TechnicianNotificationBootstrap = dynamic(
@@ -21,12 +22,13 @@ function DeferredTechnicianBootstrapsInner() {
   const searchParams = useSearchParams();
   const pushIntent = parseTechnicianNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
-    minDelayMs: pushIntent ? 0 : 3_000,
-    idleTimeoutMs: 6_000,
+    minDelayMs: 0,
+    idleTimeoutMs: 1_000,
   });
 
-  useTechnicianAssignmentPushBootstrap(idleReady);
-  useTechnicianNativePushBootstrap(idleReady);
+  useTechnicianAssignmentPushBootstrap(true);
+  useTechnicianNativePushBootstrap(true);
+  useStaffPushOnboardingHint();
 
   if (!pushIntent && !idleReady) return null;
 

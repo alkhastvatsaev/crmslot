@@ -22,9 +22,10 @@ export function isWebPushRegistrationAllowed(): boolean {
   return true;
 }
 
-/** PWA installée ou APK Android — auto-demander la permission push. */
+/** Demande auto la permission dès que Web Push est utilisable (desktop, Android, PWA). */
 export function shouldAutoPromptForPush(): boolean {
   if (typeof window === "undefined") return false;
-  if (isCapacitorNative()) return getCapacitorPlatform() === "android";
-  return isPwaStandalone();
+  // iOS/Android natif : jetons via NativePushBootstrap (Capacitor).
+  if (isCapacitorNative()) return false;
+  return isWebPushRegistrationAllowed();
 }
