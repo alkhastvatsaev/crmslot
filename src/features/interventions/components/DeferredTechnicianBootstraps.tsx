@@ -5,8 +5,6 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import { useTechnicianAssignmentPushBootstrap } from "@/features/interventions/hooks/useTechnicianAssignmentPushBootstrap";
-import { useTechnicianNativePushBootstrap } from "@/features/interventions/hooks/useTechnicianNativePushBootstrap";
-import { useStaffPushOnboardingHint } from "@/features/notifications/hooks/useStaffPushOnboardingHint";
 import { parseTechnicianNotificationSearchParams } from "@/features/notifications/technicianNotificationUrls";
 
 const TechnicianNotificationBootstrap = dynamic(
@@ -27,14 +25,12 @@ function DeferredTechnicianBootstrapsInner() {
   });
 
   useTechnicianAssignmentPushBootstrap(true);
-  useTechnicianNativePushBootstrap(true);
-  useStaffPushOnboardingHint();
 
-  if (!pushIntent && !idleReady) return null;
+  const deferredReady = pushIntent || idleReady;
 
   return (
     <>
-      {pushIntent || idleReady ? <TechnicianNotificationBootstrap /> : null}
+      {deferredReady ? <TechnicianNotificationBootstrap /> : null}
       {idleReady ? <AndroidAppInstallPromoBootstrap surface="technician" /> : null}
     </>
   );

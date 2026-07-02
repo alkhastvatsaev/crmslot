@@ -23,22 +23,22 @@ function DeferredClientBootstrapsInner() {
   const searchParams = useSearchParams();
   const pushIntent = parseClientNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
-    minDelayMs: pushIntent ? 0 : 0,
-    idleTimeoutMs: pushIntent ? 0 : 1_500,
+    minDelayMs: 0,
+    idleTimeoutMs: pushIntent ? 0 : 800,
   });
 
-  if (!pushIntent && !idleReady) return null;
+  const deferredReady = pushIntent || idleReady;
 
   return (
     <>
       <ClientPortalPushBootstrap />
-      {pushIntent || idleReady ? <ClientPortalNotificationBootstrap /> : null}
+      {deferredReady ? <ClientPortalNotificationBootstrap /> : null}
       {idleReady ? <AndroidAppInstallPromoBootstrap surface="demande" /> : null}
     </>
   );
 }
 
-/** Notifications / PWA portail client — après idle (sauf deep-link notif). */
+/** Notifications / PWA portail client — push immédiat, routing notif différé. */
 export default function DeferredClientBootstraps() {
   return (
     <Suspense fallback={null}>

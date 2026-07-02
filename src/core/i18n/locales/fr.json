@@ -2793,7 +2793,10 @@
     "prefs_saved": "Préférences enregistrées",
     "staff_onboarding_ios_title": "Activer les notifications",
     "staff_onboarding_ios_desc": "Ajoutez CRMSLOT à l'écran d'accueil (Partager → Sur l'écran d'accueil), puis rouvrez l'app pour recevoir les alertes.",
-    "staff_onboarding_enabled": "Notifications activées — vous recevrez les nouvelles demandes et messages."
+    "staff_onboarding_enabled": "Notifications activées — vous recevrez les nouvelles demandes et messages.",
+    "staff_push_enable_hint": "Activez les notifications pour recevoir les demandes et messages sur cet appareil.",
+    "staff_push_enable_action": "Activer",
+    "staff_push_blocked_hint": "Notifications bloquées. Autorisez-les dans les réglages de l’appareil."
   },
   "integrations": {
     "webhooks_title": "Webhooks sortants",

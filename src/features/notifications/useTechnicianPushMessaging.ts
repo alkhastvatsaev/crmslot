@@ -222,5 +222,7 @@ export function useTechnicianPushMessaging(
 /** Supprime un jeton en base lorsque l’utilisateur révoque les notifications (best-effort). */
 export async function deleteStoredFcmToken(uid: string, token: string): Promise<void> {
   if (!firestore) return;
-  await deleteDoc(doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token))).catch(() => null);
+  await deleteDoc(
+    doc(firestore, "users", uid, "fcm_tokens", tokenDocId(token, "web", "technician"))
+  ).catch(() => null);
 }

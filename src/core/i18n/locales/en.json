@@ -2793,7 +2793,10 @@
     "prefs_saved": "Preferences saved",
     "staff_onboarding_ios_title": "Enable notifications",
     "staff_onboarding_ios_desc": "Add CRMSLOT to your Home Screen (Share → Add to Home Screen), then open the app to receive alerts.",
-    "staff_onboarding_enabled": "Notifications enabled — you will receive new requests and messages."
+    "staff_onboarding_enabled": "Notifications enabled — you will receive new requests and messages.",
+    "staff_push_enable_hint": "Enable notifications to receive new requests and messages on this device.",
+    "staff_push_enable_action": "Enable",
+    "staff_push_blocked_hint": "Notifications are blocked. Allow them in your device settings."
   },
   "integrations": {
     "webhooks_title": "Outbound webhooks",

@@ -22,10 +22,13 @@ export function isWebPushRegistrationAllowed(): boolean {
   return true;
 }
 
-/** Demande auto la permission dès que Web Push est utilisable (desktop, Android, PWA). */
+/** Demande auto la permission (desktop + Android PWA). iOS PWA exige un geste utilisateur. */
 export function shouldAutoPromptForPush(): boolean {
   if (typeof window === "undefined") return false;
   // iOS/Android natif : jetons via NativePushBootstrap (Capacitor).
   if (isCapacitorNative()) return false;
-  return isWebPushRegistrationAllowed();
+  if (!isWebPushRegistrationAllowed()) return false;
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIos && isPwaStandalone()) return false;
+  return true;
 }
