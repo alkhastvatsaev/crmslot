@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus } from "lucide-react";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { useRequestMobileHubRail } from "@/features/dashboard/MobileHubRailContext";
 import { capitalizeName } from "@/utils/stringUtils";
 import RequesterTrackingStepScreen from "@/features/interventions/components/RequesterTrackingStepScreen";
 import RequesterTrackingCaseGrid from "@/features/interventions/components/RequesterTrackingCaseGrid";
@@ -62,13 +60,10 @@ export default function RequesterTrackingPanel() {
     pendingTrackingInterventionId,
     setPendingTrackingInterventionId,
     portalAccessSession,
-    resetRequestOnly,
-    setLastSubmittedPortalAccessCode,
   } = useRequesterHub();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { t } = useTranslation();
-  const requestMobileHubRail = useRequestMobileHubRail();
 
   const {
     interventions,
@@ -170,16 +165,6 @@ export default function RequesterTrackingPanel() {
     return d.toLocaleDateString("fr-BE", { day: "2-digit", month: "short" });
   };
 
-  const showNewRequestButton =
-    showTrackingView && !isComposingNewRequest && (hasIntervention || hasSubmitted);
-
-  const handleNewRequest = () => {
-    resetRequestOnly();
-    setSelectedId(null);
-    setLastSubmittedPortalAccessCode(null);
-    requestMobileHubRail("center");
-  };
-
   return (
     <div
       data-testid="requester-tracking-panel"
@@ -243,17 +228,6 @@ export default function RequesterTrackingPanel() {
               />
             </div>
           )}
-          {showNewRequestButton ? (
-            <button
-              type="button"
-              data-testid="requester-new-request-btn"
-              onClick={handleNewRequest}
-              className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full bg-blue-500 px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 active:scale-[0.98]"
-            >
-              <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
-              {String(t("requester.ux.new_request"))}
-            </button>
-          ) : null}
         </div>
       ) : (
         <RequesterPortalAccessUnlock suggestedDossierNumber={lastSubmittedPortalAccessCode} />

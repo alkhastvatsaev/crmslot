@@ -22,6 +22,7 @@ export function useRequesterInterventionPanelController() {
     validationFailedCount,
     lastSubmittedPortalAccessCode,
     setLastSubmittedPortalAccessCode,
+    resetRequestOnly,
   } = useRequesterHub();
 
   const { t, language } = useTranslation();
@@ -158,6 +159,11 @@ export function useRequesterInterventionPanelController() {
     !interventionAddress.trim()
   );
 
+  const handleNewRequest = useCallback(() => {
+    setLastSubmittedPortalAccessCode(null);
+    resetRequestOnly();
+  }, [resetRequestOnly, setLastSubmittedPortalAccessCode]);
+
   return {
     currentStep,
     setCurrentStep,
@@ -193,5 +199,6 @@ export function useRequesterInterventionPanelController() {
     trySubmitOnEnter,
     handleProblemSelect,
     showSubmitSuccess,
+    handleNewRequest,
   };
 }
