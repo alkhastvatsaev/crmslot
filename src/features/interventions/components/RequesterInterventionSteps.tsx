@@ -135,8 +135,6 @@ export default function RequesterInterventionSteps({ c }: Props) {
             locatingAddress={c.locatingAddress}
             canSubmit={Boolean(c.canSubmit)}
             isSubmitting={c.isSubmitting}
-            addressConfirmed={c.addressConfirmed}
-            hasValidAddress={c.hasValidAddress}
             onAddressChange={(val) =>
               c.setRequestData((prev) => ({ ...prev, interventionAddress: val }))
             }
@@ -148,7 +146,6 @@ export default function RequesterInterventionSteps({ c }: Props) {
               }))
             }
             onLocate={c.fillAddressFromGeolocation}
-            onConfirmAddress={() => c.setAddressConfirmed(true)}
             onNewRequest={c.handleNewRequest}
             onSubmit={() => void c.handleSubmit()}
             onKeyDown={c.showSubmitSuccess ? undefined : c.trySubmitOnEnter}

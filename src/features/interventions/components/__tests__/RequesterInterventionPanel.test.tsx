@@ -168,8 +168,6 @@ describe("RequesterInterventionPanel", () => {
       </RequesterHubProvider>
     );
 
-    const confirmBtn = await screen.findByTestId("requester-address-confirm-yes");
-    fireEvent.click(confirmBtn);
     const btn = await screen.findByTestId("intervention-submit-btn");
     expect(btn).not.toBeDisabled();
     fireEvent.click(btn);
@@ -204,8 +202,6 @@ describe("RequesterInterventionPanel", () => {
       </RequesterHubProvider>
     );
 
-    const confirmBtn = await screen.findByTestId("requester-address-confirm-yes");
-    fireEvent.click(confirmBtn);
     const step4 = await screen.findByTestId("requester-step4");
     fireEvent.keyDown(step4, { key: "Enter", code: "Enter" });
 
