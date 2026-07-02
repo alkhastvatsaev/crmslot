@@ -2,10 +2,7 @@ import { randomBytes } from "node:crypto";
 import type * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import type { CreateCompanyStaffInput, CreateCompanyStaffResult } from "@/features/teamHub/types";
-import {
-  companyStaffKindNeedsTechnicianProfile,
-  companyStaffKindToMembershipRole,
-} from "@/features/teamHub/resolveCompanyStaffKind";
+import { companyStaffKindToMembershipRole } from "@/features/teamHub/resolveCompanyStaffKind";
 import { upsertCompanyStaffDirectoryEntry } from "@/features/company/server/companyStaffDirectory";
 import { provisionTechnicianStaffRecord } from "@/features/company/server/provisionTechnicianStaff";
 import { syncTenantClaims } from "@/features/company/server/syncTenantClaims";
@@ -51,7 +48,7 @@ async function attachStaffToCompany(
 
   await upsertCompanyStaffDirectoryEntry(db, params.companyId, params.uid, membershipRole);
 
-  if (companyStaffKindNeedsTechnicianProfile(params.input.staffKind)) {
+  if (params.input.staffKind !== "dispatcher") {
     await provisionTechnicianStaffRecord(
       db,
       {
@@ -64,6 +61,14 @@ async function attachStaffToCompany(
         },
       },
       { auth }
+    );
+    await db.collection("technicians").doc(params.uid).set(
+      {
+        active: true,
+        companyId: params.companyId,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
     );
   }
 

@@ -39,6 +39,17 @@ describe("rankTechniciansForIntervention", () => {
     expect(ranked).toHaveLength(1);
     expect(ranked[0]!.technician.id).toBe("busy");
   });
+
+  it("keeps busy technicians visible but ranks available ones first", () => {
+    const technicians: Technician[] = [
+      baseTech({ id: "busy", status: "on_site", location: { lat: 50.8501, lng: 4.3501 } }),
+      baseTech({ id: "free", status: "available", location: { lat: 50.9, lng: 4.4 } }),
+    ];
+
+    const ranked = rankTechniciansForIntervention(technicians, 50.85, 4.35);
+
+    expect(ranked.map((row) => row.technician.id)).toEqual(["free", "busy"]);
+  });
 });
 
 describe("prioritizeDefaultAssignTechnician", () => {

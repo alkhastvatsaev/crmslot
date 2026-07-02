@@ -24,7 +24,7 @@ import {
 } from "@/features/dispatch/technicianAssignUid";
 import { toast } from "sonner";
 import { findBestTechnician } from "@/features/dispatch/algorithm";
-import { useTechnicians } from "@/features/technicians/hooks";
+import { useAssignableTechnicians } from "@/features/technicians/hooks/useAssignableTechnicians";
 
 export type UseTechnicianAssignPickerParams = {
   intervention: Pick<
@@ -55,7 +55,7 @@ export function useTechnicianAssignPicker({
   techniciansOnly = false,
   t,
 }: UseTechnicianAssignPickerParams) {
-  const { technicians, loading } = useTechnicians();
+  const { technicians, loading } = useAssignableTechnicians();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [etaLoading, setEtaLoading] = useState(false);
   const [recommendedId, setRecommendedId] = useState<string | null>(null);
