@@ -24,7 +24,11 @@ export async function authHeaders(
     try {
       headers.Authorization = `Bearer ${await tokenUser.getIdToken(false)}`;
     } catch {
-      /* refresh échoué */
+      try {
+        headers.Authorization = `Bearer ${await tokenUser.getIdToken(true)}`;
+      } catch {
+        /* refresh échoué — requête sans jeton */
+      }
     }
   }
   return headers;

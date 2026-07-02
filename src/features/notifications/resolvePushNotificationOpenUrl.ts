@@ -2,6 +2,7 @@ import { CLIENT_MOBILE_APP_ROUTE } from "@/features/company/clientMobileAppConst
 import { TECHNICIAN_MOBILE_APP_ROUTE } from "@/features/interventions/technicianMobileAppConstants";
 import {
   BM_BACKOFFICE_CHAT_PARAM,
+  BM_BACKOFFICE_REQUEST_PARAM,
   BM_CLIENT_CASE_PARAM,
   BM_CLIENT_CHAT_PARAM,
   BM_MATERIAL_ORDER_PARAM,
@@ -72,6 +73,17 @@ export function resolvePushNotificationOpenUrl(
           ? interventionId
           : "global";
     return `${base}/?${BM_BACKOFFICE_CHAT_PARAM}=${encodeURIComponent(chatIv)}`;
+  }
+
+  if (pushType === "new_client_request" && audience === "staff") {
+    const requestIv =
+      typeof data[BM_BACKOFFICE_REQUEST_PARAM] === "string" && data[BM_BACKOFFICE_REQUEST_PARAM]
+        ? data[BM_BACKOFFICE_REQUEST_PARAM]
+        : interventionId;
+    if (requestIv.trim()) {
+      return `${base}/?${BM_BACKOFFICE_REQUEST_PARAM}=${encodeURIComponent(requestIv.trim())}`;
+    }
+    return `${base}/`;
   }
 
   if (pushType === "material_order_placed" || pushType === "material_order_status_changed") {

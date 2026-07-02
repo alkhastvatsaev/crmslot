@@ -1,5 +1,7 @@
 import { parseBackofficeChatNotificationData } from "@/features/notifications/backofficeChatNotificationUrls";
 import { dispatchBackofficeChatNotificationIntent } from "@/features/notifications/backofficeChatNotificationIntent";
+import { parseBackofficeRequestNotificationData } from "@/features/notifications/backofficeRequestNotificationUrls";
+import { dispatchBackofficeRequestNotificationIntent } from "@/features/notifications/backofficeRequestNotificationIntent";
 import {
   dispatchClientNotificationIntent,
   parseClientNotificationData,
@@ -23,6 +25,12 @@ export function routePushNotificationClick(data: Record<string, string | undefin
   if (pushType === "portal_chat" && audience === "staff") {
     const intent = parseBackofficeChatNotificationData(data);
     if (intent.kind !== "none") dispatchBackofficeChatNotificationIntent(intent);
+    return;
+  }
+
+  if (pushType === "new_client_request" && audience === "staff") {
+    const intent = parseBackofficeRequestNotificationData(data);
+    if (intent.kind !== "none") dispatchBackofficeRequestNotificationIntent(intent);
     return;
   }
 

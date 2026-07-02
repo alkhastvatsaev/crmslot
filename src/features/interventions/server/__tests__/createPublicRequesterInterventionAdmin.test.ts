@@ -4,6 +4,10 @@ jest.mock("@/features/backoffice/server/ensureCompanyAcceptsPublicInterventionsA
   ensureCompanyAcceptsPublicInterventionsAdmin: jest.fn(async () => ({ ok: true })),
 }));
 
+jest.mock("@/features/notifications/server/notifyStaffNewClientRequestAdmin", () => ({
+  notifyStaffNewClientRequestAdmin: jest.fn(async () => ({ notified: 0 })),
+}));
+
 function mockDb(existing = false) {
   const set = jest.fn(async () => undefined);
   const get = jest.fn(async () => ({ exists: existing }));

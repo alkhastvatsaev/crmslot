@@ -2,6 +2,23 @@ import { render, screen } from "@/test-utils/render";
 import * as mobileFooterGalaxyVisible from "@/features/dashboard/hooks/useMobileFooterGalaxyVisible";
 import AdminMobileApp from "@/features/dashboard/components/AdminMobileApp";
 
+jest.mock("@/core/config/firebase", () => {
+  const user = { uid: "test-admin", isAnonymous: false, emailVerified: true };
+  return {
+    auth: {
+      currentUser: user,
+      authStateReady: jest.fn().mockResolvedValue(undefined),
+    },
+    isConfigured: true,
+    firestore: {},
+    app: {},
+    clientPortalAuth: null,
+    clientPortalFirestore: null,
+    storage: null,
+    clientPortalStorage: null,
+  };
+});
+
 jest.mock("@/features/map/components/MapboxView", () => ({
   __esModule: true,
   default: () => <div data-testid="mapbox-view-stub" />,

@@ -28,6 +28,7 @@ import {
   geocodeRequesterInterventionAddress,
 } from "@/features/interventions/requesterInterventionSubmitQueries";
 import { triggerRequesterMobileHaptic } from "@/features/interventions/requesterMobileHaptics";
+import { notifyStaffNewClientRequestClient } from "@/features/notifications/notifyStaffNewClientRequestClient";
 import {
   validateRequesterInterventionSubmit,
   type RequesterInterventionSubmitInput,
@@ -189,6 +190,16 @@ export async function submitRequesterIntervention(
       companyId,
       docPayload,
     });
+
+    if (profile.type !== "particulier") {
+      notifyStaffNewClientRequestClient({
+        companyId,
+        interventionId: newDocRef.id,
+        title,
+        address: requestData.interventionAddress.trim(),
+        user,
+      });
+    }
 
     const { clientFirstRaw, clientLastRaw, clientEmailRaw } = clientFields;
 

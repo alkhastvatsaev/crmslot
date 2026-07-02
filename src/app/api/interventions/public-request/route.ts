@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
+import * as admin from "firebase-admin";
 import { requirePortalChatApiUser } from "@/core/api/routeAuth";
 import { rateLimitByIp } from "@/core/api/rateLimit";
 import { createPublicRequesterInterventionAdmin } from "@/features/interventions/server/createPublicRequesterInterventionAdmin";
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
   try {
     const result = await createPublicRequesterInterventionAdmin({
       db: getAdminDb(),
+      auth: admin.auth,
       uid: auth.uid,
       companyId,
       interventionId,

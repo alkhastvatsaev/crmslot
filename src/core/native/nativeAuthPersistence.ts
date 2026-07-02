@@ -1,24 +1,26 @@
 import { browserLocalPersistence, setPersistence, type Auth } from "firebase/auth";
-import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { logger } from "@/core/logger";
 
-let persistenceApplied = false;
+const persistenceApplied = new WeakSet<Auth>();
 
-/** WebView Capacitor : persistance localStorage (session survit fermeture app). */
-export async function ensureNativeAuthPersistence(auth: Auth | null): Promise<void> {
-  if (!auth || !isCapacitorNative() || persistenceApplied) return;
-  persistenceApplied = true;
+/** Persistance locale — session survit fermeture app / onglet (web + Capacitor). */
+export async function ensureAuthPersistence(auth: Auth | null): Promise<void> {
+  if (!auth || persistenceApplied.has(auth)) return;
+  persistenceApplied.add(auth);
   try {
     await setPersistence(auth, browserLocalPersistence);
   } catch (err) {
-    persistenceApplied = false;
-    logger.warn("[nativeAuthPersistence] setPersistence failed", {
+    persistenceApplied.delete(auth);
+    logger.warn("[authPersistence] setPersistence failed", {
       error: err instanceof Error ? err.message : String(err),
     });
   }
 }
 
+/** @deprecated Utiliser ensureAuthPersistence */
+export const ensureNativeAuthPersistence = ensureAuthPersistence;
+
 /** Test-only reset. */
 export function resetNativeAuthPersistenceForTests(): void {
-  persistenceApplied = false;
+  // WeakSet cannot be cleared — tests should use fresh Auth instances.
 }

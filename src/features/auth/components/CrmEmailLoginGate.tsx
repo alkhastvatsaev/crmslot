@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import AppBootLoadingScreen from "@/core/ui/AppBootLoadingScreen";
 import { auth, isConfigured } from "@/core/config/firebase";
-import { ensureNativeAuthPersistence } from "@/core/native/nativeAuthPersistence";
+import { ensureAuthPersistence } from "@/core/native/nativeAuthPersistence";
 import CrmEmailLoginPanel from "@/features/auth/components/CrmEmailLoginPanel";
 import CrmStaffAuthEffects from "@/features/auth/components/CrmStaffAuthEffects";
 import {
@@ -37,19 +37,24 @@ export default function CrmEmailLoginGate({ variant, children }: Props) {
       return;
     }
 
-    void ensureNativeAuthPersistence(auth);
+    let cancelled = false;
 
-    const failSafe = setTimeout(() => {
-      setPhase(resolveGatePhase(auth?.currentUser ?? null));
-    }, 3500);
+    void (async () => {
+      await ensureAuthPersistence(auth);
+      try {
+        await auth.authStateReady();
+      } catch {
+        /* ignore */
+      }
+      if (!cancelled) setPhase(resolveGatePhase(auth.currentUser));
+    })();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      clearTimeout(failSafe);
-      setPhase(resolveGatePhase(user));
+      if (!cancelled) setPhase(resolveGatePhase(user));
     });
 
     return () => {
-      clearTimeout(failSafe);
+      cancelled = true;
       unsubscribe();
     };
   }, []);
