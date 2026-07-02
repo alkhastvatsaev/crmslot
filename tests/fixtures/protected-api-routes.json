@@ -1,5 +1,9 @@
 [
   {
+    "path": "/api/account/staff-profile",
+    "methods": ["PATCH"]
+  },
+  {
     "method": "POST",
     "path": "/api/ai/assistant",
     "body": {}
@@ -49,6 +53,11 @@
   {
     "method": "POST",
     "path": "/api/ai/material-agent",
+    "body": {}
+  },
+  {
+    "method": "POST",
+    "path": "/api/ai/mission-kit",
     "body": {}
   },
   {
@@ -383,9 +392,5 @@
     "method": "POST",
     "path": "/api/suppliers/order",
     "body": {}
-  },
-  {
-    "path": "/api/account/staff-profile",
-    "methods": ["PATCH"]
   }
 ]

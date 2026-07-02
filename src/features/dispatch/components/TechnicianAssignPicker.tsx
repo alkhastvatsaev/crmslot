@@ -7,15 +7,21 @@ import type { Intervention } from "@/features/interventions";
 import type { AssignScheduleOverride } from "@/features/interventions";
 import ProposedScheduleSlots from "@/features/scheduling/components/ProposedScheduleSlots";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
+import { useFeatureFlag } from "@/core/useFeatureFlags";
 import { useTechnicianAssignPicker } from "@/features/dispatch/hooks/useTechnicianAssignPicker";
 import TechnicianAssignPickerFooter from "@/features/dispatch/components/TechnicianAssignPickerFooter";
 import TechnicianAssignPickerHeader from "@/features/dispatch/components/TechnicianAssignPickerHeader";
 import TechnicianAssignPickerOption from "@/features/dispatch/components/TechnicianAssignPickerOption";
+import MissionKitBadge from "@/features/missionKit/components/MissionKitBadge";
+import { useMissionKit } from "@/features/missionKit/hooks/useMissionKit";
 
 type Props = {
   intervention: Pick<
     Intervention,
     | "id"
+    | "title"
+    | "category"
+    | "companyId"
     | "location"
     | "address"
     | "problem"
@@ -47,6 +53,7 @@ export default function TechnicianAssignPicker({
   techniciansOnly = false,
 }: Props) {
   const { t } = useTranslation();
+  const missionKitEnabled = useFeatureFlag("missionKit");
   const picker = useTechnicianAssignPicker({
     intervention,
     peerInterventions,
@@ -55,6 +62,17 @@ export default function TechnicianAssignPicker({
     isAssigning,
     techniciansOnly,
     t,
+  });
+
+  const selectedTechnicianUid =
+    picker.ranked.find((row) => row.technician.id === picker.selectedId)?.technician.authUid ??
+    picker.selectedId;
+
+  const missionKit = useMissionKit({
+    enabled: missionKitEnabled,
+    intervention,
+    peerInterventions: allInterventions ?? peerInterventions,
+    technicianUid: selectedTechnicianUid,
   });
 
   const footer = (
@@ -84,6 +102,12 @@ export default function TechnicianAssignPicker({
         cancelLabel={String(t("dispatch.assign_picker.cancel"))}
         onCancel={onCancel}
       />
+
+      {missionKitEnabled ? (
+        <div className="mb-3 shrink-0">
+          <MissionKitBadge kit={missionKit.kit} loading={missionKit.loading} />
+        </div>
+      ) : null}
 
       {picker.loading ? (
         <div className="flex min-h-0 flex-1 flex-col">
