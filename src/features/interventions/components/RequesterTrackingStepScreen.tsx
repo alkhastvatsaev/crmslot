@@ -10,6 +10,7 @@ import {
   getTrackingHeadlineKey,
 } from "@/features/interventions/requesterTrackingSteps";
 import RequesterTrackingProgressBar from "@/features/interventions/components/RequesterTrackingProgressBar";
+import RequesterPushNotificationButton from "@/features/interventions/components/RequesterPushNotificationButton";
 import RequesterPaymentPanel from "@/features/interventions/components/RequesterPaymentPanel";
 import ClientRatingPanel from "@/features/interventions/components/ClientRatingPanel";
 
@@ -127,6 +128,15 @@ export default function RequesterTrackingStepScreen({
           >
             {t("tracking.waiting_material_subline")}
           </p>
+        ) : null}
+
+        {phase.id === "received" && hasIntervention && status === "pending" ? (
+          <div data-testid="tracking-push-prompt" className="mt-4 w-full max-w-[280px] shrink-0">
+            <p className="mb-2 text-[12px] leading-relaxed text-slate-500">
+              {String(t("requester.ux.tracking_push_prompt"))}
+            </p>
+            <RequesterPushNotificationButton />
+          </div>
         ) : null}
 
         {showCompletionExtras ? (

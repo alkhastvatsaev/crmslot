@@ -3,6 +3,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import RequesterTrackingPanel from "@/features/interventions/components/RequesterTrackingPanel";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 
+jest.mock("@/features/notifications/ClientPortalPushContext", () => ({
+  useClientPortalPush: () => ({
+    status: "idle",
+    lastError: null,
+    registerPush: jest.fn(),
+  }),
+}));
+
 jest.mock("@/context/RequesterHubContext", () => ({
   useRequesterHub: jest.fn(),
 }));

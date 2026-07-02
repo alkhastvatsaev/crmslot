@@ -27,6 +27,7 @@ import {
   findRequesterDuplicateInterventions,
   geocodeRequesterInterventionAddress,
 } from "@/features/interventions/requesterInterventionSubmitQueries";
+import { triggerRequesterMobileHaptic } from "@/features/interventions/requesterMobileHaptics";
 import {
   validateRequesterInterventionSubmit,
   type RequesterInterventionSubmitInput,
@@ -254,6 +255,7 @@ export async function submitRequesterIntervention(
       toast.success(String(t("requester.toasts.request_saved")));
     }
 
+    triggerRequesterMobileHaptic("medium");
     onFocusMobileRail?.("right");
   } catch (e) {
     const errMsg = e instanceof Error ? e.message : String(e);

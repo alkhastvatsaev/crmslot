@@ -1556,6 +1556,17 @@
     "tracking": {
       "switched_to_case_prefix": "Switched to case for",
       "client_fallback": "the client"
+    },
+    "ux": {
+      "address_confirm_title": "Is this the right place?",
+      "address_confirm_yes": "Yes, that's correct",
+      "address_confirm_edit": "Edit",
+      "address_confirm_required": "Confirm the address on the map",
+      "profile_submit_need_problem": "Complete the issue in Request",
+      "profile_submit_need_address": "Complete the address in Request",
+      "dossier_copy": "Copy",
+      "dossier_copied": "Number copied",
+      "tracking_push_prompt": "Get notified when a technician picks up your case. Typical response within 1 business day."
     }
   },
   "company_hub": {
