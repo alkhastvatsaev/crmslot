@@ -134,7 +134,7 @@ export async function submitSmartFormIntervention(input: SmartFormSubmitInput): 
     });
 
     if (interventionCompanyId?.trim()) {
-      notifyStaffNewClientRequestClient({
+      void notifyStaffNewClientRequestClient({
         companyId: interventionCompanyId.trim(),
         interventionId: newDocRef.id,
         title: finalTitle,

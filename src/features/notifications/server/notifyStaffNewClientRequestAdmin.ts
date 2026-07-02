@@ -33,13 +33,13 @@ export async function notifyStaffNewClientRequestAdmin(params: {
   if (!companyId || !interventionId) return { notified: 0 };
 
   const staff = await listCompanyStaff(params.db, params.auth, companyId);
-  // Toujours notifier tout le staff actif : le demandeur (souvent anonyme) n'est pas dans la liste ;
-  // si un admin teste depuis /m/demande avec sa session CRM, il doit quand même recevoir la push.
   const recipients = staff.filter((m) => m.active);
 
   if (recipients.length === 0) {
     logger.warn("[notifyStaffNewClientRequestAdmin] aucun destinataire staff actif", {
       companyId,
+      staffTotal: staff.length,
+      staffInactive: staff.filter((m) => !m.active).map((m) => m.uid),
     });
     return { notified: 0 };
   }
@@ -80,6 +80,15 @@ export async function notifyStaffNewClientRequestAdmin(params: {
         error: err instanceof Error ? err.message : String(err),
       });
     }
+  }
+
+  if (notified === 0) {
+    logger.warn("[notifyStaffNewClientRequestAdmin] 0 push envoyée", {
+      companyId,
+      interventionId,
+      recipientCount: recipients.length,
+      recipientUids: recipients.map((m) => m.uid),
+    });
   }
 
   return { notified };

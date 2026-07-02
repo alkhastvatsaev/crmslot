@@ -27,7 +27,7 @@ export type CreatePublicRequesterInterventionInput = {
 };
 
 export type CreatePublicRequesterInterventionResult =
-  | { ok: true; id: string }
+  | { ok: true; id: string; notified: number }
   | { ok: false; status: number; error: string };
 
 function validatePublicRequesterPayload(
@@ -95,9 +95,10 @@ export async function createPublicRequesterInterventionAdmin(
     assignedTechnicianUid: payload.assignedTechnicianUid ?? null,
   });
 
+  let notified = 0;
   if (adminAuth) {
     try {
-      await notifyStaffNewClientRequestAdmin({
+      const result = await notifyStaffNewClientRequestAdmin({
         db,
         auth: adminAuth,
         companyId: trimmedCompany,
@@ -106,6 +107,7 @@ export async function createPublicRequesterInterventionAdmin(
         title: typeof payload.title === "string" ? payload.title : null,
         address: typeof payload.address === "string" ? payload.address : null,
       });
+      notified = result.notified;
     } catch (err) {
       logger.warn("[createPublicRequesterInterventionAdmin] notify staff failed", {
         interventionId: trimmedId,
@@ -115,5 +117,5 @@ export async function createPublicRequesterInterventionAdmin(
     }
   }
 
-  return { ok: true, id: trimmedId };
+  return { ok: true, id: trimmedId, notified };
 }

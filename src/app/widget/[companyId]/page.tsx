@@ -60,7 +60,7 @@ export default function WidgetPage() {
         actorRole: "client",
         source: "widget_qr",
       });
-      notifyStaffNewClientRequestClient({
+      void notifyStaffNewClientRequestClient({
         companyId,
         interventionId: createdRef.id,
         title: problem.trim().slice(0, 140) || "Demande widget",
