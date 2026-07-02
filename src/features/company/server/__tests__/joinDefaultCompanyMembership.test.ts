@@ -32,11 +32,13 @@ describe("joinDefaultCompanyMembership", () => {
 
   it("creates admin membership and syncs claims", async () => {
     const membershipSet = jest.fn();
+    const technicianSet = jest.fn();
     const companyGet = jest.fn().mockResolvedValue({
       exists: true,
       data: () => ({ name: "ABC" }),
     });
     const membershipGet = jest.fn().mockResolvedValue({ exists: false });
+    const technicianGet = jest.fn().mockResolvedValue({ exists: false, data: () => undefined });
     const membershipsSnap = {
       docs: [{ id: "co-abc", data: () => ({ role: "admin" }) }],
     };
@@ -49,6 +51,14 @@ describe("joinDefaultCompanyMembership", () => {
         }
         if (path === "users/uid-1/company_memberships") {
           return { get: membershipsGet };
+        }
+        if (path === "technicians") {
+          return {
+            doc: jest.fn(() => ({
+              get: technicianGet,
+              set: technicianSet,
+            })),
+          };
         }
         if (path === "users") {
           return {
@@ -87,6 +97,13 @@ describe("joinDefaultCompanyMembership", () => {
       bmTenants: ["co-abc:admin"],
       bmActive: "co-abc",
     });
+    expect(technicianSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        active: true,
+        companyId: "co-abc",
+      }),
+      { merge: true }
+    );
   });
 
   it("creates collaborateur membership and technicians doc for staffKind technician", async () => {

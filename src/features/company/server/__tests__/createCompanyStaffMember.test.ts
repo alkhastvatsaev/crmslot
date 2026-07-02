@@ -37,6 +37,10 @@ function makeDb() {
     }),
   };
 
+  const technicianRef = {
+    set: jest.fn().mockResolvedValue(undefined),
+  };
+
   const db = {
     collection: jest.fn((name: string) => {
       if (name === "companies") {
@@ -44,6 +48,9 @@ function makeDb() {
       }
       if (name === "company_invites") {
         return { add: jest.fn() };
+      }
+      if (name === "technicians") {
+        return { doc: jest.fn(() => technicianRef) };
       }
       throw new Error(name);
     }),
@@ -53,7 +60,7 @@ function makeDb() {
     }),
   };
 
-  return { db, writes, membershipRef };
+  return { db, writes, membershipRef, technicianRef };
 }
 
 describe("createCompanyStaffMember", () => {
@@ -71,7 +78,7 @@ describe("createCompanyStaffMember", () => {
   }));
 
   it("crée le compte Auth, le membership et provisionne le technicien", async () => {
-    const { db, writes } = makeDb();
+    const { db, writes, technicianRef } = makeDb();
 
     const result = await createCompanyStaffMember(
       db as never,
@@ -126,6 +133,13 @@ describe("createCompanyStaffMember", () => {
         },
       },
       { auth }
+    );
+    expect(technicianRef.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        active: true,
+        companyId: "co-abc",
+      }),
+      { merge: true }
     );
   });
 });
