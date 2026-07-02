@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useRequesterHub } from "@/context/RequesterHubContext";
 import { useRequesterInterventionForm } from "@/features/interventions/hooks/useRequesterInterventionForm";
+import { REQUESTER_GEOLOC_ADDRESS_PENDING } from "@/features/interventions/smartInterventionConstants";
 import {
   REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT,
   SMART_FORM_TEMPLATES,
@@ -48,6 +49,17 @@ export function useRequesterInterventionPanelController() {
     photoDataUrls,
     urgency: requestDataUrgency,
   } = requestData;
+
+  const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const addressSnapshotRef = useRef("");
+
+  useEffect(() => {
+    const snapshot = `${interventionAddress}|${interventionLatLng?.lat ?? ""}|${interventionLatLng?.lng ?? ""}`;
+    if (snapshot !== addressSnapshotRef.current) {
+      addressSnapshotRef.current = snapshot;
+      setAddressConfirmed(false);
+    }
+  }, [interventionAddress, interventionLatLng?.lat, interventionLatLng?.lng]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -94,26 +106,32 @@ export function useRequesterInterventionPanelController() {
     interimTranscript,
   } = useBrowserSpeechDictation(appendDescriptionFromVoice, handleAudioRecorded);
 
+  const hasValidAddress =
+    interventionAddress.trim().length > 0 &&
+    interventionAddress !== REQUESTER_GEOLOC_ADDRESS_PENDING;
+
+  const canSubmitStep4 = Boolean(canSubmit && (!hasValidAddress || addressConfirmed));
+
   const trySubmitOnEnter = useCallback(
     (e: KeyboardEvent) => {
       if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.defaultPrevented) return;
-      if (currentStep !== 4 || !canSubmit || isSubmitting) return;
+      if (currentStep !== 4 || !canSubmitStep4 || isSubmitting) return;
       e.preventDefault();
       void handleSubmit();
     },
-    [currentStep, canSubmit, isSubmitting, handleSubmit]
+    [currentStep, canSubmitStep4, isSubmitting, handleSubmit]
   );
 
   useEffect(() => {
     if (currentStep !== 4) return;
     const onEnterSubmit = () => {
-      if (!canSubmit || isSubmitting) return;
+      if (!canSubmitStep4 || isSubmitting) return;
       void handleSubmit();
     };
     window.addEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
     return () =>
       window.removeEventListener(REQUESTER_INTERVENTION_ENTER_SUBMIT_EVENT, onEnterSubmit);
-  }, [currentStep, canSubmit, isSubmitting, handleSubmit]);
+  }, [currentStep, canSubmitStep4, isSubmitting, handleSubmit]);
 
   const handleProblemSelect = useCallback(
     (tpl: SmartFormTemplate) => {
@@ -149,7 +167,10 @@ export function useRequesterInterventionPanelController() {
     lastSubmittedPortalAccessCode,
     tenantCompanyId,
     locatingAddress,
-    canSubmit,
+    canSubmit: canSubmitStep4,
+    addressConfirmed,
+    setAddressConfirmed,
+    hasValidAddress,
     handleSubmit,
     fillAddressFromGeolocation,
     ingestFiles,

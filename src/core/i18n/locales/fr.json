@@ -1556,6 +1556,17 @@
     "tracking": {
       "switched_to_case_prefix": "Dossier basculé sur",
       "client_fallback": "le client"
+    },
+    "ux": {
+      "address_confirm_title": "C'est bien ici ?",
+      "address_confirm_yes": "Oui, c'est correct",
+      "address_confirm_edit": "Modifier",
+      "address_confirm_required": "Confirmez l'adresse sur la carte",
+      "profile_submit_need_problem": "Complétez le problème dans Demande",
+      "profile_submit_need_address": "Complétez l'adresse dans Demande",
+      "dossier_copy": "Copier",
+      "dossier_copied": "Numéro copié",
+      "tracking_push_prompt": "Soyez prévenu quand un technicien prend en charge votre dossier. Réponse habituelle sous 24 h ouvrées."
     }
   },
   "company_hub": {

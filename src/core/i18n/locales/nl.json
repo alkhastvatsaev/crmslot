@@ -1556,6 +1556,17 @@
     "tracking": {
       "switched_to_case_prefix": "Overgeschakeld naar dossier voor",
       "client_fallback": "de klant"
+    },
+    "ux": {
+      "address_confirm_title": "Is dit de juiste plek?",
+      "address_confirm_yes": "Ja, klopt",
+      "address_confirm_edit": "Wijzigen",
+      "address_confirm_required": "Bevestig het adres op de kaart",
+      "profile_submit_need_problem": "Vul het probleem in bij Aanvraag",
+      "profile_submit_need_address": "Vul het adres in bij Aanvraag",
+      "dossier_copy": "Kopiëren",
+      "dossier_copied": "Nummer gekopieerd",
+      "tracking_push_prompt": "Ontvang een melding zodra een technieker uw dossier oppakt. Meestal antwoord binnen 1 werkdag."
     }
   },
   "company_hub": {

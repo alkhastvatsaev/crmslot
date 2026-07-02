@@ -76,7 +76,7 @@ interface RequesterHubContextValue {
 }
 
 const defaultProfile: RequesterProfile = {
-  type: "login",
+  type: "particulier",
   firstName: "",
   lastName: "",
   companyName: "",
@@ -140,6 +140,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         const parsed = JSON.parse(stored) as {
           profile?: RequesterProfile;
           requestData?: InterventionRequestData;
+          currentStep?: number;
           lastSubmittedRequest?: InterventionRequestData | null;
           lastSubmittedInterventionId?: string | null;
           lastSubmittedPortalAccessCode?: string | null;
@@ -154,6 +155,13 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
           }
         }
         if (parsed.requestData) setRequestData({ ...defaultRequestData, ...parsed.requestData });
+        if (
+          typeof parsed.currentStep === "number" &&
+          parsed.currentStep >= 0 &&
+          parsed.currentStep <= 4
+        ) {
+          setCurrentStep(parsed.currentStep);
+        }
         if (parsed.lastSubmittedRequest)
           setLastSubmittedRequest({ ...defaultRequestData, ...parsed.lastSubmittedRequest });
         if (typeof parsed.lastSubmittedInterventionId === "string") {
@@ -184,6 +192,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
         JSON.stringify({
           profile,
           requestData,
+          currentStep,
           lastSubmittedRequest,
           lastSubmittedInterventionId,
           lastSubmittedPortalAccessCode,
@@ -195,6 +204,7 @@ export function RequesterHubProvider({ children }: { children: ReactNode }) {
   }, [
     profile,
     requestData,
+    currentStep,
     lastSubmittedRequest,
     lastSubmittedInterventionId,
     lastSubmittedPortalAccessCode,

@@ -37,7 +37,7 @@ export default function RequesterProfilePanel() {
     saving: accountSaving,
   } = useClientPortalAccount();
   const { t } = useTranslation();
-  const { handleSubmit } = useRequesterInterventionForm();
+  const { readiness, handleSubmit } = useRequesterInterventionForm();
   const shakeControls = useAnimation();
   useEffect(() => {
     if (validationFailedCount > 0) {
@@ -60,6 +60,9 @@ export default function RequesterProfilePanel() {
     e.preventDefault();
     dispatchRequesterInterventionEnterSubmit();
   };
+
+  const profileSubmitBlocked = Boolean(readiness.profileSubmitHintKey);
+  const profileSubmitDisabled = isSubmitting || profileSubmitBlocked;
 
   return (
     <div data-testid="requester-profile-panel" className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -234,16 +237,18 @@ export default function RequesterProfilePanel() {
               <button
                 type="button"
                 data-testid="requester-profile-submit-btn"
-                disabled={isSubmitting}
+                disabled={profileSubmitDisabled}
                 onClick={() => void handleSubmit()}
-                className="mx-auto flex w-full max-w-none items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-4 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                className="mx-auto flex w-full max-w-none min-h-[52px] items-center justify-center gap-2 rounded-[16px] bg-black px-6 py-5 text-base font-bold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
                     <SendHorizontal className="h-5 w-5" />
-                    {String(t("requester.intervention.submit_request"))}
+                    {profileSubmitBlocked && readiness.profileSubmitHintKey
+                      ? String(t(readiness.profileSubmitHintKey))
+                      : String(t("requester.intervention.submit_request"))}
                   </>
                 )}
               </button>
