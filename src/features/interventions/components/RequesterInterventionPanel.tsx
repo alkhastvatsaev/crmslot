@@ -16,7 +16,10 @@ export default function RequesterInterventionPanel() {
         <RequesterInterventionSteps c={c} />
       </div>
       <footer className="shrink-0 px-8 pb-4 pt-1" data-testid="requester-intervention-stepper">
-        <RequesterInterventionStepperHeader />
+        <RequesterInterventionStepperHeader
+          showNewRequest={c.showSubmitSuccess}
+          onNewRequest={c.handleNewRequest}
+        />
       </footer>
     </div>
   );
