@@ -1,4 +1,4 @@
-import { signInAnonymously, signOut, type User } from "firebase/auth";
+import { signInAnonymously, type User } from "firebase/auth";
 import { auth, clientPortalAuth, isConfigured } from "@/core/config/firebase";
 import { logger } from "@/core/logger";
 import type { RequesterProfile } from "@/context/RequesterHubContext";
@@ -44,16 +44,8 @@ export async function ensureRequesterUserForSubmit(
   }
 
   if (!auth) return null;
-  if (auth.currentUser?.isAnonymous) return auth.currentUser;
-  if (auth.currentUser) {
-    try {
-      await signOut(auth);
-    } catch (err) {
-      logger.warn("ensureRequesterUserForSubmit signOut CRM session", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
+  // Conserver la session CRM staff — ne jamais déconnecter pour soumettre une demande invité.
+  if (auth.currentUser) return auth.currentUser;
   try {
     const cred = await withRequesterFormTimeout(signInAnonymously(auth), 10000, "Auth timeout");
     return cred.user;

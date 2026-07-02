@@ -28,9 +28,10 @@ describe("nativeAuthPersistence", () => {
     expect(setPersistence).toHaveBeenCalledWith(auth, browserLocalPersistence);
   });
 
-  it("skips when not Capacitor native", async () => {
+  it("sets browserLocalPersistence on web too", async () => {
     isCapacitorNative.mockReturnValue(false);
-    await ensureNativeAuthPersistence({} as never);
-    expect(setPersistence).not.toHaveBeenCalled();
+    const auth = {} as never;
+    await ensureNativeAuthPersistence(auth);
+    expect(setPersistence).toHaveBeenCalledWith(auth, browserLocalPersistence);
   });
 });

@@ -22,3 +22,4 @@ export { runSupplierOrderProgressTickAdmin } from "@/features/notifications/serv
 export type { SupplierOrderProgressTickReport } from "@/features/notifications/server/runSupplierOrderProgressTickAdmin";
 export { runGoogleReviewRequestsAdmin } from "@/features/notifications/server/runGoogleReviewRequestsAdmin";
 export type { GoogleReviewRequestsReport } from "@/features/notifications/server/runGoogleReviewRequestsAdmin";
+export { notifyStaffNewClientRequestAdmin } from "@/features/notifications/server/notifyStaffNewClientRequestAdmin";

@@ -1,5 +1,6 @@
 import type * as admin from "firebase-admin";
 import { ensureCompanyAcceptsPublicInterventionsAdmin } from "@/features/backoffice/server/ensureCompanyAcceptsPublicInterventionsAdmin";
+import { notifyStaffNewClientRequestAdmin } from "@/features/notifications/server/notifyStaffNewClientRequestAdmin";
 
 const BLOCKED_PAYLOAD_KEYS = new Set([
   "paymentStatus",
@@ -16,6 +17,8 @@ const BLOCKED_PAYLOAD_KEYS = new Set([
 
 export type CreatePublicRequesterInterventionInput = {
   db: admin.firestore.Firestore;
+  /** Firebase Admin Auth — requis pour notifier le staff après création. */
+  auth?: typeof admin.auth;
   uid: string;
   companyId: string;
   interventionId: string;
@@ -59,7 +62,7 @@ function validatePublicRequesterPayload(
 export async function createPublicRequesterInterventionAdmin(
   input: CreatePublicRequesterInterventionInput
 ): Promise<CreatePublicRequesterInterventionResult> {
-  const { db, uid, companyId, interventionId, payload } = input;
+  const { db, auth: adminAuth, uid, companyId, interventionId, payload } = input;
   const trimmedId = interventionId.trim();
   const trimmedCompany = companyId.trim();
 
@@ -90,6 +93,18 @@ export async function createPublicRequesterInterventionAdmin(
     status: "pending",
     assignedTechnicianUid: payload.assignedTechnicianUid ?? null,
   });
+
+  if (adminAuth) {
+    void notifyStaffNewClientRequestAdmin({
+      db,
+      auth: adminAuth,
+      companyId: trimmedCompany,
+      senderUid: uid,
+      interventionId: trimmedId,
+      title: typeof payload.title === "string" ? payload.title : null,
+      address: typeof payload.address === "string" ? payload.address : null,
+    }).catch(() => null);
+  }
 
   return { ok: true, id: trimmedId };
 }

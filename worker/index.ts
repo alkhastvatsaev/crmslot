@@ -37,6 +37,8 @@ function showPushNotification(payload: PushPayload): void {
       const chatIv = interventionId.length > 0 ? interventionId : "global";
       tag = `portal-chat-${chatIv}`;
     }
+  } else if (pushType === "new_client_request") {
+    tag = interventionId.length > 0 ? `new-request-${interventionId}` : "new-client-request";
   } else if (interventionId.length > 0) {
     tag = `case-${interventionId}`;
   }

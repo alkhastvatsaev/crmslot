@@ -6,10 +6,15 @@ import { useSearchParams } from "next/navigation";
 import { useDeferredMount } from "@/core/perf/useDeferredMount";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { parseBackofficeChatNotificationSearchParams } from "@/features/notifications/backofficeChatNotificationUrls";
+import { parseBackofficeRequestNotificationSearchParams } from "@/features/notifications/backofficeRequestNotificationUrls";
 import { parseMaterialOrderNotificationSearchParams } from "@/features/notifications/materialOrderNotificationUrls";
 
 const BackofficeChatNotificationBootstrap = dynamic(
   () => import("@/features/notifications/components/BackofficeChatNotificationBootstrap"),
+  { ssr: false }
+);
+const BackofficeRequestNotificationBootstrap = dynamic(
+  () => import("@/features/notifications/components/BackofficeRequestNotificationBootstrap"),
   { ssr: false }
 );
 const MaterialOrderNotificationBootstrap = dynamic(
@@ -38,6 +43,7 @@ function DeferredAdminBootstrapsInner() {
   const isMobile = useIsMobile();
   const pushIntent =
     parseBackofficeChatNotificationSearchParams(searchParams).kind !== "none" ||
+    parseBackofficeRequestNotificationSearchParams(searchParams).kind !== "none" ||
     parseMaterialOrderNotificationSearchParams(searchParams).kind !== "none";
   const idleReady = useDeferredMount({
     minDelayMs: pushIntent || isMobile !== true ? 0 : 2_500,
@@ -51,6 +57,7 @@ function DeferredAdminBootstrapsInner() {
   return (
     <>
       {pushIntent || idleReady ? <BackofficeChatNotificationBootstrap /> : null}
+      {pushIntent || idleReady ? <BackofficeRequestNotificationBootstrap /> : null}
       {pushIntent || idleReady ? <MaterialOrderNotificationBootstrap /> : null}
       {pushBootstrapReady ? <BackofficePushBootstrap /> : null}
       {idleReady ? (

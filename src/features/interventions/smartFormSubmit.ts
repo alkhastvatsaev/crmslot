@@ -16,6 +16,7 @@ import {
   validateSmartFormSubmitInput,
 } from "@/features/interventions/smartFormSubmitValidation";
 import { writeSmartFormInterventionDoc } from "@/features/interventions/smartFormSubmitWrite";
+import { notifyStaffNewClientRequestClient } from "@/features/notifications/notifyStaffNewClientRequestClient";
 
 export type {
   SmartFormAudioRecorderApi,
@@ -106,7 +107,7 @@ export async function submitSmartFormIntervention(input: SmartFormSubmitInput): 
     });
     finalAudioBlob = audioUpload.finalAudioBlob;
 
-    await writeSmartFormInterventionDoc({
+    const { finalTitle } = await writeSmartFormInterventionDoc({
       db,
       newDocRef,
       user,
@@ -131,6 +132,16 @@ export async function submitSmartFormIntervention(input: SmartFormSubmitInput): 
       nowIso,
       hour,
     });
+
+    if (interventionCompanyId?.trim()) {
+      notifyStaffNewClientRequestClient({
+        companyId: interventionCompanyId.trim(),
+        interventionId: newDocRef.id,
+        title: finalTitle,
+        address: address.trim(),
+        user,
+      });
+    }
 
     runSmartFormSubmitBackgroundTasks({
       db,

@@ -17,6 +17,8 @@ import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePu
 import { isFirebasePublicConfigured } from "@/features/notifications/firebasePublicConfig";
 import { parseBackofficeChatNotificationData } from "@/features/notifications/backofficeChatNotificationUrls";
 import { dispatchBackofficeChatNotificationIntent } from "@/features/notifications/backofficeChatNotificationIntent";
+import { parseBackofficeRequestNotificationData } from "@/features/notifications/backofficeRequestNotificationUrls";
+import { dispatchBackofficeRequestNotificationIntent } from "@/features/notifications/backofficeRequestNotificationIntent";
 
 export type BackofficePushApi = {
   status: FcmUiStatus;
@@ -50,6 +52,12 @@ export function useBackofficePushMessaging(
       if (chatIntent.kind !== "none") {
         toast.message(title, { description: body });
         dispatchBackofficeChatNotificationIntent(chatIntent);
+        return;
+      }
+      const requestIntent = parseBackofficeRequestNotificationData(data);
+      if (requestIntent.kind !== "none") {
+        toast.message(title, { description: body });
+        dispatchBackofficeRequestNotificationIntent(requestIntent);
         return;
       }
       toast.message(title, { description: body });

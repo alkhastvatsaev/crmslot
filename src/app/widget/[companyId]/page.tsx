@@ -6,6 +6,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
 import { auth, firestore, isConfigured } from "@/core/config/firebase";
 import { logCrmInterventionCreated } from "@/features/crmHistory";
+import { notifyStaffNewClientRequestClient } from "@/features/notifications/notifyStaffNewClientRequestClient";
 import { CheckCircle2 } from "lucide-react";
 
 export default function WidgetPage() {
@@ -58,6 +59,13 @@ export default function WidgetPage() {
         actorUid: uid,
         actorRole: "client",
         source: "widget_qr",
+      });
+      notifyStaffNewClientRequestClient({
+        companyId,
+        interventionId: createdRef.id,
+        title: problem.trim().slice(0, 140) || "Demande widget",
+        address: address.trim(),
+        user: auth.currentUser,
       });
       setDone(true);
     } finally {
