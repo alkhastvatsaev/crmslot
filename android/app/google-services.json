@@ -24,6 +24,44 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889606998232:android:851ccd32867fa1562dafad",
+        "android_client_info": {
+          "package_name": "com.crmslot.technician"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3gZyNTOmsDC6Iy1CoIjpL7sg6x1f8HXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889606998232:android:851ccd32867fa1562dafad",
+        "android_client_info": {
+          "package_name": "com.crmslot.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3gZyNTOmsDC6Iy1CoIjpL7sg6x1f8HXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"

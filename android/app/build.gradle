@@ -3,8 +3,22 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.crmslot.app"
     compileSdk rootProject.ext.compileSdkVersion
+    flavorDimensions "satellite"
+    productFlavors {
+        technician {
+            dimension "satellite"
+            applicationId "com.crmslot.technician"
+            resValue "string", "app_name", "Technicien"
+            resValue "string", "title_activity_main", "Technicien"
+        }
+        admin {
+            dimension "satellite"
+            applicationId "com.crmslot.admin"
+            resValue "string", "app_name", "CRMSLOT Admin"
+            resValue "string", "title_activity_main", "CRMSLOT Admin"
+        }
+    }
     defaultConfig {
-        applicationId "com.crmslot.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
