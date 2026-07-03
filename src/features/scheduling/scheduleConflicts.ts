@@ -19,6 +19,8 @@ export type FindScheduleConflictsParams = {
   technicianUid: string;
   candidateRange: OccupiedTimeRange;
   excludeInterventionId?: string;
+  /** Alias UID supplémentaires pour ce technicien (doc ID legacy, etc.). */
+  technicianUidAliases?: readonly string[];
 };
 
 function interventionClientShort(iv: Intervention): string {
@@ -35,11 +37,19 @@ export function findTechnicianScheduleConflicts(
   const tech = technicianUid.trim();
   if (!tech) return [];
 
+  const knownUids = new Set<string>([tech]);
+  if (params.technicianUidAliases) {
+    for (const alias of params.technicianUidAliases) {
+      const a = alias.trim();
+      if (a) knownUids.add(a);
+    }
+  }
+
   const conflicts: ScheduleConflict[] = [];
 
   for (const iv of interventions) {
     if (excludeInterventionId && iv.id === excludeInterventionId) continue;
-    if ((iv.assignedTechnicianUid ?? "").trim() !== tech) continue;
+    if (!knownUids.has((iv.assignedTechnicianUid ?? "").trim())) continue;
     if (!interventionBlocksSchedule(iv)) continue;
 
     const range = getInterventionOccupiedRange(iv);

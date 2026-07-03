@@ -42,7 +42,19 @@ function mergeTechnicianLists(
   return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"));
 }
 
-const ensuredTechniciansCache = new Map<string, Technician[]>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const ensuredTechniciansCache = new Map<
+  string,
+  { data: Technician[]; ts: number; firestoreCount: number }
+>();
+
+function isCacheValid(companyId: string, firestoreCount: number): Technician[] | undefined {
+  const entry = ensuredTechniciansCache.get(companyId);
+  if (!entry) return undefined;
+  if (Date.now() - entry.ts >= CACHE_TTL_MS) return undefined;
+  if (entry.firestoreCount !== firestoreCount) return undefined;
+  return entry.data;
+}
 
 /** Techniciens assignables : profils terrain assurés côté serveur + sync Firestore temps réel. */
 export function useAssignableTechnicians() {
@@ -50,13 +62,19 @@ export function useAssignableTechnicians() {
   const companyId =
     workspace?.workspaceReady === true ? workspace.activeCompanyId?.trim() || null : null;
   const { technicians: firestoreTechnicians, loading: firestoreLoading } = useTechnicians();
-  const cachedEnsured = companyId ? ensuredTechniciansCache.get(companyId) : undefined;
-  const [ensuredTechnicians, setEnsuredTechnicians] = useState<Technician[]>(cachedEnsured ?? []);
-  const [ensuring, setEnsuring] = useState(
-    Boolean(companyId) && !cachedEnsured && firestoreTechnicians.length === 0
-  );
+
+  const firestoreCount = firestoreTechnicians.length;
+
+  const [ensuredTechnicians, setEnsuredTechnicians] = useState<Technician[]>(() => {
+    if (!companyId) return [];
+    return isCacheValid(companyId, firestoreCount) ?? [];
+  });
+  const [ensuring, setEnsuring] = useState(() => {
+    if (!companyId) return false;
+    return !isCacheValid(companyId, firestoreCount) && firestoreCount === 0;
+  });
   const [ensureError, setEnsureError] = useState<string | null>(null);
-  const ensuredCompanyIdRef = useRef<string | null>(cachedEnsured ? companyId : null);
+  const ensuredCompanyIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!companyId) {
@@ -67,10 +85,10 @@ export function useAssignableTechnicians() {
       return;
     }
 
-    const cached = ensuredTechniciansCache.get(companyId);
-    if (cached) {
+    const validData = isCacheValid(companyId, firestoreCount);
+    if (validData) {
       ensuredCompanyIdRef.current = companyId;
-      setEnsuredTechnicians(cached);
+      setEnsuredTechnicians(validData);
       setEnsuring(false);
       setEnsureError(null);
       return;
@@ -78,7 +96,7 @@ export function useAssignableTechnicians() {
 
     let cancelled = false;
     setEnsuredTechnicians([]);
-    setEnsuring(firestoreTechnicians.length === 0);
+    setEnsuring(firestoreCount === 0);
     setEnsureError(null);
 
     void (async () => {
@@ -98,7 +116,11 @@ export function useAssignableTechnicians() {
         }
         if (cancelled) return;
         const normalized = data.technicians.map((technician) => withTechnicianAuthUid(technician));
-        ensuredTechniciansCache.set(companyId, normalized);
+        ensuredTechniciansCache.set(companyId, {
+          data: normalized,
+          ts: Date.now(),
+          firestoreCount,
+        });
         ensuredCompanyIdRef.current = companyId;
         setEnsuredTechnicians(normalized);
       } catch (error) {
@@ -117,7 +139,7 @@ export function useAssignableTechnicians() {
     return () => {
       cancelled = true;
     };
-  }, [companyId, firestoreTechnicians.length]);
+  }, [companyId, firestoreCount]);
 
   const technicians = useMemo(
     () => mergeTechnicianLists(firestoreTechnicians, ensuredTechnicians),

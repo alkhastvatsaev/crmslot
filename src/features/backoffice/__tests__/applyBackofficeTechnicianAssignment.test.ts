@@ -6,9 +6,14 @@ const mockTransitionAdmin = jest.fn(async () => ({ id: "evt-1" }));
 const mockUpdate = jest.fn(async () => undefined);
 
 const mockNotifyAssignment = jest.fn(async () => ({ sent: 1 }));
+const mockNotifyUnassignment = jest.fn(async () => ({ sent: 1 }));
 
 jest.mock("@/features/interventions/server/notifyTechnicianAssignmentAdmin", () => ({
   notifyTechnicianAssignmentAdmin: (...args: unknown[]) => mockNotifyAssignment(...args),
+}));
+
+jest.mock("@/features/interventions/server/notifyTechnicianUnassignmentAdmin", () => ({
+  notifyTechnicianUnassignmentAdmin: (...args: unknown[]) => mockNotifyUnassignment(...args),
 }));
 
 jest.mock("@/features/interventions/workflow/transitionInterventionStatusAdmin", () => ({
@@ -39,17 +44,26 @@ function row(partial: Partial<Intervention> = {}): Intervention {
 }
 
 function makeMockDb(peerDocs: Intervention[] = []) {
+  const emptyQueryResult = { docs: [] };
+  const emptyDocSnap = { exists: false, data: () => undefined };
+
   return {
     collection: () => ({
-      where: () => ({
+      where: (_field: string, _op: string, _val: string) => ({
         get: async () => ({
           docs: peerDocs.map((doc) => ({
             id: doc.id,
             data: () => doc,
           })),
         }),
+        limit: () => ({
+          get: async () => emptyQueryResult,
+        }),
       }),
-      doc: () => ({ update: mockUpdate }),
+      doc: () => ({
+        update: mockUpdate,
+        get: async () => emptyDocSnap,
+      }),
     }),
   } as unknown as Parameters<typeof applyBackofficeTechnicianAssignmentAdmin>[0]["db"];
 }
@@ -59,6 +73,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
     mockTransitionAdmin.mockClear();
     mockUpdate.mockClear();
     mockNotifyAssignment.mockClear();
+    mockNotifyUnassignment.mockClear();
   });
 
   it("transitions pending to assigned", async () => {
@@ -101,6 +116,7 @@ describe("applyBackofficeTechnicianAssignmentAdmin", () => {
     expect(patch.status).toBe("assigned");
     expect(patch.technicianAcceptedAt).toBe("__delete__");
     expect(mockNotifyAssignment).toHaveBeenCalledTimes(1);
+    expect(mockNotifyUnassignment).toHaveBeenCalledTimes(1);
   });
 
   it("rejects en_route dossiers", () => {
