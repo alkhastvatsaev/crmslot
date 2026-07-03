@@ -1,4 +1,4 @@
-import { isCapacitorNative, getCapacitorPlatform } from "./capacitorRuntime";
+import { getCapacitorPlatform, isCapacitorNative } from "./capacitorRuntime";
 import { logger } from "@/core/logger";
 import { ensureAndroidPushChannels } from "./ensureAndroidPushChannels";
 
@@ -24,12 +24,15 @@ export async function fetchNativeFcmToken(): Promise<NativeFcmRegistration | nul
 
   const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
   try {
-    await FirebaseMessaging.requestPermissions();
+    if (platform === "ios") {
+      await FirebaseMessaging.requestPermissions();
+    }
     const { token } = await FirebaseMessaging.getToken();
     if (!token) return null;
     return { token, platform };
   } catch (err) {
     logger.warn("[push] getToken failed", {
+      platform,
       error: err instanceof Error ? err.message : String(err),
     });
     return null;

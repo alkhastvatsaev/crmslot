@@ -2796,7 +2796,9 @@
     "staff_onboarding_enabled": "Notifications activées — vous recevrez les nouvelles demandes et messages.",
     "staff_push_enable_hint": "Activez les notifications pour recevoir les demandes et messages sur cet appareil.",
     "staff_push_enable_action": "Activer",
-    "staff_push_blocked_hint": "Notifications bloquées. Autorisez-les dans les réglages de l’appareil."
+    "staff_push_blocked_hint": "Notifications bloquées. Autorisez-les dans les réglages de l’appareil.",
+    "technician_native_push_hint": "Recevez les nouvelles missions sur cet appareil. Appuyez pour autoriser les notifications de l’app Technicien.",
+    "technician_chrome_push_hint": "Les alertes via l’app Chrome s’affichent sous « Google Chrome ». Pour des notifications au nom Technicien, utilisez l’app native (APK). En attendant, activez les notifications ici."
   },
   "integrations": {
     "webhooks_title": "Webhooks sortants",

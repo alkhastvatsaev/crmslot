@@ -2796,7 +2796,9 @@
     "staff_onboarding_enabled": "Meldingen ingeschakeld — u ontvangt nieuwe aanvragen en berichten.",
     "staff_push_enable_hint": "Schakel meldingen in om aanvragen en berichten op dit apparaat te ontvangen.",
     "staff_push_enable_action": "Inschakelen",
-    "staff_push_blocked_hint": "Meldingen geblokkeerd. Sta ze toe in de instellingen van het apparaat."
+    "staff_push_blocked_hint": "Meldingen geblokkeerd. Sta ze toe in de instellingen van het apparaat.",
+    "technician_native_push_hint": "Ontvang nieuwe opdrachten op dit toestel. Tik om meldingen van de Technicus-app toe te staan.",
+    "technician_chrome_push_hint": "Meldingen via de in Chrome geïnstalleerde app verschijnen als « Google Chrome ». Gebruik de native Technicus-app (APK) voor meldingen onder de app-naam. Schakel intussen hier meldingen in."
   },
   "integrations": {
     "webhooks_title": "Uitgaande webhooks",

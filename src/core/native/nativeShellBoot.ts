@@ -1,10 +1,13 @@
 import { isCapacitorNative } from "./capacitorRuntime";
+import { purgeMobileServiceWorkersAndCaches } from "@/core/pwa/mobileServiceWorkerPolicy";
 
 let booted = false;
 
 export async function bootNativeShell(): Promise<void> {
   if (booted || !isCapacitorNative()) return;
   booted = true;
+
+  await purgeMobileServiceWorkersAndCaches().catch(() => null);
 
   const [{ StatusBar, Style }, { SplashScreen }, { Keyboard }, { App }, { Network }] =
     await Promise.all([

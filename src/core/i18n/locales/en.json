@@ -2796,7 +2796,9 @@
     "staff_onboarding_enabled": "Notifications enabled — you will receive new requests and messages.",
     "staff_push_enable_hint": "Enable notifications to receive new requests and messages on this device.",
     "staff_push_enable_action": "Enable",
-    "staff_push_blocked_hint": "Notifications are blocked. Allow them in your device settings."
+    "staff_push_blocked_hint": "Notifications are blocked. Allow them in your device settings.",
+    "technician_native_push_hint": "Get new assignments on this device. Tap to allow notifications from the Technician app.",
+    "technician_chrome_push_hint": "Alerts via the Chrome-installed app appear as « Google Chrome ». Use the native Technician app (APK) for app-branded notifications. Meanwhile, enable alerts here."
   },
   "integrations": {
     "webhooks_title": "Outbound webhooks",

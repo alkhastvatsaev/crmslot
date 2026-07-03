@@ -6,6 +6,7 @@ import { auth } from "@/core/config/firebase";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { fetchNativeFcmToken, onNativeFcmTokenRefresh } from "@/core/native/nativeFcmToken";
 import { persistFcmTokenAudiences } from "@/features/notifications/fcmWebPush";
+import { purgeWebFcmTokensForUser } from "@/features/notifications/purgeWebFcmTokensClient";
 import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { logger } from "@/core/logger";
 
@@ -18,6 +19,7 @@ export function useTechnicianNativePushBootstrap(enabled = true): void {
     const reg = await fetchNativeFcmToken();
     if (!reg) return;
     await persistFcmTokenAudiences(uid, reg.token, ["technician", "backoffice"], reg.platform);
+    await purgeWebFcmTokensForUser(uid);
   }, []);
 
   useEffect(() => {

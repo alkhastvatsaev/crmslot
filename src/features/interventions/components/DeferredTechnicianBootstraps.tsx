@@ -11,8 +11,8 @@ const TechnicianNotificationBootstrap = dynamic(
   () => import("@/features/notifications/components/TechnicianNotificationBootstrap"),
   { ssr: false }
 );
-const AndroidAppInstallPromoBootstrap = dynamic(
-  () => import("@/core/pwa/AndroidAppInstallPromoBootstrap"),
+const TechnicianPushEnableBanner = dynamic(
+  () => import("@/features/notifications/components/TechnicianPushEnableBanner"),
   { ssr: false }
 );
 
@@ -30,8 +30,8 @@ function DeferredTechnicianBootstrapsInner() {
 
   return (
     <>
+      {idleReady ? <TechnicianPushEnableBanner /> : null}
       {deferredReady ? <TechnicianNotificationBootstrap /> : null}
-      {idleReady ? <AndroidAppInstallPromoBootstrap surface="technician" /> : null}
     </>
   );
 }

@@ -6,6 +6,7 @@ import { auth, clientPortalAuth } from "@/core/config/firebase";
 import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { fetchNativeFcmToken, onNativeFcmTokenRefresh } from "@/core/native/nativeFcmToken";
 import { persistFcmToken, persistFcmTokenAudiences } from "@/features/notifications/fcmWebPush";
+import { purgeWebFcmTokensForUser } from "@/features/notifications/purgeWebFcmTokensClient";
 import type { FcmAudience } from "@/features/notifications/fcmWebPush";
 import { usePushTokenResyncOnResume } from "@/features/notifications/hooks/usePushTokenResyncOnResume";
 import { logger } from "@/core/logger";
@@ -27,6 +28,7 @@ export function useStaffNativePushBootstrap(audience: FcmAudience, enabled = tru
       const staffAudiences: StaffNativeAudience[] =
         audience === "technician" ? ["technician", "backoffice"] : ["backoffice", "technician"];
       await persistFcmTokenAudiences(uid, reg.token, staffAudiences, reg.platform);
+      await purgeWebFcmTokensForUser(uid);
     },
     [audience]
   );
