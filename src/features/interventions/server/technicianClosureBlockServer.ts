@@ -1,8 +1,10 @@
 import type * as admin from "firebase-admin";
+import { isSyntheticInterventionId } from "@/core/config/syntheticInterventions";
 import type { Intervention } from "@/features/interventions/types";
 import {
-  getTechnicianUnclosedInterventions,
+  getTechnicianBlockingActiveMissions,
   isTechnicianAcceptAssignmentBlocked,
+  TECHNICIAN_ACCEPT_BLOCK_QUERY_STATUSES,
 } from "@/features/interventions/technicianClosureBlock";
 import {
   featureFlagsFromEnv,
@@ -55,9 +57,12 @@ export async function assertTechnicianClosureBlockForAccept(params: {
   const snap = await params.db
     .collection("interventions")
     .where("assignedTechnicianUid", "==", uid)
+    .where("status", "in", TECHNICIAN_ACCEPT_BLOCK_QUERY_STATUSES)
     .get();
 
-  const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Intervention);
+  const rows = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as Intervention)
+    .filter((iv) => !isSyntheticInterventionId(iv.id));
   const companyId = (params.companyId ?? "").trim();
   const scoped = companyId ? rows.filter((iv) => (iv.companyId ?? "").trim() === companyId) : rows;
 
@@ -67,7 +72,7 @@ export async function assertTechnicianClosureBlockForAccept(params: {
 
   return {
     blocked: true,
-    blocking: getTechnicianUnclosedInterventions(scoped, uid, {
+    blocking: getTechnicianBlockingActiveMissions(scoped, uid, {
       excludeInterventionId: acceptingId,
     }),
   };
