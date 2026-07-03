@@ -2,7 +2,6 @@
 
 import { useBackofficeChatPushBootstrap } from "@/features/notifications/hooks/useBackofficeChatPushBootstrap";
 import { useStaffPushOnboardingHint } from "@/features/notifications/hooks/useStaffPushOnboardingHint";
-import BackofficePushEnableBanner from "@/features/notifications/components/BackofficePushEnableBanner";
 
 /**
  * Bootstrap silencieux : enregistre le jeton FCM web pour l'admin connecté.
@@ -11,5 +10,5 @@ import BackofficePushEnableBanner from "@/features/notifications/components/Back
 export default function BackofficePushBootstrap() {
   useBackofficeChatPushBootstrap();
   useStaffPushOnboardingHint();
-  return <BackofficePushEnableBanner />;
+  return null;
 }
