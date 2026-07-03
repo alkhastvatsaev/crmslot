@@ -12,6 +12,7 @@ import {
 import type { Intervention } from "@/features/interventions";
 import { isInterventionPendingBackOfficeIntake } from "@/features/interventions/technicianSchedule";
 import { notifyTechnicianAssignmentAdmin } from "@/features/interventions/server/notifyTechnicianAssignmentAdmin";
+import { notifyTechnicianUnassignmentAdmin } from "@/features/interventions/server/notifyTechnicianUnassignmentAdmin";
 import { transitionInterventionStatusAdmin } from "@/features/interventions/workflow/transitionInterventionStatusAdmin";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { logger } from "@/core/logger";
@@ -22,6 +23,36 @@ function clearTechnicianResponseFields(): Record<string, unknown> {
     technicianDeclinedAt: admin.firestore.FieldValue.delete(),
     technicianDeclinedByUid: admin.firestore.FieldValue.delete(),
   };
+}
+
+/**
+ * Résout les alias UID d'un technicien (doc ID Firestore ↔ authUid).
+ * Permet de détecter les conflits sur des interventions stockées avec l'un ou l'autre.
+ */
+async function resolveTechnicianUidAliases(
+  db: admin.firestore.Firestore,
+  authUid: string
+): Promise<string[]> {
+  const trimmed = authUid.trim();
+  if (!trimmed) return [];
+  const aliases: string[] = [];
+  try {
+    const snap = await db.collection("technicians").where("authUid", "==", trimmed).limit(5).get();
+    for (const doc of snap.docs) {
+      const docId = doc.id.trim();
+      if (docId && docId !== trimmed) aliases.push(docId);
+    }
+    const directSnap = await db.collection("technicians").doc(trimmed).get();
+    if (directSnap.exists) {
+      const docAuthUid = (
+        ((directSnap.data() as Record<string, unknown>)?.authUid as string) ?? ""
+      ).trim();
+      if (docAuthUid && docAuthUid !== trimmed) aliases.push(docAuthUid);
+    }
+  } catch {
+    // non critique
+  }
+  return [...new Set(aliases)];
 }
 
 export async function applyBackofficeTechnicianAssignmentAdmin(params: {
@@ -55,7 +86,10 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
     peerInterventions,
     scheduleOverride: schedule,
     now,
+    serverTz: true,
   });
+
+  const technicianUidAliases = await resolveTechnicianUidAliases(db, technicianUid);
 
   const candidateRange = candidateRangeFromScheduleFields(
     resolved.scheduledDate,
@@ -67,6 +101,7 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
       technicianUid,
       candidateRange,
       excludeInterventionId: interventionId,
+      technicianUidAliases,
     });
     if (conflicts.length > 0) {
       throw new Error("Ce créneau chevauche une autre mission du technicien.");
@@ -105,6 +140,24 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
 
   const previousUid = (iv.assignedTechnicianUid ?? "").trim();
   const nextUid = technicianUid.trim();
+
+  if (previousUid && previousUid !== nextUid) {
+    try {
+      await notifyTechnicianUnassignmentAdmin({
+        db,
+        technicianUid: previousUid,
+        interventionId,
+        iv,
+      });
+    } catch (err) {
+      logger.warn("[applyBackofficeTechnicianAssignmentAdmin] unassign push failed", {
+        interventionId,
+        technicianUid: previousUid,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
   if (nextUid && previousUid !== nextUid) {
     try {
       const push = await notifyTechnicianAssignmentAdmin({
