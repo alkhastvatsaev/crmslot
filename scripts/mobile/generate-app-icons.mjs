@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 /**
  * Generate native + PWA app icons from public/pwa/icon-*.svg sources.
- *
- * Android adaptive icons use 108dp layers (not 48dp launcher sizes) to avoid blur.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -12,7 +10,6 @@ import sharp from "sharp";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
 
-/** Legacy launcher icon sizes (48dp) */
 const ANDROID_LAUNCHER_SIZES = {
   mdpi: 48,
   hdpi: 72,
@@ -21,7 +18,6 @@ const ANDROID_LAUNCHER_SIZES = {
   xxxhdpi: 192,
 };
 
-/** Adaptive icon foreground sizes (108dp) — required for sharp rendering */
 const ANDROID_ADAPTIVE_FOREGROUND_SIZES = {
   mdpi: 108,
   hdpi: 162,
@@ -34,20 +30,50 @@ const NATIVE_VARIANTS = {
   admin: {
     svg: "icon-admin.svg",
     backgroundColor: "#FFFFFF",
-    lockColor: "#A8A29E",
+    foreground: "admin",
   },
   technician: {
     svg: "icon-technician.svg",
     backgroundColor: "#09090B",
-    lockColor: "#FFFFFF",
+    foreground: "technician",
   },
 };
 
 const PWA_VARIANTS = ["admin", "inbox", "technician", "demande"];
 
-function lockForegroundSvg(lockColor) {
+function lockForegroundSvg(variant) {
+  if (variant === "admin") {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="adminLockGradFg" x1="256" y1="128" x2="256" y2="406" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E7E5E4"/>
+      <stop offset="38%" stop-color="#A8A29E"/>
+      <stop offset="72%" stop-color="#78716C"/>
+      <stop offset="100%" stop-color="#57534E"/>
+    </linearGradient>
+    <filter id="adminLockShadowFg" x="-25%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#78716C" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <g transform="translate(256,272) scale(0.58) translate(-256,-272)" filter="url(#adminLockShadowFg)" fill="url(#adminLockGradFg)">
+    <circle cx="256" cy="214" r="86"/>
+    <rect x="204" y="228" width="104" height="178" rx="52"/>
+  </g>
+</svg>`;
+  }
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <g transform="translate(256,272) scale(0.58) translate(-256,-272)" fill="${lockColor}">
+  <defs>
+    <linearGradient id="techLockGradFg" x1="256" y1="128" x2="256" y2="406" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="42%" stop-color="#F5F5F4"/>
+      <stop offset="100%" stop-color="#D4D4D8"/>
+    </linearGradient>
+    <filter id="techLockShadowFg" x="-25%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+  </defs>
+  <g transform="translate(256,272) scale(0.58) translate(-256,-272)" filter="url(#techLockShadowFg)" fill="url(#techLockGradFg)">
     <circle cx="256" cy="214" r="86"/>
     <rect x="204" y="228" width="104" height="178" rx="52"/>
   </g>
@@ -112,7 +138,7 @@ async function generateAndroidFlavor(flavor, config) {
   console.log(`→ Android flavor: ${flavor}`);
   const flavorRes = path.join(ROOT, "android/app/src", flavor, "res");
   const svgPath = path.join(ROOT, "public/pwa", config.svg);
-  const foregroundSvg = lockForegroundSvg(config.lockColor);
+  const foregroundSvg = lockForegroundSvg(config.foreground);
 
   fs.mkdirSync(path.join(flavorRes, "values"), { recursive: true });
   fs.mkdirSync(path.join(flavorRes, "mipmap-anydpi-v26"), { recursive: true });
@@ -131,8 +157,7 @@ async function generateAndroidFlavor(flavor, config) {
   for (const [density, size] of Object.entries(ANDROID_ADAPTIVE_FOREGROUND_SIZES)) {
     const dir = path.join(flavorRes, `mipmap-${density}`);
     fs.mkdirSync(dir, { recursive: true });
-    const foreground = await renderSvg(foregroundSvg, size);
-    await writePng(path.join(dir, "ic_launcher_foreground.png"), foreground);
+    await writePng(path.join(dir, "ic_launcher_foreground.png"), await renderSvg(foregroundSvg, size));
   }
 
   console.log(`  ✓ ${path.relative(ROOT, flavorRes)}`);
