@@ -4,7 +4,17 @@ import type { Intervention } from "@/features/interventions/types";
 type TechnicianResponseBody = {
   ok?: boolean;
   error?: string;
+  code?: string;
+  blockingIds?: string[];
 };
+
+function formatTechnicianResponseError(body: TechnicianResponseBody, status: number): string {
+  const base = body.error?.trim() || `Erreur serveur (${status})`;
+  if (body.code !== "TECHNICIAN_CLOSURE_BLOCK") return base;
+  const ids = (body.blockingIds ?? []).map((id) => id.trim()).filter(Boolean);
+  if (ids.length === 0) return base;
+  return `${base} Dossier(s) bloquant(s) : ${ids.join(", ")}.`;
+}
 
 async function postTechnicianAssignmentResponse(
   interventionId: string,
@@ -30,10 +40,10 @@ async function postTechnicianAssignmentResponse(
   }
 
   if (!res.ok) {
-    throw new Error(body.error?.trim() || `Erreur serveur (${res.status})`);
+    throw new Error(formatTechnicianResponseError(body, res.status));
   }
   if (body.ok === false) {
-    throw new Error(body.error?.trim() || "Action refusée");
+    throw new Error(formatTechnicianResponseError(body, res.status));
   }
 }
 
