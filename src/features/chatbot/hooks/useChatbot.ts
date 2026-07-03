@@ -10,8 +10,6 @@ import { useChatbotSupplierOrdersPanel } from "@/features/chatbot/hooks/useChatb
 import { useDashboardPagerOptional } from "@/features/dashboard";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useHubRailActive } from "@/features/dashboard/hooks/useHubRailActive";
-import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
-import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useBillingHubIntentOptional } from "@/context/BillingHubIntentContext";
 import { BILLING_HUB_SLOT_INDEX } from "@/features/billingHub/billingHubConstants";
 import { useDocumentPageVisible } from "@/core/perf/useDocumentPageVisible";
@@ -33,10 +31,8 @@ export function useChatbot() {
   const companyId = resolveCompanyId(workspace);
   const uid = workspace?.firebaseUid ?? "anon";
   const isMobile = useIsMobile();
-  const inboxIntent = useBackofficeInboxIntentOptional();
   const billingIntent = useBillingHubIntentOptional();
   const billingHubRightRailActive = useHubRailActive("right");
-  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
   const documentVisible = useDocumentPageVisible();
   const billingHubPageActive = pager?.pageIndex === BILLING_HUB_SLOT_INDEX;
   const billingHubDocumentsTab =
@@ -49,11 +45,7 @@ export function useChatbot() {
     companyId &&
     workspaceReady &&
     documentVisible &&
-    (isMobile !== true ||
-      (powerGate.documentsTabActive && powerGate.inboxDataActive) ||
-      billingHubDocumentsRailActive ||
-      hasDocumentPreview ||
-      streaming)
+    (isMobile !== true || billingHubDocumentsRailActive || hasDocumentPreview || streaming)
   );
 
   const supplierOrdersPanelApi = useChatbotSupplierOrdersPanel(

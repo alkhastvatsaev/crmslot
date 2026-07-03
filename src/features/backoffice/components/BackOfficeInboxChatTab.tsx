@@ -10,6 +10,7 @@ import ChatDayClientsPicker from "@/features/backoffice/components/ChatDayClient
 import { interventionClientLabel } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import type { ChatDayMissionRow } from "@/features/backoffice/chatDayMissionRow";
+import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import {
   PORTAL_CHAT_GLOBAL_THREAD_ID,
   isPortalChatSenderThreadId,
@@ -32,7 +33,7 @@ export default function BackOfficeInboxChatTab({
   chatDayRows: ChatDayMissionRow[];
   threadsNeedingReply?: ReadonlySet<string>;
   interventions: Intervention[];
-  setActiveTab: (tab: "chat" | "requests" | "reports" | "documents") => void;
+  setActiveTab: (tab: BackOfficeInboxTab) => void;
 }) {
   const { t } = useTranslation();
 

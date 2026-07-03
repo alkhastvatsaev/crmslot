@@ -8,7 +8,6 @@ import MapboxMapControls from "@/features/map/components/MapboxMapControls";
 import MapMissionSelectedOverlay from "@/features/map/components/MapMissionSelectedOverlay";
 import MapboxViewDesktopLayout from "@/features/map/components/MapboxViewDesktopLayout";
 import { useDashboardPagerOptional } from "@/features/dashboard";
-import { useBackofficeInboxIntentOptional } from "@/context/BackofficeInboxIntentContext";
 import { useMobileHubLayout } from "@/context/LayoutShellContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 import { useMobileMapPagePowerGate } from "@/features/dashboard/hooks/useMobileMapPagePowerGate";
@@ -34,9 +33,8 @@ export default function MapboxView() {
   const mobileHubLayout = useMobileHubLayout();
   const isMobile = mobileHubLayout || isMobileClient === true;
   const pager = useDashboardPagerOptional();
-  const inboxIntent = useBackofficeInboxIntentOptional();
   const mapRenderActive = useMobileMapRenderGate(mapContainer);
-  const powerGate = useMobileMapPagePowerGate(inboxIntent?.activeInboxTab);
+  const powerGate = useMobileMapPagePowerGate();
   const mapHubDataActive = isMobile !== true || powerGate.mapHubDataActive;
   const dashboardPageIndex = pager?.pageIndex ?? 0;
   const mapWebGLActive = resolveMapWebGLActive(isMobile, dashboardPageIndex, mapRenderActive);

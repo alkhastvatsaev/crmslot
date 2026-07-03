@@ -165,11 +165,11 @@ describe("useBackOfficeInboxSelection", () => {
     const { result } = renderSelection([], intent);
 
     act(() => {
-      result.current.setActiveTab("documents");
+      result.current.setActiveTab("reports");
     });
 
     await waitFor(() => {
-      expect(intent.setActiveInboxTab).toHaveBeenCalledWith("documents");
+      expect(intent.setActiveInboxTab).toHaveBeenCalledWith("reports");
     });
   });
 });
