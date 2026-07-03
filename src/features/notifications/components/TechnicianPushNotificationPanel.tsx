@@ -2,11 +2,29 @@
 
 import { Bell, BellOff, BellRing, Loader2 } from "lucide-react";
 import { GLASS_PANEL_BODY_SCROLL_COMPACT } from "@/core/ui/glassPanelChrome";
+import { isCapacitorNative } from "@/core/native/capacitorRuntime";
+import { useTechnicianNativePushRegistration } from "@/features/notifications/hooks/useTechnicianNativePushRegistration";
 import { useTechnicianPushMessaging } from "@/features/notifications/useTechnicianPushMessaging";
 
 export default function TechnicianPushNotificationPanel() {
   const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-  const { status, lastError, registerPush } = useTechnicianPushMessaging(vapidKey);
+  const native = isCapacitorNative();
+  const nativePush = useTechnicianNativePushRegistration(native);
+  const webPush = useTechnicianPushMessaging(vapidKey, { enabled: !native });
+
+  const status = native
+    ? nativePush.status === "granted"
+      ? "registered"
+      : nativePush.status === "denied"
+        ? "blocked"
+        : nativePush.status === "registering"
+          ? "registering"
+          : nativePush.status === "unsupported"
+            ? "unsupported"
+            : "idle"
+    : webPush.status;
+  const lastError = native ? nativePush.lastError : webPush.lastError;
+  const registerPush = native ? nativePush.registerPush : webPush.registerPush;
 
   const hint =
     status === "needs_vapid"
@@ -18,12 +36,16 @@ export default function TechnicianPushNotificationPanel() {
           : status === "blocked"
             ? "Notifications bloquées."
             : status === "registered"
-              ? "Actives."
+              ? native
+                ? "Actives (app Technicien)."
+                : "Actives."
               : status === "registering"
                 ? "…"
                 : status === "error"
                   ? "Erreur."
-                  : "En attente d’activation.";
+                  : native
+                    ? "Appuyez pour autoriser les notifications."
+                    : "En attente d’activation.";
 
   return (
     <div
@@ -33,7 +55,7 @@ export default function TechnicianPushNotificationPanel() {
       <h2 className="sr-only">Notifications push</h2>
       <p className="sr-only">
         Alertes missions et rappel quotidien 17h Europe/Bruxelles si interventions ouvertes ;
-        Firebase Cloud Messaging et service worker.
+        Firebase Cloud Messaging.
       </p>
 
       <div className="flex flex-col items-center gap-2 rounded-[16px] border border-black/[0.06] bg-white/90 px-3 py-4 shadow-[0_14px_36px_-18px_rgba(15,23,42,0.14)]">
