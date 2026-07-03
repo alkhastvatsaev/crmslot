@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { Mission } from "@/features/map";
 import CompanyChatPanel from "@/features/backoffice/components/CompanyChatPanel";
-import ChatbotDocumentsRightPanel from "@/features/chatbot/components/ChatbotDocumentsRightPanel";
 import ScheduleDragBoard from "@/features/scheduling/components/ScheduleDragBoard";
 import { useBackOfficeInboxState } from "@/features/backoffice/hooks/useBackOfficeInboxState";
+import type { BackOfficeInboxTab } from "@/features/backoffice/backOfficeInboxTypes";
 import BackOfficeInboxChatTab from "@/features/backoffice/components/BackOfficeInboxChatTab";
 import BackOfficeInboxListTab from "@/features/backoffice/components/BackOfficeInboxListTab";
 import InterventionDetailPanel from "@/features/backoffice/components/InterventionDetailPanel";
@@ -93,7 +93,7 @@ export default function BackOfficeInboxPanel({
 
       <HubSegmentedControl
         value={s.activeTab}
-        onChange={(id) => s.setActiveTab(id as "chat" | "requests" | "reports" | "documents")}
+        onChange={(id) => s.setActiveTab(id as BackOfficeInboxTab)}
         className="mx-4 my-4 shrink-0"
         options={[
           {
@@ -120,12 +120,6 @@ export default function BackOfficeInboxPanel({
             badge: s.chatThreadsNeedingReply,
             badgeAccent: "blue",
           },
-          {
-            id: "documents",
-            label: t("backoffice.inbox.tabs.documents"),
-            testId: "backoffice-inbox-tab-documents",
-            activeAccent: "slate",
-          },
         ]}
       />
 
@@ -139,17 +133,6 @@ export default function BackOfficeInboxPanel({
         interventions={s.interventions}
         setActiveTab={s.setActiveTab}
       />
-
-      <div
-        className={cn(
-          "flex min-h-0 flex-1 flex-col overflow-hidden",
-          s.activeTab !== "documents" && "hidden"
-        )}
-        aria-hidden={s.activeTab !== "documents"}
-        data-testid="backoffice-inbox-documents-panel"
-      >
-        <ChatbotDocumentsRightPanel />
-      </div>
 
       <BackOfficeInboxListTab
         active={listTabActive}

@@ -5,7 +5,7 @@ import { useDashboardPagerOptional } from "@/features/dashboard/dashboardPagerCo
 import { useMobileHubRailSnapshot } from "@/features/dashboard/MobileHubRailContext";
 import { useIsMobile } from "@/features/dashboard/hooks/useIsMobile";
 
-export type MobileInboxTab = "chat" | "requests" | "reports" | "documents";
+export type MobileInboxTab = "chat" | "requests" | "reports";
 
 export type MobileMapPagePowerGate = {
   /** Page carte (index 0) visible à l'écran mobile. */
@@ -16,27 +16,20 @@ export type MobileMapPagePowerGate = {
   mapRenderDataActive: boolean;
   /** Inbox back-office : rail droit. */
   inboxDataActive: boolean;
-  /** Onglet Documents actif dans l'inbox. */
-  documentsTabActive: boolean;
 };
 
-export function useMobileMapPagePowerGate(
-  activeInboxTab: MobileInboxTab | null | undefined
-): MobileMapPagePowerGate {
+export function useMobileMapPagePowerGate(): MobileMapPagePowerGate {
   const isMobile = useIsMobile();
   const pager = useDashboardPagerOptional();
   const railSnapshot = useMobileHubRailSnapshot();
 
   return useMemo(() => {
-    const documentsTabActive = activeInboxTab === "documents";
-
     if (isMobile !== true) {
       return {
         mapPageVisible: true,
         mapHubDataActive: true,
         mapRenderDataActive: true,
         inboxDataActive: true,
-        documentsTabActive,
       };
     }
 
@@ -48,7 +41,6 @@ export function useMobileMapPagePowerGate(
       mapHubDataActive: mapPageVisible && (activeRail === "left" || activeRail === "center"),
       mapRenderDataActive: mapPageVisible && activeRail === "left",
       inboxDataActive: mapPageVisible && activeRail === "right",
-      documentsTabActive,
     };
-  }, [activeInboxTab, isMobile, pager?.pageIndex, railSnapshot?.activeRail, railSnapshot?.visible]);
+  }, [isMobile, pager?.pageIndex, railSnapshot?.activeRail, railSnapshot?.visible]);
 }

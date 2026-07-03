@@ -46,25 +46,23 @@ describe("useMobileMapPagePowerGate", () => {
   it("desktop — tous les flux carte/inbox restent actifs", () => {
     useIsMobileMock.mockReturnValue(false);
 
-    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
+    const { result } = renderHook(() => useMobileMapPagePowerGate());
 
     expect(result.current).toEqual({
       mapPageVisible: true,
       mapHubDataActive: true,
       mapRenderDataActive: true,
       inboxDataActive: true,
-      documentsTabActive: true,
     });
   });
 
   it("mobile carte rail gauche — WebGL actif, inbox coupé", () => {
-    const { result } = renderHook(() => useMobileMapPagePowerGate("chat"));
+    const { result } = renderHook(() => useMobileMapPagePowerGate());
 
     expect(result.current.mapPageVisible).toBe(true);
     expect(result.current.mapRenderDataActive).toBe(true);
     expect(result.current.mapHubDataActive).toBe(true);
     expect(result.current.inboxDataActive).toBe(false);
-    expect(result.current.documentsTabActive).toBe(false);
   });
 
   it("mobile autre hub — carte démontée", () => {
@@ -76,7 +74,7 @@ describe("useMobileMapPagePowerGate", () => {
       goPrev: jest.fn(),
     });
 
-    const { result } = renderHook(() => useMobileMapPagePowerGate(null));
+    const { result } = renderHook(() => useMobileMapPagePowerGate());
 
     expect(result.current.mapPageVisible).toBe(false);
     expect(result.current.mapHubDataActive).toBe(false);
@@ -92,10 +90,9 @@ describe("useMobileMapPagePowerGate", () => {
       requestRail: jest.fn(),
     });
 
-    const { result } = renderHook(() => useMobileMapPagePowerGate("documents"));
+    const { result } = renderHook(() => useMobileMapPagePowerGate());
 
     expect(result.current.inboxDataActive).toBe(true);
-    expect(result.current.documentsTabActive).toBe(true);
     expect(result.current.mapRenderDataActive).toBe(false);
   });
 });
