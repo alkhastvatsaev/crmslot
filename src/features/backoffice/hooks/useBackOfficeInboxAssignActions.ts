@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { auth, firestore } from "@/core/config/firebase";
 import { assignInterventionFromBackoffice } from "@/features/backoffice/assignInterventionFromBackoffice";
 import type { BackOfficeInboxActionsArgs } from "@/features/backoffice/backOfficeInboxActionsTypes";
+import { scheduledFieldsWhenReleasingToTechnician } from "@/features/interventions/technicianSchedule";
 import { transitionInterventionStatus } from "@/features/interventions/workflow/transitionInterventionStatus";
 import { dispatcherTransitionActor } from "@/features/interventions/workflow/workflowActor";
 import { updateInterventionSchedule } from "@/features/scheduling/updateInterventionSchedule";
@@ -62,8 +63,8 @@ export function useBackOfficeInboxAssignActions({
         }
         const assignment = await assignInterventionFromBackoffice(id, row, technicianUid, schedule);
         if (assignment?.rescheduled) {
-          const fromSlot =
-            `${row.requestedDate ?? row.scheduledDate ?? "?"} ${row.requestedTime ?? row.scheduledTime ?? ""}`.trim();
+          const baseline = scheduledFieldsWhenReleasingToTechnician(row);
+          const fromSlot = `${baseline.scheduledDate} ${baseline.scheduledTime}`.trim();
           toast.success(String(t("backoffice.toasts.request_assigned_rescheduled")), {
             description: String(t("backoffice.toasts.request_assigned_rescheduled_desc"))
               .replace("{{from}}", fromSlot)

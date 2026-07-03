@@ -2,6 +2,10 @@ import * as admin from "firebase-admin";
 import type { AssignInterventionSchedule } from "@/features/backoffice/assignInterventionFromBackoffice";
 import { resolveSmartAssignmentSchedule } from "@/features/scheduling/resolveSmartAssignmentSchedule";
 import {
+  candidateRangeFromScheduleFields,
+  findTechnicianScheduleConflicts,
+} from "@/features/scheduling/scheduleConflicts";
+import {
   buildBackofficeAssignPatch,
   canApplyBackofficeTechnicianAssignment,
 } from "@/features/backoffice/applyBackofficeTechnicianAssignmentShared";
@@ -53,9 +57,28 @@ export async function applyBackofficeTechnicianAssignmentAdmin(params: {
     now,
   });
 
+  const candidateRange = candidateRangeFromScheduleFields(
+    resolved.scheduledDate,
+    resolved.scheduledTime
+  );
+  if (candidateRange) {
+    const conflicts = findTechnicianScheduleConflicts({
+      interventions: peerInterventions,
+      technicianUid,
+      candidateRange,
+      excludeInterventionId: interventionId,
+    });
+    if (conflicts.length > 0) {
+      throw new Error("Ce créneau chevauche une autre mission du technicien.");
+    }
+  }
+
   const actor = dispatcherTransitionActor(actorUid);
   const basePatch = buildBackofficeAssignPatch(iv, technicianUid, schedule, {
-    peerInterventions,
+    resolvedSchedule: {
+      scheduledDate: resolved.scheduledDate,
+      scheduledTime: resolved.scheduledTime,
+    },
     now,
   });
 

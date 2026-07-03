@@ -14,8 +14,15 @@ export function buildBackofficeAssignPatch(
   opts?: {
     peerInterventions?: Intervention[];
     now?: Date;
+    resolvedSchedule?: { scheduledDate: string; scheduledTime: string };
   }
 ) {
+  if (opts?.resolvedSchedule) {
+    return buildAssignInterventionToTechnicianUpdate(iv, technicianUid, opts.now ?? new Date(), {
+      scheduledDate: opts.resolvedSchedule.scheduledDate,
+      scheduledTime: opts.resolvedSchedule.scheduledTime,
+    });
+  }
   if (opts?.peerInterventions) {
     const resolved = resolveSmartAssignmentSchedule({
       iv,

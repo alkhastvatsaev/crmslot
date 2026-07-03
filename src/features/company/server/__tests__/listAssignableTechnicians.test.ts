@@ -33,22 +33,35 @@ function staffMember(overrides: Partial<CompanyStaffMember> & Pick<CompanyStaffM
 }
 
 function makeDb(technicians: Array<{ id: string; data: Record<string, unknown> }>) {
-  const set = jest.fn().mockResolvedValue(undefined);
-  const where = jest.fn().mockReturnValue({
-    get: jest.fn().mockResolvedValue({
-      docs: technicians.map((row) => ({
-        id: row.id,
-        data: () => row.data,
-      })),
-    }),
+  const byId = new Map(technicians.map((row) => [row.id, row.data]));
+  const set = jest.fn().mockImplementation(async (id: string, data: Record<string, unknown>) => {
+    const existing = byId.get(id) ?? {};
+    byId.set(id, { ...existing, ...data });
   });
-  const doc = jest.fn().mockReturnValue({ set });
+  const where = jest.fn().mockReturnValue({
+    get: jest.fn().mockImplementation(async () => ({
+      docs: [...byId.entries()].map(([id, data]) => ({
+        id,
+        data: () => data,
+      })),
+    })),
+  });
+  const doc = jest.fn().mockImplementation((id: string) => ({
+    set: (data: Record<string, unknown>, opts?: { merge?: boolean }) =>
+      set(id, opts?.merge ? { ...(byId.get(id) ?? {}), ...data } : data),
+    get: jest.fn().mockImplementation(async () => ({
+      id,
+      exists: byId.has(id),
+      data: () => byId.get(id) ?? {},
+    })),
+  }));
   const collection = jest.fn().mockReturnValue({ where, doc });
 
   return {
     db: { collection } as unknown as admin.firestore.Firestore,
     set,
     where,
+    byId,
   };
 }
 
@@ -57,7 +70,7 @@ describe("listAssignableTechnicians", () => {
     jest.clearAllMocks();
   });
 
-  it("provisions missing profiles for dirigeants and active technicians", async () => {
+  it("lists assignable technicians and provisions only missing profiles", async () => {
     listCompanyStaffMock
       .mockResolvedValueOnce([
         staffMember({
@@ -94,7 +107,7 @@ describe("listAssignableTechnicians", () => {
         }),
       ]);
 
-    const { db, set } = makeDb([
+    const { db } = makeDb([
       {
         id: "admin-1",
         data: {
@@ -119,8 +132,7 @@ describe("listAssignableTechnicians", () => {
 
     const technicians = await listAssignableTechnicians(db, {} as typeof admin.auth, "company-1");
 
-    expect(provisionTechnicianStaffRecordMock).toHaveBeenCalledTimes(2);
-    expect(set).toHaveBeenCalledTimes(2);
+    expect(provisionTechnicianStaffRecordMock).not.toHaveBeenCalled();
     expect(technicians.map((row) => row.id).sort()).toEqual(["admin-1", "tech-1"]);
   });
 });

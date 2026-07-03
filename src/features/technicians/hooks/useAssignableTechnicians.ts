@@ -7,19 +7,42 @@ import { useTechnicians } from "@/features/technicians/hooks";
 import type { Technician } from "@/features/technicians/types";
 import { withTechnicianAuthUid } from "@/features/technicians/withTechnicianAuthUid";
 
+function mergeTechnicianRecord(primary: Technician, secondary: Technician): Technician {
+  const a = withTechnicianAuthUid(primary);
+  const b = withTechnicianAuthUid(secondary);
+  return {
+    ...a,
+    ...b,
+    authUid: a.authUid || b.authUid,
+    name: b.name?.trim() ? b.name : a.name,
+    status: b.status ?? a.status,
+    location: b.location ?? a.location,
+  };
+}
+
 function mergeTechnicianLists(
   firestoreTechnicians: Technician[],
   ensuredTechnicians: Technician[]
 ): Technician[] {
   const byId = new Map<string, Technician>();
   for (const technician of ensuredTechnicians) {
-    byId.set(technician.id, withTechnicianAuthUid(technician));
+    const existing = byId.get(technician.id);
+    byId.set(
+      technician.id,
+      existing ? mergeTechnicianRecord(technician, existing) : withTechnicianAuthUid(technician)
+    );
   }
   for (const technician of firestoreTechnicians) {
-    byId.set(technician.id, withTechnicianAuthUid(technician));
+    const existing = byId.get(technician.id);
+    byId.set(
+      technician.id,
+      existing ? mergeTechnicianRecord(existing, technician) : withTechnicianAuthUid(technician)
+    );
   }
   return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"));
 }
+
+const ensuredTechniciansCache = new Map<string, Technician[]>();
 
 /** Techniciens assignables : profils terrain assurés côté serveur + sync Firestore temps réel. */
 export function useAssignableTechnicians() {
@@ -27,10 +50,13 @@ export function useAssignableTechnicians() {
   const companyId =
     workspace?.workspaceReady === true ? workspace.activeCompanyId?.trim() || null : null;
   const { technicians: firestoreTechnicians, loading: firestoreLoading } = useTechnicians();
-  const [ensuredTechnicians, setEnsuredTechnicians] = useState<Technician[]>([]);
-  const [ensuring, setEnsuring] = useState(Boolean(companyId));
+  const cachedEnsured = companyId ? ensuredTechniciansCache.get(companyId) : undefined;
+  const [ensuredTechnicians, setEnsuredTechnicians] = useState<Technician[]>(cachedEnsured ?? []);
+  const [ensuring, setEnsuring] = useState(
+    Boolean(companyId) && !cachedEnsured && firestoreTechnicians.length === 0
+  );
   const [ensureError, setEnsureError] = useState<string | null>(null);
-  const ensuredCompanyIdRef = useRef<string | null>(null);
+  const ensuredCompanyIdRef = useRef<string | null>(cachedEnsured ? companyId : null);
 
   useEffect(() => {
     if (!companyId) {
@@ -41,8 +67,18 @@ export function useAssignableTechnicians() {
       return;
     }
 
+    const cached = ensuredTechniciansCache.get(companyId);
+    if (cached) {
+      ensuredCompanyIdRef.current = companyId;
+      setEnsuredTechnicians(cached);
+      setEnsuring(false);
+      setEnsureError(null);
+      return;
+    }
+
     let cancelled = false;
-    setEnsuring(true);
+    setEnsuredTechnicians([]);
+    setEnsuring(firestoreTechnicians.length === 0);
     setEnsureError(null);
 
     void (async () => {
@@ -61,10 +97,10 @@ export function useAssignableTechnicians() {
           );
         }
         if (cancelled) return;
+        const normalized = data.technicians.map((technician) => withTechnicianAuthUid(technician));
+        ensuredTechniciansCache.set(companyId, normalized);
         ensuredCompanyIdRef.current = companyId;
-        setEnsuredTechnicians(
-          data.technicians.map((technician) => withTechnicianAuthUid(technician))
-        );
+        setEnsuredTechnicians(normalized);
       } catch (error) {
         if (cancelled) return;
         setEnsureError(
@@ -81,7 +117,7 @@ export function useAssignableTechnicians() {
     return () => {
       cancelled = true;
     };
-  }, [companyId]);
+  }, [companyId, firestoreTechnicians.length]);
 
   const technicians = useMemo(
     () => mergeTechnicianLists(firestoreTechnicians, ensuredTechnicians),
@@ -90,7 +126,8 @@ export function useAssignableTechnicians() {
 
   return {
     technicians,
-    loading: firestoreLoading || ensuring,
+    loading: technicians.length === 0 && (firestoreLoading || ensuring),
     ensureError,
+    ensuring,
   };
 }

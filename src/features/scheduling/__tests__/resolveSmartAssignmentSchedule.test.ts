@@ -24,7 +24,9 @@ describe("resolveSmartAssignmentSchedule", () => {
     expect(result).toEqual({
       scheduledDate: "2026-06-20",
       scheduledTime: "14:00",
-      rescheduled: false,
+      rescheduled: true,
+      originalDate: "2026-06-10",
+      originalTime: "09:00",
     });
   });
 

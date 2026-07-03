@@ -10,8 +10,8 @@ describe("pickRecommendedSlot", () => {
     expect(pickRecommendedSlot(slots, "11:00")).toBe("11:00");
   });
 
-  it("falls back to first slot", () => {
-    expect(pickRecommendedSlot(slots, "15:00")).toBe("09:00");
+  it("falls back to the closest available slot", () => {
+    expect(pickRecommendedSlot(slots, "15:00")).toBe("11:00");
   });
 
   it("returns null when no slots", () => {

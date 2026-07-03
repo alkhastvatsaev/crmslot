@@ -17,34 +17,67 @@ function isAssignableStaffMember(member: CompanyStaffMember): boolean {
 export async function ensureAssignableTechnicianProfiles(
   db: admin.firestore.Firestore,
   auth: typeof admin.auth,
-  companyId: string
+  companyId: string,
+  assignableStaff?: CompanyStaffMember[]
 ): Promise<void> {
-  const staff = await listCompanyStaff(db, auth, companyId);
+  const staff = assignableStaff ?? (await listCompanyStaff(db, auth, companyId));
   const assignable = staff.filter(isAssignableStaffMember);
+  if (assignable.length === 0) return;
+
+  const existingSnaps = await Promise.all(
+    assignable.map((member) => db.collection("technicians").doc(member.uid).get())
+  );
+  const existingByUid = new Map(existingSnaps.map((snap) => [snap.id, snap]));
 
   await Promise.all(
     assignable.map(async (member) => {
-      await provisionTechnicianStaffRecord(
-        db,
-        {
-          uid: member.uid,
-          companyId,
-          profile: {
-            firstName: member.firstName,
-            lastName: member.lastName,
-            email: member.email,
+      const existing = existingByUid.get(member.uid);
+      const existingData = existing?.data() ?? {};
+      const isActiveProfile =
+        existing?.exists === true &&
+        existingData.active !== false &&
+        (existingData.companyId ?? "").trim() === companyId.trim();
+
+      if (!existing?.exists) {
+        await provisionTechnicianStaffRecord(
+          db,
+          {
+            uid: member.uid,
+            companyId,
+            profile: {
+              firstName: member.firstName,
+              lastName: member.lastName,
+              email: member.email,
+            },
           },
-        },
-        { auth }
-      );
-      await db.collection("technicians").doc(member.uid).set(
-        {
-          active: true,
-          companyId,
-          updatedAt: FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+          { auth }
+        );
+        return;
+      }
+
+      const needsAuthUidBackfill = isActiveProfile && !String(existingData.authUid ?? "").trim();
+
+      if (needsAuthUidBackfill) {
+        await db.collection("technicians").doc(member.uid).set(
+          {
+            authUid: member.uid,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+        return;
+      }
+
+      if (!isActiveProfile) {
+        await db.collection("technicians").doc(member.uid).set(
+          {
+            active: true,
+            companyId,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
     })
   );
 }
@@ -55,10 +88,11 @@ export async function listAssignableTechnicians(
   auth: typeof admin.auth,
   companyId: string
 ): Promise<Technician[]> {
-  await ensureAssignableTechnicianProfiles(db, auth, companyId);
-
   const staff = await listCompanyStaff(db, auth, companyId);
-  const assignableUids = new Set(staff.filter(isAssignableStaffMember).map((member) => member.uid));
+  const assignable = staff.filter(isAssignableStaffMember);
+  await ensureAssignableTechnicianProfiles(db, auth, companyId, assignable);
+
+  const assignableUids = new Set(assignable.map((member) => member.uid));
 
   const snap = await db.collection("technicians").where("companyId", "==", companyId).get();
   return stripLegacyDemoTechnicians(

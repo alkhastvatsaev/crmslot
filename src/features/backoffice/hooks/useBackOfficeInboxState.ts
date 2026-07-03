@@ -43,7 +43,10 @@ import {
   proposeAvailableSlotsForTechnician,
   proposeCompanyOpenSlots,
 } from "@/features/scheduling/proposeAvailableSlots";
-import { initialAssignmentDateYmd } from "@/features/scheduling/resolveSmartAssignmentSchedule";
+import {
+  initialAssignmentDateYmd,
+  filterFutureProposedSlots,
+} from "@/features/scheduling/resolveSmartAssignmentSchedule";
 
 export type { BackOfficeInboxStateOptions } from "@/features/backoffice/backOfficeInboxTypes";
 
@@ -191,15 +194,15 @@ export function useBackOfficeInboxState(
     const dateYmd =
       selection.editDate.trim() || initialAssignmentDateYmd(selection.selectedItem, new Date());
     const tech = (selection.selectedItem.assignedTechnicianUid ?? "").trim();
-    if (tech) {
-      return proposeAvailableSlotsForTechnician({
-        interventions,
-        technicianUid: tech,
-        dateYmd,
-        excludeInterventionId: selection.selectedItem.id,
-      });
-    }
-    return proposeCompanyOpenSlots({ interventions, dateYmd });
+    const slots = tech
+      ? proposeAvailableSlotsForTechnician({
+          interventions,
+          technicianUid: tech,
+          dateYmd,
+          excludeInterventionId: selection.selectedItem.id,
+        })
+      : proposeCompanyOpenSlots({ interventions, dateYmd });
+    return filterFutureProposedSlots(slots);
   }, [interventions, selection.editDate, selection.isEditingDateTime, selection.selectedItem]);
 
   const intakeSlotsTitleKey = (selection.selectedItem?.assignedTechnicianUid ?? "").trim()
