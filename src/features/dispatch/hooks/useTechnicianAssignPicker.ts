@@ -9,7 +9,10 @@ import {
   type AssignScheduleOverride,
 } from "@/features/interventions/assignInterventionToTechnician";
 import { proposeAvailableSlotsForTechnician } from "@/features/scheduling/proposeAvailableSlots";
-import { initialAssignmentDateYmd } from "@/features/scheduling/resolveSmartAssignmentSchedule";
+import {
+  filterFutureProposedSlots,
+  initialAssignmentDateYmd,
+} from "@/features/scheduling/resolveSmartAssignmentSchedule";
 import {
   prioritizeDefaultAssignTechnician,
   rankTechniciansForIntervention,
@@ -93,8 +96,9 @@ export function useTechnicianAssignPicker({
   rankedLengthRef.current = ranked.length;
 
   useEffect(() => {
+    if (techniciansOnly || rankedLengthRef.current === 0) return;
+
     let cancelled = false;
-    if (rankedLengthRef.current === 0) return;
 
     const calculateBest = async () => {
       setEtaLoading(true);
@@ -129,7 +133,13 @@ export function useTechnicianAssignPicker({
     };
     // technicians/ranked are accessed via ref — only re-run on stable intervention identity
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interventionCoords.lat, interventionCoords.lng, intervention.problem, intervention.address]);
+  }, [
+    techniciansOnly,
+    interventionCoords.lat,
+    interventionCoords.lng,
+    intervention.problem,
+    intervention.address,
+  ]);
 
   const scheduleOverride = useMemo((): AssignScheduleOverride | undefined => {
     if (techniciansOnly || !selectedSlotTime?.trim()) return undefined;
@@ -140,12 +150,14 @@ export function useTechnicianAssignPicker({
     if (techniciansOnly || !selectedId) return [];
     const tech = ranked.find((r) => r.technician.id === selectedId);
     if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
-    return proposeAvailableSlotsForTechnician({
-      interventions: peerInterventions,
-      technicianUid: resolveTechnicianAssignUid(tech.technician),
-      dateYmd: scheduleDate,
-      excludeInterventionId: intervention.id,
-    });
+    return filterFutureProposedSlots(
+      proposeAvailableSlotsForTechnician({
+        interventions: peerInterventions,
+        technicianUid: resolveTechnicianAssignUid(tech.technician),
+        dateYmd: scheduleDate,
+        excludeInterventionId: intervention.id,
+      })
+    );
   }, [techniciansOnly, selectedId, ranked, peerInterventions, scheduleDate, intervention.id]);
 
   useEffect(() => {
@@ -166,7 +178,7 @@ export function useTechnicianAssignPicker({
   ]);
 
   const selectedConflicts = useMemo(() => {
-    if (!selectedId) return [];
+    if (techniciansOnly || !selectedId) return [];
     const tech = ranked.find((r) => r.technician.id === selectedId);
     if (!tech || !canResolveTechnicianAssignUid(tech.technician)) return [];
     const uid = resolveTechnicianAssignUid(tech.technician);
@@ -184,7 +196,7 @@ export function useTechnicianAssignPicker({
       candidateRange: range,
       excludeInterventionId: intervention.id,
     });
-  }, [selectedId, ranked, intervention, peerInterventions, scheduleOverride]);
+  }, [techniciansOnly, selectedId, ranked, intervention, peerInterventions, scheduleOverride]);
 
   const handleConfirm = () => {
     const row = ranked.find((r) => r.technician.id === selectedId);
@@ -193,7 +205,7 @@ export function useTechnicianAssignPicker({
       toast.error(String(t("dispatch.assign_picker.missing_auth_uid")));
       return;
     }
-    if (selectedConflicts.length > 0) {
+    if (!techniciansOnly && selectedConflicts.length > 0) {
       toast.error(String(t("scheduling.conflict.block_assign")));
       return;
     }
@@ -206,7 +218,10 @@ export function useTechnicianAssignPicker({
   };
 
   const confirmDisabled =
-    !selectedId || isAssigning || ranked.length === 0 || selectedConflicts.length > 0;
+    !selectedId ||
+    isAssigning ||
+    ranked.length === 0 ||
+    (!techniciansOnly && selectedConflicts.length > 0);
 
   return {
     loading,

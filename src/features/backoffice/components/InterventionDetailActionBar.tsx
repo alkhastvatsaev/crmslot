@@ -7,6 +7,7 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   isInterventionAwaitingTechnicianAcceptance,
   isInterventionInBackofficeRequestsQueue,
+  localCalendarYmd,
 } from "@/features/interventions/technicianSchedule";
 import type { Intervention } from "@/features/interventions";
 import ScheduleConflictBanner from "@/features/scheduling/components/ScheduleConflictBanner";
@@ -100,7 +101,7 @@ export default function InterventionDetailActionBar({
               dateYmd={
                 editDate.trim() ||
                 selectedItem.requestedDate?.trim() ||
-                new Date().toISOString().slice(0, 10)
+                localCalendarYmd(new Date())
               }
               onDateChange={(date) => {
                 setEditDate(date);

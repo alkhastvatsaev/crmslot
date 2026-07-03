@@ -2031,7 +2031,7 @@
       "voice_empty": "No voice message",
       "signature_client": "Client signature",
       "signature_alt": "Signature",
-      "confirm_assign": "Confirm & assign",
+      "confirm_assign": "Assign",
       "verify_report": "Validate",
       "archive_report": "Archive",
       "archive_report_aria": "Archive this report to the Archive section",

@@ -2031,7 +2031,7 @@
       "voice_empty": "Нет голосового сообщения",
       "signature_client": "Подпись клиента",
       "signature_alt": "Подпись",
-      "confirm_assign": "Подтвердить и назначить",
+      "confirm_assign": "Назначить",
       "verify_report": "Подтвердить",
       "archive_report": "В архив",
       "archive_report_aria": "Архивировать этот отчёт в разделе Архив",

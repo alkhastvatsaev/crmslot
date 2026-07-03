@@ -61,8 +61,8 @@ describe("findBestTechnician", () => {
     expect(result).toBeNull();
   });
 
-  it("returns null when technician has no authUid (canResolveTechnicianAssignUid fails)", async () => {
-    const result = await findBestTechnician([tech("a", { authUid: undefined })], 50.85, 4.35);
+  it("returns null when technician cannot resolve assign uid", async () => {
+    const result = await findBestTechnician([tech("", { authUid: undefined })], 50.85, 4.35);
     expect(result).toBeNull();
   });
 

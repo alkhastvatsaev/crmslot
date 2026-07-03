@@ -19,9 +19,22 @@ describe("resolveTechnicianAssignUid", () => {
     expect(resolveTechnicianAssignUid(techWithAuth)).toBe("firebase-uid-abc");
   });
 
-  it("throws when authUid missing outside dev preview fallback", () => {
+  it("falls back to document id when authUid is missing", () => {
     const tech: Technician = {
       id: "1",
+      name: "Alex",
+      initial: "A",
+      vehicle: "Van",
+      status: "available",
+      location: { lat: 50.85, lng: 4.35 },
+    };
+    expect(resolveTechnicianAssignUid(tech)).toBe("1");
+    expect(canResolveTechnicianAssignUid(tech)).toBe(true);
+  });
+
+  it("throws when authUid and document id are missing", () => {
+    const tech: Technician = {
+      id: "",
       name: "Alex",
       initial: "A",
       vehicle: "Van",

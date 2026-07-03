@@ -1,6 +1,8 @@
 import type { Technician } from "@/features/technicians/types";
 
-/** Retourne le technicien tel quel — `authUid` doit être renseigné en base. */
+/** Normalise `authUid` — repli sur l’id doc quand le profil legacy n’a pas le champ. */
 export function withTechnicianAuthUid(technician: Technician): Technician {
-  return technician;
+  const authUid = (technician.authUid ?? "").trim() || technician.id.trim();
+  if (!authUid || authUid === (technician.authUid ?? "").trim()) return technician;
+  return { ...technician, authUid };
 }

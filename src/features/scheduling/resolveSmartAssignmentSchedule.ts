@@ -4,13 +4,13 @@ import {
   localCalendarYmd,
   scheduledFieldsWhenReleasingToTechnician,
 } from "@/features/interventions/technicianSchedule";
+import { normalizeTimeHm } from "@/features/interventions/technicianScheduleParse";
 import {
   proposeAvailableSlotsForTechnician,
   proposeCompanyOpenSlots,
   type ProposedSlot,
 } from "@/features/scheduling/proposeAvailableSlots";
 import { pickRecommendedSlot } from "@/features/scheduling/pickRecommendedSlot";
-import { SCHEDULING_WORK_SLOTS } from "@/features/scheduling/schedulingConstants";
 
 export const SMART_ASSIGNMENT_HORIZON_DAYS = 14;
 
@@ -59,12 +59,19 @@ export function initialAssignmentDateYmd(
   return today;
 }
 
-function filterFutureSlots(slots: ProposedSlot[], now: Date): ProposedSlot[] {
+export function filterFutureProposedSlots(
+  slots: ProposedSlot[],
+  now: Date = new Date()
+): ProposedSlot[] {
   const nowMs = now.getTime();
   return slots.filter((slot) => {
     const ms = parseScheduleSlotStartMs(slot.date, slot.time);
     return ms != null && ms > nowMs;
   });
+}
+
+function filterFutureSlots(slots: ProposedSlot[], now: Date): ProposedSlot[] {
+  return filterFutureProposedSlots(slots, now);
 }
 
 function slotsForDay(params: {
@@ -118,9 +125,20 @@ export function resolveSmartAssignmentSchedule(params: {
 
   if (override?.scheduledDate?.trim() && override.scheduledTime?.trim()) {
     const scheduledDate = override.scheduledDate.trim();
-    const scheduledTime = override.scheduledTime.trim();
+    const scheduledTime =
+      normalizeTimeHm(override.scheduledTime.trim()) ?? override.scheduledTime.trim();
     if (!isScheduleSlotInPast(scheduledDate, scheduledTime, now)) {
-      return { scheduledDate, scheduledTime, rescheduled: false };
+      const baseline = scheduledFieldsWhenReleasingToTechnician(params.iv, now);
+      const rescheduled =
+        scheduledDate !== baseline.scheduledDate || scheduledTime !== baseline.scheduledTime;
+      return {
+        scheduledDate,
+        scheduledTime,
+        rescheduled,
+        ...(rescheduled
+          ? { originalDate: baseline.scheduledDate, originalTime: baseline.scheduledTime }
+          : {}),
+      };
     }
   }
 
@@ -128,7 +146,9 @@ export function resolveSmartAssignmentSchedule(params: {
   const originalDate = baseline.scheduledDate;
   const originalTime = baseline.scheduledTime;
   const preferredTime =
-    params.iv.requestedTime?.trim() || params.iv.scheduledTime?.trim() || baseline.scheduledTime;
+    normalizeTimeHm(params.iv.requestedTime) ||
+    normalizeTimeHm(params.iv.scheduledTime) ||
+    baseline.scheduledTime;
 
   const baselinePast = isScheduleSlotInPast(originalDate, originalTime, now);
 
@@ -175,19 +195,5 @@ export function resolveSmartAssignmentSchedule(params: {
     };
   }
 
-  const today = localCalendarYmd(now);
-  const fallbackSlots = filterFutureSlots(
-    SCHEDULING_WORK_SLOTS.map((time) => ({ date: today, time })),
-    now
-  );
-  const scheduledTime =
-    pickRecommendedSlot(fallbackSlots, preferredTime) ?? SCHEDULING_WORK_SLOTS[0]!;
-
-  return {
-    scheduledDate: today,
-    scheduledTime,
-    rescheduled: true,
-    originalDate,
-    originalTime,
-  };
+  throw new Error("Aucun créneau disponible pour ce technicien dans les 14 prochains jours.");
 }
