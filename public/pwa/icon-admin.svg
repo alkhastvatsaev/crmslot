@@ -5,18 +5,24 @@
       <stop offset="100%" stop-color="#F5F5F5"/>
     </linearGradient>
     <linearGradient id="adminLockGrad" x1="256" y1="128" x2="256" y2="406" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#E7E5E4"/>
-      <stop offset="38%" stop-color="#A8A29E"/>
-      <stop offset="72%" stop-color="#78716C"/>
+      <stop offset="0%" stop-color="#F5F5F4"/>
+      <stop offset="35%" stop-color="#D6D3D1"/>
+      <stop offset="62%" stop-color="#A8A29E"/>
       <stop offset="100%" stop-color="#57534E"/>
     </linearGradient>
+    <linearGradient id="adminLockStroke" x1="210" y1="130" x2="300" y2="410" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.65"/>
+      <stop offset="45%" stop-color="#A8A29E" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#44403C" stop-opacity="0.42"/>
+    </linearGradient>
     <filter id="adminLockShadow" x="-25%" y="-20%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#78716C" flood-opacity="0.28"/>
+      <feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#78716C" flood-opacity="0.22"/>
     </filter>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#adminBgGrad)"/>
-  <g filter="url(#adminLockShadow)" fill="url(#adminLockGrad)">
+  <g filter="url(#adminLockShadow)" fill="url(#adminLockGrad)" stroke="url(#adminLockStroke)" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke fill">
     <circle cx="256" cy="214" r="86"/>
     <rect x="204" y="228" width="104" height="178" rx="52"/>
   </g>
+  <ellipse cx="256" cy="176" rx="34" ry="18" fill="#FFFFFF" fill-opacity="0.18"/>
 </svg>
