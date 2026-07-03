@@ -2,12 +2,7 @@
 /**
  * Generate native + PWA app icons from public/pwa/icon-*.svg sources.
  *
- * Fixes Android adaptive icon "too big" issue by splitting foreground (glyph only,
- * safe-zone padded) from background (solid color per variant).
- *
- * Usage:
- *   node scripts/mobile/generate-app-icons.mjs
- *   NATIVE_ICON_VARIANT=admin node scripts/mobile/generate-app-icons.mjs --ios-only
+ * Android adaptive icons use 108dp layers (not 48dp launcher sizes) to avoid blur.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,7 +12,8 @@ import sharp from "sharp";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
 
-const ANDROID_DENSITIES = {
+/** Legacy launcher icon sizes (48dp) */
+const ANDROID_LAUNCHER_SIZES = {
   mdpi: 48,
   hdpi: 72,
   xhdpi: 96,
@@ -25,31 +21,33 @@ const ANDROID_DENSITIES = {
   xxxhdpi: 192,
 };
 
-/** Native Android flavors → SVG source + adaptive background color */
+/** Adaptive icon foreground sizes (108dp) — required for sharp rendering */
+const ANDROID_ADAPTIVE_FOREGROUND_SIZES = {
+  mdpi: 108,
+  hdpi: 162,
+  xhdpi: 216,
+  xxhdpi: 324,
+  xxxhdpi: 432,
+};
+
 const NATIVE_VARIANTS = {
   admin: {
     svg: "icon-admin.svg",
     backgroundColor: "#FFFFFF",
-    lockColor: "#09090B",
+    lockColor: "#A8A29E",
   },
   technician: {
     svg: "icon-technician.svg",
     backgroundColor: "#09090B",
-    lockColor: "#F5F5F4",
+    lockColor: "#FFFFFF",
   },
 };
 
-/** PWA variants → SVG source file */
-const PWA_VARIANTS = [
-  "admin",
-  "inbox",
-  "technician",
-  "demande",
-];
+const PWA_VARIANTS = ["admin", "inbox", "technician", "demande"];
 
 function lockForegroundSvg(lockColor) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <g transform="translate(256,272) scale(0.56) translate(-256,-272)" fill="${lockColor}">
+  <g transform="translate(256,272) scale(0.58) translate(-256,-272)" fill="${lockColor}">
     <circle cx="256" cy="214" r="86"/>
     <rect x="204" y="228" width="104" height="178" rx="52"/>
   </g>
@@ -72,11 +70,21 @@ function backgroundColorXml(color) {
 }
 
 async function renderSvg(svgContent, size) {
-  return sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer();
+  const supersample = size * 2;
+  return sharp(Buffer.from(svgContent))
+    .resize(supersample, supersample, { kernel: sharp.kernel.lanczos3 })
+    .resize(size, size, { kernel: sharp.kernel.lanczos3 })
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toBuffer();
 }
 
 async function renderSvgFile(svgPath, size) {
-  return sharp(svgPath).resize(size, size).png().toBuffer();
+  const supersample = size * 2;
+  return sharp(svgPath)
+    .resize(supersample, supersample, { kernel: sharp.kernel.lanczos3 })
+    .resize(size, size, { kernel: sharp.kernel.lanczos3 })
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toBuffer();
 }
 
 async function writePng(filePath, buffer) {
@@ -88,24 +96,14 @@ async function generatePwaIcons() {
   console.log("→ PWA icons");
   for (const variant of PWA_VARIANTS) {
     const svgPath = path.join(ROOT, "public/pwa", `icon-${variant}.svg`);
-    if (!fs.existsSync(svgPath)) {
-      console.warn(`  skip ${variant}: ${svgPath} missing`);
-      continue;
-    }
+    if (!fs.existsSync(svgPath)) continue;
     for (const size of [192, 512]) {
       const out = path.join(ROOT, "public/pwa", `icon-${variant}-${size}.png`);
-      const buf = await renderSvgFile(svgPath, size);
-      await writePng(out, buf);
+      await writePng(out, await renderSvgFile(svgPath, size));
       console.log(`  ✓ ${path.relative(ROOT, out)}`);
     }
     const maskableOut = path.join(ROOT, "public/pwa", `icon-${variant}-maskable-512.png`);
-    const maskableSvg = await fs.promises.readFile(svgPath, "utf8");
-    const padded = maskableSvg.replace(
-      'viewBox="0 0 512 512"',
-      'viewBox="0 0 512 512"',
-    );
-    const buf = await renderSvg(padded, 512);
-    await writePng(maskableOut, buf);
+    await writePng(maskableOut, await renderSvgFile(svgPath, 512));
     console.log(`  ✓ ${path.relative(ROOT, maskableOut)}`);
   }
 }
@@ -114,34 +112,26 @@ async function generateAndroidFlavor(flavor, config) {
   console.log(`→ Android flavor: ${flavor}`);
   const flavorRes = path.join(ROOT, "android/app/src", flavor, "res");
   const svgPath = path.join(ROOT, "public/pwa", config.svg);
+  const foregroundSvg = lockForegroundSvg(config.lockColor);
 
   fs.mkdirSync(path.join(flavorRes, "values"), { recursive: true });
   fs.mkdirSync(path.join(flavorRes, "mipmap-anydpi-v26"), { recursive: true });
+  fs.writeFileSync(path.join(flavorRes, "values/ic_launcher_background.xml"), backgroundColorXml(config.backgroundColor));
+  fs.writeFileSync(path.join(flavorRes, "mipmap-anydpi-v26/ic_launcher.xml"), adaptiveIconXml());
+  fs.writeFileSync(path.join(flavorRes, "mipmap-anydpi-v26/ic_launcher_round.xml"), adaptiveIconXml());
 
-  fs.writeFileSync(
-    path.join(flavorRes, "values/ic_launcher_background.xml"),
-    backgroundColorXml(config.backgroundColor),
-  );
-  fs.writeFileSync(
-    path.join(flavorRes, "mipmap-anydpi-v26/ic_launcher.xml"),
-    adaptiveIconXml(),
-  );
-  fs.writeFileSync(
-    path.join(flavorRes, "mipmap-anydpi-v26/ic_launcher_round.xml"),
-    adaptiveIconXml(),
-  );
-
-  const foregroundSvg = lockForegroundSvg(config.lockColor);
-
-  for (const [density, size] of Object.entries(ANDROID_DENSITIES)) {
+  for (const [density, size] of Object.entries(ANDROID_LAUNCHER_SIZES)) {
     const dir = path.join(flavorRes, `mipmap-${density}`);
     fs.mkdirSync(dir, { recursive: true });
-
     const fullIcon = await renderSvgFile(svgPath, size);
-    const foreground = await renderSvg(foregroundSvg, size);
-
     await writePng(path.join(dir, "ic_launcher.png"), fullIcon);
     await writePng(path.join(dir, "ic_launcher_round.png"), fullIcon);
+  }
+
+  for (const [density, size] of Object.entries(ANDROID_ADAPTIVE_FOREGROUND_SIZES)) {
+    const dir = path.join(flavorRes, `mipmap-${density}`);
+    fs.mkdirSync(dir, { recursive: true });
+    const foreground = await renderSvg(foregroundSvg, size);
     await writePng(path.join(dir, "ic_launcher_foreground.png"), foreground);
   }
 
@@ -152,20 +142,15 @@ async function generateIosIcon(variant) {
   console.log(`→ iOS AppIcon (${variant})`);
   const config = NATIVE_VARIANTS[variant] ?? NATIVE_VARIANTS.admin;
   const svgPath = path.join(ROOT, "public/pwa", config.svg);
-  const out = path.join(
-    ROOT,
-    "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png",
-  );
-  const buf = await renderSvgFile(svgPath, 1024);
-  await writePng(out, buf);
+  const out = path.join(ROOT, "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png");
+  await writePng(out, await renderSvgFile(svgPath, 1024));
   console.log(`  ✓ ${path.relative(ROOT, out)}`);
 }
 
 async function updateResourcesIcon() {
   const adminSvg = path.join(ROOT, "public/pwa/icon-admin.svg");
   const out = path.join(ROOT, "resources/icon-only.png");
-  const buf = await renderSvgFile(adminSvg, 512);
-  await writePng(out, buf);
+  await writePng(out, await renderSvgFile(adminSvg, 512));
   console.log(`  ✓ ${path.relative(ROOT, out)}`);
 }
 
@@ -182,10 +167,7 @@ async function main() {
     await updateResourcesIcon();
   }
 
-  await generateIosIcon(
-    NATIVE_VARIANTS[variant] ? variant : "admin",
-  );
-
+  await generateIosIcon(NATIVE_VARIANTS[variant] ? variant : "admin");
   console.log("\nDone. Rebuild APK/IPA to see changes.");
 }
 
