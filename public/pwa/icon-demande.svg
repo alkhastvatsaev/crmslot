@@ -20,7 +20,7 @@
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#techBgGrad)"/>
   <g filter="url(#techLockShadow)">
-    <path d="M256 128 A86 86 0 1 1 308 282.4 L308 354 A52 52 0 0 1 256 406 A52 52 0 0 1 204 354 L204 282.4 A86 86 0 1 1 256 128 Z" fill="url(#techLockGrad)" stroke="url(#techLockStroke)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+    <path d="M 256 128 A 86 86 0 0 1 308 282.4 L 308 354 A 52 52 0 0 1 256 406 A 52 52 0 0 1 204 354 L 204 282.4 A 86 86 0 0 1 256 128 Z" fill="url(#techLockGrad)" stroke="url(#techLockStroke)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
     <ellipse cx="256" cy="176" rx="34" ry="18" fill="#FFFFFF" fill-opacity="0.22"/>
   </g>
 </svg>
