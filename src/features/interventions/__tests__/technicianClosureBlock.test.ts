@@ -1,4 +1,5 @@
 import {
+  getTechnicianBlockingActiveMissions,
   getTechnicianUnclosedInterventions,
   isTechnicianAcceptAssignmentBlocked,
   isTechnicianBlockedByOpenDossiers,
@@ -18,9 +19,14 @@ describe("technicianClosureBlock", () => {
     expect(isTechnicianBlockedByOpenDossiers(rows, uid)).toBe(false);
   });
 
-  it("lists active missions assigned to technician", () => {
+  it("lists unclosed missions assigned to technician", () => {
     const rows = [
-      makeIntervention({ id: "open", status: "in_progress", assignedTechnicianUid: uid }),
+      makeIntervention({
+        id: "open",
+        status: "in_progress",
+        assignedTechnicianUid: uid,
+        technicianAcceptedAt: "2026-07-03T08:00:00.000Z",
+      }),
       makeIntervention({ id: "closed", status: "done", assignedTechnicianUid: uid }),
       makeIntervention({
         id: "other-tech",
@@ -39,13 +45,26 @@ describe("technicianClosureBlock", () => {
     expect(isTechnicianAcceptAssignmentBlocked(rows, uid, "only-assigned")).toBe(false);
   });
 
-  it("blocks accept when another mission is still open", () => {
+  it("does not block accept when only other assigned missions exist", () => {
     const rows = [
-      makeIntervention({ id: "active", status: "in_progress", assignedTechnicianUid: uid }),
+      makeIntervention({ id: "future", status: "assigned", assignedTechnicianUid: uid }),
+      makeIntervention({ id: "new-offer", status: "assigned", assignedTechnicianUid: uid }),
+    ];
+    expect(isTechnicianAcceptAssignmentBlocked(rows, uid, "new-offer")).toBe(false);
+  });
+
+  it("blocks accept when another active field mission is open", () => {
+    const rows = [
+      makeIntervention({
+        id: "active",
+        status: "in_progress",
+        assignedTechnicianUid: uid,
+        technicianAcceptedAt: "2026-07-03T08:00:00.000Z",
+      }),
       makeIntervention({ id: "new-offer", status: "assigned", assignedTechnicianUid: uid }),
     ];
     expect(isTechnicianAcceptAssignmentBlocked(rows, uid, "new-offer")).toBe(true);
-    const blocking = getTechnicianUnclosedInterventions(rows, uid, {
+    const blocking = getTechnicianBlockingActiveMissions(rows, uid, {
       excludeInterventionId: "new-offer",
     });
     expect(blocking.map((r) => r.id)).toEqual(["active"]);
