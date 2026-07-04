@@ -182,6 +182,7 @@ export default function TechnicianCommissionPanel({
             return (
               <div key={p.monthKey} className="flex h-full flex-1 flex-col justify-end">
                 <div
+                  data-testid={`technician-commission-sparkline-bar-${p.monthKey}`}
                   className={cn(
                     "w-full rounded-t-md transition",
                     isCurrent

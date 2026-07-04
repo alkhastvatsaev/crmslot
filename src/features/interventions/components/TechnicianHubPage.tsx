@@ -7,7 +7,6 @@ import { useHubAnyRailActive, useHubRailActive } from "@/features/dashboard/hook
 import TechnicianDashboardDetailPanel from "@/features/interventions/components/TechnicianDashboardDetailPanel";
 import TechnicianFinishJobPanel from "@/features/interventions/components/TechnicianFinishJobPanel";
 import TechnicianHubRightPanel from "@/features/interventions/components/TechnicianHubRightPanel";
-import { interventionOpenForTerrainPhotos } from "@/features/interventions/technicianCommissionScope";
 import DailyMissions from "@/features/dashboard/components/DailyMissions";
 import type { Mission } from "@/features/map";
 import { useTechnicianCaseIntent } from "@/context/TechnicianCaseIntentContext";
@@ -134,12 +133,6 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
 
   const centerView = calendarOpen ? "calendar" : finishJobInterventionId ? "finish" : "detail";
 
-  const showPhotosInRightPanel = Boolean(
-    selectedCaseId &&
-    liveSelectedIntervention &&
-    interventionOpenForTerrainPhotos(liveSelectedIntervention)
-  );
-
   const leftPanel = (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <DailyMissions missions={todayMissions} onMissionClick={handleMissionClick} isEmbedded />
@@ -190,9 +183,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
     </div>
   );
 
-  const rightAriaSuffix = showPhotosInRightPanel
-    ? t("technician_hub.aria.right_photos")
-    : t("technician_hub.aria.right_gains");
+  const rightAriaSuffix = t("technician_hub.aria.right_gains");
 
   const layoutLabels = {
     left: `${t("technician_hub.aria.page")} ${humanPage} — ${t("technician_hub.aria.left")}`,
@@ -228,13 +219,7 @@ export default function TechnicianHubPage({ slotIndex }: Props) {
         rightAriaLabel={layoutLabels.right}
         mobileLeftLabel={String(t("technician_hub.mobile.rail_left"))}
         mobileCenterLabel={String(t("technician_hub.mobile.rail_center"))}
-        mobileRightLabel={String(
-          t(
-            showPhotosInRightPanel
-              ? "technician_hub.mobile.rail_right_photos"
-              : "technician_hub.mobile.rail_right"
-          )
-        )}
+        mobileRightLabel={String(t("technician_hub.mobile.rail_right"))}
         left={leftPanel}
         center={centerPanel}
         right={rightPanel}
