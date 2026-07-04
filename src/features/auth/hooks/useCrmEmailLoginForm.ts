@@ -23,6 +23,10 @@ import {
 import type { CrmEmailAuthTab, CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
 import { useCrmStaffOAuth } from "@/features/auth/hooks/useCrmStaffOAuth";
 import { markStaffPushOnboardingPending } from "@/features/notifications/staffPushOnboarding";
+import {
+  staffPasswordResetActionCodeSettings,
+  staffPasswordResetErrorFeedback,
+} from "@/features/auth/staffPasswordResetFeedback";
 
 type Args = {
   variant: CrmEmailLoginVariant;
@@ -127,14 +131,16 @@ export function useCrmEmailLoginForm({ variant }: Args) {
       return;
     }
     setResetting(true);
+    const continueOrigin = typeof window !== "undefined" ? window.location.origin : "";
     try {
-      await sendPasswordResetEmail(auth, email.trim());
+      await sendPasswordResetEmail(auth, email.trim(), staffPasswordResetActionCodeSettings());
       toast.success(String(t("auth.reset_email_sent")));
     } catch (e) {
       logger.error(`[${logLabel}] reset failed`, {
         error: e instanceof Error ? e.message : String(e),
       });
-      setInlineError(String(t("auth.reset_email_failed")));
+      const { title, description } = staffPasswordResetErrorFeedback(e, continueOrigin);
+      setInlineError(description ? `${title} — ${description}` : title);
     } finally {
       setResetting(false);
     }
