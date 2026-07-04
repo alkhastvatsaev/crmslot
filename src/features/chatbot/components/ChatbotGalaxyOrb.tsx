@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/features/dashboard";
 import { startGalaxyStarsAnimation } from "@/core/ui/GalaxyButton/galaxyStarsAnimation";
 import "@/core/ui/GalaxyButton/GalaxyButton.css";
 import { isMobilePowerSaveClient } from "@/core/ui/GalaxyButton/galaxyAnimationPowerPolicy";
@@ -20,12 +21,14 @@ type Props = {
 
 /** Cercle avatar Chatbot — animation étoiles / fond bleu (GalaxyButton). */
 export default function ChatbotGalaxyOrb({ className, size = "sm", onPress }: Props) {
+  const isMobile = useIsMobile();
   const surfaceRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isHero = size === "hero";
   const interactive = Boolean(onPress);
 
   useEffect(() => {
+    if (isMobile === true) return;
     const surface = surfaceRef.current;
     const canvas = canvasRef.current;
     if (!surface || !canvas) return;
@@ -52,7 +55,9 @@ export default function ChatbotGalaxyOrb({ className, size = "sm", onPress }: Pr
       window.cancelAnimationFrame(id);
       cleanup?.();
     };
-  }, [isHero]);
+  }, [isHero, isMobile]);
+
+  if (isMobile === true) return null;
 
   const surface = (
     <>

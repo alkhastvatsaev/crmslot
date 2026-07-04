@@ -1606,47 +1606,12 @@
     background: rgb(255 255 255 / 0.97) !important;
   }
 
-  [data-mobile-shell] .premium-btn .galaxy-stars-canvas,
-  [data-mobile-shell] .chatbot-galaxy-orb__canvas {
+  [data-mobile-shell] .premium-btn .galaxy-stars-canvas {
     display: none;
   }
 
   [data-mobile-shell] .premium-btn {
     background: linear-gradient(145deg, rgb(30 58 138), rgb(37 99 235)) !important;
-  }
-
-  [data-mobile-shell] .chatbot-galaxy-orb {
-    --orb-fill: radial-gradient(
-      circle at 48% 42%,
-      rgb(147 197 253) 0%,
-      rgb(59 130 246) 28%,
-      rgb(37 99 235) 52%,
-      rgb(29 78 216) 78%,
-      rgb(30 58 138) 100%
-    );
-    background: var(--orb-fill) !important;
-    border: 1px solid rgba(255, 255, 255, 0.78);
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-    outline: none !important;
-    outline-offset: 0 !important;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.12),
-      0 2px 8px -2px rgba(15, 23, 42, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.38),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.16) !important;
-  }
-
-  [data-mobile-shell] .chatbot-galaxy-orb--hero {
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.16),
-      0 6px 18px -4px rgba(15, 23, 42, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.48),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.22) !important;
-  }
-
-  [data-mobile-shell] .chatbot-galaxy-orb::after {
-    display: none !important;
   }
 
   [data-mobile-shell] .mobile-hub-rail-layer,
