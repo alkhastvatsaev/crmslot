@@ -4,14 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "@/core/config/firebase";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
-import { resolveHubCompanyId } from "@/features/company/resolveHubCompanyId";
 import {
   subscribeManualCommissions,
   type ManualCommissionEntry,
 } from "@/features/commissions/commissionFirestore";
 import { useCommissionRules } from "@/features/commissions/useCommissionRules";
 import {
-  buildPatronMonthlySeries,
   buildPatronTechnicianRows,
   buildPatronTrend,
   resolveTechnicianPayablePreviewCents,
@@ -20,6 +18,9 @@ import {
   type PatronTechnicianRow,
   type PatronTrend,
 } from "@/features/commissionsHub/commissionsHubPatronMetrics";
+import { useTechnicianSelfProfile } from "@/features/interventions/hooks/useTechnicianSelfProfile";
+import { resolveTechnicianCommissionCompany } from "@/features/interventions/resolveTechnicianCommissionCompany";
+import { buildTechnicianGainsMonthlySeries } from "@/features/interventions/technicianCommissionMonthlySeries";
 import type { Intervention } from "@/features/interventions/types";
 import {
   filterInterventionsForTechnicianCommission,
@@ -53,6 +54,26 @@ function findCurrentTechnician(
   return findTechnicianByAssignUid(technicians, technicianUid ?? "", { email }) ?? null;
 }
 
+function mergeTechniciansForCommission(
+  technicians: Technician[],
+  selfTechnician: Technician | null
+): Technician[] {
+  if (!selfTechnician) return technicians;
+  const selfDocId = selfTechnician.id.trim();
+  const selfAuthUid = (selfTechnician.authUid ?? "").trim();
+  const alreadyPresent = technicians.some((tech) => {
+    const docId = tech.id.trim();
+    const authUid = (tech.authUid ?? "").trim();
+    return (
+      (selfDocId && docId === selfDocId) ||
+      (selfAuthUid && authUid === selfAuthUid) ||
+      (selfDocId && authUid === selfDocId) ||
+      (selfAuthUid && docId === selfAuthUid)
+    );
+  });
+  return alreadyPresent ? technicians : [...technicians, selfTechnician];
+}
+
 export function useTechnicianCommissionSummary(params: {
   technicianUid: string | null;
   interventions: Intervention[];
@@ -61,8 +82,17 @@ export function useTechnicianCommissionSummary(params: {
 }): Summary {
   const enabled = params.enabled !== false;
   const workspace = useCompanyWorkspaceOptional();
-  const { companyId, phase: companyPhase } = resolveHubCompanyId(workspace);
+  const { selfTechnician, loading: selfTechnicianLoading } = useTechnicianSelfProfile(enabled);
+  const { companyId, phase: companyPhase } = resolveTechnicianCommissionCompany({
+    workspace,
+    selfTechnician,
+    selfTechnicianLoading,
+  });
   const activeCompanyId = enabled ? companyId : null;
+  const technicians = useMemo(
+    () => mergeTechniciansForCommission(params.technicians, selfTechnician),
+    [params.technicians, selfTechnician]
+  );
 
   const { rules, loading: rulesLoading } = useCommissionRules(activeCompanyId);
   const [manualEntries, setManualEntries] = useState<ManualCommissionEntry[]>([]);
@@ -97,10 +127,10 @@ export function useTechnicianCommissionSummary(params: {
       filterInterventionsForTechnicianCommission(
         params.interventions,
         params.technicianUid,
-        params.technicians,
+        technicians,
         authProfile.email
       ),
-    [authProfile.email, params.interventions, params.technicianUid, params.technicians]
+    [authProfile.email, params.interventions, params.technicianUid, technicians]
   );
 
   const scopedManualEntries = useMemo(
@@ -108,15 +138,15 @@ export function useTechnicianCommissionSummary(params: {
       filterManualEntriesForTechnicianCommission(
         manualEntries,
         params.technicianUid,
-        params.technicians,
+        technicians,
         authProfile.email
       ),
-    [authProfile.email, manualEntries, params.technicianUid, params.technicians]
+    [authProfile.email, manualEntries, params.technicianUid, technicians]
   );
 
   const currentTechnician = useMemo(
-    () => findCurrentTechnician(params.technicians, params.technicianUid, authProfile.email),
-    [authProfile.email, params.technicians, params.technicianUid]
+    () => findCurrentTechnician(technicians, params.technicianUid, authProfile.email),
+    [authProfile.email, technicians, params.technicianUid]
   );
 
   const row = useMemo(() => {
@@ -126,12 +156,9 @@ export function useTechnicianCommissionSummary(params: {
       manualEntries: scopedManualEntries,
       rules,
       companyId: activeCompanyId,
-      technicians: params.technicians,
+      technicians,
     });
-    const canonicalUid = resolveCanonicalTechnicianAssignUid(
-      params.technicians,
-      params.technicianUid
-    );
+    const canonicalUid = resolveCanonicalTechnicianAssignUid(technicians, params.technicianUid);
     return (
       rows.find((item) => item.uid === canonicalUid) ??
       rows.find((item) => item.alternateTargetIds.includes(canonicalUid)) ??
@@ -140,20 +167,26 @@ export function useTechnicianCommissionSummary(params: {
   }, [
     activeCompanyId,
     params.technicianUid,
-    params.technicians,
+    technicians,
     rules,
     scopedInterventions,
     scopedManualEntries,
   ]);
 
+  const rate = row
+    ? resolveTechnicianRateValue(row)
+    : { valueType: "percentage" as const, value: 0 };
+
   const monthlySeries = useMemo(
     () =>
-      buildPatronMonthlySeries({
+      buildTechnicianGainsMonthlySeries({
         interventions: scopedInterventions,
         manualEntries: scopedManualEntries,
+        valueType: rate.valueType,
+        value: rate.value,
         months: 6,
       }),
-    [scopedInterventions, scopedManualEntries]
+    [scopedInterventions, scopedManualEntries, rate.valueType, rate.value]
   );
 
   const revenueTrend = useMemo(
@@ -166,9 +199,7 @@ export function useTechnicianCommissionSummary(params: {
   );
 
   const payableCents = row ? resolveTechnicianPayablePreviewCents(row) : 0;
-  const { valueType, value } = row
-    ? resolveTechnicianRateValue(row)
-    : { valueType: "percentage" as const, value: 0 };
+  const { valueType, value } = rate;
   const rateLabel = valueType === "percentage" ? `${value}%` : `${value} €`;
 
   const loading =
