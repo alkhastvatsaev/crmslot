@@ -55,7 +55,14 @@ describe("TechnicianLoginPanel — polish (login UI propre + branding)", () => {
     });
     fireEvent.click(screen.getByTestId("technician-login-forgot"));
     await waitFor(() =>
-      expect(sendPasswordResetEmail).toHaveBeenCalledWith(expect.anything(), "tech@example.com")
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+        expect.anything(),
+        "tech@example.com",
+        expect.objectContaining({
+          url: expect.stringMatching(/\/$/),
+          handleCodeInApp: false,
+        })
+      )
     );
   });
 
@@ -64,6 +71,22 @@ describe("TechnicianLoginPanel — polish (login UI propre + branding)", () => {
     fireEvent.click(screen.getByTestId("technician-login-forgot"));
     await waitFor(() => expect(screen.getByTestId("technician-login-error")).toBeInTheDocument());
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it("bouton 'forgot' affiche l'erreur Firebase domaine non autorisé", async () => {
+    (sendPasswordResetEmail as jest.Mock).mockRejectedValueOnce({
+      code: "auth/unauthorized-continue-uri",
+    });
+    render(<TechnicianLoginPanel />);
+    fireEvent.change(screen.getByTestId("technician-login-email"), {
+      target: { value: "tech@example.com" },
+    });
+    fireEvent.click(screen.getByTestId("technician-login-forgot"));
+    await waitFor(() => {
+      expect(screen.getByTestId("technician-login-error")).toHaveTextContent(
+        /Domaine non autorisé/i
+      );
+    });
   });
 
   it("n'affiche pas de raccourci démo (web ni Capacitor)", () => {
