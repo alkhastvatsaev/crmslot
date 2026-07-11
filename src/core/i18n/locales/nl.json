@@ -2922,6 +2922,20 @@
       "portal_return": "Terug van facturatieportaal.",
       "create_company_title": "Maak uw bedrijf aan",
       "create_company_hint": "Bedrijfshub → bedrijfsnaam → aanmaken. Ga daarna terug naar /pricing om te abonneren."
+    },
+    "account": {
+      "activate": "Activeren",
+      "manage": "Beheren",
+      "portal_error": "Portaal niet beschikbaar.",
+      "status": {
+        "none": "Niet actief",
+        "trialing": "Proefperiode",
+        "active": "Actief",
+        "past_due": "Achterstallig",
+        "canceled": "Geannuleerd",
+        "incomplete": "Onvolledig",
+        "unpaid": "Onbetaald"
+      }
     }
   }
 }

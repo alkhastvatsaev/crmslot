@@ -5,6 +5,7 @@ import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   SUBSCRIPTION_PLANS,
+  savePendingSubscriptionPlan,
   subscriptionCheckoutEnabled,
   type SubscriptionPlanId,
 } from "@/features/subscriptions";
@@ -17,52 +18,19 @@ export default function PricingPlansGrid({ defaultPlanId }: Props) {
   const { t } = useTranslation();
   const checkoutEnabled = subscriptionCheckoutEnabled();
   const [busyPlan, setBusyPlan] = useState<SubscriptionPlanId | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleChoose = useCallback(
-    async (planId: SubscriptionPlanId) => {
-      setError(null);
-      const user = auth?.currentUser;
-      if (!user) {
-        window.location.href = `/?plan=${planId}&auth=register`;
-        return;
-      }
+  const handleChoose = useCallback((planId: SubscriptionPlanId) => {
+    savePendingSubscriptionPlan(planId);
+    setBusyPlan(planId);
 
-      setBusyPlan(planId);
-      try {
-        const idToken = await user.getIdToken();
-        const res = await fetch("/api/subscriptions/checkout", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ planId }),
-        });
-        const data = (await res.json().catch(() => ({}))) as {
-          url?: string;
-          error?: string;
-          needsCompany?: boolean;
-        };
+    const user = auth?.currentUser;
+    if (!user) {
+      window.location.href = `/?auth=register&plan=${planId}`;
+      return;
+    }
 
-        if (data.needsCompany) {
-          window.location.href = `/?plan=${planId}&setup=company`;
-          return;
-        }
-
-        if (!res.ok || !data.url) {
-          throw new Error(data.error?.trim() || t("subscription.pricing.checkout_error"));
-        }
-
-        window.location.href = data.url;
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      } finally {
-        setBusyPlan(null);
-      }
-    },
-    [t]
-  );
+    window.location.href = `/?account=1&plan=${planId}`;
+  }, []);
 
   return (
     <div className="w-full max-w-3xl">
@@ -73,12 +41,6 @@ export default function PricingPlansGrid({ defaultPlanId }: Props) {
         <p className="mt-1.5 text-[13px] text-slate-500">{t("subscription.pricing.subtitle")}</p>
       </div>
 
-      {error ? (
-        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-center text-[13px] text-red-700">
-          {error}
-        </p>
-      ) : null}
-
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {SUBSCRIPTION_PLANS.map((plan) => {
           const selected = defaultPlanId === plan.id;
@@ -88,7 +50,7 @@ export default function PricingPlansGrid({ defaultPlanId }: Props) {
             <div
               key={plan.id}
               className={[
-                "flex flex-col rounded-2xl border bg-white/95 p-5 shadow-[0_12px_40px_-16px_rgba(15,23,42,0.12)] backdrop-blur-xl transition-shadow",
+                "flex flex-col rounded-2xl border bg-white/95 p-5 shadow-[0_12px_40px_-16px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-shadow",
                 highlighted ? "border-blue-200 ring-1 ring-blue-500/20" : "border-slate-200/80",
                 selected ? "ring-2 ring-blue-500/30" : "",
               ].join(" ")}
@@ -116,7 +78,7 @@ export default function PricingPlansGrid({ defaultPlanId }: Props) {
               <button
                 type="button"
                 disabled={!checkoutEnabled || busyPlan !== null}
-                onClick={() => void handleChoose(plan.id)}
+                onClick={() => handleChoose(plan.id)}
                 className={[
                   "mt-5 w-full rounded-xl py-2.5 text-[13px] font-semibold transition active:scale-[0.99] disabled:opacity-50",
                   highlighted

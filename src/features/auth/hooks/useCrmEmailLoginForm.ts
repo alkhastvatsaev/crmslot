@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth, isConfigured } from "@/core/config/firebase";
@@ -23,6 +23,10 @@ import {
 import type { CrmEmailAuthTab, CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
 import { useCrmStaffOAuth } from "@/features/auth/hooks/useCrmStaffOAuth";
 import { markStaffPushOnboardingPending } from "@/features/notifications/staffPushOnboarding";
+import {
+  readPlanIdFromSearchParams,
+  savePendingSubscriptionPlan,
+} from "@/features/subscriptions/pendingSubscriptionPlan";
 
 type Args = {
   variant: CrmEmailLoginVariant;
@@ -42,6 +46,16 @@ export function useCrmEmailLoginForm({ variant }: Args) {
   const [inlineError, setInlineError] = useState<string | null>(null);
   const { googleBusy, appleBusy, oauthBusy, handleGoogleSignIn, handleAppleSignIn } =
     useCrmStaffOAuth({ variant, authTab, onInlineError: setInlineError });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const planId = readPlanIdFromSearchParams(params);
+    if (planId) savePendingSubscriptionPlan(planId);
+    if (params.get("auth") === "register") {
+      setAuthTab("register");
+    }
+  }, []);
 
   const logLabel = variant === "technician" ? "TechnicianLoginPanel" : "AdminLoginPanel";
   const showTechnicianProfileFields = variant === "technician" && authTab === "register";

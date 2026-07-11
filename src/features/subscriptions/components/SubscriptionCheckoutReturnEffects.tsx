@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { clearPendingSubscriptionPlan } from "@/features/subscriptions/pendingSubscriptionPlan";
 import { isSubscriptionPlanId } from "@/features/subscriptions/subscriptionPlans";
 
 function SubscriptionCheckoutReturnEffectsInner() {
@@ -12,24 +13,15 @@ function SubscriptionCheckoutReturnEffectsInner() {
 
   useEffect(() => {
     const subscription = searchParams.get("subscription")?.trim();
-    const setup = searchParams.get("setup")?.trim();
-    const plan = searchParams.get("plan")?.trim();
-
-    if (setup === "company" && plan && isSubscriptionPlanId(plan)) {
-      toast.message(t("subscription.checkout.create_company_title"), {
-        description: t("subscription.checkout.create_company_hint"),
-        duration: 12_000,
-      });
-    }
-
     if (!subscription) return;
 
     if (subscription === "success") {
+      clearPendingSubscriptionPlan();
       const plan = searchParams.get("plan")?.trim();
       const planLabel =
         plan && isSubscriptionPlanId(plan)
           ? t(`subscription.plans.${plan}.name`)
-          : t("subscription.banner.subscribe");
+          : t("subscription.account.activate");
       toast.success(t("subscription.checkout.success_title"), {
         description: t("subscription.checkout.success_hint").replace("{{plan}}", planLabel),
       });

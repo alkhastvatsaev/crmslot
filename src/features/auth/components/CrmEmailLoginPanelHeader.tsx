@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
@@ -7,6 +8,13 @@ import {
   crmEmailLoginTitleKey,
   type CrmEmailLoginVariant,
 } from "@/features/auth/crmEmailLoginVariant";
+import {
+  getSubscriptionPlan,
+  readPendingSubscriptionPlan,
+  readPlanIdFromSearchParams,
+  savePendingSubscriptionPlan,
+  type SubscriptionPlanId,
+} from "@/features/subscriptions";
 
 type Props = {
   variant: CrmEmailLoginVariant;
@@ -14,6 +22,16 @@ type Props = {
 
 export default function CrmEmailLoginPanelHeader({ variant }: Props) {
   const { t } = useTranslation();
+  const [pendingPlanId, setPendingPlanId] = useState<SubscriptionPlanId | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = readPlanIdFromSearchParams(params);
+    if (fromUrl) savePendingSubscriptionPlan(fromUrl);
+    setPendingPlanId(readPendingSubscriptionPlan());
+  }, []);
+
+  const pendingPlan = pendingPlanId ? getSubscriptionPlan(pendingPlanId) : null;
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -29,9 +47,16 @@ export default function CrmEmailLoginPanelHeader({ variant }: Props) {
         <h1 className="text-[17px] font-semibold tracking-tight text-slate-900">
           {t(crmEmailLoginTitleKey(variant))}
         </h1>
-        <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
-          {t(crmEmailLoginSubtitleKey(variant))}
-        </p>
+        {pendingPlan ? (
+          <p className="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[12px] font-medium text-blue-700">
+            {t(pendingPlan.nameKey)} · {pendingPlan.priceEurMonthly} €
+            {t("subscription.pricing.per_month")}
+          </p>
+        ) : (
+          <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
+            {t(crmEmailLoginSubtitleKey(variant))}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -2922,6 +2922,20 @@
       "portal_return": "Retour depuis le portail de facturation.",
       "create_company_title": "Créez votre société",
       "create_company_hint": "Hub Société → saisissez le nom de votre entreprise → créez. Puis retournez sur /pricing pour choisir un plan."
+    },
+    "account": {
+      "activate": "Activer",
+      "manage": "Gérer",
+      "portal_error": "Portail indisponible.",
+      "status": {
+        "none": "Non activé",
+        "trialing": "Essai",
+        "active": "Actif",
+        "past_due": "Paiement en retard",
+        "canceled": "Annulé",
+        "incomplete": "Incomplet",
+        "unpaid": "Impayé"
+      }
     }
   }
 }

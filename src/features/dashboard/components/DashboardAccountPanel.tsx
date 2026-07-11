@@ -1,27 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  Building2,
-  ChevronDown,
-  Loader2,
-  LogOut,
-  Mail,
-  Pencil,
-  Phone,
-  Save,
-  Shield,
-  Trash2,
-  User,
-} from "lucide-react";
+import { Building2, Loader2, LogOut, Mail, Pencil, Phone, Save, Trash2, User } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
-import {
-  resolveStaffProfileRoleKey,
-  STAFF_ACCOUNT_ROLE_OPTIONS,
-  staffAccountRoleOptionLabelKey,
-  type StaffAccountRoleOption,
-} from "@/features/auth/staffAccountRoleDisplay";
+import { resolveStaffProfileRoleKey } from "@/features/auth/staffAccountRoleDisplay";
+import AccountSubscriptionRow from "@/features/subscriptions/components/AccountSubscriptionRow";
 import DashboardLanguageSelector from "@/features/dashboard/components/DashboardLanguageSelector";
 import MobileCentralPanelFrame from "@/features/dashboard/components/MobileCentralPanelFrame";
 import {
@@ -61,12 +45,6 @@ const accountCompactButtonClass =
 const accountInputClass = cn(
   "min-w-0 flex-1 border border-black/[0.06] bg-transparent px-2.5 py-2 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-slate-900/15",
   HUB_RADIUS.input
-);
-
-const accountSelectClass = cn(
-  accountInputClass,
-  "appearance-none pr-9",
-  "bg-[length:1rem] bg-[right_0.65rem_center] bg-no-repeat"
 );
 
 function CompactInfoRow({
@@ -127,44 +105,6 @@ function EditableField({
   );
 }
 
-function SelectField({
-  icon,
-  label,
-  testId,
-  value,
-  onChange,
-  children,
-}: {
-  icon: ReactNode;
-  label: string;
-  testId: string;
-  value: string;
-  onChange: (value: string) => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className={accountFieldRowClass}>
-      <span className={accountIconRailClass}>{icon}</span>
-      <div className="relative min-w-0 flex-1">
-        <select
-          id={testId}
-          data-testid={testId}
-          value={value}
-          aria-label={label}
-          onChange={(e) => onChange(e.target.value)}
-          className={cn(accountSelectClass, "w-full")}
-        >
-          {children}
-        </select>
-        <ChevronDown
-          className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-          aria-hidden
-        />
-      </div>
-    </div>
-  );
-}
-
 function AccountProfileHero({
   firstName,
   lastName,
@@ -218,7 +158,6 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
   const {
     fields,
     draft,
-    memberships,
     editing,
     ready,
     signingOut,
@@ -227,7 +166,6 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
     startEditing,
     cancelEditing,
     updateDraft,
-    handleCompanyChange,
     handleSave,
     handleDeleteAccount,
     handleSignOut,
@@ -306,38 +244,6 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
                   value={draft.phone}
                   onChange={(value) => updateDraft({ phone: value })}
                 />
-                <SelectField
-                  icon={<Building2 className="h-4 w-4 opacity-70" aria-hidden />}
-                  label={String(t("staff_account.company"))}
-                  testId="dashboard-account-company-select"
-                  value={draft.companyId}
-                  onChange={handleCompanyChange}
-                >
-                  {memberships.length === 0 ? (
-                    <option value="">{fields.companyName}</option>
-                  ) : (
-                    memberships.map((membership) => (
-                      <option key={membership.companyId} value={membership.companyId}>
-                        {membership.companyName}
-                      </option>
-                    ))
-                  )}
-                </SelectField>
-                <SelectField
-                  icon={<Shield className="h-4 w-4 opacity-70" aria-hidden />}
-                  label={String(t("staff_account.role"))}
-                  testId="dashboard-account-role-select"
-                  value={draft.accountRole}
-                  onChange={(value) =>
-                    updateDraft({ accountRole: value as StaffAccountRoleOption })
-                  }
-                >
-                  {STAFF_ACCOUNT_ROLE_OPTIONS.map((role) => (
-                    <option key={role} value={role}>
-                      {String(t(staffAccountRoleOptionLabelKey(role)))}
-                    </option>
-                  ))}
-                </SelectField>
               </div>
             ) : showPhoneRow || showCompanyRow ? (
               <div className={accountSectionCardClass}>
@@ -358,6 +264,10 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
                   />
                 ) : null}
               </div>
+            ) : null}
+
+            {!editing && fields.companyId ? (
+              <AccountSubscriptionRow companyId={fields.companyId} />
             ) : null}
           </div>
 

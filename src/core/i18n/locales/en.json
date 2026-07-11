@@ -2922,6 +2922,20 @@
       "portal_return": "Returned from billing portal.",
       "create_company_title": "Create your company",
       "create_company_hint": "Company hub → enter your business name → create. Then go back to /pricing to subscribe."
+    },
+    "account": {
+      "activate": "Activate",
+      "manage": "Manage",
+      "portal_error": "Portal unavailable.",
+      "status": {
+        "none": "Not active",
+        "trialing": "Trial",
+        "active": "Active",
+        "past_due": "Past due",
+        "canceled": "Canceled",
+        "incomplete": "Incomplete",
+        "unpaid": "Unpaid"
+      }
     }
   }
 }
