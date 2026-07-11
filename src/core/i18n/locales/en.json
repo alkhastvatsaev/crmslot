@@ -2857,18 +2857,22 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Simple, transparent pricing",
-      "subtitle": "From client request to invoice — one platform for field work. 14-day free trial.",
+      "title": "Pricing",
+      "subtitle": "14-day trial · cancel anytime",
       "founding_badge": "Founding offer: 30% off for life for the first 10 customers",
       "most_popular": "Most popular",
-      "per_month": "/ month excl. VAT",
+      "per_month": "/ mo excl. VAT",
       "founding_price": "Founding: €{{price}}/mo with promo code",
       "seats_included": "Up to {{count}} technician(s) included",
       "extra_technician": "+ €{{price}}/mo per extra technician",
       "choose_plan": "Choose plan",
-      "checkout_loading": "Redirecting…",
+      "checkout_loading": "…",
       "already_account": "Already have an account?",
-      "open_app": "Open app"
+      "open_app": "Open app",
+      "recommended": "Popular",
+      "cta": "Get started",
+      "checkout_error": "Checkout unavailable.",
+      "footnote": "Code FONDATEUR30: 30% off for the first 10 customers"
     },
     "plans": {
       "solo": {
@@ -2878,7 +2882,8 @@
           "map": "Real-time Mapbox map",
           "tech_app": "Technician PWA app",
           "billing_basic": "Quote & invoice PDFs"
-        }
+        },
+        "tagline": "1 technician"
       },
       "team": {
         "name": "Team",
@@ -2887,7 +2892,8 @@
           "portal": "Live client portal",
           "planning": "Planning & dispatch",
           "offline": "Technician offline mode"
-        }
+        },
+        "tagline": "5 technicians"
       },
       "pro": {
         "name": "Pro",
@@ -2896,7 +2902,8 @@
           "peppol": "Peppol / UBL e-invoicing",
           "gmail": "Gmail integration",
           "chatbot": "AI business assistant"
-        }
+        },
+        "tagline": "15 technicians · Peppol · AI"
       }
     },
     "banner": {

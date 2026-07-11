@@ -2857,18 +2857,22 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Eenvoudige, transparante prijzen",
-      "subtitle": "Van klantaanvraag tot factuur — één platform voor terreinwerk. 14 dagen gratis proberen.",
+      "title": "Prijzen",
+      "subtitle": "14 dagen proef · opzeggen wanneer u wilt",
       "founding_badge": "Founding-aanbieding: 30% korting voor altijd voor de eerste 10 klanten",
       "most_popular": "Meest gekozen",
-      "per_month": "/ maand excl. btw",
+      "per_month": "/ mnd excl. btw",
       "founding_price": "Founding: €{{price}}/mnd met promocode",
       "seats_included": "Tot {{count}} technieker(s) inbegrepen",
       "extra_technician": "+ €{{price}}/mnd per extra technieker",
       "choose_plan": "Kies dit plan",
-      "checkout_loading": "Doorverwijzen…",
+      "checkout_loading": "…",
       "already_account": "Al een account?",
-      "open_app": "App openen"
+      "open_app": "App openen",
+      "recommended": "Populair",
+      "cta": "Starten",
+      "checkout_error": "Betaling niet beschikbaar.",
+      "footnote": "Code FONDATEUR30: −30 % voor de eerste 10 klanten"
     },
     "plans": {
       "solo": {
@@ -2878,7 +2882,8 @@
           "map": "Mapbox-kaart realtime",
           "tech_app": "Technieker PWA-app",
           "billing_basic": "Offertes & facturen PDF"
-        }
+        },
+        "tagline": "1 technieker"
       },
       "team": {
         "name": "Team",
@@ -2887,7 +2892,8 @@
           "portal": "Live klantenportaal",
           "planning": "Planning & dispatch",
           "offline": "Offline modus technieker"
-        }
+        },
+        "tagline": "5 techniekers"
       },
       "pro": {
         "name": "Pro",
@@ -2896,7 +2902,8 @@
           "peppol": "Peppol / UBL e-facturatie",
           "gmail": "Gmail-integratie",
           "chatbot": "AI-assistent"
-        }
+        },
+        "tagline": "15 techniekers · Peppol · AI"
       }
     },
     "banner": {

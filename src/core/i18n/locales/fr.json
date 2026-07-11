@@ -2857,8 +2857,8 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Tarifs simples, sans surprise",
-      "subtitle": "De la demande client à la facture — une plateforme pour vos interventions terrain. Essai 14 jours offert.",
+      "title": "Tarifs",
+      "subtitle": "14 jours d'essai · sans engagement",
       "founding_badge": "Offre fondateur : -30 % à vie pour les 10 premiers clients",
       "most_popular": "Le plus choisi",
       "per_month": "/ mois HT",
@@ -2866,9 +2866,13 @@
       "seats_included": "Jusqu'à {{count}} technicien(s) inclus",
       "extra_technician": "+ {{price}} €/mois par technicien supplémentaire",
       "choose_plan": "Choisir ce plan",
-      "checkout_loading": "Redirection…",
+      "checkout_loading": "…",
       "already_account": "Déjà un compte ?",
-      "open_app": "Ouvrir l'app"
+      "open_app": "Ouvrir l'app",
+      "recommended": "Populaire",
+      "cta": "Commencer",
+      "checkout_error": "Paiement indisponible.",
+      "footnote": "Code FONDATEUR30 : −30 % pour les 10 premiers clients"
     },
     "plans": {
       "solo": {
@@ -2878,7 +2882,8 @@
           "map": "Carte Mapbox temps réel",
           "tech_app": "App technicien PWA",
           "billing_basic": "Devis & factures PDF"
-        }
+        },
+        "tagline": "1 technicien"
       },
       "team": {
         "name": "Équipe",
@@ -2887,7 +2892,8 @@
           "portal": "Portail client suivi live",
           "planning": "Planning & dispatch",
           "offline": "Mode hors-ligne technicien"
-        }
+        },
+        "tagline": "5 techniciens"
       },
       "pro": {
         "name": "Pro",
@@ -2896,7 +2902,8 @@
           "peppol": "Facturation Peppol / UBL",
           "gmail": "Intégration Gmail",
           "chatbot": "Assistant IA métier"
-        }
+        },
+        "tagline": "15 techniciens · Peppol · IA"
       }
     },
     "banner": {

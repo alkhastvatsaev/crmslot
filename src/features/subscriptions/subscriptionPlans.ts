@@ -3,10 +3,10 @@ import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTy
 export type SubscriptionPlanDefinition = {
   id: SubscriptionPlanId;
   nameKey: string;
+  taglineKey: string;
   priceEurMonthly: number;
   foundingPriceEurMonthly: number;
   technicianSeatsIncluded: number;
-  featureKeys: readonly string[];
   highlight?: boolean;
 };
 
@@ -15,42 +15,27 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
   {
     id: "solo",
     nameKey: "subscription.plans.solo.name",
+    taglineKey: "subscription.plans.solo.tagline",
     priceEurMonthly: 49,
     foundingPriceEurMonthly: 34,
     technicianSeatsIncluded: 1,
-    featureKeys: [
-      "subscription.plans.solo.features.crm",
-      "subscription.plans.solo.features.map",
-      "subscription.plans.solo.features.tech_app",
-      "subscription.plans.solo.features.billing_basic",
-    ],
   },
   {
     id: "team",
     nameKey: "subscription.plans.team.name",
+    taglineKey: "subscription.plans.team.tagline",
     priceEurMonthly: 89,
     foundingPriceEurMonthly: 62,
     technicianSeatsIncluded: 5,
     highlight: true,
-    featureKeys: [
-      "subscription.plans.team.features.all_solo",
-      "subscription.plans.team.features.portal",
-      "subscription.plans.team.features.planning",
-      "subscription.plans.team.features.offline",
-    ],
   },
   {
     id: "pro",
     nameKey: "subscription.plans.pro.name",
+    taglineKey: "subscription.plans.pro.tagline",
     priceEurMonthly: 149,
     foundingPriceEurMonthly: 104,
     technicianSeatsIncluded: 15,
-    featureKeys: [
-      "subscription.plans.pro.features.all_team",
-      "subscription.plans.pro.features.peppol",
-      "subscription.plans.pro.features.gmail",
-      "subscription.plans.pro.features.chatbot",
-    ],
   },
 ] as const;
 

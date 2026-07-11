@@ -25,10 +25,7 @@ import DevServiceWorkerCleanup from "@/features/dev/DevServiceWorkerCleanup";
 import { TechnicianBackofficeReportBridgeProvider } from "@/context/TechnicianBackofficeReportBridgeContext";
 import DeferredAdminBootstraps from "@/features/dashboard/components/DeferredAdminBootstraps";
 import { prefetchDashboardHubChunksIdle } from "@/features/dashboard/prefetchDashboardHubChunks";
-import {
-  SubscriptionAdminBanner,
-  SubscriptionCheckoutReturnEffects,
-} from "@/features/subscriptions";
+import { SubscriptionCheckoutReturnEffects } from "@/features/subscriptions";
 import TeamHubBootPrefetch from "@/features/teamHub/components/TeamHubBootPrefetch";
 
 type Props = {
@@ -66,7 +63,6 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                           <RequesterHubProvider>
                                             <DeferredAdminBootstraps />
                                             <SubscriptionCheckoutReturnEffects />
-                                            <SubscriptionAdminBanner />
                                             <TeamHubBootPrefetch />
                                             {children}
                                           </RequesterHubProvider>
