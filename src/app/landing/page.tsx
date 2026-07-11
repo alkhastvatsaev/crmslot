@@ -75,11 +75,17 @@ export default function LandingPage() {
             terrain.
           </p>
           <Link
-            href="/"
+            href="/pricing"
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-slate-900 shadow-lg transition-all hover:bg-slate-100 hover:shadow-xl"
           >
-            Accéder à la plateforme
+            Voir les tarifs
             <span aria-hidden="true">→</span>
+          </Link>
+          <Link
+            href="/"
+            className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200"
+          >
+            Déjà client ? Connexion
           </Link>
         </div>
       </section>
@@ -192,10 +198,10 @@ export default function LandingPage() {
             Accédez à votre espace de gestion d&apos;interventions.
           </p>
           <Link
-            href="/"
+            href="/pricing"
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90"
           >
-            Ouvrir la plateforme
+            Voir les tarifs
             <span aria-hidden="true">→</span>
           </Link>
         </div>

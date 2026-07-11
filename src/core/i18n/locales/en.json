@@ -2854,5 +2854,66 @@
     "toast_quote_declined": "Quote declined",
     "toast_invoice_issued": "Invoice sent by email",
     "toast_invoice_pending": "Invoice pending field completion"
+  },
+
+  "subscription": {
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "subtitle": "From client request to invoice — one platform for field work. 14-day free trial.",
+      "founding_badge": "Founding offer: 30% off for life for the first 10 customers",
+      "most_popular": "Most popular",
+      "per_month": "/ month excl. VAT",
+      "founding_price": "Founding: €{{price}}/mo with promo code",
+      "seats_included": "Up to {{count}} technician(s) included",
+      "extra_technician": "+ €{{price}}/mo per extra technician",
+      "choose_plan": "Choose plan",
+      "checkout_loading": "Redirecting…",
+      "already_account": "Already have an account?",
+      "open_app": "Open app"
+    },
+    "plans": {
+      "solo": {
+        "name": "Solo",
+        "features": {
+          "crm": "Intervention CRM & statuses",
+          "map": "Real-time Mapbox map",
+          "tech_app": "Technician PWA app",
+          "billing_basic": "Quote & invoice PDFs"
+        }
+      },
+      "team": {
+        "name": "Team",
+        "features": {
+          "all_solo": "Everything in Solo",
+          "portal": "Live client portal",
+          "planning": "Planning & dispatch",
+          "offline": "Technician offline mode"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "all_team": "Everything in Team",
+          "peppol": "Peppol / UBL e-invoicing",
+          "gmail": "Gmail integration",
+          "chatbot": "AI business assistant"
+        }
+      }
+    },
+    "banner": {
+      "soft_title": "Activate your CRMSLOT subscription",
+      "soft_hint": "14-day trial · Manage billing anytime.",
+      "enforce_title": "Subscription required",
+      "enforce_hint": "Choose a plan to access the platform.",
+      "subscribe": "Subscribe",
+      "manage": "Manage subscription",
+      "view_pricing": "View pricing",
+      "loading": "Loading…"
+    },
+    "checkout": {
+      "success_title": "Subscription activated",
+      "success_hint": "Plan {{plan}} — thank you! Access updates in a few seconds.",
+      "portal_return": "Returned from billing portal."
+    }
   }
 }

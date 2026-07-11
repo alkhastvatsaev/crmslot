@@ -2854,5 +2854,66 @@
     "toast_quote_declined": "Offerte geweigerd",
     "toast_invoice_issued": "Factuur per e-mail verzonden",
     "toast_invoice_pending": "Factuur wacht op afronding ter plaatse"
+  },
+
+  "subscription": {
+    "pricing": {
+      "title": "Eenvoudige, transparante prijzen",
+      "subtitle": "Van klantaanvraag tot factuur — één platform voor terreinwerk. 14 dagen gratis proberen.",
+      "founding_badge": "Founding-aanbieding: 30% korting voor altijd voor de eerste 10 klanten",
+      "most_popular": "Meest gekozen",
+      "per_month": "/ maand excl. btw",
+      "founding_price": "Founding: €{{price}}/mnd met promocode",
+      "seats_included": "Tot {{count}} technieker(s) inbegrepen",
+      "extra_technician": "+ €{{price}}/mnd per extra technieker",
+      "choose_plan": "Kies dit plan",
+      "checkout_loading": "Doorverwijzen…",
+      "already_account": "Al een account?",
+      "open_app": "App openen"
+    },
+    "plans": {
+      "solo": {
+        "name": "Solo",
+        "features": {
+          "crm": "Interventie-CRM & statussen",
+          "map": "Mapbox-kaart realtime",
+          "tech_app": "Technieker PWA-app",
+          "billing_basic": "Offertes & facturen PDF"
+        }
+      },
+      "team": {
+        "name": "Team",
+        "features": {
+          "all_solo": "Alles uit Solo",
+          "portal": "Live klantenportaal",
+          "planning": "Planning & dispatch",
+          "offline": "Offline modus technieker"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "all_team": "Alles uit Team",
+          "peppol": "Peppol / UBL e-facturatie",
+          "gmail": "Gmail-integratie",
+          "chatbot": "AI-assistent"
+        }
+      }
+    },
+    "banner": {
+      "soft_title": "Activeer uw CRMSLOT-abonnement",
+      "soft_hint": "14 dagen proef · Beheer facturatie wanneer u wilt.",
+      "enforce_title": "Abonnement vereist",
+      "enforce_hint": "Kies een plan om verder te gaan.",
+      "subscribe": "Abonneren",
+      "manage": "Abonnement beheren",
+      "view_pricing": "Prijzen bekijken",
+      "loading": "Laden…"
+    },
+    "checkout": {
+      "success_title": "Abonnement geactiveerd",
+      "success_hint": "Plan {{plan}} — bedankt! Toegang binnen enkele seconden.",
+      "portal_return": "Terug van facturatieportaal."
+    }
   }
 }

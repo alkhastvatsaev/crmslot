@@ -2854,5 +2854,66 @@
   },
   "timetracking": {
     "export_payroll": "Exporter feuilles de temps"
+  },
+
+  "subscription": {
+    "pricing": {
+      "title": "Tarifs simples, sans surprise",
+      "subtitle": "De la demande client à la facture — une plateforme pour vos interventions terrain. Essai 14 jours offert.",
+      "founding_badge": "Offre fondateur : -30 % à vie pour les 10 premiers clients",
+      "most_popular": "Le plus choisi",
+      "per_month": "/ mois HT",
+      "founding_price": "Fondateur : {{price}} €/mois avec code promo",
+      "seats_included": "Jusqu'à {{count}} technicien(s) inclus",
+      "extra_technician": "+ {{price}} €/mois par technicien supplémentaire",
+      "choose_plan": "Choisir ce plan",
+      "checkout_loading": "Redirection…",
+      "already_account": "Déjà un compte ?",
+      "open_app": "Ouvrir l'app"
+    },
+    "plans": {
+      "solo": {
+        "name": "Solo",
+        "features": {
+          "crm": "CRM interventions & statuts",
+          "map": "Carte Mapbox temps réel",
+          "tech_app": "App technicien PWA",
+          "billing_basic": "Devis & factures PDF"
+        }
+      },
+      "team": {
+        "name": "Équipe",
+        "features": {
+          "all_solo": "Tout le plan Solo",
+          "portal": "Portail client suivi live",
+          "planning": "Planning & dispatch",
+          "offline": "Mode hors-ligne technicien"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "all_team": "Tout le plan Équipe",
+          "peppol": "Facturation Peppol / UBL",
+          "gmail": "Intégration Gmail",
+          "chatbot": "Assistant IA métier"
+        }
+      }
+    },
+    "banner": {
+      "soft_title": "Activez votre abonnement CRMSLOT",
+      "soft_hint": "Essai 14 jours · Gérez votre abonnement à tout moment.",
+      "enforce_title": "Abonnement requis pour continuer",
+      "enforce_hint": "Choisissez un plan pour accéder à la plateforme.",
+      "subscribe": "S'abonner",
+      "manage": "Gérer l'abonnement",
+      "view_pricing": "Voir les tarifs",
+      "loading": "Chargement…"
+    },
+    "checkout": {
+      "success_title": "Abonnement activé",
+      "success_hint": "Plan {{plan}} — merci ! L'accès est actif sous quelques secondes.",
+      "portal_return": "Retour depuis le portail de facturation."
+    }
   }
 }

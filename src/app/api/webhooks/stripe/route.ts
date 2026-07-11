@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import "@/core/config/firebase-admin";
+import { getAdminDb } from "@/core/config/firebase-admin";
 import { markInterventionPaidAdmin } from "@/features/billing/index.server";
+import { handleStripeSubscriptionWebhookAdmin } from "@/features/subscriptions/index.server";
 
 export const runtime = "nodejs";
 
@@ -29,14 +31,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
+  const db = getAdminDb();
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const interventionId = session.metadata?.interventionId?.trim();
-    if (interventionId) {
-      await markInterventionPaid(
-        interventionId,
-        typeof session.payment_intent === "string" ? session.payment_intent : undefined
-      );
+    if (session.metadata?.purpose === "saas_subscription") {
+      await handleStripeSubscriptionWebhookAdmin(db, stripe, event);
+    } else {
+      const interventionId = session.metadata?.interventionId?.trim();
+      if (interventionId) {
+        await markInterventionPaid(
+          interventionId,
+          typeof session.payment_intent === "string" ? session.payment_intent : undefined
+        );
+      }
     }
   }
 
@@ -46,6 +54,14 @@ export async function POST(request: Request) {
     if (interventionId) {
       await markInterventionPaid(interventionId, intent.id);
     }
+  }
+
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    await handleStripeSubscriptionWebhookAdmin(db, stripe, event);
   }
 
   return NextResponse.json({ received: true });
