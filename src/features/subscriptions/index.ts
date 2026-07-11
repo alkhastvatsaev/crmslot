@@ -19,6 +19,10 @@ export {
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
+export {
+  isSaasSignupFlow,
+  provisionSaasCompanyForAdmin,
+} from "@/features/subscriptions/provisionSaasCompanyClient";
 export type {
   CompanySaasSubscription,
   SubscriptionPlanId,
@@ -29,3 +33,4 @@ export { default as PricingPlansGrid } from "@/features/subscriptions/components
 export { default as SubscriptionCheckoutReturnEffects } from "@/features/subscriptions/components/SubscriptionCheckoutReturnEffects";
 export { default as SubscriptionSignupEffects } from "@/features/subscriptions/components/SubscriptionSignupEffects";
 export { useCompanySubscription } from "@/features/subscriptions/hooks/useCompanySubscription";
+export { usePendingSubscriptionPlan } from "@/features/subscriptions/hooks/usePendingSubscriptionPlan";

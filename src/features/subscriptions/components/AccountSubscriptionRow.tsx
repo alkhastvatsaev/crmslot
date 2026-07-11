@@ -7,56 +7,78 @@ import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   getSubscriptionPlan,
   isSubscriptionActive,
-  readPendingSubscriptionPlan,
+  provisionSaasCompanyForAdmin,
   subscriptionCheckoutEnabled,
   useCompanySubscription,
+  usePendingSubscriptionPlan,
   type SubscriptionPlanId,
 } from "@/features/subscriptions";
 
 type Props = {
   companyId: string;
+  onCompanyProvisioned?: (companyId: string) => void;
 };
 
-export default function AccountSubscriptionRow({ companyId }: Props) {
+export default function AccountSubscriptionRow({ companyId, onCompanyProvisioned }: Props) {
   const { t } = useTranslation();
   const { subscription, loading } = useCompanySubscription();
+  const pendingPlanId = usePendingSubscriptionPlan();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const pendingPlanId = readPendingSubscriptionPlan();
   const active = isSubscriptionActive(subscription);
   const displayPlanId: SubscriptionPlanId | null = subscription?.planId ?? pendingPlanId ?? null;
 
   const startCheckout = useCallback(
-    async (planId: SubscriptionPlanId) => {
-      if (!companyId.trim()) return;
+    async (planId: SubscriptionPlanId, targetCompanyId: string) => {
       const user = auth?.currentUser;
       if (!user) return;
 
       setBusy(true);
       setError(null);
+
+      let companyIdForCheckout = targetCompanyId.trim();
+
       try {
-        const idToken = await user.getIdToken();
-        const res = await fetch("/api/subscriptions/checkout", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ companyId, planId }),
-        });
-        const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-        if (!res.ok || !data.url) {
-          throw new Error(data.error?.trim() || t("subscription.pricing.checkout_error"));
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          const idToken = await user.getIdToken();
+          const res = await fetch("/api/subscriptions/checkout", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ companyId: companyIdForCheckout || undefined, planId }),
+          });
+          const data = (await res.json().catch(() => ({}))) as {
+            url?: string;
+            error?: string;
+            needsCompany?: boolean;
+          };
+
+          if (data.needsCompany && attempt === 0) {
+            companyIdForCheckout = await provisionSaasCompanyForAdmin(user, {
+              pendingPlanId: planId,
+            });
+            onCompanyProvisioned?.(companyIdForCheckout);
+            await user.getIdToken(true);
+            continue;
+          }
+
+          if (!res.ok || !data.url) {
+            throw new Error(data.error?.trim() || t("subscription.pricing.checkout_error"));
+          }
+
+          window.location.href = data.url;
+          return;
         }
-        window.location.href = data.url;
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       } finally {
         setBusy(false);
       }
     },
-    [companyId, t]
+    [onCompanyProvisioned, t]
   );
 
   const openPortal = useCallback(async () => {
@@ -93,8 +115,8 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
 
   const plan = displayPlanId ? getSubscriptionPlan(displayPlanId) : null;
   const statusKey = subscription?.status ?? "none";
-  const showActivate =
-    !active && displayPlanId && subscriptionCheckoutEnabled() && Boolean(companyId.trim());
+  const canCheckout = subscriptionCheckoutEnabled() && Boolean(displayPlanId);
+  const showActivate = !active && canCheckout;
   const showManage = Boolean(subscription?.stripeCustomerId);
 
   return (
@@ -128,7 +150,7 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
               type="button"
               disabled={busy}
               data-testid="dashboard-account-subscribe"
-              onClick={() => void startCheckout(displayPlanId)}
+              onClick={() => void startCheckout(displayPlanId, companyId)}
               className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-full bg-blue-600 px-3.5 text-[13px] font-semibold text-white disabled:opacity-50"
             >
               {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}

@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
 import {
+  readPendingSubscriptionPlan,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
@@ -18,7 +19,10 @@ function SubscriptionSignupEffectsInner() {
       savePendingSubscriptionPlan(planId);
     }
 
-    if (searchParams.get("account") === "1") {
+    const shouldOpenAccount =
+      searchParams.get("account") === "1" || Boolean(planId ?? readPendingSubscriptionPlan());
+
+    if (shouldOpenAccount) {
       pageSelector?.openAccount();
     }
 
@@ -39,7 +43,7 @@ function SubscriptionSignupEffectsInner() {
   return null;
 }
 
-/** Persiste le plan choisi et ouvre le panneau compte si demandé (?account=1&plan=). */
+/** Persiste le plan choisi et ouvre Mon compte après connexion/inscription. */
 export default function SubscriptionSignupEffects() {
   return (
     <Suspense fallback={null}>

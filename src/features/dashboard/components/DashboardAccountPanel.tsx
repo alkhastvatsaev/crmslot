@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Building2, Loader2, LogOut, Mail, Pencil, Phone, Save, Trash2, User } from "lucide-react";
 import { useTranslation } from "@/core/i18n/I18nContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import { useCrmStaffAccountPanel } from "@/features/auth/hooks/useCrmStaffAccountPanel";
 import { resolveStaffProfileRoleKey } from "@/features/auth/staffAccountRoleDisplay";
 import AccountSubscriptionRow from "@/features/subscriptions/components/AccountSubscriptionRow";
@@ -155,6 +156,7 @@ function AccountProfileHero({
 
 export default function DashboardAccountPanel({ onClose, variant = "mobile" }: Props) {
   const { t } = useTranslation();
+  const workspace = useCompanyWorkspaceOptional();
   const {
     fields,
     draft,
@@ -266,8 +268,11 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
               </div>
             ) : null}
 
-            {!editing && fields.companyId ? (
-              <AccountSubscriptionRow companyId={fields.companyId} />
+            {!editing ? (
+              <AccountSubscriptionRow
+                companyId={fields.companyId}
+                onCompanyProvisioned={() => void workspace?.refreshClaimsSilent()}
+              />
             ) : null}
           </div>
 

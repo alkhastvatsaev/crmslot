@@ -7,6 +7,10 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import { requestDefaultCompanyMembership } from "@/features/auth/requestDefaultCompanyMembership";
+import {
+  isSaasSignupFlow,
+  provisionSaasCompanyForAdmin,
+} from "@/features/subscriptions/provisionSaasCompanyClient";
 import type { CrmStaffOAuthMode } from "@/features/auth/crmStaffOAuthMode";
 import type { StaffJoinPayload } from "@/features/auth/staffJoinPayload";
 
@@ -27,23 +31,29 @@ export class CrmStaffOAuthModeError extends Error {
   }
 }
 
-/** Connexion : rattachement idempotent à la société unique. */
+/** Connexion : rattachement idempotent à la société unique (sauf parcours SaaS /pricing). */
 export async function syncDefaultCompanyMembershipAfterLogin(
   cred: UserCredential,
   staffJoin?: StaffJoinPayload | null
 ): Promise<void> {
+  if (isSaasSignupFlow()) {
+    return;
+  }
   const result = await requestDefaultCompanyMembership(cred.user, staffJoin);
   if (!result.ok) {
     throw new CrmStaffJoinCompanyError(result.error);
   }
 }
 
-export async function joinDefaultCompanyAfterSignUp(
+async function attachCompanyAfterSignUp(
   cred: UserCredential,
   staffJoin?: StaffJoinPayload | null
 ): Promise<string> {
-  const result = await requestDefaultCompanyMembership(cred.user, staffJoin);
+  if (isSaasSignupFlow()) {
+    return provisionSaasCompanyForAdmin(cred.user);
+  }
 
+  const result = await requestDefaultCompanyMembership(cred.user, staffJoin);
   if (!result.ok) {
     try {
       await deleteUser(cred.user);
@@ -54,6 +64,13 @@ export async function joinDefaultCompanyAfterSignUp(
   }
 
   return result.companyId;
+}
+
+export async function joinDefaultCompanyAfterSignUp(
+  cred: UserCredential,
+  staffJoin?: StaffJoinPayload | null
+): Promise<string> {
+  return attachCompanyAfterSignUp(cred, staffJoin);
 }
 
 export async function registerCrmStaffAccount(params: {

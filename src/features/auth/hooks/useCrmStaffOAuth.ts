@@ -29,6 +29,10 @@ import {
   persistCrmStaffOAuthMode,
 } from "@/features/auth/crmStaffOAuthMode";
 import type { CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
+import {
+  readPlanIdFromSearchParams,
+  savePendingSubscriptionPlan,
+} from "@/features/subscriptions/pendingSubscriptionPlan";
 
 type Options = {
   variant: CrmEmailLoginVariant;
@@ -64,7 +68,13 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
       }
 
       persistCrmStaffOAuthMode(oauthMode);
-      persistStaffJoinPayload(staffJoinPayloadFromVariant(variant));
+      const staffJoin = staffJoinPayloadFromVariant(variant);
+      persistStaffJoinPayload(staffJoin);
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const planId = readPlanIdFromSearchParams(params);
+        if (planId) savePendingSubscriptionPlan(planId);
+      }
       const setBusy = provider === "google" ? setGoogleBusy : setAppleBusy;
       setBusy(true);
       try {
