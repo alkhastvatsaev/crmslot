@@ -70,7 +70,7 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
       };
 
       if (meData.needsCompany) {
-        window.location.href = "/?plan=" + planId;
+        window.location.href = `/?plan=${planId}&setup=company`;
         return;
       }
 

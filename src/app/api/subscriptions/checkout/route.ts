@@ -21,6 +21,10 @@ async function resolveCompanyIdForAdmin(
     if ("status" in guard) {
       return { error: guard.error, status: guard.status };
     }
+    const companySnap = await db.doc(`companies/${guard.companyId}`).get();
+    if (!companySnap.exists) {
+      return { needsCompany: true };
+    }
     return { companyId: guard.companyId };
   }
 
@@ -30,7 +34,13 @@ async function resolveCompanyIdForAdmin(
     return { needsCompany: true };
   }
 
-  return { companyId: adminMembership.id };
+  const companyId = adminMembership.id;
+  const companySnap = await db.doc(`companies/${companyId}`).get();
+  if (!companySnap.exists) {
+    return { needsCompany: true };
+  }
+
+  return { companyId };
 }
 
 export async function POST(request: Request) {

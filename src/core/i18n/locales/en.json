@@ -2855,7 +2855,6 @@
     "toast_invoice_issued": "Invoice sent by email",
     "toast_invoice_pending": "Invoice pending field completion"
   },
-
   "subscription": {
     "pricing": {
       "title": "Simple, transparent pricing",
@@ -2913,7 +2912,9 @@
     "checkout": {
       "success_title": "Subscription activated",
       "success_hint": "Plan {{plan}} — thank you! Access updates in a few seconds.",
-      "portal_return": "Returned from billing portal."
+      "portal_return": "Returned from billing portal.",
+      "create_company_title": "Create your company",
+      "create_company_hint": "Company hub → enter your business name → create. Then go back to /pricing to subscribe."
     }
   }
 }

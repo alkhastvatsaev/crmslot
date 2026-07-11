@@ -2855,7 +2855,6 @@
   "timetracking": {
     "export_payroll": "Exporter feuilles de temps"
   },
-
   "subscription": {
     "pricing": {
       "title": "Tarifs simples, sans surprise",
@@ -2913,7 +2912,9 @@
     "checkout": {
       "success_title": "Abonnement activé",
       "success_hint": "Plan {{plan}} — merci ! L'accès est actif sous quelques secondes.",
-      "portal_return": "Retour depuis le portail de facturation."
+      "portal_return": "Retour depuis le portail de facturation.",
+      "create_company_title": "Créez votre société",
+      "create_company_hint": "Hub Société → saisissez le nom de votre entreprise → créez. Puis retournez sur /pricing pour choisir un plan."
     }
   }
 }

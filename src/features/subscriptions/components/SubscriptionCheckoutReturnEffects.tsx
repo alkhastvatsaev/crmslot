@@ -12,6 +12,16 @@ function SubscriptionCheckoutReturnEffectsInner() {
 
   useEffect(() => {
     const subscription = searchParams.get("subscription")?.trim();
+    const setup = searchParams.get("setup")?.trim();
+    const plan = searchParams.get("plan")?.trim();
+
+    if (setup === "company" && plan && isSubscriptionPlanId(plan)) {
+      toast.message(t("subscription.checkout.create_company_title"), {
+        description: t("subscription.checkout.create_company_hint"),
+        duration: 12_000,
+      });
+    }
+
     if (!subscription) return;
 
     if (subscription === "success") {
