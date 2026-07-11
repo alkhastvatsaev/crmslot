@@ -1,7 +1,5 @@
-import {
-  isSubscriptionPlanId,
-  type SubscriptionPlanId,
-} from "@/features/subscriptions/subscriptionPlans";
+import { isSubscriptionPlanId } from "@/features/subscriptions/subscriptionPlans";
+import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
 const STORAGE_KEY = "crmslot_pending_plan";
 
