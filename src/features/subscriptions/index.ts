@@ -23,15 +23,17 @@ export {
   type SubscriptionBillingInterval,
 } from "@/features/subscriptions/subscriptionPlans";
 export {
+  clearAutoCheckoutAttempted,
   clearPendingSubscriptionPlan,
   clearSubscriptionCheckoutCompleted,
+  markAutoCheckoutAttempted,
+  markPendingSubscriptionCheckout,
   markSubscriptionCheckoutCompleted,
-  markSubscriptionPricingRedirectDone,
   readPendingSubscriptionPlan,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
+  wasAutoCheckoutAttempted,
   wasSubscriptionCheckoutCompleted,
-  wasSubscriptionPricingRedirectDone,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
 export {
   isSaasSignupFlow,
@@ -43,8 +45,9 @@ export type {
   SubscriptionStatus,
 } from "@/features/subscriptions/subscriptionTypes";
 export { default as AccountSubscriptionRow } from "@/features/subscriptions/components/AccountSubscriptionRow";
-export { default as PricingPageEffects } from "@/features/subscriptions/components/PricingPageEffects";
-export { default as PricingPlansGrid } from "@/features/subscriptions/components/PricingPlansGrid";
+export { default as PricingLanding } from "@/features/subscriptions/components/PricingLanding";
+export { default as SubscriptionAccessGate } from "@/features/subscriptions/components/SubscriptionAccessGate";
+export { default as SubscriptionPaywall } from "@/features/subscriptions/components/SubscriptionPaywall";
 export { startSubscriptionCheckout } from "@/features/subscriptions/startSubscriptionCheckoutClient";
 export { default as SubscriptionCheckoutReturnEffects } from "@/features/subscriptions/components/SubscriptionCheckoutReturnEffects";
 export { default as SubscriptionSignupEffects } from "@/features/subscriptions/components/SubscriptionSignupEffects";

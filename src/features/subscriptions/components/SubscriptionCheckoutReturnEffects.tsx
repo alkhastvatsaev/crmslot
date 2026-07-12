@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
+  clearAutoCheckoutAttempted,
   markSubscriptionCheckoutCompleted,
   clearSubscriptionCheckoutCompleted,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
@@ -41,7 +42,7 @@ function SubscriptionCheckoutReturnEffectsInner() {
       const sessionId = searchParams.get("session_id")?.trim();
       const planLabel =
         plan && isSubscriptionPlanId(plan)
-          ? t(`subscription.plans.${plan}.name`)
+          ? t(`subscription.plans.standard.name`)
           : t("subscription.account.activate");
 
       void (async () => {
@@ -60,6 +61,11 @@ function SubscriptionCheckoutReturnEffectsInner() {
 
     if (subscription === "portal_return") {
       toast.message(t("subscription.checkout.portal_return"));
+    }
+
+    if (subscription === "canceled") {
+      clearAutoCheckoutAttempted();
+      toast.message(t("subscription.checkout.canceled"));
     }
 
     const url = new URL(window.location.href);

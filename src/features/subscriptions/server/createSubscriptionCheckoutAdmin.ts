@@ -85,7 +85,7 @@ export async function createSubscriptionCheckoutAdmin(
       },
     ],
     success_url: `${origin}/?subscription=success&plan=${input.planId}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/pricing?canceled=1`,
+    cancel_url: `${origin}/?subscription=canceled`,
     allow_promotion_codes: true,
     client_reference_id: input.companyId,
     metadata: {

@@ -2954,6 +2954,11 @@
       },
       "title": "CRMSLOT subscription",
       "view_pricing": "View pricing"
+    },
+    "paywall": {
+      "title": "Access CRMSLOT",
+      "subtitle": "One subscription for your whole team",
+      "cta": "Continue to payment"
     }
   }
 }

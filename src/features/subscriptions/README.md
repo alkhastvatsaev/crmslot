@@ -4,29 +4,32 @@ Abonnements SaaS plateforme CRMSLOT (≠ facturation interventions dans `billing
 
 ## Parcours
 
-1. `/pricing` → choix du plan + **Stripe Checkout** (connecté) ou inscription (non connecté)
-2. Inscription → société SaaS dédiée créée → redirection auto vers `/pricing?plan=…`
-3. Retour Stripe → toast succès sur `/`
-4. **Mon compte** → statut + lien « Voir les tarifs » ou portail Stripe (actif)
+1. **Inscription** → checkout Stripe auto → app (avec `NEXT_PUBLIC_SUBSCRIPTION_ENFORCE=true`)
+2. **Compte sans abo** → paywall in-app (1 CTA → Stripe)
+3. `/pricing` → landing publique (prix + liens auth), pas de checkout direct
+4. Retour Stripe → toast succès sur `/`
+5. **Mon compte** → statut + activer / portail Stripe
 
 ## Points d'entrée
 
-| Fichier                                     | Rôle                                       |
-| ------------------------------------------- | ------------------------------------------ |
-| `subscriptionPlans.ts`                      | Tarif unique 50 € HT / technicien          |
-| `startSubscriptionCheckoutClient.ts`        | Checkout Stripe (+ provision société)      |
-| `pendingSubscriptionPlan.ts`                | Plan choisi avant auth (sessionStorage)    |
-| `provisionSaasCompanyClient.ts`             | Crée `companies/{id}` à l'inscription SaaS |
-| `hooks/useCompanySubscription.ts`           | Contexte `FeatureFlagsProvider`            |
-| `components/PricingPlansGrid.tsx`           | Grille `/pricing`                          |
-| `components/AccountSubscriptionRow.tsx`     | Statut dans Mon compte (sans « Activer »)  |
-| `components/SubscriptionSignupEffects.tsx`  | Redirige vers `/pricing` après auth        |
-| `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session                    |
-| `index.server.ts`                           | Routes API uniquement                      |
+| Fichier                                     | Rôle                                  |
+| ------------------------------------------- | ------------------------------------- |
+| `subscriptionPlans.ts`                      | Tarif unique 50 € HT / technicien     |
+| `startSubscriptionCheckoutClient.ts`        | Checkout Stripe (+ provision société) |
+| `pendingSubscriptionPlan.ts`                | Flag checkout après inscription       |
+| `components/SubscriptionSignupEffects.tsx`  | Lance checkout auto après auth        |
+| `components/SubscriptionAccessGate.tsx`     | Paywall in-app si abo inactif         |
+| `components/SubscriptionPaywall.tsx`        | UI paywall (1 bouton)                 |
+| `components/PricingLanding.tsx`             | Landing `/pricing`                    |
+| `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session               |
+| `index.server.ts`                           | Routes API uniquement                 |
 
-## Setup Stripe
+## Env
 
-Guide complet → [`docs/ops/STRIPE_SUBSCRIPTIONS_SETUP.md`](../../docs/ops/STRIPE_SUBSCRIPTIONS_SETUP.md)
+```bash
+NEXT_PUBLIC_SUBSCRIPTION_ENFORCE=true   # paywall + checkout auto
+STRIPE_SUBSCRIPTION_PRICE_TEAM=price_…  # 50 € unitaire / technicien
+```
 
 ## Tests
 

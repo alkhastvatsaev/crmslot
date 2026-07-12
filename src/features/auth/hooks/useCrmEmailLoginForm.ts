@@ -24,6 +24,7 @@ import type { CrmEmailAuthTab, CrmEmailLoginVariant } from "@/features/auth/crmE
 import { useCrmStaffOAuth } from "@/features/auth/hooks/useCrmStaffOAuth";
 import { markStaffPushOnboardingPending } from "@/features/notifications/staffPushOnboarding";
 import {
+  markPendingSubscriptionCheckout,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
@@ -108,6 +109,9 @@ export function useCrmEmailLoginForm({ variant }: Args) {
     setBusy(true);
     try {
       if (authTab === "register") {
+        if (variant === "admin") {
+          markPendingSubscriptionCheckout();
+        }
         await registerCrmStaffAccount({ auth, email, password, staffJoin });
         markStaffPushOnboardingPending();
         toast.success(String(t("auth.register_success")));

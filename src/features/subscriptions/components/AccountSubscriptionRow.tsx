@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Link from "next/link";
 import { CreditCard, Loader2 } from "lucide-react";
 import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   getSubscriptionPlan,
   isSubscriptionActive,
+  PUBLIC_SUBSCRIPTION_PLAN_ID,
+  startSubscriptionCheckout,
+  subscriptionCheckoutEnabled,
   useCompanySubscription,
   type SubscriptionPlanId,
 } from "@/features/subscriptions";
@@ -16,7 +18,7 @@ type Props = {
   companyId: string;
 };
 
-/** Résumé abonnement dans Mon compte — activation uniquement via /pricing. */
+/** Résumé abonnement dans Mon compte. */
 export default function AccountSubscriptionRow({ companyId }: Props) {
   const { t } = useTranslation();
   const { subscription, loading } = useCompanySubscription();
@@ -25,6 +27,23 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
 
   const active = isSubscriptionActive(subscription);
   const displayPlanId: SubscriptionPlanId | null = subscription?.planId ?? null;
+  const checkoutEnabled = subscriptionCheckoutEnabled();
+
+  const startCheckout = useCallback(async () => {
+    if (!companyId?.trim()) return;
+    const user = auth?.currentUser;
+    if (!user) return;
+
+    setBusy(true);
+    setError(null);
+    try {
+      const url = await startSubscriptionCheckout(PUBLIC_SUBSCRIPTION_PLAN_ID, { companyId });
+      window.location.assign(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      setBusy(false);
+    }
+  }, [companyId]);
 
   const openPortal = useCallback(async () => {
     if (!companyId?.trim()) return;
@@ -91,13 +110,16 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
 
       <div className="flex gap-2">
         {!active ? (
-          <Link
-            href="/pricing"
-            data-testid="dashboard-account-view-pricing"
-            className="flex min-h-[36px] flex-1 items-center justify-center rounded-full bg-blue-600 px-3.5 text-[13px] font-semibold text-white"
+          <button
+            type="button"
+            disabled={!checkoutEnabled || busy}
+            data-testid="dashboard-account-activate-subscription"
+            onClick={() => void startCheckout()}
+            className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-full bg-blue-600 px-3.5 text-[13px] font-semibold text-white disabled:opacity-50"
           >
-            {t("subscription.account.view_pricing")}
-          </Link>
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
+            {t("subscription.paywall.cta")}
+          </button>
         ) : null}
         {showManage ? (
           <button

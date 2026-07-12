@@ -4,16 +4,23 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import {
+  clearAutoCheckoutAttempted,
   clearPendingSubscriptionPlan,
+  markAutoCheckoutAttempted,
   markSubscriptionCheckoutCompleted,
-  markSubscriptionPricingRedirectDone,
   readPendingSubscriptionPlan,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
+  wasAutoCheckoutAttempted,
   wasSubscriptionCheckoutCompleted,
-  wasSubscriptionPricingRedirectDone,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
-import { isSubscriptionActive, useCompanySubscription } from "@/features/subscriptions";
+import {
+  isSubscriptionActive,
+  startSubscriptionCheckout,
+  subscriptionCheckoutEnabled,
+  subscriptionEnforcementEnabled,
+  useCompanySubscription,
+} from "@/features/subscriptions";
 
 function SubscriptionSignupEffectsInner() {
   const searchParams = useSearchParams();
@@ -48,35 +55,42 @@ function SubscriptionSignupEffectsInner() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!workspace?.firebaseUid || subscriptionLoading) return;
+    if (!subscriptionEnforcementEnabled() || !subscriptionCheckoutEnabled()) return;
+    if (!workspace?.firebaseUid || !workspace.workspaceReady || subscriptionLoading) return;
     if (wasSubscriptionCheckoutCompleted()) return;
 
-    const subscriptionParam =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("subscription")?.trim()
-        : null;
+    const subscriptionParam = searchParams.get("subscription")?.trim();
     if (subscriptionParam === "success") return;
-
-    const pendingPlan = readPendingSubscriptionPlan();
-    if (!pendingPlan) return;
 
     if (isSubscriptionActive(subscription)) {
       clearPendingSubscriptionPlan();
+      clearAutoCheckoutAttempted();
       return;
     }
 
-    if (typeof window === "undefined") return;
-    if (window.location.pathname === "/pricing") return;
-    if (wasSubscriptionPricingRedirectDone()) return;
+    const pendingPlan = readPendingSubscriptionPlan();
+    if (!pendingPlan || wasAutoCheckoutAttempted()) return;
 
-    markSubscriptionPricingRedirectDone();
-    window.location.href = `/pricing?plan=${pendingPlan}`;
-  }, [workspace?.firebaseUid, subscription, subscriptionLoading]);
+    markAutoCheckoutAttempted();
+    void startSubscriptionCheckout(pendingPlan)
+      .then((url) => {
+        window.location.assign(url);
+      })
+      .catch(() => {
+        clearAutoCheckoutAttempted();
+      });
+  }, [
+    workspace?.firebaseUid,
+    workspace?.workspaceReady,
+    subscription,
+    subscriptionLoading,
+    searchParams,
+  ]);
 
   return null;
 }
 
-/** Persiste le plan choisi et renvoie vers /pricing après connexion pour le checkout Stripe. */
+/** Inscription → checkout Stripe auto (sans passer par /pricing). */
 export default function SubscriptionSignupEffects() {
   return (
     <Suspense fallback={null}>

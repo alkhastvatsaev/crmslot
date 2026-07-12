@@ -28,6 +28,7 @@ import { prefetchDashboardHubChunksIdle } from "@/features/dashboard/prefetchDas
 import {
   SubscriptionCheckoutReturnEffects,
   SubscriptionSignupEffects,
+  SubscriptionAccessGate,
 } from "@/features/subscriptions";
 import TeamHubBootPrefetch from "@/features/teamHub/components/TeamHubBootPrefetch";
 
@@ -67,8 +68,10 @@ export default function AdminDashboardProviders({ pageCount, children }: Props) 
                                             <DeferredAdminBootstraps />
                                             <SubscriptionCheckoutReturnEffects />
                                             <SubscriptionSignupEffects />
-                                            <TeamHubBootPrefetch />
-                                            {children}
+                                            <SubscriptionAccessGate>
+                                              <TeamHubBootPrefetch />
+                                              {children}
+                                            </SubscriptionAccessGate>
                                           </RequesterHubProvider>
                                         </TechnicianQueryProvider>
                                       </OfflineSyncProvider>

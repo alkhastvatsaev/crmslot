@@ -2954,6 +2954,11 @@
       },
       "title": "CRMSLOT-abonnement",
       "view_pricing": "Tarief bekijken"
+    },
+    "paywall": {
+      "title": "Toegang tot CRMSLOT",
+      "subtitle": "Eén abonnement voor je hele team",
+      "cta": "Doorgaan naar betaling"
     }
   }
 }

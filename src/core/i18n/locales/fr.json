@@ -2954,6 +2954,11 @@
       },
       "title": "Abonnement CRMSLOT",
       "view_pricing": "Voir les tarifs"
+    },
+    "paywall": {
+      "title": "Accéder à CRMSLOT",
+      "subtitle": "Un abonnement pour toute l'équipe",
+      "cta": "Continuer vers le paiement"
     }
   }
 }

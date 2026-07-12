@@ -30,6 +30,7 @@ import {
 } from "@/features/auth/crmStaffOAuthMode";
 import type { CrmEmailLoginVariant } from "@/features/auth/crmEmailLoginVariant";
 import {
+  markPendingSubscriptionCheckout,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
@@ -73,7 +74,11 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
         const planId = readPlanIdFromSearchParams(params);
-        if (planId) savePendingSubscriptionPlan(planId);
+        if (variant === "admin" && oauthMode === "register") {
+          markPendingSubscriptionCheckout();
+        } else if (planId) {
+          savePendingSubscriptionPlan(planId);
+        }
       }
       const setBusy = provider === "google" ? setGoogleBusy : setAppleBusy;
       setBusy(true);

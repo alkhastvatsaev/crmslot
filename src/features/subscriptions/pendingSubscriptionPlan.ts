@@ -6,8 +6,13 @@ import {
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
 const STORAGE_KEY = "crmslot_pending_plan";
-const PRICING_REDIRECT_KEY = "crmslot_pricing_redirect_done";
 const CHECKOUT_COMPLETE_KEY = "crmslot_checkout_complete";
+const AUTO_CHECKOUT_KEY = "crmslot_auto_checkout_attempted";
+
+/** Marque qu’un checkout Stripe doit démarrer après auth (inscription SaaS). */
+export function markPendingSubscriptionCheckout(): void {
+  savePendingSubscriptionPlan(PUBLIC_SUBSCRIPTION_PLAN_ID);
+}
 
 export function savePendingSubscriptionPlan(planId: SubscriptionPlanId): void {
   if (typeof window === "undefined") return;
@@ -23,15 +28,15 @@ export function readPendingSubscriptionPlan(): SubscriptionPlanId | null {
 export function clearPendingSubscriptionPlan(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(STORAGE_KEY);
-  sessionStorage.removeItem(PRICING_REDIRECT_KEY);
+  sessionStorage.removeItem(AUTO_CHECKOUT_KEY);
 }
 
-/** Après paiement Stripe validé — ne plus renvoyer vers /pricing. */
+/** Après paiement Stripe validé — ne plus bloquer ni relancer checkout. */
 export function markSubscriptionCheckoutCompleted(): void {
   if (typeof window === "undefined") return;
   sessionStorage.setItem(CHECKOUT_COMPLETE_KEY, "1");
   sessionStorage.removeItem(STORAGE_KEY);
-  sessionStorage.removeItem(PRICING_REDIRECT_KEY);
+  sessionStorage.removeItem(AUTO_CHECKOUT_KEY);
 }
 
 export function wasSubscriptionCheckoutCompleted(): boolean {
@@ -44,15 +49,19 @@ export function clearSubscriptionCheckoutCompleted(): void {
   sessionStorage.removeItem(CHECKOUT_COMPLETE_KEY);
 }
 
-/** Une seule redirection auto vers /pricing par session (après auth). */
-export function markSubscriptionPricingRedirectDone(): void {
+export function markAutoCheckoutAttempted(): void {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(PRICING_REDIRECT_KEY, "1");
+  sessionStorage.setItem(AUTO_CHECKOUT_KEY, "1");
 }
 
-export function wasSubscriptionPricingRedirectDone(): boolean {
+export function wasAutoCheckoutAttempted(): boolean {
   if (typeof window === "undefined") return false;
-  return sessionStorage.getItem(PRICING_REDIRECT_KEY) === "1";
+  return sessionStorage.getItem(AUTO_CHECKOUT_KEY) === "1";
+}
+
+export function clearAutoCheckoutAttempted(): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(AUTO_CHECKOUT_KEY);
 }
 
 export function readPlanIdFromSearchParams(params: URLSearchParams): SubscriptionPlanId | null {
