@@ -8,13 +8,18 @@ import {
   getSubscriptionPlan,
   isSubscriptionPlanId,
   resolveStripePriceId,
+  computeSubscriptionMonthlyTotal,
   subscriptionTrialDays,
 } from "@/features/subscriptions/subscriptionPlans";
 
 describe("subscriptionPlans", () => {
   it("defines three public plans", () => {
     expect(SUBSCRIPTION_PLANS.map((p) => p.id)).toEqual(["solo", "team", "pro"]);
-    expect(getSubscriptionPlan("team").technicianPriceEurMonthly).toBe(89);
+    expect(getSubscriptionPlan("team").technicianPriceEurMonthly).toBe(22);
+  });
+
+  it("computes monthly total from technician quantity", () => {
+    expect(computeSubscriptionMonthlyTotal("team", 4)).toBe(88);
   });
 
   it("validates plan ids", () => {
