@@ -32,7 +32,6 @@ export type {
   SubscriptionStatus,
 } from "@/features/subscriptions/subscriptionTypes";
 export { default as AccountSubscriptionRow } from "@/features/subscriptions/components/AccountSubscriptionRow";
-export { default as PricingFaq } from "@/features/subscriptions/components/PricingFaq";
 export { default as PricingPageEffects } from "@/features/subscriptions/components/PricingPageEffects";
 export { default as PricingPlansGrid } from "@/features/subscriptions/components/PricingPlansGrid";
 export { startSubscriptionCheckout } from "@/features/subscriptions/startSubscriptionCheckoutClient";

@@ -2857,51 +2857,22 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Tarifs",
-      "subtitle": "Facturation à la carte · par technicien actif · 14 jours d'essai",
-      "founding_badge": "Offre fondateur : -30 % à vie pour les 10 premiers clients",
+      "title": "Tarifs simples",
+      "subtitle": "Choisissez un niveau. Payez par technicien actif.",
       "most_popular": "Le plus choisi",
       "per_month": "/ mois HT",
-      "founding_price": "Fondateur : {{price}} €/technicien/mois avec code promo",
-      "seats_included": "Jusqu'à {{count}} technicien(s) inclus",
-      "extra_technician": "+ {{price}} €/mois par technicien supplémentaire",
       "choose_plan": "Choisir ce plan",
       "checkout_loading": "…",
-      "already_account": "Déjà un compte ?",
+      "already_account": "Déjà client ?",
       "open_app": "Ouvrir l'app",
       "recommended": "Populaire",
-      "cta": "Commencer",
+      "cta": "Choisir",
       "checkout_error": "Paiement indisponible.",
-      "footnote": "Code FONDATEUR30 : −30 % pour les 10 premiers clients",
       "cta_subscribe": "S'abonner",
       "sign_in": "Se connecter",
-      "faq_title": "Questions fréquentes",
-      "faq": {
-        "plan": {
-          "q": "Quel plan choisir ?",
-          "a": "Choisissez le niveau de fonctionnalités (Solo, Équipe ou Pro). Le montant = tarif unitaire × nombre de techniciens."
-        },
-        "trial": {
-          "q": "Comment fonctionne l'essai ?",
-          "a": "14 jours gratuits sur tous les plans. Aucun prélèvement avant la fin de l'essai. Résiliation à tout moment depuis le portail Stripe."
-        },
-        "technicians": {
-          "q": "Comment est calculé le prix ?",
-          "a": "Prix = tarif du plan × nombre de techniciens. Ex. Équipe à 22 € × 4 techniciens = 88 € HT/mois. Ajustez la quantité sur /pricing ou dans le portail Stripe."
-        },
-        "billing": {
-          "q": "Facturation et TVA ?",
-          "a": "Paiement mensuel sécurisé via Stripe. TVA belge appliquée selon votre statut. Factures disponibles dans le portail client Stripe."
-        }
-      },
-      "per_technician": " / technicien / mois HT",
+      "per_technician": " / tech / mois HT",
       "per_technician_short": " / technicien / mois HT",
-      "monthly_total": "{{count}} technicien(s) → {{total}} € / mois HT",
-      "technician_quantity_label": "Nombre de techniciens",
-      "technician_quantity_hint": "Ajustez avant de vous abonner — modifiable ensuite dans Stripe.",
-      "technician_quantity_decrease": "Retirer un technicien",
-      "technician_quantity_increase": "Ajouter un technicien",
-      "billing_per_technician": "Tarif unitaire par technicien terrain actif — pas de palier ni de lot."
+      "billing_per_technician": "Le nombre de techniciens se règle dans Stripe au moment du paiement."
     },
     "plans": {
       "solo": {

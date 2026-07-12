@@ -2857,51 +2857,22 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Pricing",
-      "subtitle": "Pay per active technician · 14-day trial",
-      "founding_badge": "Founding offer: 30% off for life for the first 10 customers",
+      "title": "Simple pricing",
+      "subtitle": "Choose a level. Pay per active technician.",
       "most_popular": "Most popular",
       "per_month": "/ mo excl. VAT",
-      "founding_price": "Founding: €{{price}}/technician/mo with promo code",
-      "seats_included": "Up to {{count}} technician(s) included",
-      "extra_technician": "+ €{{price}}/mo per extra technician",
       "choose_plan": "Choose plan",
       "checkout_loading": "…",
-      "already_account": "Already have an account?",
+      "already_account": "Already a customer?",
       "open_app": "Open app",
       "recommended": "Popular",
-      "cta": "Get started",
+      "cta": "Choose",
       "checkout_error": "Checkout unavailable.",
-      "footnote": "Code FONDATEUR30: 30% off for the first 10 customers",
       "cta_subscribe": "Subscribe",
       "sign_in": "Sign in",
-      "faq_title": "Questions & answers",
-      "faq": {
-        "plan": {
-          "q": "Which plan should I pick?",
-          "a": "Pick the feature level (Solo, Team or Pro). Total = unit price × number of technicians."
-        },
-        "trial": {
-          "q": "How does the trial work?",
-          "a": "14-day free trial on every plan. No charge until the trial ends. Cancel anytime from the Stripe billing portal."
-        },
-        "technicians": {
-          "q": "How is pricing calculated?",
-          "a": "Price = plan rate × technicians. E.g. Team at €22 × 4 technicians = €88/mo excl. VAT. Adjust quantity on /pricing or in the Stripe portal."
-        },
-        "billing": {
-          "q": "Billing and VAT?",
-          "a": "Secure monthly payment via Stripe. Belgian VAT applied based on your status. Invoices available in the Stripe customer portal."
-        }
-      },
-      "per_technician": " / technician / mo excl. VAT",
+      "per_technician": " / tech / mo excl. VAT",
       "per_technician_short": " / technician / mo excl. VAT",
-      "monthly_total": "{{count}} technician(s) → €{{total}} / mo excl. VAT",
-      "technician_quantity_label": "Number of technicians",
-      "technician_quantity_hint": "Adjust before subscribing — change later in Stripe.",
-      "technician_quantity_decrease": "Remove a technician",
-      "technician_quantity_increase": "Add a technician",
-      "billing_per_technician": "Unit price per active field technician — no bundles or tiers by headcount."
+      "billing_per_technician": "Technician quantity is adjusted in Stripe during checkout."
     },
     "plans": {
       "solo": {

@@ -4,6 +4,8 @@ import {
   clampTechnicianQuantity,
   getSubscriptionPlan,
   isSubscriptionPlanId,
+  MAX_TECHNICIAN_QUANTITY,
+  MIN_TECHNICIAN_QUANTITY,
   resolveStripePriceId,
   subscriptionTrialDays,
 } from "@/features/subscriptions/subscriptionPlans";
@@ -66,7 +68,17 @@ export async function createSubscriptionCheckoutAdmin(
   const session = await input.stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: priceId, quantity: technicianQuantity }],
+    line_items: [
+      {
+        price: priceId,
+        quantity: technicianQuantity,
+        adjustable_quantity: {
+          enabled: true,
+          minimum: MIN_TECHNICIAN_QUANTITY,
+          maximum: MAX_TECHNICIAN_QUANTITY,
+        },
+      },
+    ],
     success_url: `${origin}/?subscription=success&plan=${input.planId}`,
     cancel_url: `${origin}/pricing?canceled=1`,
     allow_promotion_codes: true,

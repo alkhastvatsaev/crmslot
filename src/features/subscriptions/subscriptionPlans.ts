@@ -6,7 +6,6 @@ export type SubscriptionPlanDefinition = {
   taglineKey: string;
   /** Tarif unitaire HT — facturé par technicien actif (Stripe quantity). */
   technicianPriceEurMonthly: number;
-  foundingTechnicianPriceEurMonthly: number;
   featureKeys: readonly string[];
   highlight?: boolean;
 };
@@ -18,7 +17,6 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     nameKey: "subscription.plans.solo.name",
     taglineKey: "subscription.plans.solo.tagline",
     technicianPriceEurMonthly: 19,
-    foundingTechnicianPriceEurMonthly: 13,
     featureKeys: [
       "subscription.plans.solo.features.crm",
       "subscription.plans.solo.features.map",
@@ -31,7 +29,6 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     nameKey: "subscription.plans.team.name",
     taglineKey: "subscription.plans.team.tagline",
     technicianPriceEurMonthly: 22,
-    foundingTechnicianPriceEurMonthly: 15,
     highlight: true,
     featureKeys: [
       "subscription.plans.team.features.all_solo",
@@ -45,7 +42,6 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     nameKey: "subscription.plans.pro.name",
     taglineKey: "subscription.plans.pro.tagline",
     technicianPriceEurMonthly: 27,
-    foundingTechnicianPriceEurMonthly: 19,
     featureKeys: [
       "subscription.plans.pro.features.all_team",
       "subscription.plans.pro.features.peppol",

@@ -19,7 +19,6 @@ Abonnements SaaS plateforme CRMSLOT (≠ facturation interventions dans `billing
 | `provisionSaasCompanyClient.ts`             | Crée `companies/{id}` à l'inscription SaaS       |
 | `hooks/useCompanySubscription.ts`           | Contexte `FeatureFlagsProvider`                  |
 | `components/PricingPlansGrid.tsx`           | Grille `/pricing`                                |
-| `components/PricingFaq.tsx`                 | FAQ tarifs                                       |
 | `components/AccountSubscriptionRow.tsx`     | Statut dans Mon compte (sans « Activer »)        |
 | `components/SubscriptionSignupEffects.tsx`  | Redirige vers `/pricing` après auth              |
 | `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session                          |
