@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/core/config/firebase";
@@ -16,10 +15,9 @@ import { startSubscriptionCheckout } from "@/features/subscriptions/startSubscri
 
 type Props = {
   defaultPlanId?: SubscriptionPlanId;
-  showAppLink?: boolean;
 };
 
-export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: Props) {
+export default function PricingPlansGrid({ defaultPlanId }: Props) {
   const { t } = useTranslation();
   const checkoutEnabled = subscriptionCheckoutEnabled();
   const [busyPlan, setBusyPlan] = useState<SubscriptionPlanId | null>(null);
@@ -60,13 +58,10 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
 
   return (
     <div className="w-full">
-      <div className="mb-7 text-center sm:mb-8">
+      <div className="mb-6 text-center sm:mb-7">
         <h1 className="text-[clamp(1.7rem,4vw,2.35rem)] font-semibold tracking-tight text-slate-950">
           {t("subscription.pricing.title")}
         </h1>
-        <p className="mx-auto mt-2 max-w-lg text-[14px] leading-relaxed text-slate-500">
-          {t("subscription.pricing.subtitle")}
-        </p>
       </div>
 
       {error ? (
@@ -143,19 +138,6 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
           );
         })}
       </div>
-
-      <p className="mt-5 text-center text-[12px] text-slate-500">
-        {t("subscription.pricing.billing_per_technician")}
-      </p>
-
-      {showAppLink ? (
-        <p className="mt-4 text-center text-[12px] text-slate-500">
-          {t("subscription.pricing.already_account")}{" "}
-          <Link href="/" className="font-medium text-slate-950 underline-offset-2 hover:underline">
-            {signedIn ? t("subscription.pricing.open_app") : t("subscription.pricing.sign_in")}
-          </Link>
-        </p>
-      ) : null}
     </div>
   );
 }

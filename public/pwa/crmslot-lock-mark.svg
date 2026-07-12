@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 100 272 330" fill="none">
+  <defs>
+    <linearGradient id="lockGrad" x1="256" y1="128" x2="256" y2="406" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5F5F4"/>
+      <stop offset="35%" stop-color="#D6D3D1"/>
+      <stop offset="62%" stop-color="#A8A29E"/>
+      <stop offset="100%" stop-color="#57534E"/>
+    </linearGradient>
+    <linearGradient id="lockStroke" x1="210" y1="130" x2="300" y2="410" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.65"/>
+      <stop offset="45%" stop-color="#A8A29E" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#44403C" stop-opacity="0.42"/>
+    </linearGradient>
+    <filter id="lockShadow" x="-25%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#78716C" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <g filter="url(#lockShadow)">
+    <path d="M 256 128 A 86 86 0 0 1 308 282.4 L 308 354 A 52 52 0 0 1 256 406 A 52 52 0 0 1 204 354 L 204 282.4 A 86 86 0 0 1 256 128 Z" fill="url(#lockGrad)" stroke="url(#lockStroke)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+  </g>
+</svg>

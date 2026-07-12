@@ -2857,22 +2857,17 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Simple pricing",
-      "subtitle": "Choose a level. Pay per active technician.",
+      "title": "Pricing",
       "most_popular": "Most popular",
       "per_month": "/ mo excl. VAT",
       "choose_plan": "Choose plan",
       "checkout_loading": "…",
-      "already_account": "Already a customer?",
-      "open_app": "Open app",
       "recommended": "Popular",
       "cta": "Choose",
       "checkout_error": "Checkout unavailable.",
       "cta_subscribe": "Subscribe",
-      "sign_in": "Sign in",
       "per_technician": " / tech / mo excl. VAT",
-      "per_technician_short": " / technician / mo excl. VAT",
-      "billing_per_technician": "Technician quantity is adjusted in Stripe during checkout."
+      "per_technician_short": " / technician / mo excl. VAT"
     },
     "plans": {
       "solo": {

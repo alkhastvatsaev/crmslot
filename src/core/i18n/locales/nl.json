@@ -2857,22 +2857,17 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Eenvoudige prijzen",
-      "subtitle": "Kies een niveau. Betaal per actieve technieker.",
+      "title": "Prijzen",
       "most_popular": "Meest gekozen",
       "per_month": "/ mnd excl. btw",
       "choose_plan": "Kies dit plan",
       "checkout_loading": "…",
-      "already_account": "Al klant?",
-      "open_app": "App openen",
       "recommended": "Populair",
       "cta": "Kiezen",
       "checkout_error": "Betaling niet beschikbaar.",
       "cta_subscribe": "Abonneren",
-      "sign_in": "Inloggen",
       "per_technician": " / tech / mnd excl. btw",
-      "per_technician_short": " / technieker / mnd excl. btw",
-      "billing_per_technician": "Het aantal techniekers wordt in Stripe aangepast tijdens betaling."
+      "per_technician_short": " / technieker / mnd excl. btw"
     },
     "plans": {
       "solo": {

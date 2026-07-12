@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { LockKeyhole, Sparkles } from "lucide-react";
 import {
   isSubscriptionPlanId,
   PricingPageEffects,
@@ -23,12 +23,15 @@ export default async function PricingPage({ searchParams }: Props) {
 
       <header>
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link
-            href="/"
-            aria-label="CRMSLOT"
-            className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-black via-slate-900 to-slate-600 text-white shadow-[0_16px_40px_-22px_rgba(2,6,23,0.9)]"
-          >
-            <LockKeyhole className="h-5 w-5" aria-hidden />
+          <Link href="/" aria-label="CRMSLOT" className="inline-flex shrink-0">
+            <Image
+              src="/pwa/crmslot-lock-mark.svg"
+              alt=""
+              width={34}
+              height={42}
+              priority
+              className="h-[42px] w-[34px]"
+            />
           </Link>
           <Link
             href="/"
@@ -39,12 +42,8 @@ export default async function PricingPage({ searchParams }: Props) {
         </div>
       </header>
 
-      <section className="px-4 pb-6 pt-4 sm:px-6 sm:pb-10 sm:pt-8">
+      <section className="px-4 pb-6 pt-2 sm:px-6 sm:pb-10 sm:pt-4">
         <div className="mx-auto max-w-5xl rounded-[2rem] border border-slate-200/80 bg-white/80 p-4 shadow-[0_30px_90px_-60px_rgba(2,6,23,0.55)] backdrop-blur sm:p-8">
-          <div className="mb-5 flex items-center justify-center gap-2 text-[12px] font-medium text-slate-500">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
-            <span>Tarif simple. Un prix par technicien.</span>
-          </div>
           <PricingPlansGrid defaultPlanId={defaultPlanId} />
         </div>
       </section>

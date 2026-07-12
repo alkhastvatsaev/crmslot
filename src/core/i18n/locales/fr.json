@@ -2857,22 +2857,17 @@
   },
   "subscription": {
     "pricing": {
-      "title": "Tarifs simples",
-      "subtitle": "Choisissez un niveau. Payez par technicien actif.",
+      "title": "Tarifs",
       "most_popular": "Le plus choisi",
       "per_month": "/ mois HT",
       "choose_plan": "Choisir ce plan",
       "checkout_loading": "…",
-      "already_account": "Déjà client ?",
-      "open_app": "Ouvrir l'app",
       "recommended": "Populaire",
       "cta": "Choisir",
       "checkout_error": "Paiement indisponible.",
       "cta_subscribe": "S'abonner",
-      "sign_in": "Se connecter",
       "per_technician": " / tech / mois HT",
-      "per_technician_short": " / technicien / mois HT",
-      "billing_per_technician": "Le nombre de techniciens se règle dans Stripe au moment du paiement."
+      "per_technician_short": " / technicien / mois HT"
     },
     "plans": {
       "solo": {
