@@ -119,7 +119,7 @@ describe("LoginOverlay (admin)", () => {
     expect(screen.queryByTestId("admin-login-apple")).not.toBeInTheDocument();
   });
 
-  it("shows Apple OAuth on Mac desktop", async () => {
+  it("hides Apple OAuth on Mac desktop (Developer Program requis)", async () => {
     Object.defineProperty(window.navigator, "userAgent", {
       value:
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
@@ -141,7 +141,8 @@ describe("LoginOverlay (admin)", () => {
       </LoginOverlay>
     );
 
-    await waitFor(() => expect(screen.getByTestId("admin-login-apple")).toBeInTheDocument());
-    expect(screen.getByTestId("admin-login-google")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId("admin-login-google")).toBeInTheDocument());
+    expect(screen.queryByTestId("admin-login-apple")).not.toBeInTheDocument();
+    expect(screen.getByTestId("admin-login-oauth")).toHaveAttribute("data-show-apple", "false");
   });
 });
