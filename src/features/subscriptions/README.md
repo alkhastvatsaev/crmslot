@@ -31,6 +31,20 @@ NEXT_PUBLIC_SUBSCRIPTION_ENFORCE=true   # paywall + checkout auto
 STRIPE_SUBSCRIPTION_PRICE_TEAM=price_…  # 50 € unitaire / technicien
 ```
 
+## Apple Pay (Stripe Checkout)
+
+Fichier hébergé : `public/.well-known/apple-developer-merchantid-domain-association` (fichier Stripe standard).
+
+Après déploiement, enregistrer le domaine prod dans Stripe (clé **live**) :
+
+```bash
+curl https://api.stripe.com/v1/payment_method_domains \
+  -u "$STRIPE_SECRET_KEY:" \
+  -d domain_name=crmslot.vercel.app
+```
+
+Tester en **Safari** sur Mac avec une carte dans Wallet. Vérifier : `curl -I https://crmslot.vercel.app/.well-known/apple-developer-merchantid-domain-association`
+
 ## Tests
 
 ```bash
