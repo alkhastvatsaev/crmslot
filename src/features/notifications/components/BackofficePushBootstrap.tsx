@@ -1,14 +1,15 @@
 "use client";
 
+import BackofficePushEnableBanner from "@/features/notifications/components/BackofficePushEnableBanner";
 import { useBackofficeChatPushBootstrap } from "@/features/notifications/hooks/useBackofficeChatPushBootstrap";
 import { useStaffPushOnboardingHint } from "@/features/notifications/hooks/useStaffPushOnboardingHint";
 
 /**
- * Bootstrap silencieux : enregistre le jeton FCM web pour l'admin connecté.
- * Demande la permission automatiquement (desktop / Android / PWA) après connexion ou inscription.
+ * Enregistre le jeton FCM web admin + bannière mobile (geste requis iOS PWA).
+ * Android/desktop : dialogue système auto via useAutoPushPermissionPrompt.
  */
 export default function BackofficePushBootstrap() {
-  useBackofficeChatPushBootstrap();
+  const { status, registerPush } = useBackofficeChatPushBootstrap();
   useStaffPushOnboardingHint();
-  return null;
+  return <BackofficePushEnableBanner status={status} registerPush={registerPush} />;
 }

@@ -9,7 +9,7 @@ import { isCapacitorNative } from "@/core/native/capacitorRuntime";
 import { useTechnicianNativePushBootstrap } from "@/features/interventions/hooks/useTechnicianNativePushBootstrap";
 
 /** Propose l’activation push une fois à l’ouverture du hub terrain. */
-export function useTechnicianAssignmentPushBootstrap(enabled = true): void {
+export function useTechnicianAssignmentPushBootstrap(enabled = true) {
   const native = isCapacitorNative();
   const webAllowed = enabled && !native && isWebPushRegistrationAllowed();
   useTechnicianNativePushBootstrap(enabled);
@@ -28,4 +28,13 @@ export function useTechnicianAssignmentPushBootstrap(enabled = true): void {
   );
 
   useAutoPushPermissionPrompt(registerWebPush, webStatus, webAllowed);
+
+  return {
+    native,
+    webAllowed,
+    webStatus,
+    registerWebPush,
+    nativeStatus,
+    registerNativePush,
+  };
 }

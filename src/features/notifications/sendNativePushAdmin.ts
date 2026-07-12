@@ -59,18 +59,13 @@ export async function sendNativePushToUser(
     return true;
   });
 
-  const hasNativeToken = eligibleDocs.some((docSnap) => {
-    const platform = normalizeFcmTokenPlatform(docSnap.data()?.platform);
-    return platform === "ios" || platform === "android";
-  });
-
-  for (const docSnap of eligibleDocs) {
+  const sendToToken = async (
+    docSnap: (typeof eligibleDocs)[number],
+    platform: ReturnType<typeof normalizeFcmTokenPlatform>
+  ): Promise<boolean> => {
     const data = docSnap.data();
     const token = String(data?.token ?? "");
-    if (!token) continue;
-
-    const platform = normalizeFcmTokenPlatform(data?.platform);
-    if (hasNativeToken && platform === "web") continue;
+    if (!token) return false;
 
     try {
       const payload = buildFcmPayloadForPlatform(platform, {
@@ -83,6 +78,7 @@ export async function sendNativePushToUser(
         ...payload,
       });
       report.sent += 1;
+      return true;
     } catch (err) {
       const code = (err as { code?: string } | null)?.code ?? "";
       const isStale =
@@ -99,7 +95,13 @@ export async function sendNativePushToUser(
           error: err instanceof Error ? err.message : String(err),
         });
       }
+      return false;
     }
+  };
+
+  for (const docSnap of eligibleDocs) {
+    const platform = normalizeFcmTokenPlatform(docSnap.data()?.platform);
+    await sendToToken(docSnap, platform);
   }
 
   return report;

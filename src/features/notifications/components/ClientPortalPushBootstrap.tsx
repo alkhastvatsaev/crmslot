@@ -1,8 +1,9 @@
 "use client";
 
-import { useClientPortalPushMessaging } from "@/features/notifications/useClientPortalPushMessaging";
+import ClientPortalPushEnableBanner from "@/features/notifications/components/ClientPortalPushEnableBanner";
 import { useAutoPushPermissionPrompt } from "@/features/notifications/hooks/useAutoPushPermissionPrompt";
 import { isWebPushRegistrationAllowed } from "@/features/notifications/webPushRegistrationPolicy";
+import { useClientPortalPushMessaging } from "@/features/notifications/useClientPortalPushMessaging";
 
 /**
  * Enregistre le jeton FCM web portail client (comme admin/terrain).
@@ -17,5 +18,5 @@ export default function ClientPortalPushBootstrap() {
 
   useAutoPushPermissionPrompt(registerPush, status, webAllowed);
 
-  return null;
+  return <ClientPortalPushEnableBanner status={status} registerPush={registerPush} />;
 }

@@ -11,6 +11,10 @@ const TechnicianNotificationBootstrap = dynamic(
   () => import("@/features/notifications/components/TechnicianNotificationBootstrap"),
   { ssr: false }
 );
+const TechnicianPushEnableBanner = dynamic(
+  () => import("@/features/notifications/components/TechnicianPushEnableBanner"),
+  { ssr: false }
+);
 
 function DeferredTechnicianBootstrapsInner() {
   const searchParams = useSearchParams();
@@ -20,11 +24,16 @@ function DeferredTechnicianBootstrapsInner() {
     idleTimeoutMs: 1_000,
   });
 
-  useTechnicianAssignmentPushBootstrap(true);
+  const pushBootstrap = useTechnicianAssignmentPushBootstrap(true);
 
   const deferredReady = pushIntent || idleReady;
 
-  return <>{deferredReady ? <TechnicianNotificationBootstrap /> : null}</>;
+  return (
+    <>
+      {idleReady ? <TechnicianPushEnableBanner {...pushBootstrap} /> : null}
+      {deferredReady ? <TechnicianNotificationBootstrap /> : null}
+    </>
+  );
 }
 
 /** Notifications / PWA / FCM terrain — après idle (sauf deep-link notif). */
