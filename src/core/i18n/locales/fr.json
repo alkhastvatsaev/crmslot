@@ -2908,6 +2908,17 @@
           "ai": "Assistant IA métier"
         },
         "tagline": "Peppol · Gmail · IA"
+      },
+      "standard": {
+        "name": "CRMSLOT",
+        "tagline": "CRM terrain · portail client · Peppol · IA",
+        "features": {
+          "crm": "Interventions & dossiers CRM",
+          "map": "Carte Mapbox temps réel",
+          "portal": "Portail client & dispatch équipe",
+          "peppol": "Facturation Peppol / UBL",
+          "ai": "Assistant IA métier"
+        }
       }
     },
     "banner": {

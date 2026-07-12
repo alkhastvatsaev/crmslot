@@ -2908,6 +2908,17 @@
           "ai": "Business AI assistant"
         },
         "tagline": "Peppol · Gmail · AI"
+      },
+      "standard": {
+        "name": "CRMSLOT",
+        "tagline": "Field CRM · client portal · Peppol · AI",
+        "features": {
+          "crm": "Jobs & CRM case files",
+          "map": "Live Mapbox map",
+          "portal": "Client portal & team dispatch",
+          "peppol": "Peppol / UBL invoicing",
+          "ai": "Business AI assistant"
+        }
       }
     },
     "banner": {

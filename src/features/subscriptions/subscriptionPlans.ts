@@ -15,40 +15,22 @@ export type SubscriptionPlanDefinition = {
 /** Mois facturés sur 12 — 2 mois offerts en annuel. */
 export const ANNUAL_MONTHS_BILLED = 10;
 
-/** Grille publique — les montants Stripe doivent être des prix **unitaires** par technicien. */
+/** Plan unique affiché sur /pricing (les ids legacy solo/pro redirigent ici). */
+export const PUBLIC_SUBSCRIPTION_PLAN_ID = "team" as const;
+
+/** Grille publique — un seul tarif unitaire / technicien. */
 export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
   {
-    id: "solo",
-    nameKey: "subscription.plans.solo.name",
-    taglineKey: "subscription.plans.solo.tagline",
-    technicianPriceEurMonthly: 19,
+    id: PUBLIC_SUBSCRIPTION_PLAN_ID,
+    nameKey: "subscription.plans.standard.name",
+    taglineKey: "subscription.plans.standard.tagline",
+    technicianPriceEurMonthly: 50,
     featureKeys: [
-      "subscription.plans.solo.features.crm",
-      "subscription.plans.solo.features.map",
-      "subscription.plans.solo.features.field",
-    ],
-  },
-  {
-    id: "team",
-    nameKey: "subscription.plans.team.name",
-    taglineKey: "subscription.plans.team.tagline",
-    technicianPriceEurMonthly: 22,
-    highlight: true,
-    featureKeys: [
-      "subscription.plans.team.features.portal",
-      "subscription.plans.team.features.dispatch",
-      "subscription.plans.team.features.offline",
-    ],
-  },
-  {
-    id: "pro",
-    nameKey: "subscription.plans.pro.name",
-    taglineKey: "subscription.plans.pro.tagline",
-    technicianPriceEurMonthly: 27,
-    featureKeys: [
-      "subscription.plans.pro.features.peppol",
-      "subscription.plans.pro.features.gmail",
-      "subscription.plans.pro.features.ai",
+      "subscription.plans.standard.features.crm",
+      "subscription.plans.standard.features.map",
+      "subscription.plans.standard.features.portal",
+      "subscription.plans.standard.features.peppol",
+      "subscription.plans.standard.features.ai",
     ],
   },
 ] as const;
@@ -56,17 +38,9 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
 export const MIN_TECHNICIAN_QUANTITY = 1;
 export const MAX_TECHNICIAN_QUANTITY = 99;
 
-const STRIPE_PRICE_ENV: Record<SubscriptionBillingInterval, Record<SubscriptionPlanId, string>> = {
-  monthly: {
-    solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO",
-    team: "STRIPE_SUBSCRIPTION_PRICE_TEAM",
-    pro: "STRIPE_SUBSCRIPTION_PRICE_PRO",
-  },
-  yearly: {
-    solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO_YEARLY",
-    team: "STRIPE_SUBSCRIPTION_PRICE_TEAM_YEARLY",
-    pro: "STRIPE_SUBSCRIPTION_PRICE_PRO_YEARLY",
-  },
+const STRIPE_PRICE_ENV: Record<SubscriptionBillingInterval, string> = {
+  monthly: "STRIPE_SUBSCRIPTION_PRICE_TEAM",
+  yearly: "STRIPE_SUBSCRIPTION_PRICE_TEAM_YEARLY",
 };
 
 export function technicianPlanDisplayPrice(
@@ -81,10 +55,17 @@ export function technicianPlanAnnualTotal(plan: SubscriptionPlanDefinition): num
   return plan.technicianPriceEurMonthly * ANNUAL_MONTHS_BILLED;
 }
 
+/** Normalise solo/pro/team vers le plan public unique. */
+export function normalizeSubscriptionPlanId(planId: string | null | undefined): SubscriptionPlanId {
+  if (planId && isSubscriptionPlanId(planId)) return PUBLIC_SUBSCRIPTION_PLAN_ID;
+  return PUBLIC_SUBSCRIPTION_PLAN_ID;
+}
+
 export function getSubscriptionPlan(planId: SubscriptionPlanId): SubscriptionPlanDefinition {
-  const plan = SUBSCRIPTION_PLANS.find((p) => p.id === planId);
-  if (!plan) throw new Error(`Plan inconnu: ${planId}`);
-  return plan;
+  if (!isSubscriptionPlanId(planId)) {
+    throw new Error(`Plan inconnu: ${planId}`);
+  }
+  return SUBSCRIPTION_PLANS[0];
 }
 
 export function isSubscriptionPlanId(value: string): value is SubscriptionPlanId {
@@ -104,16 +85,17 @@ export function computeSubscriptionMonthlyTotal(
   return plan.technicianPriceEurMonthly * clampTechnicianQuantity(technicianQuantity);
 }
 
-/** Price ID Stripe (unitaire / technicien) depuis l'environnement serveur. */
+/** Price ID Stripe (unitaire / technicien) — un seul prix pour tous les ids legacy. */
 export function resolveStripePriceId(
   planId: SubscriptionPlanId,
   interval: SubscriptionBillingInterval = "monthly"
 ): string | null {
-  const key = STRIPE_PRICE_ENV[interval][planId];
+  void planId;
+  const key = STRIPE_PRICE_ENV[interval];
   const value = process.env[key]?.trim();
   if (value) return value;
   if (interval === "yearly") {
-    return process.env[STRIPE_PRICE_ENV.monthly[planId]]?.trim() || null;
+    return process.env[STRIPE_PRICE_ENV.monthly]?.trim() || null;
   }
   return null;
 }

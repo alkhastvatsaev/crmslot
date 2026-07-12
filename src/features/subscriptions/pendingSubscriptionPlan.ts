@@ -1,4 +1,8 @@
-import { isSubscriptionPlanId } from "@/features/subscriptions/subscriptionPlans";
+import {
+  isSubscriptionPlanId,
+  normalizeSubscriptionPlanId,
+  PUBLIC_SUBSCRIPTION_PLAN_ID,
+} from "@/features/subscriptions/subscriptionPlans";
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
 const STORAGE_KEY = "crmslot_pending_plan";
@@ -7,13 +11,13 @@ const CHECKOUT_COMPLETE_KEY = "crmslot_checkout_complete";
 
 export function savePendingSubscriptionPlan(planId: SubscriptionPlanId): void {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(STORAGE_KEY, planId);
+  sessionStorage.setItem(STORAGE_KEY, normalizeSubscriptionPlanId(planId));
 }
 
 export function readPendingSubscriptionPlan(): SubscriptionPlanId | null {
   if (typeof window === "undefined") return null;
   const raw = sessionStorage.getItem(STORAGE_KEY)?.trim();
-  return raw && isSubscriptionPlanId(raw) ? raw : null;
+  return raw && isSubscriptionPlanId(raw) ? normalizeSubscriptionPlanId(raw) : null;
 }
 
 export function clearPendingSubscriptionPlan(): void {
@@ -53,5 +57,7 @@ export function wasSubscriptionPricingRedirectDone(): boolean {
 
 export function readPlanIdFromSearchParams(params: URLSearchParams): SubscriptionPlanId | null {
   const raw = params.get("plan")?.trim();
-  return raw && isSubscriptionPlanId(raw) ? raw : null;
+  return raw && isSubscriptionPlanId(raw) ? normalizeSubscriptionPlanId(raw) : null;
 }
+
+export { PUBLIC_SUBSCRIPTION_PLAN_ID };

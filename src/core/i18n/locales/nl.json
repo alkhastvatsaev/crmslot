@@ -2908,6 +2908,17 @@
           "ai": "Zakelijke AI-assistent"
         },
         "tagline": "Peppol · Gmail · AI"
+      },
+      "standard": {
+        "name": "CRMSLOT",
+        "tagline": "Veld-CRM · klantenportaal · Peppol · AI",
+        "features": {
+          "crm": "Interventies & CRM-dossiers",
+          "map": "Live Mapbox-kaart",
+          "portal": "Klantenportaal & dispatch",
+          "peppol": "Peppol / UBL-facturatie",
+          "ai": "Zakelijke AI-assistent"
+        }
       }
     },
     "banner": {

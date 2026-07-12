@@ -10,19 +10,21 @@ import {
   resolveStripePriceId,
   computeSubscriptionMonthlyTotal,
   subscriptionTrialDays,
+  PUBLIC_SUBSCRIPTION_PLAN_ID,
 } from "@/features/subscriptions/subscriptionPlans";
 
 describe("subscriptionPlans", () => {
-  it("defines three public plans", () => {
-    expect(SUBSCRIPTION_PLANS.map((p) => p.id)).toEqual(["solo", "team", "pro"]);
-    expect(getSubscriptionPlan("team").technicianPriceEurMonthly).toBe(22);
+  it("defines a single public plan at 50 €/technicien", () => {
+    expect(SUBSCRIPTION_PLANS.map((p) => p.id)).toEqual([PUBLIC_SUBSCRIPTION_PLAN_ID]);
+    expect(getSubscriptionPlan("team").technicianPriceEurMonthly).toBe(50);
+    expect(getSubscriptionPlan("solo").technicianPriceEurMonthly).toBe(50);
   });
 
   it("computes monthly total from technician quantity", () => {
-    expect(computeSubscriptionMonthlyTotal("team", 4)).toBe(88);
+    expect(computeSubscriptionMonthlyTotal("team", 4)).toBe(200);
   });
 
-  it("validates plan ids", () => {
+  it("validates legacy plan ids", () => {
     expect(isSubscriptionPlanId("solo")).toBe(true);
     expect(isSubscriptionPlanId("enterprise")).toBe(false);
   });
@@ -35,9 +37,9 @@ describe("subscriptionPlans", () => {
   });
 
   it("reads stripe price id from env", () => {
-    process.env.STRIPE_SUBSCRIPTION_PRICE_SOLO = "price_test_solo";
-    expect(resolveStripePriceId("solo")).toBe("price_test_solo");
-    delete process.env.STRIPE_SUBSCRIPTION_PRICE_SOLO;
+    process.env.STRIPE_SUBSCRIPTION_PRICE_TEAM = "price_test_team";
+    expect(resolveStripePriceId("solo")).toBe("price_test_team");
+    delete process.env.STRIPE_SUBSCRIPTION_PRICE_TEAM;
   });
 });
 
