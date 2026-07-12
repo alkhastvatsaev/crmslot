@@ -268,12 +268,7 @@ export default function DashboardAccountPanel({ onClose, variant = "mobile" }: P
               </div>
             ) : null}
 
-            {!editing ? (
-              <AccountSubscriptionRow
-                companyId={fields.companyId}
-                onCompanyProvisioned={() => void workspace?.refreshClaimsSilent()}
-              />
-            ) : null}
+            {!editing ? <AccountSubscriptionRow companyId={fields.companyId} /> : null}
           </div>
 
           <div className="account-panel-footer shrink-0">

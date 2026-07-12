@@ -30,6 +30,12 @@ function SubscriptionCheckoutReturnEffectsInner() {
     if (subscription === "portal_return") {
       toast.message(t("subscription.checkout.portal_return"));
     }
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("subscription");
+    url.searchParams.delete("plan");
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, "", next);
   }, [searchParams, t]);
 
   return null;

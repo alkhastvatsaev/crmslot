@@ -4,22 +4,24 @@ Abonnements SaaS plateforme CRMSLOT (≠ facturation interventions dans `billing
 
 ## Parcours
 
-1. `/pricing` → choix du plan (sessionStorage)
-2. Connexion / inscription (plan affiché sur l'écran auth)
-3. **Mon compte** (dock profil) → plan sous la société → **Activer** → Stripe Checkout
-4. Inscription SaaS → société dédiée créée (pas la société démo par défaut)
+1. `/pricing` → choix du plan + **Stripe Checkout** (connecté) ou inscription (non connecté)
+2. Inscription → société SaaS dédiée créée → redirection auto vers `/pricing?plan=…`
+3. Retour Stripe → toast succès sur `/`
+4. **Mon compte** → statut + lien « Voir les tarifs » ou portail Stripe (actif)
 
 ## Points d'entrée
 
 | Fichier                                     | Rôle                                       |
 | ------------------------------------------- | ------------------------------------------ |
-| `subscriptionPlans.ts`                      | Grille 49 / 89 / 149 € + env price IDs     |
+| `subscriptionPlans.ts`                      | Grille 49 / 89 / 149 € + feature keys      |
+| `startSubscriptionCheckoutClient.ts`        | Checkout Stripe (+ provision société)      |
 | `pendingSubscriptionPlan.ts`                | Plan choisi avant auth (sessionStorage)    |
 | `provisionSaasCompanyClient.ts`             | Crée `companies/{id}` à l'inscription SaaS |
-| `hooks/useCompanySubscription.ts`           | Listener `companies/{id}.saasSubscription` |
+| `hooks/useCompanySubscription.ts`           | Contexte `FeatureFlagsProvider`            |
 | `components/PricingPlansGrid.tsx`           | Grille `/pricing`                          |
-| `components/AccountSubscriptionRow.tsx`     | Plan + Activer dans Mon compte             |
-| `components/SubscriptionSignupEffects.tsx`  | Ouvre Mon compte après auth                |
+| `components/PricingFaq.tsx`                 | FAQ tarifs                                 |
+| `components/AccountSubscriptionRow.tsx`     | Statut dans Mon compte (sans « Activer »)  |
+| `components/SubscriptionSignupEffects.tsx`  | Redirige vers `/pricing` après auth        |
 | `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session                    |
 | `index.server.ts`                           | Routes API uniquement                      |
 

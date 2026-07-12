@@ -2872,7 +2872,28 @@
       "recommended": "Popular",
       "cta": "Get started",
       "checkout_error": "Checkout unavailable.",
-      "footnote": "Code FONDATEUR30: 30% off for the first 10 customers"
+      "footnote": "Code FONDATEUR30: 30% off for the first 10 customers",
+      "cta_subscribe": "Subscribe",
+      "sign_in": "Sign in",
+      "faq_title": "Questions & answers",
+      "faq": {
+        "plan": {
+          "q": "Which plan should I pick?",
+          "a": "Solo for a one-person business, Team for multiple technicians and the client portal, Pro for Peppol, Gmail and the AI assistant."
+        },
+        "trial": {
+          "q": "How does the trial work?",
+          "a": "14-day free trial on every plan. No charge until the trial ends. Cancel anytime from the Stripe billing portal."
+        },
+        "technicians": {
+          "q": "Extra technicians?",
+          "a": "Each plan includes a technician quota. Beyond that, +€15 excl. VAT/month per active field technician."
+        },
+        "billing": {
+          "q": "Billing and VAT?",
+          "a": "Secure monthly payment via Stripe. Belgian VAT applied based on your status. Invoices available in the Stripe customer portal."
+        }
+      }
     },
     "plans": {
       "solo": {
@@ -2921,7 +2942,8 @@
       "success_hint": "Plan {{plan}} — thank you! Access updates in a few seconds.",
       "portal_return": "Returned from billing portal.",
       "create_company_title": "Create your company",
-      "create_company_hint": "Company hub → enter your business name → create. Then go back to /pricing to subscribe."
+      "create_company_hint": "Company hub → enter your business name → create. Then go back to /pricing to subscribe.",
+      "canceled": "Checkout canceled — you can subscribe whenever you're ready."
     },
     "account": {
       "activate": "Activate",
@@ -2935,7 +2957,9 @@
         "canceled": "Canceled",
         "incomplete": "Incomplete",
         "unpaid": "Unpaid"
-      }
+      },
+      "title": "CRMSLOT subscription",
+      "view_pricing": "View pricing"
     }
   }
 }

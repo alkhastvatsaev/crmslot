@@ -2,16 +2,21 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useDashboardPageSelectorOptional } from "@/features/dashboard/DashboardPageSelectorContext";
+import { useCompanyWorkspaceOptional } from "@/context/CompanyWorkspaceContext";
 import {
+  clearPendingSubscriptionPlan,
+  markSubscriptionPricingRedirectDone,
   readPendingSubscriptionPlan,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
+  wasSubscriptionPricingRedirectDone,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
+import { isSubscriptionActive, useCompanySubscription } from "@/features/subscriptions";
 
 function SubscriptionSignupEffectsInner() {
   const searchParams = useSearchParams();
-  const pageSelector = useDashboardPageSelectorOptional();
+  const workspace = useCompanyWorkspaceOptional();
+  const { subscription, loading: subscriptionLoading } = useCompanySubscription();
 
   useEffect(() => {
     const planId = readPlanIdFromSearchParams(searchParams);
@@ -19,31 +24,44 @@ function SubscriptionSignupEffectsInner() {
       savePendingSubscriptionPlan(planId);
     }
 
-    const shouldOpenAccount =
-      searchParams.get("account") === "1" || Boolean(planId ?? readPendingSubscriptionPlan());
-
-    if (shouldOpenAccount) {
-      pageSelector?.openAccount();
-    }
-
     const authTab = searchParams.get("auth")?.trim();
     const plan = searchParams.get("plan")?.trim();
     const account = searchParams.get("account")?.trim();
-    if (!authTab && !plan && !account) return;
+    const setup = searchParams.get("setup")?.trim();
+    if (authTab || plan || account || setup) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("auth");
+      url.searchParams.delete("plan");
+      url.searchParams.delete("account");
+      url.searchParams.delete("setup");
+      const next = `${url.pathname}${url.search}${url.hash}`;
+      window.history.replaceState(window.history.state, "", next);
+    }
+  }, [searchParams]);
 
-    const url = new URL(window.location.href);
-    url.searchParams.delete("auth");
-    url.searchParams.delete("plan");
-    url.searchParams.delete("account");
-    url.searchParams.delete("setup");
-    const next = `${url.pathname}${url.search}${url.hash}`;
-    window.history.replaceState(window.history.state, "", next);
-  }, [searchParams, pageSelector]);
+  useEffect(() => {
+    if (!workspace?.firebaseUid || subscriptionLoading) return;
+
+    const pendingPlan = readPendingSubscriptionPlan();
+    if (!pendingPlan) return;
+
+    if (isSubscriptionActive(subscription)) {
+      clearPendingSubscriptionPlan();
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+    if (window.location.pathname === "/pricing") return;
+    if (wasSubscriptionPricingRedirectDone()) return;
+
+    markSubscriptionPricingRedirectDone();
+    window.location.href = `/pricing?plan=${pendingPlan}`;
+  }, [workspace?.firebaseUid, subscription, subscriptionLoading]);
 
   return null;
 }
 
-/** Persiste le plan choisi et ouvre Mon compte après connexion/inscription. */
+/** Persiste le plan choisi et renvoie vers /pricing après connexion pour le checkout Stripe. */
 export default function SubscriptionSignupEffects() {
   return (
     <Suspense fallback={null}>

@@ -2872,7 +2872,28 @@
       "recommended": "Populair",
       "cta": "Starten",
       "checkout_error": "Betaling niet beschikbaar.",
-      "footnote": "Code FONDATEUR30: −30 % voor de eerste 10 klanten"
+      "footnote": "Code FONDATEUR30: −30 % voor de eerste 10 klanten",
+      "cta_subscribe": "Abonneren",
+      "sign_in": "Inloggen",
+      "faq_title": "Veelgestelde vragen",
+      "faq": {
+        "plan": {
+          "q": "Welk plan kies ik?",
+          "a": "Solo voor een eenmanszaak, Team voor meerdere technici en het klantenportaal, Pro voor Peppol, Gmail en de AI-assistent."
+        },
+        "trial": {
+          "q": "Hoe werkt de proefperiode?",
+          "a": "14 dagen gratis op elk plan. Geen afschrijving vóór het einde van de proef. Opzeggen kan altijd via het Stripe-portaal."
+        },
+        "technicians": {
+          "q": "Extra technici?",
+          "a": "Elk plan bevat een techniciquotum. Daarboven: +€15 excl. btw/maand per actieve veldtechnicus."
+        },
+        "billing": {
+          "q": "Facturatie en btw?",
+          "a": "Veilige maandelijkse betaling via Stripe. Belgische btw volgens uw status. Facturen beschikbaar in het Stripe-klantenportaal."
+        }
+      }
     },
     "plans": {
       "solo": {
@@ -2921,7 +2942,8 @@
       "success_hint": "Plan {{plan}} — bedankt! Toegang binnen enkele seconden.",
       "portal_return": "Terug van facturatieportaal.",
       "create_company_title": "Maak uw bedrijf aan",
-      "create_company_hint": "Bedrijfshub → bedrijfsnaam → aanmaken. Ga daarna terug naar /pricing om te abonneren."
+      "create_company_hint": "Bedrijfshub → bedrijfsnaam → aanmaken. Ga daarna terug naar /pricing om te abonneren.",
+      "canceled": "Betaling geannuleerd — u kunt op elk moment een plan kiezen."
     },
     "account": {
       "activate": "Activeren",
@@ -2935,7 +2957,9 @@
         "canceled": "Geannuleerd",
         "incomplete": "Onvolledig",
         "unpaid": "Onbetaald"
-      }
+      },
+      "title": "CRMSLOT-abonnement",
+      "view_pricing": "Tarief bekijken"
     }
   }
 }

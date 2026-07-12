@@ -1,85 +1,30 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Loader2 } from "lucide-react";
 import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
   getSubscriptionPlan,
   isSubscriptionActive,
-  provisionSaasCompanyForAdmin,
-  subscriptionCheckoutEnabled,
   useCompanySubscription,
-  usePendingSubscriptionPlan,
   type SubscriptionPlanId,
 } from "@/features/subscriptions";
 
 type Props = {
   companyId: string;
-  onCompanyProvisioned?: (companyId: string) => void;
 };
 
-export default function AccountSubscriptionRow({ companyId, onCompanyProvisioned }: Props) {
+/** Résumé abonnement dans Mon compte — activation uniquement via /pricing. */
+export default function AccountSubscriptionRow({ companyId }: Props) {
   const { t } = useTranslation();
   const { subscription, loading } = useCompanySubscription();
-  const pendingPlanId = usePendingSubscriptionPlan();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const active = isSubscriptionActive(subscription);
-  const displayPlanId: SubscriptionPlanId | null = subscription?.planId ?? pendingPlanId ?? null;
-
-  const startCheckout = useCallback(
-    async (planId: SubscriptionPlanId, targetCompanyId: string) => {
-      const user = auth?.currentUser;
-      if (!user) return;
-
-      setBusy(true);
-      setError(null);
-
-      let companyIdForCheckout = targetCompanyId.trim();
-
-      try {
-        for (let attempt = 0; attempt < 2; attempt += 1) {
-          const idToken = await user.getIdToken();
-          const res = await fetch("/api/subscriptions/checkout", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ companyId: companyIdForCheckout || undefined, planId }),
-          });
-          const data = (await res.json().catch(() => ({}))) as {
-            url?: string;
-            error?: string;
-            needsCompany?: boolean;
-          };
-
-          if (data.needsCompany && attempt === 0) {
-            companyIdForCheckout = await provisionSaasCompanyForAdmin(user, {
-              pendingPlanId: planId,
-            });
-            onCompanyProvisioned?.(companyIdForCheckout);
-            await user.getIdToken(true);
-            continue;
-          }
-
-          if (!res.ok || !data.url) {
-            throw new Error(data.error?.trim() || t("subscription.pricing.checkout_error"));
-          }
-
-          window.location.href = data.url;
-          return;
-        }
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      } finally {
-        setBusy(false);
-      }
-    },
-    [onCompanyProvisioned, t]
-  );
+  const displayPlanId: SubscriptionPlanId | null = subscription?.planId ?? null;
 
   const openPortal = useCallback(async () => {
     if (!companyId.trim()) return;
@@ -110,14 +55,11 @@ export default function AccountSubscriptionRow({ companyId, onCompanyProvisioned
     }
   }, [companyId, t]);
 
-  if (loading) return null;
-  if (!displayPlanId && !active) return null;
+  if (loading || !companyId.trim()) return null;
 
   const plan = displayPlanId ? getSubscriptionPlan(displayPlanId) : null;
   const statusKey = subscription?.status ?? "none";
-  const canCheckout = subscriptionCheckoutEnabled() && Boolean(displayPlanId);
-  const showActivate = !active && canCheckout;
-  const showManage = Boolean(subscription?.stripeCustomerId);
+  const showManage = Boolean(subscription?.stripeCustomerId) && active;
 
   return (
     <div
@@ -134,7 +76,11 @@ export default function AccountSubscriptionRow({ companyId, onCompanyProvisioned
               {t(plan.nameKey)} · {plan.priceEurMonthly} €
               <span className="text-slate-500"> {t("subscription.pricing.per_month")}</span>
             </p>
-          ) : null}
+          ) : (
+            <p className="truncate text-sm font-medium text-slate-900">
+              {t("subscription.account.title")}
+            </p>
+          )}
           <p className="text-[11px] font-medium text-slate-500">
             {t(`subscription.account.status.${statusKey}`)}
           </p>
@@ -143,33 +89,29 @@ export default function AccountSubscriptionRow({ companyId, onCompanyProvisioned
 
       {error ? <p className="text-[11px] text-red-600">{error}</p> : null}
 
-      {showActivate || showManage ? (
-        <div className="flex gap-2">
-          {showActivate && displayPlanId ? (
-            <button
-              type="button"
-              disabled={busy}
-              data-testid="dashboard-account-subscribe"
-              onClick={() => void startCheckout(displayPlanId, companyId)}
-              className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-full bg-blue-600 px-3.5 text-[13px] font-semibold text-white disabled:opacity-50"
-            >
-              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
-              {t("subscription.account.activate")}
-            </button>
-          ) : null}
-          {showManage ? (
-            <button
-              type="button"
-              disabled={busy}
-              data-testid="dashboard-account-manage-subscription"
-              onClick={() => void openPortal()}
-              className="flex min-h-[36px] flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-3.5 text-[13px] font-semibold text-slate-800 disabled:opacity-50"
-            >
-              {t("subscription.account.manage")}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+      <div className="flex gap-2">
+        {!active ? (
+          <Link
+            href="/pricing"
+            data-testid="dashboard-account-view-pricing"
+            className="flex min-h-[36px] flex-1 items-center justify-center rounded-full bg-blue-600 px-3.5 text-[13px] font-semibold text-white"
+          >
+            {t("subscription.account.view_pricing")}
+          </Link>
+        ) : null}
+        {showManage ? (
+          <button
+            type="button"
+            disabled={busy}
+            data-testid="dashboard-account-manage-subscription"
+            onClick={() => void openPortal()}
+            className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 text-[13px] font-semibold text-slate-800 disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
+            {t("subscription.account.manage")}
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

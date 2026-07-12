@@ -7,6 +7,7 @@ export type SubscriptionPlanDefinition = {
   priceEurMonthly: number;
   foundingPriceEurMonthly: number;
   technicianSeatsIncluded: number;
+  featureKeys: readonly string[];
   highlight?: boolean;
 };
 
@@ -19,6 +20,12 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     priceEurMonthly: 49,
     foundingPriceEurMonthly: 34,
     technicianSeatsIncluded: 1,
+    featureKeys: [
+      "subscription.plans.solo.features.crm",
+      "subscription.plans.solo.features.map",
+      "subscription.plans.solo.features.tech_app",
+      "subscription.plans.solo.features.billing_basic",
+    ],
   },
   {
     id: "team",
@@ -28,6 +35,12 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     foundingPriceEurMonthly: 62,
     technicianSeatsIncluded: 5,
     highlight: true,
+    featureKeys: [
+      "subscription.plans.team.features.all_solo",
+      "subscription.plans.team.features.portal",
+      "subscription.plans.team.features.planning",
+      "subscription.plans.team.features.offline",
+    ],
   },
   {
     id: "pro",
@@ -36,6 +49,12 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     priceEurMonthly: 149,
     foundingPriceEurMonthly: 104,
     technicianSeatsIncluded: 15,
+    featureKeys: [
+      "subscription.plans.pro.features.all_team",
+      "subscription.plans.pro.features.peppol",
+      "subscription.plans.pro.features.gmail",
+      "subscription.plans.pro.features.chatbot",
+    ],
   },
 ] as const;
 
