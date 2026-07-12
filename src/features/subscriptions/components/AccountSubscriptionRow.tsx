@@ -27,7 +27,7 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
   const displayPlanId: SubscriptionPlanId | null = subscription?.planId ?? null;
 
   const openPortal = useCallback(async () => {
-    if (!companyId.trim()) return;
+    if (!companyId?.trim()) return;
     const user = auth?.currentUser;
     if (!user) return;
 
@@ -55,7 +55,7 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
     }
   }, [companyId, t]);
 
-  if (loading || !companyId.trim()) return null;
+  if (loading || !companyId?.trim()) return null;
 
   const plan = displayPlanId ? getSubscriptionPlan(displayPlanId) : null;
   const statusKey = subscription?.status ?? "none";
