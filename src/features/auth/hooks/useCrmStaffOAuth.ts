@@ -17,6 +17,7 @@ import {
   staffJoinPayloadFromOAuthUser,
   staffJoinPayloadFromVariant,
 } from "@/features/auth/staffJoinPayload";
+import type { UserCredential } from "firebase/auth";
 import {
   CrmStaffOAuthRedirectPending,
   crmStaffOAuthSignInErrorFeedback,
@@ -60,6 +61,63 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
 
   const oauthBusy = googleBusy || appleBusy;
 
+  const persistOAuthIntent = useCallback(() => {
+    persistCrmStaffOAuthMode(oauthMode);
+    persistStaffJoinPayload(staffJoinPayloadFromVariant(variant));
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const planId = readPlanIdFromSearchParams(params);
+      if (variant === "admin" && oauthMode === "register") {
+        markPendingSubscriptionCheckout();
+      } else if (planId) {
+        savePendingSubscriptionPlan(planId);
+      }
+    }
+  }, [oauthMode, variant]);
+
+  const finalizeOAuthCredential = useCallback(
+    async (cred: UserCredential, provider: CrmStaffOAuthProviderId) => {
+      const staffJoin = staffJoinPayloadFromOAuthUser(variant, cred.user);
+      persistStaffJoinPayload(staffJoin);
+      const outcome = await completeCrmStaffOAuthSession(cred, oauthMode, auth!, staffJoin);
+      toast.success(
+        String(
+          outcome === "register"
+            ? t("auth.register_success")
+            : t(provider === "google" ? "auth.google_signin_success" : "auth.apple_signin_success")
+        )
+      );
+    },
+    [oauthMode, t, variant]
+  );
+
+  const reportOAuthError = useCallback(
+    (provider: CrmStaffOAuthProviderId, e: unknown) => {
+      if (e instanceof CrmStaffOAuthRedirectPending) {
+        toast.message(String(t("auth.oauth_redirect")));
+        return;
+      }
+      logger.error(`[${logLabel}] ${provider} oauth ${oauthMode} failed`, {
+        error: e instanceof Error ? e.message : String(e),
+      });
+      if (e instanceof CrmStaffOAuthModeError) {
+        onInlineError?.(oauthModeErrorMessage(t, e.code));
+        return;
+      }
+      if (e instanceof CrmStaffJoinCompanyError) {
+        onInlineError?.(e.message);
+        return;
+      }
+      const { titleKey, descriptionKey } = crmStaffOAuthSignInErrorFeedback(provider, e);
+      const message = descriptionKey
+        ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
+        : String(t(titleKey));
+      onInlineError?.(message);
+      toast.error(message);
+    },
+    [logLabel, oauthMode, onInlineError, t]
+  );
+
   const handleOAuth = useCallback(
     async (provider: CrmStaffOAuthProviderId) => {
       onInlineError?.(null);
@@ -68,18 +126,7 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
         return;
       }
 
-      persistCrmStaffOAuthMode(oauthMode);
-      const staffJoin = staffJoinPayloadFromVariant(variant);
-      persistStaffJoinPayload(staffJoin);
-      if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const planId = readPlanIdFromSearchParams(params);
-        if (variant === "admin" && oauthMode === "register") {
-          markPendingSubscriptionCheckout();
-        } else if (planId) {
-          savePendingSubscriptionPlan(planId);
-        }
-      }
+      persistOAuthIntent();
       const setBusy = provider === "google" ? setGoogleBusy : setAppleBusy;
       setBusy(true);
       try {
@@ -87,45 +134,41 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
           provider === "google"
             ? await signInCrmStaffWithGoogle(auth)
             : await signInCrmStaffWithApple(auth);
-        const staffJoin = staffJoinPayloadFromOAuthUser(variant, cred.user);
-        persistStaffJoinPayload(staffJoin);
-        const outcome = await completeCrmStaffOAuthSession(cred, oauthMode, auth, staffJoin);
-        toast.success(
-          String(
-            outcome === "register"
-              ? t("auth.register_success")
-              : t(
-                  provider === "google" ? "auth.google_signin_success" : "auth.apple_signin_success"
-                )
-          )
-        );
+        await finalizeOAuthCredential(cred, provider);
       } catch (e) {
-        if (e instanceof CrmStaffOAuthRedirectPending) {
-          toast.message(String(t("auth.oauth_redirect")));
-          return;
-        }
-        logger.error(`[${logLabel}] ${provider} oauth ${oauthMode} failed`, {
-          error: e instanceof Error ? e.message : String(e),
-        });
-        if (e instanceof CrmStaffOAuthModeError) {
-          onInlineError?.(oauthModeErrorMessage(t, e.code));
-          return;
-        }
-        if (e instanceof CrmStaffJoinCompanyError) {
-          onInlineError?.(e.message);
-          return;
-        }
-        const { titleKey, descriptionKey } = crmStaffOAuthSignInErrorFeedback(provider, e);
-        const message = descriptionKey
-          ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
-          : String(t(titleKey));
-        onInlineError?.(message);
-        toast.error(message);
+        reportOAuthError(provider, e);
       } finally {
         setBusy(false);
       }
     },
-    [logLabel, oauthMode, onInlineError, t, variant]
+    [finalizeOAuthCredential, onInlineError, persistOAuthIntent, reportOAuthError, t]
+  );
+
+  const handleAppleSignedIn = useCallback(
+    async (cred: UserCredential) => {
+      onInlineError?.(null);
+      if (!isConfigured || !auth) {
+        onInlineError?.(String(t("auth.signin_failed")));
+        return;
+      }
+      persistOAuthIntent();
+      setAppleBusy(true);
+      try {
+        await finalizeOAuthCredential(cred, "apple");
+      } catch (e) {
+        reportOAuthError("apple", e);
+      } finally {
+        setAppleBusy(false);
+      }
+    },
+    [finalizeOAuthCredential, onInlineError, persistOAuthIntent, reportOAuthError, t]
+  );
+
+  const handleAppleError = useCallback(
+    (e: unknown) => {
+      reportOAuthError("apple", e);
+    },
+    [reportOAuthError]
   );
 
   return {
@@ -134,5 +177,7 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
     oauthBusy,
     handleGoogleSignIn: () => void handleOAuth("google"),
     handleAppleSignIn: () => void handleOAuth("apple"),
+    handleAppleSignedIn,
+    handleAppleError,
   };
 }

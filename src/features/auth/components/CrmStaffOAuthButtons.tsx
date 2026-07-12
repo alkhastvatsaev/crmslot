@@ -1,9 +1,10 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/I18nContext";
+import type { UserCredential } from "firebase/auth";
 import type { CrmEmailAuthTab } from "@/features/auth/crmEmailLoginVariant";
-import AppleSignInConnectButton from "@/features/auth/components/AppleSignInConnectButton";
-import GoogleSignInConnectButton from "@/features/auth/components/GoogleSignInConnectButton";
+import OfficialAppleSignInButton from "@/features/auth/components/OfficialAppleSignInButton";
+import OfficialGoogleSignInButton from "@/features/auth/components/OfficialGoogleSignInButton";
 import { useIsAppleOAuthClient } from "@/features/auth/hooks/useIsIphoneClient";
 import {
   crmEmailLoginTestId,
@@ -18,6 +19,8 @@ type Props = {
   appleBusy?: boolean;
   onGoogleSignIn: () => void;
   onAppleSignIn: () => void;
+  onAppleSignedIn: (cred: UserCredential) => void | Promise<void>;
+  onAppleError: (error: unknown) => void;
 };
 
 export default function CrmStaffOAuthButtons({
@@ -28,6 +31,8 @@ export default function CrmStaffOAuthButtons({
   appleBusy = false,
   onGoogleSignIn,
   onAppleSignIn,
+  onAppleSignedIn,
+  onAppleError,
 }: Props) {
   const { t } = useTranslation();
   const isAppleOAuth = useIsAppleOAuthClient();
@@ -57,7 +62,7 @@ export default function CrmStaffOAuthButtons({
         <div className="h-px flex-1 bg-slate-200/90" />
       </div>
 
-      <GoogleSignInConnectButton
+      <OfficialGoogleSignInButton
         dataTestId={crmEmailLoginTestId(variant, "google")}
         ariaLabel={googleLabel}
         disabled={oauthDisabled}
@@ -66,12 +71,14 @@ export default function CrmStaffOAuthButtons({
       />
 
       {showApple ? (
-        <AppleSignInConnectButton
+        <OfficialAppleSignInButton
           dataTestId={crmEmailLoginTestId(variant, "apple")}
           ariaLabel={appleLabel}
           disabled={oauthDisabled}
           busy={appleBusy}
-          onClick={onAppleSignIn}
+          onAppleSignIn={onAppleSignIn}
+          onAppleSignedIn={onAppleSignedIn}
+          onAppleError={onAppleError}
         />
       ) : null}
     </div>

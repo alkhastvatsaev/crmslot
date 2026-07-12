@@ -1,6 +1,9 @@
 import { render, screen } from "@/test-utils/render";
 import CrmStaffOAuthButtons from "@/features/auth/components/CrmStaffOAuthButtons";
 
+const noopAsync = async () => {};
+const noop = () => {};
+
 jest.mock("@/features/auth/hooks/useIsIphoneClient", () => ({
   useIsAppleOAuthClient: jest.fn(() => false),
   useIsIphoneClient: jest.fn(() => false),
@@ -21,6 +24,8 @@ describe("CrmStaffOAuthButtons", () => {
         authTab="login"
         onGoogleSignIn={jest.fn()}
         onAppleSignIn={jest.fn()}
+        onAppleSignedIn={noopAsync}
+        onAppleError={noop}
       />
     );
 
@@ -35,6 +40,8 @@ describe("CrmStaffOAuthButtons", () => {
         authTab="register"
         onGoogleSignIn={jest.fn()}
         onAppleSignIn={jest.fn()}
+        onAppleSignedIn={noopAsync}
+        onAppleError={noop}
       />
     );
 
@@ -49,6 +56,8 @@ describe("CrmStaffOAuthButtons", () => {
         authTab="login"
         onGoogleSignIn={jest.fn()}
         onAppleSignIn={jest.fn()}
+        onAppleSignedIn={noopAsync}
+        onAppleError={noop}
       />
     );
 
@@ -65,6 +74,8 @@ describe("CrmStaffOAuthButtons", () => {
         authTab="login"
         onGoogleSignIn={jest.fn()}
         onAppleSignIn={jest.fn()}
+        onAppleSignedIn={noopAsync}
+        onAppleError={noop}
       />
     );
 

@@ -62,6 +62,8 @@ export default function CrmEmailLoginPanel({ variant }: Props) {
           appleBusy={form.appleBusy}
           onGoogleSignIn={form.handleGoogleSignIn}
           onAppleSignIn={form.handleAppleSignIn}
+          onAppleSignedIn={form.handleAppleSignedIn}
+          onAppleError={form.handleAppleError}
         />
       </div>
     </div>

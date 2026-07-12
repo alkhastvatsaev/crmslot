@@ -45,8 +45,15 @@ export function useCrmEmailLoginForm({ variant }: Args) {
   const [busy, setBusy] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const { googleBusy, appleBusy, oauthBusy, handleGoogleSignIn, handleAppleSignIn } =
-    useCrmStaffOAuth({ variant, authTab, onInlineError: setInlineError });
+  const {
+    googleBusy,
+    appleBusy,
+    oauthBusy,
+    handleGoogleSignIn,
+    handleAppleSignIn,
+    handleAppleSignedIn,
+    handleAppleError,
+  } = useCrmStaffOAuth({ variant, authTab, onInlineError: setInlineError });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -191,5 +198,7 @@ export function useCrmEmailLoginForm({ variant }: Args) {
     handleAuthTabChange,
     handleGoogleSignIn,
     handleAppleSignIn,
+    handleAppleSignedIn,
+    handleAppleError,
   };
 }
