@@ -24,7 +24,7 @@ export default function SubscriptionAccessGate({ children }: Props) {
     subscriptionEnforcementEnabled() &&
     subscriptionCheckoutEnabled() &&
     Boolean(workspace?.firebaseUid) &&
-    workspace.workspaceReady &&
+    workspace?.workspaceReady === true &&
     !loading &&
     !isSubscriptionActive(subscription) &&
     !wasSubscriptionCheckoutCompleted();
