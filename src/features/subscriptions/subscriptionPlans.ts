@@ -1,5 +1,7 @@
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
+export type SubscriptionBillingInterval = "monthly" | "yearly";
+
 export type SubscriptionPlanDefinition = {
   id: SubscriptionPlanId;
   nameKey: string;
@@ -9,6 +11,9 @@ export type SubscriptionPlanDefinition = {
   featureKeys: readonly string[];
   highlight?: boolean;
 };
+
+/** Mois facturés sur 12 — 2 mois offerts en annuel. */
+export const ANNUAL_MONTHS_BILLED = 10;
 
 /** Grille publique — les montants Stripe doivent être des prix **unitaires** par technicien. */
 export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
@@ -20,8 +25,7 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     featureKeys: [
       "subscription.plans.solo.features.crm",
       "subscription.plans.solo.features.map",
-      "subscription.plans.solo.features.tech_app",
-      "subscription.plans.solo.features.billing_basic",
+      "subscription.plans.solo.features.field",
     ],
   },
   {
@@ -31,9 +35,8 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     technicianPriceEurMonthly: 22,
     highlight: true,
     featureKeys: [
-      "subscription.plans.team.features.all_solo",
       "subscription.plans.team.features.portal",
-      "subscription.plans.team.features.planning",
+      "subscription.plans.team.features.dispatch",
       "subscription.plans.team.features.offline",
     ],
   },
@@ -43,10 +46,9 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     taglineKey: "subscription.plans.pro.tagline",
     technicianPriceEurMonthly: 27,
     featureKeys: [
-      "subscription.plans.pro.features.all_team",
       "subscription.plans.pro.features.peppol",
       "subscription.plans.pro.features.gmail",
-      "subscription.plans.pro.features.chatbot",
+      "subscription.plans.pro.features.ai",
     ],
   },
 ] as const;
@@ -54,11 +56,30 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
 export const MIN_TECHNICIAN_QUANTITY = 1;
 export const MAX_TECHNICIAN_QUANTITY = 99;
 
-const STRIPE_PRICE_ENV: Record<SubscriptionPlanId, string> = {
-  solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO",
-  team: "STRIPE_SUBSCRIPTION_PRICE_TEAM",
-  pro: "STRIPE_SUBSCRIPTION_PRICE_PRO",
+const STRIPE_PRICE_ENV: Record<SubscriptionBillingInterval, Record<SubscriptionPlanId, string>> = {
+  monthly: {
+    solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO",
+    team: "STRIPE_SUBSCRIPTION_PRICE_TEAM",
+    pro: "STRIPE_SUBSCRIPTION_PRICE_PRO",
+  },
+  yearly: {
+    solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO_YEARLY",
+    team: "STRIPE_SUBSCRIPTION_PRICE_TEAM_YEARLY",
+    pro: "STRIPE_SUBSCRIPTION_PRICE_PRO_YEARLY",
+  },
 };
+
+export function technicianPlanDisplayPrice(
+  plan: SubscriptionPlanDefinition,
+  interval: SubscriptionBillingInterval
+): number {
+  if (interval === "monthly") return plan.technicianPriceEurMonthly;
+  return Math.round((plan.technicianPriceEurMonthly * ANNUAL_MONTHS_BILLED) / 12);
+}
+
+export function technicianPlanAnnualTotal(plan: SubscriptionPlanDefinition): number {
+  return plan.technicianPriceEurMonthly * ANNUAL_MONTHS_BILLED;
+}
 
 export function getSubscriptionPlan(planId: SubscriptionPlanId): SubscriptionPlanDefinition {
   const plan = SUBSCRIPTION_PLANS.find((p) => p.id === planId);
@@ -84,9 +105,17 @@ export function computeSubscriptionMonthlyTotal(
 }
 
 /** Price ID Stripe (unitaire / technicien) depuis l'environnement serveur. */
-export function resolveStripePriceId(planId: SubscriptionPlanId): string | null {
-  const key = STRIPE_PRICE_ENV[planId];
-  return process.env[key]?.trim() || null;
+export function resolveStripePriceId(
+  planId: SubscriptionPlanId,
+  interval: SubscriptionBillingInterval = "monthly"
+): string | null {
+  const key = STRIPE_PRICE_ENV[interval][planId];
+  const value = process.env[key]?.trim();
+  if (value) return value;
+  if (interval === "yearly") {
+    return process.env[STRIPE_PRICE_ENV.monthly[planId]]?.trim() || null;
+  }
+  return null;
 }
 
 export function subscriptionTrialDays(): number {

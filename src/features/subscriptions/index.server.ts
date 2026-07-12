@@ -5,4 +5,6 @@ export { createBillingPortalSessionAdmin } from "@/features/subscriptions/server
 export { createSubscriptionCheckoutAdmin } from "@/features/subscriptions/server/createSubscriptionCheckoutAdmin";
 export { ensureStripeCustomerAdmin } from "@/features/subscriptions/server/ensureStripeCustomerAdmin";
 export { handleStripeSubscriptionWebhookAdmin } from "@/features/subscriptions/server/handleStripeSubscriptionWebhookAdmin";
+export { provisionSaasCompanyAdmin } from "@/features/subscriptions/server/provisionSaasCompanyAdmin";
 export { syncCompanySubscriptionFromStripeAdmin } from "@/features/subscriptions/server/syncCompanySubscriptionFromStripeAdmin";
+export { syncSubscriptionCheckoutSessionAdmin } from "@/features/subscriptions/server/syncSubscriptionCheckoutSessionAdmin";

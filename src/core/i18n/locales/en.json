@@ -2865,18 +2865,24 @@
       "recommended": "Popular",
       "cta": "Choose",
       "checkout_error": "Checkout unavailable.",
-      "cta_subscribe": "Subscribe",
-      "per_technician": " / tech / mo excl. VAT",
-      "per_technician_short": " / technician / mo excl. VAT"
+      "cta_subscribe": "Choose",
+      "per_technician": "per technician · month excl. VAT",
+      "per_technician_short": " / technician / mo excl. VAT",
+      "billing_period": "Billing period",
+      "billing_monthly": "Monthly",
+      "billing_yearly": "Yearly",
+      "per_technician_annual_equiv": "per technician · month excl. VAT (annual)",
+      "billed_annually": "{{amount}} € / tech / year excl. VAT"
     },
     "plans": {
       "solo": {
         "name": "Solo",
         "features": {
-          "crm": "Intervention CRM & statuses",
-          "map": "Real-time Mapbox map",
+          "crm": "Jobs & CRM case files",
+          "map": "Live Mapbox map",
           "tech_app": "Technician PWA app",
-          "billing_basic": "Quote & invoice PDFs"
+          "billing_basic": "Quote & invoice PDFs",
+          "field": "Technician PWA + PDF quotes"
         },
         "tagline": "CRM & field app"
       },
@@ -2886,17 +2892,19 @@
           "all_solo": "Everything in Solo",
           "portal": "Live client portal",
           "planning": "Planning & dispatch",
-          "offline": "Technician offline mode"
+          "offline": "Offline field mode",
+          "dispatch": "Team planning & dispatch"
         },
-        "tagline": "Client portal & scheduling"
+        "tagline": "Client portal & planning"
       },
       "pro": {
         "name": "Pro",
         "features": {
           "all_team": "Everything in Team",
-          "peppol": "Peppol / UBL e-invoicing",
-          "gmail": "Gmail integration",
-          "chatbot": "AI business assistant"
+          "peppol": "Peppol / UBL invoicing",
+          "gmail": "Gmail & inbox built-in",
+          "chatbot": "AI business assistant",
+          "ai": "Business AI assistant"
         },
         "tagline": "Peppol · Gmail · AI"
       }

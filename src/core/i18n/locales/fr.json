@@ -2865,18 +2865,24 @@
       "recommended": "Populaire",
       "cta": "Choisir",
       "checkout_error": "Paiement indisponible.",
-      "cta_subscribe": "S'abonner",
-      "per_technician": " / tech / mois HT",
-      "per_technician_short": " / technicien / mois HT"
+      "cta_subscribe": "Choisir",
+      "per_technician": "par technicien · mois HT",
+      "per_technician_short": " / technicien / mois HT",
+      "billing_period": "Période de facturation",
+      "billing_monthly": "Mensuel",
+      "billing_yearly": "Annuel",
+      "per_technician_annual_equiv": "par technicien · mois HT (annuel)",
+      "billed_annually": "{{amount}} € / tech / an HT"
     },
     "plans": {
       "solo": {
         "name": "Solo",
         "features": {
-          "crm": "CRM interventions & statuts",
+          "crm": "Interventions & dossiers CRM",
           "map": "Carte Mapbox temps réel",
           "tech_app": "App technicien PWA",
-          "billing_basic": "Devis & factures PDF"
+          "billing_basic": "Devis & factures PDF",
+          "field": "App technicien PWA + devis PDF"
         },
         "tagline": "CRM & app terrain"
       },
@@ -2886,7 +2892,8 @@
           "all_solo": "Tout le plan Solo",
           "portal": "Portail client suivi live",
           "planning": "Planning & dispatch",
-          "offline": "Mode hors-ligne technicien"
+          "offline": "Mode hors-ligne terrain",
+          "dispatch": "Planning & dispatch équipe"
         },
         "tagline": "Portail client & planning"
       },
@@ -2895,8 +2902,9 @@
         "features": {
           "all_team": "Tout le plan Équipe",
           "peppol": "Facturation Peppol / UBL",
-          "gmail": "Intégration Gmail",
-          "chatbot": "Assistant IA métier"
+          "gmail": "Gmail & inbox intégrés",
+          "chatbot": "Assistant IA métier",
+          "ai": "Assistant IA métier"
         },
         "tagline": "Peppol · Gmail · IA"
       }

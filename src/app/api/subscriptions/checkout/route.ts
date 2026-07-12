@@ -5,8 +5,14 @@ import { requireAuthenticatedUser } from "@/core/api/routeAuth";
 import "@/core/config/firebase-admin";
 import { getAdminDb } from "@/core/config/firebase-admin";
 import { requireCompanyAdmin } from "@/features/company/server/requireCompanyAdmin";
-import { createSubscriptionCheckoutAdmin } from "@/features/subscriptions/index.server";
-import { isSubscriptionPlanId } from "@/features/subscriptions/subscriptionPlans";
+import {
+  createSubscriptionCheckoutAdmin,
+  provisionSaasCompanyAdmin,
+} from "@/features/subscriptions/index.server";
+import {
+  isSubscriptionPlanId,
+  type SubscriptionBillingInterval,
+} from "@/features/subscriptions/subscriptionPlans";
 
 export const runtime = "nodejs";
 
@@ -52,13 +58,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Stripe non configuré." }, { status: 500 });
   }
 
-  let body: { companyId?: string; planId?: string; technicianQuantity?: number };
+  let body: {
+    companyId?: string;
+    planId?: string;
+    technicianQuantity?: number;
+    billingInterval?: string;
+  };
   try {
-    body = (await request.json()) as {
-      companyId?: string;
-      planId?: string;
-      technicianQuantity?: number;
-    };
+    body = (await request.json()) as typeof body;
   } catch {
     return NextResponse.json({ error: "Corps JSON invalide." }, { status: 400 });
   }
@@ -68,19 +75,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "planId requis (solo | team | pro)." }, { status: 400 });
   }
 
-  const resolved = await resolveCompanyIdForAdmin(auth.uid, body.companyId?.trim());
+  const billingInterval: SubscriptionBillingInterval =
+    body.billingInterval === "yearly" ? "yearly" : "monthly";
+
+  const db = getAdminDb();
+  let resolved = await resolveCompanyIdForAdmin(auth.uid, body.companyId?.trim());
+  let provisionedCompanyId: string | undefined;
+
   if ("needsCompany" in resolved) {
-    return NextResponse.json(
-      { needsCompany: true, error: "Créez une société avant de souscrire." },
-      { status: 409 }
-    );
+    const userRecord = await admin.auth().getUser(auth.uid);
+    provisionedCompanyId = await provisionSaasCompanyAdmin({
+      db,
+      auth: admin.auth,
+      uid: auth.uid,
+      email: userRecord.email ?? null,
+      planId,
+    });
+    resolved = { companyId: provisionedCompanyId };
   }
+
   if ("error" in resolved) {
     return NextResponse.json({ error: resolved.error }, { status: resolved.status });
   }
 
   const stripe = new Stripe(stripeSecret, { apiVersion: "2026-04-22.dahlia" });
-  const db = getAdminDb();
 
   try {
     const userRecord = await admin.auth().getUser(auth.uid);
@@ -90,10 +108,14 @@ export async function POST(request: Request) {
       companyId: resolved.companyId,
       planId,
       technicianQuantity: body.technicianQuantity ?? 1,
+      billingInterval,
       adminUid: auth.uid,
       adminEmail: userRecord.email ?? null,
     });
-    return NextResponse.json({ url: result.url });
+    return NextResponse.json({
+      url: result.url,
+      ...(provisionedCompanyId ? { companyId: provisionedCompanyId } : {}),
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Checkout impossible.";
     return NextResponse.json({ error: message }, { status: 500 });

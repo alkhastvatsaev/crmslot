@@ -8,6 +8,7 @@ import {
   MIN_TECHNICIAN_QUANTITY,
   resolveStripePriceId,
   subscriptionTrialDays,
+  type SubscriptionBillingInterval,
 } from "@/features/subscriptions/subscriptionPlans";
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 import { ensureStripeCustomerAdmin } from "@/features/subscriptions/server/ensureStripeCustomerAdmin";
@@ -26,6 +27,7 @@ type CreateCheckoutInput = {
   companyId: string;
   planId: SubscriptionPlanId;
   technicianQuantity: number;
+  billingInterval?: SubscriptionBillingInterval;
   adminUid: string;
   adminEmail: string | null;
 };
@@ -37,7 +39,10 @@ export async function createSubscriptionCheckoutAdmin(
     throw new Error("Plan invalide.");
   }
 
-  const priceId = resolveStripePriceId(input.planId);
+  const billingInterval: SubscriptionBillingInterval =
+    input.billingInterval === "yearly" ? "yearly" : "monthly";
+
+  const priceId = resolveStripePriceId(input.planId, billingInterval);
   if (!priceId) {
     throw new Error(`Price Stripe manquant pour le plan ${input.planId}.`);
   }
@@ -79,7 +84,7 @@ export async function createSubscriptionCheckoutAdmin(
         },
       },
     ],
-    success_url: `${origin}/?subscription=success&plan=${input.planId}`,
+    success_url: `${origin}/?subscription=success&plan=${input.planId}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/pricing?canceled=1`,
     allow_promotion_codes: true,
     client_reference_id: input.companyId,
@@ -87,6 +92,7 @@ export async function createSubscriptionCheckoutAdmin(
       purpose: "saas_subscription",
       companyId: input.companyId,
       planId: input.planId,
+      billingInterval,
       technicianQuantity: String(technicianQuantity),
       adminUid: input.adminUid,
     },
@@ -94,6 +100,7 @@ export async function createSubscriptionCheckoutAdmin(
       metadata: {
         companyId: input.companyId,
         planId: input.planId,
+        billingInterval,
         technicianQuantity: String(technicianQuantity),
       },
       ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),

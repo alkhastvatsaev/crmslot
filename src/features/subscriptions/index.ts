@@ -13,14 +13,23 @@ export {
   MIN_TECHNICIAN_QUANTITY,
   MAX_TECHNICIAN_QUANTITY,
   SUBSCRIPTION_PLANS,
+  ANNUAL_MONTHS_BILLED,
   getSubscriptionPlan,
   isSubscriptionPlanId,
+  technicianPlanDisplayPrice,
+  technicianPlanAnnualTotal,
+  type SubscriptionBillingInterval,
 } from "@/features/subscriptions/subscriptionPlans";
 export {
   clearPendingSubscriptionPlan,
+  clearSubscriptionCheckoutCompleted,
+  markSubscriptionCheckoutCompleted,
+  markSubscriptionPricingRedirectDone,
   readPendingSubscriptionPlan,
   readPlanIdFromSearchParams,
   savePendingSubscriptionPlan,
+  wasSubscriptionCheckoutCompleted,
+  wasSubscriptionPricingRedirectDone,
 } from "@/features/subscriptions/pendingSubscriptionPlan";
 export {
   isSaasSignupFlow,

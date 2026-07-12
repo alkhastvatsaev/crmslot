@@ -11,6 +11,8 @@ type Props = {
   testId: string;
   disabled?: boolean;
   busy?: boolean;
+  /** Icône seule — barre d’outils compacte (ex. /pricing). */
+  compact?: boolean;
   onClick: () => void;
 };
 
@@ -68,6 +70,7 @@ export default function CrmBrandOAuthButton({
   testId,
   disabled,
   busy,
+  compact = false,
   onClick,
 }: Props) {
   return (
@@ -75,11 +78,13 @@ export default function CrmBrandOAuthButton({
       type="button"
       data-testid={testId}
       data-oauth-variant={variant}
+      data-oauth-compact={compact ? "true" : "false"}
       disabled={disabled || busy}
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "relative flex h-11 w-full items-center rounded-xl px-4 shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
+        "relative flex items-center justify-center rounded-xl shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
+        compact ? "h-10 w-10 shrink-0 px-0" : "h-11 w-full px-4",
         variantStyles[variant]
       )}
     >
@@ -98,17 +103,19 @@ export default function CrmBrandOAuthButton({
           <AppleLogo />
         )}
       </span>
-      <span
-        className="pointer-events-none absolute inset-0 flex items-center justify-center px-12"
-        aria-hidden
-      >
+      {compact ? null : (
         <span
-          className="max-w-full truncate text-[14px] font-medium leading-tight antialiased"
-          style={{ fontFamily: labelFont[variant] }}
+          className="pointer-events-none absolute inset-0 flex items-center justify-center px-12"
+          aria-hidden
         >
-          {label}
+          <span
+            className="max-w-full truncate text-[14px] font-medium leading-tight antialiased"
+            style={{ fontFamily: labelFont[variant] }}
+          >
+            {label}
+          </span>
         </span>
-      </span>
+      )}
     </button>
   );
 }

@@ -2865,18 +2865,24 @@
       "recommended": "Populair",
       "cta": "Kiezen",
       "checkout_error": "Betaling niet beschikbaar.",
-      "cta_subscribe": "Abonneren",
-      "per_technician": " / tech / mnd excl. btw",
-      "per_technician_short": " / technieker / mnd excl. btw"
+      "cta_subscribe": "Kiezen",
+      "per_technician": "per technicus · maand excl. btw",
+      "per_technician_short": " / technieker / mnd excl. btw",
+      "billing_period": "Facturatieperiode",
+      "billing_monthly": "Maandelijks",
+      "billing_yearly": "Jaarlijks",
+      "per_technician_annual_equiv": "per technicus · maand excl. btw (jaar)",
+      "billed_annually": "{{amount}} € / tech / jaar excl. btw"
     },
     "plans": {
       "solo": {
         "name": "Solo",
         "features": {
-          "crm": "Interventie-CRM & statussen",
-          "map": "Mapbox-kaart realtime",
+          "crm": "Interventies & CRM-dossiers",
+          "map": "Live Mapbox-kaart",
           "tech_app": "Technieker PWA-app",
-          "billing_basic": "Offertes & facturen PDF"
+          "billing_basic": "Offertes & facturen PDF",
+          "field": "Technicus PWA + PDF-offertes"
         },
         "tagline": "CRM & veldapp"
       },
@@ -2886,7 +2892,8 @@
           "all_solo": "Alles uit Solo",
           "portal": "Live klantenportaal",
           "planning": "Planning & dispatch",
-          "offline": "Offline modus technieker"
+          "offline": "Offline veldmodus",
+          "dispatch": "Planning & dispatch team"
         },
         "tagline": "Klantenportaal & planning"
       },
@@ -2894,9 +2901,10 @@
         "name": "Pro",
         "features": {
           "all_team": "Alles uit Team",
-          "peppol": "Peppol / UBL e-facturatie",
-          "gmail": "Gmail-integratie",
-          "chatbot": "AI-assistent"
+          "peppol": "Peppol / UBL-facturatie",
+          "gmail": "Gmail & inbox geïntegreerd",
+          "chatbot": "AI-assistent",
+          "ai": "Zakelijke AI-assistent"
         },
         "tagline": "Peppol · Gmail · AI"
       }

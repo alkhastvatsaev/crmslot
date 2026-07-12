@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   isSubscriptionPlanId,
   PricingPageEffects,
   PricingPlansGrid,
 } from "@/features/subscriptions";
+import CrmslotLockMark from "@/features/subscriptions/components/CrmslotLockMark";
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
 type Props = {
@@ -18,26 +18,13 @@ export default async function PricingPage({ searchParams }: Props) {
     rawPlan && isSubscriptionPlanId(rawPlan) ? rawPlan : undefined;
 
   return (
-    <main className="min-h-dvh bg-[radial-gradient(circle_at_top,#f8fafc_0,#fff_42%,#f8fafc_100%)] font-[family-name:var(--font-outfit)] text-slate-950">
+    <main className="min-h-dvh overflow-y-auto bg-[radial-gradient(circle_at_top,#f8fafc_0,#fff_42%,#f8fafc_100%)] font-[family-name:var(--font-outfit)] text-slate-950">
       <PricingPageEffects />
 
       <header>
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-5xl items-center px-4 py-4 sm:px-6">
           <Link href="/" aria-label="CRMSLOT" className="inline-flex shrink-0">
-            <Image
-              src="/pwa/crmslot-lock-mark.svg"
-              alt=""
-              width={34}
-              height={42}
-              priority
-              className="h-[42px] w-[34px]"
-            />
-          </Link>
-          <Link
-            href="/"
-            className="rounded-xl border border-slate-200 bg-white/70 px-3.5 py-2 text-[13px] font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:bg-white"
-          >
-            Connexion
+            <CrmslotLockMark className="h-12 w-10" />
           </Link>
         </div>
       </header>
