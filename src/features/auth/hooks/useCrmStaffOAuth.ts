@@ -116,11 +116,11 @@ export function useCrmStaffOAuth({ variant, authTab, onInlineError }: Options) {
           return;
         }
         const { titleKey, descriptionKey } = crmStaffOAuthSignInErrorFeedback(provider, e);
-        onInlineError?.(
-          descriptionKey
-            ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
-            : String(t(titleKey))
-        );
+        const message = descriptionKey
+          ? `${String(t(titleKey))} — ${String(t(descriptionKey))}`
+          : String(t(titleKey));
+        onInlineError?.(message);
+        toast.error(message);
       } finally {
         setBusy(false);
       }

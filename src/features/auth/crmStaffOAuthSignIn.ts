@@ -13,6 +13,7 @@ import {
   NativeAppleSignInCancelled,
   shouldUseNativeAppleSignIn,
 } from "@/core/native/nativeAppleSignIn";
+import { isAppleOAuthClient } from "@/core/config/mobileClientDetection";
 
 /** Connexion OAuth lancée en redirect — la page sera rechargée par Firebase. */
 export class CrmStaffOAuthRedirectPending extends Error {
@@ -31,15 +32,27 @@ function authErrorCode(e: unknown): string {
   return "";
 }
 
+function shouldPreferAppleOAuthPopup(): boolean {
+  if (typeof window === "undefined") return false;
+  return isAppleOAuthClient({
+    userAgent: navigator.userAgent,
+    maxTouchPoints: navigator.maxTouchPoints,
+  });
+}
+
 async function signInCrmStaffWithProvider(
   auth: Auth,
-  provider: AuthProvider
+  provider: AuthProvider,
+  options?: { preferPopup?: boolean }
 ): Promise<UserCredential> {
   try {
     return await signInWithPopup(auth, provider);
   } catch (e) {
     const code = authErrorCode(e);
-    if (code === "auth/popup-blocked" || code === "auth/cancelled-popup-request") {
+    const canRedirect =
+      !options?.preferPopup &&
+      (code === "auth/popup-blocked" || code === "auth/cancelled-popup-request");
+    if (canRedirect) {
       await signInWithRedirect(auth, provider);
       throw new CrmStaffOAuthRedirectPending();
     }
@@ -68,7 +81,16 @@ export async function signInCrmStaffWithApple(auth: Auth): Promise<UserCredentia
   if (shouldUseNativeAppleSignIn()) {
     return signInCrmStaffWithNativeApple(auth);
   }
-  return signInCrmStaffWithProvider(auth, createCrmStaffAppleProvider());
+  return signInCrmStaffWithAppleWeb(auth);
+}
+
+/** Safari / Mac / iPhone web — popup Apple ID native (Touch ID). Firebase gère le nonce. */
+async function signInCrmStaffWithAppleWeb(auth: Auth): Promise<UserCredential> {
+  const provider = createCrmStaffAppleProvider();
+  provider.setCustomParameters({ locale: "fr_FR" });
+  return signInCrmStaffWithProvider(auth, provider, {
+    preferPopup: shouldPreferAppleOAuthPopup(),
+  });
 }
 
 async function signInCrmStaffWithNativeApple(auth: Auth): Promise<UserCredential> {
@@ -106,6 +128,24 @@ export function crmStaffOAuthSignInErrorFeedback(
       };
     case "auth/account-exists-with-different-credential":
       return { titleKey: "auth.oauth_account_conflict" };
+    case "auth/unauthorized-domain":
+      return {
+        titleKey: `auth.${prefix}_signin_failed`,
+        descriptionKey: "auth.oauth_unauthorized_domain_hint",
+      };
+    case "auth/invalid-oauth-client-id":
+    case "auth/invalid-oauth-provider-id":
+      return {
+        titleKey: `auth.${prefix}_provider_disabled`,
+        descriptionKey: `auth.${prefix}_provider_disabled_hint`,
+      };
+    case "auth/missing-or-invalid-nonce":
+      return { titleKey: `auth.${prefix}_signin_failed` };
+    case "auth/popup-blocked":
+      return {
+        titleKey: `auth.${prefix}_signin_failed`,
+        descriptionKey: "auth.oauth_popup_blocked_hint",
+      };
     default:
       return { titleKey: `auth.${prefix}_signin_failed` };
   }

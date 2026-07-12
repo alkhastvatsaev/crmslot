@@ -59,11 +59,12 @@ function AppleLogo() {
 }
 
 const variantStyles: Record<Variant, string> = {
-  google: "border border-[#747775] bg-white text-[#1F1F1F] hover:bg-[#f8f9fa] active:bg-[#f1f3f4]",
+  google:
+    "border border-[#3c4043] bg-[#131314] text-[#e3e3e3] hover:bg-[#1f1f1f] active:bg-[#2a2a2a]",
   apple: "border border-black bg-black text-white hover:bg-neutral-900 active:bg-neutral-800",
 };
 
-/** Bouton OAuth CRM — logo fixe + libellé en vraie police système. */
+/** Bouton OAuth CRM — style Cursor : icône à gauche, libellé centré, fond sombre. */
 export default function CrmBrandOAuthButton({
   variant,
   label,
@@ -83,17 +84,19 @@ export default function CrmBrandOAuthButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "relative flex items-center justify-center rounded-xl shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
-        compact ? "h-10 w-10 shrink-0 px-0" : "h-11 w-full px-4",
+        "grid w-full items-center rounded-[10px] shadow-sm transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30",
+        compact
+          ? "h-10 w-10 shrink-0 grid-cols-1 px-0"
+          : "h-11 grid-cols-[2.75rem_1fr_2.75rem] px-0",
         variantStyles[variant]
       )}
     >
-      <span className="pointer-events-none flex h-[18px] w-[18px] shrink-0 items-center justify-center">
+      <span className="pointer-events-none flex items-center justify-center">
         {busy ? (
           <Loader2
             className={cn(
               "h-4 w-4 animate-spin",
-              variant === "apple" ? "text-white" : "text-slate-500"
+              variant === "apple" ? "text-white" : "text-[#e3e3e3]"
             )}
             aria-hidden
           />
@@ -105,15 +108,10 @@ export default function CrmBrandOAuthButton({
       </span>
       {compact ? null : (
         <span
-          className="pointer-events-none absolute inset-0 flex items-center justify-center px-12"
-          aria-hidden
+          className="pointer-events-none col-start-2 truncate text-center text-[14px] font-medium leading-tight antialiased"
+          style={{ fontFamily: labelFont[variant] }}
         >
-          <span
-            className="max-w-full truncate text-[14px] font-medium leading-tight antialiased"
-            style={{ fontFamily: labelFont[variant] }}
-          >
-            {label}
-          </span>
+          {label}
         </span>
       )}
     </button>
