@@ -13,37 +13,37 @@ type Props = {
 
 const BRAND_ASSETS = {
   fr: {
-    src: "/brand/apple-sign-in-black-fr.svg",
+    src: "/brand/google-sign-in-light-fr.svg",
     width: 228,
     height: 40,
   },
   en: {
-    src: "/brand/apple-sign-in-black-en.svg",
-    width: 200,
+    src: "/brand/google-sign-in-light-en.svg",
+    width: 175,
     height: 40,
   },
   nl: {
-    src: "/brand/apple-sign-in-black-nl.svg",
-    width: 210,
+    src: "/brand/google-sign-in-light-en.svg",
+    width: 175,
     height: 40,
   },
   ru: {
-    src: "/brand/apple-sign-in-black-en.svg",
-    width: 200,
+    src: "/brand/google-sign-in-light-en.svg",
+    width: 175,
     height: 40,
   },
 } as const;
 
-/** Bouton Sign in with Apple (asset conforme HIG) — noir, logo Apple officiel. */
-export default function AppleSignInConnectButton({
+/** Bouton Sign in with Google (asset officiel) — pleine largeur. */
+export default function GoogleSignInConnectButton({
   onClick,
   disabled,
   busy,
   ariaLabel,
-  dataTestId = "apple-sign-in-btn",
+  dataTestId = "google-sign-in-btn",
 }: Props) {
   const { t, language } = useTranslation();
-  const label = ariaLabel ?? String(t("auth.continue_with_apple"));
+  const label = ariaLabel ?? String(t("auth.continue_with_google"));
   const asset = BRAND_ASSETS[language] ?? BRAND_ASSETS.fr;
 
   return (

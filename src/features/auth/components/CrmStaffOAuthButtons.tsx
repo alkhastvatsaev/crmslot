@@ -2,7 +2,8 @@
 
 import { useTranslation } from "@/core/i18n/I18nContext";
 import type { CrmEmailAuthTab } from "@/features/auth/crmEmailLoginVariant";
-import CrmBrandOAuthButton from "@/features/auth/components/CrmBrandOAuthButton";
+import AppleSignInConnectButton from "@/features/auth/components/AppleSignInConnectButton";
+import GoogleSignInConnectButton from "@/features/auth/components/GoogleSignInConnectButton";
 import { useIsAppleOAuthClient } from "@/features/auth/hooks/useIsIphoneClient";
 import {
   crmEmailLoginTestId,
@@ -56,20 +57,18 @@ export default function CrmStaffOAuthButtons({
         <div className="h-px flex-1 bg-slate-200/90" />
       </div>
 
-      <CrmBrandOAuthButton
-        variant="google"
-        testId={crmEmailLoginTestId(variant, "google")}
-        label={googleLabel}
+      <GoogleSignInConnectButton
+        dataTestId={crmEmailLoginTestId(variant, "google")}
+        ariaLabel={googleLabel}
         disabled={oauthDisabled}
         busy={googleBusy}
         onClick={onGoogleSignIn}
       />
 
       {showApple ? (
-        <CrmBrandOAuthButton
-          variant="apple"
-          testId={crmEmailLoginTestId(variant, "apple")}
-          label={appleLabel}
+        <AppleSignInConnectButton
+          dataTestId={crmEmailLoginTestId(variant, "apple")}
+          ariaLabel={appleLabel}
           disabled={oauthDisabled}
           busy={appleBusy}
           onClick={onAppleSignIn}

@@ -25,7 +25,7 @@ describe("CrmStaffOAuthButtons", () => {
     );
 
     expect(screen.getByTestId("admin-login-oauth")).toHaveAttribute("data-oauth-mode", "login");
-    expect(screen.getByText("Se connecter avec Google")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Se connecter avec Google" })).toBeInTheDocument();
   });
 
   it("affiche les libellés inscription sur l’onglet register", () => {
@@ -39,7 +39,7 @@ describe("CrmStaffOAuthButtons", () => {
     );
 
     expect(screen.getByTestId("admin-login-oauth")).toHaveAttribute("data-oauth-mode", "register");
-    expect(screen.getByText("Créer un compte avec Google")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Créer un compte avec Google" })).toBeInTheDocument();
   });
 
   it("masque Apple hors écosystème Apple", () => {
