@@ -2872,7 +2872,8 @@
       "billing_monthly": "Monthly",
       "billing_yearly": "Yearly",
       "per_technician_annual_equiv": "per technician · month excl. VAT (annual)",
-      "billed_annually": "{{amount}} € / tech / year excl. VAT"
+      "billed_annually": "{{amount}} € / tech / year excl. VAT",
+      "open_app": "Open app"
     },
     "plans": {
       "solo": {

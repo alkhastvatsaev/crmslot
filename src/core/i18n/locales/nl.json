@@ -2872,7 +2872,8 @@
       "billing_monthly": "Maandelijks",
       "billing_yearly": "Jaarlijks",
       "per_technician_annual_equiv": "per technicus · maand excl. btw (jaar)",
-      "billed_annually": "{{amount}} € / tech / jaar excl. btw"
+      "billed_annually": "{{amount}} € / tech / jaar excl. btw",
+      "open_app": "App openen"
     },
     "plans": {
       "solo": {

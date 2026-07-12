@@ -22,7 +22,7 @@ export default async function PricingPage({ searchParams }: Props) {
       <PricingPageEffects />
 
       <header>
-        <div className="mx-auto flex max-w-5xl items-center px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-5xl justify-center px-4 py-4 sm:px-6">
           <Link href="/" aria-label="CRMSLOT" className="inline-flex shrink-0">
             <CrmslotLockMark className="h-12 w-10" />
           </Link>

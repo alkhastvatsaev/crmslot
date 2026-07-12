@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
-import { HubSegmentedControl } from "@/core/ui/hub";
 import {
   SUBSCRIPTION_PLANS,
   savePendingSubscriptionPlan,
@@ -15,6 +14,7 @@ import {
   type SubscriptionPlanId,
 } from "@/features/subscriptions";
 import PricingAuthToolbar from "@/features/subscriptions/components/PricingAuthToolbar";
+import PricingBillingToggle from "@/features/subscriptions/components/PricingBillingToggle";
 import { startSubscriptionCheckout } from "@/features/subscriptions/startSubscriptionCheckoutClient";
 
 type Props = {
@@ -59,24 +59,13 @@ export default function PricingPlansGrid({ defaultPlanId }: Props) {
 
   return (
     <div className="w-full">
-      <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
-        <HubSegmentedControl
-          size="compact"
-          ariaLabel={String(t("subscription.pricing.billing_period"))}
+      <div className="mb-5 flex flex-col gap-4 lg:mb-6 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+        <PricingBillingToggle
           value={billingInterval}
-          onChange={(id) => setBillingInterval(id === "yearly" ? "yearly" : "monthly")}
-          options={[
-            {
-              id: "monthly",
-              label: t("subscription.pricing.billing_monthly"),
-              testId: "pricing-billing-monthly",
-            },
-            {
-              id: "yearly",
-              label: t("subscription.pricing.billing_yearly"),
-              testId: "pricing-billing-yearly",
-            },
-          ]}
+          onChange={setBillingInterval}
+          ariaLabel={String(t("subscription.pricing.billing_period"))}
+          monthlyLabel={String(t("subscription.pricing.billing_monthly"))}
+          yearlyLabel={String(t("subscription.pricing.billing_yearly"))}
         />
         <PricingAuthToolbar />
       </div>

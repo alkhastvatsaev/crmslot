@@ -2872,7 +2872,8 @@
       "billing_monthly": "Mensuel",
       "billing_yearly": "Annuel",
       "per_technician_annual_equiv": "par technicien · mois HT (annuel)",
-      "billed_annually": "{{amount}} € / tech / an HT"
+      "billed_annually": "{{amount}} € / tech / an HT",
+      "open_app": "Ouvrir l'app"
     },
     "plans": {
       "solo": {
