@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Minus, Plus } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/core/config/firebase";
 import { useTranslation } from "@/core/i18n/I18nContext";
 import {
-  EXTRA_TECHNICIAN_PRICE_EUR,
   SUBSCRIPTION_PLANS,
+  clampTechnicianQuantity,
+  computeSubscriptionMonthlyTotal,
   savePendingSubscriptionPlan,
   subscriptionCheckoutEnabled,
   type SubscriptionPlanId,
@@ -26,6 +27,7 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
   const [busyPlan, setBusyPlan] = useState<SubscriptionPlanId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
+  const [technicianQuantity, setTechnicianQuantity] = useState(1);
 
   useEffect(() => {
     if (!auth) return () => {};
@@ -33,26 +35,33 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
     return onAuthStateChanged(auth, (user) => setSignedIn(Boolean(user)));
   }, []);
 
-  const handleChoose = useCallback(async (planId: SubscriptionPlanId) => {
-    setError(null);
-    savePendingSubscriptionPlan(planId);
-
-    const user = auth?.currentUser;
-    if (!user) {
-      window.location.href = `/?auth=register&plan=${planId}`;
-      return;
-    }
-
-    setBusyPlan(planId);
-    try {
-      const url = await startSubscriptionCheckout(planId);
-      window.location.href = url;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusyPlan(null);
-    }
+  const adjustQuantity = useCallback((delta: number) => {
+    setTechnicianQuantity((current) => clampTechnicianQuantity(current + delta));
   }, []);
+
+  const handleChoose = useCallback(
+    async (planId: SubscriptionPlanId) => {
+      setError(null);
+      savePendingSubscriptionPlan(planId);
+
+      const user = auth?.currentUser;
+      if (!user) {
+        window.location.href = `/?auth=register&plan=${planId}`;
+        return;
+      }
+
+      setBusyPlan(planId);
+      try {
+        const url = await startSubscriptionCheckout(planId, { technicianQuantity });
+        window.location.href = url;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        setBusyPlan(null);
+      }
+    },
+    [technicianQuantity]
+  );
 
   const ctaLabel = (planId: SubscriptionPlanId) => {
     if (busyPlan === planId) return t("subscription.pricing.checkout_loading");
@@ -73,6 +82,40 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
         </p>
       </div>
 
+      <div className="mx-auto mb-8 flex max-w-md flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-4">
+        <p className="text-[13px] font-medium text-slate-700">
+          {t("subscription.pricing.technician_quantity_label")}
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label={t("subscription.pricing.technician_quantity_decrease")}
+            disabled={technicianQuantity <= 1}
+            onClick={() => adjustQuantity(-1)}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 disabled:opacity-40"
+          >
+            <Minus className="h-4 w-4" aria-hidden />
+          </button>
+          <span
+            className="min-w-[3rem] text-center text-[20px] font-semibold tabular-nums text-slate-900"
+            data-testid="pricing-technician-quantity"
+          >
+            {technicianQuantity}
+          </span>
+          <button
+            type="button"
+            aria-label={t("subscription.pricing.technician_quantity_increase")}
+            onClick={() => adjustQuantity(1)}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+        <p className="text-center text-[12px] text-slate-500">
+          {t("subscription.pricing.technician_quantity_hint")}
+        </p>
+      </div>
+
       {error ? (
         <p
           role="alert"
@@ -86,6 +129,7 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
         {SUBSCRIPTION_PLANS.map((plan) => {
           const selected = defaultPlanId === plan.id;
           const highlighted = plan.highlight === true;
+          const monthlyTotal = computeSubscriptionMonthlyTotal(plan.id, technicianQuantity);
 
           return (
             <div
@@ -109,25 +153,24 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
 
               <div className="mt-5 flex items-baseline gap-1.5">
                 <span className="text-[2.5rem] font-bold tabular-nums leading-none tracking-tight text-slate-900">
-                  {plan.priceEurMonthly}
+                  {plan.technicianPriceEurMonthly}
                 </span>
                 <span className="text-[14px] text-slate-500">
-                  €{t("subscription.pricing.per_month")}
+                  €{t("subscription.pricing.per_technician")}
                 </span>
               </div>
 
               <p className="mt-2 text-[12px] text-emerald-700">
                 {t("subscription.pricing.founding_price").replace(
                   "{{price}}",
-                  String(plan.foundingPriceEurMonthly)
+                  String(plan.foundingTechnicianPriceEurMonthly)
                 )}
               </p>
 
               <p className="mt-3 text-[13px] font-medium text-slate-700">
-                {t("subscription.pricing.seats_included").replace(
-                  "{{count}}",
-                  String(plan.technicianSeatsIncluded)
-                )}
+                {t("subscription.pricing.monthly_total")
+                  .replace("{{count}}", String(technicianQuantity))
+                  .replace("{{total}}", String(monthlyTotal))}
               </p>
 
               <ul className="mt-5 flex-1 space-y-2.5">
@@ -162,10 +205,7 @@ export default function PricingPlansGrid({ defaultPlanId, showAppLink = true }: 
       </div>
 
       <p className="mt-8 text-center text-[13px] text-slate-500">
-        {t("subscription.pricing.extra_technician").replace(
-          "{{price}}",
-          String(EXTRA_TECHNICIAN_PRICE_EUR)
-        )}
+        {t("subscription.pricing.billing_per_technician")}
       </p>
 
       <p className="mt-3 text-center text-[12px] text-slate-400">

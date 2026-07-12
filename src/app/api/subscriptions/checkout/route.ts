@@ -52,9 +52,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Stripe non configuré." }, { status: 500 });
   }
 
-  let body: { companyId?: string; planId?: string };
+  let body: { companyId?: string; planId?: string; technicianQuantity?: number };
   try {
-    body = (await request.json()) as { companyId?: string; planId?: string };
+    body = (await request.json()) as {
+      companyId?: string;
+      planId?: string;
+      technicianQuantity?: number;
+    };
   } catch {
     return NextResponse.json({ error: "Corps JSON invalide." }, { status: 400 });
   }
@@ -85,6 +89,7 @@ export async function POST(request: Request) {
       stripe,
       companyId: resolved.companyId,
       planId,
+      technicianQuantity: body.technicianQuantity ?? 1,
       adminUid: auth.uid,
       adminEmail: userRecord.email ?? null,
     });

@@ -14,7 +14,7 @@ import {
 describe("subscriptionPlans", () => {
   it("defines three public plans", () => {
     expect(SUBSCRIPTION_PLANS.map((p) => p.id)).toEqual(["solo", "team", "pro"]);
-    expect(getSubscriptionPlan("team").priceEurMonthly).toBe(89);
+    expect(getSubscriptionPlan("team").technicianPriceEurMonthly).toBe(89);
   });
 
   it("validates plan ids", () => {

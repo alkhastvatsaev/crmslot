@@ -2858,11 +2858,11 @@
   "subscription": {
     "pricing": {
       "title": "Prijzen",
-      "subtitle": "14 dagen proef · opzeggen wanneer u wilt",
+      "subtitle": "Per actieve technieker · 14 dagen proef",
       "founding_badge": "Founding-aanbieding: 30% korting voor altijd voor de eerste 10 klanten",
       "most_popular": "Meest gekozen",
       "per_month": "/ mnd excl. btw",
-      "founding_price": "Founding: €{{price}}/mnd met promocode",
+      "founding_price": "Founding: €{{price}}/technieker/mnd met promocode",
       "seats_included": "Tot {{count}} technieker(s) inbegrepen",
       "extra_technician": "+ €{{price}}/mnd per extra technieker",
       "choose_plan": "Kies dit plan",
@@ -2879,21 +2879,29 @@
       "faq": {
         "plan": {
           "q": "Welk plan kies ik?",
-          "a": "Solo voor een eenmanszaak, Team voor meerdere technici en het klantenportaal, Pro voor Peppol, Gmail en de AI-assistent."
+          "a": "Kies het featureniveau (Solo, Team of Pro). Totaal = eenheidsprijs × aantal techniekers."
         },
         "trial": {
           "q": "Hoe werkt de proefperiode?",
           "a": "14 dagen gratis op elk plan. Geen afschrijving vóór het einde van de proef. Opzeggen kan altijd via het Stripe-portaal."
         },
         "technicians": {
-          "q": "Extra technici?",
-          "a": "Elk plan bevat een techniciquotum. Daarboven: +€15 excl. btw/maand per actieve veldtechnicus."
+          "q": "Hoe wordt de prijs berekend?",
+          "a": "Prijs = planstarief × techniekers. Bv. Team €22 × 4 techniekers = €88/mnd excl. btw. Pas aan op /pricing of in het Stripe-portaal."
         },
         "billing": {
           "q": "Facturatie en btw?",
           "a": "Veilige maandelijkse betaling via Stripe. Belgische btw volgens uw status. Facturen beschikbaar in het Stripe-klantenportaal."
         }
-      }
+      },
+      "per_technician": " / technieker / mnd excl. btw",
+      "per_technician_short": " / technieker / mnd excl. btw",
+      "monthly_total": "{{count}} technieker(s) → €{{total}} / mnd excl. btw",
+      "technician_quantity_label": "Aantal techniekers",
+      "technician_quantity_hint": "Pas aan vóór abonnement — later wijzigen in Stripe.",
+      "technician_quantity_decrease": "Technieker verwijderen",
+      "technician_quantity_increase": "Technieker toevoegen",
+      "billing_per_technician": "Eenheidsprijs per actieve veldtechnieker — geen bundels of staffels."
     },
     "plans": {
       "solo": {
@@ -2904,7 +2912,7 @@
           "tech_app": "Technieker PWA-app",
           "billing_basic": "Offertes & facturen PDF"
         },
-        "tagline": "1 technieker"
+        "tagline": "CRM & veldapp"
       },
       "team": {
         "name": "Team",
@@ -2914,7 +2922,7 @@
           "planning": "Planning & dispatch",
           "offline": "Offline modus technieker"
         },
-        "tagline": "5 techniekers"
+        "tagline": "Klantenportaal & planning"
       },
       "pro": {
         "name": "Pro",
@@ -2924,7 +2932,7 @@
           "gmail": "Gmail-integratie",
           "chatbot": "AI-assistent"
         },
-        "tagline": "15 techniekers · Peppol · AI"
+        "tagline": "Peppol · Gmail · AI"
       }
     },
     "banner": {

@@ -2,10 +2,12 @@
 
 import { auth } from "@/core/config/firebase";
 import { provisionSaasCompanyForAdmin } from "@/features/subscriptions/provisionSaasCompanyClient";
+import { clampTechnicianQuantity } from "@/features/subscriptions/subscriptionPlans";
 import type { SubscriptionPlanId } from "@/features/subscriptions/subscriptionTypes";
 
 type StartCheckoutOptions = {
   companyId?: string;
+  technicianQuantity?: number;
   onCompanyProvisioned?: (companyId: string) => void;
 };
 
@@ -19,6 +21,7 @@ export async function startSubscriptionCheckout(
     throw new Error("Connexion requise.");
   }
 
+  const technicianQuantity = clampTechnicianQuantity(options?.technicianQuantity ?? 1);
   let companyId = options?.companyId?.trim() ?? "";
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -29,7 +32,11 @@ export async function startSubscriptionCheckout(
         Authorization: `Bearer ${idToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ companyId: companyId || undefined, planId }),
+      body: JSON.stringify({
+        companyId: companyId || undefined,
+        planId,
+        technicianQuantity,
+      }),
     });
     const data = (await res.json().catch(() => ({}))) as {
       url?: string;

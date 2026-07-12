@@ -73,8 +73,8 @@ export default function AccountSubscriptionRow({ companyId }: Props) {
         <div className="min-w-0 flex-1">
           {plan ? (
             <p className="truncate text-sm font-medium text-slate-900">
-              {t(plan.nameKey)} · {plan.priceEurMonthly} €
-              <span className="text-slate-500"> {t("subscription.pricing.per_month")}</span>
+              {t(plan.nameKey)} · {plan.technicianPriceEurMonthly} €
+              {t("subscription.pricing.per_technician_short")}
             </p>
           ) : (
             <p className="truncate text-sm font-medium text-slate-900">

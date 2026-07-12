@@ -8,7 +8,10 @@ export {
   subscriptionEnforcementEnabled,
 } from "@/features/subscriptions/subscriptionAccess";
 export {
-  EXTRA_TECHNICIAN_PRICE_EUR,
+  clampTechnicianQuantity,
+  computeSubscriptionMonthlyTotal,
+  MIN_TECHNICIAN_QUANTITY,
+  MAX_TECHNICIAN_QUANTITY,
   SUBSCRIPTION_PLANS,
   getSubscriptionPlan,
   isSubscriptionPlanId,

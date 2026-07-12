@@ -1,6 +1,7 @@
 import type { Firestore } from "firebase-admin/firestore";
 import type Stripe from "stripe";
 import {
+  clampTechnicianQuantity,
   getSubscriptionPlan,
   isSubscriptionPlanId,
   resolveStripePriceId,
@@ -22,6 +23,7 @@ type CreateCheckoutInput = {
   stripe: Stripe;
   companyId: string;
   planId: SubscriptionPlanId;
+  technicianQuantity: number;
   adminUid: string;
   adminEmail: string | null;
 };
@@ -47,6 +49,7 @@ export async function createSubscriptionCheckoutAdmin(
     typeof companySnap.data()?.name === "string" ? (companySnap.data()?.name as string) : "Société";
 
   getSubscriptionPlan(input.planId);
+  const technicianQuantity = clampTechnicianQuantity(input.technicianQuantity);
 
   const customerId = await ensureStripeCustomerAdmin({
     db: input.db,
@@ -63,7 +66,7 @@ export async function createSubscriptionCheckoutAdmin(
   const session = await input.stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: technicianQuantity }],
     success_url: `${origin}/?subscription=success&plan=${input.planId}`,
     cancel_url: `${origin}/pricing?canceled=1`,
     allow_promotion_codes: true,
@@ -72,12 +75,14 @@ export async function createSubscriptionCheckoutAdmin(
       purpose: "saas_subscription",
       companyId: input.companyId,
       planId: input.planId,
+      technicianQuantity: String(technicianQuantity),
       adminUid: input.adminUid,
     },
     subscription_data: {
       metadata: {
         companyId: input.companyId,
         planId: input.planId,
+        technicianQuantity: String(technicianQuantity),
       },
       ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
     },

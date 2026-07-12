@@ -4,22 +4,21 @@ export type SubscriptionPlanDefinition = {
   id: SubscriptionPlanId;
   nameKey: string;
   taglineKey: string;
-  priceEurMonthly: number;
-  foundingPriceEurMonthly: number;
-  technicianSeatsIncluded: number;
+  /** Tarif unitaire HT — facturé par technicien actif (Stripe quantity). */
+  technicianPriceEurMonthly: number;
+  foundingTechnicianPriceEurMonthly: number;
   featureKeys: readonly string[];
   highlight?: boolean;
 };
 
-/** Grille publique — les montants Stripe doivent correspondre (Dashboard). */
+/** Grille publique — les montants Stripe doivent être des prix **unitaires** par technicien. */
 export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
   {
     id: "solo",
     nameKey: "subscription.plans.solo.name",
     taglineKey: "subscription.plans.solo.tagline",
-    priceEurMonthly: 49,
-    foundingPriceEurMonthly: 34,
-    technicianSeatsIncluded: 1,
+    technicianPriceEurMonthly: 19,
+    foundingTechnicianPriceEurMonthly: 13,
     featureKeys: [
       "subscription.plans.solo.features.crm",
       "subscription.plans.solo.features.map",
@@ -31,9 +30,8 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     id: "team",
     nameKey: "subscription.plans.team.name",
     taglineKey: "subscription.plans.team.tagline",
-    priceEurMonthly: 89,
-    foundingPriceEurMonthly: 62,
-    technicianSeatsIncluded: 5,
+    technicianPriceEurMonthly: 22,
+    foundingTechnicianPriceEurMonthly: 15,
     highlight: true,
     featureKeys: [
       "subscription.plans.team.features.all_solo",
@@ -46,9 +44,8 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
     id: "pro",
     nameKey: "subscription.plans.pro.name",
     taglineKey: "subscription.plans.pro.tagline",
-    priceEurMonthly: 149,
-    foundingPriceEurMonthly: 104,
-    technicianSeatsIncluded: 15,
+    technicianPriceEurMonthly: 27,
+    foundingTechnicianPriceEurMonthly: 19,
     featureKeys: [
       "subscription.plans.pro.features.all_team",
       "subscription.plans.pro.features.peppol",
@@ -58,7 +55,8 @@ export const SUBSCRIPTION_PLANS: readonly SubscriptionPlanDefinition[] = [
   },
 ] as const;
 
-export const EXTRA_TECHNICIAN_PRICE_EUR = 15;
+export const MIN_TECHNICIAN_QUANTITY = 1;
+export const MAX_TECHNICIAN_QUANTITY = 99;
 
 const STRIPE_PRICE_ENV: Record<SubscriptionPlanId, string> = {
   solo: "STRIPE_SUBSCRIPTION_PRICE_SOLO",
@@ -76,7 +74,20 @@ export function isSubscriptionPlanId(value: string): value is SubscriptionPlanId
   return value === "solo" || value === "team" || value === "pro";
 }
 
-/** Price ID Stripe depuis l'environnement serveur. */
+export function clampTechnicianQuantity(raw: number): number {
+  if (!Number.isFinite(raw)) return MIN_TECHNICIAN_QUANTITY;
+  return Math.min(MAX_TECHNICIAN_QUANTITY, Math.max(MIN_TECHNICIAN_QUANTITY, Math.floor(raw)));
+}
+
+export function computeSubscriptionMonthlyTotal(
+  planId: SubscriptionPlanId,
+  technicianQuantity: number
+): number {
+  const plan = getSubscriptionPlan(planId);
+  return plan.technicianPriceEurMonthly * clampTechnicianQuantity(technicianQuantity);
+}
+
+/** Price ID Stripe (unitaire / technicien) depuis l'environnement serveur. */
 export function resolveStripePriceId(planId: SubscriptionPlanId): string | null {
   const key = STRIPE_PRICE_ENV[planId];
   return process.env[key]?.trim() || null;

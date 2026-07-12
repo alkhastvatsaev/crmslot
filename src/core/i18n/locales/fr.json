@@ -2858,11 +2858,11 @@
   "subscription": {
     "pricing": {
       "title": "Tarifs",
-      "subtitle": "14 jours d'essai · sans engagement",
+      "subtitle": "Facturation à la carte · par technicien actif · 14 jours d'essai",
       "founding_badge": "Offre fondateur : -30 % à vie pour les 10 premiers clients",
       "most_popular": "Le plus choisi",
       "per_month": "/ mois HT",
-      "founding_price": "Fondateur : {{price}} €/mois avec code promo",
+      "founding_price": "Fondateur : {{price}} €/technicien/mois avec code promo",
       "seats_included": "Jusqu'à {{count}} technicien(s) inclus",
       "extra_technician": "+ {{price}} €/mois par technicien supplémentaire",
       "choose_plan": "Choisir ce plan",
@@ -2879,21 +2879,29 @@
       "faq": {
         "plan": {
           "q": "Quel plan choisir ?",
-          "a": "Solo pour un artisan seul, Équipe pour une PME avec plusieurs techniciens et portail client, Pro pour Peppol, Gmail et l'assistant IA."
+          "a": "Choisissez le niveau de fonctionnalités (Solo, Équipe ou Pro). Le montant = tarif unitaire × nombre de techniciens."
         },
         "trial": {
           "q": "Comment fonctionne l'essai ?",
           "a": "14 jours gratuits sur tous les plans. Aucun prélèvement avant la fin de l'essai. Résiliation à tout moment depuis le portail Stripe."
         },
         "technicians": {
-          "q": "Techniciens supplémentaires ?",
-          "a": "Chaque plan inclut un quota de techniciens. Au-delà, +15 € HT/mois par technicien actif sur le terrain."
+          "q": "Comment est calculé le prix ?",
+          "a": "Prix = tarif du plan × nombre de techniciens. Ex. Équipe à 22 € × 4 techniciens = 88 € HT/mois. Ajustez la quantité sur /pricing ou dans le portail Stripe."
         },
         "billing": {
           "q": "Facturation et TVA ?",
           "a": "Paiement mensuel sécurisé via Stripe. TVA belge appliquée selon votre statut. Factures disponibles dans le portail client Stripe."
         }
-      }
+      },
+      "per_technician": " / technicien / mois HT",
+      "per_technician_short": " / technicien / mois HT",
+      "monthly_total": "{{count}} technicien(s) → {{total}} € / mois HT",
+      "technician_quantity_label": "Nombre de techniciens",
+      "technician_quantity_hint": "Ajustez avant de vous abonner — modifiable ensuite dans Stripe.",
+      "technician_quantity_decrease": "Retirer un technicien",
+      "technician_quantity_increase": "Ajouter un technicien",
+      "billing_per_technician": "Tarif unitaire par technicien terrain actif — pas de palier ni de lot."
     },
     "plans": {
       "solo": {
@@ -2904,7 +2912,7 @@
           "tech_app": "App technicien PWA",
           "billing_basic": "Devis & factures PDF"
         },
-        "tagline": "1 technicien"
+        "tagline": "CRM & app terrain"
       },
       "team": {
         "name": "Équipe",
@@ -2914,7 +2922,7 @@
           "planning": "Planning & dispatch",
           "offline": "Mode hors-ligne technicien"
         },
-        "tagline": "5 techniciens"
+        "tagline": "Portail client & planning"
       },
       "pro": {
         "name": "Pro",
@@ -2924,7 +2932,7 @@
           "gmail": "Intégration Gmail",
           "chatbot": "Assistant IA métier"
         },
-        "tagline": "15 techniciens · Peppol · IA"
+        "tagline": "Peppol · Gmail · IA"
       }
     },
     "banner": {

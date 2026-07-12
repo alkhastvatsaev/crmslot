@@ -49,8 +49,8 @@ export default function CrmEmailLoginPanelHeader({ variant }: Props) {
         </h1>
         {pendingPlan ? (
           <p className="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[12px] font-medium text-blue-700">
-            {t(pendingPlan.nameKey)} · {pendingPlan.priceEurMonthly} €
-            {t("subscription.pricing.per_month")}
+            {t(pendingPlan.nameKey)} · {pendingPlan.technicianPriceEurMonthly} €
+            {t("subscription.pricing.per_technician_short")}
           </p>
         ) : (
           <p className="mt-1 text-[12.5px] leading-snug text-slate-500">

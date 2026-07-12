@@ -11,19 +11,19 @@ Abonnements SaaS plateforme CRMSLOT (≠ facturation interventions dans `billing
 
 ## Points d'entrée
 
-| Fichier                                     | Rôle                                       |
-| ------------------------------------------- | ------------------------------------------ |
-| `subscriptionPlans.ts`                      | Grille 49 / 89 / 149 € + feature keys      |
-| `startSubscriptionCheckoutClient.ts`        | Checkout Stripe (+ provision société)      |
-| `pendingSubscriptionPlan.ts`                | Plan choisi avant auth (sessionStorage)    |
-| `provisionSaasCompanyClient.ts`             | Crée `companies/{id}` à l'inscription SaaS |
-| `hooks/useCompanySubscription.ts`           | Contexte `FeatureFlagsProvider`            |
-| `components/PricingPlansGrid.tsx`           | Grille `/pricing`                          |
-| `components/PricingFaq.tsx`                 | FAQ tarifs                                 |
-| `components/AccountSubscriptionRow.tsx`     | Statut dans Mon compte (sans « Activer »)  |
-| `components/SubscriptionSignupEffects.tsx`  | Redirige vers `/pricing` après auth        |
-| `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session                    |
-| `index.server.ts`                           | Routes API uniquement                      |
+| Fichier                                     | Rôle                                             |
+| ------------------------------------------- | ------------------------------------------------ |
+| `subscriptionPlans.ts`                      | Grille unitaire / technicien (19 / 22 / 27 € HT) |
+| `startSubscriptionCheckoutClient.ts`        | Checkout Stripe (+ provision société)            |
+| `pendingSubscriptionPlan.ts`                | Plan choisi avant auth (sessionStorage)          |
+| `provisionSaasCompanyClient.ts`             | Crée `companies/{id}` à l'inscription SaaS       |
+| `hooks/useCompanySubscription.ts`           | Contexte `FeatureFlagsProvider`                  |
+| `components/PricingPlansGrid.tsx`           | Grille `/pricing`                                |
+| `components/PricingFaq.tsx`                 | FAQ tarifs                                       |
+| `components/AccountSubscriptionRow.tsx`     | Statut dans Mon compte (sans « Activer »)        |
+| `components/SubscriptionSignupEffects.tsx`  | Redirige vers `/pricing` après auth              |
+| `server/createSubscriptionCheckoutAdmin.ts` | Stripe Checkout session                          |
+| `index.server.ts`                           | Routes API uniquement                            |
 
 ## Setup Stripe
 

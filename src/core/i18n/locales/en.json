@@ -2858,11 +2858,11 @@
   "subscription": {
     "pricing": {
       "title": "Pricing",
-      "subtitle": "14-day trial · cancel anytime",
+      "subtitle": "Pay per active technician · 14-day trial",
       "founding_badge": "Founding offer: 30% off for life for the first 10 customers",
       "most_popular": "Most popular",
       "per_month": "/ mo excl. VAT",
-      "founding_price": "Founding: €{{price}}/mo with promo code",
+      "founding_price": "Founding: €{{price}}/technician/mo with promo code",
       "seats_included": "Up to {{count}} technician(s) included",
       "extra_technician": "+ €{{price}}/mo per extra technician",
       "choose_plan": "Choose plan",
@@ -2879,21 +2879,29 @@
       "faq": {
         "plan": {
           "q": "Which plan should I pick?",
-          "a": "Solo for a one-person business, Team for multiple technicians and the client portal, Pro for Peppol, Gmail and the AI assistant."
+          "a": "Pick the feature level (Solo, Team or Pro). Total = unit price × number of technicians."
         },
         "trial": {
           "q": "How does the trial work?",
           "a": "14-day free trial on every plan. No charge until the trial ends. Cancel anytime from the Stripe billing portal."
         },
         "technicians": {
-          "q": "Extra technicians?",
-          "a": "Each plan includes a technician quota. Beyond that, +€15 excl. VAT/month per active field technician."
+          "q": "How is pricing calculated?",
+          "a": "Price = plan rate × technicians. E.g. Team at €22 × 4 technicians = €88/mo excl. VAT. Adjust quantity on /pricing or in the Stripe portal."
         },
         "billing": {
           "q": "Billing and VAT?",
           "a": "Secure monthly payment via Stripe. Belgian VAT applied based on your status. Invoices available in the Stripe customer portal."
         }
-      }
+      },
+      "per_technician": " / technician / mo excl. VAT",
+      "per_technician_short": " / technician / mo excl. VAT",
+      "monthly_total": "{{count}} technician(s) → €{{total}} / mo excl. VAT",
+      "technician_quantity_label": "Number of technicians",
+      "technician_quantity_hint": "Adjust before subscribing — change later in Stripe.",
+      "technician_quantity_decrease": "Remove a technician",
+      "technician_quantity_increase": "Add a technician",
+      "billing_per_technician": "Unit price per active field technician — no bundles or tiers by headcount."
     },
     "plans": {
       "solo": {
@@ -2904,7 +2912,7 @@
           "tech_app": "Technician PWA app",
           "billing_basic": "Quote & invoice PDFs"
         },
-        "tagline": "1 technician"
+        "tagline": "CRM & field app"
       },
       "team": {
         "name": "Team",
@@ -2914,7 +2922,7 @@
           "planning": "Planning & dispatch",
           "offline": "Technician offline mode"
         },
-        "tagline": "5 technicians"
+        "tagline": "Client portal & scheduling"
       },
       "pro": {
         "name": "Pro",
@@ -2924,7 +2932,7 @@
           "gmail": "Gmail integration",
           "chatbot": "AI business assistant"
         },
-        "tagline": "15 technicians · Peppol · AI"
+        "tagline": "Peppol · Gmail · AI"
       }
     },
     "banner": {
