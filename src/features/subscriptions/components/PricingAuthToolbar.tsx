@@ -117,7 +117,7 @@ export default function PricingAuthToolbar() {
         {isAppleOAuth === true ? (
           <div className="w-full min-w-[11.5rem] sm:w-[11.5rem]">
             <AppleSignInConnectButton
-              testId="pricing-auth-apple"
+              dataTestId="pricing-auth-apple"
               ariaLabel={String(
                 t(isRegister ? "auth.oauth_apple_register" : "auth.continue_with_apple")
               )}
