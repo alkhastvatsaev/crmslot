@@ -39,8 +39,14 @@ export const MIN_TECHNICIAN_QUANTITY = 1;
 export const MAX_TECHNICIAN_QUANTITY = 99;
 
 const STRIPE_PRICE_ENV: Record<SubscriptionBillingInterval, string> = {
-  monthly: "STRIPE_SUBSCRIPTION_PRICE_TEAM",
-  yearly: "STRIPE_SUBSCRIPTION_PRICE_TEAM_YEARLY",
+  monthly: "STRIPE_SUBSCRIPTION_PRICE",
+  yearly: "STRIPE_SUBSCRIPTION_PRICE_YEARLY",
+};
+
+/** Anciennes variables Vercel — rétrocompat après archivage des 3 produits Stripe. */
+const STRIPE_PRICE_LEGACY_FALLBACK: Record<SubscriptionBillingInterval, string[]> = {
+  monthly: ["STRIPE_SUBSCRIPTION_PRICE_TEAM"],
+  yearly: ["STRIPE_SUBSCRIPTION_PRICE_TEAM_YEARLY"],
 };
 
 export function technicianPlanDisplayPrice(
@@ -85,17 +91,22 @@ export function computeSubscriptionMonthlyTotal(
   return plan.technicianPriceEurMonthly * clampTechnicianQuantity(technicianQuantity);
 }
 
-/** Price ID Stripe (unitaire / technicien) — un seul prix pour tous les ids legacy. */
+/** Price ID Stripe (unitaire / technicien, 50 € HT / mois). */
 export function resolveStripePriceId(
   planId: SubscriptionPlanId,
   interval: SubscriptionBillingInterval = "monthly"
 ): string | null {
   void planId;
-  const key = STRIPE_PRICE_ENV[interval];
-  const value = process.env[key]?.trim();
-  if (value) return value;
+  const primary = process.env[STRIPE_PRICE_ENV[interval]]?.trim();
+  if (primary) return primary;
+
+  for (const legacyKey of STRIPE_PRICE_LEGACY_FALLBACK[interval]) {
+    const legacy = process.env[legacyKey]?.trim();
+    if (legacy) return legacy;
+  }
+
   if (interval === "yearly") {
-    return process.env[STRIPE_PRICE_ENV.monthly]?.trim() || null;
+    return resolveStripePriceId(planId, "monthly");
   }
   return null;
 }

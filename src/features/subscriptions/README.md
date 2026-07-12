@@ -28,8 +28,19 @@ Abonnements SaaS plateforme CRMSLOT (≠ facturation interventions dans `billing
 
 ```bash
 NEXT_PUBLIC_SUBSCRIPTION_ENFORCE=true   # paywall + checkout auto
-STRIPE_SUBSCRIPTION_PRICE_TEAM=price_…  # 50 € unitaire / technicien
+STRIPE_SUBSCRIPTION_PRICE=price_…      # 50 € HT / technicien / mois (produit Stripe unique)
+# STRIPE_SUBSCRIPTION_PRICE_TEAM=price_… # alias legacy accepté
 ```
+
+## Produit Stripe (un seul)
+
+1. [Dashboard → Products](https://dashboard.stripe.com/products) → **Add product**
+2. Nom : `CRMSLOT` · Prix : **50,00 €** · **Recurring** · **Monthly**
+3. Billing : **Per unit** (la quantité = nombre de techniciens au checkout)
+4. Copier le **Price ID** (`price_…`) → Vercel env `STRIPE_SUBSCRIPTION_PRICE` (Production)
+5. Supprimer les anciennes vars `STRIPE_SUBSCRIPTION_PRICE_SOLO|TEAM|PRO` sur Vercel si encore présentes
+
+Les 3 anciens produits archivés ne cassent rien tant que le nouveau `price_…` est dans l’env.
 
 ## Apple Pay (Stripe Checkout)
 
