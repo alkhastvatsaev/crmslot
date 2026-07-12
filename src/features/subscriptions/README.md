@@ -35,7 +35,10 @@ STRIPE_SUBSCRIPTION_PRICE_TEAM=price_…  # 50 € unitaire / technicien
 
 Fichier hébergé : `public/.well-known/apple-developer-merchantid-domain-association` (fichier Stripe standard).
 
-Après déploiement, enregistrer le domaine prod dans Stripe (clé **live**) :
+Après déploiement, enregistrer le domaine prod dans Stripe (clé **live**) — Dashboard :
+[Settings → Payment methods → Apple Pay](https://dashboard.stripe.com/settings/payment_methods/apple_pay) → **Add domain** → `crmslot.vercel.app` → **Verify**.
+
+Ou en CLI :
 
 ```bash
 curl https://api.stripe.com/v1/payment_method_domains \
